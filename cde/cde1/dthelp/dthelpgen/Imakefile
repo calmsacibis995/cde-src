@@ -1,0 +1,69 @@
+XCOMM $XConsortium: Imakefile /main/cde1_maint/3 1995/10/05 14:32:02 gtsang $
+PROGRAMS = dthelpgen
+
+/* General case INCLUDES DEFINE
+ * Each individual architecture may have more or less of the above.
+ * Use EXTRA_DEFINES and EXTRA_INCLUDES to add defines and includes
+ * to an individual architecture.
+ */
+    DEFINES = -DCDE_INSTALLATION_TOP=\"$(CDE_INSTALLATION_TOP)\" \
+              -DCDE_CONFIGURATION_TOP=\"$(CDE_CONFIGURATION_TOP)\"
+   INCLUDES = -I.
+
+/* DEPLIBS contains the list of library depencies for a client.
+ * LOCAL_LIBRARIES contains the list of libraries on the link line.
+ * Generally, the dependency form of a library has DEP as a prefix.
+ * e.g. put $(XLIB) in LOCAL_LIBRARIES and $(DEPXLIB) in DEPLIBS.
+ * NOTE: if DEPLIBS is not set here, it is by default null and there
+ *       are no library dependencies for clients.
+ *       You cannot put -Llibpath into DEPLIBS. You must put actual
+ *       paths to the library.
+ */
+DEPLIBS = $(DEPDTHELPLIB) $(DEPDTSVCLIB) $(DEPXMLIB) $(DEPTOOLLIB) $(DEPXLIB)
+LOCAL_LIBRARIES = $(DTHELPLIB) $(DTSVCLIB) $(XMLIB) $(XTOOLLIB) $(XLIB)
+EXTRA_INCLUDES = -I$(DTHELPSRC)
+
+/* don't need XMLIB for hp and ibm */
+#ifdef HPArchitecture
+DEPXMLIB=
+XMLIB=
+#endif
+
+#ifdef RsArchitecture
+SYS_LIBRARIES = -liconv
+#ifndef DEBUGTREE
+DEPXMLIB=
+XMLIB=
+#endif
+#endif
+
+#if defined(SunArchitecture)
+#SYS_LIBRARIES   = -ldl $(WIDECHARSYSLIB) -lm -lC
+#endif
+
+#if defined(USLArchitecture)
+   SYS_LIBRARIES = -lm -lgen
+#endif
+
+#if defined(UXPArchitecture)
+   SYS_LIBRARIES = -lm -lgen
+#endif
+
+
+SRCS = helpgen.c \
+       version.c
+
+OBJS = helpgen.o \
+       version.o
+
+NormalLibraryObjectRule()
+ComplexProgramTarget($(PROGRAMS))
+
+saber_src: $(SRCS) 
+	#setopt load_flags $(CFLAGS)
+        #load $(SRCS)
+	#load $(DEPLIBS)
+
+unsaber_src:
+        #unload $(SRCS)
+

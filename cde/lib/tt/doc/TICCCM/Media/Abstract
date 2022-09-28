@@ -1,0 +1,77 @@
+.TH Abstract Media "07 Sep 1993" "SunSoft" "ToolTalk ICCCM"
+.SH NAME
+.PP
+Abstract - return a summary of a document in the suggested media type
+.SH SYNOPSIS
+.so ../.synopsis
+[\fIfile\f(CW]	Abstract(	in	\fImediaType	contents\f(CW,	
+		out	\fImediaType	output\f(CW,	
+		in	boolean	\fIinquisitive\f(CW,	
+		in	boolean	\fIcovert\f(CW	
+		[in	messageID	\fIcounterfoil\f(CW]	
+		[inout	vector	\fIsize\f(CW] );
+.ft
+.fi
+.SH DESCRIPTION
+.LP
+From the given document, abstract a summary representation (for
+example, an icon for an image, or a representative video frame for a
+movie).  The abstraction should be the best possible representation of
+the document given the requester's size constraints.
+.SH REQUIRED ARGUMENTS
+.so .contents
+.TP
+.I mediaType output
+The abstraction of the document.
+.so .inquisitive
+.SH OPTIONAL ARGUMENTS
+.so ../.counterfoil
+.TP
+\f(CWvector\fR \fIsize\fR
+In the request, the maximum size of the abstraction.  The
+recipient should return an abstraction as close to this size
+as possible, without exceeding this size.
+.IP
+In the reply, the actual size of the abstraction being
+returned; or, if \f(BITT_MEDIA_ERR_SIZE\fR, the smallest possible size
+the recipient is capable of returning for this document.
+.SH EXAMPLES
+.PP
+If Acme Inc.'s video tool is able to rasterize \f(CWJPEG_Movie\fR frames
+(and somehow select a representative frame to rasterize), then it
+could support a request of the form
+.so ../.synopsis
+	Abstract(	in	JPEG_Movie	\fImovie\(CW,	
+		out	Sun_Raster	\fIframe\f(CW, ... );
+.ft
+.fi
+.LP
+Meanwhile, a desktop binding service might support a request of
+the form
+.so ../.synopsis
+	Abstract(	in	JPEG_Movie	\fImovief\(CW,	
+		out	XPM	\fIicon\f(CW, ... );
+.ft
+.fi
+.LP
+Then, when container applications acquire a snippet of Acme_Video
+data, they could chose between a (presumably custom) raster and a
+(presumably generic) XPM icon to represent the snippet, without
+having to understand the \f(CWJPEG_Movie\fR format.
+.SH ERRORS
+.so .errors
+.TP
+\f(BITT_MEDIA_ERR_SIZE\fP
+The requested size was too small.
+.SH NOTES
+.PP
+It is possible to extract from the ToolTalk types database a list
+of the installed
+.BR Abstract ()
+mediaType-to-mediaType mappings.
+.SH SEE ALSO
+.PP
+.BR Intro (Desktop),
+.BR Status (Desktop),
+.BR Intro (Media),
+.BR Translate (Media)

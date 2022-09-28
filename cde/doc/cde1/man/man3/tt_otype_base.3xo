@@ -1,0 +1,69 @@
+.TH tt_otype_base 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+tt_otype_base \- return the base otype of an otype
+.SH SYNOPSIS
+.yS
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'char *tt_otype_base('u
+char *tt_otype_base(const char *\f2otype\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn tt_otype_base
+function
+returns the base
+otype
+of the given
+otype,
+or
+.Cn NULL
+if the given
+otype
+is not derived.
+.P
+The
+otype
+argument is the object type involved in this operation.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn tt_otype_base
+function returns the name of the base otype; if the given
+otype
+is not derived, this value is
+.Cn NULL .
+The application can use
+.Fn tt_ptr_error 3
+to extract one of the following
+.B Tt_status
+values from the returned pointer:
+.VL 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_NOMP
+.br
+The
+.Cm ttsession 1
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_OTYPE
+.br
+The specified object type is not the name of an installed object type.
+.LE
+.SH "APPLICATION USAGE"
+The application should use
+.Fn tt_free 3
+to free any data stored in the address returned by the
+ToolTalk API.
+.SH "SEE ALSO"
+.Hd Tt/tt_c.h 5,
+.Fn tt_otype_is_derived 3,
+.Fn tt_otype_derived 3,
+.Fn tt_otype_deriveds_count 3,
+.Fn tt_spec_type 3,
+.Fn tt_message_otype 3,
+.Fn tt_ptr_error 3,
+.Fn tt_free 3.

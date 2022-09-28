@@ -1,0 +1,66 @@
+++++++++++++++++++++++++++++++++ Release notes
+
+The new c-client release, version 0.14 is now available:
+
+The following bugs are fixed in solaris.c:
+
+	1) Header parse core faulted if the header was larger than 65536.
+	   There is now no limit on this beyond VM availability.
+
+	2) The mailbox.lock now has max lifetime of 5 minutes. At that time,
+	the c-client attempts to remove it. IF IT FAILS, then the mailbox
+	DURING OPEN ONLY it is opened read/only, and the following errmsg 
+	#168 is sent:
+
+	168 Mailbox %s.lock CANNOT BE FREMOVED! Please contact an administrator.
+
+	This will be the case if it is owned by root and protected ----------.
+	ie, mail.local crashed during delivery.
+	Old imapd locks can always be removed.
+
+The following changes have been made to solaris.c:
+
+	You can now SET_LOCKTIMEOUT using the mail_parameter call. The default
+	lock timeout is 1 minute. BUT DURING OPEN IT IS SET TO 5 mins and 1 sec.
+
+	For check, etc  ... it is again 1 minute, but the LIFETIME of the lock			IS
+ALWAYS 5 min.
+
+	Thus, a check will fail in a minute and you will get error message
+
+	102 Cannot lock mailbox
+
+	When the age finally reaches its lifetime, then the error 168 will
+	be sent if the lock is still there and cannot be removed.
+
+This above change is important so as not to hang the UI during checks. This
+can be extremely irritating.
+
+The following fix has been made to imapd.c, ie, we have an error number here.
+
+       * OK [READ-ONLY] 128 Now READ-ONLY, mailbox lock surrendered
+
+The following fix has been made to dummy.c:
+
+	The hidden files are no longer listed unless they are explicitly asked
+	for, eg,
+
+	list "~/folders/" ".%"
+
+This has been a long standing request by me to me too (:
+
+I think that about covers it for c-client. There is also a fix in log_sv5.c
+which enables logging in under NIS+.
+
+Enjoy (:
+
+Bill
+
+PS. There is an "#ifdef CLIENTBUILD" to conditionally compile some
+optimizations required for NFS that are not needed by the server, and whose
+benefits are marginal but measureable (: 
+
+
+
+
+

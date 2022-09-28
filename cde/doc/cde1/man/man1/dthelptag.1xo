@@ -1,0 +1,337 @@
+.TH dthelptag 1 "12 May 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994 Novell, Inc.
+.\" *************************************************************************
+.SH NAME
+dthelptag \- compile CDE Help source documents into runtime Help volumes
+.SH SYNOPSIS
+.yS
+dthelptag
+[ \|options\| ] \f2file\f1 [ \f2parser\-options\f1 ]
+.yE
+.SH DESCRIPTION
+The
+.Cm dthelptag
+utility is the CDE Help System compiler for translating
+HelpTag source markup into the online distribution format suitable for
+runtime display.
+See the \f2CDE Help System Author's and Programmer's
+Guide\f1 for a description of the HelpTag markup language.
+See
+.Cm dthelpview 1
+for more information on
+previewing compiled Help volumes.
+.P
+The
+.Cm dthelptag
+utility accepts a single file name as an argument.
+If the file name
+contains a period (``\.''), any characters after the last period are
+considered to be the extension.
+The
+.Cm dthelptag
+utility removes all characters after the last period and uses the
+resulting name as the base name for all intermediate files and for the
+final output files.
+.P
+If the \f2file\f1
+argument has no periods,
+.Cm dthelptag
+uses the argument as the base name for intermediate and output files
+and assumes an extension of \f3.htg\f1, \f3.ctg\f1 or \f3.sdl\f1
+for the input file.
+The \f3.ctg\f1
+extension is assumed when the \f3\-formal\f1
+option described below is used.
+The \f3.sdl\f1
+extension is assumed when the \f3\-compress\f1
+or \f3\-decompress\f1
+option (described later in this document) is used.
+.P
+Several options to 
+.Cm dthelptag
+may precede the file name.
+Several arguments directing the
+parsing phase of the
+.Cm dthelptag
+process may follow the file name.
+.P
+The output file is:
+.br
+\f2file\f1.sdl \- the compiled help volume file.
+.SH OPTIONS
+The following options are available:
+.VL 15
+.LI \f3\-verbose\f1
+The \f3\-verbose\f1
+option will cause
+.Cm dthelptag
+to generate and display parser messages during processing.
+.LI \f3\-formal\f1
+The \f3\-formal\f1
+option causes
+.Cm dthelptag
+to accept a subset of the HelpTag language that is strictly compliant
+to canonical SGML.
+(See the \f2CDE Help System Author's and Programmer's
+Guide\f1.)
+When this option is given, the default extension of the
+input file becomes \f3.ctg\f1.
+.LI \f3\-nooptimize\f1
+The \f3\-nooptimize\f1
+option eliminates certain optimizations that normally take place
+during translation of HelpTag markup to the runtime format.
+Using
+this option speeds the translation process.
+.LI \f3\-clean\f1
+The \f3\-clean\f1
+option causes
+.Cm dthelptag
+to simply remove any intermediate files from the current directory.
+No translation takes place.
+.LI \f3\-debug\f1
+The \f3\-debug\f1
+option causes
+.Cm dthelptag
+to leave all intermediate files in the current directory.
+The \f3\-debug\f1
+option also blocks the compression step of
+.Cm dthelptag ,
+leaving the resulting \f3.sdl\f1
+output file in a human-readable form.
+.LI \f3\-files\f1
+The \f3\-files\f1
+option causes a list of files referenced in the translation process to
+be emitted to the standard output.
+No translation takes place.
+.LI \f3\-help\f1
+The \f3\-help\f1 option causes
+.Cm dthelptag
+to emit a synopsis of the
+.Cm dthelptag
+command line and a list of options to the standard output.
+.LI \f3\-decompress\f1
+The \f3\-decompress\f1
+option causes
+.Cm dthelptag
+to decompress a previously created \f3.sdl\f1
+file.
+When this option is specified, the default input extension is \f3.sdl\f1.
+.LI \f3\-compress\f1
+The \f3\-compress\f1
+option causes
+.Cm dthelptag
+to compress a \f3.sdl\f1
+file that either was created by translating a \f3.htg\f1
+or \f3.ctg\f1
+file using the \f3\-debug\f1
+option or was previously decompressed using the \f3\-decompress\f1
+option.
+When this option is specified, the default input extension is \f3.sdl\f1.
+.LE
+.HU "Parser Options"
+Any \f2parser options\f1
+follow the \f2file\f1
+argument on the command line and take the form
+\f3option=value\f1
+for those options taking an argument and simply \f3option\f1
+for those options not taking an argument.
+Parser options may also be set in the environment variable
+.IR DTTAGOPT ,
+in a
+\f3helptag.opt\f1
+file or in a file named
+\f3file\f1\f3.opt\f1
+in the current directory.
+The \f3helptag.opt\f1
+file may reside in the current directory or in the directory in which
+.Cm dthelptag
+is placed.
+.P
+The order of precedence of the option settings is:
+.VL 15
+.LI \(bu
+The file
+.B helptag.opt
+in the
+.Cm dthelptag
+installation directory.
+This directory defaults to
+.B /usr/dt/bin.
+.LI \(bu
+The environment variable \f2DTTAGOPT\f1.
+.LI \(bu
+The file
+.B helptag.opt
+in the current directory.
+.LI \(bu
+The file \f2file\f1\f3.opt\f1
+in the current directory.
+.LI \(bu
+The command line.
+.LE
+.P
+Parser options set later in the list override options set earlier.
+.P
+The parser options supported by
+.Cm dthelptag
+are:
+.VL 15
+.LI \f3onerror=go\f1
+Cause errors to be non-fatal.
+That is, parsing continues and later
+phases of the
+.Cm dthelptag
+process are run even if syntax errors were encountered.
+.LI \f3onerror=stop\f1
+This is the default setting of the \f3onerror=\f1 option.
+It causes the
+.Cm dthelptag
+process to stop upon completion of the parser phase if syntax errors were
+encountered during the parse.
+.LI \f3charset=name\f1
+The default character set used by the
+help system is ISO8859-1.
+A different character set may be specified, for example,
+\f3name\f1,
+using the \f3charset=\f1 option.
+The character set may also be set in the \f3helplang.ent\f1
+file described in the \f2CDE Help System Author's and Programmer's Guide\f1.
+.LI \f3search=path\f1
+Specifies one or more directory \f3path(s)\f1
+to be searched when executing
+.Cm dthelptag .
+Both
+.Cm dthelptag
+input files and/or additional graphics or entity declaration 
+files referenced within the HelpTag markup can be made accessible by setting
+this option.
+The \f3search=\f1
+option may be specified more that once and the list of directories to
+search is accumulated.
+.LI \f3clearsearch\f1
+Clears the list of directories searched for file and
+image entities.
+.LI \f3memo\f1
+The \f3memo\f1
+option causes authors' comments to be included in the output.
+.LI \f3nomemo\f1
+Specifies the inverse of the \f3memo\f1
+option.
+Both \f3memo\f1
+and \f3nomemo\f1
+may be specified, but the last entry will override any previous setting.
+.LI \f3shortfiles\f1
+Neither the \f3shortfiles\f1 \f2parser-option\f1
+nor any of its synonyms should be used.
+Rather, the \f3\-shortfiles\f1
+option should be given as an \f2option\f1
+to
+.Cm dthelptag .
+The
+.Cm dthelptag
+driver needs to know whether the user has requested short file names since
+.Cm dthelptag
+must know the names of the intermediate files.
+.LI \f3shortfile\f1
+This is a synonym for \f3shortfiles\f1.
+.LI \f3short\f1
+This is a synonym for \f3shortfiles\f1.
+.LI \f3longfiles\f1
+This option and any of its synonyms should not be used for the same
+reason that the \f3shortfiles\f1
+option should not be used.
+.LI \f3longfiles\f1
+Long, untruncated file names are the default.
+.LI \f3longfile\f1
+This is a synonym for \f3longfiles\f1.
+.LI \f3long\f1
+This is a synonym for \f3longfiles\f1.
+.LE
+.SH "ENVIRONMENT VARIABLES"
+.I LANG
+determines the language in which the input
+\f2file\f1 is interpreted.
+The
+.I LANG
+environment variable can be overridden in the
+\f3helplang.ent\f1
+file described in the \f2CDE Help System Author's and Programmer's Guide\f1.
+.P
+.I DTTAGOPT
+may be used to set parser options.
+.HU "International Code Set Support"
+Single- and multi-byte character code sets are supported.
+.SH INPUT FILES
+Following are the input files used by the
+.Cm dthelptag
+parser:
+.VL 15
+.LI \f3file.htg\f1
+Default input file.
+.LI \f3file.ctg\f1
+Default input file when the \f3\-formal\f1
+option has been specified.
+.LI \f3file.st\f1
+Status file and log.
+.LI \f3helplang.ent\f1
+Character set information and localizable replacement text.
+.LI \f3helptag.opt\f1
+Option file.
+.LE
+.SH OUTPUT FILES
+Following are the input files used by the
+.Cm dthelptag
+parser:
+.VL 15
+.LI \f3file.sdl\f1
+Runtime help volume
+.LI \f3file.err\f1
+Run log and error listing
+.LE
+.SH "EXTENDED DESCRIPTION"
+The
+.Cm dthelptag
+utility is a driver program that executes two phases of the
+compilation process.
+The first phase translates the source markup
+into the distribution format.
+The second phase enhances the
+distribution file by precomputing information such as a list of
+identifiers in the file and their locations.
+These precomputations,
+along with several optimizations, enable rapid runtime display of
+the file.
+The second phase of the translation process also compresses
+the distribution file to reduce file system space required to store
+the file.
+.SH "EXIT STATUS"
+The following exit values are returned:
+.VL 4
+.LI 0
+Successful completion.
+.LI 1
+An error was detected in the source file.
+.LI 2
+An invocation error was detected.
+.LE
+.SH "CONSEQUENCES OF ERRORS"
+Default.
+.SH EXAMPLES
+.VL 15
+.LI "\f3dthelptag -clean myFile.htg\f1"
+Remove all files previously generated by processing a source file
+of \f3myFile.htg\f1.
+.LI "\f3dthelptag myFile.htg onerror=go\f1"
+Process the file \f3myFile.htg\f1, not stopping even if there are syntax errors.
+.LI "\f3dthelptag myFile.htg\f1
+Process the file \f3myFile.htg\f1.
+.LE
+.SH "SEE ALSO"
+.Cm dthelpview 1,
+\f2CDE Help System Author's and Programmer's Guide\f1.
+

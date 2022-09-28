@@ -1,0 +1,69 @@
+.TH DtCMMemoryInfo 3 "17 January 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH "NAME"
+DtCMMemoryInfo \- retrieve buffer information
+.SH "SYNOPSIS"
+.yS
+#include <Bento/DtCM.h>
+.sp 0.5v
+.ta \w'void DtCMMemoryInfo('u
+void DtCMMemoryInfo(CMRefCon \f2ref_con\fP,
+	CMEnv *\f2error\fP,
+	const CMPtr *\f2buffer\fP,
+	CMSize *\f2buffer_size\fP);
+.yE
+.SH "DESCRIPTION"
+The
+.Fn DtCMMemoryInfo
+function returns the buffer and its size to the caller.
+The application must close the container before calling this function.
+The application must not
+modify or free the buffer returned by
+.Fn DtCMMemoryInfo .
+.P
+The
+.I ref_con
+argument is a reference constant from the
+.Fn DtCMMemoryCreate 3
+function.
+The
+.I error
+argument is a pointer to an error return structure.
+.P
+The
+.I buffer
+argument is a pointer to a
+.B CMPtr
+that contains the buffer used to store the
+container.
+The
+.I buffer_size
+argument is a pointer to
+.BR CMSize
+that contains the buffer size in bytes.
+.SH "RETURN VALUE"
+The
+.Fn DtCMMemoryInfo
+function returns no value.
+If an error occurs,
+.Fn DtCMMemoryInfo
+sets the major code in the
+.I error
+structure to
+.Cn USER_EXCEPTION ,
+and the application can use the
+.Fn CMRexception_number
+function to determine the minor code.
+See the Error API Appendix in the \*(ZB.
+.SH "APPLICATION USAGE"
+If the application wants to keep a copy of the container,
+it must copy the container to another location.
+.SH "SEE ALSO"
+.Fn DtCMMemoryCreate 3,
+.Fn DtCMMemoryDestroy 3,
+.Hd Bento/DtCM.h 5;
+.Fn CMRexception_number
+in the \*(ZB.

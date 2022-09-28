@@ -1,0 +1,242 @@
+#!/usr/local/bin/perl
+
+eval "exec /usr/local/bin/perl -S $0 $*"
+    if $running_under_some_shell;
+
+#### PLACE REMOTELY
+########################################################
+# required files
+########################################################
+# Add the test directory to the locations to search for
+# libraries.
+push(@INC,"/x/cdesrc/admin/BuildTools/rcs_tools");
+require 'RcsSock.pl';
+require 'RcsUtility.pl';
+
+########################################################
+# define variables
+########################################################
+&InitializeVariables();
+$exitValue = 0; 
+# don't buffer stderr and stdout
+select(STDERR); $| =1;
+select(STDOUT); $| =1;
+
+
+#######################################################
+# define local subroutines
+#######################################################
+#
+# The following are signal handlers for abort due a specific signal
+#
+sub abortHUP {
+        local(@errormessage);
+        @errormessage = ("*** Client terminated with signal 1 -> SIGHUP ***");
+        &Exit(1,@errormessage);
+}
+sub abortINT {
+        local(@errormessage);
+        &Exit(1,@errormessage);
+}
+sub abortQUIT {
+        local(@errormessage);
+        @errormessage = ("*** Client terminated with signal 3 -> SIGQUIT ***");
+        &Exit(1,@errormessage);
+}
+sub abortTERM {
+        local(@errormessage);
+        @errormessage = ("*** Client terminated with signal 15 -> SIGTERM ***");
+        &Exit(1,@errormessage);
+}
+
+########################################################
+# Catch signals
+########################################################
+$SIG{'INT'} = 'abortINT';
+$SIG{'HUP'} = 'abortHUP';
+$SIG{'QUIT'} = 'abortQUIT';
+$SIG{'TERM'} = 'abortTERM';
+
+########################################################
+# argument processing
+########################################################
+while ( $ARGV[0] =~ /^-/ ){
+	$_ = shift;
+	if (/^-H(.*)$/){
+		# specify remote host
+		$rhost = ($1 ? $1 : shift);
+	}
+	elsif (/^-P(.*)$/){
+		# specify port
+		$port = ($1 ? $1 : shift);
+	}
+	elsif (/^-D$/){
+		# turn on debugging output
+		$Debug = 1;
+	}
+	elsif (/^-S(.*)$/){
+                # specify alternate source tree
+                $srcTree= ($1 ? $1 : shift);
+        }
+	elsif (/^(-[LRht]$)/) {
+		#
+		# args which may not have associated strings
+		#
+		push(@RcsArgs,$1);
+	}
+	elsif (/^(-d)(.*)$/) {
+		#
+		# args which allow associated strings
+		# if so quote the strings to save embedded blanks etc.
+		#
+		if ( "$2" ) {
+			push(@RcsArgs, $1 . "'\"" . $2 . "\"'" );
+		} else {
+			push(@RcsArgs, $1 );
+		}
+	}
+	elsif (/^(-[lrsw])(.*)$/) {
+		#
+		# args which need a parameter but not a string
+		#
+		if ( "$2" ) {
+			push(@RcsArgs, $1 . "'" . $2 . "'" );
+		} else {
+			push(@RcsArgs, $1 );
+		}
+	}
+	else {
+		@errorMessage = ("      Unrecognized flag: \"$_\"\n");
+		&Exit(1,@errorMessage);
+	}
+}
+
+
+#
+# get the files and do appropriate error checking
+# see if the files are local or remote
+#
+# for some reason while(@ARGV) cannot be in a subroutine
+while ( @ARGV ) {
+	$tstfile=shift;
+	$tmp = `basename $tstfile`;
+	chop $tmp;
+
+	# if there is a wildcard unexpanded for the RCS vault
+	# store for later processing
+	#
+	if (($tstfile =~ m%[\*\?]%) || ($tstfile =~ m%\[.*\]%)) {
+		$tmpdir =`dirname $tstfile`;
+		chop $tmpdir;
+		if (($tmpdir =~ m%^RCS%) || ($tmpdir =~ m%\/RCS%)) {
+			$realtmpdir = &IsRcsDirectoryLocal($tmpdir);
+			$newtstfile = "${realtmpdir}/${tmp}";
+			push(@wildCardFiles,$newtstfile);
+		}
+	}			
+	# don't do RCS dir
+	elsif ("$tmp" ne "RCS")  {
+		push(@allFiles, $tstfile);
+	}
+}
+
+if ((! defined(@allFiles)) && (! defined(@wildCardFiles))) {
+	@errorMessage = ("NO FILES to Process");
+        &Exit(1,@errorMessage);
+}
+
+# do not need a readable file for Rlog
+$needReadableFile = 0;
+# get correct file paths, local and remote
+&GetFilePaths($needReadableFile);
+
+####################################################################
+# debug argument processing
+####################################################################
+if ( $Debug ) {
+	print "rhost= $rhost\n";
+	print "port= $port\n";
+	print "RcsArgs= \"@RcsArgs\"\n";
+	print "localExchangeFiles= \"@localExchangeFiles\"\n";
+	print "remoteExchangeFiles = \"@remoteExchangeFiles\"\n";
+	print "remoteCommaVFiles = \"@remoteCommaVFiles\"\n";
+	print "allremoteExchangeFiles = \"@allRemoteExchangeFiles\"\n";
+	print "originalFiles = \"@originalFiles\"\n";
+}
+
+##################################################################
+# Process the local files
+# Run local Rcs commands
+##################################################################
+if (defined(@localExchangeFiles)) {
+	print "$RcsPrg @RcsArgs @localExchangeFiles\n" if $Debug; 
+	$tmpExitValue = system "$RcsPrg @RcsArgs @localExchangeFiles";
+
+	# reset exit value if necessary
+	if ((!$exitValue) && ($tmpExitValue)) {
+		$exitValue = 1;
+	}
+}
+
+if ((defined(@allRemoteExchangeFiles)) || (defined(@wildCardFiles))) {
+
+	##################################################################
+	# Open the connection
+	##################################################################
+        if (! ($SOCK_HANDLE = &sock'open($rhost,$port))) {
+		@errorMessage = ("Connect to \"$rhost\" failed: $!");
+		&Exit(1,@errorMessage);
+	}
+
+	#
+	# Expand wildcards if there are any.
+	# Pass the basic command string.
+	#
+	print $SOCK_HANDLE  "USER: $userName\n";
+
+	#
+	# Expand wildcards if there are any.
+	# Pass the basic command string.
+	#
+	if (!defined(@wildCardFiles)) {
+		print $SOCK_HANDLE "$RemoteRcsPrg \n";
+	}
+	else {
+		print $SOCK_HANDLE "$RemoteRcsPrg @wildCardFiles\n";
+		#
+		# get the complete wildcard paths from the server.
+		# Add them to the list of remote exchange files.
+		&getWildCardsFromServer($needReadableFile);
+	}
+
+	#
+	# Pass the basic rlog command string
+	#
+	print $SOCK_HANDLE "$RemoteRcsPrg @RcsArgs @remoteCommaVFiles\n";
+	shutdown($SOCK_HANDLE,1);
+	
+	#
+	# Read rlog info from the socket
+	#
+	while( <$SOCK_HANDLE> ) {
+		&checkForDeadServer($_);
+		if (m%^>>### RLOG ALL DONE ###<<$%) {
+			$tmpExitValue = <$SOCK_HANDLE>;
+			&checkForDeadServer($tmpExitValue);
+			chop $tmpExitValue;
+			#
+			# possibly reset the exit value if it is 0
+			#
+			if ((!$exitValue) && ($tmpExitValue)){
+				$exitValue = 1;
+			}
+		}
+		else {
+			print;
+		}
+	}
+	
+	print STDOUT "Closing socket\n" if $Debug;
+	&sock'close($SOCK_HANDLE);
+}
+&Exit($exitValue,@nullError);

@@ -1,0 +1,120 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+.\" *************************************************************************
+.\" **
+.\" ** (c) Copyright 1993,1994 Hewlett-Packard Company 
+.\" **      All Rights Reserved.
+.\" **
+.\" ** (c) Copyright 1993,1994 International Business Machines Corp. 
+.\" **      All Rights Reserved.
+.\" **  
+.\" ** (c) Copyright 1993,1994 Sun Microsystems, Inc.
+.\" **      All Rights Reserved.
+.\" **
+.\" **
+.\" *************************************************************************
+.\"---
+.\".TH _title _#S_ "_dd_ _Month_ _19yy_"
+.TH DtSessionSavePath 3 "17 Feb 1994"
+.\".BH "_dd_ _Month_ -_19yy_"
+.BH \*(DT 
+.\"---
+.\"---------------------------------------------------------------------------
+.SH NAME
+DtSessionSavePath(3) \(em  the API to save session information to a path that
+can be used for restoring the client to the same state at a later time by
+DtSessionRestorePath(3) call.
+.\"---
+.\"---------------------------------------------------------------------------
+.\"---
+.\"--- SYNOPSIS 
+.\"--- This section is a syntax diagram.  Use the following lines for pages in
+.\"--- manual Sections 1, 1M, 5 and 8:
+.\"---
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Dt/Session.h>
+.sp \n(PDu
+Boolean DtSessionSavePath (
+.ta .5i 1.75i
+.nf
+	Widget	     \fIwidget\fP,
+	char **	     \fIsavePath\fP,
+	char **	     \fIsaveFile\fP)
+.wH
+.fi
+.iE
+.sE
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- DESCRIPTION 
+.\"--- This section tells concisely what the command (function, device or
+.\"--- file format) does and includes the parameter list. 
+.\"---
+.SH DESCRIPTION
+\fBDtSessionSavePath\fP returns a path for an application to save session 
+information to. The information is later used to restore the application to the 
+state it was last in when the session is restored. SavePath is the fully 
+qualified path of the file. SaveFile is the file name only , which is saved on 
+the command line using a -session option (by convention). An application program
+, using this interface, is expected to recognize the -session command line 
+option. The filename obtained from the -session option is provided to the 
+DtSessionRestorePath() call, on session startup, to get the full path of the 
+file to restore from.
+
+.P
+.IP \fIwidget\fP
+Specifies the application's top level widget.
+.IP \fIsavePath\fP
+Returns the path for the application to save to.
+.IP \fIsaveFile\fP
+Returns the file name to be saved in -session.
+.P
+\fBNOTE:\fP The \fBsavePath\fP and \fBsaveFile\fP values are malloc'd by these 
+routines, and the memory for them needs to be freed using \fBXtFree()\fP.
+.P
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- RETURN VALUES
+.\"--- This section appears in pages from Sections 2 and 3 only.
+.\"--- List the _values_ that the function returns and give _explanations_.
+.\"---
+.\"---
+.\"----------------------------------------------------------------------------
+.SH RETURN VALUES
+.P
+Upon successful completion, returns \fBTRUE\fP if the path has been created and 
+the memory allocated. Otherwise, returns \fBFALSE\fP if the path could not be 
+created or the memory allocated.
+.P
+.\"---
+.\"--- ERRORS
+.\"--- This section lists and explains _ERROR-CODES_ that the function may
+.\"--- may generate.  List _ERROR-CODES_ alphabetically.
+.\"---
+.SH ERRORS
+.PP
+This function does not return error codes.
+.\"---
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- EXAMPLES
+.\"--- This section gives examples of how to use the command (function
+.\"--- or file format).  Always preface an example with an introduction.
+.\"--- If there are multiple examples, use separate subsection headings
+.\"--- for each _example-type_.  Otherwise, omit these headings.
+.\"---
+.sp
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- SEE ALSO
+.\"--- This section lists references to other man pages, sample files, etc.
+.\"---
+.SH "SEE ALSO"
+.BR  \fBDtSessionRestorePath(3)\fP
+

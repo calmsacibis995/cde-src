@@ -1,0 +1,492 @@
+#ifndef SharedXlibRev
+#define SharedXlibRev 1
+#endif
+#ifndef SharedXtRev
+#define SharedXtRev 1
+#endif
+#ifndef SharedXextRev
+#define SharedXextRev 1
+#endif
+#ifndef SharedXmRev
+#define SharedXmRev 1
+#endif
+#ifndef SharedMrmRev
+#define SharedMrmRev 1
+#endif
+#ifndef SharedLibUilRev
+#define SharedLibUilRev 1
+#endif
+#ifndef SharedXhpRev
+#define SharedXhpRev 1
+#endif
+#ifndef SharedDtHelpRev
+#define SharedDtHelpRev 1
+#endif
+#ifndef SharedDtSvcRev
+#define SharedDtSvcRev 1
+#endif
+#ifndef SharedDtWidgetRev
+#define SharedDtWidgetRev 1
+#endif
+#ifndef SharedDtTermRev
+#define SharedDtTermRev 1
+#endif
+
+
+
+SHLIBLDFLAGS = SharedLibraryLoadFlags
+HP_ARCHIVE_LIB_PREFIX = -l:
+
+/* reset paths to X libraries depending on whether binstall is used */
+#if UseAltBuildScheme
+LOCAL_XLIBPATH=
+#else
+LOCAL_XLIBPATH=-L$(SYSX11SRC)
+#endif
+LOCAL_XLIBDIR=$(SYSX11SRC)
+
+/* The next 2 macros set the system location of the X and Motif libs */
+#ifndef SHAREDLIBPERFTREE
+   SYSX11SRC = /usr/lib/$(X11LINKENV)
+   SYSMOTIFSRC = /usr/lib/$(MOTIFENV)
+#else
+   SYSX11SRC = /usr/performance/lib/$(X11LINKENV)
+   SYSMOTIFSRC = /usr/performance/lib/$(MOTIFENV)
+#endif
+
+
+#if SharedLibXext
+     EXTENSIONLIB = $(LOCAL_XLIBPATH) -lXext
+  DEPEXTENSIONLIB = $(LOCAL_XLIBDIR)/libXext.sl
+#endif
+#if (!SharedLibXext || ARCHIVED_LINK || LinkArchivedXext)
+     EXTENSIONLIB = $(LOCAL_XLIBPATH) -Wl,-a,archive -lXext -Wl,-a,default
+  DEPEXTENSIONLIB = $(LOCAL_XLIBDIR)/libXext.a
+#endif
+
+#if SharedLibX
+             XLIB = $(EXTENSIONLIB) $(LOCAL_XLIBPATH) -lX11
+          DEPXLIB = $(DEPEXTENSIONLIB) $(LOCAL_XLIBDIR)/libX11.sl
+#endif
+#if (!SharedLibX || ARCHIVED_LINK || LinkArchivedX)
+        XLIB = $(EXTENSIONLIB) $(LOCAL_XLIBPATH) -Wl,-a,archive -lX11 -Wl,-a,default
+     DEPXLIB = $(DEPEXTENSIONLIB) $(LOCAL_XLIBDIR)/libX11.a
+#endif
+
+           XAUTHLIB = $(LOCAL_XLIBPATH) -lXau
+        DEPXAUTHLIB = $(LOCAL_XLIBDIR)/libXau.a
+
+           XDMCPLIB = $(LOCAL_XLIBPATH) -lXdmcp
+        DEPXDMCPLIB = $(LOCAL_XLIBDIR)/libXdmcp.a
+
+
+#if SharedLibXmu
+           XMULIB = $(LOCAL_XLIBPATH) -lXmu
+        DEPXMULIB = $(LOCAL_XLIBDIR)/libXmu.sl
+#endif
+#if (!SharedLibXmu || ARCHIVED_LINK || LinkArchivedXmu)
+           XMULIB = $(LOCAL_XLIBPATH) -Wl,-a,archive -lXmu -Wl,-a,default
+        DEPXMULIB = $(LOCAL_XLIBDIR)/libXmu.a
+#endif
+
+#if SharedLibXhp
+           XHPLIB = $(LOCAL_XLIBPATH) -lXhp11
+        DEPXHPLIB = $(LOCAL_XLIBDIR)/libXhp11.sl
+#endif
+#if (!SharedLibXhp || ARCHIVED_LINK || LinkArchivedXhp)
+           XHPLIB = $(LOCAL_XLIBPATH) -Wl,-a,archive -lXhp11 -Wl,-a,default
+        DEPXHPLIB = $(LOCAL_XLIBDIR)/libXhp11.a
+#endif
+
+
+#if SharedOldLibX
+          OLDXLIB = $(LOCAL_XLIBPATH) -loldX
+       DEPOLDXLIB = $(LOCAL_XLIBDIR)/liboldX.sl
+#endif
+
+#if SharedLibXt
+#if USE_XT_FROM_SYSTEM_ONLY
+         XTOOLLIB = $(LOCAL_XLIBPATH) -lXt
+      DEPXTOOLLIB = $(LOCAL_XLIBDIR)/libXt.sl
+#else /* Xt from build tree */
+#if UseAltBuildScheme
+         XTOOLLIB = -lXt
+      DEPXTOOLLIB = $(BINSTALL_LIBDIR)/libXt.sl
+#else
+         XTOOLLIB = -L $(TOOLKITSRC) -lXt
+      DEPXTOOLLIB = $(TOOLKITSRC)/libXt.sl
+#endif
+#endif
+#endif
+#if (!SharedLibXt || ARCHIVED_LINK || LinkArchivedXt)
+#if USE_XT_FROM_SYSTEM_ONLY
+         XTOOLLIB = $(LOCAL_XLIBPATH) -Wl,-a,archive -lXt -Wl,-a,default
+      DEPXTOOLLIB = $(LOCAL_XLIBDIR)/libXt.a
+#else /* Xt from build tree */
+#if UseAltBuildScheme
+         XTOOLLIB = -Wl,-a,archive -lXt -Wl,-a,default
+      DEPXTOOLLIB = $(BINSTALL_LIBDIR)/libXt.a
+#else
+         XTOOLLIB = -L $(TOOLKITSRC) -Wl,-a,archive -lXt -Wl,-a,default
+      DEPXTOOLLIB = $(TOOLKITSRC)/libXt.a
+#endif
+#endif
+#endif
+
+
+#if SharedLibXaw
+           XAWLIB = $(LOCAL_XLIBPATH) -lXaw
+        DEPXAWLIB = $(LOCAL_XLIBDIR)/libXaw.sl
+#endif
+#if (!SharedLibXaw || ARCHIVED_LINK || LinkArchivedXaw)
+           XAWLIB = $(LOCAL_XLIBPATH) -Wl,-a,archive -lXaw -Wl,-a,default
+        DEPXAWLIB = $(LOCAL_XLIBDIR)/libXaw.a
+#endif
+
+#if SharedLibXinput
+           XILIB = $(LOCAL_XLIBPATH) -lXi
+        DEPXILIB = $(LOCAL_XLIBDIR)/libXi.sl
+#endif
+#if (!SharedLibXinput || ARCHIVED_LINK || LinkArchivedXinput)
+           XILIB = $(LOCAL_XLIBPATH) -Wl,-a,archive -lXi -Wl,-a,default
+        DEPXILIB = $(LOCAL_XLIBDIR)/libXi.a
+#endif
+
+/******* XM ******/
+#if SharedLibXm
+#if  UseAltBuildScheme
+            XMLIB =  -lXm
+         DEPXMLIB = $(BINSTALL_LIBDIR)/libXm.sl
+#else
+            XMLIB = -L $(XMSRC) -lXm
+         DEPXMLIB = $(XMSRC)/libXm.sl
+#endif
+#endif
+#if (!SharedLibXm || ARCHIVED_LINK || LinkArchivedXm)
+#if  UseAltBuildScheme
+            XMLIB =  -Wl,-a,archive -lXm -Wl,-a,default
+         DEPXMLIB = $(BINSTALL_LIBDIR)/libXm.a
+#else
+            XMLIB = -L $(XMSRC) -Wl,-a,archive -lXm -Wl,-a,default
+         DEPXMLIB = $(XMSRC)/libXm.a
+#endif
+#endif
+
+/******* MRM ******/
+#if SharedLibMrm
+#if  UseAltBuildScheme
+           MRMLIB =  -lMrm
+        DEPMRMLIB = $(BINSTALL_LIBDIR)/libMrm.sl
+#else
+           MRMLIB = -L $(MRMSRC) -lMrm
+        DEPMRMLIB = $(MRMSRC)/libMrm.sl
+#endif
+#endif
+#if ((!SharedLibMrm) || (ARCHIVED_LINK) || (LinkArchivedMrm))
+#if  UseAltBuildScheme
+           MRMLIB =  -Wl,-a,archive -lMrm -Wl,-a,default
+        DEPMRMLIB = $(BINSTALL_LIBDIR)/libMrm.a
+#else
+           MRMLIB = -L $(MRMSRC) -Wl,-a,archive -lMrm -Wl,-a,default
+        DEPMRMLIB = $(MRMSRC)/libMrm.a
+#endif
+#endif
+
+/******* UIL ******/
+#if SharedLibUil
+#if  UseAltBuildScheme
+           UILLIB =  -lUil
+        DEPUILLIB = $(BINSTALL_LIBDIR)/libUil.sl
+#else
+           UILLIB = -L $(UILSRC) -lUil
+        DEPUILLIB = $(UILSRC)/libUil.sl
+#endif
+#endif
+#if ((!SharedLibUil) || (ARCHIVED_LINK) || (LinkArchivedUil))
+#if  UseAltBuildScheme
+           UILLIB =  -Wl,-a,archive -lUil -Wl,-a,default
+        DEPUILLIB = $(BINSTALL_LIBDIR)/libUil.a
+#else
+           UILLIB = -L $(UILSRC) -Wl,-a,archive -lUil -Wl,-a,default
+        DEPUILLIB = $(UILSRC)/libUil.a
+#endif
+#endif
+
+/******* DTHELP ******/
+#if SharedLibDtHelp
+#if  UseAltBuildScheme
+           DTHELPLIB =  -lDtHelp
+        DEPDTHELPLIB = $(BINSTALL_LIBDIR)/libDtHelp.sl
+#else
+           DTHELPLIB = -L $(DTHELPSRC) -lDtHelp
+        DEPDTHELPLIB = $(DTHELPSRC)/libDtHelp.sl
+#endif
+#endif
+#if ((!SharedLibDtHelp) || (ARCHIVED_LINK) || (LinkArchivedDtHelp))
+#if  UseAltBuildScheme
+           DTHELPLIB =  -Wl,-a,archive -lDtHelp -Wl,-a,default
+        DEPDTHELPLIB = $(BINSTALL_LIBDIR)/libDtHelp.a
+#else
+           DTHELPLIB = -L $(DTHELPSRC) -Wl,-a,archive -lDtHelp -Wl,-a,default
+        DEPDTHELPLIB = $(DTHELPSRC)/libDtHelp.a
+#endif
+#endif
+
+/******* DTSVC ******/
+#if SharedLibDtSvc
+#if  UseAltBuildScheme
+           DTSVCLIB =  -lDtSvc $(TTLIB)
+        DEPDTSVCLIB = $(BINSTALL_LIBDIR)/libDtSvc.sl $(DEPTTLIB)
+#else
+           DTSVCLIB = -L $(DTSVCSRC) -lDtSvc $(TTLIB)
+        DEPDTSVCLIB = $(DTSVCSRC)/libDtSvc.sl $(DEPTTLIB)
+#endif
+#endif
+/* archive case */
+#if ((!SharedLibDtSvc) || (ARCHIVED_LINK) || (LinkArchivedDtSvc))
+#if  UseAltBuildScheme
+           DTSVCLIB =  -Wl,-a,archive -lDtSvc -Wl,-a,default $(TTLIB)
+        DEPDTSVCLIB = $(BINSTALL_LIBDIR)/libDtSvc.a $(DEPTTLIB)
+#else
+           DTSVCLIB = -L $(DTSVCSRC) -Wl,-a,archive -lDtSvc -Wl,-a,default $(TTLIB)
+        DEPDTSVCLIB = $(DTSVCSRC)/libDtSvc.a $(DEPTTLIB)
+#endif
+#endif
+
+
+/******* DTWIDGET ******/
+#if SharedLibDtWidget
+#if  UseAltBuildScheme
+           DTWIDGETLIB =  -lDtWidget
+        DEPDTWIDGETLIB = $(BINSTALL_LIBDIR)/libDtWidget.sl
+#else
+           DTWIDGETLIB = -L $(DTWIDGETSRC) -lDtWidget
+        DEPDTWIDGETLIB = $(DTWIDGETSRC)/libDtWidget.sl
+#endif
+#endif
+#if ((!SharedLibDtWidget) || (ARCHIVED_LINK) || (LinkArchivedDtWidget))
+#if  UseAltBuildScheme
+           DTWIDGETLIB =  -Wl,-a,archive -lDtWidget -Wl,-a,default
+        DEPDTWIDGETLIB = $(BINSTALL_LIBDIR)/libDtWidget.a
+#else
+           DTWIDGETLIB = -L $(DTWIDGETSRC) -Wl,-a,archive -lDtWidget -Wl,-a,default
+        DEPDTWIDGETLIB = $(DTWIDGETSRC)/libDtWidget.a
+#endif
+#endif
+
+/******* TOOLTALK ******/
+#if SharedLibtt
+#if  UseAltBuildScheme
+           TTLIB =  -ltt
+        DEPTTLIB = $(LOCAL_TTLIB_DIR)/libtt.sl
+#else
+           TTLIB = -L $(LOCAL_TTLIB_DIR) -ltt
+        DEPTTLIB = $(LOCAL_TTLIB_DIR)/libtt.sl
+#endif
+#endif
+#if !SharedLibtt || ARCHIVED_LINK || LinkArchivedtt
+#if  UseAltBuildScheme
+           TTLIB =  -Wl,-a,archive -ltt -Wl,-a,default
+        DEPTTLIB = $(LOCAL_TTLIB_DIR)/libtt.a 
+#else
+           TTLIB = -L $(LOCAL_TTLIB_DIR) -Wl,-a,archive -ltt -Wl,-a,default
+        DEPTTLIB = $(LOCAL_TTLIB_DIR)/libtt.a
+#endif
+#endif
+
+/******* DTMAIL ******/
+#if SharedLibDtMail
+#if UseAltBuildScheme
+           DTMAILLIB = -lDtMail
+        DEPDTMAILLIB = $(LOCAL_DTMAILLIB_DIR)/libDtMail.sl
+#else
+           DTMAILLIB = -L$(LOCAL_DTMAILLIB_DIR) -lDtMail
+        DEPDTMAILLIB = $(LOCAL_DTMAILLIB_DIR)/libDtMail.sl
+#endif
+#endif
+#if (!SharedLibDtMail || ARCHIVED_LINK || LinkArchivedDtMail)
+#if UseAltBuildScheme
+           DTMAILLIB = -Wl,-a,archive -lDtMail -Wl,-a,default
+        DEPDTMAILLIB = $(LOCAL_DTMAILLIB_DIR)/libDtMail.a
+#else
+           DTMAILLIB = -L$(LOCAL_DTMAILLIB_DIR) -Wl,-a,archive -lDtMail -Wl,-a,default
+        DEPDTMAILLIB = $(LOCAL_DTMAILLIB_DIR)/libDtMail.a
+#endif
+#endif
+
+/****** MOTIFAPP ******/
+#if SharedLibMotifApp
+#if UseAltBuildScheme
+           MOTIFAPPLIB = -lMotifApp
+        DEPMOTIFAPPLIB = $(LOCAL_MOTIFAPPLIB_DIR)/libMotifApp.sl
+#else
+           MOTIFAPPLIB = -L$(LOCAL_MOTIFAPPLIB_DIR) -lMotifApp
+        DEPMOTIFAPPLIB = $(LOCAL_MOTIFAPPLIB_DIR)/libMotifApp.sl
+#endif
+#endif
+#if (!SharedLibMotifApp || ARCHIVED_LINK || LinkArchivedMotifApp)
+#if UseAltBuildScheme
+           MOTIFAPPLIB = -Wl,-a,archive -lMotifApp -Wl,-a,default
+        DEPMOTIFAPPLIB = $(LOCAL_MOTIFAPPLIB_DIR)/libMotifApp.a
+#else
+           MOTIFAPPLIB = -L$(LOCAL_MOTIFAPPLIB_DIR) -Wl,-a,archive -lMotifApp -Wl,-a,default
+        DEPMOTIFAPPLIB = $(LOCAL_MOTIFAPPLIB_DIR)/libMotifApp.a
+#endif
+#endif
+
+
+/******* DTCM ******/
+#if SharedLibDtCm
+#if  UseAltBuildScheme
+           DTCMLIB = -lDtCm
+        DEPDTCMLIB = $(BINSTALL_LIBDIR)/libDtCm.sl
+#else
+           DTCMLIB = -L$(DTCMLIBSRC) -lDtCm
+        DEPDTCMLIB = $(DTCMLIBSRC)/libDtCm.sl
+#endif
+#endif
+#if ((!SharedLibDtCm) || (ARCHIVED_LINK) || (LinkArchivedDtCm))
+#if  UseAltBuildScheme
+           DTCMLIB = -Wl,-a,archive -lDtCm -Wl,-a,default
+        DEPDTCMLIB = $(BINSTALL_LIBDIR)/libDtCm.a
+#else
+           DTCMLIB = -L$(DTCMLIBSRC) -Wl,-a,archive -lDtCm -Wl,-a,default
+        DEPDTCMLIB = $(DTCMLIBSRC)/libDtCm.a
+#endif
+#endif
+
+
+/******* CSA ******/
+#if SharedLibcsa
+#if  UseAltBuildScheme
+           CSALIB = -lcsa
+        DEPCSALIB = $(BINSTALL_LIBDIR)/libcsa.sl
+#else
+           CSALIB = -L$(CSALIBSRC) -lcsa
+        DEPCSALIB = $(CSALIBSRC)/libcsa.sl
+#endif
+#endif
+#if ((!SharedLibcsa) || (ARCHIVED_LINK) || (LinkArchivedCsa))
+#if  UseAltBuildScheme
+           CSALIB = -Wl,-a,archive -lcsa -Wl,-a,default
+        DEPCSALIB = $(BINSTALL_LIBDIR)/libcsa.a
+#else
+           CSAMLIB = -L$(CSALIBSRC) -Wl,-a,archive -lcsa -Wl,-a,default
+         DEPCSALIB = $(CSALIBSRC)/libcsa.a
+#endif
+#endif
+
+
+
+/******* DTPRINTLIB ******/
+#if SharedLibDtPrint
+#if  UseAltBuildScheme
+           DTPRINTLIB =  -lDtPrint
+        DEPDTPRINTLIB = $(BINSTALL_LIBDIR)/libDtPrint.sl
+#else
+           DTPRINTLIB = -L $(DTPRINTSRC) -lDtPrint
+        DEPDTPRINTLIB = $(DTPRINTSRC)/libDtPrint.sl
+#endif
+#endif
+#if ((!SharedLibDtPrint) || (ARCHIVED_LINK) || (LinkArchivedDtPrint))
+#if  UseAltBuildScheme
+           DTPRINTLIB =  -Wl,-a,archive -lDtPrint -Wl,-a,default
+        DEPDTPRINTLIB = $(BINSTALL_LIBDIR)/libDtPrint.a
+#else
+           DTPRINTLIB = -L $(DTPRINTSRC) -Wl,-a,archive -lDtPrint -Wl,-a,default
+        DEPDTPRINTLIB = $(DTPRINTSRC)/libDtPrint.a
+#endif
+#endif
+
+
+/******* DTTERM LIBRARY ******/
+#if SharedLibDtTerm
+#if  UseAltBuildScheme
+DTTERMLIB =  -lDtTerm
+DEPDTTERMLIB = $(BINSTALL_LIBDIR)/libDtTerm.sl
+#else
+DTTERMLIB = -L $(CDESRC)/dtterm -lDtTerm
+DEPDTTERMLIB = $(CDESRC)/dtterm/libDtTerm.sl
+#endif
+#endif
+#if (!SharedLibDtTerm || ARCHIVED_LINK || LinkArchivedDtTerm)
+#if  UseAltBuildScheme
+DTTERMLIB =  -Wl,-a,archive -lDtTerm -Wl,-a,default
+DEPDTTERMLIB = $(BINSTALL_LIBDIR)/libDtTerm.a
+#else
+DTTERMLIB = -L $(CDESRC)/dtterm -Wl,-a,archive -lDtTerm -Wl,-a,default
+DEPDTTERMLIB = $(CDESRC)/dtterm/libDtTerm.a
+#endif
+#endif
+
+
+/* The following section is for archive only libraries */
+/******* IMAGE LIBRARY ******/
+#if (!SharedLibil || ARCHIVED_LINK || LinkArchivedil)
+#if  UseAltBuildScheme
+          ILLIB =  -Wl,-a,archive -lil -Wl,-a,default
+       DEPILLIB = $(BINSTALL_LIBDIR)/libil.a
+#else
+          ILLIB = -L $(ILSRC) -Wl,-a,archive -lil -Wl,-a,default
+       DEPILLIB = $(ILSRC)/libil.a
+#endif
+#endif
+
+/******* SYNLIB LIBRARY ******/
+#if (!SharedLibSynLib || ARCHIVED_LINK || LinkArchivedSynLib)
+#if  UseAltBuildScheme
+         SYNLIB =  -Wl,-a,archive -lsynlib -Wl,-a,default
+      DEPSYNLIB = $(BINSTALL_LIBDIR)/libsynlib.a
+#else
+         SYNLIB = -L $(SYNLIBSRC) -Wl,-a,archive -lsynlib -Wl,-a,default
+      DEPSYNLIB = $(SYNLIBSRC)/libsynlib.a
+#endif
+#endif
+
+
+/******* SYNLIBTST LIBRARY ******/
+#if (!SharedLibSynLibTst || ARCHIVED_LINK || LinkArchivedSynLibTst)
+#if  UseAltBuildScheme
+      SYNLIBTST =  -Wl,-a,archive -lsynlibTst -Wl,-a,default
+   DEPSYNLIBTST = $(BINSTALL_LIBDIR)/libsynlibTst.a
+#else
+      SYNLIBTST = -L $(SYNLIBSRC) -Wl,-a,archive -lsynlibTst -Wl,-a,default
+   DEPSYNLIBTST = $(SYNLIBSRC)/libsynlibTst.a
+#endif
+#endif
+
+
+/******* VFA LIBRARY ******/
+#if (!SharedLibVfa || ARCHIVED_LINK || LinkArchivedVfa)
+#if  UseAltBuildScheme
+         VFA_LIB =  -Wl,-a,archive -lvfa -Wl,-a,default
+       DEPVFA_LIB= $(BINSTALL_LIBDIR)/libvfa.a
+#else
+          VFA_LIB= -L $(VFA_LIBSRC) -Wl,-a,archive -lvfa -Wl,-a,default
+       DEPVFA_LIB= $(VFA_LIBSRC)/libvfa.a
+#endif
+#endif
+
+/******* TET LIBRARY ******/
+#if (!SharedTetApiLib || ARCHIVED_LINK || LinkArchivedTetApiLib)
+#if  UseAltBuildScheme
+      TETAPILIB =  -Wl,-a,archive -lapi -Wl,-a,default
+   DEPTETAPILIB = $(BINSTALL_LIBDIR)/libapi.a
+#else
+      TETAPILIB = -L $(TETSRC) -Wl,-a,archive -lapi -Wl,-a,default
+   DEPTETAPILIB = $(TETSRC)/tet/src/posix_c/api/libapi.a
+#endif
+#endif
+
+
+/******* CDE TET LIBRARY ******/
+#if (!SharedCdeTetLib || ARCHIVED_LINK || LinkArchivedCdeTetLib)
+#if  UseAltBuildScheme
+   CDETETAPILIB =  -Wl,-a,archive -lcde_tet -Wl,-a,default
+DEPCDETETAPILIB = $(BINSTALL_LIBDIR)/libcde_tet.a
+#else
+   CDETETAPILIB = -L $(TETSRC)/cde_tet/src -Wl,-a,archive -lcde_tet -Wl,-a,default
+DEPCDETETAPILIB = $(TETSRC)/cde_tet/src/libcde_tet.a
+#endif
+#endif
+

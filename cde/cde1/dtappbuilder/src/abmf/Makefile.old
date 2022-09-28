@@ -1,0 +1,102 @@
+
+#
+#	$Revision: 1.1 $
+#
+#  @(#)Makefile.old	1.28 01/18/94	cde_app_builder/src/abmf
+#
+# 	RESTRICTED CONFIDENTIAL INFORMATION:
+#	
+#	The information in this document is subject to special
+#	restrictions in a confidential disclosure agreement between
+#	HP, IBM, Sun, USL, SCO and Univel.  Do not distribute this
+#	document outside HP, IBM, Sun, USL, SCO, or Univel without
+#	Sun's specific written approval.  This document and all copies
+#	and derivative works thereof must be returned or destroyed at
+#	Sun's request.
+#
+#	Copyright 1993 Sun Microsystems, Inc.  All rights reserved.
+#
+#
+
+PROJECTDIR = ../..
+PROGRAM=	abmf
+LIBPART=	$(PROGRAM)
+LINK.c= 	$(CC)
+
+SOURCES.c = \
+        abmf.c \
+	args.c \
+	cdefs.c \
+	code_tbl.c \
+	connect.c \
+	create_decls.c \
+	file_merge.c \
+	group.c \
+	instances.c \
+	make_file.c \
+	motifdefs.c \
+	obj_names.c \
+	parse.c \
+	proj_c_file.c \
+	proj_header_file.c \
+	resource_file.c \
+	stubs_c_file.c \
+	ui_c_file.c \
+	ui_header_file.c \
+        utils.c \
+	window.c \
+	write_code.c
+
+SOURCES.h.shipped=
+
+SOURCES.h.shared= 
+
+SOURCES.h.unshared= \
+	abmfP.h \
+	argsP.h \
+	cdefsP.h \
+	code_tblP.h \
+	connectP.h \
+	create_declsP.h \
+	file_mergeP.h \
+	groupP.h \
+	ui_header_fileP.h \
+	instancesP.h \
+	make_fileP.h \
+	motifdefsP.h \
+	obj_namesP.h \
+	parseP.h \
+	proj_c_fileP.h \
+	proj_header_fileP.h \
+	resource_fileP.h \
+	stubs_c_fileP.h \
+	ui_c_fileP.h \
+	utilsP.h \
+	windowP.h \
+	write_codeP.h
+
+SOURCES.h = \
+	$(SOURCES.h.shipped)	\
+	$(SOURCES.h.shared)	\
+	$(SOURCES.h.unshared)
+
+#SOURCES.misc = MOTIF.config
+
+#CFLAGS += -I.. -L$(PROJECTDIR)/src/libABobj
+#CPPFLAGS += -I$(PROJECTDIR)/src/libAButil
+
+ULIBDIR		= $(PROJECTDIR)/src/lib
+CPPFLAGS        +=  -I$(MOTIFHOME)/include -I$(OPENWINHOME)/include
+
+XLIBS=		-lX11 -lXt -lXm
+DTLIBS=		-lDtWidget -lDtTerm -lDtHelp -lDtSvc -lXpm -lbento
+
+ULIBS +=	$(ULIBDIR)/libABil.a \
+		$(ULIBDIR)/libABobjXm.a \
+		$(ULIBDIR)/libABobj.a
+
+LDLIBS += 	$(DTLIBS) $(XLIBS) -lm -lgen -lC
+
+.INIT:  $(PROJECTDIR)/Makefile.include
+include $(PROJECTDIR)/Makefile.include
+

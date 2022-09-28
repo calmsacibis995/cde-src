@@ -1,0 +1,134 @@
+.de Lc
+.\" version of .LI that emboldens its argument
+.TP \\n()Jn
+\s-1\f3\\$1\f1\s+1
+..
+.TH tt_host_netfile_file 3 "1 March 1996" "ToolTalk 1.3" "ToolTalk Functions"
+.BH "1 March 1996"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.IX "tt_host_netfile_file" "" "tt_host_netfile_file(3)" ""
+.SH NAME
+tt_host_netfile_file \- map between canonical and local pathnames on a remote host
+.SH SYNOPSIS
+.ft 3
+.nf
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'char *tt_host_netfile_file('u
+char *tt_host_netfile_file(const char *\f2host\fP,
+	const char *\f2netfilename\fP);
+.PP
+.fi
+.SH DESCRIPTION
+The
+.BR tt_host_netfile_file (\|)
+function performs a conversion equivalent to that of the
+.BR tt_netfile_file (3)
+function, but performs it on a remote host.
+.PP
+The
+.I host
+argument
+is the host on which the file resides.
+The
+.I netfilename
+argument is a copy of a null-terminated string returned by
+.BR tt_netfile_file (3)
+or
+.BR tt_host_netfile_file (3).
+.SH "RETURN VALUE"
+Upon successful completion, the
+.BR tt_host_netfile_file (\|)
+function returns
+a freshly allocated
+null-terminated string of unspecified format, which can be passed to
+.BR tt_host_netfile_file (3);
+otherwise, it returns an error pointer.
+The application can use
+.BR tt_ptr_error (3)
+to extract one of the following
+.B Tt_status
+values from the returned pointer:
+.PP
+.RS 3
+.nr )J 8
+.Lc TT_ERR_DBAVAIL
+.br
+The ToolTalk database server
+could not be reached on
+.IR host ,
+perhaps because the host is unavailable or
+cannot be reached through the network.
+.Lc TT_ERR_DBEXIST
+.br
+The ToolTalk database server
+is not properly installed on
+.IR host .
+.br
+.Lc TT_ERR_NETFILE
+.br
+The
+.I netfilename
+is not a valid netfilename.
+.br
+.Lc TT_ERR_UNIMP
+.br
+The ToolTalk database server
+contacted is of a version that does not support
+.BR tt_host_netfile_file (\|).
+.PP
+.RE
+.nr )J 0
+.SH "APPLICATION USAGE"
+The
+.BR tt_file_netfile (3),
+.BR tt_netfile_file (3),
+.BR tt_host_file_netfile (3)
+and
+.BR tt_host_netfile_file (3)
+functions allow an
+application to determine a path valid on remote hosts,
+perhaps for purposes of constructing a command string valid for remote
+execution on that host.
+By composing the two calls, paths for files not accessible from the
+current host can be constructed.
+For example, if path
+.B /sample/file
+is valid on host A, a program
+running on host B can use
+.PP
+.sp -1
+.RS 5
+.ta 4m +4m +4m +4m +4m +4m +4m
+.nf
+.ft 3
+tt_host_netfile_file("C", tt_host_file_netfile("A", "/sample/file"))
+.PP
+.ft 1
+.fi
+.RE
+to determine a path to the same file valid on host C, if such a
+path is possible.
+.PP
+Allocated strings should be freed using either
+.BR tt_free (3)
+or
+.BR tt_release (3).
+.PP
+The
+.BR tt_open (3)
+function need not be called before
+.BR tt_host_netfile_file (\|).
+.SH "SEE ALSO"
+.na
+.BR tt_c (5),
+.BR tt_file_netfile (3),
+.BR tt_netfile_file (3),
+.BR tt_host_file_netfile (3),
+.BR tt_open (3),
+.BR tt_free (3),
+.BR tt_release (3).

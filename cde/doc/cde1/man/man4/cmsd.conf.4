@@ -1,0 +1,165 @@
+.\" "@(#)cmsd.conf.4	1.2 96/06/12 Sun Microsystems, Inc."
+.\" Copyright (c) 1996, Sun Microsystems, Inc.
+.\" All Rights Reserved
+.TH cmsd.conf 4 "7 June 1996"
+.BH "7 June 1996"
+.SH NAME
+cmsd.conf \- configuration file for the calendar server
+.SH SYNOPSIS
+The configuration file provides per host configuration for the calendar server.
+.PP
+.fi
+.SH DESCRIPTION
+The calendar server configuration file contains configuration
+information for
+.BR rpc.cmsd (1),
+the calendar server.  The configuration file
+is read when
+.BR rpc.cmsd
+is started and read again when
+.BR rpc.cmsd
+is sent a
+.BR SIGUSR1
+signal.
+.PP
+The configuration files are:
+.br
+\f3/usr/dt/config/cmsd.conf
+and
+.br
+/etc/dt/config/cmsd.conf
+.PP
+The file
+.B /usr/dt/config/cmsd.conf
+is created when CDE is installed.  It provides the default configuration
+and serves as an example for customization. This file may be overwritten
+by subsequent CDE installations.  Consequently, customized
+configuration should be placed in the file
+.B /etc/dt/config/cmsd.conf
+because this file is not overwritten during installation.
+.PP
+If the configuration file
+.B /etc/dt/config/cmsd.conf
+exists,
+.B rpc.cmsd
+reads the configuration options specified in this file.  Otherwise,
+.B rpc.cmsd
+reads the configuration information from the file
+.BR /usr/dt/config/cmsd.conf .
+.PP
+Each configuration file contains a list of keyword-value pairs
+that provide various
+information for the server.  Each configuration entry is composed of a
+single line of the form:
+.IP
+.I keyword	value
+.PP
+The keyword must start the line and the value follows the keyword,
+separated by white space.  If the same keyword appears in multiple
+lines, the last entry prevails.  Lines beginning with a number sign (#)
+are considered comments and are not processed.
+.PP
+Two configuration options are supported:
+.PP
+.B The trusted users option
+.TP 20
+.BI "trusted " value
+Value specifies the list of users that are
+allowed to create calendars on the local host.
+Users are separated by white space.  Each user is
+specified in the format
+.I user@host.
+If the form
+.IR user
+is used, then
+.I user
+from any host is allowed to
+create calendars on the local host.
+If the form
+.IR @host
+is used, then any user from the specified host is
+allowed to create calendars on the local host.
+If an empty list is specified, no user except the
+local super user is allowed to create calendars on
+the local host.
+.PP
+.B The untrusted users option
+.TP 20
+.BI "untrusted " value
+Value specifies the list of users that are
+not allowed to create calendars on the local host.
+The format is the same as the trusted users option.
+.PP
+The
+.BR trusted
+and
+.BR untrusted
+options are used to control
+who can and cannot create calendars on the local host, respectively.
+If neither option is specified (i.e., no configuration entries
+contain the keyword
+.BR trusted
+and no configuration entries contain the keyword
+.BR untrusted
+exists in the file, or no configuration files exist on the system),
+.BR rpc.cmsd
+allows any users
+from any hosts to create calendars on the local host.  Otherwise,
+a user from a particular host is allowed to create calendars if 
+a match is found in the
+.BR trusted
+option or if the
+.BR trusted
+option is not specified and a match is not found in the
+.BR untrusted
+option.  The local super user is always allowed to
+create calendars on the local host.
+.SH EXAMPLES
+This entry specifies that
+.I user1
+and
+.I user2
+from any host can create calendars on the local host.
+.sp 0
+.IP
+.BR "trusted
+.I user1 user2 "
+.PP
+This entry specifies that
+.I user1@host1
+and any user from
+.I host2
+can create calendars on the local host.
+.sp 0
+.IP
+.B trusted
+.I user1@host1 @host2
+.PP
+The following entries specifies that any user from
+.I host1
+except
+.I user1@host1
+can create calendars on the local host.
+.sp 0
+.IP
+.B trusted
+.I host1
+.sp 0
+.B untrusted
+.I user1@host1
+.PP
+This entry specifies that no user (except the local super user) can
+create calendars on the local host.
+.sp 0
+.IP
+.B trusted
+.SH FILES
+.PD 0
+.TP 20
+.B /usr/dt/conf/cmsd.conf
+.TP
+.B /etc/dt/conf/cmsd.conf
+.PD
+.SH "SEE ALSO"
+.na
+.BR rpc.cmsd (1)

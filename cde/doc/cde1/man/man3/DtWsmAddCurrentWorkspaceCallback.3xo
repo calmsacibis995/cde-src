@@ -1,0 +1,100 @@
+.TH DtWsmAddCurrentWorkspaceCallback 3 "20 Apr 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.\" *************************************************************************
+.SH NAME
+DtWsmAddCurrentWorkspaceCallback \- add a callback to be called when the current workspace changes
+.SH SYNOPSIS
+.yS
+#include <Dt/Wsm.h>
+.sp 0.5v
+.ta \w'DtWsmAddCurrentWorkspaceCallback('u
+DtWsmCBContext
+DtWsmAddCurrentWorkspaceCallback(Widget \f2widget\fP,
+	DtWsmWsChangeProc \f2ws_change\fP,
+	Pointer \f2client_data\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn DtWsmAddCurrentWorkspaceCallback
+function registers an application function to be called when the
+.xos
+workspace manager
+.xoe
+.cdes
+Cde
+workspace manager,
+.Cm dtwm 1,
+.cdee
+switches to a new workspace.
+.P
+The workspace manager sends the new current workspace name to the
+.B DtWsmWsChangeProc
+callback.
+.P
+The
+.I widget
+argument is a realized widget.
+.P
+The
+.I ws_change
+argument is the procedure to be called when the
+workspace changes.
+.P
+The
+.I client_data
+argument points to arbitrary client data to be
+passed back to
+.IR ws_change .
+.P
+The
+header defines the
+.B DtWsmWsChangeProc
+callback prototype as follows:
+.br
+.Cs I
+.ta \w'typedef void (*DtWsmWsChangeProc)('u
+typedef void (*DtWsmWsChangeProc)(Widget \f2widget\fP,
+	Atom \f2aWorkspace\fP,
+	Pointer \f2client_data\fP);
+.Ce
+.P
+The
+.I widget
+argument is the ID of the widget to be registered with the callback.
+.P
+The
+.I aWorkspace
+argument is the name of the new current workspace
+(converted to an X atom).
+.P
+The
+.I client_data
+argument points to the client data to be
+registered with the callback.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn DtWsmAddCurrentWorkspaceCallback
+function returns a workspace callback registration context.
+.SH "APPLICATION USAGE"
+The
+.Fn DtWsmAddCurrentWorkspaceCallback
+function returns a registration context that the application
+must save in order to remove this callback later.
+.Fn DtWsmAddCurrentWorkspaceCallback
+requires a window; thus, a gadget is not acceptable for the
+.I widget
+argument.
+The
+.Fn DtWsmRemoveWorkspaceCallback 3
+function needs a registration context to remove the callback.
+.SH "SEE ALSO"
+.Hd Dt/Wsm.h 5,
+.cdes
+.Cm dtwm 1,
+.cdee
+.Fn DtWsmRemoveWorkspaceCallback 3.

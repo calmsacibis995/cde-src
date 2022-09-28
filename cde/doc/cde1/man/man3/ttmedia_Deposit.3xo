@@ -1,0 +1,159 @@
+.TH ttmedia_Deposit 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+ttmedia_Deposit \- send a Deposit request to checkpoint a document
+.SH SYNOPSIS
+.yS
+#include <Tt/tttk.h>
+.sp 0.5v
+.ta \w'Tt_status ttmedia_Deposit('u
+Tt_status ttmedia_Deposit(Tt_message \f2load_contract\fP,
+	const char *\f2buffer_id\fP,
+	const char *\f2media_type\fP,
+	const unsigned char *\f2new_contents\fP,
+	int \f2new_len\fP,
+	const char *\f2pathname\fP,
+	XtAppContext \f2app2run\fP,
+	int \f2ms_timeout\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn ttmedia_Deposit
+function
+is used to perform a checkpoint save on a document that was the
+subject of a Media Exchange
+.I load_contract
+request such as
+.IR Edit ,
+.IR Compose ,
+or
+.IR Open .
+.xo (See
+.xo .cX mediamessages .)
+To carry out a checkpoint save, the editor must send the new document
+contents back to the sender of
+.IR load_contract .
+.P
+The
+.Fn ttmedia_Deposit
+function
+creates and sends a
+.IR Deposit
+request and returns the
+success or failure of that request.
+The
+.I load_contract
+argument is the request that caused this editor to load the document.
+The
+.I buffer_id
+argument is the identifier
+of the buffer this editor created if the document was
+loaded via an
+.IR Open
+request.
+If
+.I buffer_id
+is
+.Cn NULL ,
+the
+the ToolTalk service
+gives the
+.I Deposit
+request a
+.B Tt_address
+of
+.Cn TT_HANDLER
+and sends it directly to the
+.Fn tt_message_sender
+of
+.IR load_contract ;
+otherwise, the
+the ToolTalk service
+will address it as a
+.Cn TT_PROCEDURE
+and insert
+.I buffer_id
+into the request to match the pattern registered by the
+sender of the
+.IR load_contract .
+.P
+The
+.Fn ttmedia_Deposit
+function uses the
+.I media_type
+argument as the
+vtype
+of the contents argument of the sent request, and
+.I new_contents
+and
+.I new_len
+as its value.
+The latter two must be zero if
+.I pathname
+is used to name a temporary file into which the editor will place the
+checkpointed document.
+The editor is free to remove the temporary
+file after the reply to the
+.IR Deposit
+request is received; that is, after
+.Fn ttmedia_Deposit
+has returned.
+.P
+After the request is sent,
+.Fn ttmedia_Deposit
+passes
+.I app2run
+and
+.I ms_timeout
+to
+.Fn tttk_block_while 3
+to wait for the reply.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn ttmedia_Deposit
+function returns the status of the operation as one of the following
+.B Tt_status
+values:
+.VL 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_DESKTOP_ETIMEDOUT
+.br
+No reply was received within
+.I ms_timeout
+milliseconds.
+.Lc TT_ERR_NOMEM
+.br
+There is insufficient memory available to perform the function.
+.Lc TT_ERR_NOMP
+.br
+The
+.Cm ttsession 1
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_OVERFLOW
+.br
+The ToolTalk service has more active messages than it can handle.
+(The maximum number of active messages is
+.ne 2
+implementation specific, but is at least 2000.)
+.Lc TT_ERR_POINTER
+.br
+The
+.I pathname
+argument was
+.Cn NULL
+or was a ToolTalk error pointer.
+.Lc TT_ERR_PROCID
+.br
+The specified process identifier is out of date or invalid.
+.LE
+.SH "SEE ALSO"
+.Hd Tt/tttk.h 5,
+.Fn ttmedia_load 3,
+.Fn ttmedia_load_reply 3,
+.Fn ttmedia_ptype_declare 3,
+.Fn ttdt_Save 3,
+.Fn tttk_block_while 3.

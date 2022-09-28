@@ -1,0 +1,588 @@
+.de LI
+.\" simulate -mm .LIs by turning them into .TPs
+.TP \\n()Jn
+\\$1
+..
+.de Lc
+.\" version of .LI that emboldens its argument
+.TP \\n()Jn
+\s-1\f3\\$1\f1\s+1
+..
+.TH SdmSortVector 3 "07/02/96"
+.BH "07/02/96"
+.\" @(#)SdmSortVector.3	1.6 96/07/02 SMI
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994, 1995, 1996 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994, 1995, 1996 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994, 1995, 1996 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994, 1995, 1996 Novell, Inc.
+.SH NAME
+SdmSortVector \- Template based class - sorted vector of objects
+.SH SYNOPSIS
+.\"
+.SS Includes
+.ft 3
+.nf
+#include <Sdtmail.hh>
+#include <SortVector.hh>
+.\"
+.SS Creation
+.ft 3
+.nf
+.sp 0.5v
+.ta \w'new SdmSortVector('u
+new SdmSortVector<dataType>();
+.PP
+.ft 3
+.ta \w'new SdmSortVector('u
+new SdmSortVector<dataType> (const int \f2maxElements\fP);
+.PP
+.ft 3
+.ta \w'new SdmSortVector('u
+new SdmSortVector<dataType> (const SdmSortVector<dataType>& \f2vector\fP);
+.fi
+.ft 1
+.\"
+.SS Operators
+.PP
+.ft 3
+.nf
+.sp 0.5v
+dataType& operator[] (const int pos) const;
+.PP
+.ft 3
+dataType& operator() (const int pos);
+.fi
+.ft 1
+.\"
+.SS Methods
+.PP
+.ft 3
+.nf
+.sp 0.5v
+.ta \w'int AddElementToList('u
+int AddElementToList(const dataType& \f2element\fP);
+.PP
+.ft 3
+.ta \w'int AddElementToVector('u
+int AddElementToVector();
+.PP
+.ft 3
+.ta \w'void ClearAllElements('u
+void ClearAllElements();
+.PP
+.ft 3
+.ta \w'int ElementCount('u
+int ElementCount() const;
+.PP
+.ft 3
+.ta \w'int FindElement('u
+int FindElement(const dataType& \f2element\fP);
+.PP
+.ft 3
+.ta \w'void InsertElementAfter('u
+void InsertElementAfter(const dataType& \f2element\fP,
+	 const int \f2pos\fP);
+.PP
+.ft 3
+.ta \w'void InsertElementBefore('u
+void InsertElementBefore(const dataType& \f2element\fP,
+         const int \f2position\fP);
+.PP
+.ft 3
+.ta \w'void RemoveElement('u
+void RemoveElement(const int \f2pos\fP);
+.PP
+.ft 3
+.ta \w'void SetVectorSize('u
+void SetVectorSize(const int \f2size\fP);
+.fi
+.ft 1
+.\" end of methods list
+.ta 0.25i 0.50i 0.75i 1.0i 1.25i 1.50i 1.75i 2.0i 2.5i 3.0i
+.SH DESCRIPTION
+The SdmSortVector object is a template based vector class, derived from SdmVector,
+providing the ability to containerize a sorted list of any type of object. This differs
+from the SdmVector object that does not maintain a sorted list. Because of this, any such
+object must support the '<' operator to allow the vector to maintain a sorted list. The
+vector allocates no memory unless a size has been specified or until an object is added to
+the vector. The vector allocates chunks of memory and then assigns elements, only
+allocating more space when the vector is full.
+.SS Vector Contents
+This is an object (as opposed to pointer) vector; the actual objects themselves are stored
+in such a vector; therefore, any such object must have copy constructors and assignment
+operators.
+.SS Origin
+This vector implements 0-origin indexing. For example, given a vector named X with 100
+objects in it, the first object in the vector is referred to as X[0], and the last element
+as X[99].
+.PP
+You must be careful when using indexing to assign values into the vector rather than using
+methods that append values to the end of the vector. You must assure that the vector was
+either assigned a size at creation, or that SetVectorSize() was called.
+.\"
+.SH CREATION
+There are a number of ways to create a sorted object vector.
+.SS Empty Vector
+You can call the vector constructor with no arguments. A vector with no objects
+is allocated.
+.PP
+.nf
+        SdmSortVector<dataType>* vtr = new SdmSortVector<dataType>;
+        SdmSortVector<dataType> vtr;
+ 
+For example:
+ 
+        SdmSortVector<int>* numlist = new SdmSortVector<int>;
+        SdmSortVector<int> numlist;
+.fi
+.PP
+This creates a integer vector that contains no elements.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "none."
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmSortVector<dataType>*)\fP"
+.br
+A pointer to the SdmSortVector object if successfully created;
+otherwise, the return value is undefined.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS Preallocated Vector
+You can call the vector constructor with an integer argument specifying the
+number of elements to preallocate. A vector with that number of empty objects of
+the templated type is created. The objects default constructors are used to
+create the empty objects.
+.PP
+.nf
+        SdmSortVector<dataType>* vtr = new SdmSortVector<dataType>(const int maxElements);
+        SdmSortVector<dataType> vtr(const int maxElements);
+ 
+For example:
+ 
+        SdmSortVector<int> numlist(100);
+        for (i=0; i<100; i++)
+            numlist[i] = 0;
+ 
+.fi
+.PP
+This creates an integer vector that contains 100 integers.  Note that the
+integers are not initialized so it's up to the caller to initialize the
+elements in this vector after it is created.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3maxElements\fP (\f3const int\fP)"
+.br
+The number of elements to preallocate in the vector.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmSortVector<dataType>*)\fP"
+.br
+A pointer to the SdmSortVector object if successfully created;
+otherwise, the return value is undefined.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS From Existing Vector
+You can call the vector constructor with another vector of the same type as
+an argument. A new vector is created with a complete copy of the original vectors
+contents. The objects copy constructors are used to create the object copies.
+.PP
+.nf
+  SdmSortVector<dataType>* vtr = new SdmSortVector<dataType>(const SdmSortVector<vector>& theCopy);
+  SdmSortVector<dataType>  vtr(const SdmSortVector<dataType>& theCopy);
+ 
+.fi
+.PP
+This creates a new vector that contains copies of each element in theCopy.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3theCopy\fP (\f3SdmSortVector<dataType>&\fP)"
+.br
+The vector where elements are copied from.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmSortVector<dataType>*)\fP"
+.br
+A pointer to the SdmSortVector object if successfully created;
+otherwise, the return value is undefined.
+.PP
+.RE
+.nr )J 0
+.\"
+.SH DESTRUCTION
+A SdmSortVector object can be destroyed like any other object.  The contents of
+the vector are automatically destroyed when the vector itself is destroyed. The
+owner does not have to make any provisions for destroying the objects themselves
+to prevent a memory leak, as the objects are part of the vector itself.
+.\"
+.SH OPERATORS
+Two standard C operators are overloaded to function with SdmSortVector objects: [] and ().
+.SS []
+Vector indexing via the [] operator operates identically to the standard C subscripting
+mechanisms for arrays of ordinary data types. This operator works on const and non-const
+vectors.
+.PP
+If this operator is used to change an object in the vector, the vector may no longer be
+properly sorted. To maintain proper sorting, only use the AddElementToList() and
+RemoveElement() methods.
+.SS ()
+Vector indexing via the () operator operates identically to the [] operator described
+above with the following two exceptions: 
+.PP
+1) the () operator does not work on const objects.
+.PP
+2) if the index is -1, then a new element is added to the end of the list, and that
+elements index is then used in the operation. This allows for the quick addition of
+elements to the end of the vector. For example:
+.PP
+.nf
+	SdmSortVector<int> intL;
+
+	intL(-1) = 1;
+	intL(-1) = 2;
+	intL(-1) = 3;
+.fi
+.PP
+Creates a vector and assigns three values to it: [0] == 1, [1] == 2 and [2] == 3. While
+this may appear slightly "ugly", it is much more efficient than:
+.PP
+.nf
+	intL[intL.AddElementToVector()] = 1;
+	intL[intL.AddElementToVector()] = 2;
+	intL[intL.AddElementToVector()] = 3;
+.fi
+.PP
+This also allows object methods to be invoked on the newly created object as well. For example:
+.PP
+.nf
+	SdmSortVector<SdmStrStr> ssL;
+
+	ssL(-1).SetBothStrings("1", "2");
+	ssL(-1).SetBothStrings("3", "4");
+	ssL(-1).SetBothStrings("5", "6");
+.fi
+.PP
+If this operator is used to change an object in the vector, the vector may no longer be
+properly sorted. To maintain proper sorting, only use the AddElementToList() and
+RemoveElement() methods.
+.\"
+.SH METHODS
+The following methods are provided to operate on the contents of a SdmSortVector templated object.
+.\"
+.SS \f3AddElementToList\fP
+(\f3element\fP)
+
+This method appends a copy of an object to the end of the vector, increasing the size of
+the vector by one element, grabbing additional storage as needed to grow the vector.  The
+following example creates a vector of SdmString objects and appends two objects onto the
+end of the vector:
+.PP
+.nf
+	SdmString str1("test");
+	SdmString str2("again");
+	SdmSortVector<SdmString> strvec;
+
+	strvec.AddElementToList(str1);
+	strvec.AddElementToList(str2);
+.fi
+.PP
+This method maintains the sorting order of the vector when objects are inserted.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3element\fP (\f3const dataType&\fP)"
+.br
+An object of the same type as the template data type to be appended to the end of the
+vector. A copy of the object is created and placed on the end of the vector. For this
+reason, the object must have a copy constructor that does a full (deep) copy of the object
+that can survive the destruction of the original object passed in.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "(\f3int\fP)"
+.br
+The index into the vector where this object is inserted is returned. This value can be
+used to index into the vector to retrieve the object just added.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3AddElementToVector\fP
+()
+
+This method appends a new object to the end of the vector, increasing the size of the
+vector by one element, grabbing additional storage as needed to grow the vector. It is
+similar to AddElementToList() but it adds a new object as opposed to a copy of an existing
+object to the vector. The following example creates a vector of SdmString objects and
+appends two objects onto the end of the vector in two different ways using this method:
+.PP
+.nf
+	SdmString str1("test");
+	SdmString str2("again");
+	SdmSortVector<SdmString> strvec;
+	int pos;
+
+	pos = strvec.AddElementToVector();
+	strvec[pos] = str1;
+	strvec[strvec.AddElementToVector()] = str2;
+.fi
+.PP
+If this method is used to change an object in the vector, the vector may no longer be
+properly sorted. To maintain proper sorting, only use the AddElementToList() and
+RemoveElement() methods.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "none"
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "(\f3int\fP)"
+.br
+The index into the vector where the new object is inserted is returned. This value can be
+used to index into the vector to retrieve the object just added.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3ClearAllElements\fP
+()
+
+This method causes all elements in the vector to be destroyed, and the size of the vector
+to be set to zero. This method is usually used to clear the vector out of old objects before
+inserting a new list of objects into the vector.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "none"
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "none"
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3ElementCount\fP
+()
+
+Return the number of elements in the vector. The following example iterates through the list
+of elements in a vector of integers and prints out the contents:
+.PP
+.nf
+	SdmSortVector<int> intL;
+
+	<< do something to add elements to the vector >>
+
+	for (int i = 0; i < intL.ElementCount(); i++)
+	  printf("Element %d value %d\n", i, intL[i]);
+.fi
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "none"
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(int)\fP"
+.br
+The number of elements in the vector is returned.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3FindElement\fP
+(\f2element\fP)
+
+This method is used to locate a particular object in the vector and return the index of the
+element in the vector.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3element\fP (\f3const dataType&\fP)"
+.br
+The object to look for in the vector. The comparison operator of the object is used to
+find a match.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(int)\fP"
+.br
+The index into the vector of where the object is found; Sdm_Not_Found is returned if the
+object cannot be found in the vector.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3InsertElementAfter\fP
+(\f3element\fP, \f3pos\fP)
+
+This method is similar to AddElementToList, except that it allows an index into the vector
+where the object is to be added. All objects in the vector above that position are shifted
+up in the vector one position, and the given object is then inserted after the indicated
+position.
+.PP
+If this method is used to change an object in the vector, the vector may no longer be
+properly sorted. To maintain proper sorting, only use the AddElementToList() and
+RemoveElement() methods.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3element\fP (\f3const dataType&\fP)"
+.br
+An object of the same type as the template data type to be inserted after the given
+index. A copy of the object is created and placed in vector after the given index.
+.LI "\f3pos\fP (\f3int\fP)"
+.br
+The index into the vector after which the object is to be inserted.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "none"
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3InsertElementBefore\fP
+(\f3element\fP, \f3position\fP)
+ 
+This method is similar to AddElementToList, except that it allows an index into the vector
+where the object is to be added. All objects in the vector starting at that position are shifted
+up in the vector one position, and the given object is then added at the
+position.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3element\fP (\f3const dataType&\fP)"
+.br
+An object of the same type as the template data type to be inserted after the given
+index. A copy of the object is created and placed in vector after the given index.
+.LI "\f3position\fP (\f3int\fP)"
+.br
+The index into the vector after which the object is to be inserted.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "none"
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3RemoveElement\fP
+(\f3pos\fP)
+
+This method removes an object from a position in the vector. The object is destroyed, and
+all objects in the vector above that position are shifted down in the vector one position.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3pos\fP (\f3int\fP)"
+.br
+The index into the vector of the position of the object to be removed.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "none"
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3SetVectorSize\fP
+(\f3size\fP)
+
+This method allows the size of the vector to be manipulated. If the vector size is adjusted
+up, new empty objects are appended to the end of the vector. If the vector size is adjusted
+down, the objects that fall off the end of the vector are destroyed.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3size\fP (\f3int\fP)"
+.br
+The number of elements to set the vector to.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "none"
+.PP
+.RE
+.nr )J 0
+.\"
+.PP
+.RE
+.nr )J 0
+.SH "SEE ALSO"
+.na
+.BR SdmPtrSortVector (3),
+.BR SdmPtrVector (3),
+.BR SdmVector (3)

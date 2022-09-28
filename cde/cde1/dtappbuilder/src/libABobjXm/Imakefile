@@ -1,0 +1,86 @@
+XCOMM
+XCOMM 	$XConsortium: Imakefile /main/cde1_maint/2 1995/09/06 08:00:45 lehors $
+XCOMM
+XCOMM 	@(#)Imakefile	1.6 18 Jan 1994
+XCOMM
+XCOMM 	RESTRICTED CONFIDENTIAL INFORMATION:
+XCOMM	
+XCOMM	The information in this document is subject to special
+XCOMM	restrictions in a confidential disclosure agreement between
+XCOMM	HP, IBM, Sun, USL, SCO and Univel.  Do not distribute this
+XCOMM	document outside HP, IBM, Sun, USL, SCO, or Univel without
+XCOMM	Sun's specific written approval.  This document and all copies
+XCOMM	and derivative works thereof must be returned or destroyed at
+XCOMM	Sun's request.
+XCOMM
+XCOMM	Copyright 1993 Sun Microsystems, Inc.  All rights reserved.
+XCOMM
+XCOMM
+
+#define PassCDebugFlags 'CDEBUGFLAGS=$(CDEBUGFLAGS)'
+
+#include <Library.tmpl>
+#include "../ab.tmpl"
+#include "../ab.rules"
+
+    INCLUDES = -I. -I$(ABINCLUDES)
+
+INSTALLFLAGS = $(INSTINCFLAGS)
+
+    LINTLIBS = $(LINTXLIB) $(LINTXTOOL)
+
+     DEFINES =
+
+SOURCES.h.shipped= 
+
+SOURCES.h.shared= \
+                objxm.h
+
+SOURCES.h.unshared = \
+		objxmP.h
+
+SRCS = \
+	objxm_args.c \
+	objxm_config.c \
+	objxm_conn.c \
+	objxm_inst.c \
+	objxm_strs.c \
+	objxm_util.c \
+	objxm_objects.c
+
+OBJS = \
+	objxm_args.o \
+	objxm_config.o \
+	objxm_conn.o \
+	objxm_inst.o \
+	objxm_strs.o \
+	objxm_util.o \
+	objxm_objects.o
+
+  SYS_LIBRARIES = -lm
+
+#ifdef RsArchitecture
+SYS_LIBRARIES = -lm -liconv
+#endif
+
+#ifdef	SunArchitecture
+SYS_LIBRARIES = -lm -ldl $(WIDECHARSYSLIB) -lgen
+WAITTARGET = .WAIT
+#endif	/* SunArchitecture */
+
+   INSTALLFLAGS = -m 4755
+       LINTLIBS = $(XINPUTLIB) $(DTHELPLIB) $(DTSVCLIB) $(XMLIB) $(XTOOLLIB) $(XLIB)
+LOCAL_LIBRARIES = $(XINPUTLIB) $(DTHELPLIB) $(DTSVCLIB) $(XMLIB) $(XTOOLLIB) $(XLIB)
+
+LibraryObjectRule()
+
+NormalLibraryTarget(ABobjXm,$(OBJS))
+
+DependTarget()
+
+BuildAbIncludes(shared_includes, $(SOURCES.h.shared),../include/ab_private, ../../libABobjXm)
+
+includes:: shared_includes $(WAITTARGET)
+sdtgilcvt:
+dtcodegen: libABobjXm.a
+dtbuilder: libABobjXm.a

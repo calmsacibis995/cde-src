@@ -1,0 +1,253 @@
+XCOMM
+XCOMM	RESTRICTED CONFIDENTIAL INFORMATION:
+XCOMM	
+XCOMM	The information in this document is subject to special
+XCOMM	restrictions in a confidential disclosure agreement bertween
+XCOMM	HP, IBM, Sun, USL, SCO and Univel.  Do not distribute this
+XCOMM	document outside HP, IBM, Sun, USL, SCO, or Univel wihtout
+XCOMM	Sun's specific written approval.  This documment and all copies
+XCOMM	and derivative works thereof must be returned or destroyed at
+XCOMM	Sun's request.
+XCOMM
+XCOMM	Copyright 1993, 1994, 1995 Sun Microsystems, Inc.  All rights reserved.
+XCOMM
+XCOMM	@(#)Imakefile	1.24 04/26/96
+XCOMM
+
+/*
+ * I turned this off so that it would stop trying to rebuild imake.
+ * Imake is another component, let them build it.
+ */
+#undef  ImakeDependency
+#define ImakeDependency(dummy)	/**/
+
+#ifndef DoNormalLib
+#define DoNormalLib NormalLibDtMail
+#endif
+#ifndef DoSharedLib
+#define DoSharedLib SharedLibDtMail
+#endif
+
+#ifdef SunArchitecture
+#undef LibraryDefines
+#define LibraryDefines /**/
+#endif
+
+#include <Library.tmpl>
+
+
+INSTALLFLAGS	=	$(INSTINCFLAGS)
+
+INCLUDES	=	-I. -I../../include -I../../include/utils \
+			-I$(TOP)/cde1/dtcompat
+
+DEFINES		=	
+
+#ifdef RsArchitecture
+DEPLIBS=$(DEPDTSVCLIB) $(DEPTTLIB) $(DEPXTOOLIB) $(DEPXLIB)
+#define NEED_XDR_UTILS	1
+
+EXTRA_DEFINES	=	-DBIG_ENDIAN -DAIX -DSTRCASECMP_NOT_DEFINED \
+			-DI_HAVE_NO_BOOL -DNEED_XDR_SIZEOF -DDL_NOT_DYNAMIC \
+			-DI_HAVE_SELECT_H -DSENDMAIL_LOCKS \
+			-DMAILGROUP_REQUIRED \
+			-DMAIL_SPOOL_PATH=\"/var/spool/mail/%s\"
+
+	    
+PLATFORMDL	=	NotDynamic.C
+PLATFORMDL_O	=	NotDynamic.o
+
+#ifdef DoSharedLib
+REQUIREDLIBS	=	$(DTHELPLIB) $(DTSVCLIB) $(TTLIB) $(XTOOLIB) $(XLIB)
+NONSHAREDLIBCOBJ =	nonsharelibC.o
+#endif
+#endif
+
+#ifdef HPArchitecture
+DEPLIBS=$(DEPDTSVCLIB) $(DEPTTLIB) $(DEPXTOOLIB) $(DEPXLIB)
+#define NEED_XDR_UTILS	1
+C++INCLUDES	=	-I../../../include/$(VENDOR)
+EXTRA_DEFINES	=	-DBIG_ENDIAN -DHPUX -Ds9000 -DI_HAVE_NO_IDENT \
+			-DI_HAVE_NO_BOOL -DNEED_XDR_SIZEOF -DDL_NOT_DYNAMIC \
+			-DNEED_MMAP_WRAPPER -DSENDMAIL_LOCKS \
+			-DMAILGROUP_REQUIRED \
+			-DMAIL_SPOOL_PATH=\"/usr/mail/%s\"
+EXTRA_C++OPTIONS =	+p
+PLATFORMDL	=	NotDynamic.C
+PLATFORMDL_O	=	NotDynamic.o
+#endif
+
+#ifdef SunArchitecture
+DEPLIBS		=	/* They are dynamicaly linked on Sun always */
+#undef NEED_XDR_UTILS
+
+#if !defined(i386) && !defined(__ppc)
+ENDIAN =	-DBIG_ENDIAN
+#endif
+
+EXTRA_DEFINES	=	$(ENDIAN) \
+			-DSunOS=$(OSMAJORVERSION)$(OSMINORVERSION) \
+			-DDL_NOT_DYNAMIC -DMMAP_NORESERVE \
+			-DI_HAVE_SELECT_H -D_REENTRANT
+
+#ifdef USE_SPRO_V3
+SPRO_V3_OPTIONS =	-noex -xO0 -USPRO_V2
+#ifdef DEBUGTREE
+SPRO_V3_OPTIONS +=      -xsb
+#endif
+#else
+EXTRA_DEFINES	+=	-DSPRO_V2
+#endif
+
+#ifdef REORDER_PROFILED
+EXTRA_C++OPTIONS =     -xF +p +w $(SPRO_V3_OPTIONS)
+EXTRA_CCOPTIONS  =     -xF
+C++              =     CC -pg $(BBAFLAGS)
+CC               =     cc -xpg $(BBAFLAGS)
+#else
+EXTRA_C++OPTIONS =     -xF +p +w $(SPRO_V3_OPTIONS)
+EXTRA_CCOPTIONS  =     -xF
+#endif
+
+.KEEP_STATE:
+.PARALLEL:
+
+# libDtMail is so small, we just statically link it now
+#PLATFORMDL	=	DlDynamicLib.C
+#PLATFORMDL_O	=	DlDynamicLib.o
+PLATFORMDL	=	NotDynamic.C
+PLATFORMDL_O	=	NotDynamic.o
+
+#endif /* SunArchitecture */
+
+#ifdef USLArchitecture
+PLATFORMDL      =       DlDynamicLib.C
+PLATFORMDL_O    =       DlDynamicLib.o
+
+EXTRA_DEFINES   =       -DDL_DYNAMIC_LIBS
+#endif /* USLArchitecture */
+
+#ifdef AlphaArchitecture
+EXTRA_DEFINES	=	-DI_HAVE_NO_IDENT -DDL_NOT_DYNAMIC -DNEED_MMAP_WRAPPER
+#endif /* AlphaArchitecture */
+
+#ifdef NEED_XDR_UTILS
+XDR_UTILS.c	=	xdr_utils.c
+XDR_UTILS.o	=	xdr_utils.o
+XDR_UTILS.h	=	xdr_utils.h
+#endif
+
+HEADERS		= \
+                        HeaderTable.h \
+                        MBXError.h \
+			$(XDR_UTILS.h)
+
+HEADERS_HH      = \
+                        Mbox.hh
+
+SRCS		= \
+			Buffer.C \
+			DetermineFileLocality.C \
+			DtMailBodyPart.C \
+			DtMailEnvelope.C \
+			DtMailError.C \
+			DtMailMailBox.C \
+			DtMailMessage.C \
+			DtMailTransport.C \
+			DtMailValuesBuiltin.C \
+			DtMailXtProc.C \
+			DtVirtArray.C \
+			DynamicLib.C \
+			FileShare.C \
+			$(PLATFORMDL) \
+			HashTable.C \
+			IO.C \
+			LanguagePortability.C \
+			DtMailRc.C \
+			ObjectKey.C \
+			parse.c \
+			Process.C \
+			Session.C \
+			Threads.C \
+			md5.c \
+			$(XDR_UTILS.c)
+
+
+OBJS		= \
+			Buffer.o \
+			DetermineFileLocality.o \
+			DtMailBodyPart.o \
+			DtMailEnvelope.o \
+			DtMailError.o \
+			DtMailMailBox.o \
+			DtMailMessage.o \
+			DtMailTransport.o \
+			DtMailValuesBuiltin.o \
+			DtMailXtProc.o \
+			DtVirtArray.o \
+			DynamicLib.o \
+			FileShare.o \
+			$(PLATFORMDL_O) \
+			HashTable.o \
+			IO.o \
+			LanguagePortability.o \
+			DtMailRc.o \
+			ObjectKey.o \
+			parse.o \
+			Process.o \
+			Session.o \
+			Threads.o \
+			md5.o \
+			$(XDR_UTILS.o)
+
+
+LibraryObjectRule()
+
+all :: Obj.List
+ 
+#if !defined(USLArchitecture)
+Obj.List : $(OBJS)
+	@echo "Building libDtMail/Common Object List"
+	@$(RM) Obj.List
+	@for O in $(OBJS) ; do \
+		echo "  Adding $$O" ; \
+		echo Common/$$O >> Obj.List ;\
+	done
+	@echo "."
+#else
+#ifdef DoSharedLib
+Obj.List : $(OBJS)
+        @echo "Building libDtMail/Common Object List"
+        @$(RM) Obj.List
+        @for O in $(OBJS) ; do \
+                echo "  Adding $$O" ; \
+                echo Common/shared/$$O >> Obj.List ;\
+        done
+        @echo "."
+#else
+Obj.List : $(OBJS)
+        @echo "Building libDtMail/Common Object List"
+        @$(RM) Obj.List
+        @for O in $(OBJS) ; do \
+                echo "  Adding $$O" ; \
+                echo Common/$$O >> Obj.List ;\
+        done
+        @echo "."
+#endif
+#endif
+
+#ifdef SunArchitecture
+clean::
+	$(RM) -r .sb ptrepository
+	$(RM) .make.state*
+#else
+DependTarget()
+#endif
+
+clean::
+	$(RM) cscope.out core dtmail *.cat Obj.List
+	$(RM) -r shared
+
+DependTarget()
+
+NormalLintTarget($(SRCS))

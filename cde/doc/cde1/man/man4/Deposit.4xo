@@ -1,0 +1,105 @@
+.TH Deposit 4 "13 May 1994"
+.SH NAME
+Deposit request \- save a document to its backing store
+.SH SYNOPSIS
+.yS
+.ta \w'[\f2file\fP] Deposit('u
+[\f2file\fP] Deposit(in \f2mediaType contents\fP
+	[in messageID \f2commission\fP]);
+.yE
+.SH DESCRIPTION
+The
+.I Deposit
+request saves a document to its backing store.
+This request is different from the
+.I Save
+request in that the requester (not the handler) has the data to be saved.
+.P
+The
+.I contents
+argument
+is the contents of the document.
+If this argument is unset
+(in other words, has a value of
+.BR (char\ *)0 ) ,
+then the contents of the document are in
+the file named in the message's
+.I file
+attribute.
+The data type
+.RI ( mediaType )
+of the
+.I contents
+argument should be
+.BR string ,
+unless nulls are valid in the given media type,
+in which case the data type must be
+.BR bytes .
+.P
+The
+.I commission
+argument contains the message ID of the
+.I Edit
+request that caused the creation of this buffer.
+.SH "APPLICATION USAGE"
+The
+.Fn ttmedia_load 3
+function can be used to register for,
+and help process, this message.
+.P
+This message can be sent with the
+.Fn ttmedia_Deposit 3
+function.
+.P
+The
+.I Deposit
+request is useful for cases where the user may perform
+an intermediate save of modifications to a document that is the subject of an
+.I Edit
+or
+.I Display
+request in progress.
+In the latter case, the
+.I Deposit
+may fail on a
+.Cn TT_DESKTOP_EACCES
+error if the handler does not allow updates to the document being displayed.
+.P
+Handlers receiving this request should reply before deleting
+any file named in the message's
+.I file
+attribute,
+but this is optional
+and applications should not rely on this.
+.SH ERRORS
+The ToolTalk service may return one of the following errors
+in processing the
+.I Deposit
+request:
+.VL 6
+.Lc TT_DESKTOP_EACCES
+.br
+The document is read-only.
+.Lc TT_DESKTOP_ENOENT
+.br
+The file that was alleged to contain the document does not exist.
+.Lc TT_DESKTOP_ENODATA
+.br
+The in-mode
+.I contents
+argument had no value and the
+.I file
+attribute
+of the message was not set.
+.Lc TT_MEDIA_ERR_FORMAT
+.br
+The document is not a valid instance of the media type.
+.LE
+.SH "SEE ALSO"
+.Fn ttmedia_load 3,
+.Fn ttmedia_Deposit 3;
+.IR Intro ,
+.IR Display ,
+.IR Edit ,
+.I Status
+requests.

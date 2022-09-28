@@ -1,0 +1,46 @@
+\#
+\#
+\#    (c) Copyright 1993 Hewlett-Packard Company
+\#    (c) Copyright 1993 International Business Machines Corp.
+\#    (c) Copyright 1993 Sun Microsystems, Inc.
+\#
+\#
+\#####################################################################
+\###                                                               ###
+\### Invocation Specifications for the DT Applications            ###
+\###                                                               ###
+\#####################################################################
+\#
+\#
+\# Tool        Type  Scope  Filetypes  ExecHost  Invocation
+
+\# The following tools are visible to users.
+\#
+FILEMGR      TOOL     NET    *    %Local%    CDE_INSTALLATION_TOP/bin/dtfile -noview
+HELPMGR	     TOOL     NET    *    %Local%    dthelp -unmapped
+STYLEMGR     COMMAND  NET    *    %Local%    CDE_INSTALLATION_TOP/bin/dtstyle
+ANNOTATOR    TOOL     NET    *    %Local%    CDE_INSTALLATION_TOP/bin/dtannotator
+DTPAD       TOOL     NET    *    %Local%     CDE_INSTALLATION_TOP/bin/dtpad -server
+
+\# The following tools are special cases that should never be auto-started
+\# due to a request message.  If they were not started during the normal
+\# DT start-up, requests for them should be ignored instead of causing
+\# them to be started.  This is because starting them in the middle of
+\# a session can cause havoc.
+\#
+\# To keep them from being auto-started, a "fake" exec-string of /bin/true
+\# is used.  One side-effect of this is that if these tools aren't running,
+\# requests messages to them will be held forever in the Execution Manger.
+\# This is a memory leak, though it is expected to be quite small.
+\#
+\# The alternative solution of not listing these tools at all cannot be
+\# used because the Softbench Tool Manager will produce warning dialog
+\# boxes for unknown tools.
+\#
+SESSIONMGR    TOOL  NET    *          %Local%    /bin/true
+WORKSPACEMGR  TOOL  NET    *          %Local%    /bin/true
+
+
+
+
+

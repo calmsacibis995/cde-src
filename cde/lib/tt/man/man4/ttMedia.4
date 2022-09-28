@@ -1,0 +1,140 @@
+'\" t
+.de LI
+.\" simulate -mm .LIs by turning them into .TPs
+.TP \\n()Jn
+\\$1
+..
+.TH ttMedia 4 "1 March 1996" "ToolTalk 1.3" "ToolTalk Policy"
+.BH "1 March 1996"
+.IX "ttMedia" "" "ttMedia.4" ""
+.SH NAME
+ttMedia \- introduction to Media Exchange messaging conventions
+.SH DESCRIPTION
+.PP
+The
+.B Media
+conventions allow a tool to be a container for arbitrary media,
+or to be a media player/editor that can be driven from such
+a container.  These conventions allow a container
+application to compose, display, edit, print, or transform a document
+of an arbitrary media type, without understanding anything about
+the format of that media type.  ToolTalk routes container requests
+to the user's preferred tool for the given media type and operation.
+This includes routing the request to an already-running instance of
+the tool if that instance is best-positioned to handle the request.
+.SH LIST OF MESSAGES
+.PP
+.TS
+tab (/) ;
+l l l l l .
+[\fIfile\f(CW]/Deposit(/in/\fImediaType/contents\f(CW,
+ / /[in/bufferID/beingDeposited
+ / /in/messageID/commission] );
+[\fIfile\f(CW]/Display(/in/\fImediaType/contents\f(CW,
+ / /[in/messageID/conterfoil]
+ / /[in/title/docName] );
+[\fIfile\f(CW]/Edit(/[in]out/\fImediaType/contents\f(CW,
+ / /[in/messageID/counterfoil]
+ / /[in/title/docName ])
+[\fIfile\f(CW]/Mail(/in/\fImediaType/contents\f(CW );
+[\fIfile\f(CW]/Mail(/out/\fImediaType/contents\f(CW    
+ / /[in/title/\fIdocName\f(CW] );
+[\fIfile\f(CW]/Mail(/inout/\fImediaType/contents\f(CW
+ / /[in/title/\fIdocName\f(CW] );
+[\fIfile\f(CW]/Print(/in/\fImediaType/contents\f(CW,
+ / /in/boolean/\fIinquisitive\f(CW,
+ / /in/boolean/\fIcovert\f(CW
+[\fIfile\f(CW]/Translate(/in/\fImediaType/contents\f(CW,
+ / /out/\fImediaType/output\f(CW,
+ / /in/boolean/\fIinquisitive\f(CW,
+ / /in/boolean/\fIcovert\f(CW
+ / /[in/messageID/\fIcounterfoil\f(CW] );
+.TE
+.SH DEFINITIONS
+.SS document
+.PP
+A vector of bytes with an associated \fImediaType\fR.
+.SS \fImediaType\fR
+.PP
+The name of a media format.  The media type of a document
+allows messages about that document to be dispatched to the
+right tool.  Standard media types include:
+.PP
+.TS
+tab (/) ;
+l l l .
+\f(CWISO_Latin_1\fR/ISO 8859-1 (+TAB+NEWLINE)/ISO	
+\f(CWEUC\fR/Multi-National Lang. Supplement/AT&T	
+\f(CWPostScript\fR/PostScript Lang. Ref. Manual/Adobe	
+\f(CWSun_Raster\fR/rasterfile(5)/Sun	
+\f(CWTIFF\fR/"TIFF Rev. 5" Technical Memo/Aldus/Microsoft	
+\f(CWGIF\fR/Graphics Interchange Format/CompuServe	
+\f(CWXPM\fR/XPM -- The X PixMap Format/Groupe Bull	
+\f(CWJPEG\fR/ /ISO-CCITT	
+\f(CWJPEG_Movie\fR/ /Parallax	
+\f(CWSun_Audio\fR/audio_intro(3), audio_hdr(3)/Sun	
+\f(CWRFC_822_Message\fR/RFC 822/NIC	
+\f(CWMIME_Message\fR/RFC MIME/NIC	
+\f(CWUNIX_Mail_Folder\fR/ /	
+\f(CWRTF\fR/MS Word Technical Reference/Microsoft	
+\f(CWEPS\fR/ /	
+\f(CWSun_CM_Appointment\fR/ /Sun	
+.TE
+.\".SS abstract mediaType
+.\".PP
+.\"A family of similar media types, such as flat text or
+.\"structured graphics.
+.\".SS \f8vector\fR
+.\".PP
+.\"A string vtype describing a distance and a direction in a
+.\"document.  The syntax of vectors varies by abstract
+.\"media type.
+.\".SS \f8locator\fR
+.\".PP
+.\"A string describing a location in a document.  The syntax of
+.\"locators varies by abstract media type, but should usually be a
+.\"superset of vector syntax.
+.\".SS flat text
+.\".PP
+.\"A family of media types which (like ISO_Latin_1) consist
+.\"of a sequence of characters from some character set.
+.\".PP
+.\"Legal vectors for flat text are
+.\".PD 0
+.\".IP
+.\".ta 1i
+.\".nf
+.\"\fIlineVec\f(CW	::= Line:[-][0-9]+	
+.\"\fIcharVec\f(CW	::= Character:[-][0-9]+	
+.\"\fIvector\f(CW	::= \fIlineVec\f(CW	
+.\"\fIvector\f(CW	::= [\fIlineVec\f(CW,]\fIcharVec\f(CW
+.\".fi
+.\".PD
+.\".PP
+.\"Legal locators for flat text are vectors.
+.\".SS time-based media
+.\"A family of media types which (like Sun_Audio) consist
+.\"of time-structured data.
+.\".PP
+.\"Legal vectors for time-based media include
+.\".PD 0
+.\".IP
+.\".ta 1i
+.\".nf
+.\"\fIvector\f(CW	::= uSeconds:[-][0-9]+	
+.\"\fIvector\f(CW	::= Samples:[-][0-9]+	
+.\".fi
+.\".PD
+.\".PP
+.\"Legal locators for time-based media are vectors.
+.SH ERRORS
+.TP
+.B 1300 TT_MEDIA_ERR_SIZE
+\f(CWThe specified size was too big or too small\fR
+.TP
+.B 1301 TT_MEDIA_ERR_FORMAT
+\f(CWThe data do not conform to their alleged format\fR
+.SH NOTES
+.PP
+It is possible to extract from the ToolTalk types database a list
+of the installed media types.

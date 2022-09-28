@@ -1,0 +1,73 @@
+
+#
+#	$Revision: 1.1 $
+#
+#  @(#)Makefile.old	1.30 01/18/94	cde_app_builder/src/libAButil
+#
+# 	RESTRICTED CONFIDENTIAL INFORMATION:
+#	
+#	The information in this document is subject to special
+#	restrictions in a confidential disclosure agreement between
+#	HP, IBM, Sun, USL, SCO and Univel.  Do not distribute this
+#	document outside HP, IBM, Sun, USL, SCO, or Univel without
+#	Sun's specific written approval.  This document and all copies
+#	and derivative works thereof must be returned or destroyed at
+#	Sun's request.
+#
+#	Copyright 1993 Sun Microsystems, Inc.  All rights reserved.
+#
+#
+
+.KEEP_STATE:
+PROJECTDIR = ../..
+
+LIBPART = libAButil
+LIBS.shared = libAButil.a
+
+SOURCES.c = \
+	abio.c \
+	abio_path.c \
+	istr.c \
+	util.c \
+	util_convert.c \
+	util_err.c \
+	util_file.c \
+	util_string.c
+
+SOURCES.h.shipped = \
+	util_types.h
+
+SOURCES.h.shared = \
+	abio.h \
+	istr.h \
+	util.h \
+	util_err.h \
+	XmAll.h \
+	MwmUtil.h
+
+SOURCES.h.unshared = \
+	utilP.h
+
+SOURCES.h = \
+	$(SOURCES.h.shipped)	\
+	$(SOURCES.h.shared)	\
+	$(SOURCES.h.unshared)
+
+SOURCES.other = \
+	Makefile.install
+
+LIBRARY = libAButil.a
+
+# Compiler flags.
+
+#CPPFLAGS += -I.. -I$(OPENWINHOME)/include
+
+# Make information.
+
+.INIT:  $(PROJECTDIR)/Makefile.include
+include $(PROJECTDIR)/Makefile.include
+
+INSTALL.share = src
+INSTALL.other = $(SOURCES.c) $(SOURCES.h) $(SOURCES.other)
+INSTDIR.other = $(DESTDIR)/share/src/libAButil
+

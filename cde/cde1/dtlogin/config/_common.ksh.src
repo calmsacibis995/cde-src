@@ -1,0 +1,497 @@
+#if 0
+/*
+ *
+ *  _common.ksh.src
+ *
+ *  Common Desktop Environment (CDE)
+ *
+ *   Common code for dtlogin config scripts
+ *
+ *   (c) Copyright 1993, 1994 Hewlett-Packard Company
+ *   (c) Copyright 1993, 1994 International Business Machines Corp.
+ *   (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+ *   (c) Copyright 1993, 1994 Novell, Inc.
+ *
+ *   $XConsortium: _common.ksh.src /main/cde1_maint/5 1995/11/30 21:59:00 montyb $
+ */
+#endif
+
+#if 0
+/*
+ * Note: this file is included by Xsession.src and Xsetup.src. If
+ * Xsession is being built, cpp_Xsession will be defined. If Xsetup
+ * is being built, cpp_Xsetup will be defined.
+ */
+#endif
+
+#ifdef cpp_Xsession
+  COM
+  COM Determine Xsession parent
+  COM
+#if defined (__osf__)
+  pexec=$(LC_TIME=C ps -p $PPID | awk 'NR==2 {print $5}')
+#elif defined(USL) && (OSMAJORVERSION > 1)
+  pexec=$(LC_TIME=C ps -p $PPID | awk 'NR==2 {print $6}')
+#else
+  pexec=$(LC_TIME=C /usr/bin/ps -p $PPID | awk 'NR==2 {print $4}')
+#endif
+  Log "Xsession started by $pexec"
+#endif
+
+COM ###########################################################################
+COM  
+COM Append desktop font aliases to font path
+COM
+COM ###########################################################################
+
+#if defined(sun)
+ADDFONTPATH_LOCAL() {
+        COM Combine lines together to make arguments for the xset command
+        FP=`awk '
+        BEGIN { fp="fp+ " }
+        /^[     ]*$/ { fp=" +fp " ; continue }
+        { printf("%s%s", fp, $0) ; fp="," } ' $1`
+        if [ -n "$FP" ]; then
+#ifdef cpp_Xsession
+                Log "setting auxiliary font path..."
+#endif
+                eval "xset $FP"
+        fi
+}
+
+ADDFONTPATH_REMOTE() {
+        nawk '  BEGIN {
+                fp=" fp+ "
+               XDIR=0
+                }
+                /^[     ]*$/ {
+                fp=" +fp " ; continue }
+                {cmd = sprintf("%s%s%s%s%s",XDIR,"/xset",fp, $0," 1>/dev/null");
+                system(cmd); } ' XDIR=$OPENWINHOME/bin  $1
+}
+
+#endif /* sun */
+
+#ifdef cpp_Xsession
+  if [ "${pexec##*/}" != "dtlogin" ]; then
+    COM
+    COM If Xsession launched by dtlogin, it is assumed that the desktop
+    COM font path has already been added by Xsetup, so no need to add it here.
+    COM 
+#endif
+
+    COM 
+    COM Reset Xserver font path to its default values
+    COM
+
+    $XDIR/xset fp default
+
+#if defined (sun)
+
+
+    COM
+    COM Switch Sun's Alt and Meta mod mappings to work with Motif
+    COM
+    if $XDIR/xmodmap | /bin/grep mod4 | /bin/grep Alt > /dev/null 2>/dev/null
+    then
+	$XDIR/xmodmap -e "clear Mod1" \
+		-e "clear Mod4" \
+		-e "add Mod1 = Alt_L" \
+		-e "add Mod1 = Alt_R" \
+		-e "add Mod4 = Meta_L" \
+		-e "add Mod4 = Meta_R"
+    fi
+
+#endif /* sun */
+    COM
+    COM Append desktop font paths. Note: these directories should be
+    COM accessable by the X server. The file precedence is:
+    COM
+    COM   CDE_CONFIGURATION_TOP/config/xfonts/C
+    COM   CDE_INSTALLATION_TOP/config/xfonts/C
+    COM   CDE_CONFIGURATION_TOP/config/xfonts/$LANG
+    COM   CDE_INSTALLATION_TOP/config/xfonts/$LANG
+    COM
+#ifdef cpp_Xsession
+    Log "setting font path..."
+#endif
+#if defined (_AIX)
+    if [ "$DTXSERVERLOCATION" != "remote" -a -z "$XSTATION" ]; then
+#else
+    if [ "$DTXSERVERLOCATION" != "remote" ]; then
+#endif
+      COM
+      COM Since X server is local, optimize by checking local desktop
+      COM font directories and making one call to xset.
+      COM
+
+      if [ -r $OPENWINHOME/lib/locale/$LANG/OWfontpath ]; then
+          ADDFONTPATH_LOCAL $OPENWINHOME/lib/locale/$LANG/OWfontpath
+      fi
+
+      if [ -f CDE_CONFIGURATION_TOP/config/xfonts/C/fonts.dir ]; then
+          fontpath=CDE_CONFIGURATION_TOP/config/xfonts/C
+      fi
+
+      if [ -f CDE_INSTALLATION_TOP/config/xfonts/C/fonts.dir ]; then
+        if [ -z "$fontpath" ]; then
+          fontpath=CDE_INSTALLATION_TOP/config/xfonts/C
+        else
+          fontpath=$fontpath,CDE_INSTALLATION_TOP/config/xfonts/C
+        fi
+      fi
+
+      if [ "$LANG" != "C" ]; then
+        if [ -f CDE_CONFIGURATION_TOP/config/xfonts/$LANG/fonts.dir ]; then
+          if [ -z "$fontpath" ]; then
+            fontpath=CDE_CONFIGURATION_TOP/config/xfonts/$LANG
+          else
+            fontpath=$fontpath,CDE_CONFIGURATION_TOP/config/xfonts/$LANG
+          fi
+        fi
+      fi
+
+      if [ "$LANG" != "C" ]; then
+        if [ -f CDE_INSTALLATION_TOP/config/xfonts/$LANG/fonts.dir ]; then
+          if [ -z "$fontpath" ]; then
+            fontpath=CDE_INSTALLATION_TOP/config/xfonts/$LANG
+          else
+            fontpath=$fontpath,CDE_INSTALLATION_TOP/config/xfonts/$LANG
+          fi
+        fi
+      fi
+
+
+      if [ ! -z "$fontpath" ]; then
+        $XDIR/xset fp+ $fontpath
+      fi
+
+    else
+      COM
+      COM Since X server not local, we don't know if the desktop font
+      COM directories exist on the X server machine, so we have to
+      COM set them one at a time.
+      COM
+
+      if [ -r $OPENWINHOME/lib/locale/$LANG/OWfontpath ]; then
+          ADDFONTPATH_REMOTE $OPENWINHOME/lib/locale/$LANG/OWfontpath
+      fi
+
+      $XDIR/xset fp+ CDE_CONFIGURATION_TOP/config/xfonts/C 1>/dev/null
+
+      $XDIR/xset fp+ CDE_INSTALLATION_TOP/config/xfonts/C 1>/dev/null
+
+      if [ "$LANG" != "C" ]; then 
+        $XDIR/xset fp+ CDE_CONFIGURATION_TOP/config/xfonts/$LANG 1>/dev/null
+      fi
+
+      if [ "$LANG" != "C" ]; then
+        $XDIR/xset fp+ CDE_INSTALLATION_TOP/config/xfonts/$LANG 1>/dev/null
+      fi
+
+      COM
+      COM Append Font Server to tail of path.  
+      COM Will server any "-dt-" fonts not found on the remote machine.
+      COM 
+      if [ -x /usr/openwin/bin/fs ]; then
+	$XDIR/xset fp+ tcp/`/usr/bin/hostname`.`/usr/bin/domainname | /usr/bin/cut -d. -f2-`:7100
+      fi
+    fi
+#ifdef cpp_Xsession
+  fi 
+#endif
+
+
+#if defined (__osf__)
+#ifdef cpp_Xsetup
+
+    if [ "$DTXSERVERLOCATION" != "remote" ]; then
+      COM
+      COM We can only modify the font path or the keymap if the X server is
+      COM local.
+      COM
+      COM Since X server is local, optimize by checking local desktop
+      COM font directories and making one call to xset.
+      COM
+      COM
+      COM
+      COM check if the system has a Low or High Resolution Monitor
+      COM   -  High Resolution (1280 x 1024) uses 100 dpi fonts.
+      COM   -  Medium Resolution (1024 x 864 ) uses 75 dpi fonts.
+      COM   -  Low Resolution (1024 x 768 or lower) uses 75 dpi fonts.
+      COM This will only switch to 75dpi fonts if there is a low or medium
+      COM resolution monitor found.  
+      COM
+      COM
+      fd=""
+      prefplist=""
+      appfplist=""
+      setfont="No"
+      FONTLIB="/usr/lib/X11/fonts"
+      I18N="/usr/i18n/${FONTLIB}/decwin"
+      pixwidth=`/usr/sbin/sizer -gr | awk -Fx ' { print $1 } ' `
+      if [ ${pixwidth} -lt 1280 ] 
+      then
+         nat_res="75dpi"
+         alt_res="100dpi"
+      else
+	 nat_res="100dpi"
+         alt_res="75dpi"
+      fi
+
+      COM
+      COM Add scalable fonts to the font path, based on 
+      COM screen resolution
+      COM
+      if [ ${pixwidth} -lt 1024 ] 
+      then
+          COM
+          COM Prepend fontpaths
+          COM
+          prefplist="${FONTLIB}/Speedo ${FONTLIB}/Type1 ${FONTLIB}/Type1Adobe"
+      else
+          COM
+          COM Append fontpaths 
+          COM
+          appfplist="${FONTLIB}/Type1Adobe"
+      fi
+
+      COM
+      COM Append fontpaths
+      COM add optional extra fonts
+      COM
+      appfplist="${appfplist} ${FONTLIB}/user/${nat_res} ${FONTLIB}/user/misc"
+      if [ "$LANG" != "C" ]; then
+        appfplist="${appfplist} "CDE_CONFIGURATION_TOP"/config/xfonts/$LANG/$nat_res"
+        appfplist="${appfplist} "CDE_CONFIGURATION_TOP"/config/xfonts/$LANG/$alt_res"
+      fi
+      appfplist="${appfplist} "CDE_CONFIGURATION_TOP"/config/xfonts/C"
+      appfplist="${appfplist} "CDE_CONFIGURATION_TOP"/config/xfonts/C/$nat_res"
+      appfplist="${appfplist} "CDE_CONFIGURATION_TOP"/config/xfonts/C/$alt_res"
+      if [ "$LANG" != "C" ]; then
+        appfplist="${appfplist} "CDE_INSTALLATION_TOP"/config/xfonts/$LANG/$nat_res"
+        appfplist="${appfplist} "CDE_INSTALLATION_TOP"/config/xfonts/$LANG/$alt_res"
+      fi
+      appfplist="${appfplist} "CDE_INSTALLATION_TOP"/config/xfonts/C"
+      appfplist="${appfplist} "CDE_INSTALLATION_TOP"/config/xfonts/C/$nat_res"
+      appfplist="${appfplist} "CDE_INSTALLATION_TOP"/config/xfonts/C/$alt_res"
+
+      COM
+      COM Prepend fontpaths
+      COM add i18n fonts if they exist
+      COM
+      prefplist="${I18N}/${nat_res} ${I18N}/${alt_res} ${prefplist}"
+
+      COM
+      COM Prepend to fontpath
+      COM
+      for i in ${prefplist} 
+      do 
+         if [ -f ${i}/fonts.dir ]
+         then 
+             if [ $fd ] 
+             then
+                fd="${fd},${i}/" 
+             else
+                fd="${i}/"
+                setfont="Yes" 
+             fi
+         fi 
+      done
+
+      if [ ${setfont} = Yes ]
+      then
+         xset +fp ${fd}
+         if [ $? -ne 0 ] 
+         then
+            COM
+            COM set the old slow way.....
+            COM
+            for i in ${prefplist}
+            do
+              if [ -f ${i}/fonts.dir ]
+              then
+                  xset +fp ${i}
+              fi
+            done
+         fi
+         COM
+         COM End of the setting the old slow way.........
+         COM
+         fd=""
+         setfont='No'
+      fi  
+
+      COM
+      COM Append to fontpath
+      COM
+      for i in ${appfplist}
+      do
+         if [ -f ${i}/fonts.dir ]
+         then
+             if [ $fd ]
+             then
+                fd="${fd},${i}/"
+             else
+                fd="${i}/"
+                setfont="Yes"
+             fi
+         fi
+      done
+
+      if [ ${setfont} = Yes ]
+      then
+         xset fp+ ${fd}
+         if [ $? -ne 0 ] 
+         then
+            COM
+            COM set the old slow way.....
+            COM
+            for i in ${appfplist}
+            do
+              if [ -f ${i}/fonts.dir ]
+              then
+                  xset fp+ ${i}
+              fi
+            done
+         fi
+         COM
+         COM End of the setting the old slow way.........
+         COM
+      fi
+
+
+    fi
+#endif
+#endif
+
+#if defined (_AIX)
+COM ###########################################################################
+COM
+COM  Setup keyboard mapping for local display if required
+COM
+COM ###########################################################################
+#if 0
+/*
+ * The keyboard mapping method depends upon how the session is started:
+ *
+ * - from dtlogin with a local X server
+ *   
+ *   This is generally the case for the console. Since the keyboard is
+ *   on the login server, the keyboard mapping will be done in Xsetup
+ *   and the language will be determined via querybkd. 
+ *
+ * - from dtlogin with a remote X server
+ *
+ *   The is generally the case for X stations. Since the keyboard is not
+ *   on the login server, we cannot query for the language. The keyboard
+ *   language will thus be provided in the KBD_MAP table setup by the
+ *   sysadmin and the keyboard mapping will be done in Xsetup. 
+ *
+ * - using 'xinit /usr/dt/bin/Xsession' from an HFT/LFT
+ *   
+ *   Since the keyboard is local, the keyboard mapping will be done in 
+ *   Xsession and the language will be determined via querykbd.
+ *   
+ * - starting Xsession from an x_st_mgr provided aixterm on an X station
+ *   
+ *   The X station manager sets up the keyboard mapping in this case, so
+ *   no work is required.
+ */
+#endif
+
+SetKeyboardMap()
+{
+  COM $1 = language name
+
+#if defined (_POWER)
+#  define cpp_KBDALTFILE "$KBD_LIST $XMODDIR/${1}@alt/keyboard"
+#else
+#  define cpp_KBDALTFILE "$KBD_LIST $XMODDIR/$1/keyboard.alt"
+#endif
+
+  KBD_LIST=""
+  KBD_LIST="$KBD_LIST $IMKEYMAPPATH/$1/keyboard"
+  if [ "$IMKEYMAPPATH" = "/usr/lib/nls/im.alt" ]; then
+    KBD_LIST=cpp_KBDALTFILE
+  fi
+  KBD_LIST="$KBD_LIST $XMODDIR/$1/keyboard"
+
+  for i in $KBD_LIST; do
+    if [ -r $i ]; then
+#ifdef cpp_Xsession
+      Log "starting xmodmap $i"
+#endif
+      $XDIR/xmodmap $i
+      return 0
+    fi
+  done
+
+  return 1
+}
+
+#ifdef cpp_Xsession
+  if [ "${pexec##*/}" != "dtlogin" -a -z "$XSTATION" ]; then
+    COM
+    COM If Xsession started by dtlogin, it is assumed that the keyboard mapping
+    COM was set up in Xsetup. If Xsession not started by dtlogin, but XSTATION
+    COM set, it is assumed that the keyboard mapping was set up by x_st_mgr.
+    COM
+#endif
+    
+#if defined (_POWER)
+# define cpp_CNAME "C"
+#else
+# define cpp_CNAME "C.hft"
+#endif
+
+#ifdef cpp_Xsetup
+    COM
+    COM Determine keyboard language
+    COM
+    KBD_LANG=""
+    if [ "$DTXSERVERLOCATION" = "local" ]; then
+      COM
+      COM Local display so query for keyboard map
+      COM
+      KBD_LANG=`/usr/lpp/X11/bin/querykbd`
+    else
+      COM
+      COM Non-local display so use KEY_MAP list
+      COM
+      let i=0
+      while true; do
+        [ -z "${KBD_MAP[i]}" ] && break
+        if [ "$DISPLAY" = "${KBD_MAP[i]%% *}" ]; then
+          KBD_LANG=${KBD_MAP[i]##* }
+          break
+        fi
+        let i=$i+1
+      done
+    fi
+#endif
+#ifdef cpp_Xsession
+    KBD_LANG=`/usr/lpp/X11/bin/querykbd`
+#endif
+
+    COM
+    COM Set up keyboard mapping
+    COM 
+    KBD=""
+    XMODDIR=/usr/lpp/X11/defaults/xmodmap
+
+    if [ ! -z "$KBD_LANG" ]; then
+      if [ "$KBD_LANG" != "NULL" -a "$KBD_LANG" != cpp_CNAME ]; then
+        SetKeyboardMap $KBD_LANG
+        if [ $? != 0 ]; then
+          SetKeyboardMap $LANG
+        fi
+      else
+        SetKeyboardMap $LANG
+      fi
+    fi
+    
+#ifdef cpp_Xsession
+  fi
+#endif
+#endif

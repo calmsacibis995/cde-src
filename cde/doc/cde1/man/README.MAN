@@ -1,0 +1,222 @@
+This READEME file covers the instructions for man pages
+that were previously sent out in email.  It includes information
+on:
+
+	Copyright statement
+	CRT
+	Editing
+	Examples
+	File naming conventions
+	Grouping functions
+	List of man pages
+	Printing (verifying for online use)
+	Required Sections
+	Schedule
+	Templates
+	Problems with tables
+
+	
+Copyright
+--------------------------------------------------------------
+
+Put the copyright at the top of the man page.
+It should only appear on the troff source file.  
+Comment it out, so it doesn't appear when the page is
+formatted for printing or viewed via the man command
+interface.  For example,
+
+.\" (c) Copyright 1994 Hewlett-Packard Company
+.\" (c) Copyright 1994 International Business Machines Corp.
+.\" (c) Copyright 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1994 Unix System Labs, Inc., a subsidiary of Novell, Inc.
+
+
+
+CRT
+--------------------------------------------------------------
+
+CRT for man pages is more liberal than for code.  Changes may
+be made to man pages without permission from CRT until the man
+pages freeze on 2/28.  CRT for man pages prior to the Sample
+Implementation will stricter.
+
+
+
+Editing
+--------------------------------------------------------------
+
+There are no dedicated writing or editing resources for
+man pages.  Your writers can edit a hard copy version of
+your man page.  Writers cannot edit the troff file or
+make any formatting corrections.
+
+Your man pages should be reviewed.  Talk to your writers
+about an editorial cycle for your man pages.  Writers should
+have some cycles in their schedule after 3/15.
+
+
+
+Examples
+--------------------------------------------------------------
+
+There are examples of some man pages in this directory.
+The files "create_pushbutton.ex" and pushbutton.ex" are
+examples of man page files for both nroff and troff.  These
+files correspond to the source files for XmCreatePushbutton
+and XmPushbutton.  The file "string.3c" is one that demonstrates
+a man page with more than one function.
+
+Do not use the .C macros: .C., .CI, .CB, .CR, .RC, .BC, .IC,
+they do not work with every company's man macro package.
+.C is for courier font.  For code examples, where you might
+use courier font, use .ft 3 instead.
+
+
+
+File naming conventions
+--------------------------------------------------------------
+
+Use the case sensitive, unabbreviated and untruncated
+name of your client, function, etc., for the name of the
+man page file, even if it is longer than 14 characters.
+For example:
+ 
+        cdesrc/doc/cde1/man/man1/dtwm.1
+        cdesrc/doc/cde1/man/man3/DtInitialize.3
+
+
+
+Grouping functions
+--------------------------------------------------------------
+
+Previous instructions suggested grouping functions
+together on a single man page where it made sense.  You
+may still do that, but since the man pages will most likely
+be used as part of the CDE submittal to X/Open, please limit
+the number of functions per man page.
+
+
+
+List of man pages
+--------------------------------------------------------------
+
+The most up-to-date list of man pages or man page topics
+is included in this directory in the file called mpage_list.
+
+
+
+Printing (Verifying for online use)
+--------------------------------------------------------------
+
+Verify your man pages for online use.  Use the
+following commands to simulate the output of your online
+man system
+
+HP:
+
+	tbl <filename> | nroff -man | col | more -s
+
+Sun:
+
+	tbl <filename> | nroff -man  | more
+
+IBM:
+
+	TBD
+
+The online command results in output that is virtually identical to
+what you see from the "man" command.
+
+To print your man page, use the commands:
+
+HP:
+
+	tbl <filename> | troff -man
+
+Sun:
+
+	tbl <filename> | troff -mansun
+
+IBM:
+
+	TBD
+
+
+
+Required Sections
+--------------------------------------------------------------
+
+The following are the required sections for your man page.
+
+Page Heading
+NAME
+CONFIGURATION (section 7 only)
+SYNOPSIS
+PROTOCOL (section 3R only),
+DESCRIPTION
+IOCTLS (section 7 only)
+OPTIONS
+RESOURCES (sections 1 and 3)
+RETURN VALUES,
+ENVIRONMENT (if applicable),
+FILES
+SEE ALSO
+
+
+
+Schedule
+--------------------------------------------------------------
+
+12/13 - Man pages/Base Libraries
+1/17  - Man pages/Other Libraries
+2/7   - Man pages/Base Clients
+2/28  - Man pages/Other Clients
+
+2/28  - Man pages freeze for snapshot
+
+2/28 - 3/14  - System Test including man pages
+
+3/21 -  Editorial Review
+        (see editing)
+
+4/29 - 5/13 - Technical Review TBD
+
+xx/xx - Man page Freeze for sample implementation
+        all man pages complete and checked in
+
+xx/xx - Another system test cycle?
+
+
+
+Templates
+--------------------------------------------------------------
+
+There are four man page templates.
+
+	client_template         man(1) clients, utilities
+        config_file_template    man(4) file formats
+        function_template       man(3) API functions
+        widget_template         man(3) widgets
+
+
+
+Problems with tables
+--------------------------------------------------------------
+
+A potential problem area when you create a man page for online use (nroff),
+is the resource tables.  Look at the example file for XmPushbutton.
+You'll see that there is no box around any of the tables, no horizontal
+lines within any of the tables.  The point size is also quite small ---
+7 point for headers and 6 point for text.  This helps make the tables
+more readable online, but more often than not you'll still need to 
+resize the term window from which you originate the online command.
+
+For example, use the appropriate nroff command on your system to format
+the pushbutton.ex for online use from a normal (80X24) term window
+and page through the man page.  When the table first appears, you'll
+see line wraps that make the overall appearance ugly.  Next, bring
+up another term window and resize it to 130X48.  Format the
+pushbutton.ex man page again and look at it.  The tables are much
+more readable because the line wraps have been eliminated.
+
+

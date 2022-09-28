@@ -1,0 +1,82 @@
+.de Lc
+.\" version of .LI that emboldens its argument
+.TP \\n()Jn
+\s-1\f3\\$1\f1\s+1
+..
+.TH tt_fd 3 "1 March 1996" "ToolTalk 1.3" "ToolTalk Functions"
+.BH "1 March 1996"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.IX "tt_fd" "" "tt_fd(3)" ""
+.SH NAME
+tt_fd \- return a file descriptor
+.SH SYNOPSIS
+.ft 3
+.nf
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'int tt_fd('u
+int tt_fd(void);
+.PP
+.fi
+.SH DESCRIPTION
+The
+.BR tt_fd (\|)
+function
+returns a file descriptor.
+The returned file descriptor alerts the process that a message has
+arrived for the default
+procid
+in the default session.
+.PP
+File descriptors are either active or inactive.
+When the file descriptor becomes
+active, the process must call
+.BR tt_message_receive (3)
+to receive the message.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.BR tt_fd (\|)
+function returns the file descriptor for the current
+procid.
+The application can use
+.BR tt_int_error (3)
+to extract one of the following
+.B Tt_status
+values from the returned integer:
+.PP
+.RS 3
+.nr )J 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_NOMP
+.br
+The
+.BR ttsession (1)
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_PROCID
+.br
+The current default process identifier is out of date or invalid.
+.Lc TT_ERR_SESSION
+.br
+The specified ToolTalk session is out of date or invalid.
+.PP
+.RE
+.nr )J 0
+.SH "APPLICATION USAGE"
+The application must have a separate file descriptor for each
+procid.
+To get an
+associated file descriptor, the application should use
+.BR tt_fd (\|)
+each time it calls
+.BR tt_open (3).
+.SH "SEE ALSO"
+.na
+.BR tt_c (5),
+.BR tt_open (3),
+.BR tt_int_error (3),
+.BR tt_message_receive (3).

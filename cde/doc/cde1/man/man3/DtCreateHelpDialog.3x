@@ -1,0 +1,461 @@
+.\" **
+.\" **
+.\" ** (c) Copyright 1994 Hewlett-Packard Company
+.\" ** (c) Copyright 1994 International Business Machines Corp.
+.\" ** (c) Copyright 1994 Sun Microsystems, Inc.
+.\" ** (c) Copyright 1994 Unix Systems Labs, Inc., a subsidiary of Novell, Inc.
+.\" **
+.\" **
+.\" **
+.TH DtCreateHelpDialog 3 "11 Jan 1994"
+.BH "11 Jan 1994"
+.SH NAME
+DtCreateHelpDialog \- A HelpDialog convenience creation function.
+.iX "DtCreateHelpDialog"
+.iX "creation functions" "DtCreateHelpDialog"
+.SH SYNOPSIS
+\fB
+\&#include <Dt/HelpDialog.h>
+.br
+\&#include <Dt/Help.h>
+.sp .5
+Widget DtCreateHelpDialog (\fIparent, name, arglist, argcount\fP)
+.br
+.ta .5i 1.5i
+        Widget   \fIparent\fP;
+.br
+        String   \fIname\fP;
+.br
+        ArgList  \fIarglist\fP;
+.br
+        Cardinal \fIargcount\fP;
+.fi
+\fP
+.SH DESCRIPTION
+\fBDtCreateHelpDialog\fP is a convenience function that creates a help
+dialog widget hierarchy.
+.IP "\fIparent\fP" .75i
+Specifies the parent widget ID
+.IP "\fIname\fP" .75i
+Specifies the name of the created widget
+.IP "\fIarglist\fP" .75i
+Specifies the argument list
+.IP "\fIargcount\fP" .75i
+Specifies the number of attribute/value pairs in the argument list
+(\fIarglist\fP)
+.PP
+This function provides developers with a standard mechanism for creating a
+General Help Dialog. The widget returned by this function is an
+ \fBXmBulletinBoard\fP
+widget whose parent is a dialog shell widget which serves as the top level 
+child in the created help dialog. Refer to the Motif 1.2 documentation for 
+more information on the dialog shell widget and applicable resources.
+.SH DETAILED DESCRIPTION
+.fi
+The general help dialog widget provides access to Cde online help volumes.
+These online help voluems contain structured information, with rich text, 
+graphics, and embedded hyperlinks.
+.PP 
+A general help dialog widget has six main areas:
+.TP
+\(bu
+A menu bar which contains the following items: File, Edit, Search, Navigate,
+and Help.
+.TP
+\(bu
+A volume label area that shows the current help volume's title.
+.TP
+\(bu
+A "Topic Tree" area that displays all of the topics and subtopics of the 
+current help volume in a table of contents type format.  The 
+\fIhome topic\fP is at the top of the list (the top of the hierarchy).
+An arrow (->) points to the current topic and shows your location in the 
+help volume.
+.TP
+\(bu
+A Button Box area that provides quick access to frequently used features: 
+\fI"Backtrack"\fP, \fI"History..."\fP, \fI"Index..."\fP.
+.TP
+\(bu
+A adjustable vpane widget to allow end-user sizing of the topic tree area
+relative to the display area.
+.TP
+\(bu
+A text display area that renders the rich text, graphics, and embedded 
+hypertext links contained in the help volume topics.
+.PP
+
+The user can specify resources in a resource file for the automatically
+created widgets and gadgets of the general help dialog.  The following list
+identifies the names of these widgets (or gadgets) and the associated
+general help dialog .
+.PP
+         Topic Tree \- "TocArea"
+.PP
+         Display Area \- "DisplayArea"
+.PP
+         Button Box \- "btnBox"
+.PP
+.fi
+In all but one case, the genereal help dialog widget will honor all default
+and user specified resource settings.  In the case wherein an error is 
+caused due to a non-valid request, the help dialog will post the proper 
+error message in its display area, and modify the \fBDtNhelpType\fP to 
+reflect the current contents of the display area (i.e. help message text). 
+As a general rule, developers and/or users should with each 
+setting of the help widget, set the \fBDtNhelpType\fP to the appropriate 
+value.
+.SP .5
+.SS "Classes"
+HelpDialog inherits behavior and resources from \fBCore\fP, \fBComposite\fP,
+\fBConstraint\fP, \fBXmManager\fP,and  \fBXmBulletinBoard\fP classes.
+.PP
+The class pointer is \fBdtHelpDialogClass\fP. 
+.PP
+The class name is \fBDtHelpDialog\fP.
+.sp .5
+.SS "New Resources"
+The following table defines a set of widget resources used by the programmer
+to specify data.  The programmer can also set the resource values for the 
+inherited classes to set attributes for this widget.  To reference a
+resource by name or by class in a .Xdefaults file, remove the \fBDtN\fP or
+\fBDtC\fP prefix and use the remaining letters.  To specify one of the defined 
+values for a resource in a .Xdefaults file, remove the \fBDt\fP prefix and use
+the remaining letters (in either lowercase or uppercase, but include any
+underscores between words).
+The codes in the access column indicate if the given resource can be
+set at creation time (\fBC\fP), set by using \fBXtSetValues\fP (\fBS\fP), 
+retrieved by using \fBXtGetValues\fP (\fBG\fP), or is not applicable (\fBN/A\fP).
+.sp .5
+.sp .5
+.in 0
+.KS
+.sp 1
+.in 0
+.TS
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+DtCreateHelpDialog Resource Set
+Name	Class	Type	Default	Access
+_
+DtNlocationId 	DtCLocationId 	char *	NULL	CSG
+DtNhelpVolume	DtCHelpVolume	char *	NULL	CSG
+DtNhelpOnHelpVolume	DtCHelpOnHelpVolume	char *	NULL	CSG
+DtNmanPage	DtCManPage	char *	NULL	CSG
+DtNstringData	DtCStringData	char *	NULL 	CSG
+DtNhelpFile	DtCHelpFile	char *	NULL	CSG
+DtNtopicTitle	DtCTopicTitle	char *	NULL	CSG
+DtNhelpType	DtCHelpType	Int	See Definition	CSG
+DtNvisiblePathCount	DtCVisiblePathCount	Int	6	C
+DtNscrollBarPolicy 	DtCScrollBarPolicy 	Int	See Definition	C
+.\" ** FOR Cde Only
+DtNpaperSize	DtCPaperSize	int  	See Definition	CSG	
+DtNprinter	DtCPrinter	char * 	NULL	CSG
+DtNhelpPrint	DtCHelpPrint	char * 	See Definition	CSG
+.\" ** END, FOR Cde Only
+DtNrows	DtCRows	Dimension	15	CSG
+DtNcolumns	DtCColumns	Dimension	40	CSG
+DtNhyperLinkCallback	DtCHyperLinkCallback	XtCallbackList 	NULL		C
+DtNcloseCallback	DtCCloseCallback	XtCallbackList	NULL	C
+DtNshowNewWindowButton	DtCShowNewWindowButton	Boolean	TRUE	C
+.TE
+.in
+.sp 1
+.KE
+.in
+.sp .5
+.sp .5
+.IP "\fBDtNlocationId\fP"
+Specifies a help topic to display. Applications reference topics within a help 
+volume via a location ID. Location ID's are author defined at the help volume 
+creation time. Developers use these location ID's to display the desired help
+topic. \fBDtNhelpVolume\fP must be set to the help volume in which the 
+corresponding location ID resides, and \fBDtNhelpType\fP must be set to
+\fBDtHELP_TYPE_TOPIC\fP.
+.IP "\fBDtNhelpVolume\fP"
+Specifies the help volume to use. This resource is used in conjunction with the
+\fBDtNlocationId\fP resource to display help topics.
+.IP "\fBDtNhelpOnHelpVolume\fP"
+Specifies the help volume that is displayed when a user selects help from any
+of the help dialogs.
+.IP "\fBDtNmanPage\fP"
+Specifies the Unix man page to display in the current help dialog. This resource
+is used when the \fBDtNhelpType\fP is set to \fBDtHELP_TYPE_MAN_PAGE\fP. 
+.IP "\fBDtNstringData\fP"
+Specifies the string data (char*) to display in the current help dialog. This 
+resource is used when the \fBDtNhelpType\fP is set to \fBDtHELP_TYPE_STRING\fP. 
+.IP "\fBDtNhelpFile\fP"
+Specifies the file name of a ASCII file to be read and displayed. This resource 
+is used when the \fBDtNhelpType\fP is set to \fBDtHELP_TYPE_FILE\fP. 
+.IP "\fBDtNtopicTitle\fP"
+Specifies the topic title (char*) to be used in conjunction with either the 
+\fBDtNstringData\fP or \fBDtNhelpFile resource\fP. The topic title is required
+in order to maintain the history list correctly.
+.IP "\fBDtNhelpType\fP"
+Specifies the current topic type. When the value is \fBDtHELP_TYPE_TOPIC\fP, then
+the \fBDtNlocationId\fP resource is used and the given help topic will be 
+displayed. When the value is \fBDtHELP_TYPE_STRING\fP or
+\fBDtHELP_TYPE_DYNAMIC_STRING\fP, the \fBDtNstringData\fP resource will be 
+used and the given string will be displayed. When the value is 
+\fBDtHELP_TYPE_FILE\fP, the \fBDtNhelpFile\fP resource will be used and the
+given ASCII file will be displayed. When the value is \fBDtHELP_TYPE_MAN_PAGE\fP,
+the \fBDtNmanPage\fP resource will be used and the given Unix man page 
+will be displayed. The initial default value is \fBDtHELP_TYPE_TOPIC\fP, however,
+each time any request to display a help topic, ASCII text file, man page, or 
+ASCII text string is received, the \fBDtNhelpType\fP should be reset to 
+the proper type.
+.IP "\fBDtNvisiblePathCount\fP"
+Specifies the number of items that can fit in the visible space of the 
+table of contents area.
+The table of contents area uses this value to determine it's initial 
+visible lines displayed (i.e. height).
+.IP "\fBDtNscrollBarPolicy\fP"
+Controls the automatic placement of scroll bars in the text display area. If it 
+is set to \fBDtHELP_AS_NEEDED_SCROLLBARS\fP the scroll bars are displayed only 
+if the display area exceeds the clip area in one or both dimensions. A resource 
+value of \fBDtHELP_STATIC_SCROLLBARS\fP causes the display area to display the
+scroll bars whenever the help dialog is managed, regardless of the relationship
+between the clip window and the display area. A value of 
+\fBDtHELP_NO_SCROLLBARS\fP  will cause no scroll bars to ever appear within the 
+help dialog. The default value is \fBDtHELPH_AS_NEEDED_SCROLLBARS\fP.
+.\" **
+.\" ** FOR Cde Only
+.\" ** 
+.IP "\fBDtNpaperSize\fP"
+Controls the value used in the Help - Print dialog for Paper Size. The default value is
+set to \fBDtHELP_PAPERSIZE_LETTER\fP. \fBDtHELP_PAPERSIZE_A4\fP is the other supported
+value for this resource.
+.IP "\fBDtNprinter\fP"
+Specifies the printer name to be used in when printing within the help widget.
+A NULL value will cause the print program to default to "lp".
+.IP "\fBDtNhelpPrint\fP"
+Specifies the executable used when printing help topics, man page, files or
+help messages from the help dialog widget.  This value defaults to 
+"dthelpprint", and expects the users path to be setup accordingly, such 
+that this file can be found in /usr/dt/bin/dthelpprint.
+.\" ** 
+.\" ** END, FOR Cde Only
+.\" **
+.IP "\fBDtNrow\fP"
+Specifies the number of rows of text to display in the help dialog.
+.IP "\fBDtNcolumns\fP"
+Specifies the number of columns of text to display in the help dialog.
+.IP "\fBDtNhyperLinkCallback\fP"
+Specifies the list of callbacks that is called when a hypertext link is activated
+in the help dialog display area. It is activated when the user presses mouse 
+button 1 over the link area. For this callback the reason is 
+\fBDtCR_HELP_LINK_ACTIVATE\fP. \fBDtNhyperLinkCallback\fP allows developers to
+register a callback procedure that will be used to process one of four 
+hypertext link types: \fBDtHELP_LINK_APP_DEFINE\fP, \fBDtHELP_LINK_TOPIC\fP, 
+\fBDtHELP_LINK_MAN_PAGE\fP, or \fBDtHELP_LINK_TEXT_FILE\fP.
+.IP "\fBDtNcloseCallback\fP"
+Specifies the list of callbacks called when the user activates the Close button.
+The callback reason is \fBDtHELP_CR_CLOSE\fP.
+.IP "\fBDtNshowNewWindowButton\fP"
+When set, a "New Window..." button will be created and managed under the file
+menu in the help dialog. The "New Window..." button, when selected will 
+request via the DtNhyperLinkCallback, to display a new window, showing the
+current data.
+.sp .5
+.sp 1
+.SH "RETURN VALUES"
+.TP 15
+Returns the Help dialog shell widget ID.
+.sp .5
+.sp .5
+.SS "Callback Information"
+A pointer to the following structure is passed to each callback:
+.sp .5
+.nf
+.ta .25i 1.1i
+\fBtypedef struct\fP
+{
+	\fBint\fP	\fIreason\fP;
+	\fBXEvent\fP	\fI*event\fP;
+	\fBchar\fP	\fI*locationId\fP;
+	\fBchar\fP	\fI*helpVolume\fP;
+	\fBchar\fP	\fI*specification\fP;
+	\fBint\fP	\fIhyperType\fP;
+	\fBint\fP	\fIwindowHint\fP;
+} \fBDtHelpDialogCallbackStruc\fP;
+.fi
+.fi
+.sp .5
+.IP "\fIreason\fP" .85i
+Indicates why the callback was invoked.
+.IP "\fIevent\fP" .85i
+Points to the \fBXEvent\fP that triggered the callback.  
+.IP "\fIlocationId\fP" .85i
+Indicates the current topic. This value will return NULL if not currently 
+displaying a valid help topic.
+.IP "\fIhelpVolume\fP" .85i
+Indicates the current help volume. This value will return NULL if not 
+currently displaying a valid help topic.
+.IP "\fIspecification\fP" .85i
+Indicates any developer defined data that was contained within the hypertext 
+link selected. NULL if no author/developer defined data was given.
+.IP "\fIhyperType\fP" .85i
+Indicates the hypertext link type. Valid values are:
+ \fBDtHELP_LINK_TOPIC\fP, \fBDtHELP_LINK_MAN_PAGE\fP, 
+\fPDtHELP_LINK_APP_DEFINE\fP, or \fBDtHELP_LINK_TEXT_FILE\fP.
+.IP "\fIwindowHint\fP" .75i
+Indicates a "hint" for the type of window (new, existing, quick help) to use.
+This value will contain one of the following three types: 
+\fBDtHELP_POPUP_WINDOW\fP,\fBDtHELP_CURRENT_WINDOW\fP, or 
+\fBDtHELP_NEW_WINDOW\fP.
+.SS "Additional Behavior"
+The general help dialoig widget has the additional behavior described below:
+.IP "\fIMAny\ KCancel\fP:"
+Calls the activate callbacks for the "Close" button. If a \fI<BDrag>\fP for
+either a selection or scrollbar movement is in process, the KCancel just
+aborts that action.
+.IP "\fI<KActivate>\fP\ in\ Topic Tree\ Text:"
+Opens the help topic currently selected, displays that topic in the display
+area, updates the topic tree to match the newly displayed topic.
+.IP "\fI<KActivate>\fP\ in\ Display Area\ Text:"
+Invokes the hypertext link that contins the current selection.
+.IP "\fI<DoubleClick>\fP\ in\ Topic Tree or\ Display Area Text:"
+Ignored.
+.IP "\fI<BDrag>\fP in\ Topic Tree or\ Display Area Text:"
+Causes a selection (i.e. copy to clipboard) of the text from the Drag start
+point to the Drag end point.  Moving and holding the \fI<BDrag>\fP outside
+the topic tree, or display area will cause the remainder of that text to
+be selected.
+.IP "\fIMAny\ BSelect\fP in\  Topic Tree\ Index Item Text:"
+Invokes the DtNhyperLinkCallback for the help dialog, setting the helpType
+to \fBDtHELP_LINK_TOPIC\fP, the window hint to \fBDtHELP_NEW_WINDOW\fP, the
+helpVolume to the current volume name, and the locationId to the selected
+items location id. If no DtNhyperLinkCallback was supplied, the 
+action is ignored.
+.IP "\fIMAny\ BSelect\fP in\  Display Area\ Hypertext Link Text:"
+Invokes the DtNhyperLinkCallback for the help dialog, honoring all existing
+link settings, but forcing the  window hint to \fBDtHELP_NEW_WINDOW\fP.
+If no DtNhyperLinkCallback was supplied, the hypertext link is handled 
+internally.
+.SS "Virtual Bindings"
+The bindings for virtual keys are vendor specific.
+For information about bindings for virtual buttons and keys, see \fIVirtualBindings(3X)\fP.
+.SH ENVIRONMENT VARIABLES
+The general help dialog utilizes two environment variables for locating 
+help volumes within the desktop environment:
+.TP 10
+.SM \fBDTHELPSEARCHPATH\fP
+\fISystem\fP search path environment variable for locating
+help volumes on local and/or remote nfs mounted systems.
+.TP 10
+.SM \fBDTHELPUSERSEARCHPATH\fP
+\fIUsers\fP search path environment variable for locating user
+specific help volumes on local and/or remote nfs mounted systems.
+.P
+.sp 1
+The environment variables  contain colon-separated lists of directory paths.
+Each directory path can contain both environment variable names as well as
+special field descriptors that are expanded at runtime via each help component
+that uses these environment variables.
+.P
+Field descriptors consist of a
+.B %
+followed by a single character.
+Field descriptors and their substitution values are:
+.RS
+.TP 8
+.B %H
+This value is replaced with the current volume name being searched 
+for.
+.PD 0
+.TP
+.B %L
+Replaced with the current value of the $LANG environment variable.
+.SM .
+.TP
+.B %%
+Replaced with a single
+.BR % .
+.PD
+.RE
+.sp1
+The default value for DTHELPUSERSEARCH path is: NULL.
+.sp1
+If the DTHELPUSERSEARCH is set, its searched for the requested volume. If
+the volume is not found, the DTHELPSEARCHPATH value is searched.
+.P
+The default value for DTHELPSEARCHPATH path is:
+.ta li
+\fB
+.br
+$HOME/.dt/help/%H:
+.br
+$HOME/.dt/help/%H.hv:
+.br
+/etc/dt/appconfig/help/%L/%H:
+.br
+/etc/dt/appconfig/help/%L/%H.sdl:
+.br
+/etc/dt/appconfig/help/%L/%H.hv:
+.br
+/usr/dt/appconfig/help/%L/%H:
+.br
+/usr/dt/appconfig/help/%L/%H.sdl:
+.br
+/usr/dt/appconfig/help/%L/%H.hv
+.fi
+\fP
+.sp 1
+.SH "SEE ALSO"
+.BR XmBulletinBoard(3),
+.BR DtCreateQuickHelpDialog(3),
+.BR DtHelpSetCatalogName(3),
+.BR dtsdldtd(4)	
+.SH WARNINGS-ERRORS
+.TP
+.B "String data could not be formatted."
+Error occurred when formatting help information of type DtHELP_TYPE_STRING.
+.TP
+.B "Dynamic string data could not be formatted."
+Error occurred when formatting help information of type 
+DtHELP_TYPE_DYNAMIC_STRING.
+.TP
+.B "Man Page could not be formatted."
+Error occurred when formatting help information of type DtHELP_TYPE_MAN_PAGE.
+.TP
+.B "Text file could not be formatted."
+Error occurred when formatting help information of type DtHELP_TYPE_FILE.
+.TP
+.B "Non-supported DtNhelpType value used."
+Developer used a non-supported DtNhelpType.
+.TP
+.B "Help topic could not be formatted."
+Attempted to access a corrupt run-time help file.
+.TP
+.B "No DtNhyperLinkCallback supplied for widget."
+A hypertext link of type JumpNewView has been selected, but the
+application has not supplied a hypertext callback to handle it. 
+The link will be handled as if it was a Jump.
+.TP
+.B "Nonexistent DtNlocationId."
+The requested DtNlocationId is not present in the current help volume.
+.TP
+.B "No DtNhyperLinkCallback supplied for widget."
+A hypertext link of type DtHELP_LINK_APP_DEFINE or DtHELP_LINK_MAN_PAGE has
+been selected, but the application did not supply a hypertext callback
+to handle these link types.
+.TP
+.B "Nonexistent DtNlocationId."
+The application has requested a help topic that does not exist in the
+help volume.
+.TP
+.B "Could not find DtNhelpVolume."
+The Help System is unable to find the help volume requested.
+.TP
+.B "Could not open DtNhelpVolume."
+The Help System found the requested help volume, but does not have the 
+permission to open it.
+
+
+
+
+
+
+

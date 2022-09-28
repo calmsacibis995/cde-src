@@ -1,0 +1,129 @@
+			Sat Jan  7 19:00:09 PST 1995
+			Mon Jan  9 09:24:19 PST 1995
+				  bfreeman
+
+Logically, the test mode initialization should start off at the module level
+and then work its way down to windows, panes, then controls. At the module
+and window levels, it should take care of the two different test modes (Test
+Project and Test Shown Modules).
+
+
+If going into Test Project, all modules should be prepared for use. All
+windows and connections are supported.
+
+If going into Test Shown Modules, all of the shown modules should be
+prepared for use. Only the windows and connections within the modules are
+supported.
+
+If a module is not instantiated, it should be instantiated. 
+
+    if (!obj_has_flag(module, InstantiatedFlag))
+    {
+        if (abobj_instantiate_tree(module, TRUE) == -1) goto cret;
+    }
+
+
+Menus should be instantiated on all modules
+
+    objxm_instantiate_menus(module);
+
+
+Interpretation of connections should be added to all modules (ie the project).
+
+        /* Setup connections */
+        for (trav_open(&trav, obj_get_project(module), AB_TRAV_ACTIONS);
+             (action = trav_next(&trav)) != NULL; )
+        {
+            AB_ACTION_INFO	*info = &(action->info.action);
+
+            if (info == NULL || info->from == NULL ||
+                obj_get_module(info->from) != module)
+                continue;
+            
+            attach_interpretation(action);
+        }
+        trav_close(&trav);
+
+
+Help should be added to all modules.
+
+	/* Enable test-mode help support on this module's children */
+	tree_enable_help(module);
+
+
+Windows should be obtained and the necessary tracking mechanisms added.
+
+    /*
+    ** Attach a focus handler to each window in the project. When the window
+    ** recieves focus, it gets marked dirty.
+    */
+    if (tmodeP_window_list_add_handler(EnterWindowMask, False,
+	    track_win_focus) != OK)
+    {
+	util_dprintf(1, "tmode_enable: Unable to add window focus handler.\n");
+	goto cret;
+    }
+
+        /* 
+        ** Dialogs and FSB's need a window-close callback to handle
+        ** "manual" close as if it were a 'hide' action.
+        */
+        if(obj_is_popup_win(win) || obj_is_file_chooser(win)) {
+            ui_add_window_close_callback((Widget)win->ui_handle,
+	        win_closeCB, (XtPointer)win, XmUNMAP);
+            util_aset_add(ConnP_win_close, win);
+
+Initial state should be set on all objects (visibility, iconification,
+activity).
+
+    if (to_test_project)
+	tree_set_initial_state(project, FALSE);
+    else
+    {
+        ABObj		mod;
+        AB_TRAVERSAL	trav;
+
+        for (trav_open(&trav, project, AB_TRAV_MODULES);
+             (mod = trav_next(&trav)) != NULL; )
+            if (obj_is_module(mod) && obj_has_flag(mod, MappedFlag))
+            	tree_set_initial_state(mod, TRUE);
+        trav_close(&trav);
+    }
+
+
+
+To disable Test Mode, it mainly boils down to disabling the appropriate
+modules and getting the window states correct. All of the objs within the
+windows will either be re-instantiated or set back to their obj definition.
+
+remove connection interpretation on all of the modules (ie the project).
+
+    /* Remove connections */
+    for (trav_open(&trav, obj_get_project(mod), AB_TRAV_ACTIONS);
+         (action = trav_next(&trav)) != NULL; )
+    {
+        AB_ACTION_INFO	*info = &(action->info.action);
+        
+        if (info == NULL || info->from == NULL ||
+            obj_get_module(info->from) != mod)
+            continue;
+        
+        detach_interpretation(action);
+    }
+    trav_close(&trav);
+
+
+menus destroyed on all modules
+
+    objxm_destroy_menus(mod);
+
+
+remove help from all of the modules.
+
+    tree_disable_help(mod);
+
+tracking handlers removed from the windows.
+
+windows re-instantiated or ui_set_args.
+
+window state returned.

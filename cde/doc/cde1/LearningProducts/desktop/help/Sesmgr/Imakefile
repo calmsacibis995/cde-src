@@ -1,0 +1,36 @@
+/* $Header: Imakefile,v 1.2 93/09/09 14:53:32 fred_hp_cv Exp $ */
+#define IHaveSubdirs
+#define PassCDebugFlags
+
+
+SUBDIRS = control entityFiles
+
+DEPENDLINKS = DivAddress Glossary
+
+DEPENDDIRS = graphicsShared
+
+MakeSubdirs($(SUBDIRS))
+
+DependSubdirs($(SUBDIRS))
+
+
+includes::
+
+
+	/* now need to link to common directories */
+depend::
+	@for i in $(DEPENDLINKS) ;do \
+	$(RM) `basename $$i`; \
+	echo "linking ../../global/$$i to . ";\
+	ln -f -s ../../global/$$i .; \
+	done
+LinkFiles(../../global, $(DEPENDLINKS))
+
+depend::
+	@for i in $(DEPENDDIRS) ;do \
+	$(RM) `basename $$i`; \
+	echo "linking ../$$i to . ";\
+	ln -f -s ../$$i .; \
+	done
+LinkFiles(.., $(DEPENDDIRS))
+

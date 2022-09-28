@@ -1,0 +1,1112 @@
+%!PS-Adobe-1.0
+%%Creator: poobah:hlj (Hal Jespersen)
+%%Title: stdin (ditroff)
+%%CreationDate: Mon Nov 21 17:15:30 1994
+%%EndComments
+% Start of psdit.pro -- prolog for ditroff translator
+% Copyright (c) 1985,1987 Adobe Systems Incorporated. All Rights Reserved. 
+% GOVERNMENT END USERS: See Notice file in TranScript library directory
+% -- probably /usr/lib/ps/Notice
+% RCS: $Header: xcsa.index.ps,v 1.4 94/11/22 08:42:03 hlj_sun Exp $
+/$DITroff 140 dict def $DITroff begin
+/fontnum 1 def /fontsize 10 def /fontheight 10 def /fontslant 0 def
+/xi {0 72 11 mul translate 72 resolution div dup neg scale 0 0 moveto
+  /fontnum 1 def /fontsize 10 def /fontheight 10 def /fontslant 0 def F
+  /pagesave save def}def
+/PB{save /psv exch def currentpoint translate
+  resolution 72 div dup neg scale 0 0 moveto}def
+/PE{psv restore}def
+/m1 matrix def /m2 matrix def /m3 matrix def /oldmat matrix def
+/tan{dup sin exch cos div}bind def
+/point{resolution 72 div mul}bind def
+/dround	{transform round exch round exch itransform}bind def
+/xT{/devname exch def}def
+/xr{/mh exch def /my exch def /resolution exch def}def
+/xp{}def
+/xs{docsave restore end}def
+/xt{}def
+/xf{/fontname exch def /slotno exch def fontnames slotno get fontname eq not
+ {fonts slotno fontname findfont put fontnames slotno fontname put}if}def
+/xH{/fontheight exch def F}bind def
+/xS{/fontslant exch def F}bind def
+/s{/fontsize exch def /fontheight fontsize def F}bind def
+/f{/fontnum exch def F}bind def
+/F{fontheight 0 le {/fontheight fontsize def}if
+   fonts fontnum get fontsize point 0 0 fontheight point neg 0 0 m1 astore
+   fontslant 0 ne{1 0 fontslant tan 1 0 0 m2 astore m3 concatmatrix}if
+   makefont setfont .04 fontsize point mul 0 dround pop setlinewidth}bind def
+/X{exch currentpoint exch pop moveto show}bind def
+/N{3 1 roll moveto show}bind def
+/Y{exch currentpoint pop exch moveto show}bind def
+/S /show load def
+/ditpush{}def/ditpop{}def
+/AX{3 -1 roll currentpoint exch pop moveto 0 exch ashow}bind def
+/AN{4 2 roll moveto 0 exch ashow}bind def
+/AY{3 -1 roll currentpoint pop exch moveto 0 exch ashow}bind def
+/AS{0 exch ashow}bind def
+/MX{currentpoint exch pop moveto}bind def
+/MY{currentpoint pop exch moveto}bind def
+/MXY /moveto load def
+/cb{pop}def	% action on unknown char -- nothing for now
+/n{}def/w{}def
+/p{pop showpage pagesave restore /pagesave save def}def
+/abspoint{currentpoint exch pop add exch currentpoint pop add exch}def
+/dstroke{currentpoint stroke moveto}bind def
+/Dl{2 copy gsave rlineto stroke grestore rmoveto}bind def
+/arcellipse{oldmat currentmatrix pop
+ currentpoint translate 1 diamv diamh div scale /rad diamh 2 div def
+ rad 0 rad -180 180 arc oldmat setmatrix}def
+/Dc{gsave dup /diamv exch def /diamh exch def arcellipse dstroke 
+    grestore diamh 0 rmoveto}def
+/De{gsave /diamv exch def /diamh exch def arcellipse dstroke
+    grestore diamh 0 rmoveto}def
+/Da{currentpoint /by exch def /bx exch def /fy exch def /fx exch def
+   /cy exch def /cx exch def /rad cx cx mul cy cy mul add sqrt def
+   /ang1 cy neg cx neg atan def /ang2 fy fx atan def cx bx add cy by add
+   2 copy rad ang1 ang2 arcn stroke exch fx add exch fy add moveto}def
+/Barray 200 array def % 200 values in a wiggle
+/D~{mark}def
+/D~~{counttomark Barray exch 0 exch getinterval astore /Bcontrol exch def pop
+ /Blen Bcontrol length def Blen 4 ge Blen 2 mod 0 eq and
+ {Bcontrol 0 get Bcontrol 1 get abspoint /Ycont exch def /Xcont exch def
+  Bcontrol 0 2 copy get 2 mul put Bcontrol 1 2 copy get 2 mul put
+  Bcontrol Blen 2 sub 2 copy get 2 mul put
+  Bcontrol Blen 1 sub 2 copy get 2 mul put
+  /Ybi /Xbi currentpoint 3 1 roll def def 0 2 Blen 4 sub
+  {/i exch def
+   Bcontrol i get 3 div Bcontrol i 1 add get 3 div
+   Bcontrol i get 3 mul Bcontrol i 2 add get add 6 div
+   Bcontrol i 1 add get 3 mul Bcontrol i 3 add get add 6 div
+   /Xbi Xcont Bcontrol i 2 add get 2 div add def
+   /Ybi Ycont Bcontrol i 3 add get 2 div add def
+   /Xcont Xcont Bcontrol i 2 add get add def
+   /Ycont Ycont Bcontrol i 3 add get add def
+   Xbi currentpoint pop sub Ybi currentpoint exch pop sub rcurveto
+  }for dstroke}if}def
+end
+/ditstart{$DITroff begin
+ /nfonts 60 def			% NFONTS makedev/ditroff dependent!
+ /fonts[nfonts{0}repeat]def
+ /fontnames[nfonts{()}repeat]def
+/docsave save def
+}def
+
+% character outcalls
+/oc {/pswid exch def /cc exch def /name exch def
+   /ditwid pswid fontsize mul resolution mul 72000 div def
+   /ditsiz fontsize resolution mul 72 div def
+   ocprocs name known{ocprocs name get exec}{name cb}
+   ifelse}def
+/fractm [.65 0 0 .6 0 0] def
+/fraction
+ {/fden exch def /fnum exch def gsave /cf currentfont def
+  cf fractm makefont setfont 0 .3 dm 2 copy neg rmoveto
+  fnum show rmoveto currentfont cf setfont(\244)show setfont fden show 
+  grestore ditwid 0 rmoveto} def
+/oce {grestore ditwid 0 rmoveto}def
+/dm {ditsiz mul}def
+/ocprocs 50 dict def ocprocs begin
+(14){(1)(4)fraction}def
+(12){(1)(2)fraction}def
+(34){(3)(4)fraction}def
+(13){(1)(3)fraction}def
+(23){(2)(3)fraction}def
+(18){(1)(8)fraction}def
+(38){(3)(8)fraction}def
+(58){(5)(8)fraction}def
+(78){(7)(8)fraction}def
+(sr){gsave .05 dm .16 dm rmoveto(\326)show oce}def
+(is){gsave 0 .15 dm rmoveto(\362)show oce}def
+(->){gsave 0 .02 dm rmoveto(\256)show oce}def
+(<-){gsave 0 .02 dm rmoveto(\254)show oce}def
+(==){gsave 0 .05 dm rmoveto(\272)show oce}def
+end
+% DIThacks fonts for some special chars
+50 dict dup begin
+/FontType 3 def
+/FontName /DIThacks def
+/FontMatrix [.001 0.0 0.0 .001 0.0 0.0] def
+/FontBBox [-220 -280 900 900] def% a lie but ...
+/Encoding 256 array def
+0 1 255{Encoding exch /.notdef put}for
+Encoding
+ dup 8#040/space put %space
+ dup 8#110/rc put %right ceil
+ dup 8#111/lt put %left  top curl
+ dup 8#112/bv put %bold vert
+ dup 8#113/lk put %left  mid curl
+ dup 8#114/lb put %left  bot curl
+ dup 8#115/rt put %right top curl
+ dup 8#116/rk put %right mid curl
+ dup 8#117/rb put %right bot curl
+ dup 8#120/rf put %right floor
+ dup 8#121/lf put %left  floor
+ dup 8#122/lc put %left  ceil
+ dup 8#140/sq put %square
+ dup 8#141/bx put %box
+ dup 8#142/ci put %circle
+ dup 8#143/br put %box rule
+ dup 8#144/rn put %root extender
+ dup 8#145/vr put %vertical rule
+ dup 8#146/ob put %outline bullet
+ dup 8#147/bu put %bullet
+ dup 8#150/ru put %rule
+ dup 8#151/ul put %underline
+ pop
+/DITfd 100 dict def
+/BuildChar{0 begin
+ /cc exch def /fd exch def
+ /charname fd /Encoding get cc get def
+ /charwid fd /Metrics get charname get def
+ /charproc fd /CharProcs get charname get def
+ charwid 0 fd /FontBBox get aload pop setcachedevice
+ 40 setlinewidth
+ newpath 0 0 moveto gsave charproc grestore
+ end}def
+/BuildChar load 0 DITfd put
+%/UniqueID 5 def
+/CharProcs 50 dict def
+CharProcs begin
+/space{}def
+/.notdef{}def
+/ru{500 0 rls}def
+/rn{0 750 moveto 500 0 rls}def
+/vr{20 800 moveto 0 -770 rls}def
+/bv{20 800 moveto 0 -1000 rls}def
+/br{20 770 moveto 0 -1040 rls}def
+/ul{0 -250 moveto 500 0 rls}def
+/ob{200 250 rmoveto currentpoint newpath 200 0 360 arc closepath stroke}def
+/bu{200 250 rmoveto currentpoint newpath 200 0 360 arc closepath fill}def
+/sq{80 0 rmoveto currentpoint dround newpath moveto
+    640 0 rlineto 0 640 rlineto -640 0 rlineto closepath stroke}def
+/bx{80 0 rmoveto currentpoint dround newpath moveto
+    640 0 rlineto 0 640 rlineto -640 0 rlineto closepath fill}def
+/ci{355 333 rmoveto currentpoint newpath 333 0 360 arc
+    50 setlinewidth stroke}def
+
+/lt{20 -200 moveto 0 550 rlineto currx 800 2cx s4 add exch s4 a4p stroke}def
+/lb{20 800 moveto 0 -550 rlineto currx -200 2cx s4 add exch s4 a4p stroke}def
+/rt{20 -200 moveto 0 550 rlineto currx 800 2cx s4 sub exch s4 a4p stroke}def
+/rb{20 800 moveto 0 -500 rlineto currx -200 2cx s4 sub exch s4 a4p stroke}def
+/lk{20 800 moveto 20 300 -280 300 s4 arcto pop pop 1000 sub
+    currentpoint stroke moveto
+    20 300 4 2 roll s4 a4p 20 -200 lineto stroke}def
+/rk{20 800 moveto 20 300 320 300 s4 arcto pop pop 1000 sub
+    currentpoint stroke moveto
+    20 300 4 2 roll s4 a4p 20 -200 lineto stroke}def
+/lf{20 800 moveto 0 -1000 rlineto s4 0 rls}def
+/rf{20 800 moveto 0 -1000 rlineto s4 neg 0 rls}def
+/lc{20 -200 moveto 0 1000 rlineto s4 0 rls}def
+/rc{20 -200 moveto 0 1000 rlineto s4 neg 0 rls}def
+end
+
+/Metrics 50 dict def Metrics begin
+/.notdef 0 def
+/space 500 def
+/ru 500 def
+/br 0 def
+/lt 250 def
+/lb 250 def
+/rt 250 def
+/rb 250 def
+/lk 250 def
+/rk 250 def
+/rc 250 def
+/lc 250 def
+/rf 250 def
+/lf 250 def
+/bv 250 def
+/ob 350 def
+/bu 350 def
+/ci 750 def
+/bx 750 def
+/sq 750 def
+/rn 500 def
+/ul 500 def
+/vr 0 def
+end
+
+DITfd begin
+/s2 500 def /s4 250 def /s3 333 def
+/a4p{arcto pop pop pop pop}def
+/2cx{2 copy exch}def
+/rls{rlineto stroke}def
+/currx{currentpoint pop}def
+/dround{transform round exch round exch itransform} def
+end
+end
+/DIThacks exch definefont pop
+
+ditstart
+(psc)xT
+576 1 1 xr
+1(Times-Roman)xf 1 f
+2(Times-Italic)xf 2 f
+3(Times-Bold)xf 3 f
+4(Times-BoldItalic)xf 4 f
+5(Helvetica)xf 5 f
+6(Helvetica-Bold)xf 6 f
+7(Courier)xf 7 f
+8(Courier-Bold)xf 8 f
+9(Symbol)xf 9 f
+10(DIThacks)xf 10 f
+10 s
+1 f
+xi
+%%EndProlog
+1(Palatino-Roman)xf 1 f
+2(Palatino-Italic)xf 2 f
+1 f
+3(Palatino-Bold)xf 3 f
+1 f
+4(Palatino-BoldItalic)xf 4 f
+1 f
+5(Courier)xf 5 f
+1 f
+6(Courier-Oblique)xf 6 f
+1 f
+7(Courier-Bold)xf 7 f
+1 f
+8(Times-Roman)xf 8 f
+1 f
+
+%%Page: 459 1
+1(Palatino-Roman)xf 1 f
+2(Palatino-Italic)xf 2 f
+3(Palatino-Bold)xf 3 f
+4(Palatino-BoldItalic)xf 4 f
+5(Courier)xf 5 f
+6(Courier-Oblique)xf 6 f
+7(Courier-Bold)xf 7 f
+8(Times-Roman)xf 8 f
+11 s 0 xH 0 xS 8 f
+10 s
+1 f
+4377 MX
+
+% included PostScript
+
+%%HLJ_Lineno_Off
+1002 754 MXY
+96 -432 Dl
+1006 754 MXY
+96 -432 Dl
+1010 754 MXY
+96 -432 Dl
+1014 754 MXY
+96 -432 Dl
+1018 754 MXY
+96 -432 Dl
+1022 754 MXY
+96 -432 Dl
+1026 754 MXY
+96 -432 Dl
+1030 754 MXY
+96 -432 Dl
+1034 754 MXY
+96 -432 Dl
+1037 754 MXY
+96 -432 Dl
+1041 754 MXY
+96 -432 Dl
+2 f
+18 s
+1122 706(Index)N
+1378 MX
+
+% included PostScript
+
+%%HLJ_Lineno_On
+1 f
+10 s
+8 s
+1162 MY
+420(1)X
+10 s
+680 1162(<Dt/Editor.h>)N
+1206(.......................................................)X
+3 f
+(188)S
+1 f
+8 s
+1258 MY
+420(2)X
+10 s
+680 1258 -0.3250(<Dt/Help.h>)AN
+1166(...........................................................)X
+3 f
+(61)S
+1 f
+8 s
+1354 MY
+420(3)X
+10 s
+680 1354 -0.2422(<Dt/HelpDialog.h>)AN
+1406(...............................................)X
+3 f
+(63)S
+1 f
+8 s
+1450 MY
+420(4)X
+10 s
+680 1450 -0.2227(<Dt/HelpQuickD.h>)AN
+1446(.............................................)X
+3 f
+(64)S
+1 f
+8 s
+1546 MY
+420(5)X
+10 s
+680 1546(<Dt/Saver.h>)N
+1186(..........................................................)X
+3 f
+(30)S
+1 f
+8 s
+1642 MY
+420(6)X
+10 s
+680 1642(<Dt/Session.h>)N
+1246(.......................................................)X
+3 f
+(31)S
+1 f
+8 s
+1738 MY
+420(7)X
+10 s
+680 1738(<Dt/Term.h>)N
+1186(........................................................)X
+3 f
+(273)S
+1 f
+8 s
+1834 MY
+420(8)X
+10 s
+680 1834(<Dt/Wsm.h>...........................................................)N
+3 f
+2346(21)X
+1 f
+8 s
+1930 MY
+420(9)X
+10 s
+680 1930(<dtactionaction>)N
+1286(...................................................)X
+3 f
+(344)S
+1 f
+8 s
+2026 MY
+420(10)X
+10 s
+680 2026(<dtappaction>.......................................................)N
+3 f
+2306(340)X
+1 f
+8 s
+2122 MY
+420(11)X
+10 s
+680 2122(<dtbuilderaction>.................................................)N
+3 f
+2306(319)X
+1 f
+8 s
+2218 MY
+420(12)X
+10 s
+680 2218(<dtcalcaction>)N
+1206(.......................................................)X
+3 f
+(352)S
+1 f
+8 s
+2314 MY
+420(13)X
+10 s
+680 2314(<dtcalendaraction>)N
+1386(................................................)X
+3 f
+(92)S
+1 f
+8 s
+2410 MY
+420(14)X
+10 s
+680 2410(<dtfileaction>)N
+1186(........................................................)X
+3 f
+(112)S
+1 f
+8 s
+2506 MY
+420(15)X
+10 s
+680 2506(<dthelpaction>)N
+1226(........................................................)X
+3 f
+(67)S
+1 f
+8 s
+2602 MY
+420(16)X
+10 s
+680 2602(<dticonaction>)N
+1226(......................................................)X
+3 f
+(204)S
+1 f
+8 s
+2698 MY
+420(17)X
+10 s
+680 2698(<dtmailaction>......................................................)N
+3 f
+2306(104)X
+1 f
+8 s
+2794 MY
+420(18)X
+10 s
+680 2794(<dtmanaction>........................................................)N
+3 f
+2346(66)X
+1 f
+8 s
+2890 MY
+420(19)X
+10 s
+680 2890(<dtprintinfoaction>)N
+1386(..............................................)X
+3 f
+(348)S
+1 f
+8 s
+2986 MY
+420(20)X
+10 s
+680 2986(<dtsessionaction>)N
+1326(...................................................)X
+3 f
+(33)S
+1 f
+8 s
+3082 MY
+420(21)X
+10 s
+680 3082(<dtstyleaction>)N
+1246(.....................................................)X
+3 f
+(310)S
+1 f
+8 s
+3178 MY
+420(22)X
+10 s
+680 3178(<dttermaction>)N
+1246(.....................................................)X
+3 f
+(290)S
+1 f
+8 s
+3274 MY
+420(23)X
+10 s
+680 3274(<dttextaction>)N
+1206(.......................................................)X
+3 f
+(199)S
+1 f
+8 s
+3370 MY
+420(24)X
+10 s
+680 3370(<dttrashaction>.....................................................)N
+3 f
+2306(113)X
+1 f
+8 s
+3466 MY
+420(25)X
+10 s
+680 3466(csa_x_process_updates\()N
+1540(\))X
+1586(......................................)X
+3 f
+(79)S
+1 f
+8 s
+3562 MY
+420(26)X
+10 s
+680 3562(dtappintegrate.......................................................)N
+3 f
+2306(336)X
+1 f
+8 s
+3658 MY
+420(27)X
+10 s
+680 3658(dtcm_admin)N
+1146(............................................................)X
+3 f
+(81)S
+1 f
+8 s
+3754 MY
+420(28)X
+10 s
+680 3754(dtcm_delete)N
+1126(.............................................................)X
+3 f
+(84)S
+1 f
+8 s
+3850 MY
+420(29)X
+10 s
+680 3850(dtcm_insert)N
+1106(..............................................................)X
+3 f
+(86)S
+1 f
+8 s
+3946 MY
+420(30)X
+10 s
+680 3946(dtcm_lookup)N
+1166(...........................................................)X
+3 f
+(89)S
+1 f
+8 s
+4042 MY
+420(31)X
+10 s
+680 4042(dtcodegen)N
+1066(..............................................................)X
+3 f
+(314)S
+1 f
+8 s
+4138 MY
+420(32)X
+10 s
+680 4138(DtCreateEditor\()N
+1262(\))X
+1306(..................................................)X
+3 f
+(147)S
+1 f
+8 s
+4234 MY
+420(33)X
+10 s
+680 4234(DtCreateHelpDialog\()N
+1450(\))X
+1486(...........................................)X
+3 f
+(54)S
+1 f
+8 s
+4330 MY
+420(34)X
+10 s
+680 4330(DtCreateHelpQuickDialog\()N
+1664(\))X
+1706(................................)X
+3 f
+(55)S
+1 f
+8 s
+4426 MY
+420(35)X
+10 s
+680 4426(DtCreateTerm\()N
+1229(\))X
+1266(....................................................)X
+3 f
+(250)S
+1 f
+8 s
+4522 MY
+420(36)X
+10 s
+680 4522(DtEditor\()N
+1031(\))X
+1066(..............................................................)X
+3 f
+(130)S
+1 f
+8 s
+4618 MY
+420(37)X
+10 s
+680 4618(DtEditorAppend\()N
+1322(\))X
+1366(...............................................)X
+3 f
+(148)S
+1 f
+8 s
+4714 MY
+420(38)X
+10 s
+680 4714(DtEditorAppendFromFile\()N
+1641(\))X
+1686(...............................)X
+3 f
+(150)S
+1 f
+8 s
+4810 MY
+420(39)X
+10 s
+680 4810(DtEditorChange\()N
+1302(\))X
+1346(................................................)X
+3 f
+(151)S
+1 f
+8 s
+4906 MY
+420(40)X
+10 s
+680 4906(DtEditorCheckForUnsavedChanges\()N
+1991(\))X
+2026(..............)X
+3 f
+(152)S
+1 f
+8 s
+5002 MY
+420(41)X
+10 s
+680 5002(DtEditorClearSelection\()N
+1537(\).....................................)X
+3 f
+2306(153)X
+1 f
+8 s
+5098 MY
+420(42)X
+10 s
+680 5098(DtEditorCopyToClipboard\()N
+1677(\)..............................)X
+3 f
+2306(154)X
+1 f
+8 s
+5194 MY
+420(43)X
+10 s
+680 5194(DtEditorCutToClipboard\()N
+1615 0.1326(\).................................)AX
+3 f
+2306(155)X
+1 f
+8 s
+5290 MY
+420(44)X
+10 s
+680 5290(DtEditorDeleteSelection\()N
+1572(\))X
+1606(...................................)X
+3 f
+(156)S
+1 f
+8 s
+5386 MY
+420(45)X
+10 s
+680 5386(DtEditorDeselect\()N
+1326(\))X
+1366(...............................................)X
+3 f
+(157)S
+1 f
+2660 1162(DtEditorFind\()N
+3173(\))X
+3206(......................................................)X
+3 f
+(158)S
+1 f
+2660 1258(DtEditorFormat\()N
+3268(\))X
+3306(.................................................)X
+3 f
+(159)S
+1 f
+2660 1354(DtEditorGetContents\()N
+3453(\))X
+3486(........................................)X
+3 f
+(160)S
+1 f
+2660 1450(DtEditorGetInsertionPosition\()N
+3740(\))X
+3786(.........................)X
+3 f
+(162)S
+1 f
+2660 1546(DtEditorGetLastPosition\()N
+3573(\))X
+3606(..................................)X
+3 f
+(163)S
+1 f
+2660 1642(DtEditorGetSizeHints\()N
+3474(\))X
+3506(.......................................)X
+3 f
+(164)S
+1 f
+2660 1738(DtEditorGoToLine\()N
+3365(\))X
+3406(............................................)X
+3 f
+(165)S
+1 f
+2660 1834(DtEditorInsert\()N
+3214(\))X
+3246(....................................................)X
+3 f
+(166)S
+1 f
+2660 1930(DtEditorInsertFromFile\()N
+3533(\))X
+3566(....................................)X
+3 f
+(168)S
+1 f
+2660 2026 -0.1229(DtEditorInvokeFindChangeDialog\()AN
+3924(\))X
+3966(................)X
+3 f
+(170)S
+1 f
+2660 2122(DtEditorInvokeFormatDialog\()N
+3748(\))X
+3786(.........................)X
+3 f
+(171)S
+1 f
+2660 2218(DtEditorPasteFromClipboard\()N
+3748(\))X
+3786(.........................)X
+3 f
+(172)S
+1 f
+2660 2314(DtEditorReplace\()N
+3288(\))X
+3326(................................................)X
+3 f
+(173)S
+1 f
+2660 2410(DtEditorReplaceFromFile\()N
+3607(\))X
+3646(................................)X
+3 f
+(175)S
+1 f
+2660 2506(DtEditorReset\()N
+3201(\))X
+3246(....................................................)X
+3 f
+(177)S
+1 f
+2660 2602(DtEditorSaveContentsToFile\()N
+3714(\))X
+3746(...........................)X
+3 f
+(178)S
+1 f
+2660 2698(DtEditorSelectAll\()N
+3322(\))X
+3366(..............................................)X
+3 f
+(180)S
+1 f
+2660 2794(DtEditorSetContents\()N
+3434(\))X
+3466(.........................................)X
+3 f
+(181)S
+1 f
+2660 2890(DtEditorSetContentsFromFile\()N
+3753(\))X
+3786(.........................)X
+3 f
+(183)S
+1 f
+2660 2986(DtEditorSetInsertionPosition\()N
+3721(\))X
+3766(..........................)X
+3 f
+(184)S
+1 f
+2660 3082(DtEditorTraverseToEditor\()N
+3635 0.1411(\)...............................)AX
+3 f
+4286(185)X
+1 f
+2660 3178(DtEditorUndoEdit\()N
+3359(\).............................................)X
+3 f
+4286(186)X
+1 f
+2660 3274(DtHelpDialog\()N
+3199(\).......................................................)X
+3 f
+4326(36)X
+1 f
+2660 3370(DtHelpQuickDialog\()N
+3413(\))X
+3446(............................................)X
+3 f
+(44)S
+1 f
+2660 3466(DtHelpQuickDialogGetChild\()N
+3736 0.1205(\)............................)AX
+3 f
+4326(56)X
+1 f
+2660 3562(DtHelpReturnSelectedWidgetId\()N
+3833(\))X
+3866(.......................)X
+3 f
+(57)S
+1 f
+2660 3658(DtHelpSetCatalogName\()N
+3558(\).....................................)X
+3 f
+4326(59)X
+1 f
+2660 3754(dtksh)N
+2866(.......................................................................)X
+3 f
+(208)S
+1 f
+2660 3850(dtpad)N
+2886(......................................................................)X
+3 f
+(195)S
+1 f
+2660 3946(DtSaverGetWindows\()N
+3453(\))X
+3486(..........................................)X
+3 f
+(26)S
+1 f
+2660 4042(DtSessionRestorePath\()N
+3475 0.1067(\).........................................)AX
+3 f
+4326(27)X
+1 f
+2660 4138(DtSessionSavePath\()N
+3374(\))X
+3406(..............................................)X
+3 f
+(28)S
+1 f
+2660 4234 0.0600(dtterm.....................................................................)AN
+3 f
+4286(275)X
+1 f
+2660 4330(DtTerm\()N
+2978(\)................................................................)X
+3 f
+4286(256)X
+1 f
+2660 4426(DtTermDisplaySend\()N
+3427(\))X
+3466(.........................................)X
+3 f
+(251)S
+1 f
+2660 4522(DtTermInitialize\()N
+3287(\))X
+3326(................................................)X
+3 f
+(252)S
+1 f
+2660 4618(DtTermSubprocReap\()N
+3452(\))X
+3486(........................................)X
+3 f
+(253)S
+1 f
+2660 4714(DtTermSubprocSend\()N
+3447(\))X
+3486(........................................)X
+3 f
+(254)S
+1 f
+2660 4810(DtWsmAddCurrentWorkspaceCallback\()N
+4115 0.3977(\)...........)AX
+3 f
+4366(4)X
+1 f
+2660 4906(DtWsmAddWorkspaceFunctions\()N
+3876 0.1467(\).......................)AX
+3 f
+4366(5)X
+1 f
+2660 5002(DtWsmAddWorkspaceModifiedCallback\()N
+4165(\))X
+4206(........)X
+3 f
+(6)S
+1 f
+2660 5098(DtWsmFreeWorkspaceInfo\()N
+3665(\))X
+3706(.................................)X
+3 f
+(8)S
+1 f
+2660 5194(DtWsmGetCurrentBackdropWindow\()N
+4028(\))X
+4066(...............)X
+3 f
+(9)S
+1 f
+2660 5290(DtWsmGetCurrentWorkspace\()N
+3773(\))X
+3806(..........................)X
+3 f
+(10)S
+1 f
+2660 5386(DtWsmGetWorkspaceInfo\()N
+3638(\).................................)X
+3 f
+4326(11)X
+1 f
+9 s
+680 5854(X/Open)N
+967(Common)X
+1284(Desktop)X
+1569(Environment)X
+2008(\320)X
+2098(Services)X
+2377(and)X
+2517(Applications)X
+2943(Company)X
+3276(Review)X
+3534(Draft)X
+11 s
+4289(459)X
+
+460 p
+%%Page: 460 2
+1(Palatino-Roman)xf 1 f
+2(Palatino-Italic)xf 2 f
+3(Palatino-Bold)xf 3 f
+4(Palatino-BoldItalic)xf 4 f
+5(Courier)xf 5 f
+6(Courier-Oblique)xf 6 f
+7(Courier-Bold)xf 7 f
+8(Times-Roman)xf 8 f
+11 s 0 xH 0 xS 8 f
+10 s
+1 f
+2 f
+12 s
+4203 322(Index)N
+1 f
+10 s
+8 s
+658 MY
+420(46)X
+10 s
+680 658(DtWsmGetWorkspaceList\()N
+1646(\))X
+1686(.................................)X
+3 f
+(13)S
+1 f
+8 s
+754 MY
+420(47)X
+10 s
+680 754(DtWsmGetWorkspacesOccupied\()N
+1889(\))X
+1926(.....................)X
+3 f
+(14)S
+1 f
+8 s
+850 MY
+420(48)X
+10 s
+680 850(DtWsmOccupyAllWorkspaces\()N
+1806(\))X
+1846(.........................)X
+3 f
+(15)S
+1 f
+8 s
+946 MY
+420(49)X
+10 s
+680 946(DtWsmRemoveWorkspaceCallback\()N
+1986(\))X
+2026(................)X
+3 f
+(16)S
+1 f
+8 s
+1042 MY
+420(50)X
+10 s
+680 1042(DtWsmRemoveWorkspaceFunctions\()N
+2026(\))X
+2066(..............)X
+3 f
+(17)S
+1 f
+8 s
+1138 MY
+420(51)X
+10 s
+680 1138(DtWsmSetCurrentWorkspace\()N
+1774(\))X
+1806(...........................)X
+3 f
+(18)S
+1 f
+8 s
+1234 MY
+420(52)X
+10 s
+680 1234(DtWsmSetWorkspacesOccupied\()N
+1870(\))X
+1906(......................)X
+3 f
+(19)S
+1 f
+11 s
+8 s
+5741 MY
+420(53)X
+11 s
+680 5741(460)N
+9 s
+2300(X/Open)X
+2587(CAE)X
+2756(Specification)X
+3181(Draft)X
+3366(\(1994\))X
+3576(\(Draft)X
+3785(November)X
+4145(21,)X
+4253(1994\))X
+
+3 p
+%%Trailer
+xt
+
+xs

@@ -1,0 +1,165 @@
+.TH DtEditorReplace 3 "30 July 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.\" *************************************************************************
+.SH NAME
+DtEditorReplace \- replace a portion of the contents of a DtEditor widget
+.SH SYNOPSIS
+.yS
+#include <Dt/Editor.h>
+.sp 0.5v
+.ta \w'DtEditorErrorCode DtEditorReplace('u
+DtEditorErrorCode DtEditorReplace(Widget \f2widget\fP,
+	XmTextPosition \f2startPos\fP,
+	XmTextPosition \f2endPos\fP,
+	DtEditorContentRec *\f2data\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn DtEditorReplace
+function replaces part of the contents of a DtEditor widget with a string,
+a wide character string or sized buffer.
+The data is transferred to the
+DtEditor widget using a
+.BR DtEditorContentRec ,
+which indicates the
+type of data being transferred along with the actual data.
+All data following the start position
+and up to, but not including, the end position is replaced.
+If the start position and the end position are equal, the
+data is inserted after the end position.
+The character positions begin at zero and are numbered sequentially
+from the beginning of the text.
+After the replacement, the insertion cursor is positioned after the
+last character inserted.
+.P
+The
+.I widget
+argument specifies the DtEditor widget ID.
+.P
+The
+.I startPos
+argument specifies the starting character position of
+the portion to replace.
+The replacement begins
+at this character.
+.P
+The
+.I endPos
+argument specifies the ending character position of
+the portion to replace.
+The replacement ends
+before this character.
+.P
+The
+.I data
+argument is a pointer to the data structure
+containing the data to insert.
+.cde .P
+.cde For a complete definition of the DtEditor widget
+.cde and its associated resources, see
+.cde .Fn DtEditor 3.
+.P
+For a complete definition of
+.BR DtEditorContentRec ,
+see
+.Hd Dt/Editor.h 5.
+.SH "RETURN VALUE"
+.xos
+Upon successful completion, the
+.Fn DtEditorReplace
+function returns
+.Cn DtEDITOR_\%NO_ERRORS ;
+otherwise, if it cannot
+replace the string, the function returns one of the following values:
+.xoe
+.cdes
+Upon successful completion, the
+.Fn DtEditorReplace
+function returns one of the following values:
+.VL 6
+.Lc DtEDITOR_NO_ERRORS
+.br
+The data was replaced sucessfully.
+.Lc DtEDITOR_NULLS_REMOVED
+.br
+NULL characters were found and removed from the data.
+.LE
+.P
+Otherwise, if
+the
+.Fn DtEditorReplace
+function
+cannot replace the data in the DtEditor widget,
+it returns one of the following values:
+.cdee
+.VL 6
+.Lc DtEDITOR_INVALID_TYPE
+.br
+The Type field is not recognized.
+.Lc DtEDITOR_INVALID_RANGE
+.br
+The
+.I startPos
+argument is greater than the
+.I endPos
+argument.
+.Lc DtEDITOR_ILLEGAL_SIZE
+.br
+The size of the buffer passed in is negative.
+.Lc DtEDITOR_NULL_ITEM
+.br
+The data buffer is
+.Cn NULL .
+.cdes
+.Lc DtEDITOR_INSUFFICIENT_MEMORY
+.br
+Not enough system memory is available to replace the data.
+.cdee
+.LE
+.SH EXAMPLES
+The following code segment modifies the contents of a
+DtEditor widget to ``The quick fox.''
+.Cs I
+Widget                  editor;
+DtEditorContentRec      cr;
+DtEditorErrorCode       status;
+XmTextPosition          start = (XmTextPosition) 4,
+                        end = (XmTextPosition) 9;
+char                    *sampleString1="The brown fox",
+                        *sampleString2="quick";
+.sp 0.5v
+cr.type = DtEDITOR_TEXT;
+cr.value.string = sampleString1;
+status = DtEditorSetContents(editor, &cr);
+.xo if (status != DtEDITOR_NO_ERRORS) {
+.cde if (status != DtEDITOR_NO_ERRORS && status != DtEDITOR_NULLS_REMOVED) {
+        printf("Unable to set contents of the widget\en");
+} else {
+        cr.type = DtEDITOR_TEXT;
+        cr.data.string = sampleString2;
+        status = DtEditorReplace(editor, start, end, &cr);
+        if (status != DtEDITOR_NO_ERRORS)
+          printf("Unable to replace part of the widget contents\en");
+}
+.Ce
+.SH "APPLICATION USAGE"
+If the data is in a disk file, rather than in memory, the application should
+use
+.Fn DtEditorReplaceFromFile 3.
+.SH "SEE ALSO"
+.Hd Dt/Editor.h 5,
+.Fn DtEditor 3,
+.Fn DtEditorAppend 3,
+.Fn DtEditorAppendFromFile 3,
+.Fn DtEditorGetContents 3,
+.Fn DtEditorInsert 3,
+.Fn DtEditorInsertFromFile 3,
+.Fn DtEditorReplaceFromFile 3,
+.Fn DtEditorSaveContentsToFile 3,
+.Fn DtEditorSetContents 3,
+.Fn DtEditorSetContentsFromFile 3.

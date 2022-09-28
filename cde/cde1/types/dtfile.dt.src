@@ -1,0 +1,1068 @@
+\###############################################################################
+\#
+\#     dtfile.dt
+\#
+\#     Actions for interfacing to the Common Desktop Environment 
+\#     File Manager.
+\#
+\#    (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+\#    (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+\#    (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+\#    (c) Copyright 1993, 1994, 1995 Novell, Inc.
+\#
+\#     $XConsortium: dtfile.dt.src /main/cde1_maint/4 1995/10/31 11:13:21 rcs $
+\#
+\###############################################################################
+set DtDbVersion=1.0
+
+\###############################################################################
+\#
+%|nls-10-#\# WARNING:...#|
+\#
+\###############################################################################
+#define STAR *
+\###################################################################
+\#
+%|nls-4001-#\# Data Attributes#|
+\#
+\###################################################################
+\############################################################
+\#
+%|nls-4002-#\# Folders#|
+\#
+\############################################################
+DATA_ATTRIBUTES TRASH_FOLDER
+{
+        LABEL           %|nls-4027-#Trash Can#|
+        ACTIONS         OpenInPlace,OpenNewView,Print
+        ICON            DtdirR
+        MEDIA           FILE_NAME
+        MOVE_TO_ACTION  FILESYSTEM_MOVE
+	DESCRIPTION	%|nls-4003-#This folder....#|
+        TYPE_LABEL      %|nls-31034-#TRASH_FOLDER#|
+}
+DATA_CRITERIA TRASH_FOLDER1
+{
+        DATA_ATTRIBUTES_NAME TRASH_FOLDER
+        MODE            d
+        PATH_PATTERN    STAR/.dt/Trash
+}
+ACTION Open
+{
+        LABEL           %|nls-1-Open|
+        ARG_TYPE        TRASH_FOLDER,\
+			PARENT_FOLDER,\
+			CURRENT_FOLDER,\
+			DOT_FOLDER,\
+			FOLDER_LOCK,\
+			NON_WRITABLE_FOLDER,\
+			FOLDER
+        TYPE            MAP
+        MAP_ACTION      OpenFolder
+}
+ACTION Print
+{
+        LABEL           %|nls-2-Print|
+        ARG_TYPE        TRASH_FOLDER,\
+			PARENT_FOLDER,\
+			CURRENT_FOLDER,\
+			DOT_FOLDER,\
+			FOLDER_LOCK,\
+			NON_WRITABLE_FOLDER,\
+			FOLDER
+        TYPE            MAP
+        MAP_ACTION      PrintFolderList
+}
+
+\############################################################
+
+DATA_ATTRIBUTES OPEN_PARENT_FOLDER
+{
+        ACTIONS         OpenInPlace,OpenNewView,Print
+        ICON		Dtdirup
+        MEDIA           FILE_NAME
+        MOVE_TO_ACTION	FILESYSTEM_MOVE
+        COPY_TO_ACTION	FILESYSTEM_COPY
+        LINK_TO_ACTION	FILESYSTEM_LINK
+}
+DATA_ATTRIBUTES PARENT_FOLDER
+{
+        ACTIONS         OpenInPlace,OpenNewView,Print
+        ICON		Dtdirup
+        MEDIA           FILE_NAME
+        MOVE_TO_ACTION	FILESYSTEM_MOVE
+        COPY_TO_ACTION	FILESYSTEM_COPY
+        LINK_TO_ACTION	FILESYSTEM_LINK
+	DESCRIPTION	%|nls-4004-#The '..'#|
+        TYPE_LABEL      %|nls-31035-#PARENT_FOLDER#|
+}
+DATA_CRITERIA PARENT_FOLDER1
+{
+	DATA_ATTRIBUTES_NAME PARENT_FOLDER
+	MODE		d
+	NAME_PATTERN	..
+}
+
+\############################################################
+
+DATA_ATTRIBUTES OPEN_CURRENT_FOLDER
+{
+        ACTIONS         OpenInPlace,OpenNewView,Print
+        ICON		DtdirB
+        MEDIA           FILE_NAME
+        MOVE_TO_ACTION	FILESYSTEM_MOVE
+        COPY_TO_ACTION	FILESYSTEM_COPY
+        LINK_TO_ACTION	FILESYSTEM_LINK
+}
+DATA_ATTRIBUTES CURRENT_FOLDER
+{
+        ACTIONS         OpenInPlace,OpenNewView,Print
+        ICON		DtdirB
+        MEDIA           FILE_NAME
+        MOVE_TO_ACTION	FILESYSTEM_MOVE
+        COPY_TO_ACTION	FILESYSTEM_COPY
+        LINK_TO_ACTION	FILESYSTEM_LINK
+	DESCRIPTION	%|nls-4005-#The '.'#|
+        TYPE_LABEL      %|nls-31036-#CURRENT_FOLDER#|
+}
+DATA_CRITERIA CURRENT_FOLDER1
+{
+	DATA_ATTRIBUTES_NAME CURRENT_FOLDER
+	MODE		d
+	NAME_PATTERN	.
+}
+
+\############################################################
+
+#ifdef sun
+
+\############################################################
+
+ACTION Open
+{
+        LABEL           %|nls-1-Open|
+        ARG_TYPE        SLASH-NET_FOLDER,\
+			SLASH-HOME_FOLDER
+        TYPE            MAP
+        MAP_ACTION      OpenFolder
+}
+ACTION Open
+{
+        LABEL           %|nls-1-Open|
+        ARG_TYPE        FLOPPY_FOLDER
+        TYPE            MAP
+        MAP_ACTION      OpenFloppy
+}
+ACTION Open
+{
+        LABEL           %|nls-1-Open|
+        ARG_TYPE        CD-ROM_FOLDER
+        TYPE            MAP
+        MAP_ACTION      OpenCD-ROM
+}
+ACTION Print
+{
+        LABEL           %|nls-2-Print|
+        ARG_TYPE        FLOPPY_FOLDER,\
+			CD-ROM_FOLDER,\
+			SLASH-NET_FOLDER,\
+			SLASH-HOME_FOLDER
+        TYPE            MAP
+        MAP_ACTION      PrintFolderList
+}
+
+\############################################################
+
+DATA_ATTRIBUTES FLOPPY_FOLDER
+{
+	ACTIONS		Open,Eject,FormatFloppy,RenameFloppy,Print
+	ICON		SDtRM.wfp
+        MEDIA           FILE_NAME
+	COPY_TO_ACTION	FILESYSTEM_COPY
+	LINK_TO_ACTION	FILESYSTEM_LINK
+	DESCRIPTION	%|nls-4056-#This is#|
+}
+
+DATA_CRITERIA FLOPPY_FOLDER1
+{
+        DATA_ATTRIBUTES_NAME FLOPPY_FOLDER
+        MODE            d
+	PATH_PATTERN	/floppy/STAR
+	PATH_PATTERN	!/floppy/STAR/STAR
+}
+
+\############################################################
+
+DATA_ATTRIBUTES CD-ROM_FOLDER
+{
+	ACTIONS		Open,Eject,Print
+	ICON		SDtRM.pcd
+	COPY_TO_ACTION	FILESYSTEM_COPY
+	LINK_TO_ACTION	FILESYSTEM_LINK
+	DESCRIPTION	%|nls-4057-#This is#|
+}
+
+DATA_CRITERIA CD-ROM_FOLDER1
+{
+        DATA_ATTRIBUTES_NAME CD-ROM_FOLDER
+        MODE            d
+	PATH_PATTERN	/cdrom/STAR
+	PATH_PATTERN	!/cdrom/STAR/STAR
+}
+
+ACTION Open
+{
+        LABEL           %|nls-1-Open|
+        ARG_TYPE        CD-ROM_FOLDER
+        TYPE            MAP
+        MAP_ACTION      OpenCD-ROM
+}
+ACTION Print
+{
+        LABEL           %|nls-2-Print|
+        ARG_TYPE        CD-ROM_FOLDER
+        TYPE            MAP
+        MAP_ACTION      PrintFolderList
+}
+
+\######
+
+ACTION EjectFloppy
+{
+        LABEL           %|nls-4058-#Eject Floppy#|
+	ICON		SDtRM.efp
+	ARG_COUNT	0
+	TYPE		COMMAND
+	CWD		/
+	WINDOW_TYPE	NO_STDIO
+	EXEC_STRING	sh -c 'if eject floppy; then :; \
+			else exec dtaction DttermErrorlog; fi'
+	DESCRIPTION	%|nls-4059-#The Eject Floppy....#|
+}
+
+ACTION EjectFloppy
+{
+        LABEL           %|nls-4058-#Eject Floppy#|
+	ICON		SDtRM.efp
+        ARG_COUNT	1
+        TYPE            MAP
+        MAP_ACTION      Eject
+}
+
+ACTION Eject
+{
+        LABEL           %|nls-4072-#Eject#|
+	ICON		SDtRM.efp
+	ARG_COUNT	1
+	TYPE		COMMAND
+	CWD		/
+	WINDOW_TYPE	NO_STDIO
+	EXEC_STRING	dtksh -c 'dir="%Arg_1%"; \
+		if [[ ! -d "\$dir" ]] ; then \
+			dir="`dirname \\"\$dir\\"`"; \
+		fi; \
+		cd "\$dir"; \
+		media="`basename \\"\$dir\\"`"; \
+		cd ..; \
+		dir="`pwd`"; \
+		until [[ "`dirname \\"\$dir\\"`" = / ]]; do \
+			media="`basename \\"\$dir\\"`"; \
+			cd ..; \
+			dir="`pwd`"; \
+		done; \
+		if eject "\$media"; then :; \
+		else exec dtaction DttermErrorlog; fi'
+	DESCRIPTION	%|nls-4073-#The Eject Floppy....#|
+}
+
+ACTION Trash
+{
+	ARG_TYPE	FLOPPY_FOLDER
+	TYPE		MAP
+	MAP_ACTION	EjectFloppy
+}
+
+\######
+
+ACTION RenameFloppy
+{
+        LABEL           %|nls-4076-#Rename Floppy...#|
+	ICON		SDtRM.nfp
+	ARG_COUNT	0
+	TYPE		COMMAND
+	WINDOW_TYPE	NO_STDIO
+	CWD		/
+	EXEC_STRING	dtaction RenameFloppy /floppy/floppy0
+	DESCRIPTION	%|nls-4077-#The Rename Floppy....#|
+}
+
+ACTION RenameFloppy
+{
+        LABEL           %|nls-4076-#Rename Floppy...#|
+	ICON		SDtRM.nfp
+	ARG_COUNT	1
+	TYPE		COMMAND
+	WINDOW_TYPE	NO_STDIO
+	CWD		/
+	EXEC_STRING	dtksh -c 'dir="%Arg_1%"; \
+		subpath=\${dir#/floppy/}; \
+		volname=\${subpath%%/*}; \
+		for volumefile in /tmp/.removable/floppy?; do \
+			volumeSpec="`head \\"\$volumefile\\"`"; \
+			mountPt="\${volumeSpec% /*}"; \
+			if [[ \$mountPt -ef /floppy/\$volname ]]; then \
+				floppySpec=\${volumefile#/tmp/.removable/}; \
+				sdtvolcheck -Df \$floppySpec \
+					dtaction RenameFloppy; \
+				exec sdtvolcheck -f \$floppySpec \
+					dtaction OpenFloppy; \
+			fi; \
+		done'
+	DESCRIPTION	%|nls-4077-#The Rename Floppy....#|
+}
+
+ACTION RenameFloppy
+{
+        LABEL           %|nls-4076-#Rename Floppy...#|
+	ICON		SDtRM.nfp
+	ARG_COUNT	2
+	TYPE		COMMAND
+	WINDOW_TYPE	NO_STDIO
+	CWD		/
+	EXEC_STRING	ff.core -r "%(String)Arg_2%" \
+				"%(String)"%|nls-4078-#Floppy Name:#|"%" \
+				"%(String)Arg_1%"
+	DESCRIPTION	%|nls-4077-#The Rename Floppy....#|
+}
+
+\######
+
+ACTION FormatFloppy
+{
+        LABEL           %|nls-4060-#Format Floppy...#|
+	ICON		SDtRM.ffp
+	ARG_COUNT	0
+	TYPE		COMMAND
+	WINDOW_TYPE	NO_STDIO
+	CWD		/
+	EXEC_STRING	sdtvolcheck -Df floppy0 dtaction FormatFloppy
+	DESCRIPTION	%|nls-4061-#The Format Floppy....#|
+}
+
+ACTION FormatFloppy
+{
+        LABEL           %|nls-4060-#Format Floppy...#|
+	ICON		SDtRM.ffp
+	ARG_COUNT	1
+	TYPE		COMMAND
+	WINDOW_TYPE	NO_STDIO
+	CWD		/
+	EXEC_STRING	dtksh -c 'dir="%Arg_1%"; \
+		subpath=\${dir#/floppy/}; \
+		volname=\${subpath%%/*}; \
+		for volumefile in /tmp/.removable/floppy?; do \
+			volumeSpec="`head \\"\$volumefile\\"`"; \
+			mountPt="\${volumeSpec% /*}"; \
+			if [[ \$mountPt -ef /floppy/\$volname ]]; then \
+				floppySpec=\${volumefile#/tmp/.removable/}; \
+				sdtvolcheck -Df \$floppySpec \
+					dtaction FormatFloppy; \
+				exec sdtvolcheck -f \$floppySpec \
+					dtaction OpenFloppy; \
+			fi; \
+		done'
+	DESCRIPTION	%|nls-4061-#The Format Floppy....#|
+}
+
+ACTION FormatFloppy
+{
+        LABEL           %|nls-4060-#Format Floppy...#|
+	ICON		SDtRM.ffp
+	ARG_COUNT	2
+	TYPE		COMMAND
+	WINDOW_TYPE	NO_STDIO
+	CWD		/
+	EXEC_STRING	sdtformat_floppy -d "%(String)Arg_2%" \
+				-m "%(String)Arg_1%" -p format
+	DESCRIPTION	%|nls-4061-#The Format Floppy....#|
+}
+
+\######
+
+ACTION EjectCD-ROM
+{
+        LABEL           %|nls-4062-#Eject CD-ROM#|
+	ICON		SDtRM.ecd
+	ARG_COUNT	0
+	TYPE		COMMAND
+	WINDOW_TYPE	NO_STDIO
+	CWD		/
+	EXEC_STRING	sh -c 'if eject cd; then :; \
+			else exec dtaction DttermErrorlog; fi'
+	DESCRIPTION	%|nls-4063-#The Eject CD-ROM....#|
+}
+
+ACTION EjectCD-ROM
+{
+        LABEL           %|nls-4062-#Eject CD-ROM#|
+	ICON		SDtRM.ecd
+        ARG_COUNT	1
+        TYPE            MAP
+        MAP_ACTION      Eject
+}
+
+ACTION Trash
+{
+	ARG_TYPE	CD-ROM_FOLDER
+	TYPE		MAP
+	MAP_ACTION	EjectCD-ROM
+}
+
+\######
+
+ACTION OpenFloppy
+{
+        ARG_COUNT	1
+        TYPE            MAP
+        MAP_ACTION      ReOpenRestrictedFolder
+}
+
+ACTION OpenFloppy
+{
+	LABEL		%|nls-4066-#Open Floppy#|
+	ICON		SDtRM.ofp
+	ARG_COUNT	0
+	TYPE		COMMAND
+	WINDOW_TYPE	NO_STDIO
+	EXEC_STRING	sdtvolcheck floppy
+	DESCRIPTION	%|nls-4067-#The Open Floppy....#|
+}
+
+\######
+
+ACTION ReOpenRestrictedFolder
+{
+	ARG_COUNT		1
+        TYPE            	TT_MSG
+        TT_CLASS		TT_REQUEST
+        TT_SCOPE		TT_SESSION
+        TT_OPERATION		DtFolder_Show
+        TT_FILE		   	%Arg_1%
+        TT_ARG0_MODE            TT_IN
+        TT_ARG0_VTYPE           -restricted
+        TT_ARG1_MODE            TT_IN
+        TT_ARG1_VTYPE           -reuse
+}
+
+ACTION OpenCD-ROM
+{
+        ARG_COUNT	1
+        TYPE            MAP
+        MAP_ACTION      ReOpenRestrictedFolder
+}
+
+ACTION OpenCD-ROM
+{
+	LABEL		%|nls-4064-#Open CD-ROM#|
+	ICON		SDtRM.ocd
+	ARG_COUNT	0
+	TYPE		COMMAND
+	EXEC_STRING	sdtvolcheck cdrom
+	WINDOW_TYPE	NO_STDIO
+	DESCRIPTION	%|nls-4065-#The Open CD-ROM....#|
+}
+
+\######
+
+ACTION FileProperties
+{
+	LABEL		%|nls-4068-#Properties...#|
+	ICON		SDtF.prop
+	TYPE		COMMAND
+	EXEC_STRING	sdtfprop -s "%Arg_1%"
+	WINDOW_TYPE	NO_STDIO
+	DESCRIPTION	%|nls-4069-#The Properties....#|
+}
+
+ACTION FileProperties
+{
+	LABEL		%|nls-4068-#Properties...#|
+	ICON		SDtF.prop
+	ARG_COUNT	0
+	TYPE		COMMAND
+	EXEC_STRING	sdtfprop
+	WINDOW_TYPE	NO_STDIO
+	DESCRIPTION	%|nls-4069-#The Properties....#|
+}
+
+\######
+
+ACTION OpenTerminal
+{
+	LABEL		%|nls-4070-#Open Terminal#|
+	TYPE		MAP
+	MAP_ACTION	Terminal
+}
+
+ACTION Format
+{
+	LABEL		%|nls-4074-#Format...#|
+	TYPE		MAP
+	MAP_ACTION	FormatFloppy
+	DESCRIPTION	%|nls-4075-#The Format....#|
+}
+
+DATA_ATTRIBUTES ANY_OBJECT
+{
+	ACTIONS		FileProperties
+}
+
+DATA_ATTRIBUTES ANY_FILE
+{
+}
+
+DATA_ATTRIBUTES ANY_FOLDER
+{
+	ACTIONS		OpenTerminal
+}
+
+DATA_ATTRIBUTES ANY_FOLDER_VIEW
+{
+	ACTIONS		OpenFloppy,OpenCD-ROM
+}
+
+\############################################################
+
+DATA_ATTRIBUTES SLASH-NET_FOLDER
+{
+        ACTIONS         OpenInPlace,OpenNewView,Print
+        ICON            Dtdirnw
+        MEDIA           FILE_NAME
+        MOVE_TO_ACTION  FILESYSTEM_MOVE
+        COPY_TO_ACTION  FILESYSTEM_COPY
+        LINK_TO_ACTION  FILESYSTEM_LINK
+        DESCRIPTION     %|nls-4051-#This folder is ....#|
+}
+
+DATA_ATTRIBUTES SLASH-HOME_FOLDER
+{
+        ACTIONS         OpenInPlace,OpenNewView,Print
+        ICON            Dtdirnw
+        MEDIA           FILE_NAME
+        MOVE_TO_ACTION  FILESYSTEM_MOVE
+        COPY_TO_ACTION  FILESYSTEM_COPY
+        LINK_TO_ACTION  FILESYSTEM_LINK
+        DESCRIPTION     %|nls-4052-#This folder is ....#|
+}
+
+DATA_CRITERIA SLASH-NET_FOLDER1
+{
+	DATA_ATTRIBUTES_NAME	SLASH-NET_FOLDER
+	MODE		d
+	PATH_PATTERN	/net/STAR
+	PATH_PATTERN	!/net/STAR/STAR
+}
+
+DATA_CRITERIA SLASH-HOME_FOLDER1
+{
+	DATA_ATTRIBUTES_NAME	SLASH-HOME_FOLDER
+	MODE		d
+	PATH_PATTERN	/home/STAR
+	PATH_PATTERN	!/home/STAR/STAR
+}
+
+\############################################################
+
+
+ACTION TerminalCWD
+{
+	LABEL		%|nls-4070-#Open Terminal#|
+	ARG_COUNT	0
+	TYPE		COMMAND
+	WINDOW_TYPE	NO_STDIO
+	EXEC_STRING	/usr/dt/bin/dtterm
+	DESCRIPTION	%|nls-4071-#The#|
+}
+
+\#######
+
+#endif
+
+\############################################################
+
+DATA_ATTRIBUTES DOT_FOLDER
+{
+        ACTIONS         OpenInPlace,OpenNewView,Print
+        ICON		DtdirB
+        MEDIA           FILE_NAME
+        MOVE_TO_ACTION	FILESYSTEM_MOVE
+        COPY_TO_ACTION	FILESYSTEM_COPY
+        LINK_TO_ACTION	FILESYSTEM_LINK
+	DESCRIPTION	%|nls-4006-#This folder's#|
+        TYPE_LABEL      %|nls-31037-#DOT_FOLDER#|
+}
+DATA_CRITERIA DOT_FOLDER1
+{
+	DATA_ATTRIBUTES_NAME DOT_FOLDER
+	MODE		d
+	NAME_PATTERN	.*
+}
+
+\############################################################
+
+DATA_ATTRIBUTES FOLDER_LOCK
+{
+	ACTIONS         OpenInPlace,OpenNewView,Print
+        ICON		Dtdirlk
+        MEDIA           FILE_NAME
+        MOVE_TO_ACTION	FILESYSTEM_MOVE
+        COPY_TO_ACTION	FILESYSTEM_COPY
+        LINK_TO_ACTION	FILESYSTEM_LINK
+	DESCRIPTION	%|nls-4050-#This is#|
+        TYPE_LABEL      %|nls-31038-#FOLDER_LOCK#|
+}
+DATA_CRITERIA FOLDER_LOCK1
+{
+	DATA_ATTRIBUTES_NAME FOLDER_LOCK
+	MODE            d&!r
+}
+DATA_CRITERIA FOLDER_LOCK2
+{
+	DATA_ATTRIBUTES_NAME FOLDER_LOCK
+	MODE            d&!x
+}
+DATA_ATTRIBUTES OPEN_NON_WRITABLE_FOLDER
+{
+        ACTIONS         OpenInPlace,OpenNewView,Print
+        ICON            DtdirBO
+        MEDIA           FILE_NAME
+        MOVE_TO_ACTION  FILESYSTEM_MOVE
+        COPY_TO_ACTION  FILESYSTEM_COPY
+        LINK_TO_ACTION  FILESYSTEM_LINK
+}
+DATA_ATTRIBUTES NON_WRITABLE_FOLDER
+{
+        ACTIONS         OpenInPlace,OpenNewView,Print
+        ICON            Dtdirnw
+        MEDIA           FILE_NAME
+        MOVE_TO_ACTION  FILESYSTEM_MOVE
+        COPY_TO_ACTION  FILESYSTEM_COPY
+        LINK_TO_ACTION  FILESYSTEM_LINK
+        DESCRIPTION     %|nls-4007-#This is#|
+        TYPE_LABEL      %|nls-31039-#NON_WRITABLE_FOLDER#|
+}
+DATA_CRITERIA NON_WRITABLE_FOLDER1
+{
+	DATA_ATTRIBUTES_NAME NON_WRITABLE_FOLDER
+	MODE            d&!w
+}
+
+\############################################################
+
+DATA_ATTRIBUTES OPEN_FOLDER
+{
+        ACTIONS         OpenInPlace,OpenNewView,Print
+        ICON		DtdirBO
+        MEDIA           FILE_NAME
+        MOVE_TO_ACTION	FILESYSTEM_MOVE
+        COPY_TO_ACTION	FILESYSTEM_COPY
+        LINK_TO_ACTION	FILESYSTEM_LINK
+}
+DATA_ATTRIBUTES FOLDER
+{
+        ACTIONS         OpenInPlace,OpenNewView,Print
+        ICON		DtdirB
+        MEDIA           FILE_NAME
+        MOVE_TO_ACTION	FILESYSTEM_MOVE
+        COPY_TO_ACTION	FILESYSTEM_COPY
+        LINK_TO_ACTION	FILESYSTEM_LINK
+	DESCRIPTION	%|nls-4008-#This is#|
+        TYPE_LABEL      %|nls-31040-#FOLDER#|
+}
+DATA_CRITERIA FOLDER1
+{
+	DATA_ATTRIBUTES_NAME FOLDER
+	MODE		d
+}
+
+\############################################################
+\############################################################
+\#
+%|nls-11-#\# Data Attributes#|
+\#
+\############################################################
+
+DATA_ATTRIBUTES RECURSIVE_LINK
+{
+	ICON		Dtinf
+	DESCRIPTION	%|nls-4009-#This icon....#|
+        TYPE_LABEL      %|nls-31041-#RECURSIVE_LINK#|
+}
+
+\############################################################
+
+DATA_ATTRIBUTES BROKEN_LINK
+{
+        ICON            Dtblink
+        DESCRIPTION     %|nls-4010-#This icon....#|
+        TYPE_LABEL      %|nls-31042-#BROKEN_LINK#|
+}
+
+\############################################################
+
+DATA_ATTRIBUTES DOT_FILE
+{
+        ACTIONS         Open,Print
+        ICON		Dtdata
+        IS_TEXT		true
+        MIME_TYPE	text/plain
+        MEDIA           C_STRING
+	DESCRIPTION	%|nls-4011-#This file's#|
+        TYPE_LABEL      %|nls-31043-#DOT_FILE#|
+}
+DATA_CRITERIA DOT_FILE1
+{
+	DATA_ATTRIBUTES_NAME DOT_FILE
+        MODE            f
+	NAME_PATTERN	.*
+}
+
+\############################################################
+
+DATA_ATTRIBUTES EXECUTABLE
+{
+	ACTIONS		Run,Open
+        ICON		Dtexec
+        IS_EXECUTABLE	true
+        COPY_TO_ACTION  Execute
+#ifdef sun
+#define sunWasRedefined
+#undef sun
+#endif
+        MIME_TYPE	application/x-sun-default-app
+#ifdef sunWasRedefined
+#define sun 1
+#undef sunWasRedefined
+#endif
+	SUNV3_TYPE	default-app
+        MEDIA           _DT_DATA
+	DESCRIPTION	%|nls-4012-#This file#|
+        TYPE_LABEL      %|nls-31044-#EXECUTABLE#|
+}
+DATA_CRITERIA EXECUTABLE1
+{
+	DATA_ATTRIBUTES_NAME EXECUTABLE
+	MODE		f&x
+}
+ACTION Run
+{
+        LABEL           %|nls-3-#Run#|
+        ARG_TYPE        EXECUTABLE
+        TYPE            MAP
+        MAP_ACTION      Execute
+}
+
+\############################################################
+
+DATA_ATTRIBUTES UNKNOWN
+{
+	ACTIONS		Open,Print
+        ICON		Dtdata
+        MIME_TYPE	application/octet-stream
+        MEDIA           _DT_DATA
+	DESCRIPTION	%|nls-4013-#This file#|
+        TYPE_LABEL      %|nls-31045-#UNKNOWN#|
+}
+
+\############################################################
+
+DATA_ATTRIBUTES DATA
+{
+	ACTIONS		Open,Print
+        ICON		Dtdata
+        MIME_TYPE	application/octet-stream
+        MEDIA           _DT_DATA
+	DESCRIPTION	%|nls-4014-#This file#|
+        TYPE_LABEL      %|nls-31046-#DATA#|
+}
+DATA_CRITERIA DATA1
+{
+	DATA_ATTRIBUTES_NAME DATA
+	MODE		f&!x
+}
+
+\####################################################################
+\####################################################################
+\#
+%|nls-4015-#\# Actions provided#|
+\#
+\####################################################################
+ACTION DtfileHome
+{
+        LABEL           	%|nls-4016-#File Manager Home#|
+        ARG_COUNT		0
+        ICON			Fphome
+        TYPE            	TT_MSG
+        TT_CLASS		TT_REQUEST
+        TT_SCOPE		TT_SESSION
+        TT_OPERATION		DtHome_Show
+        DESCRIPTION     	%|nls-4017-#The File Manager Home....#|
+}
+
+\######
+
+ACTION Dtfile
+{
+        LABEL           	%|nls-4018-#File Manager#|
+        ICON			Fphome
+        TYPE            	TT_MSG
+        TT_CLASS		TT_REQUEST
+        TT_SCOPE		TT_SESSION
+        TT_OPERATION		Edit
+        TT_FILE		   	%Arg_1"%|nls-4019-#Folder to open:#|"%
+        TT_ARG0_MODE		TT_INOUT
+        TT_ARG0_VTYPE   	FILE_NAME
+        DESCRIPTION     	%|nls-4020-#The File Manager...#|
+}
+
+\######
+
+ACTION Dtappmgr
+{
+        LABEL           	%|nls-4021-#Application Manager#|
+        ICON			Fpapps
+        TYPE            	TT_MSG
+        TT_CLASS		TT_REQUEST
+        TT_SCOPE		TT_SESSION
+        TT_OPERATION		DtTools_Show
+        TT_FILE			/var/dt/appconfig/appmanager/$DTUSERSESSION
+        TT_ARG0_MODE            TT_IN
+        TT_ARG0_VTYPE           -title
+        TT_ARG0_REP_TYPE        TT_REP_STRING
+        TT_ARG0_VALUE   	%|nls-4022-#Application_Manager#|
+        TT_ARG1_MODE            TT_IN
+        TT_ARG1_VTYPE           -help_volume
+        TT_ARG1_REP_TYPE        TT_REP_STRING
+        TT_ARG1_VALUE   	Appmanager
+        DESCRIPTION     	%|nls-4023-#The Application Manager action....#|
+}
+
+\######
+
+ACTION DtEmptyTrash
+{
+        LABEL           %|nls-31106-#Empty Trash Can#|
+        ARG_COUNT	0
+        ICON            Fptrsh
+        TYPE           	TT_MSG
+        TT_CLASS        TT_REQUEST
+        TT_SCOPE        TT_SESSION
+        TT_OPERATION    DtTrash_Empty
+	DESCRIPTION     %|nls-31107-#The Empty Trash....#|
+}
+ACTION Dttrash
+{
+        LABEL           %|nls-4027-#Trash Can#|
+        ARG_COUNT	0
+        ICON		Dttrsh
+        TYPE           	TT_MSG
+        TT_CLASS	TT_REQUEST
+        TT_SCOPE	TT_SESSION
+        TT_OPERATION	DtTrash_Show
+	DESCRIPTION	%|nls-4028-#The Trash....#|
+}
+ACTION Dttrash
+{
+        LABEL           	%|nls-4027-#Trash Can#|
+        ARG_COUNT		>0
+        ICON			Dttrsh
+        TYPE            	TT_MSG
+        TT_CLASS                TT_REQUEST
+        TT_SCOPE		TT_SESSION
+        TT_OPERATION		DtTrash_Remove
+        TT_ARG0_MODE		TT_IN
+        TT_ARG0_VTYPE		string
+        TT_ARG1_MODE		TT_IN
+        TT_ARG1_VTYPE		string
+        TT_ARG1_REP_TYPE	TT_REP_STRING
+        TT_ARG1_VALUE		%Arg_1%
+	DESCRIPTION		%|nls-4028-#The Trash....#|
+}
+ACTION DtUnlink
+{
+        LABEL           	%|nls-4027-#Trash Can#|
+        ARG_COUNT		2
+        ICON			Dttrsh
+        TYPE            	TT_MSG
+        TT_CLASS		TT_REQUEST
+        TT_SCOPE		TT_SESSION
+        TT_OPERATION		DtTrash_Remove
+        TT_FILE			%Arg_1%
+        TT_ARG0_MODE		TT_IN
+        TT_ARG0_VTYPE   	string
+        TT_ARG1_MODE		TT_IN
+        TT_ARG1_VTYPE   	string
+        TT_ARG1_REP_TYPE	TT_REP_STRING
+	TT_ARG1_VALUE		%Arg_2%
+	DESCRIPTION	%|nls-4028-#The Trash....#|
+}
+ACTION DtUnlink
+{
+        LABEL           	%|nls-4027-#Trash Can#|
+        ARG_COUNT		>2
+        ICON			Dttrsh
+        TYPE            	TT_MSG
+        TT_CLASS		TT_REQUEST
+        TT_SCOPE		TT_SESSION
+        TT_OPERATION		DtTrash_Remove
+        TT_FILE			%Arg_1%
+        TT_ARG0_MODE		TT_IN
+        TT_ARG0_VTYPE   	string
+        TT_ARG0_REP_TYPE	TT_REP_STRING
+	TT_ARG0_VALUE		%Args%
+	DESCRIPTION		%|nls-4028-#The Trash....#|
+}
+
+ACTION PutOnWorkspace
+{
+        LABEL           	%|nls-30000-#Put On Workspace#|
+        ICON			Fpfpmin
+        TYPE			TT_MSG
+        TT_CLASS		TT_REQUEST
+        TT_SCOPE		TT_SESSION
+        TT_OPERATION		DtFile_PutOnWorkspace
+        TT_FILE			%Arg_1%
+	DESCRIPTION		%|nls-30001-#Put On Workspace....#|
+}
+
+\######
+
+ACTION FILESYSTEM_MOVE
+{
+        LABEL                   Move To Directory
+        TYPE                    TT_MSG
+        TT_CLASS                TT_REQUEST
+        TT_SCOPE                TT_SESSION
+        TT_OPERATION            DtFile_Move
+        TT_FILE                 %Arg_1%
+        TT_ARG0_MODE            TT_IN
+        TT_ARG0_VTYPE           string
+        TT_ARG0_REP_TYPE        TT_REP_STRING
+        TT_ARG0_VALUE           %Arg_1%
+        TT_ARG1_MODE            TT_IN
+        TT_ARG1_VTYPE           string
+        TT_ARG1_REP_TYPE        TT_REP_STRING
+        TT_ARG1_VALUE           %Args%
+        DESCRIPTION             The FILESYSTEM_MOVE action allows an Common\
+                                Desktop Environment compliant application \
+                                to run an action to which causes the File \
+                                Manager to preform a move on the file(s) \
+                                passed in.  The format for this action is: \
+                                'FILESYSTEM_MOVE <folder_name_to> <files>' \
+                                where files is a full path name list of files \
+                                separated by spaces.
+}
+
+\######
+
+ACTION FILESYSTEM_COPY
+{
+        LABEL                   Copy To Directory
+        TYPE                    TT_MSG
+        TT_CLASS                TT_REQUEST
+        TT_SCOPE                TT_SESSION
+        TT_OPERATION            DtFile_Copy
+        TT_FILE                 %Arg_1%
+        TT_ARG0_MODE            TT_IN
+        TT_ARG0_VTYPE           string
+        TT_ARG0_REP_TYPE        TT_REP_STRING
+        TT_ARG0_VALUE           %Arg_1%
+        TT_ARG1_MODE            TT_IN
+        TT_ARG1_VTYPE           string
+        TT_ARG1_REP_TYPE        TT_REP_STRING
+        TT_ARG1_VALUE           %Args%
+        DESCRIPTION             The FILESYSTEM_COPY action allows an Common\
+                                Desktop Environment compliant application \
+                                to run an action to which causes the File \
+                                Manager to preform a copy on the file(s) \
+                                passed in.  The format for this action is: \
+                                'FILESYSTEM_COPY <folder_name_to> <files>' \
+                                where files is a full path name list of files \
+                                separated by spaces.
+}
+
+\######
+
+ACTION FILESYSTEM_LINK
+{
+        LABEL                   Link To Directory
+        TYPE                    TT_MSG
+        TT_CLASS                TT_REQUEST
+        TT_SCOPE                TT_SESSION
+        TT_OPERATION            DtFile_Link
+        TT_FILE                 %Arg_1%
+        TT_ARG0_MODE            TT_IN
+        TT_ARG0_VTYPE           string
+        TT_ARG0_REP_TYPE        TT_REP_STRING
+        TT_ARG0_VALUE           %Arg_1%
+        TT_ARG1_MODE            TT_IN
+        TT_ARG1_VTYPE           string
+        TT_ARG1_REP_TYPE        TT_REP_STRING
+        TT_ARG1_VALUE           %Args%
+        DESCRIPTION             The FILESYSTEM_LINK action allows an Common\
+                                Desktop Environment compliant application \
+                                to run an action to which causes the File \
+                                Manager to preform a link on the file(s) \
+                                passed in.  The format for this action is: \
+                                'FILESYSTEM_LINK <folder_name_to> <files>' \
+                                where files is a full path name list of files \
+                                separated by spaces.
+}
+
+\######
+
+ACTION OpenFolder
+{
+        LABEL           	%|nls-1-#Open#|
+        TYPE            	TT_MSG
+        TT_CLASS		TT_REQUEST
+        TT_SCOPE		TT_SESSION
+        TT_OPERATION		Edit
+        TT_FILE		   	%Arg_1"%|nls-4019-#Folder to open:#|"%
+        TT_ARG0_MODE		TT_INOUT
+        TT_ARG0_VTYPE   	FILE_NAME
+        DESCRIPTION		%|nls-4029-#The Open New View action....#|
+}
+
+\######
+
+ACTION OpenNewView
+{
+        LABEL           %|nls-9-#Open New View#|
+        TYPE            MAP
+	MAP_ACTION      Open
+}
+
+\######
+
+ACTION OpenInPlace
+{
+        LABEL           %|nls-8-#Open In Place#|
+        TYPE            MAP
+	MAP_ACTION      Open
+}
+
+\######
+
+ACTION PrintFolderList
+{
+        LABEL           %|nls-4030-#PrintFolderList#|
+        TYPE            COMMAND
+        WINDOW_TYPE     NO_STDIO
+        EXEC_STRING     sh -c ' \
+                        ls -aLlF "%(File)Arg_1%" | \
+                        /usr/dt/bin/dtlp -u "%(File)Arg_1%"'
+        DESCRIPTION     %|nls-4031-#The PrintFolderList action....#|
+}
+
+\########################### EOF ##############################################

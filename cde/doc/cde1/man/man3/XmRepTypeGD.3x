@@ -1,0 +1,78 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **
+.TH XmRepTypeGetRegistered 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmRepTypeGetRegistered\fP \- A representation type manager function that
+returns a copy of the registration list
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/RepType.h>
+.sp \n(PDu
+XmRepTypeList XmRepTypeGetRegistered ()
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+\fIXmRepTypeGetRegistered\fP retrieves information about
+all representation types that are registered with the 
+representation type manager.  The registration list is
+an array of structures, each of which contains information
+for a representation type entry.  The end of the registration
+list is marked with a representation type entry whose
+\fBrep_type_name\fP field has a NULL pointer.  This routine
+allocates memory for the returned data.  The application must free
+this memory using \fIXtFree\fP.
+.PP
+The representation type entry structure contains the following
+information:
+.ne 10
+.sS
+.iS
+.ta .25i 1.5i
+.nf
+typedef struct
+{
+	String	\fBrep_type_name\fI;
+	String	*\fBvalue_names\fI;
+	unsigned char	*\fBvalues\fI;
+	unsigned char	\fBnum_values\fI;
+	Boolean	\fBreverse_installed\fI;
+	XmRepTypeId	\fBrep_type_id\fI;
+} XmRepTypeEntryRec, *XmRepTypeList ;
+.iE
+.sE
+.IP "\fBrep_type_name\fP"
+The name of the representation type
+.IP "\fBvalue_names\fP"
+An array of representation type value names
+.IP "\fBvalues\fP"
+An array of representation type numerical values
+.IP "\fBnum_values\fP"
+The number of values associated with the representation type
+.IP "\fBreverse_installed\fP"
+A flag that indicates whether or not the reverse converter is
+installed
+.IP "\fBrep_type_id\fP"
+The identification number of the representation type
+.SH RETURN VALUE
+Returns a pointer to the registration list of representation types.
+.SH RELATED INFORMATION
+.na
+\fIXmRepTypeRegister(3X)\fP and
+\fIXmRepTypeGetRecord(3X)\fP.
+.ad

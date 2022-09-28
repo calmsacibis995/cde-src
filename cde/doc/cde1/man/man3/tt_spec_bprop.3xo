@@ -1,0 +1,80 @@
+.TH tt_spec_bprop 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+tt_spec_bprop \- retrieve the ith value of a property
+.SH SYNOPSIS
+.yS
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'Tt_status tt_spec_bprop('u
+Tt_status tt_spec_bprop(const char *\f2objid\fP,
+	const char *\f2propname\fP,
+	int \f2i\fP,
+	unsigned char **\f2value\fP,
+	int *\f2length\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn tt_spec_bprop
+function
+retrieves the
+.IR i th
+value of the specified property.
+.P
+The
+.I objid
+argument is the identifier of the object involved in this operation.
+The
+.I propname
+argument is the name of the property whose value is to be retrieved.
+The name must be
+less than 64 characters.
+The
+.I i
+argument is the item of the list for which a value is to be obtained.
+The list numbering
+begins with zero.
+The
+.I value
+argument is the
+address of a character pointer to which the ToolTalk service is to point a
+string that contains the contents of the spec's property.
+If there are
+.I i
+values
+or fewer, the pointer is set to zero.
+The
+.I length
+argument is the address of an integer to which the
+ToolTalk service is to set the length of the value in bytes.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn tt_spec_bprop
+function returns the status of the operation as one of the following
+.B Tt_status
+values:
+.VL 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_NOMP
+.br
+The
+.Cm ttsession 1
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_NUM
+.br
+The integer value passed was invalid (out of range).
+.Lc TT_ERR_OBJID
+.br
+The
+.I objid
+passed to the ToolTalk service does not reference an existing object spec.
+.Lc TT_ERR_PROPNAME
+.br
+The specified property name is syntactically invalid.
+.LE
+.SH "SEE ALSO"
+.Hd Tt/tt_c.h 5.

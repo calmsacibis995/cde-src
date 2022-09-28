@@ -1,0 +1,74 @@
+.TH DtDtsBufferToAttributeValue 3 "15 Jun 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.SH NAME
+DtDtsBufferToAttributeValue \- get a single data attribute value for a byte stream
+.SH SYNOPSIS
+.yS
+#include <Dt/Dts.h>
+.sp 0.5v
+.ta \w'char *DtDtsBufferToAttributeValue('u
+char *DtDtsBufferToAttributeValue(const void *\f2buffer\fP,
+	const int \f2size\fP,
+	const char *\f2attr_name\fP,
+	const char *\f2opt_name\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn DtDtsBufferToAttributeValue
+function
+returns a data attribute value for a given byte stream.
+The
+.I buffer
+argument
+is a pointer to the buffer of the data to be typed.
+.P
+The
+.I size
+argument
+is the size of the buffer in bytes.
+.P
+The
+.I attr_name
+argument is a name of the attribute.
+.P
+The
+.I opt_name
+argument can be used to specify a name to be associated with the buffer.
+If the
+.I opt_name
+argument is not
+.Cn NULL ,
+it is used as a pseudo file name in typing;
+otherwise, certain attributes may be returned as
+.Cn NULL
+because the filename components could not be determined.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn DtDtsBufferToAttributeValue
+function returns a pointer to a data attribute value string, or
+.Cn NULL
+if no value could be determined.
+.SH "APPLICATION USAGE"
+The application should use the
+.Fn DtDtsFreeAttributeValue 3
+function to release the memory for the returned value.
+.P
+The
+.Fn DtDtsBufferToAttributeValue
+function assumes that the buffer is readable and writable
+by the user, group and other file classes
+and selects a type accordingly.
+An application requiring a type based on read-only
+permissions should use
+.Fn DtDtsDataToDataType .
+.br
+.SH "SEE ALSO"
+.Hd Dt/Dts.h ,
+.Fn DtDtsDataToDataType 3,
+.Fn DtDtsLoadDataTypes 3,
+.Fn DtDtsFreeAttributeValue 3.
+.br

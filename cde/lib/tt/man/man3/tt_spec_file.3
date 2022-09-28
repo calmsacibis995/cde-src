@@ -1,0 +1,78 @@
+.de Lc
+.\" version of .LI that emboldens its argument
+.TP \\n()Jn
+\s-1\f3\\$1\f1\s+1
+..
+.TH tt_spec_file 3 "1 March 1996" "ToolTalk 1.3" "ToolTalk Functions"
+.BH "1 March 1996"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.IX "tt_spec_file.3" "" "tt_spec_file.3" "" 
+.SH NAME
+tt_spec_file \- retrieve the name of the file that contains the object described by the spec
+.SH SYNOPSIS
+.ft 3
+.nf
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'char *tt_spec_file('u
+char *tt_spec_file(const char *\f2objid\fP);
+.PP
+.fi
+.SH DESCRIPTION
+The
+.BR tt_spec_file (\|)
+function
+retrieves the name of the file that contains the object described by the spec.
+.PP
+The
+.I objid
+argument is the identifier of the object involved in this operation.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.BR tt_spec_file (\|)
+function returns the absolute pathname of the file.
+The application can use
+.BR tt_ptr_error (3)
+to extract one of the following
+.B Tt_status
+values from the returned pointer:
+.PP
+.RS 3
+.nr )J 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_DBAVAIL
+.br
+The ToolTalk service could not access the
+ToolTalk database needed for this operation.
+.Lc TT_ERR_DBEXIST
+.br
+The ToolTalk service could not access the
+specified ToolTalk database in the expected place.
+.Lc TT_ERR_NOMP
+.br
+The
+.BR ttsession (1)
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_OBJID
+.br
+The
+.I objid
+passed to the ToolTalk service does not reference an existing object spec.
+.PP
+.RE
+.nr )J 0
+.SH "APPLICATION USAGE"
+The application should use
+.BR tt_free (3)
+to free any data stored in the address returned by the
+ToolTalk API.
+.SH "SEE ALSO"
+.na
+.BR tt_c (5),
+.BR tt_ptr_error (3),
+.BR tt_free (3).

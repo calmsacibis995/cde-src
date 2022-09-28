@@ -1,0 +1,132 @@
+/* 
+ * This file is a special .tmpl file that is included by Imake.tmpl
+ * It is used to overwrite defines in hp.cf for a specific tree 
+ * To make a tree use these defaults simply link localtree.tmpl to this
+ * file.
+ *
+ * NOTE!!! This file should not be used for building 700 bits on 800's
+ * or vice-versa.
+ *
+ * 
+ * This file is intended to be used to build shared libraries and link
+ * clients against these shared libraries once the libraries have been
+ * copied to /usr/performance/lib/Motif1.1 and /usr/performance/lib/X11R4
+ * 
+ * To make use of this file you need to do 
+ * make Makefile; make Makefiles; make   from the top of your clone tree.
+ * Once the libraries have been built,  
+ * run  /x/toolsrc/BuildTools/master_build/copySharedLibs on the machine
+ * that your clonetree is on to copy the libraries to /usr/performance/lib
+ * 
+ * You may have to go to hp/rivers/<component_name> and do
+ *  make load<component_name> to get the components to relink against
+ * the /usr/performance/lib/ shared libraries the first time you
+ * make in your clone tree.
+ *
+ */
+
+#define ARCHIVED_LINK NO
+#define SHAREDLIBPERFTREE YES
+
+#define LinkArchivedXvh NO 
+#define LinkArchivedXv3.0 NO 
+#define LinkArchivedXmp3.0 NO 
+#define LinkArchivedXpm NO 
+#define LinkArchivedVpm NO 
+#define LinkArchivedXhp NO 
+#define LinkArchivedXext NO
+
+
+/* ================ */
+/* turn on shlibs for the following */
+#ifndef SharedLibXhp
+#define SharedLibXhp YES 
+#endif
+#ifndef SharedLibXmp30
+#define SharedLibXmp30 YES
+#endif
+#ifndef SharedLibXv30
+#define SharedLibXv30 YES
+#endif
+#ifndef SharedLibXvh
+#define SharedLibXvh YES
+#endif
+#ifndef SharedLibXvhp
+#define SharedLibXvhp YES
+#endif
+#ifndef SharedLibXvp
+#define SharedLibXvp YES
+#endif
+#ifndef SharedLibXpm
+#define SharedLibXpm YES
+#endif
+#ifndef SharedLibVpm
+#define SharedLibVpm YES
+#endif
+#ifndef SharedLibXext
+#define SharedLibXext YES
+#endif
+
+/* ================ */
+
+/* used to link against archived libraries in a shlib tree */
+#ifndef ARCHIVED_LINK
+#define ARCHIVED_LINK NO
+#endif
+#if ARCHIVED_LINK
+#define ExtraLoadFlags -Wl,-a archive
+#endif
+
+/* turn on DA1.0 option for non-server pieces of build */
+/*
+#ifndef ExtraCCOptions
+#define ExtraCCOptions +DA1.0
+#endif
+
+#undef OptimizedCDebugFlags
+#define OptimizedCDebugFlags -O -z +DS1.1 +Obb1400
+*/
+
+
+#define OSRev 9.0
+#define OSName HP-UX Daily -O
+#define HP_BUILD_ENV
+#define BITS
+#define BUILD_R4_RIVERS
+#define BUILD_R4_LIBS
+/*  #define BUILD_BMS  turn on to build and link against BMS */
+
+/* NOTE this is now preset in OSVersion.tmpl */
+#ifndef OSMajorVersion
+#define OSMajorVersion         9
+#endif
+#ifndef OSMinorVersion
+#define OSMinorVersion         0
+#endif
+
+#define HASANSIC
+#define SHLIB /* used to determine whether shared libs are made */
+
+/* used to link against archived libraries in a shlib tree */
+#ifndef ARCHIVED_LINK
+#define ARCHIVED_LINK YES
+#endif
+#if ARCHIVED_LINK
+#define ExtraLoadFlags -Wl,-a archive
+#endif
+
+#ifdef __hp9000s700
+    /* turn on ESlit for 700s by setting the following to +ESlit */
+    SPECIAL_CC_OPTIONS =
+    /* turn on DA1.0 option for non-server pieces of build */
+#   ifndef ExtraCCOptions
+#       define ExtraCCOptions +DA1.0
+#   endif
+#   define OptimizedCDebugFlags -O -z +DS1.1 +Obb2000
+#else /* 300 & 800 */
+#   ifdef __hp9000s300
+#      define OptimizedCDebugFlags -O
+#   else
+#      define OptimizedCDebugFlags -O -z
+#   endif /* 300 */
+#endif /* 700 */

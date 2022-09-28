@@ -1,0 +1,29 @@
+XCOMM $XConsortium: Imakefile /main/cde1_maint/2 1995/11/09 10:13:18 drk $
+#define PassCDebugFlags /**/
+
+INSTALLFLAGS = $(INSTINCFLAGS)
+
+HEADERS = hpversion.h Xosdefs.h
+
+#ifdef SunArchitecture 
+SAVER_EXTENSION_HEADERS = scrnsaver.h saver.h saverproto.h extutil.h
+#else
+SAVER_EXTENSION_HEADERS =
+#endif
+	   
+HEADERS = hpversion.h Xosdefs.h $(SAVER_EXTENSION_HEADERS)
+
+all::
+
+BuildIncludes($(HEADERS),.,.)
+
+LOCAL_BINSTALL_DEST = include/X11
+BuildMultipleInstall(hpversion.h,$(LOCAL_BINSTALL_DEST))
+#ifdef SunArchitecture 
+BuildMultipleInstall($(SAVER_EXTENSION_HEADERS),include/X11/extensions)
+#endif
+InstallMultiple($(HEADERS),$(INCDIR))
+
+depend::
+
+clean::

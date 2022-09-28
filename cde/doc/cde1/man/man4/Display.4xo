@@ -1,0 +1,126 @@
+.TH Display 4 "13 May 1994"
+.SH NAME
+Display request \- display a document
+.SH SYNOPSIS
+.yS
+.ta \w'[\f2file\fP] Display('u
+[\f2file\fP] Display(in \f2mediaType contents\fP
+	[in title \f2docName\fP]);
+.yE
+.SH DESCRIPTION
+The
+.I Display
+request causes the handler to display (present or manifest)
+a document to the user.
+For example, an audio manipulation utility would be said to
+``display'' audio documents when it plays them.
+.P
+The handler must decide issues such as:
+.VL 3
+.LI \(bu
+When the display operation can be deemed completed
+.LI \(bu
+What user gesture signals the completion of the display
+.LI \(bu
+What the handling tool should do with itself after replying
+.LE
+.P
+The
+.I contents
+argument
+is the contents of the document.
+If this argument is unset
+(in other words, has a value of
+.BR (char\ *)0 ) ,
+then the contents of the document are in
+the file named in the message's
+.I file
+attribute.
+The data type
+.RI ( mediaType )
+of the
+.I contents
+argument should be
+.BR string ,
+unless nulls are valid in the given media type,
+in which case the data type must be
+.BR bytes .
+.P
+The
+.I docName
+argument contains the name of the document.
+If the
+.I docName
+argument is absent and the
+.I file
+attribute is set,
+the file name is considered to be the title of the document.
+This string would be suitable for display in a window title bar, for example.
+.SH "APPLICATION USAGE"
+The
+.Fn ttmedia_ptype_declare 3
+function can be used to register for,
+and help process, this message.
+.P
+This message can be sent with the
+.Fn ttmedia_load 3
+function.
+.P
+When the document to be displayed
+is read-only or unlikely to be modified
+the
+.I Display
+message is frequently used instead of the
+.I Edit
+message.
+.SH EXAMPLES
+To display a PostScript document, the application can send a
+.I Display
+request with a first argument whose vtype is
+.BR PostScript ,
+and whose value is a vector of bytes such as:
+.Cs I
+\&%!\en/inch {72 mul} def...
+.Ce
+.P
+The
+.B \en
+in the example represents the ISO C newline character.
+.P
+To display a PostScript document contained in a file,
+the application can send a
+.I Display
+request with the
+.I file
+attribute set to that file
+and with an unset first argument whose vtype is
+.BR PostScript .
+.SH ERRORS
+The ToolTalk service may return one of the following errors
+in processing the
+.I Display
+request:
+.VL 6
+.Lc TT_DESKTOP_ENOENT
+.br
+The file that was alleged to contain the document does not exist.
+.Lc TT_DESKTOP_ENODATA
+.br
+The in-mode
+.I contents
+argument had no value and the
+.I file
+attribute
+of the message was not set.
+.Lc TT_MEDIA_ERR_FORMAT
+.br
+The document is not a valid instance of the media type.
+.LE
+.SH "SEE ALSO"
+.Fn ttmedia_ptype_declare 3,
+.Fn ttmedia_load 3;
+.IR Intro ,
+.IR Deposit ,
+.IR Edit ,
+.I Status
+requests.

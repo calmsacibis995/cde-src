@@ -1,0 +1,79 @@
+.TH Set_Mapped 4 "1 March 1996" "ToolTalk 1.3" "Desktop Services Message Sets"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.BH "1 March 1996" 
+.IX "Set_Mapped.4" "" "Set_Mapped.4" "" 
+.SH NAME
+Set_Mapped \- set whether a tool is mapped to the screen
+.SH SYNOPSIS
+.ft 3
+.nf
+.ta \w@Set_Mapped(@u
+Set_Mapped(in boolean \f2mapped\fP
+	[in messageID \f2commission\fP]);
+.PP
+.fi
+.SH DESCRIPTION
+The
+.I Set_Mapped
+request
+sets the mapped state of the optionally specified
+window, or of the window primarily associated with the handling
+procid (if no window is specified).
+.PP
+The
+.I mapped
+argument
+is a Boolean value indicating whether the specified window is (to be)
+mapped to the screen.
+.PP
+The
+.I commission
+argument
+is the ID of the ongoing request, if any, that resulted in the creation
+of the window in question.
+.SH "APPLICATION USAGE"
+The
+.BR ttdt_session_join (3),
+and
+.BR ttdt_message_accept (3),
+functions can be used by Xt applications to register for,
+and transparently process, the
+.I Set_Mapped
+request.
+.SH EXAMPLES
+The
+.I Set_Mapped
+request can be sent as in the following example:
+.PP
+.sp -1
+.RS 5
+.ta 4m +4m +4m +4m +4m +4m +4m
+.nf
+.ft 3
+Tt_message msg = tttk_message_create(0, TT_REQUEST, TT_SESSION,
+			the_recipient_procid, TTDT_SET_MAPPED,
+			my_callback);
+tt_message_iarg_add(msg, TT_IN, Tttk_boolean, 1);
+tt_message_send(msg);
+.PP
+.ft 1
+.fi
+.RE
+.SH WARNINGS
+.I Set_Mapped
+can also be sent as a multicast notice, as an
+.I edict
+to all tools in the scope of the message.
+The consequences of doing so can be severe and unexpected.
+.SH "SEE ALSO"
+.na
+.BR tt_message_iarg_add (3),
+.BR tt_message_send (3),
+.BR ttdt_message_accept (3),
+.BR ttdt_session_join (3);
+.I Get_Mapped
+request.

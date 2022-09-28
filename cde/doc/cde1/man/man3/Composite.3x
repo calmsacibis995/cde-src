@@ -1,0 +1,180 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH Composite 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIComposite\fP \- The Composite widget class
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&\fI\&#include <Xm/Xm.h>
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+Composite widgets are intended to be containers for other widgets and can
+have an arbitrary number of children.  Their responsibilities (implemented
+either directly by the widget class or indirectly by Intrinsics
+functions) include:
+.TP
+\(bu
+Overall management of children from creation to destruction.
+.TP
+\(bu
+Destruction of descendants when the composite widget is destroyed.
+.TP
+\(bu
+Physical arrangement (geometry management) of a displayable subset of
+managed children.
+.TP
+\(bu
+Mapping and unmapping of a subset of the managed children.
+Instances of composite widgets need to specify the order in which
+their children are kept.  For example, an application may want a set of
+command buttons in some logical order grouped by function, and it may want
+buttons that represent filenames to be kept in alphabetical order.
+.nL
+.ne 7
+.SS "Classes"
+Composite inherits behavior and resources from \fICore\fP.
+.PP 
+The class pointer is \fIcompositeWidgetClass\fP.
+.PP 
+The class name is \fIComposite\fP.
+.SS "New Resources"
+The following table defines a set of widget resources used by the programmer
+to specify data.  The programmer can also set the resource values for the
+inherited classes to set attributes for this widget.  To reference a
+resource by name or by class in a .Xdefaults file, remove the \fIXmN\fP or
+\fIXmC\fP prefix and use the remaining letters.  To specify one of the defined
+values for a resource in a .Xdefaults file, remove the \fIXm\fP prefix and use
+the remaining letters (in either lowercase or uppercase, but include any
+underscores between words).
+The codes in the access column indicate if the given resource can be
+set at creation time (C),
+set by using \fIXtSetValues\fP (S),
+retrieved by using \fIXtGetValues\fP (G), or is not applicable (N/A).
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+Composite Resource Set
+Name	Class	Type	Default	Access
+_
+XmNchildren	XmCReadOnly	WidgetList	NULL	G
+XmNinsertPosition	XmCInsertPosition	XtOrderProc	NULL	CSG
+XmNnumChildren	XmCReadOnly	Cardinal	0	G
+.TE
+.KE
+.in
+.sp 1
+.nL
+.ne 10
+.IP "\fIXmNchildren\fP"
+A read-only list of the children of the widget.
+.IP "\fIXmNinsertPosition\fP"
+Points to the \fIXtOrderProc\fP function described below.
+.IP "\fIXmNnumChildren\fP"
+A read-only resource specifying the length of the list of children in
+\fIXmNchildren\fP.
+.PP 
+The following procedure pointer in a composite widget instance is of type
+\fIXtOrderProc\fP:
+.sS
+.iS
+Cardinal (* XtOrderProc) (\fBwidget\fI)
+.ta .5i 1.5i
+.nf
+	Widget	\fBw\fP;
+.iE
+.sE
+.IP "\fBw\fP"
+Specifies the widget.
+.PP 
+Composite widgets that allow clients to order their children (usually
+homogeneous boxes) can call their widget instance's insert_position
+procedure from the class's insert_child procedure to determine where a new
+child should go in its children array.  Thus, a client of a composite class
+can apply different sorting criteria to widget instances of the class,
+passing in a different insert_position procedure when it creates each
+composite widget instance.
+.PP 
+The return value of the insert_position procedure indicates how many children
+should go before the widget.  Returning \fBzero\fP indicates that the
+widget should go before all other children; returning num_children indicates
+that it should go after all other children.  The default insert_position
+function returns num_children and can be overridden by a specific composite
+widget's resource list or by the argument list provided when the composite
+widget is created.
+.SS "Inherited Resources"
+Composite inherits behavior and resources from the following superclass.
+For a complete description of each resource, refer to the manual page for
+that superclass.
+.P 
+.wH
+.in 0 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+Core Resource Set
+Name	Class	Type	Default	Access
+_
+XmNaccelerators	XmCAccelerators	XtAccelerators	dynamic	CSG
+XmNancestorSensitive	XmCSensitive	Boolean	dynamic	G
+XmNbackground	XmCBackground	Pixel	dynamic	CSG
+XmNbackgroundPixmap	XmCPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNborderColor	XmCBorderColor	Pixel	XtDefaultForeground	CSG
+XmNborderPixmap	XmCPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNborderWidth	XmCBorderWidth	Dimension	1	CSG
+XmNcolormap	XmCColormap	Colormap	dynamic	CG
+XmNdepth	XmCDepth	int	dynamic	CG
+XmNdestroyCallback	XmCCallback	XtCallbackList	NULL	C
+XmNheight	XmCHeight	Dimension	dynamic	CSG
+XmNinitialResourcesPersistent	XmCInitialResourcesPersistent	Boolean	True	C
+XmNmappedWhenManaged	XmCMappedWhenManaged	Boolean	True	CSG
+XmNscreen	XmCScreen	Screen *	dynamic	CG
+.wH
+.tH
+XmNsensitive	XmCSensitive	Boolean	True	CSG
+XmNtranslations	XmCTranslations	XtTranslations	dynamic	CSG
+XmNwidth	XmCWidth	Dimension	dynamic	CSG
+XmNx	XmCPosition	Position	0	CSG
+XmNy	XmCPosition	Position	0	CSG
+.TE
+.KE
+.in
+.sp 1
+.wH
+.in  
+.SS "Translations"
+There are no translations for Composite.
+.SH RELATED INFORMATION
+.na
+\fICore(3X)\fP.
+.ad

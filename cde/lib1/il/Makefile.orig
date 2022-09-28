@@ -1,0 +1,123 @@
+# Compile options   -Aa    ANSI
+#                   +Z     PIC
+#                   +DA1.0 PA_RISC v 1.0 
+CCFLAGS = -Aa +Z +DA1.0 -D_INCLUDE_POSIX_SOURCE -D_INCLUDE_XOPEN_SOURCE -D_INCLUDE_HPUX_SOURCE 
+
+HEADERS = \
+	ilXint.h       ildecompg4.h      iljpegmarker.h      ilpipeint.h \
+	ilcodec.h      ilimage.h         iljpegparam.h       ilscaleint.h \
+	ilcompress.h   ilint.h           iljpegprototypes.h  iltiffint.h \
+	ilcontext.h    iljpegcsize.h     iljpegstream.h \
+	ilconvert.h    iljpegdct.h       iljpegsystem.h \
+	ildecomp.h     iljpegglobals.h   iljpegtables.h
+SRCS = \
+	ilbigray.c \
+	ilcodec.c \
+	ilcomplzw.c \
+	ilcomppackbits.c \
+	ilcompressg3.c \
+	ilcompressjpeg.c \
+	ilcontext.c \
+	ilconvert.c \
+	ilcrop.c \
+	ildata.c \
+	ildecompg3.c \
+	ildecompg4.c \
+	ildecompjpeg.c \
+	ildecomplzw.c \
+	ildecomppackbits.c \
+	iljpeg.c \
+	iljpegcodec.c \
+	iljpeghuffman.c \
+	iljpegio.c \
+	iljpegisodct.c \
+	iljpegmarker.c \
+	iljpegstream.c \
+	iljpegtransform.c \
+	ildither.c \
+	ilformat.c \
+	ilimage.c \
+	ilinvert.c \
+	ilmap.c \
+	ilmirror.c \
+	ilobject.c \
+	ilpalette.c \
+	ilpipe.c \
+	ilrotate.c \
+	ilrwimage.c \
+	ilreadX.c \
+	ilscale.c \
+	ilscalesample.c \
+	iltiff.c \
+	iltiffread.c \
+	iltiffwrite.c \
+	iltruegray.c \
+	ilversion.c \
+	ilycbcr.c \
+	ilX.c 
+
+OBJS = \
+	ilbigray.o \
+	ilcodec.o \
+	ilcomplzw.o \
+	ilcomppackbits.o \
+	ilcompressg3.o \
+	ilcompressjpeg.o \
+	ilcontext.o \
+	ilconvert.o \
+	ilcrop.o \
+	ildata.o \
+	ildecompg3.o \
+	ildecompg4.o \
+	ildecompjpeg.o \
+	ildecomplzw.o \
+	ildecomppackbits.o \
+	iljpeg.o \
+	iljpegcodec.o \
+	iljpeghuffman.o \
+	iljpegio.o \
+	iljpegisodct.o \
+	iljpegmarker.o \
+	iljpegstream.o \
+	iljpegtransform.o \
+	ildither.o \
+	ilformat.o \
+	ilimage.o \
+	ilinvert.o \
+	ilmap.o \
+	ilmirror.o \
+	ilobject.o \
+	ilpalette.o \
+	ilpipe.o \
+	ilrotate.o \
+	ilrwimage.o \
+	ilreadX.o \
+	ilscale.o \
+	ilscalesample.o \
+	iltiff.o \
+	iltiffread.o \
+	iltiffwrite.o \
+	iltruegray.o \
+	ilversion.o \
+	ilycbcr.o \
+	ilX.o 
+
+CC = /bin/cc 
+LD = /bin/ld
+
+.c.o:
+	$(CC) -O $(CCFLAGS) -c -I../include -I/ilinc -I/usr/include/imaging -I/usr/include/X11R4 -c $*.c
+
+
+all: libil.sl
+
+clean:
+	rm -f *.o *.sl *.a
+
+libil.sl: $(OBJS)
+	$(LD) -b -x $(OBJS) -o $@ -m > $@.map
+
+# Cannot debug a shared library
+libil.a: $(OBJS)
+	$(LD) -r $(OBJS)  -o $@ -m > %@.map
+

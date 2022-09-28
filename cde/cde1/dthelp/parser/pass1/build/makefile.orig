@@ -1,0 +1,111 @@
+SHELL=/bin/csh
+#
+# This makefile should reside in BUILD. It includes rules
+# for generating BUILD.E in that directory. 
+#
+
+.SUFFIXES: .e .o .c
+
+COPYCMD = cp
+ARCCMD = arc u
+UNARCCMD = arc x
+ARCDELCMD = arc d
+DELETECMD = -rm -f
+OBJ = o
+EXE = e
+
+STDHDRS = $(UTIL)basic.h $(UTIL)sparse.h $(UTIL)common.h \
+	build.h proto.h
+
+OBJECTS = build.$(OBJ) buildutl.$(OBJ) \
+	eltree.$(OBJ) except.$(OBJ) fsa.$(OBJ) \
+	out.$(OBJ) param.$(OBJ) scan.$(OBJ) \
+	sref.$(OBJ) tree.$(OBJ)
+
+# Default rule for object files for main programs
+.c.o:
+	cc -c -g -I $(UTIL) $<
+
+.o.e:
+# Default rule for executables
+	-hp9000s800 && ld /lib/crt0.o $(OBJECTS) $(UTIL)util.a \
+		-lc /usr/lib/xdbend.o -o $@
+	-hp9000s300 && ld /lib/crt0.o $(OBJECTS) $(UTIL)util.a \
+		-lc /usr/lib/end.o -o $@
+
+# all is the default target.
+#
+# all depends on copyfiles to ensure that the copies are executed
+# every time.  The program fclndir performs these copies.
+all : dtd.h copyfiles
+
+# Compile BUILD.$(EXE), then process the DTD file, generating header files
+# for ELTDEF and PARSER.
+dtd.h : build.$(EXE) $(DTDFILE)
+	./build.$(EXE) < $(DTDFILE)
+
+copyfiles:
+	$(UTIL)fclndir.$(EXE) arc.h ../parser/arc.h
+	$(UTIL)fclndir.$(EXE) dtd.h ../parser/dtd.h
+	$(UTIL)fclndir.$(EXE) dtd.h ../eltdef/dtd.h
+	$(UTIL)fclndir.$(EXE) entity.h ../eltdef/entity.h
+
+build.$(EXE) : $(OBJECTS) 
+
+build.$(OBJ) : build.c delim.h $(STDHDRS) $(UTIL)entdef.h \
+	$(UTIL)trie.h proto.h $(UTIL)chartype.h 
+
+buildutl.$(OBJ) : buildutl.c $(STDHDRS) $(UTIL)version.h delim.h
+
+eltree.$(OBJ) : eltree.c $(STDHDRS)
+
+except.$(OBJ) : except.c $(STDHDRS)
+
+fsa.$(OBJ) : fsa.c $(STDHDRS) delim.h
+
+out.$(OBJ) : out.c $(STDHDRS) delim.h $(UTIL)entout.c $(UTIL)entdef.h
+
+param.$(OBJ) : param.c $(STDHDRS) delim.h
+
+scan.$(OBJ) : scan.c $(STDHDRS) delim.h $(UTIL)scanutil.c \
+	$(UTIL)sparse.c $(UTIL)sref.h
+
+sref.$(OBJ) : sref.c $(STDHDRS) $(UTIL)sref.h $(UTIL)entdef.h
+
+tree.$(OBJ) : tree.c $(STDHDRS) delim.h
+
+delim.h : $(UTIL)context.$(EXE) context.dat delim.dat
+# Actually all context output depends on these files ("dependencies").
+# However, listing each of the CONTEXT-generated files as a target 
+# causes CONTEXT to be run multiple times (needlessly).
+	$(UTIL)context.$(EXE) sparse
+
+# get application-specific delim.dat
+delim.dat : $(APPL)delim.bld
+	$(COPYCMD) $(APPL)delim.bld delim.dat
+	touch delim.dat
+
+clean : minimal
+	$(DELETECMD) *.$(EXE)
+
+mini minimal minimum : 
+	$(DELETECMD) context.h
+	$(DELETECMD) delim.h
+	$(DELETECMD) case.c
+	$(DELETECMD) arc.h
+	$(DELETECMD) dtd.h 
+	$(DELETECMD) entity.h
+	$(DELETECMD) *.$(OBJ)
+	$(DELETECMD) *.$(EXE)
+	$(DELETECMD) *.a
+
+arc package : 
+	if exist build.arc $(COPYCMD) build.arc old.arc
+	$(ARCCMD) build.arc *.c *.h context.dat makefile
+# D is used to delete generated files from the ARC file; the - 
+# preceding the command causes make to ignore errors on that 
+# command ONLY
+	-$(ARCDELCMD) build.arc case.c delim.h context.h arc.h dtd.h entity.h
+
+unarc dearc :
+	$(UNARCCMD) build.arc

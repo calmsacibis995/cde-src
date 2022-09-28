@@ -1,0 +1,94 @@
+XCOMM $XConsortium: Imakefile /main/cde1_maint/7 1995/11/13 14:21:59 lehors $
+PROGRAMS = dthelpprint
+
+/* General case INCLUDES DEFINES LOCAL_LIBRARIES
+ * Each individual architecture may have more or less of the above.
+ * Use EXTRA_DEFINES and EXTRA_INCLUDES to add defines and includes
+ * to an individual architecture.  There is no equivalent for
+ * LOCAL_LIBRARIES.
+ * USE_libraryname in LOCAL_LIBRARIES is by default empty.
+ * It should be set when necessary to the real library macro name.
+ */
+DEFINES = -D_BMS
+INCLUDES = -I. 
+
+/* DEPLIBS contains the list of library depencies for a client.
+ * LOCAL_LIBRARIES contains the list of libraries on the link line.
+ * Generally, the dependency form of a library has DEP as a prefix.
+ * e.g. put $(XLIB) in LOCAL_LIBRARIES and $(DEPXLIB) in DEPLIBS.
+ * NOTE: if DEPLIBS is not set here, it is by default null and there
+ *       are no library dependencies for clients.
+ *       You cannot put -Llibpath into DEPLIBS. You must put actual
+ *       paths to the library.
+ */
+DEPLIBS = $(DEPDTHELPLIB) $(DEPXLIB)
+LOCAL_LIBRARIES = $(DTHELPLIB) $(XLIB)
+EXTRA_INCLUDES = -I$(DTHELPSRC)
+#SYS_LIBRARIES = -lm
+DEFINES = -DDTLIB -DMESSAGE_CAT $(LOCAL_DEFINES) \
+          -DCDE_CONFIGURATION_TOP='"$(CDE_CONFIGURATION_TOP)"' \
+          -DCDE_INSTALLATION_TOP='"$(CDE_INSTALLATION_TOP)"'
+
+#ifdef HPArchitecture
+#endif
+
+#if defined(RsArchitecture) || defined(AlphaArchitecture)
+SYS_LIBRARIES = -lm -liconv
+#endif
+
+#if defined (SunArchitecture)
+#SYS_LIBRARIES = -lm -ldl $(WIDECHARSYSLIB) -lC
+SYS_LIBRARIES = $(WIDECHARSYSLIB) 
+#endif /* SunArchitecture */
+
+#if defined (USLArchitecture)
+SYS_LIBRARIES = -lm -ldl $(WIDECHARSYSLIB) -lgen
+DEPLIBS = $(DEPDTHELPLIB) $(DEPXMLIB) $(DEPXTOOLLIB) $(DEPXLIB)
+LOCAL_LIBRARIES = $(DTHELPLIB) $(XMLIB) $(XTOOLLIB) $(XLIB)
+#endif /* USLArchitecture */
+
+#if defined (UXPArchitecture)
+SYS_LIBRARIES = -lm -ldl $(WIDECHARSYSLIB) -lgen
+DEPLIBS = $(DEPDTHELPLIB) $(DEPDTSVCLIB) $(DEPXMLIB) $(DEPXTOOLLIB) $(DEPXLIB)
+LOCAL_LIBRARIES = $(DTHELPLIB) $(DTSVCLIB) $(XMLIB) $(XTOOLLIB) $(XLIB)
+#endif /* UXPArchitecture */
+
+
+SRCS = Main.c \
+       Initialize.c \
+       PrintUtil.c \
+       PrintTopics.c \
+       PrintManStrFile.c \
+       version.c
+
+OBJS = Main.o \
+       Initialize.o \
+       PrintUtil.o \
+       PrintTopics.o \
+       PrintManStrFile.o \
+       version.o
+
+NormalLibraryObjectRule()
+ComplexProgramTarget($(PROGRAMS))
+
+saber_src: $(SRCS) 
+	#setopt load_flags $(CFLAGS)
+	#load $(SRCS)
+	#load $(DEPLIBS)
+
+unsaber_src:
+        #unload $(SRCS)
+
+/***** For dtge make a client_OBJS.o using client_main.o ******/
+/***** This implies the existence of client_main.c       ******/
+#ifdef BuildHugeObject
+#ifdef HPArchitecture
+/***** dtge hidden symbols *******/
+#ifdef __hp9000s300
+HIDDEN_SYMBOLS = -h _main
+#else
+HIDDEN_SYMBOLS = -h main
+#endif
+#endif
+SpecialRelocatableTarget(dthelpprint,$(HIDDEN_SYMBOLS),$(OBJS))
+#endif

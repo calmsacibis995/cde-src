@@ -1,0 +1,76 @@
+.de Lc
+.\" version of .LI that emboldens its argument
+.TP \\n()Jn
+\s-1\f3\\$1\f1\s+1
+..
+.TH tt_message_arg_ival 3 "1 March 1996" "ToolTalk 1.3" "ToolTalk Functions"
+.BH "1 March 1996"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.IX "tt_message_arg_ival" "" "tt_message_arg_ival(3)" ""
+.SH NAME
+tt_message_arg_ival \- retrieve the integer value of a message argument
+.SH SYNOPSIS
+.ft 3
+.nf
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'Tt_status tt_message_arg_ival('u
+Tt_status tt_message_arg_ival(Tt_message \f2m\fP,
+	int \f2n\fP,
+	int *\f2value\fP);
+.PP
+.fi
+.SH DESCRIPTION
+The
+.BR tt_message_arg_ival (\|)
+function
+retrieves the integer value of the
+.IR n th
+message argument.
+.PP
+The
+.I m
+argument is the opaque handle for the message involved in this operation.
+The
+.I n
+argument is the number of the argument to be retrieved.
+The first argument is numbered zero.
+The
+.I value
+argument is a pointer to an integer where the ToolTalk service
+is to store the contents of the argument.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.BR tt_message_arg_ival (\|)
+function returns the status of the operation as one of the following
+.B Tt_status
+values:
+.PP
+.RS 3
+.nr )J 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_NOMP
+.br
+The
+.BR ttsession (1)
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_NUM
+.br
+The integer value passed was invalid (out of range), or, if the value
+in the message is not yet set (as it would be in observing a request
+in state TT_SENT and trying to look at the TT_OUT arguments).
+.Lc TT_ERR_POINTER
+.br
+The pointer passed does not point to an object of
+the correct type for this operation.
+.PP
+.RE
+.nr )J 0
+.SH "SEE ALSO"
+.na
+.BR tt_c (5).

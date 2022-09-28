@@ -1,0 +1,185 @@
+/*
+ * File:         Imakefile $XConsortium: Imakefile /main/cde1_maint/4 1995/10/08 22:11:45 pascale $
+ *
+ * (c) Copyright 1993, 1994 Hewlett-Packard Company			*
+ * (c) Copyright 1993, 1994 International Business Machines Corp.	*
+ * (c) Copyright 1993, 1994 Sun Microsystems, Inc.			*
+ * (c) Copyright 1993, 1994 Novell, Inc.				*
+ */
+
+#define IHaveSubdirs
+#define PassCDebugFlags /**/
+/* for linking headers */
+SUBDIRS=bms SPC
+MakeSubdirs($(SUBDIRS))
+DependSubdirs($(SUBDIRS))
+
+
+#ifndef DoNormalLib
+#define DoNormalLib NormalLibDtSvc
+#endif
+#ifndef DoSharedLib
+#define DoSharedLib SharedLibDtSvc
+#endif
+
+#include <Library.tmpl>
+
+#if defined(REORDER_PROFILED)
+    C++ = CC -pg $(BBAFLAGS)
+    CC = cc -xpg $(BBAFLAGS)
+    LD = cc
+#endif
+
+/* look for DT stuff locally */
+LOCALDTCODELIBSSRC = ../DtCodelibs
+/* General case INCLUDES DEFINES
+ * Each individual architecture may have more or less of the above.
+ * Use EXTRA_DEFINES and EXTRA_INCLUDES to add defines and includes
+ * to an individual architecture.
+ */
+DEFINES = -DXK_MISCELLANY -DMULTIBYTE \
+          -DCDE_CONFIGURATION_TOP=\"$(CDE_CONFIGURATION_TOP)\" \
+          -DCDE_INSTALLATION_TOP=\"$(CDE_INSTALLATION_TOP)\" \
+          -DCDE_LOGFILES_TOP=\"$(CDE_LOGFILES_TOP)/tmp\"
+
+INCLUDES = -I. -ISPC -I$(LOCALDTCODELIBSSRC) -I../include
+
+#ifdef SCOArchitecture
+EXTRA_DEFINES = -DMESSAGE_CAT -DMULTIBYTE
+#endif
+
+#ifdef HPArchitecture
+EXTRA_DEFINES = -DMESSAGE_CAT -DMULTIBYTE
+EXTRA_CCOPTIONS = $(ESLIT_OPTION)
+#endif
+
+#if defined(RsArchitecture) 
+#endif
+
+#ifdef SunArchitecture
+EXTRA_DEFINES=-DNO_REGCOMP
+
+/* Following files need a "long long" for large file system support. Use -Xa */
+connect.o := CCOPTIONS = -Xa
+#endif
+
+#ifdef USLArchitecture
+EXTRA_DEFINES=-DNO_REGCOMP
+#endif
+
+#ifdef UXPArchitecture
+EXTRA_DEFINES=-DNO_REGCOMP
+#endif
+
+#ifdef AlphaArchitecture
+EXTRA_DEFINES = -DMESSAGE_CAT -DMULTIBYTE
+#endif
+  
+INSTALLFLAGS = $(INSTINCFLAGS)
+
+LINTLIBS = $(LINTXLIB) $(LINTXTOOL) $(LINTXM) 
+
+HEADERS = \
+	SPC/chars.h \
+	SPC/spc-obj.h \
+	SPC/spc-proto.h \
+	SPC/spcE.h \
+	SPC/spcP.h \
+	bms/MemoryMgr.h \
+	bms/SbEvent.h \
+	bms/Symbolic.h \
+	bms/XeUserMsg.h \
+	bms/bms.h \
+	bms/connect.h \
+	bms/pathwexp.h \
+	bms/sbport.h \
+	bms/sbstdinc.h \
+	bms/scoop.h \
+	bms/spc.h \
+	bms/stringbuf.h \
+	bms/usersig.h
+
+
+SRCS1 = \
+	MemoryMgr.c \
+	SbEvent.c \
+	Symbolic.c \
+	bmsglob.c \
+	connect.c \
+	local.c \
+	nls.c \
+	noio.c \
+	pathwexp.c \
+	pipe.c \
+	pty.c \
+	remote.c \
+	sbstdinc.c \
+	scoop.c \
+	spc-env.c \
+	spc-error.c \
+	spc-exec.c \
+	spc-net.c \
+	spc-obj.c \
+	spc-proto.c \
+	spc-sm.c \
+	spc-termio.c \
+	spc-util.c \
+	spc-xt.c \
+	spc.c \
+	stringbuf.c \
+	usersig.c
+
+/* WARNING!!!!
+ * Any .o's added to this list need to be added to DTENCAP_OBJS4
+ * and SHARED_DTENCAP_OBJS4 in the DtSvc Imakefile.
+ */
+OBJS1 = \
+	MemoryMgr.o \
+	SbEvent.o \
+	Symbolic.o \
+	bmsglob.o \
+	connect.o \
+	local.o \
+	nls.o \
+	noio.o \
+	pathwexp.o \
+	pipe.o \
+	pty.o \
+	remote.o \
+	sbstdinc.o \
+	scoop.o \
+	spc-env.o \
+	spc-error.o \
+	spc-exec.o \
+	spc-net.o \
+	spc-obj.o \
+	spc-proto.o \
+	spc-sm.o \
+	spc-termio.o \
+	spc-util.o \
+	spc-xt.o \
+	spc.o \
+	stringbuf.o \
+	usersig.o
+
+
+OBJS=$(OBJS1) $(OBJS2)
+SRCS=$(SRCS1) $(SRCS2)
+
+LibraryObjectRule()
+all:: $(OBJS)
+
+LintLibraryTarget(DtSvc,$(SRCS))
+
+/*
+ * These headers should not be made public
+ * No clients should access them directly -- library code can use -I BMSLIBSRC and/or
+ * -I LIBSOFTLIBSRC for the time being.
+ *
+ *  BuildIncludes($(HEADERS),$(DTINCLUDEDEST),../..) 
+ */
+
+DependTarget()
+
+includes::
+

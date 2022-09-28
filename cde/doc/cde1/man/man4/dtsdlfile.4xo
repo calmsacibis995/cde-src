@@ -1,0 +1,117 @@
+.TH dtsdlfile 4 "11 Jan 1994"
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994 Novell, Inc.
+.\" *************************************************************************
+.SH NAME
+dtsdlfile \- CDE runtime help volume files
+.SH DESCRIPTION
+Semantic Delivery Language (sdl) files are used for presenting online 
+information or application specific contextual help information in CDE.
+They
+are refered to as Help Volumes, and contain the equivalent of a runtime 
+version of the original, authored help information.
+Help Volumes can be
+viewed via one of the two CDE help dialog widgets provided as part of the CDE
+Development Environment.
+.HU "File Generation"
+Refer to the
+.Cm dthelptag 1
+man page for detailed information on the creation of \f3*.sdl\f1 files within CDE.
+.SH "ENVIRONMENT VARIABLES"
+The CDE Help system uses two environment variables for locating 
+Help volumes and Family files  
+within the desktop environment:
+.VL 15
+.LI \f2DTHELPSEARCHPATH\f1
+\f2System\f1 search path environment variable for locating
+Help volumes on local and/or remote nfs mounted systems.
+.LI \f2DTHELPUSERSEARCHPATH\f1
+\f2Users\f1 search path environment variable for locating user
+specific Help volumes on local and/or remote nfs mounted systems.
+.LE
+.P
+The environment variables contain colon-separated lists of directory paths.
+Each directory path can contain environment variable names as well as
+special field descriptors that are expanded at runtime.
+.P
+Field descriptors consist of a \f3%\f1
+followed by a single character.
+Field descriptors and their substitution values are:
+.VL 15
+.LI \f3%H\f1
+This value is replaced with the current volume or Family name being searched 
+for.
+.LI \f3%L\f1
+Replaced with the current value of the
+.I LANG
+environment variable.
+.LI \f3%%\f1
+Replaced with a single \f3%\f1.
+.LE
+.P
+The default value for
+.I DTHELPUSERSEARCHPATH
+is:
+.P
+\f3
+.br
+$HOME/.dt/help/$DTUSERSESSION/%H:
+.br
+$HOME/.dt/help/$DTUSERSESSION/%H.sdl:
+.br 
+$HOME/.dt/help/$DTUSERSESSION/%H.hv:
+.br
+$HOME/.dt/help/%H:
+.br
+$HOME/.dt/help/%H.sdl:
+.br 
+$HOME/.dt/help/%H.hv\f1
+.P
+The
+.I DTHELPUSERSEARCH
+is first searched for the requested volume.
+If
+the volume is not found, the
+.I DTHELPSEARCHPATH
+value is searched.
+.P
+The default value for
+.I DTHELPSEARCHPATH
+path is:
+.P
+\f3
+.br
+/etc/dt/appconfig/help/%L/%H:
+.br
+/etc/dt/appconfig/help/%L/%H.sdl:
+.br
+/etc/dt/appconfig/help/%L/%H.hv:
+.br
+/etc/dt/appconfig/help/C/%H:
+.br
+/etc/dt/appconfig/help/C/%H.sdl:
+.br
+/etc/dt/appconfig/help/C/%H.hv:
+.br
+/usr/dt/appconfig/help/%L/%H:
+.br
+/usr/dt/appconfig/help/%L/%H.sdl:
+.br
+/usr/dt/appconfig/help/%L/%H.hv:
+.br
+/usr/dt/appconfig/help/C/%H:
+.br
+/usr/dt/appconfig/help/C/%H.sdl:
+.br
+/usr/dt/appconfig/help/C/%H.hv\f1
+.SH "SEE ALSO"
+.Fn DtCreateHelpDialog 3,
+.Fn DtCreateQuickHelpDialog 3,
+.Cm dthelptag 1,
+\f2CDE Help System Author's and Programmer's Guide\f1
+
+
+

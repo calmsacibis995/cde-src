@@ -1,0 +1,43 @@
+# %%  (c) Copyright 1993, 1994 Hewlett-Packard Company			
+# %%  (c) Copyright 1993, 1994 International Business Machines Corp.	
+# %%  (c) Copyright 1993, 1994 Sun Microsystems, Inc.			
+# %%  (c) Copyright 1993, 1994 Novell, Inc. 				
+# %%  $Revision: $ 			 				
+#
+#
+# @(#)Makefile	1.3 @(#)
+#
+# The ToolTalk shell script utility makefile
+#
+# Copyright (c) 1992 by Sun Microsystems, Inc.
+#
+# Any shell scripts shipped as part of ToolTalk are collected here.
+
+TT_DIR = ../..
+THIS_DIR = bin/tt_type_comp
+
+SCRIPTS = ttce2xdr
+
+include $(TT_DIR)/SunMakefile-head.mk
+
+all::			Bin-g
+
+ttce2xdr: ttce2xdr.sh
+	rm -f ttce2xdr
+	cat ttce2xdr.sh | sed "s/TT_VERSION_STRING/$(TT_VERSION)/" > ttce2xdr
+	chmod +x ttce2xdr
+
+$(BIN_TARGETS)::	$(SCRIPTS)
+
+$(INSTALL_TARGETS)::	$(SCRIPTS) $(SCRIPTS:%=$(INSTALL_DIR)/bin/%)
+
+# The scripts are all made from scriptname.sh through the standard
+# Make default rules, but we have to be sure to sccs get the .sh files.
+
+INIT_DEPENDENCIES += $(SCRIPTS:%=%.sh)
+
+Clean::
+	$(RM)  $(SCRIPTS)
+
+include $(TT_DIR)/SunMakefile-tail.mk
+

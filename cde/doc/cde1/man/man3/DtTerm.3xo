@@ -1,0 +1,1551 @@
+.TH DtTerm 3 "25 Apr 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.\" *************************************************************************
+.SH NAME
+DtTerm \- DtTerm widget class
+.SH SYNOPSIS
+.yS
+#include <Dt/Term.h>
+.yE
+.SH DESCRIPTION
+.cdes
+The DtTerm widget provides the core set of functionality needed to
+emulate an \f3ANSI X3.64-1979\fP- and \f3ISO 6429:1992(E)\fP-style terminal,
+such as the DEC VT220.
+This functionality includes text rendering, scrolling, margin and tab support,
+escape sequence parsing and the low-level OS-specific interface required to
+allocate and configure a
+.B pty
+or STREAMS pseudo-terminal device and write the system's
+.B utmp
+device.
+.cdee
+.xos
+The DtTerm widget provides the core set of functionality needed to
+emulate a terminal that supports the control sequences in the \*(Z5
+and the \*(Z6.
+This functionality includes text rendering, scrolling, margin
+and tab support, escape
+sequence parsing and the low-level implementation-specific interfaces
+required to
+allocate and configure a pseudo-terminal device
+and to update the system's implementation-dependent database
+of logged-in users (see
+.Cm who
+in the \*(ZC).
+.xoe
+.HU "Classes"
+The
+DtTerm
+widget inherits behavior and resources from the
+.I Core
+and
+.I XmPrimitive
+classes.
+.P
+The class pointer is
+.B dtTermWidgetClass .
+.P
+The class name is
+.IR DtTerm .
+.HU "New Resources"
+The following table defines a set of widget resources used by the application
+to specify data.
+The application can also set the resource values for the
+inherited classes to set attributes for this widget.
+To reference a resource by name or by class in a
+.B \&.Xdefaults
+file, the application must remove the
+.B DtN
+or
+.B DtC
+prefix and use the remaining letters.
+To specify one of the defined
+values for a resource in a
+.B \&.Xdefaults
+file, the application must remove the
+.B Dt
+prefix and use
+the remaining letters (in either lower case or upper case,
+but including any underscores between words).
+The codes in the access column indicate if the given resource can be
+set at creation time (C),
+set by using
+.Fn XtSetValues
+(S), retrieved by using
+.Fn XtGetValues
+(G), or is not applicable (N/A).
+.P
+.cde .ne 10
+.DS
+.S -1
+.TS
+.xo expand box tab(@);
+.cde expand tab(@);
+cf3 ssss
+.xo lf3 1 | lf3 1 | lf3 1 | lf3 1 | lf3
+.xo lf3 1 | lf3 1 | lf3 1 | l   1 | l .
+.cde lf3 1 lf3 1 lf3 1 lf3 1 lf3
+.cde lf3 1 lf3 1 lf3 1 l   1 l .
+DtTerm Resource Set, Part 1 of 2
+_
+Name@Class@Type@Default@Access
+_
+DtNallowSendEvents@DtCAllowSendEvents@Boolean@False@CSG
+DtNappCursorDefault@DtCAppCursorDefault@Boolean@False@CSG
+DtNappKeypadDefault@DtCAppKeypadDefault@Boolean@False@CSG
+DtNautoWrap@DtCAutoWrap@Boolean@True@CSG
+DtNbackgroundIsSelect@DtCBackgroundIsSelect@Boolean@False@CG
+DtNbaseHeight@DtCBaseHeight@int@0@G
+DtNbaseWidth@DtCBaseWidth@int@0@G
+DtNblinkRate@DtCBlinkRate@int@250@CSG
+DtNc132@DtCC132@Boolean@False@CSG
+DtNcharCursorStyle@DtCCharCursorStyle@unsigned@DtTERM_CHAR-@CSG
+@@   char@   _CURSOR_BOX
+.xos
+.TE
+.S +1
+.DE
+.P
+.cde .ne 10
+.DS
+.S -1
+.TS
+expand box tab(@);
+cf3 ssss
+lf3 1 | lf3 1 | lf3 1 | lf3 1 | lf3
+lf3 1 | lf3 1 | lf3 1 | l   1 | l .
+DtTerm Resource Set, Part 2 of 2
+_
+Name@Class@Type@Default@Access
+_
+.xoe
+DtNcolumns@DtCColumns@short@80@CSG
+DtNconsoleMode@DtCConsoleMode@Boolean@False@CG
+DtNemulationID@DtCEmulationID@String@``DtTermWidget''@CSG
+DtNheightInc@DtCHeightInc@int@0@G
+DtNinputVerifyCallback@DtCCallback@XtCallbackList@NULL@C
+DtNjumpScroll@DtCJumpScroll@Boolean@True@CSG
+DtNkshMode@DtCKshMode@Boolean@False@CSG
+DtNlogging@DtCLogging@Boolean@False@CSG
+.\" DKS DtNlogFile@DtCLogFile@String@\f3dttermLogXXXXX\fP@CSG
+.\" DKS DtNlogInhibit@DtCLogInhibit@Boolean@False@CSG
+.\" DKS DtNloginShell@DtCLoginShell@Boolean@False@CSG
+DtNmapOnOutput@DtCMapOnOutput@Boolean@False@CSG
+DtNmapOnOutputDelay@DtCMapOnOutputDelay@int@0@CSG
+DtNmarginBell@DtCMarginBell@Boolean@False@CSG
+DtNmarginHeight@DtCMarginHeight@Dimension@2@CSG
+DtNmarginWidth@DtCMarginWidth@Dimension@2@CSG
+DtNnMarginBell@DtCNMarginBell@int@10@CSG
+DtNoutputLogCallback@DtCCallback@XtCallbackList@NULL@C
+DtNpointerBlank@DtCPointerBlank@Boolean@False@CSG
+DtNpointerBlankDelay@DtCPointerBlankDelay@int@2@CSG
+DtNpointerColor@DtCForeground@String@dynamic@CSG
+DtNpointerColorBackground@DtCBackground@String@dynamic@CSG
+DtNpointerShape@DtCPointerShape@String@\f3xterm\fP@CSG
+DtNreverseWrap@DtCReverseWrap@Boolean@False@CSG
+DtNrows@DtCRows@short@24@CSG
+DtNsaveLines@DtCSaveLines@string@4s@CG
+DtNshadowType@DtCShadowType@unsigned @DtSHADOW_IN@CSG
+@@   char
+DtNstatusChangeCallback@DtCCallback@XtCallbackList@NULL@C
+DtNsubprocessArgv@DtCSubprocessArgv@String *@NULL@CG
+DtNsubprocessCmd@DtCSubprocessCmd@String@NULL@CG
+DtNsubprocessExec@DtCSubprocessExec@Boolean@True@CSG
+DtNsubprocessLoginShell@DtCSubprocessLoginShell@Boolean@False@CG
+DtNsubprocessPid@DtCSubprocessPid@int@\-1@G
+DtNsubprocess-@DtCCallback@XtCallbackList@NULL@C
+   TerminationCallback
+DtNsubprocess-@DtCSubprocess-@Boolean@True@CSG
+   TerminationCatch@   TerminationCatch
+DtNsunFunctionKeys@DtCSunFunctionKeys@Boolean@False@CSG
+DtNtermDevice@DtCTermDevice@int@\-1@CG
+DtNtermDeviceAllocate@DtCTermDeviceAllocate@Boolean@True@CG
+DtNtermId@DtCTermId@String@``vt220''@CSG
+DtNtermName@DtCTermName@String@``dtterm''@CSG
+DtNtermSlaveName@DtCTermSlaveName@String@NULL@CG
+DtNttyModes@DtCTtyModes@String@NULL@CSG
+DtNuserBoldFont@DtCUserBoldFont@XmFontList@dynamic@CSG
+DtNuserFont@DtCUserFont@XmFontList@dynamic@CSG
+DtNverticalScrollBar@DtCVerticalScrollBar@Widget@NULL@CSG
+DtNvisualBell@DtCVisualBell@Boolean@False@CSG
+DtNwidthInc@DtCWidthInc@int@0@G
+.TE
+.S +1
+.DE
+.VL 6
+.LI \f3allowSendEvents\fP
+.br
+Specifies that the terminal emulator allow
+synthetic events (generated and sent by another application).
+Enabling this resource opens up a possible security hole.
+.LI \f3appCursorDefault\fP
+.br
+Specifies the initial cursor mode.
+If True,
+the cursor keys are initially in application mode.
+If False,
+the cursor keys are initially in cursor mode.
+.LI \f3appKeypadDefault\fP
+.br
+Specifies the initial keypad mode.
+If
+True,
+the keypad keys are initially in application mode.
+If
+False,
+the keypad keys are initially in numeric mode.
+.LI \f3c132\fP
+.br
+Specifies whether or not the
+.Cn DECCOLM
+escape sequence that
+switches between a 132- and 80-column window is honored.
+.LI \f3consoleMode\fP
+.br
+Specifies that output directed at
+.B /dev/console
+be directed instead to the terminal window.
+It is provided as a way to
+prevent output that would normally be displayed on the internal
+terminal emulator (ITE) from overwriting the X server's display.
+It is not provided as a general mechanism to
+direct the output from an arbitrary system's
+.B /dev/console
+to an arbitrary X server.
+Ownership of, and read-write permission for,
+.B /dev/console
+is required to redirect console output.
+.LI \f3DtNautoWrap\fP
+.br
+Specifies whether or not auto-wrap is initially enabled.
+.LI \f3DtNbackgroundIsSelect\fP
+.br
+Controls the background color.
+When
+False,
+the background color is the color specified.
+When
+True,
+the background
+color is the select color corresponding to the background and is
+constant with other Motif-based applications.
+.LI \f3DtNbaseHeight\fP
+.br
+Specifies the terminal window's base height.
+With this resource the application computes its base height for the
+shell widget, which then allows the window manager to provide
+appropriate sizing feedback to the user.
+The height of the terminal
+window is:
+.Cs I
+\f3DtNbaseHeight\fP + \f3DtNrows\fP \(mu \f3DtNheightInc\fP
+.Ce
+.LI \f3DtNbaseWidth\fP
+.br
+Specifies the terminal window's base width.
+With this resource the application computes its base width for the
+shell widget, which then allows the window manager to provide
+appropriate sizing feedback to the user.
+The width of the terminal
+window is:
+.Cs I
+\f3DtNbaseWidth\fP + \f3DtNcolumns\fP \(mu \f3DtNwidthInc\fP
+.Ce
+.LI \f3DtNblinkRate\fP
+.br
+Specifies the number of milliseconds the cursor is in the
+on and off states while blinking.
+A value of 250 blinks the cursor two times per second.
+A value of zero turns blinking off.
+.LI \f3DtNc132\fP
+.br
+This resource specifies whether or not the
+.Cn DECCOLM
+escape sequence should be honored.
+.LI \f3DtNcharCursorStyle\fP
+.br
+Specifies the text cursor shape.
+A
+.Cn DtTERM_CHAR_CURSOR_BOX
+value specifies a cursor the width and height of the base
+font's bounding box.
+A
+.Cn DtTERM_CHAR_CURSOR_BAR
+value specifies a cursor
+the width of the base font's bounding box, two pixels high, and drawn with
+its top on the baseline.
+The default is
+.Cn DtTERM_CHAR_CURSOR_BOX .
+.LI \f3DtNcolumns\fP
+.br
+Specifies the number of text columns in the terminal
+window.
+For additional information, see
+.BR DtNbaseWidth .
+.LI \f3DtNemulationID\fP
+.br
+Specifies the string to which the
+.I TERMINAL_EMULATOR
+environment variable is set.
+.LI \f3DtNheightInc\fP
+.br
+Specifies the character cell height used as the
+height increment when calculating the size of the terminal window.
+For additional information, see
+.BR DtNbaseHeight .
+.LI \f3DtNinputVerifyCallback\fP
+.br
+Specifies the list of callbacks called before the
+DtTerm
+widget sends text
+to the child process.
+The text may be generated either in response
+to keyboard input, selection or drag and drop.
+The
+.B DtTermInputVerifyCallbackStruct
+structure's address is passed to this callback.
+.Cn DtCR_TERM_INPUT_VERIFY
+is the
+.I reason
+set by the callback.
+.LI \f3DtNjumpScroll\fP
+.br
+Specifies that the
+DtTerm
+widget uses jump scrolling.
+.cdes
+Under jump
+scrolling, the screen may be scrolled more than one line at a time.
+This means faster screen updates when multiple lines
+of text are sent to the terminal.
+.cdee
+The maximum number of lines that may be
+jump scrolled is limited to the number of lines in the terminal window.
+The
+DtTerm
+widget guarantees that all lines are displayed.
+.LI \f3DtNkshMode\fP
+.br
+Enables
+.Cm ksh
+mode.
+With
+.Cm ksh
+mode, a key pressed with the extend modifier bit set generates an
+escape character followed by the character generated by the unextended
+keystroke.
+.hps
+This option is provided for use with
+.Cm emacs 1
+and the emacs
+command-line editor mode of
+.Cm ksh 1
+or
+.Cm ied 1.
+.hpe
+This option is provided for use with
+.Cm emacs 1
+and the emacs
+command-line editor mode of
+.Cm ksh 1.
+It conflicts with the
+normal meta key use for generating extended single byte
+characters and for generating multi-byte Asian characters.
+.\" DKS .LI  "\f3DtNlogging\fP"
+.\" DKS This resource enables output logging.  When logging is enabled, all
+.\" DKS output received from the pty will be logged either to a file or to a
+.\" DKS command pipeline (as specified via the \f3DtNlogFile\fP resource below).
+.\" DKS Since these data are being logged directly from the pty, it will include
+.\" DKS all escape characters and carriage return / new line pairs sent by the
+.\" DKS terminal line discipline.  Output may be enabled and disabled via escape
+.\" DKS sequences.  The default is False.
+.\" DKS .LI  "\f3DtNlogFile\fP"
+.\" DKS This resource specifies the name of the file to which the output logging
+.\" DKS described above is written.  If the filename begins with a pipe symbol
+.\" DKS ("\f3|\fP"), the rest of the string is assumed to be a command to be used as
+.\" DKS the endpoint of a pipe.  The default filename is
+.\" \f3dttermLogXXXXX\fP
+.\" DKS (where "XXXXX" is the process ID of the parent process) and is created
+.\" DKS in the directory from which the subprocess was started.
+.\" DKS .LI  "\f3DtNlogInhibit\fP"
+.\" DKS This resource indicates that device and file logging should be
+.\" DKS inhibited.  The default is False.
+.LI \f3DtNmapOnOutput\fP
+.br
+Indicates that the terminal widget map
+(de-iconify) itself upon subprocess output if it is unmapped (iconified).
+An initial period of time during which the terminal widget does not map itself
+upon subprocess output can be specified via the
+.B DtNmapOnOutputDelay
+resource.
+.LI \f3DtNmapOnOutputDelay\fP
+.br
+Specifies the number of seconds after start-up that the
+widget
+does not honor the
+.B DtNmapOnOutput
+resource.
+This allows for
+initial output (for example, shell prompts) to be sent to the terminal without
+auto-mapping the window.
+The default is zero (no delay).
+.LI \f3DtNmarginBell\fP
+.br
+Specifies whether or not the bell rings when the user types near
+the right margin.
+The distance from the right margin is specified by the
+.B nMarginBell
+resource.
+.LI \f3DtNmarginHeight\fP
+.br
+Specifies the height of the margin between the text and
+the top and bottom of the
+DtTerm
+widget's window.
+.LI \f3DtNmarginWidth\fP
+.br
+Specifies the width of the margin between the text and
+both sides of the
+DtTerm
+widget's window.
+.LI \f3DtNnMarginBell\fP
+.br
+Specifies the number of characters from the right margin at which the
+margin bell rings when enabled via the
+.B DtNmarginBell
+resource.
+.LI \f3DtNoutputLogCallback\fP
+.br
+Specifies the list of callbacks called when the widget receives text
+from the child process.
+.B DtTermOutputLogCallbackStruct
+is the structure type whose address is passed to this callback.
+.Cn DtCR_TERM_OUTPUT_LOG
+is the
+.I reason
+set by the callback.
+.LI \f3DtNpointerBlank\fP
+.br
+Indicates that the pointer cursor is in
+blanking mode.
+In this mode, the cursor turns on when the pointer
+is moved, and is blanked either after a selectable number of
+seconds or after keyboard input.
+The delay is set via the
+.B DtNpointerBlankDelay
+resource.
+.LI \f3DtNpointerBlankDelay\fP
+.br
+Specifies the number of seconds to wait after the pointer
+has stopped moving before blanking the pointer (see
+.BR DtNpointerBlank ).
+A value of zero prevents the pointer from
+blanking until a key is pressed.
+.LI \f3DtNpointerColor\fP
+.br
+Specifies the foreground color the
+DtTerm
+widget uses for the terminal
+window's pointer (X11 cursor).
+The default is the terminal window's foreground color.
+.LI \f3DtNpointerColorBackground\fP
+.br
+Specifies the background color the
+DtTerm
+widget uses for the terminal
+window's pointer (X11 cursor).
+The default is the terminal window's background color.
+.LI \f3DtNpointerShape\fP
+.br
+Specifies the X cursor font character the
+DtTerm
+widget uses as the
+pointer cursor.
+The font character should be specified as a string from the include file,
+.Hd X11/cursorfont.h ,
+with the leading
+.B XC_
+removed.
+.cdes
+The default is
+.Cm xterm 1X.
+.cdee
+.LI \f3DtNreverseWrap\fP
+.br
+Specifies whether or not reverse-wraparound is
+enabled.
+.LI \f3DtNrows\fP
+.br
+Specifies the number of rows of text in the terminal
+window.
+For additional information, see
+.BR DtNbaseHeight .
+.LI \f3DtNsaveLines\fP
+.br
+Defines the number of lines in the terminal buffer beyond
+the length of the window.
+The resource value consists of a number
+followed by an optional suffix.
+If no suffix is included or the suffix
+is ``l'' (ell), the total length of the terminal buffer is the number
+plus the length of the terminal window.
+If the suffix is ``s,'' the total
+length of the terminal buffer is (the number plus one) times the length
+of the terminal window.
+The
+DtTerm
+widget tries to maintain
+the same buffer-to-window ratio when the window is resized larger.
+.LI \f3DtNshadowType\fP
+.br
+Specifies the type of shadow drawn around the terminal
+window.
+See the
+.xo XmFrame
+.cde .IR XmFrame (3X)
+widget
+for supported shadow types.
+.LI \f3DtNstatusChangeCallback\fP
+.br
+Specifies the list of callbacks called when the
+DtTerm
+widget's status changes.
+Status changes include
+changes such as cursor position, caps lock state and insert char state.
+The
+.B DtTermStatusChangeCallbackStruct
+structure's address is passed to this callback.
+.Cn DtCR_TERM_STATUS_CHANGE
+is the
+.I reason
+the callback sends.
+.LI \f3DtNsubprocessArgv\fP
+.br
+Specifies the argument list passed to the subprocess if
+.B DtNsubprocessExec
+is
+True.
+If
+.B DtNsubprocessCmd
+is
+.Cn NULL ,
+the first string of this argument is used as the name of the command to
+execute.
+.LI \f3DtNsubprocessCmd\fP
+.br
+Specifies the name of the command to run if
+.B DtNsubprocessExec
+is
+True.
+If
+.B DtNsubprocessExec
+is
+.Cn NULL ,
+the first string of the
+.B DtNsubprocessArgv
+argument is used.
+.LI \f3DtNsubprocessExec\fP
+.br
+This resource specifies whether or not
+a subprocess is
+.Fn fork 2
+and
+.Fn exec 2.
+If
+True,
+a subprocess is launched as specified via the
+.B DtNsubprocessArgv
+resource, if set,
+or the
+.B DtNsubprocessCmd
+resource, if
+set, or the
+.I SHELL
+environment variable, if set, or the default
+system shell.
+.LI \f3DtNsubprocessloginShell\fP
+.xos
+Indicates that the starting shell is to be a login
+shell (that is, the first character of
+.IR argv [0]
+is to be a dash),
+that tells the shell to read the
+system's
+.B profile
+and the user's
+.B \&.profile
+files
+(for
+.Cm ksh 1
+and
+.Cm sh 1).
+.xoe
+.cdes
+Indicates that the starting shell be a login
+shell (that is, the first character of
+.IR argv [0]
+be a dash),
+that tells the shell to read the
+system's
+.B profile
+and the user's
+.B \&.profile
+files
+(for
+.Cm ksh 1
+and
+.Cm sh 1)
+or the system's
+.B csh.login
+and the user's
+.B \&.login
+(for
+.Cm csh 1 ).
+.cdee
+.LI \f3DtNsubprocessPid\fP
+.br
+Supplies the process ID of the subprocess running in the
+terminal widget when
+.B DtNsubprocessExec
+is
+True.
+.LI \f3DtNsubprocessTerminationCallback\fP
+.br
+Supplies the list of callbacks called when the
+subprocess associated with the
+DtTerm
+widget exits.
+The
+.B DtTermSubprocessTerminationCallbackStruct
+structure's address is passed to this callback.
+.Cn DtCR_TERM_SUBPROCESS_TERMINATION
+is the
+.I reason
+the callback sends.
+.LI \f3DtNsubprocessTerminationCatch\fP
+.br
+Specifies whether or not the
+DtTerm
+widget
+installs a signal handler to catch the subprocess termination.
+If
+the application installs its own signal handler, the application must catch
+the subprocess termination and inform the
+DtTerm
+widget via the
+.Fn DtTermSubprocReap 3
+function.
+.LI \f3DtNsunFunctionKeys\fP
+.br
+Specifies whether or not Sun Function Key escape sequences are
+generated for function keys instead of standard escape sequences.
+.xo See
+.xo .cX sunfunckeys
+.xo for a description of the Sun Function Key escape sequences.
+.LI \f3DtNtermDevice\fP
+.br
+Supplies the file descriptor for the master side of the
+.cde .B pty
+.cde or STREAMS
+pseudo-terminal device associated with the DtTerm widget.
+.LI \f3DtNtermDeviceAllocate\fP
+.br
+Specifies whether or not the DtTerm widget allocates a
+.cde .B pty
+.cde or STREAMS
+pseudo-terminal device, or uses the
+pseudo-terminal device passed to it via the
+.B DtNtermDevice
+resource.
+.LI \f3DtNtermId\fP
+.br
+Supplies the name the DtTerm widget uses to select the correct response to
+terminal ID queries.
+Valid values are
+.BR vt100 ,
+.BR vt101 ,
+.B vt102
+and
+.BR vt220 .
+.LI \f3DtNtermName\fP
+.br
+Supplies the name the
+DtTerm
+widget uses in setting the
+.I TERM
+environment variable.
+The default is
+.Cm dtterm 1.
+.LI \f3DtNtermSlaveName\fP
+.br
+Supplies the name of the slave device of the
+.cde .B pty
+.cde or STREAMS
+pseudo-terminal device
+associated with the DtTerm widget.
+The DtTerm widget uses this resource to update the system's
+.cde .B utmp
+.xos
+implementation-dependent database
+of logged-in users (see
+.Cm who
+in the \*(ZC)
+.xoe
+entry associated with the subprocess.
+.LI \f3DtNttyModes\fP
+.br
+Specifies a string containing terminal-setting keywords
+and the characters to which they may be bound.
+Allowable keywords
+include:
+.BR intr ,
+.BR quit ,
+.BR erase ,
+.BR kill ,
+.BR eof ,
+.BR eol ,
+.BR swtch ,
+.BR start ,
+.BR stop ,
+.BR brk ,
+.BR susp ,
+.BR dsusp ,
+.BR rprnt ,
+.BR flush ,
+.B weras
+and
+.BR lnext .
+The terminal emulator
+correctly parses and silently ignores keywords that do not apply
+to a specific architecture.
+Control characters can be
+specified as
+.B ^char
+(for example,
+.B ^c
+or
+.BR ^u ),
+and
+.B ^?
+can be used to indicate delete.
+This is useful for overriding the default
+terminal settings without having to do an
+.Cm stty 1
+every time a
+DtTerm
+widget is created.
+.LI \f3DtNuserBoldFont\fP
+.br
+Supplies the
+.B XmFontList
+the
+DtTerm
+widget uses to display bold terminal text.
+The terminal emulator
+supports only character or mono-spaced fonts.
+When using proportional fonts, the behavior is undefined.
+The terminal emulator
+generates a default bold font based on the
+XLFD
+name of the
+.BR userFont .
+If that font is not available,
+the terminal emulator
+generates bold text
+by overstriking (with a one pixel offset) the
+.BR userFont .
+.LI \f3DtNuserFont\fP
+.br
+Supplies the
+.B XmFontList
+the
+DtTerm
+widget uses to display terminal text.
+The terminal emulator
+supports only character or mono-spaced fonts.
+When using proportional fonts, the behavior is undefined.
+The terminal emulator
+gets a default font via
+the
+.B XmNtextFontList
+value of the parent bulletin board (see the
+.xo XmBulletinBoard
+.cde .IR XmBulletinBoard (3X)
+widget)
+in the same manner as the
+.xo XmText
+.cde .IR XmText (3X)
+widget.
+.LI \f3DtNverticalScrollBar\fP
+.br
+Specifies a
+an application-supplied vertical scroll bar widget to update
+as scrolling occurs.
+The
+DtTerm
+widget does not create the scroll bar.
+.LI \f3DtNvisualBell\fP
+.br
+Specifies whether the
+DtTerm
+widget uses a visible bell (that is, flashing)
+instead of an audible bell when <control>\(hyG is received.
+.LI \f3DtNwidthInc\fP
+.br
+Specifies the character cell width the
+DtTerm
+widget uses as the width
+increment when calculating the size of the terminal window.
+For additional information, see
+.BR DtNbaseWidth .
+.LE
+.nr 3i
+.HU "Inherited Resources"
+The
+DtTerm
+widget inherits behavior and resources from the following
+named superclasses.
+For a complete description of each resource, see the
+.cde man page
+.xo entry in \*(ZM
+for that superclass.
+.P
+.cde .ne 10
+.DS
+.S -1
+.TS
+.xo expand box tab(@);
+.cde expand tab(@);
+cf3 ssss
+.xo lf3 1 | lf3 1 | lf3 1 | lf3 1 | lf3
+.xo lf3 1 | lf3 1 | lf3 1 | l   1 | l .
+.cde lf3 1 lf3 1 lf3 1 lf3 1 lf3
+.cde lf3 1 lf3 1 lf3 1 l   1 l .
+XmPrimitive Resource Set
+_
+Name@Class@Type@Default@Access
+_
+XmNbottomShadowColor@XmCBottomShadowColor@Pixel@dynamic@CSG
+XmNbottom-@XmCBottom-@Pixmap@XmUNSPECIFIED-@CSG
+   ShadowPixmap@   ShadowPixmap@@   _PIXMAP
+XmNforeground@XmCForeground@Pixel@dynamic@CSG
+XmNhelpCallback@XmCCallback@XtCallbackList@NULL@C
+XmNhighlightColor@XmCHighlightColor@Pixel@dynamic@CSG
+XmNhighlightOnEnter@XmCHighlightOnEnter@Boolean@False@CSG
+XmNhighlightPixmap@XmCHighlightPixmap@Pixmap@dynamic@CSG
+XmNhighlightThickness@XmCHighlightThickness@Dimension@2@CSG
+XmNnavigationType@XmCNavigationType@XmNavigation-@XmNONE@G
+@@   Type
+XmNshadowThickness@XmCShadowThickness@Dimension@2@CSG
+XmNtopShadowColor@XmCTopShadowColor@Pixel@dynamic@CSG
+XmNtopShadowPixmap@XmCTopShadowPixmap@Pixmap@dynamic@CSG
+XmNtraversalOn@XmCTraversalOn@Boolean@True@CSG
+XmNunitType@XmCUnitType@unsigned char@dynamic@CSG
+XmNuserData@XmCUserData@Pointer@NULL@CSG
+.TE
+.S +1
+.DE
+.P
+.cde .ne 10
+.DS
+.S -1
+.TS
+.xo expand box tab(@);
+.cde expand tab(@);
+cf3 ssss
+.xo lf3 1 | lf3 1 | lf3 1 | lf3 1 | lf3
+.xo lf3 1 | lf3 1 | lf3 1 | l   1 | l .
+.cde lf3 1 lf3 1 lf3 1 lf3 1 lf3
+.cde lf3 1 lf3 1 lf3 1 l   1 l .
+Core Resource Set
+_
+Name@Class@Type@Default@Access
+_
+XmNaccelerators@XmCAccelerators@XtAccelerators@NULL@CSG
+XmNancestorSensitive@XmCSensitive@Boolean@dynamic@G
+XmNbackground@XmCBackground@Pixel@dynamic@CSG
+XmNbackgroundPixmap@XmCPixmap@Pixmap@XmUNSPECIFIED-@CSG
+@@@   _PIXMAP
+XmNborderColor@XmCBorderColor@Pixel@XtDefaultForeground@CSG
+XmNborderPixmap@XmCPixmap@Pixmap@XmUNSPECIFIED-@CSG
+@@@   _PIXMAP
+XmNborderWidth@XmCBorderWidth@Dimension@0@CSG
+XmNcolormap@XmCColormap@Colormap@dynamic@CG
+XmNdepth@XmCDepth@int@dynamic@CG
+XmNdestroyCallback@XmCCallback@XtCallbackList@NULL@C
+XmNheight@XmCHeight@Dimension@dynamic@CSG
+XmNinitial-@XmCInitial-@Boolean@True@CG
+   ResourcesPersistent@   ResourcesPersistent
+XmNmapped-@XmCMapped-@Boolean@True@CSG
+WhenManaged@WhenManaged
+XmNscreen@XmCScreen@Screen *@dynamic@CG
+XmNsensitive@XmCSensitive@Boolean@True@CSG
+XmNtranslations@XmCTranslations@XtTranslations@NULL@CSG
+XmNwidth@XmCWidth@Dimension@dynamic@CSG
+XmNx@XmCPosition@Position@0@CSG
+XmNy@XmCPosition@Position@0@CSG
+.TE
+.S +1
+.DE
+.HU "Callback Information"
+A pointer to the
+.B DtTermStatusChangeCallbackStruct
+callback structure,
+which includes at least the following members,
+is passed to callbacks for
+.BR DtNstatusChangeCallback .
+.P
+.ne 6v
+.TS
+.xo lf5 lf5 lw(2.75i) .
+.cde lf3 lf2 lw(3.25i) .
+int	reason	T{
+.na
+Indicates why the callback was invoked:
+.Cn DtCR_TERM_STATUS_CHANGE .
+T}
+XEvent	*event	T{
+.na
+Points to the
+\f3XEvent\fP,
+if any, that triggered the callback or
+.Cn NULL .
+T}
+int	cursorX	T{
+.na
+The current text cursor X (column) position.
+T}
+int	cursorY	T{
+.na
+The current text cursor Y (row) position.
+T}
+Boolean	capsLock	T{
+.na
+The current state of the caps lock indicator.
+T}
+Boolean	stop	T{
+.na
+The current state subprocess output parsing.
+Processing output from the
+subprocess can be turned on and off via the
+.Fn stop
+action (similar to
+the
+.Cn XON /\c
+.Cn XOFF
+handshake invoked via <control>\(hyS/<control>\(hyQ).
+T}
+DtTermInsertCharMode	insertCharMode	T{
+.na
+Not used by the
+DtTerm
+widget.
+T}
+Boolean	locked	T{
+.na
+The current state of the keyboard caps lock.
+T}
+.TE
+.P
+A pointer to the
+.B DtTermSubprocessTerminationCallbackStruct
+callback structure,
+which includes at least the following members,
+is passed to callbacks for
+.BR DtNsubprocessTerminationCallback .
+.P
+.ne 6v
+.TS
+.xo lf5 lf5 lw(4i) .
+.cde lf3 lf2 lw(4i) .
+int	reason	T{
+.na
+Indicates why the callback was invoked:
+.Cn DtCR_TERM_SUBPROCESS_TERMINATION .
+T}
+XEvent	*event	T{
+.na
+Points to the
+\f3XEvent\fP,
+if any, that triggered the callback or
+.Cn NULL .
+T}
+pid_t	pid	T{
+.na
+The process ID of the terminated subprocess.
+T}
+int	status	T{
+.na
+The exit status of the terminated subprocess.
+T}
+.TE
+.P
+A pointer to the
+.B DtTermInputVerifyCallbackStruct
+callback structure,
+which includes at least the following members,
+is passed to callbacks for
+.BR DtNinputVerifyCallback .
+.P
+.ne 6v
+.TS
+.xo lf5 lf5 lw(4i) .
+.cde lf3 lf2 lw(4i) .
+int	reason	T{
+.na
+Indicates why the callback was invoked:
+.Cn DtCR_TERM_INPUT_VERIFY .
+T}
+XEvent	*event	T{
+.na
+Points to the
+\f3XEvent\fP,
+if any, that triggered the callback or
+.Cn NULL .
+T}
+Boolean	doit	T{
+.na
+Indicates whether the text should be sent to the child process.
+Setting \f2doit\fP to False negates the action.
+T}
+unsigned char	*text	T{
+.na
+Points to the text (either single- or multi-byte
+depending on the locale) to be sent to the child process.
+T}
+int	length	T{
+.na
+Specifies the number of bytes to be sent to the
+child process.
+T}
+.TE
+.P
+A pointer to the
+.B DtTermOutputlogVerifyCallbackStruct
+callback structure,
+which includes at least the following members,
+is passed to callbacks for
+.BR DtNoutputLogCallback .
+.P
+.ne 6v
+.TS
+.xo lf5 lf5 lw(4i) .
+.cde lf3 lf2 lw(4i) .
+int	reason	T{
+.na
+Indicates why the callback was invoked:
+.Cn DtCR_TERM_OUTPUT_LOG .
+T}
+XEvent	*event	T{
+.na
+Points to the
+\f3XEvent\fP,
+if any, that triggered the callback or
+.Cn NULL .
+T}
+.na
+unsigned char	*text	T{
+.na
+Points to the text (either single- or multi-byte
+depending on the locale) received from the child process.
+T}
+int	length	T{
+.na
+Specifies the number of bytes received from
+the child process.
+T}
+.TE
+.HU "Translations"
+The
+DtTerm
+widget includes translations from
+.xo .IR XmPrimitive .
+.cde .IR XmPrimitive (3X).
+.P
+Altering translations in
+.BR #override
+or
+.BR #augment
+mode is undefined.
+.P
+.TS
+center;
+cf3 cf3
+.xo lf5 lf5 .
+.cde lf3 lf3 .
+Key Pressed	Action Routine
+_
+Shift ~Ctrl<Key>KP_Multiply:	XtDisplayInstalledAccelerators(\|)
+~Shift Ctrl<Key>KP_Multiply:	XtDisplayAccelerators(\|)
+Shift Ctrl<Key>KP_Multiply:	XtDisplayTranslations(\|)
+<Key>osfCancel:	process-cancel(\|)
+<Key>osfCopy:	copy-clipboard(\|)
+<Key>osfCut:	copy-clipboard(\|)
+<Key>osfPaste:	paste-clipboard(\|)
+<Key>osfBeginLine:	beginning-of-buffer(\|)
+<Key>osfEndLine:	end-of-buffer(\|)
+Shift<Key>osfUp:	scroll(1,line)
+Shift<Key>osfDown:	scroll(\-1,line)
+<Key>osfUp:	move-cursor(up)
+<Key>osfDown:	move-cursor(down)
+<Key>osfLeft:	move-cursor(backward)
+<Key>osfRight:	move-cursor(forward)
+<Key>Do:	vt-edit-key(do)
+<Key>Help:	vt-edit-key(help)
+<Key>Menu:	vt-edit-key(menu)
+<Key>Find:	vt-edit-key(find)
+<Key>Insert:	vt-edit-key(insert)
+<Key>Select:	vt-edit-key(select)
+~Shift<Key>osfPageUp:	vt-edit-key(prior)
+~Shift<Key>osfPageDown:	vt-edit-key(next)
+<Key>osfPageUp:	scroll(\-1,page)
+<Key>osfPageDown:	scroll(1,page)
+Mod1<Key>Break:	soft-reset(\|)
+Shift<Key>Break:	hard-reset(\|)
+~Shift ~Mod1<Key>Break:	vt-break(\|)
+Ctrl<Key>Cancel:	stop(long)
+~Ctrl<Key>Cancel:	stop(\|)
+~Shift<Key>Tab:	tab(\|)
+~Mod1<Key>KP_Space:	keypad-key-execute(space)
+~Mod1<Key>KP_Tab:	keypad-key-execute(tab)
+~Mod1<Key>KP_Enter:	keypad-key-execute(enter)
+~Mod1<Key>KP_F1:	keypad-key-execute(f1)
+~Mod1<Key>KP_F2:	keypad-key-execute(f2)
+~Mod1<Key>KP_F3:	keypad-key-execute(f3)
+~Mod1<Key>KP_F4:	keypad-key-execute(f4)
+~Mod1<Key>KP_Equal:	keypad-key-execute(equal)
+~Mod1<Key>KP_Multiply:	keypad-key-execute(multiply)
+~Mod1<Key>KP_Add:	keypad-key-execute(add)
+~Mod1<Key>KP_Separator:	keypad-key-execute(separator)
+~Mod1<Key>KP_Subtract:	keypad-key-execute(subtract)
+~Mod1<Key>KP_Decimal:	keypad-key-execute(decimal)
+~Mod1<Key>KP_Divide:	keypad-key-execute(divide)
+~Mod1<Key>KP_0:	keypad-key-execute(0)
+~Mod1<Key>KP_1:	keypad-key-execute(1)
+~Mod1<Key>KP_2:	keypad-key-execute(2)
+~Mod1<Key>KP_3:	keypad-key-execute(3)
+~Mod1<Key>KP_4:	keypad-key-execute(4)
+~Mod1<Key>KP_5:	keypad-key-execute(5)
+~Mod1<Key>KP_6:	keypad-key-execute(6)
+~Mod1<Key>KP_7:	keypad-key-execute(7)
+~Mod1<Key>KP_8:	keypad-key-execute(8)
+~Mod1<Key>KP_9:	keypad-key-execute(9)
+Shift<Key>F1:	vt-function-key-execute(1, UDK)
+Shift<Key>F2:	vt-function-key-execute(2, UDK)
+Shift<Key>F3:	vt-function-key-execute(3, UDK)
+Shift<Key>F4:	vt-function-key-execute(4, UDK)
+Shift<Key>F5:	vt-function-key-execute(5, UDK)
+Shift<Key>F6:	vt-function-key-execute(6, UDK)
+Shift<Key>F7:	vt-function-key-execute(7, UDK)
+Shift<Key>F8:	vt-function-key-execute(8, UDK)
+Shift<Key>F9:	vt-function-key-execute(9, UDK)
+Shift<Key>F10:	vt-function-key-execute(10, UDK)
+Shift<Key>F11:	vt-function-key-execute(11, UDK)
+Shift<Key>F12:	vt-function-key-execute(12, UDK)
+Shift<Key>F13:	vt-function-key-execute(13, UDK)
+Shift<Key>F14:	vt-function-key-execute(14, UDK)
+Shift<Key>F15:	vt-function-key-execute(15, UDK)
+Shift<Key>F16:	vt-function-key-execute(16, UDK)
+Shift<Key>F17:	vt-function-key-execute(17, UDK)
+Shift<Key>F18:	vt-function-key-execute(18, UDK)
+Shift<Key>F19:	vt-function-key-execute(19, UDK)
+Shift<Key>F20:	vt-function-key-execute(20, UDK)
+Shift<Key>F21:	vt-function-key-execute(21, UDK)
+Shift<Key>F22:	vt-function-key-execute(22, UDK)
+Shift<Key>F23:	vt-function-key-execute(23, UDK)
+Shift<Key>F24:	vt-function-key-execute(24, UDK)
+Shift<Key>F25:	vt-function-key-execute(25, UDK)
+Shift<Key>F26:	vt-function-key-execute(26, UDK)
+Shift<Key>F27:	vt-function-key-execute(27, UDK)
+Shift<Key>F28:	vt-function-key-execute(28, UDK)
+Shift<Key>F29:	vt-function-key-execute(29, UDK)
+Shift<Key>F30:	vt-function-key-execute(30, UDK)
+Shift<Key>F31:	vt-function-key-execute(31, UDK)
+Shift<Key>F32:	vt-function-key-execute(32, UDK)
+Shift<Key>F33:	vt-function-key-execute(33, UDK)
+Shift<Key>F34:	vt-function-key-execute(34, UDK)
+Shift<Key>F35:	vt-function-key-execute(35, UDK)
+~Shift<Key>F1:	vt-function-key-execute(1, function)
+~Shift<Key>F2:	vt-function-key-execute(2, function)
+~Shift<Key>F3:	vt-function-key-execute(3, function)
+~Shift<Key>F4:	vt-function-key-execute(4, function)
+~Shift<Key>F5:	vt-function-key-execute(5, function)
+~Shift<Key>F6:	vt-function-key-execute(6, function)
+~Shift<Key>F7:	vt-function-key-execute(7, function)
+~Shift<Key>F8:	vt-function-key-execute(8, function)
+~Shift<Key>F9:	vt-function-key-execute(9, function)
+~Shift<Key>F10:	vt-function-key-execute(10, function)
+~Shift<Key>F11:	vt-function-key-execute(11, function)
+~Shift<Key>F12:	vt-function-key-execute(12, function)
+~Shift<Key>F13:	vt-function-key-execute(13, function)
+~Shift<Key>F14:	vt-function-key-execute(14, function)
+~Shift<Key>F15:	vt-function-key-execute(15, function)
+~Shift<Key>F16:	vt-function-key-execute(16, function)
+~Shift<Key>F17:	vt-function-key-execute(17, function)
+~Shift<Key>F18:	vt-function-key-execute(18, function)
+~Shift<Key>F19:	vt-function-key-execute(19, function)
+~Shift<Key>F20:	vt-function-key-execute(20, function)
+~Shift<Key>F21:	vt-function-key-execute(21, function)
+~Shift<Key>F22:	vt-function-key-execute(22, function)
+~Shift<Key>F23:	vt-function-key-execute(23, function)
+~Shift<Key>F24:	vt-function-key-execute(24, function)
+~Shift<Key>F25:	vt-function-key-execute(25, function)
+~Shift<Key>F26:	vt-function-key-execute(26, function)
+~Shift<Key>F27:	vt-function-key-execute(27, function)
+~Shift<Key>F28:	vt-function-key-execute(28, function)
+~Shift<Key>F29:	vt-function-key-execute(29, function)
+~Shift<Key>F30:	vt-function-key-execute(30, function)
+~Shift<Key>F31:	vt-function-key-execute(31, function)
+~Shift<Key>F32:	vt-function-key-execute(32, function)
+~Shift<Key>F33:	vt-function-key-execute(33, function)
+~Shift<Key>F34:	vt-function-key-execute(34, function)
+~Shift<Key>F35:	vt-function-key-execute(35, function)
+<KeyRelease>:	key-release(\|)
+<KeyPress>:	insert(\|)
+~Shift~Ctrl<Btn1Down>:	grab-focus(\|)
+Shift~Ctrl<Btn1Down>:	extend-start(\|)
+~Ctrl<Btn1Motion>:	select-adjust(\|)
+~Ctrl<Btn1Up>:	extend-end(\|)
+~Shift<Btn2Down>:	process-bdrag(\|)
+~Shift<Btn2Up>:	copy-to(\|)
+<EnterWindow>:	enter(\|)
+<LeaveWindow>:	leave(\|)
+<FocusIn>:	focus-in(\|)
+<FocusOut>:	focus-out(\|)
+.TE
+.HU "Action Routines"
+The
+DtTerm
+widget supports the following action routines:
+.\" DKS .LI  "\f3answerback\^\f1(\|)"
+.\" DKS This action sends the answer back message to the child process.
+.\" DKS .LI  "\f3backarrow\^\f1(\|)"
+.\" DKS This action sends a \f3\s-1DEL\s0\fP (delete) character to the child
+.\" process.
+.VL 6
+.LI "\f2bell\^\f1(\f3[\f2percentage\f3]\f1)"
+.br
+Rings the keyboard bell at the specified
+.I percentage
+above or
+below the base volume.
+.LI "\f2break\^\f1(\|)"
+.br
+Sends an RS232 break signal to the child process.
+.LI "\f2cancel\^\f1(\|)"
+.br
+Sends a
+.BR \s-1CAN\s0
+(cancel) character to the child process.
+.LI "\f2copy-clipboard\^\f1(\|)"
+.br
+Copies current selection to the clipboard.
+.LI "\f2copy-to\^\f1(\|)"
+.br
+Sends the primary selection to the subprocess.
+.LI "\f2do\^\f1(\|)"
+Sends the escape sequence (see
+.cde .BR dtterm (5))
+.xo .cX dtterm.5 )
+associated with the
+.B Do
+key
+to the child process.
+.LI "\f2edit-key\^\f1(\f2string\f1)"
+.br
+Sends the escape sequence (see
+.cde .BR dtterm (5))
+.xo .cX dtterm.5 )
+associated with the corresponding
+edit key to the child process.
+The interpretation of these keys is application-specific.
+Valid values for
+.I string
+are:
+.Cs I
+find
+insert
+next
+prior
+remove
+select
+.Ce
+.LI "\f2extend-start\^\f1(\|)"
+.br
+Starts the extension of the currently selected text.
+The amount of text selected depends on the number of mouse clicks
+(see
+.Fn grab-focus ).
+.LI "\f2extend-end\^\f1(\|)"
+.br
+Extends the current selection.
+The amount of text selected depends on the number of mouse clicks
+(see
+.Fn grab-focus ).
+.LI "\f2function-key-execute\^\f1(\f2num\f3[, \f2type\f3]\f1)"
+.br
+Sends the escape sequence (see
+.cde .BR dtterm (5))
+.xo .cX dtterm.5 )
+associated with the corresponding
+function key
+.I num
+to the child process.
+Valid values for
+.I num
+are 1 to 35, inclusive.
+If
+.I type
+is set to
+.B function
+(or not set at all), the escape sequence (see
+.cde .BR dtterm (5))
+.xo .cX dtterm.5 )
+associated with function
+key
+.I num
+is sent to the child process.
+If
+.I type
+is set to
+.Cn UDK ,
+then the string associated with user defined key
+.I num
+is sent to the child process.
+.LI "\f2grab-focus\^\f1(\|)"
+.br
+Performs one of the following depending on the number of
+multiple mouse clicks.
+One click deselects any selected text and
+sets the selection anchor at the pointer position; two clicks selects
+a word; three clicks selects a line of text; and four clicks
+selects all text.
+.LI "\f2hard-reset\^\f1(\|)"
+.br
+Performs a hard reset on the terminal emulator.
+.cde See
+.cde .BR dtterm (5)
+.cde for a definition of hard reset.
+.LI "\f2help\^\f1(\|)"
+.br
+.cdes
+Sends the escape sequence (see
+.cde .BR dtterm (5))
+.xo .cX dtterm.5 )
+associated with the
+DEC VT220
+Help key to the child process.
+.cdee
+.xos
+.br
+Sends the escape sequence (see
+.cde .BR dtterm (5))
+.xo .cX dtterm.5 )
+associated with the
+DEC VT220
+Help key to the child process.
+.xoe
+The interpretation of this key is application-specific.
+.LI "\f2keymap\^\f1(name)"
+.br
+Defines a new translation table whose resource
+name is named with the suffix
+.B Keymap
+(case is significant).
+The name
+.B None
+restores the original translation table.
+.LI "\f2keypad-key-execute\^\f1(\f2string\f1)"
+.br
+Sends the escape sequence (see
+.cde .BR dtterm (5))
+.xo .cX dtterm.5 )
+associated with the corresponding
+keypad key to the child process.
+The interpretation of these keys is application-specific.
+Valid values for
+.I string
+are:
+.Cs I
+f1 \- f4
+space
+tab
+enter
+equal
+multiply
+add
+separator
+subtract
+decimal
+divide
+0 \- 9
+.Ce
+.LI "\f2move-cursor\^\f1(\f2direction\f1)"
+.br
+Sends the escape sequence (see
+.cde .BR dtterm (5))
+.xo .cX dtterm.5 )
+associated with the corresponding
+cursor motion to the child process.
+The interpretation of these keys is application-specific.
+Valid values for
+.I direction
+are:
+.Cs I
+up
+down
+backward
+forward
+.Ce
+.LI "\f2paste-clipboard\^\f1(\|)"
+.br
+Sends the contents of the clipboard to the subprocess.
+.LI "\f2process-bdrag\^\f1(\|)"
+.br
+The result of this action is determined by several factors:
+position of the location cursor, motion of the
+location cursor and the interval between a
+.B BTransfer
+release.
+.P
+This action sends the current selection to
+the subprocess if text is selected, the location cursor
+is disjoint from the current selection and no motion is
+detected within a given time interval.
+.P
+The action drags the current selection if the location
+cursor is positioned on the selection, the time interval
+is exceeded and movement of the location cursor is
+detected.
+This action creates a
+.B DragContext
+object whose
+.B XmNexportTargets
+resource value
+includes target types of
+.Cn COMPOUND_TEXT ,
+.Cn STRING
+and
+.Cn TEXT .
+.LI "\f2redraw-display\^\f1(\|)"
+.br
+Redraws the contents of the text window.
+.LI "\f2scroll\^\f1(\f2count\f3[, \f2units\f3]\f1)"
+.br
+Scrolls the display memory down if
+.I count
+is greater than
+zero, or up if
+.I count
+is less than zero.
+The number of lines scrolled is based on count and units.
+The default for units is
+.BR line .
+Valid values for
+.I units
+are:
+.Cs I
+page
+halfpage
+line
+.Ce
+.LI "\f2select-adjust\^\f1(\|)"
+.br
+Extends the selection.
+The amount of text selected depends on the
+number of mouse clicks.
+One click selects characters;
+two clicks selects words; three clicks selects lines; and four clicks
+selects the entire buffer.
+.LI "\f2select-all\^\f1(\|)"
+.br
+Selects all text.
+.LI "\f2select-page\^\f1(\|)"
+.br
+Selects all text currently displayed on the screen.
+.LI "\f2self-insert\^\f1(\|)"
+.br
+Sends the character associated with the key pressed to the child
+process.
+.LI "\f2soft-reset\^\f1(\|)"
+.br
+Performs a soft reset of the terminal.
+.cde For a definition of soft reset see the ``Reset'' section in
+.cde .BR dtterm (5).
+.LI "\f2stop\^\f1(\f2state\f1)"
+.br
+Toggles, starts, or stops the process of reading data
+from the child process.
+Valid values for
+.I state
+are:
+.Cs I
+toggle
+on
+off
+.Ce
+.LI "\f2string\^\f1(\f2string\f1)"
+.br
+Inserts the specified text string as if it had been typed.
+The string must be quoted if it contains white space or non-alphanumeric
+characters.
+The string is interpreted as a hexadecimal character constant if it
+begins with the characters
+.BR 0x .
+.LI "\f2tab\^\f1(\|)"
+Sends a tab to the child process.
+.LI "\f2visual-bell\^\f1(\|)"
+.br
+Flashes the window quickly.
+.LE
+.HU "Virtual Bindings"
+The bindings for virtual keys are vendor-specific.
+Virtual bindings do not apply when the
+DtTerm
+widget has input focus.
+For information about bindings for virtual buttons and keys, see
+.Fn VirtualBindings 3X.
+.SH "SEE ALSO"
+.Cm dtterm 1,
+.hp .Cm emacs 1,
+.Hd Dt/Term.h 5,
+.Fn DtTermInitialize 3,
+.Fn DtTermDisplaySend 3,
+.Fn DtTermSubprocSend 3,
+.Fn DtTermSubprocReap 3,
+.cdes
+.Cm dtterm 5,
+.BR pty (7),
+.Fn XtSetValues 1X,
+.Fn XtGetValues 1X,
+.IR XmFrame (3X),
+.IR XmPrimitive (3X),
+.IR XmFontList (3X),
+.IR XmBulletinBoard (3X),
+.IR XmText (3X),
+.IR VirtualBindings (3X),
+.IR Core (3X).
+.cdee
+.xos
+.Fn XtSetValues 1X
+and
+.Fn XtGetValues 1X,
+in the \*(Zt;
+.IR XmFrame ,
+.IR XmPrimitive ,
+.IR XmFontList ,
+.IR XmBulletinBoard ,
+.IR XmText ,
+in the \*(Zl;
+.IR VirtualBindings ,
+.I Core
+in the \*(ZM;
+.Cm who
+in the \*(ZC.
+.xoe

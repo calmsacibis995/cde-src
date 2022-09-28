@@ -1,0 +1,629 @@
+.de LI
+.\" simulate -mm .LIs by turning them into .TPs
+.TP \\n()Jn
+\\$1
+..
+.de Lc
+.\" version of .LI that emboldens its argument
+.TP \\n()Jn
+\s-1\f3\\$1\f1\s+1
+..
+.TH SdmMessageEnvelope 3 "07/03/96"
+.BH "07/03/96"
+.\" @(#)SdmMessageEnvelope.3	1.8 96/07/03 SMI
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994, 1995, 1996 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994, 1995, 1996 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994, 1995, 1996 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994, 1995, 1996 Novell, Inc.
+.SH NAME
+SdmMessageEnvelope \- Allow retrieval and manipulation of message envelope
+.SH SYNOPSIS
+.\"
+.SS Includes
+.ft 3
+.nf
+#include <Sdtmail.hh>
+#include <MessageEnvelope.hh>
+.\"
+.SS Creation
+.ft 3
+.nf
+.sp 0.5v
+.ta \w'SdmErrorCode SdmMessage.SdmMessageEnvelopeFactory('u
+SdmErrorCode SdmMessage.SdmMessageEnvelopeFactory(SdmError& \f2err\fP,
+	SdmMessageEnvelope*& \f2r_envelope\fP); 
+.fi
+.ft 1
+.\"
+.SS Methods
+.ft 3
+.nf
+.sp 0.5v
+.ta \w'SdmErrorCode AddHeader('u
+SdmErrorCode AddHeader(SdmError& \f2err\fP,
+	const SdmString& \f2header\fP,
+	const SdmString& \f2headervalue\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetContents('u
+SdmErrorCode GetContents(SdmError& \f2err\fP,
+	SdmContentBuffer& \f2r_contents\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetContents_Async('u
+SdmErrorCode GetContents_Async(SdmError& \f2err\fP,
+	const SdmServiceFunction& \f2svf\fP,
+	void* \f2clientData\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetHeader('u
+SdmErrorCode GetHeader(SdmError& \f2err\fP,
+	SdmStrStrL& \f2r_hdr\fP,
+	const SdmString& \f2hdr\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetHeaders('u
+SdmErrorCode GetHeaders(SdmError& \f2err\fP,
+	SdmIntStrL& \f2r_retheader\fP,
+	const SdmMessageHeaderAbstractFlags \f2header\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetHeaders('u
+SdmErrorCode GetHeaders(SdmError& \f2err\fP,
+	SdmStrStrL& \f2r_hdrs\fP,
+	const SdmStringL& \f2hdrs\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetHeaders('u
+SdmErrorCode GetHeaders(SdmError& \f2err\fP,
+	SdmStrStrL& \f2r_retheader\fP,
+	const SdmMessageHeaderAbstractFlags \f2header\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetHeaders('u
+SdmErrorCode GetHeaders(SdmError& \f2err\fP,
+	SdmStrStrL& \f2r_hdr\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode Parent('u
+SdmErrorCode Parent(SdmError& \f2err\fP,
+	SdmMessage*& \f2r_message\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode RemoveHeader('u
+SdmErrorCode RemoveHeader(SdmError& \f2err\fP,
+	const SdmString& \f2header\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode ReplaceHeader('u
+SdmErrorCode ReplaceHeader(SdmError& \f2err\f3,
+	const SdmString& \f2header\f3,
+	const SdmString& \f2newvalue\f3);
+.PP
+.ft 3
+.ta \w'SdmErrorCode SetHeaders('u
+SdmErrorCode SetHeaders(SdmError& \f2err\fP,
+	const SdmStrStrL& \f2headers\fP);
+.fi
+.ft 1
+.\" end of methods list
+.ta 0.25i 0.50i 0.75i 1.0i 1.25i 1.50i 1.75i 2.0i 2.5i 3.0i
+.SH DESCRIPTION
+The SdmMessageEnvelope object encapsulates the concept of "the envelope of a message" as
+a container, allowing the creation and manipulation of envelopes, which are a component
+of a message, and which have header components that are the non-data portions of a
+message necessary to provide general information, and to accomplish transmission and
+delivery. The message envelope also contains a series of "message flags" that indicate
+the general status of the message in the message store.
+.PP
+You would typically create a message envelope object when it is desired to operate
+directly on the envelope (such as retrieve the contents, or to retrieve or modify
+headers).
+.PP
+.PP
+See SdmGlossary(3) for a detailed list of general definitions.
+.PP
+.\"
+.SH CREATION
+A SdmMessageEnvelope object is never created directly by a front end application; its
+constructor is private and cannot be accessed by front end applications. A
+SdmMessageEnvelope object is created by invoking the SdmMessageEnvelopeFactory method of
+a previously created SdmMessage object. The following code snippet creates an message
+envelope object for the first message in a message store:
+.PP
+.nf
+	SdmError err;
+	SdmConnection* con;
+	SdmSession* ses;
+	SdmMessageStore* mst;
+	SdmMessage* msg;
+	SdmMessageEnvelope* menv;
+	SdmToken* tokenName;
+
+	con = new SdmConnection(appName);
+	if (con->StartUp(err) != Sdm_EC_Success) {
+		// connection could not be started: handle error
+	}
+	if (con->SdmSessionFactory(err, ses, SdmDefs::ST_InSession) 
+		!= Sdm_EC_Success) {
+		// session could not be created: handle error
+	}
+	if (ses->StartUp(err) != Sdm_EC_Success) {
+		// session could not be started: handle error
+	}
+	if (ses->SdmMessageStoreFactory(err, mst) != Sdm_EC_Success) {
+		// message store could not be created: handle error
+	}
+	if (mst->StartUp(err) != Sdm_EC_Success) {
+		// message store could not be started: handle error
+	}
+	if (mst->Open(err, tokenName) != Sdm_EC_Success) {
+		// message store could not be opened: handle error
+	}
+	if (mst->SdmMessageFactory(err, msg, 1) != Sdm_EC_Success) {
+		// message could not be created: handle error
+	}
+	if (msg->SdmMessageEnvelopeFactory(err, menv) != Sdm_EC_Success) {
+		// message envelope could not be created: handle error
+	}
+.fi
+.PP
+.SH DESTRUCTION
+This object is destroyed automatically when the message that created it is destroyed;
+its destructor is private and cannot be accessed by front end applications. No attempt
+should ever be made to destroy a handle to a SdmMessageEnvelope object.
+.PP
+.\"
+.SH METHODS
+Primary methods allow the retrieval and manipulation of headers associated with the
+envelope, and retrieving the contents of the message enevelope.
+.\"
+.SS AddHeader
+(\f3err\fP, \f3header\fP, \f3headervalue\fP)
+.PP
+Add a new header to the
+message envelope without deleting any previous values set for the same header; for
+example, you can add multiple "To:" headers which allows multiple recipients to be
+specified.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3header\fP (\f3const SdmString&\fP)"
+.br
+The text describing the header field to be added.
+.LI "\f3headervalue\fP (\f3const SdmString&\fP)"
+.br
+The text for the value of the header to add.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetContents\fP
+(\f3err\fP, \f3r_contents\fP)
+.PP
+Return the contents for this object; in the case of this message envelope object, the
+"contents" refer to the complete raw unprocessed data for the envelope.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_contents\fP (\f3SdmContentBuffer&\fP)"
+.br
+The raw contents of this object is returned in this simple data type.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetContents_Async\fP
+(\f3err\fP, \f3svf\fP, \f3clientData\fP)
+.PP
+Same as GetContents() except that this method returns immediately after making an
+asynchronous request to perform the requested operation. The service function provided
+in the call is invoked when the operation is completed.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3svf\fP (\f3const SdmServiceFunction&\fP)"
+.br
+The service function to be called when the request is completed. 
+
+The event passed to the service function is of type
+"Sdm_Event_GetMessageEnvelopeContents".
+.LI "\f3clientData\fP (\f3void*\fP)"
+.br
+Specific client data that is passed unmodified to the service function when it is
+called. This should contain context sufficient to allow the service function to
+execute. This overrides the "user data" provided when the service function is defined. If
+this client data is NULL, then the user data defined in the service function is passed
+instead.
+.br
+
+In a C++ environment this is typically the "this" pointer of the invoking
+object.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetHeader\fP
+(\f3err\fP, \f3r_header\fP, \f3header\fP)
+.PP
+Get one header specified by header name text from this message in the message
+store. Return the header by header field name text and header field body text.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_header\fP (\f3SdmStrStrL&\fP)"
+.br
+The header as specified by the header field name text is returned in this
+container. The container is a vector of String value pairs, where each entry in
+the vector corresponds to a single header in the message. The first string value
+corresponds to one of the header field name text, and the second string value
+corresponds to the contents of the header field body. Because a single header
+field can have multiple entries in a message envelope, more than one header may
+be returned in this vector.
+.br
+
+NOTE: This container must be empty (have no elements) before calling this
+method; after the call returns, it is the responsibility of the caller to
+destroy the container when the information in it is no longer needed.
+.LI "\f3header\fP (\f3const SdmString&\fP)"
+.br
+The text of the header field to retrieve from the message.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetHeaders\fP
+(\f3err\fP, \f3r_aheaders\fP, \f3aheaders\fP)
+.PP
+Get one or more headers specified by abstract header bit mask from this message message
+in the message store. Return the headers by header field name abstract type and header
+field body text.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_aheaders\fP (\f3SdmIntStrL&\fP)"
+.br
+All headers specified by the abstact header flag mask are returned in this
+container. The container is a vector of Integer String value pairs, where each
+entry in the vector corresponds to a single header in the message. The integer
+value corresponds to one of the abstract header flag bits set describing the
+header field name, and the string value corresponds to the contents of the
+header field body.
+.br
+
+NOTE: This container must be empty (have no elements) before calling this method; after
+the call returns, it is the responsibility of the caller to destroy the container
+when the information in it is no longer needed.
+.LI "\f3aheaders\fP (\f3const SdmMessageHeaderAbstractFlags\fP)"
+.br
+A bit mask representing the headers to be retrieved from the message; a bit that is
+on indicates the header should be retrieved.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetHeaders\fP
+(\f3err\fP, \f3r_headers\fP, \f3headers\fP)
+.PP
+Get a list of headers specified by header name text from this message in the message
+store. Return the headers by header field name text and header field body text.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_headers\fP (\f3SdmStrStrL&\fP)"
+.br
+The headers as specified by the header field name text vector are returned in
+this container. The container is a vector of String value pairs, where each
+entry in the vector corresponds to a single header in the message. The first
+string value corresponds to one of the header field name text, and the second
+string value corresponds to the contents of the header field body.
+.br
+
+NOTE: This container must be empty (have no elements) before calling this
+method; after the call returns, it is the responsibility of the caller to
+destroy the container when the information in it is no longer needed.
+.LI "\f3headers\fP (\f3const SdmStringL&\fP)"
+.br
+A vector of strings containing the text of the header fields to retrieve from
+the message.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetHeaders\fP
+(\f3err\fP, \f3r_headers\fP, \f3aheaders\fP)
+.PP
+Get one or more headers specified by abstract header bit mask from this
+message in the message store. Return the headers by header field name text and
+header field body text.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_headers\fP (\f3SdmStrStrL&\fP)"
+.br
+All headers specified by the abstact header flag mask are returned in this
+container. The container is a vector of String value pairs, where each entry in
+the vector corresponds to a single header in the message. The first string value
+corresponds to one of the header field name text, and the second string value
+corresponds to the contents of the header field body.
+.br
+
+NOTE: This container must be empty (have no elements) before calling this method; after
+the call returns, it is the responsibility of the caller to destroy the container
+when the information in it is no longer needed.
+.LI "\f3aheaders\fP (\f3const SdmMessageHeaderAbstractFlags\fP)"
+.br
+A bit mask representing the headers to be retrieved from the message; a bit that is
+on indicates the header should be retrieved.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetHeaders\fP
+(\f3err\fP, \f3r_headers\fP)
+.PP
+Get all headers from this message in the message store. Return the headers by header
+field name text and header field body text.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_headers\fP (\f3SdmStrStrL&\fP)"
+.br
+All headers in the message are returned in this container. The container is a
+vector of String value pairs, where each entry in the vector corresponds to a
+single header in the message. The first string value corresponds to one of the
+header field name text, and the second string value corresponds to the contents
+of the header field body.
+.br
+
+NOTE: This container must be empty (have no elements) before calling this
+method; after the call returns, it is the responsibility of the caller to
+destroy the container when the information in it is no longer needed.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3Parent\fP
+(\f3err\fP, \f3r_message\fP)
+.PP
+Provide a handle to the parent message that created this message envelope. Used to
+access methods of the parent of this message envelope.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_message\fP (\f3SdmMessage*&\fP)"
+.br
+A pointer to a SdmMessage object; upon successful completion, this pointer variable is
+filled in with a handle to the SdmMessage object that created this message envelope,
+which may then be used to manipulate it.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS RemoveHeader
+(\f3err\fP, \f3header\fP)
+.PP
+Remove specified header from the
+message envelope.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3header\fP (\f3const SdmString&\fP)"
+.br
+The text describing the header field to be removed.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.\"
+.SS ReplaceHeader
+(\f3err\fP, \f3header\fP, \f3headervalue\fP)
+.PP
+Replace specified header in the
+message envelope, deleting any previous values set for the same header.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3header\fP (\f3const SdmString&\fP)"
+.br
+The text describing the header field to be replaced.
+.LI "\f3headervalue\fP (\f3const SdmString&\fP)"
+.br
+The text for the value of the header to replace.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.\"
+.PP
+.RE
+.nr )J 0
+.\"
+.SS SetHeaders
+(\f3err\fP, \f3headers\fP)
+.PP
+Remove all the existing headers in this envelope and set the
+the headers to those in the specified header list.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3headers\fP (\f3SdmStrStrL&\fP)"
+.br
+A list containing the headers to set this envelope to.
+This list should be a vector of String value pairs, where each
+entry in the vector corresponds to a single header in the message. The first
+string value corresponds to one of the header field name text, and the second
+string value corresponds to the contents of the header field body.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.\"
+.PP
+.RE
+.nr )J 0
+.\"
+.SH "SEE ALSO"
+.na
+.BR SdmError (3),
+.BR SdmGlossary (3),
+.BR SdmMessage (3),
+.BR SdmMessageStore (3),
+.BR SdmServiceFunction (3)

@@ -1,0 +1,133 @@
+#!/bin/ksh
+#
+#  Common Desktop Environment
+#
+#  (c) Copyright 1993 Hewlett-Packard Company
+#  (c) Copyright 1993 International Business Machines Corp.
+#  (c) Copyright 1993 Sun Microsystems, Inc.
+#
+#  Set the X server's keyboard keysyms to the match the
+#  engravings of the user's keyboard.
+#
+#   - Querying odm (querykbd) to get keyboard id (e.g. En_US).
+#
+#   - If querykbd returns NULL or there is no keyboard file found,
+#  then the environment variable $LANG is used for the keymap.
+#
+#
+#  Notes on configuring xstation:
+#
+#  To set up dtlogin to manage an xstation in preferred language environment,
+#  you will need to edit the Xconfig file and create other files.
+#  
+#  Xconfig:
+#    Add entries of the form:
+#
+#  Dtlogin*xstationname_0.setup:          /etc/opt/dt/XstationXsetup_0
+#  Dtlogin*xstationname_0.session:        /etc/opt/dt/XstationXsession_0
+#  Dtlogin*xstationname_0.language:       language
+#
+#  The string xstationname is to be replaced with the name of the xstation.
+#  The string language is to be replaced by the LANG environment variable used
+#  in the xstation. In the following example mickey is the name of the xstation
+#  and 0 is the screen number on the display to be managed. Language is Ja_JP.
+#
+#  Dtlogin*mickey_0.setup:          /etc/opt/dt/XstationXsetup_0
+#  Dtlogin*mickey_0.session:        /etc/opt/dt/XstationXsession_0
+#  Dtlogin*mickey_0.language:       Ja_JP
+#
+#  copy the Xsetup file to XstationXsetup_0.
+#  copy the Xsession file to XstationXsession_0.
+#
+#  XstationXsetup_0:
+#    Add the following lines in the XstationXsetup_0 file. This will need to be
+#  added at the top of the file.
+#
+#  USER_KBD=language
+#  . /etc/environment
+#
+#  The string language is to be replaced by the keyboard's language attached to
+#  the xstation. Following example is to use Japanese keyboard.
+#
+#  USER_KBD=Ja_JP
+#  . /etc/environment
+#
+#  Replace the following line in the XstationXsetup_0 file
+#
+#  KBD_LANG=`ODMDIR=/etc/objrepos /usr/lpp/X11/bin/querykbd`
+#
+#  to the following lines.
+#
+#  if [ "$USER_KBD" != "" ]
+#  then
+#      KBD_LANG=$USER_KBD
+#  else
+#      KBD_LANG=NULL
+#  fi
+#
+#  Add the lines which will set the necessary font path in the XstationXsetup_0
+#  file. This will need to be added at the bottom of the file. Following example
+#  is to set the font path for Japanese.
+#
+#  /usr/lpp/x_st_mgr/bin/xset +fp /usr/lib/X11/fonts/JP
+#
+#  XstationXsession_0:
+#    Add the following lines in the XstationXsession_0 file. This will need to
+#  be added at the top of the file.
+#
+#  XSTATION=xstationname
+#  export XSTATION
+#
+#  The string xstationname is to be replaced with the name of the xstation as
+#  follows.
+#
+#  XSTATION=mickey
+#  export XSTATION
+#
+
+KBD=""
+XDIR=/usr/lpp/X11/defaults/xmodmap
+
+if [ -r $HOME/.Xkeyboard ]
+then
+    KBD=$HOME/.Xkeyboard
+else
+    KBD_LANG=`ODMDIR=/etc/objrepos /usr/lpp/X11/bin/querykbd`
+
+    if [ "$KBD_LANG" != "NULL" ]
+    then
+        if [ "$KBD_LANG" != "C.hft" ]
+        then
+            if [ -r $IMKEYMAPPATH/$KBD_LANG/keyboard ]
+            then
+                KBD=$IMKEYMAPPATH/$KBD_LANG/keyboard
+            else
+                if [ "$IMKEYMAPPATH" = "/usr/lib/nls/im.alt"     	\
+                    -a -r $XDIR/$KBD_LANG/keyboard.alt ]
+                then
+                    KBD=$XDIR/$KBD_LANG/keyboard.alt
+                else
+                    if [ -r $XDIR/$KBD_LANG/keyboard ]
+                    then
+                        KBD=$XDIR/$KBD_LANG/keyboard
+                    fi
+                fi
+            fi
+        fi
+    fi
+fi
+if [ "$KBD" != "" ]
+then
+    /usr/bin/X11/xmodmap $KBD
+else
+    if [ "$IMKEYMAPPATH" = "/usr/lib/nls/im.alt"   \
+                -a -r $XDIR/$LANG/keyboard.alt ]
+    then
+        /usr/bin/X11/xmodmap $XDIR/$LANG/keyboard.alt
+    else
+        if [ -r $XDIR/$LANG/keyboard ]
+        then
+            /usr/bin/X11/xmodmap $XDIR/$LANG/keyboard
+        fi
+    fi
+fi

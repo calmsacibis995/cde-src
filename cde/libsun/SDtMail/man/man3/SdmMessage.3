@@ -1,0 +1,783 @@
+.de LI
+.\" simulate -mm .LIs by turning them into .TPs
+.TP \\n()Jn
+\\$1
+..
+.de Lc
+.\" version of .LI that emboldens its argument
+.TP \\n()Jn
+\s-1\f3\\$1\f1\s+1
+..
+.TH SdmMessage 3 "07/17/96"
+.BH "07/17/96"
+.\" @(#)SdmMessage.3	1.11 96/07/17 SMI
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994, 1995, 1996 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994, 1995, 1996 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994, 1995, 1996 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994, 1995, 1996 Novell, Inc.
+.SH NAME
+SdmMessage \- Allow retrieval, creation and manipulation of messages
+.SH SYNOPSIS
+.\"
+.SS Includes
+.ft 3
+.nf
+#include <Sdtmail.hh>
+#include <Message.hh>
+.\"
+.SS Creation
+.ft 3
+.nf
+.sp 0.5v
+.ta \w'SdmErrorCode SdmMessageStore.SdmMessageFactory('u
+SdmErrorCode SdmMessageStore.SdmMessageFactory(SdmError& \f2err\fP,
+	SdmMessage*& \f2r_message\fP); 
+.PP
+.ft 3
+.ta \w'SdmErrorCode SdmMessageStore.SdmMessageFactory('u
+SdmErrorCode SdmMessageStore.SdmMessageFactory(SdmError& \f2err\fP,
+	SdmMessage*& \f2r_message\fP,
+	SdmMessage& \f2deriveFrom\fP,
+	SdmDefs::MessageType \f2type\fP); 
+.PP
+.ft 3
+.ta \w'SdmErrorCode SdmMessageStore.SdmMessageFactory('u
+SdmErrorCode SdmMessageStore.SdmMessageFactory(SdmError& \f2err\fP,
+	SdmMessage*& \f2r_message\fP,
+	const SdmMessageNumber \f2msgnum\fP);
+.fi
+.ft 1
+.\"
+.SS Methods
+.ft 3
+.nf
+.sp 0.5v
+.ta \w'SdmErrorCode ClearFlags('u
+SdmErrorCode ClearFlags(SdmError& \f2err\fP,
+	const SdmMessageFlagAbstractFlags \f2aflags\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode CommitPendingChanges('u
+SdmErrorCode CommitPendingChanges(SdmErrorCode& \f2err\fP,
+	SdmBoolean \f2&r_messageRewritten\fP,
+	SdmBoolean \f2includeBcc=Sdm_False\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode DiscardPendingChanges('u
+SdmErrorCode DiscardPendingChanges(SdmErrorCode& \f2err\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetBodyCount('u
+SdmErrorCode GetBodyCount(SdmError& \f2err\fP,
+	int& \f2r_count\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetContents('u
+SdmErrorCode GetContents(SdmError& \f2err\fP,
+	SdmContentBuffer& \f2r_contents\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetContents_Async('u
+SdmErrorCode GetContents_Async(SdmError& \f2err\fP,
+	const SdmServiceFunction& \f2svf\fP,
+	void* \f2clientData\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetFlags('u
+SdmErrorCode GetFlags(SdmError& \f2err\fP,
+	SdmMessageFlagAbstractFlags& \f2r_aflags\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetMessageNumber('u
+SdmErrorCode GetMessageNumber(SdmError& \f2err\fP,
+	SdmMessageNumber& \f2r_msgnum\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode Parent('u
+SdmErrorCode Parent(SdmError& \f2err\fP,
+	SdmMessageStore*& \f2r_store\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode PerformSearch('u
+SdmErrorCode PerformSearch(SdmError& \f2err\fP,
+	SdmBoolean& \f2r_bool\fP,
+	SdmSearch& \f2srch\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode SdmMessageBodyFactory('u
+SdmErrorCode SdmMessageBodyFactory(SdmError& \f2err\fP,
+	SdmMessageBody*& \f2r_body\fP,
+	int \f2bpNum\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode SdmMessageBodyFactory('u
+SdmErrorCode SdmMessageBodyFactory(SdmError& \f2err\fP,
+	SdmMessageBody*& \f2r_body\fP,
+	const SdmMsgStrType \f2bodyType\fP,
+	const SdmString \f2bodySubtype\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode SdmMessageEnvelopeFactory('u
+SdmErrorCode SdmMessageEnvelopeFactory(SdmError& \f2err\fP,
+	SdmMessageEnvelope*& \f2r_envelope\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode SetFlags('u
+SdmErrorCode SetFlags(SdmError& \f2err\fP,
+	const SdmMessageFlagAbstractFlags \f2aflags\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode Submit('u
+SdmErrorCode Submit(SdmError& \f2err\fP,
+	SdmDeliveryResponse& \f2r_response\fP,
+	const SdmMsgFormat format,
+	const SdmBoolean logMessage);
+.PP
+.ft 3
+.ta \w'SdmErrorCode Submit_Async('u
+SdmErrorCode Submit_Async(SdmError& \f2err\fP,
+	const SdmServiceFunction& \f2svf\fP,
+	void* \f2clientData\fP,
+	const SdmMsgFormat format,
+	const SdmBoolean logMessage);
+.fi
+.ft 1
+.\" end of methods list
+.ta 0.25i 0.50i 0.75i 1.0i 1.25i 1.50i 1.75i 2.0i 2.5i 3.0i
+.SH DESCRIPTION
+The SdmMessage class encapsulates the concept of "a message" as a container, allowing the
+retrieval, creation and manipulation of messages which have message envelope and message body
+components. Existing messages in message stores can be accessed in both incoming and
+outgoing message stores, and new messages can be created in outgoing message stores.
+.PP
+You would typically create a message object when it is desired to operate directly on
+the message (such as retrieve the contents, or construct a reply to or forward the
+message).
+.PP
+.PP
+See SdmGlossary(3) for a detailed list of general definitions.
+.PP
+.\"
+.SH CREATION
+A SdmMessage object is never created directly by a front end application; its
+constructor is private and cannot be accessed by front end applications. A SdmMessage
+object is created by invoking the SdmMessageFactory method of a previously created
+SdmMessageStore object. The following code snippet creates an message object for the
+first message in a message store:
+.PP
+.nf
+	SdmError err;
+	SdmConnection* con;
+	SdmSession* ses;
+	SdmMessageStore* mst;
+	SdmMessage* msg;
+	SdmToken* tokenName;
+
+	con = new SdmConnection(appName);
+	if (con->StartUp(err) != Sdm_EC_Success) {
+		// connection could not be started: handle error
+	}
+	if (con->SdmSessionFactory(err, ses, SdmDefs::ST_InSession) 
+		!= Sdm_EC_Success) {
+		// session could not be created: handle error
+	}
+	if (ses->StartUp(err) != Sdm_EC_Success) {
+		// session could not be started: handle error
+	}
+	if (ses->SdmMessageStoreFactory(err, mst) != Sdm_EC_Success) {
+		// message store could not be created: handle error
+	}
+	if (mst->StartUp(err) != Sdm_EC_Success) {
+		// message store could not be started: handle error
+	}
+	if (mst->Open(err, tokenName) != Sdm_EC_Success) {
+		// message store could not be opened: handle error
+	}
+	if (mst->SdmMessageFactory(err, msg, 1) != Sdm_EC_Success) {
+		// message could not be created: handle error
+	}
+.fi
+.PP
+.SH DESTRUCTION
+This object is destroyed automatically when the message store that created it is
+shutdown; however, it may be individually destroyed by a front end application. Its
+destructor is public and can be accessed by front end applications.  You would typically
+destroy this object when the message associated with it is no longer being operated on
+(e.g. user hit the "next" button or otherwise indicated that a different message be
+looked at).
+.PP
+Only top-level messages created from the SdmMessageFactory method in SdmMessageStore 
+should be deleted.  Nested messages created from the SdmMessageFactory method in 
+SdmMessageBody will be deleted by it's top-level message.  Deleting nested messages 
+directly will result in an assertion.
+.PP
+In general, it is better practice to delete all messages first before shutting down the
+message store that created them.
+.PP
+.\"
+.SH METHODS
+Primary methods allow searching the contents of the message, retrieving and manipulating
+flags associated with the message, and retrieving the contents of the message. Secondary
+methods allow the creation of message envelope and message body objects associated with
+the message, and submitting the message for transmission.
+.SS \f3ClearFlags\fP
+(\f3err\fP, \f3aflags\fP)
+.PP
+Clear one or more flags associated with this message.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.br
+.LI "\f3aflags\fP (\f3const SdmMessageFlagAbstractFlags\fP)"
+.br
+A bit mask representing the flags to be cleared from the message; a bit that is
+on indicates the flag should be cleared. A bit that is off indicates the flag
+should not be changed from its current value.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3CommitPendingChanges\fP
+(\f3err\fP, \f3r_messageRewritten\fP, \f3includeBcc\fP)
+.PP
+Commit the changes made to the message to the message store.
+.br
+ 
+NOTE: These changes are committed to memory or a cache and
+may not necessarily be written to the actual storage.  To have
+the changes in a message store written to the actual storage
+you must call SdmMessageStore::SaveMessageStoreState for
+the message store containing this message.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_messageRewritten\fP (\f3SdmBoolean&\fP)"
+.br
+Boolean set to a value that indicates whether the commit
+resulted in the message being rewritten in another location
+in the store.
+.LI "\f3includeBcc = Sdm_False\fP (\f3SdmBoolean\fP)"
+.br
+Boolean to specify whether any "Bcc:" header is committed.  This argument
+defaults to Sdm_False which indicates that no "Bcc:" header is to be
+committed.  If Sdm_True is passed, then any "Bcc:" header that is present in
+the message is committed.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3DiscardPendingChanges\fP
+(\f3err\fP)
+.PP
+Discards the changes made to the message since the last
+time the CommitPendingChanges method was called; for the 
+first call, since the SdmMessage object was initially created. 
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetBodyCount\fP
+(\f3err\fP, \f3r_count\fP)
+.PP
+Return the number of body parts associated with this message. The number returned can be
+used as an index to the GetMessageBodyFactory() method to gain access to the message
+body parts themselves.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_count\fP (\f3int&\fP)"
+.br
+The number of body parts associated with this message are returned in this simple data type.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetContents\fP
+(\f3err\fP, \f3r_contents\fP)
+.PP
+Return the contents for this object; in the case of this message object, the "contents"
+refer to the complete raw data that the entire message consists of, including all
+unparsed headers and body parts. Typically used for drag and drop purposes where the raw
+data is being transmitted between applications.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_contents\fP (\f3SdmContentBuffer&\fP)"
+.br
+The raw contents of this object is returned in this simple data type.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetContents_Async\fP
+(\f3err\fP, \f3svf\fP, \f3clientData\fP)
+.PP
+Same as GetContents() except that this method returns immediately after making an
+asynchronous request to perform the requested operation. The service function provided
+in the call is invoked when the operation is completed.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3svf\fP (\f3const SdmServiceFunction&\fP)"
+.br
+The service function to be called when the request is completed. 
+
+The event passed to the service function is of type "Sdm_Event_GetMessageContents".
+.LI "\f3clientData\fP (\f3void*\fP)"
+.br
+Specific client data that is passed unmodified to the service function when it is
+called. This should contain context sufficient to allow the service function to execute.
+This overrides the "user data" provided when the service function is defined. If this
+client data is NULL, then the user data defined in the service function is passed instead.
+.br
+
+In a C++ environment this is typically the "this" pointer of the invoking
+object.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetFlags\fP
+(\f3err\fP, \f3r_aflags\fP)
+.PP
+Get all flags associated with this message.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_aflags\fP (\f3SdmMessageFlagAbstractFlags&\fP)"
+.br
+All flags set for this message are returned in this simple data type.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetMessageNumber\fP
+(\f3err\fP, \f3r_msgnum\fP)
+.PP
+Return the message number for this message in the message store.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_msgnum\fP (\f3SdmMessageNumber&\fP)"
+.br
+The message number that references this message in the message store is returned in this
+simple data type.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3Parent\fP
+(\f3err\fP, \f3r_store\fP)
+.PP
+Provide a handle to the parent message store that created this message. Used to access
+methods of the parent of this message.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_store\fP (\f3SdmMessageStore*&\fP)"
+.br
+A pointer to a SdmMessageStore object; upon successful completion, this pointer
+variable is filled in with a handle to the SdmMessageStore object that created this
+message, which may then be used to manipulate it.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3PerformSearch\fP
+(\f3err\fP, \f3r_bool\fP, \f3srch\fP)
+.PP
+Search the message return an indication of whether or not the message matches the given
+search criteria.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_bool\fP (\f3SdmBoolean&\fP)"
+.br
+A boolean indicating whether or not the search is successful is returned in this
+variable; that is, Sdm_False if the search failed, else Sdm_True if the search is
+successful.
+.LI "\f3srch\fP (\f3SdmSearch&\fP)"
+.br
+A SdmSearch object that contains the criteria to search against the message.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3SdmMessageBodyFactory\fP
+(\f3err\fP, \f3r_body\fP, \f3bpNum\fP)
+.PP
+Return a handle to an a message body part component of this message, which allows a
+front end application to then retrieve and manipulate the contents of that body part.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_body\fP (\f3SdmMessageBody*&\fP)"
+.br
+A pointer to a SdmMessageBody object; upon successful completion, this pointer variable
+is filled in with a handle to the SdmMessageBody object representing the indicated
+message body part.
+.LI "\f3bpNum\fP (\f3int\fP)"
+.br
+Message body part number of the body part to create a SdmMessageBody handle on.  Message
+body parts are numbered starting with 1. It is an error to provide a message body part
+number that is less than 1, or greater than the number of message body parts in the
+message.
+
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3SdmMessageBodyFactory\fP
+(\f3err\fP, \f3r_body\fP,  \f3bodyType\fP, \f3bodySubtype\fP)
+.PP
+Return a handle to an a new message body part component of this message.
+It creates a new message body from scratch that can then be filled in
+appropriately.  Typically you would use this method to add a new
+body part to the message.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_body\fP (\f3SdmMessageBody*&\fP)"
+.br
+A pointer to a SdmMessageBody object; upon successful completion, this pointer variable
+is filled in with a handle to the SdmMessageBody object created for the
+new message body part.
+.LI "\f3bodyType\fP (\f3const SdmMsgStrType\fP)"
+.br
+The type of the body to be added.  See the mbs_type component of the
+Message Body Structure section in SdmGlossary(3) for more information on
+the possible message body types.
+.LI "\f3bodySubtype\fP (\f3const SdmMsgStrType\fP)"
+.br
+The subtype of the body to be added.  See the mbs_subtype component of the
+Message Body Structure section in SdmGlossary(3) for more information on
+the message body subtype.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+
+.\"
+.SS \f3SdmMessageEnvelopeFactory\fP
+(\f3err\fP, \f3r_envelope\fP)
+.PP
+Return a handle to the message envelope object for this message, which allows a front
+end application to then retrieve and manipulate the contents of the envelope.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_envelope\fP (\f3SdmMessageEnvelope*&\fP)"
+.br
+A pointer to a SdmMessageEnvelope object; upon successful completion, this pointer
+variable is filled in with a handle to the SdmMessageEnvelope object representing the
+message envelope.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3SetFlags\fP
+(\f3err\fP, \f3aflags\fP)
+.PP
+Set one or more flags associated with this message.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3aflags\fP (\f3const SdmMessageFlagAbstractFlags\fP)"
+.br
+A bit mask representing the flags to be set from the message; a bit that is on
+indicates the flag should be set. A bit that is off indicates the flag should
+not be changed from its current value.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3Submit\fP
+(\f3err\fP, \f3r_response\fP, \f3format\fP, \f3logMessage\fP)
+.PP
+Submit message for transmission.
+.br
+
+NOTE: Messages can only be submitted if they are created from
+the outgoing SdmMessageStore.  Submitting a message created
+from an incoming SdmMessageStore will result in an error.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_response\fP (\f3SdmDeliveryResponse&\fP)"
+.br
+Result of the submit.  The information about the 
+addressees and transports that successfully got the
+message submitted is placed in the delivery response.
+.LI "\f3format\fP (\f3const SdmMsgFormat\fP)"
+.br
+The format of how the message is to be sent (eg. Mime, SunV3).
+.LI "\f3logMessage\fP (\f3const SdmBoolean\fP)"
+.br
+Flag indicating whether message should be saved in log file before it is sent.
+The name of the log file is retrieved from SdmMailRc using the "record" variable.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3Submit_Async\fP
+(\f3err\fP, \f3svf\fP, \f3clientData\fP, \f3format\fP, \f3logMessage\fP)
+.PP
+Same as Submit() except that this method returns immediately after making an
+asynchronous request to perform the requested operation. The service function provided
+in the call is invoked when the operation is completed.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3svf\fP (\f3const SdmServiceFunction&\fP)"
+.br
+The service function to be called when the request is completed. 
+.br
+
+The event passed to the service function is of type "Sdm_Event_SubmitMessage".
+.LI "\f3clientData\fP (\f3void*\fP)"
+.br
+Specific client data that is passed unmodified to the service function when it is
+called. This should contain context sufficient to allow the service function to execute.
+This overrides the "user data" provided when the service function is defined. If this
+client data is NULL, then the user data defined in the service function is passed instead.
+.br
+
+In a C++ environment this is typically the "this" pointer of the invoking
+object.
+.LI "\f3format\fP (\f3const SdmMsgFormat\fP)"
+.br
+The format of how the message is to be sent (eg. Mime, SunV3).
+.LI "\f3logMessage\fP (\f3const SdmBoolean\fP)"
+.br
+Flag indicating whether message should be saved in log file before it is sent.
+The name of the log file is retrieved from SdmMailRc using the "record" variable.
+.PP
+.RE
+.nr )J 0
+.\"
+.SH "SEE ALSO"
+.na
+.BR SdmError(3),
+.BR SdmGlossary(3),
+.BR SdmMessageBody(3),
+.BR SdmMessageEnvelope(3),
+.BR SdmMessageStore(3),
+.BR SdmServiceFunction(3)

@@ -1,0 +1,766 @@
+.de LI
+.\" simulate -mm .LIs by turning them into .TPs
+.TP \\n()Jn
+\\$1
+..
+.\"(c) Copyright 1993, 1994 Hewlett-Packard Company
+.\"(c) Copyright 1993, 1994 International Business Machines Corp.
+.\"(c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\"(c) Copyright 1993, 1994 Novell, Inc.
+.TH DTMAIL 1X "" "" "" ""
+.ds ]W CDE 1.1 (12/96)
+.na
+.SH NAME
+dtmail \- the CDE Mailer
+.sp 1
+.SH SYNOPSIS
+.B dtmail
+[
+.B \-ch
+]
+[
+.B \-f
+.I [server:][mailfile]
+]
+[
+.B \-l
+.I deadletter
+]
+[
+.B \-a
+.I file1
+.B ...
+.I fileN
+]
+[
+.B \-T
+.I address
+]
+.sp 1
+.SH DESCRIPTION
+dtmail is the mail user agent (MUA) for CDE.  It provides an intuitive,
+easy-to-use GUI for reading, sending, and managing electronic mail.
+dtmail supports both MIME and Sun Mail Tool message formats for reading and
+sending messages.  In addition to local and NFS mailboxes, it also supports
+the use of IMAP4 for accessing remote mailboxes.  dtmail
+provides a mail-pervasive desktop environment by supporting the
+.B Mail(4)
+and
+.B Display(4)
+Media Exchange messages.  Other applications can
+compose, send, and display electronic mail messages using the ToolTalk API
+and these Media Exchange messages.
+.P
+.sp 1
+.SH OPTIONS
+.br
+.TP
+.BI \-a " file1 "  \... " fileN"
+Open a Compose window with
+.I file1
+through
+.I fileN
+as attachments.
+.TP
+.BI \-c 
+Open a new Compose window.
+.TP
+.BI \-f " [server:][filename]"
+Specify the mail file to be loaded in at start up time.
+Ordinarily, the mail file pointed to by the environment variable
+.B MAIL
+is read in as the user's inbox.  Use of the 
+.B \-f
+option overrides the
+use of the
+.B MAIL
+variable.  The optional server argument specifies the host
+name of an IMAP server to use.  If only
+.I server:
+is specified, the Inbox on
+that IMAP server is opened (if it exists).
+.TP
+.BI \-h
+Display help for command-line options.
+.TP
+.BI \-l " deadletter"
+Open a Compose window with the
+.I deadletter
+file loaded.
+.TP
+.BI -T " address "
+Open a Compose window with
+.I address
+in the To field.
+.sp 1
+.SH FEATURES
+.SS IMAP4
+dtmail supports the use of IMAP4 for accessing remote mailboxes.  The use
+of this feature requires that an IMAP4 server be installed on the machine
+that manages your mailboxes.  You can configure the IMAP-related items in the
+Basic and Move Menu Setup dialog boxes opened from the Options menu.
+.SS Search
+dtmail provides a search facility that allows you to create your own complex
+queries as well as providing a GUI for simple searches.  dtmail's advanced
+search facility supports the following case-insensitive keywords:
+.PP
+.RS 3
+.nr )J 3
+.LI \(bu
+Header-related keywords: 
+.B to, from, subject, cc, bcc, text,
+.B body, header
+.LI \(bu
+Date-related keywords: 
+.B before, since, on, during,
+.B sentsince, sentbefore, senton, today, yesterday, lastweek,
+.B thismonth, lastmonth, january ... december,
+.B sunday ... saturday
+.LI \(bu
+Message State-related keywords: 
+.B read, unread, new, old, deleted, undeleted,
+.B recent, flagged, unflagged, answered,
+.B unanswered, keyword, unkeyword, draft,
+.B undraft, all, larger, smaller
+(The meaning of some keywords is not known.  They are simply included here for
+the sake of completeness.)
+.LI \(bu
+Logic operators: 
+.B and, or, ~ (not), (, )
+.RE
+.PP
+The following are examples of advanced searches:
+.PP
+.RS 3
+\-
+.B from
+kelly@tiger
+.B and subject
+"hi there"
+.B and during lastweek
+
+\-
+.B (to
+gary
+.B or to
+tigerteam
+.B ) and ~ (to
+boss@tiger
+.B or cc
+boss@tiger
+.B )
+.PP
+Nested parentheses are not allowed.
+.RE
+.PP
+You can save your searches for use as a view via the Search dialog box.
+.SS Signals
+.PP
+SIGUSR1 - Sending this signal to dtmail causes all mailboxes to
+be closed.  dtmail will exit if there are no compose 
+windows opened. This signal is also used by the
+Solstice Internet Mail Server to inform a mail client 
+to release control of the mailbox.
+.PP
+SIGUSR2 - Sending this signal to dtmail causes all non-Inbox
+mailboxes to be closed.  This signal is also used by the
+Solstice Internet Mail Server to inform a mail client 
+to release control of a non-Inbox mailbox.
+.SS Toolbar
+You can customize the toolbar on the main mailbox window in several ways:
+.PP
+.RS 3
+.nr )J 3
+.LI \(bu
+add or remove commands
+.LI \(bu
+label buttons using either text or icon images
+.PP
+Configuring the toolbar is done via the Toolbar dialog box opened from the Options menu.
+.SS ToolTalk
+dtmail's ToolTalk interface enables other applications to compose,
+send, and display email.  dtmail supports the
+.B Mail(4)
+and
+.B Display(4)
+Media Exchange messages.  Other applications can use these two types of requests to:
+.PP
+.RS 3
+.nr )J 3
+.LI \(bu
+Display a single message or a collection of messages by using a
+.B Tttk_op
+value of
+.B TTME_DISPLAY
+and a media type of 
+.B RFC_822_MESSAGE.
+.LI \(bu
+Open a Compose window with the supplied message data loaded into the
+appropriate fields.  This is done by using a
+.B Tttk_op
+value of
+.B TTME_MAIL_EDIT
+and a media type of
+.B RFC_822_MESSAGE.
+.LI \(bu
+Open a Compose window with the supplied data loaded as an attachment.
+This is done by using a
+.B Tttk_op
+value of
+.B TTME_MAIL_EDIT
+and a media type of
+.B MAIL_TYPE.
+.LI \(bu
+Open a new Compose window. This is done by using a
+.B Tttk_op
+value of
+.B TTME_MAIL_COMPOSE
+and a media type of
+.B RFC_822_MESSAGE.
+.LI \(bu
+Send a message without using the GUI.  This is done by using a
+.B Tttk_op
+value of
+.B TTME_MAIL
+and a media type of
+.B RFC_822_MESSAGE.
+.PP
+See the man page for
+.B ttmedia_load(3),
+.B Mail(4),
+and
+.B Display(4)
+for more information on how to use ToolTalk and the Media Exchange requests.
+.SS Vacation
+You use the vacation facility to create a message that is automatically
+sent to anyone who sends you email during a period of time that you 
+specify; for example, while you are on vacation.  You can set the start
+and end dates as well as the reply interval for those who send you
+multiple messages while you are away.  Set up your vacation message in the
+Vacation Message dialog box opened from the Options menu.
+.SS Views
+You use the Views facility to display only those messages that match
+certain criteria.  Define the matching criteria via the Search dialog box.  You then create
+a view by naming the the search criteria and saving it.  The search criteria is saved
+in the
+.B views
+variable in your
+.B $HOME/.mailrc
+file.  These views can be applied to any of your mailboxes.
+
+dtmail provides two default views: all messages and new messages.
+.sp 1
+.SH RESOURCES
+dtmail provides the following resources:
+.TP
+.BI Dtmail*Message_List*doubleClickInterval
+The double-click time out (in milliseconds) for the Message Header List. The default
+is 400 milliseconds.
+.TP
+.BI Dtmail*Message_List*background
+The color to use for the Message Header List background. The default is system-dependent.
+.TP
+.BI Dtmail*Message_List*foreground
+The color to use for the Message Header List foreground. The default is system-dependent.
+.TP
+.BI Dtmail*Message_List*fontList
+The list of fonts to use in the Message Header List.  The
+list must contain two fonts.  The first must be tagged
+.B plain
+and is the font used to render the header text.  The second must be tagged
+.B attach
+and is used to render the attachment indicator.  The default
+is to use system-dependent, fixed-width fonts.
+.TP
+.BI Dtmail*Work_Area*Text*background
+Color to use for the View and Compose window text background.  The default
+is system-dependent.
+.TP
+.BI Dtmail*Work_Area*Text*foreground
+Color to use for the View and Compose window text foreground.  The default
+is system-dependent.
+.TP
+.BI Dtmail*Work_Area*Text*fontList
+The list of fonts to use in the View and Compose windows.  Font tag "plain".
+The default is to use a system-dependent, variable-width font.
+.PP
+The widget hierarchy for dtmail's main window is shown below.  The widget
+class name is given first followed by it's instance name.
+.PP
+Dtmail  dtmail
+.RS 2
+XmMainWindow  mainWindow
+.RS 2
+XmForm  Work_Area
+.RS 2
+XmPanedWindow  panedW
+.RS 2
+XmForm  form2
+.RS 2
+XmScrolledWindow  Message_ListSW
+.RS 2
+XmList  Message_List
+.RE
+XmRowColumn  Toolbar
+.RE
+XmForm  form3
+.RS 2
+XmForm  Message_Status
+.br
+XmForm  DtMailEditor
+.RS 2
+DtEditor  Text
+.br
+XmForm  AttachPane
+.RE
+.RE
+.RE
+.RE
+XmRowColumn  menubar
+.RS 2
+XmMenuShell  popup_Mailbox
+.RS 2
+XmRowColumn  Mailbox
+.br
+XmRowColumn  Message
+.br
+XmRowColumn  Compose
+.br
+XmRowColumn  View
+.br
+XmRowColumn  Options
+.br
+XmRowColumn  Move
+.br
+XmRowColumn  Help
+.RE
+.RE
+.RE
+.RE
+.RE
+.PP
+The widget hierarchy of dtmail's Compose window is shown below. The widget
+class name is given first followed by it's instance name.
+.PP
+TopLevelShell  ComposeDialog
+.RS 2
+XmMainWindow  mainWindow
+.RS 2
+XmForm  Work_Area
+.RS 2
+XmForm  StatusForm
+.br
+XmForm  HeaderArea
+.br
+XmForm  DtMailEditor
+.RS 2
+DtEditor  Text
+.br
+XmForm  AttachPane
+.RE
+.RE
+XmRowColumn  menubar
+.RS 2
+XmMenuShell  popup_File
+.RS 2
+XmRowColumn  File
+.br
+XmRowColumn  Edit
+.br
+XmRowColumn  Attachments
+.br
+XmRowColumn  Format
+.br
+XmRowColumn  Help
+.sp 1
+.SH MAIL VARIABLES
+.sp .5
+dtmail recognizes the following 
+.BR mailx (1)
+commands and variables:
+.B unset, alias, group, set, ignore, source, if,
+.B else, endif, alternates, keep, allnet,
+and
+.B metoo.
+See the
+.BR mailx (1)
+man page for more information.
+dtmail also recognizes the variables listed below.  They can be set by editing your
+.B .mailrc
+file; however, since most of the variables are accessible through
+the dtmail Options menu, we strongly recommend that you modify
+them there to reduce the chance of error. Unless otherwise noted, 
+the default for the following variables is off.
+.TP 10
+.B additionalfields
+A list of header fields to access via the
+.B Format
+menu.  You can set this variable in the Compose Window dialog box opened from the
+Options menu.
+.TP
+.B bell
+The number of times to ring the bell when new mail arrives.
+You can set this variable in the Notification dialog box opened from the Options menu.
+The default is 0.
+.TP
+.B cachedfilemenusize
+Specifies the maximum number of entries that are appended to the Move menu, as well as
+the Copy To Mailbox, and Open Mailbox submenus.  You can set this variable in the
+Move Menu Setup dialog box opened from the Options menu.  The default is 10.
+.TP
+.B composeinterval
+The interval in seconds for saving the contents of the Compose window to the
+.B mail.dead.letter
+file.
+The default is 10 minutes.
+.TP
+.B composewincols
+The default width of the compose window (in columns).  You can set this variable in the
+Compose Window dialog box opened from the Options menu.
+.TP
+.B deaddir
+The folder in which the dead letter file will be saved.  You can set this variable in the
+Compose Window dialog box opened from the Options menu.  The default
+is
+.B $HOME/DeadLetters.
+.TP
+.B displaymsgsizewarning
+If set, a warning popup dialog will be displayed when attempting to
+send a message that exceeds the value specified by the
+.B msgsizelimit
+variable.  You can set this variable in the Advanced dialog box opened from the
+Options menu.
+.TP
+.B dontautosave
+Set this variable to prevent dtmail from automatically saving changes made
+to your mailbox.
+.TP
+.B dontincludesignature
+When set, the user defined signature is not automatically added to outgoing
+messages.  You can set this variable in the Signature dialog box opened from
+the Options menu.  If a signature is defined, this variable is not set by default
+(which means the signature will be automatically included in outgoing messages).
+.TP
+.B dontdisplaycachedfiles
+Specifies whether to append file names to the Move menu as well as the Copy To Mailbox
+and Open Mailbox submenus. 
+.TP
+.B dontlogmessages
+Controls whether or not the Save Outgoing Mail item is selected in the File Menu in
+the Compose window. The default is to save outgoing mail. See also the
+.B record
+variable.
+
+If you choose this menu item but do not specify a file under "Save a copy
+of outgoing mail in" in the Basic dialog box opened from the Options menu, 
+dtmail saves your outgoing mail in
+.B $HOME/sent.mail.
+.TP
+.B dontsavemimemessageformat
+dtmail converts all Sun Mail Tool format messages to MIME.  Setting this variable prevents
+these MIME translations from being written back to the mailbox.  However, setting
+this option also causes a significant decrease in performance when you open mailboxes.
+You can set this variable in the Advanced dialog box opened from the Options menu.
+.TP
+.B dontsendmimeformat
+Set this variable to send messages in Sun Mail Tool message format instead of MIME.
+You can set this variable in the Advanced dialog box opened from the Options menu.
+.TP
+.B draftdir
+Specifies the default directory for draft messages.
+.\".TP
+.\".B expert
+.\"Set expert mode in which minimal confirmations are requested.
+.\"You can set this variable in the
+.\".B 
+.\dialog box opened from the Options menu.
+.\"filemenu2 supersedes filemenu.  dtmail does not support filemenu
+.\".TP
+.\".B filemenu
+.TP
+.B filemenu2
+A space-separated list of mailboxes that appear on the Move menu, as well as the
+Copy To Mailbox and Open Mailbox submenus.  They can be absolute path names or path names
+relative to the directory specified in the
+.B folder
+variable.  For IMAP mailboxes, see
+.B movemenu.
+You can set this variable in the Move Menu Setup dialog box opened from the Options menu.
+.TP
+.B filemenusize
+Specifies the maximum number of entries in the Move menu as well as the Copy To Mailbox
+and Open Mailbox submenus.  You can set this variable in the
+Move Menu Setup dialog box opened from the Options menu.  The default is 10.
+.TP
+.B flash
+The number of times to flash the window or 
+icon when new mail arrives.  You can set this variable in the
+Notification dialog box opened from the Options menu.  The default is 0.
+.TP
+.B folder
+Specifies the default directory for mailboxes.  You can set this variable in the
+Move Menu Setup dialog box opened from the Options menu.
+.TP
+.B headerlines
+Specifies the number of message headers to display in the Message Header List.
+You can set this variable in the Basic dialog box opened from the Options menu. 
+The default is 15.
+.TP
+.B hideattachments
+Set this variable to hide the attachments pane in the Compose Message window.
+You can set this variable in the Compose Window dialog box opened from the Options menu.
+.TP
+.B imapfolder
+Specifies the default directory for your IMAP mailboxes.  You can set this variable in the
+Move Menu Setup dialog box opened from the Options menu.
+.TP
+.B imapfolderserver
+Specifies the name of the host on which your IMAP mail folders reside.  You can set this
+variable in the Move Menu Setup dialog box opened from the Options menu.
+.TP
+.B imapinboxserver
+Specifies the name of the host on which your IMAP Inbox is stored. You can set this
+variable in the Basic dialog box opened from the Options menu.
+.TP
+.B inactivityinterval
+The number of seconds between keystrokes before dtmail checks for new email or does an
+auto save. The default is 30 seconds.
+.TP
+.B indentprefix
+Specifies the string used to mark indented text from included messages.
+You can set this variable in the Compose Window dialog box opened from the Options menu.
+The default is "> ".
+.TP
+.B keepdeleted
+Set this variable to prevent messages marked as deleted from being destroyed when closing
+(exiting) dtmail.  You can set this variable in the Basic dialog box opened from the
+Options menu. See also
+.B quietdelete.
+.TP
+.B logdebug
+Set this variable to have all IMAP protocol and miscellaneous debug messages printed
+to stdout.
+.TP
+.B logerror
+Set this variable to have all c-client fatal error messages sent to stdout.
+.TP
+.B lognotify
+Set this variable to have all notifications from the c-client sent to stdout.
+.TP
+.B movemenu
+A space-separated list of mailboxes that appear on the Move menu, as well as the 
+Copy To Mailbox and Open Mailbox submenus. The mailbox names can be absolute path
+names or path names relative to the directory specified in the
+.B folder
+variable.  This list can also contain entries that refer to remote IMAP mailboxes, of
+the form:
+.I mailboxname,servername,\imap.
+You can set this variable in the Move Menu Setup dialog box opened from the Options
+menu.
+.TP
+.B msgsizelimit
+Specifies the maximum size of a message that you can send without causing a warning
+message to be posted.  All messages whose size is greater than or equal to
+this value will cause a warning message to be posted.  You can set this variable in the
+Advanced dialog box opened from the Options menu.
+.TP
+.B popuplines
+Specifies the number of lines in the View Message and Compose Message windows.  You can
+set this variable in the Message View dialog box opened from the Options menu. 
+The default value is 30.
+.TP
+.B quietdelete
+If set, dtmail does not post a message that asks if you would like to 
+destroy the deleted messages when you close (exit) dtmail.  Set this 
+variable under "Destroy Deleted Messages" in the Basic dialog box 
+opened from the Options menu.  See also
+.B keepdeleted.
+.TP
+.B realsound
+Specifies the name of the sound file played when new mail arrives.  You can set this
+variable in the Notification dialog box opened from the Options menu.
+.TP
+.B record
+Specifies the file in which to save your outgoing messages. You can  
+set this variable by filling in the text field under "Save a copy of 
+outgoing mail in" in the Basic dialog box opened from the Options menu.
+If you leave that field blank, but choose to save outgoing mail, dtmail 
+saves it in
+.B $HOME/sent.mail. 
+
+To control whether or not to save outgoing mail on a per-message basis, select or deselect
+Save Outgoing Mail from the File menu in the Compose window. The
+.B dontlogmessages
+variable controls whether or not this item is selected by default.
+You can set this variable in the Basic dialog box opened from the Options menu.
+.TP
+.B retrieveinterval
+Specifies the interval that dtmail waits to check for new mail in your Inbox.  
+You can set this variable in the Basic dialog box opened from the Options menu.
+The default is 300 seconds.
+.TP
+.B saveinterval
+Specifies the length of time between saving the state of your mailbox to disk.
+The default is 10 minutes and the maximum is 30 minutes.  You can set this 
+variable in the Basic dialog box opened from the Options menu.
+The 
+.B dontautosave
+variable overrides the
+.B saveinterval
+variable. 
+.\".B saveinterval 
+.\"cannot be set through the dtmail GUI interface, so you 
+.\"must edit your .mailrc file directly.
+.\".TP
+.\".B save
+.\"Save contents of each Compose Message window in a dead.letter file until the
+.\"message is delivered successfully.  If a Compose Message window is quit, and
+.\"a new one is brought up, the new window will reuse the dead.letter from the
+.\"previous window.  The first dead.letter file is called dead.letter, the
+.\"second one is called dead.letter.1, the third dead.letter.2, and so on.
+.\"The default is
+.\".I on.
+.\".TP
+.TP
+.B showmsgnum
+Set this to show message numbers in the Message Header List.  You can set this variable
+in the Basic dialog box opened from the Options menu.
+.TP
+.B showto
+Shows the "To" field of mail messages in the Message Header List if
+the mail is from the same user that is reading mail; for example, you.
+You can set this variable in the Basic dialog box opened from the Options menu.
+.TP
+.B signature
+Specifies the file whose contents will be included in the Compose window. You can set
+this variable in the Signature dialog box opened from the Options menu.
+.TP
+.B smtpmailserver
+Specifies the server where mail is to be sent from.  You can set this variable in the
+Advanced dialog box opened from the Options menu.
+.TP
+.B templatedir
+The default directory for template files.
+.TP
+.B templates
+A list of
+.I name:path
+pairs that represent the collection of templates listed in the Use Templates submenu
+in the Format menu in the Compose window.
+.I name
+appears in the submenu;
+.I path
+is the file included in the Compose window when you select
+.I name.
+You can set this variable in the Templates dialog box opened from the Options menu.
+.TP
+.B toolbarcommands
+A space-separated list of command names that define which commands are
+represented in the toolbar.  You can set this variable in the Toolbar
+dialog box opened from the Options menu.
+.TP
+.B toolbarusetext
+Set this variable to have the toolbar use text labels instead of icons.
+You can set this variable in the Toolbar dialog box opened from the Options menu.
+.TP
+.B toolcols
+The default width of the primary windows (in columns).
+You can set this variable in the Message View dialog box opened from the Options menu.
+.TP
+.B usealternates
+If set, dtmail checks the address list of outgoing mail for addresses specified by the mailx
+.BI alternates
+command. You can set this variable in the Advanced dialog box opened from the Options menu.
+.TP
+.B vacationatjobhost
+Specifies the host name where dtmail was running when your vacation message was turned on.
+.TP
+.B vacationenddate
+The date on which the vacation message will be turned off. You can set this variable in the
+Vacation Message dialog box opened from the Options menu.
+.TP
+.B vacationreplyinterval
+Specifies the interval between replies to the same sender.
+For example; if this variable is set to 3, someone
+who sends you a message while you are away will not receive your vacation 
+message again until three days after receipt of the first vacation 
+message from you. You can set this variable in the
+Vacation Message dialog box opened from the Options menu.
+.TP
+.B vacationstartatjobid
+The id number returned from the "at" command used to turn on your vacation message.
+.TP
+.B vacationstartdate
+The date your vacation message is turned on. You can set this variable in the
+Vacation Message dialog box opened from the Options menu.
+.TP
+.B vacationstopatjobid
+The id number returned from the "at" command used to turn off your vacation message.
+.TP
+.B slownet
+If set, when you click a message header, dtmail loads the message text but not 
+the attachment contents.  They are loaded only when you double-click the attachment
+icon.  You can also set this variable by selecting When Open under 
+Retrieve attachments in the Login dialog box.  Use this option in a low-bandwidth
+connection.
+.TP
+.B views
+A list of
+.I name:value
+pairs separated by a semicolon (;), that represent the views you have defined.
+The
+.I name
+portion can be any ASCII string; spaces are allowed. The
+.I value
+portion can be any valid IMAP4 search string.  Define views via the Search
+dialog box opened from the Message menu.
+.sp 1
+.SH ENVIRONMENT
+.LP
+The following environment variables affect the execution of dtmail:
+.TP
+.BI \s-1HOME\s+1= directory
+The user's home directory.
+.TP
+.BI \s-1MAIL\s0= filename
+The name of the initial mailbox file to read (in lieu of the
+standard system mailbox).  The default is system-dependent.
+See FILES section.
+.TP
+.BI \s-1MAILRC\s+1= filename
+The name of the startup file. The default is
+.B $HOME/.mailrc.
+.sp 1
+.SH FILES
+.TP
+.B /var/mail/* (Sun)
+.TP
+.B /var/spool/mail/* (IBM)
+.TP
+.B /usr/mail* (HP)
+System mailboxes
+.TP
+.B /etc/mail/mailx.rc
+System setup file that is read in before
+.B $HOME/.mailrc.
+.TP
+.B $HOME/.mailrc
+Startup file for dtmail.
+.TP
+.B /usr/dt/bin/dtmail
+dtmail executable.
+.TP
+.B /usr/dt/app-defaults/<LANG>/Dtmail
+Application defaults for dtmail.
+.sp 1
+.SH SEE ALSO
+.na
+.BR mail (1),
+.BR mailx (1),
+.BR newaliases (1),
+.BR sendmail (1M),
+.BR vacation (1),
+.BR aliases (4),
+.BR ttmedia_load (3),
+.BR Mail (4),
+.BR Display (4).

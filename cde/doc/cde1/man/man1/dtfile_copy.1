@@ -1,0 +1,257 @@
+.\"---
+.\"     (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\"     (c) Copyright 1993, 1994 International Business Machines Corp.
+.\"     (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\"     (c) Copyright 1993, 1994 Novell, Inc.
+.\"---
+.TH dtfile_copy 1X "12 Oct. 1994""
+.BH "12 Oct. 1994""
+.SH NAME
+dtfile_copy - the CDE File Manager copy utility
+.SH SYNOPSIS
+dtfile_copy [options ...] source_folder target_folder
+.SH DESCRIPTION
+The CDE File Manager copy utility is used to
+recursively copy folders and their contents, including subfolders. The
+utilitiy's default action is to create a duplicate of the source_folder
+in the target_folder's location. Thus objects which exist in the target
+but not in the source are deleted, objects which exist in the source but
+not in the target are copied, and objects which exist in the target and
+in the source are replaced if they are different. The utility compares
+both timestamp and size of two objects to determine if they are
+identical.
+.P
+The copy utility is invoked by the File Manager whenever a user requests
+a folder be moved or copied. Its use is thus transparent to the user.
+However, it can also be explicitly invoked from a shell window. The
+utility has many options which can be used to modify its default
+behavior.
+.SH OPTIONS
+The following options are available from the command line:
+.SS -dontDoIt
+.sp .5
+Write a description of the actions that would be performed to a dialog window,
+but do not modify any objects.
+.SS -keepNew
+.sp .5
+If an object exists in the source and target folders, do not replace the
+target object if it is newer than the source object.
+.SS -keepOld
+.sp .5
+If an object exists in the source and target folders, rename the
+existing target object by appending .old to the name before copying the
+source.
+.SS -dontDelete
+.sp .5
+If an object exists in the target folder but not the source, do not
+delete the target object.
+.SS -dontAdd
+.sp .5
+If an object exists in the source folder but not the target, do not copy
+the source file.
+.SS -dontReplace
+.sp .5
+If an object exists in the source and target folders, do not replace the
+target object.
+.SS -dontRecur
+.sp .5
+Process only the files in the source folder, do not process any
+subfolders.
+.SS -keepLinks
+.sp .5
+If the target object is a symbolic link to the source object, retain the link
+instead of replacing the link by a copy of the source object.
+.SS -keepCopies
+.sp .5
+If a source object is a symbolic link and the target object is a
+a copy of the object that the source link points at (i.e., has same
+size and timestamp), retain the target object instead of replacing
+it by a symbolic link.
+.SS -forceCopies
+.sp .5
+If an object exists in the source and target folders, copy the source
+object even if the timestamps and sizes are equal.
+.SS -linkFolders
+.sp .5
+If a folder exists in the source but not the target, create a symbolic link in
+the target pointing to the source instead of copying the source folder.
+.SS -linkFiles
+.sp .5
+If a file exists in the source but not the target, create a symbolic link in the
+target pointing to the source instead of copying the source file.
+.SS -copyFolders
+.sp .5
+If the source is a symbolic link to a folder, make a copy of the folder
+that the source link points at, instead of just copying the link.
+.SS -copyFiles
+.sp .5
+If the source is a symbolic link to a file, makes a copy of the file
+that the source link points at, instead of just copying the link.
+.SS -copyTop
+.sp .5
+If the target folder does not exist, create one.
+.SS -move
+.sp .5
+Following a successful copy operation, remove the souce folder.
+.SS -confirmReplace
+.sp .5
+If an object exists in the source and target directories, display a
+dialog giving a choice of actions before proceeding.
+.SS -confirmErrors
+.sp .5
+If an error occurs processing an object, display a dialog describing the
+error before proceeding.
+.SS -popDown
+.sp .5
+Following a successful copy or move operation, automatically remove the
+dtfile_copy dialog after the interval specified by the delay option.
+.SS -delay
+.sp .5
+The time, in microseconds, that the dtfile_copy dialog is displayed after a
+successful copy operation is completed.
+.SS -slow
+.sp .5
+Pause for a preset time interval between each file operation.
+.SH EXAMPLES
+.sp .5
+.SS dtfile /u/aUser/FolderA /u/aUser/FolderA.backup
+The folder /u/aUser/FolderA.backup is made to be a duplicate of
+/u/aUser/FolderA. The name of each oject processed is written to a dialog window
+with an indication of the operation performed.
+.SH RESOURCES
+.sp .5
+.in 0
+.B "Name           Class             Type         Default"
+.sp .5
+.DS
+.in 0
+dontDoIt         DontDoIt         XmRBoolean       False
+.in 0
+keepNew          KeepNew          XmRBoolean       False
+.in 0
+keepOld          KeepOld          XmRBoolean       False
+.in 0
+dontDelete       DontDelete       XmRBoolean       False
+.in 0
+dontAdd          DontAdd          XmRBoolean       False
+.in 0
+dontReplace      DontReplace      XmRBoolean       False
+.in 0
+dontRecur        DontRecur        XmRBoolean       False
+.in 0
+keepLinks        KeepLinks        XmRBoolean       False
+.in 0
+keepCopies       KeepCopies       XmRBoolean       False
+.in 0
+forceCopies      ForceCopies      XmRBoolean       False
+.in 0
+linkFolders      LinkFolders      XmRBoolean       False
+.in 0
+linkFiles        LinkFiles        XmRBoolean       False
+.in 0
+copyFolders      CopyFolders      XmRBoolean       False
+.in 0
+copyFiles        CopyFiles        XmRBoolean       False
+.in 0
+copyTop          CopyTop          XmRBoolean       False
+.in 0
+move             move             XmRBoolean       False
+.in 0
+confirmReplace   ConfirmReplace   XmRBoolean       False
+.in 0
+confirmErrors    ConfirmErrors    XmRBoolean       False
+.in 0
+popDown          PopDown          XmRBoolean       False
+.in 0
+delay            Delay            XmRBoolean       False
+.in 0
+toggle           Toggle           XmRBoolean       True
+.in 0
+slow             Slow             XmRBoolean       False
+.DE
+.PP
+.sp .5
+.SS Dtfile*dontDoIt:
+.sp .5
+Write a description of the actions that would be performed to a dialog window,
+but do not modify any objects.
+.SS Dtfile*keepNew:
+.sp .5
+If an object exists in the source and target folders, do not replace the
+target object if it is newer than the source object.
+.SS Dtfile*keepOld:
+.sp .5
+If an object exists in the source and target folders, rename the
+existing target object by appending .old to the name before copying the
+source.
+.SS Dtfile*dontDelete:
+.sp .5
+If an object exists in the target folder but not the source, do not
+delete the target object.
+.SS Dtfile*dontAdd:
+.sp .5
+If an object exists in the source folder but not the target, do not copy
+the source file.
+.SS Dtfile*dontReplace:
+.sp .5
+If an object exists in the source and target folders, do not replace the
+target object.
+.SS Dtfile*dontRecur:
+.sp .5
+Process only the files in the source folder, do not process any
+subfolders.
+.SS Dtfile*keepLinks:
+.sp .5
+If the target object is a symbolic link to the source object, retain the link
+instead of replacing the link by a copy of the source object.
+.SS Dtfile*keepCopies:
+.sp .5
+If a source object is a symbolic link and the target object is a
+a copy of the object that the source link points at (i.e., has same
+size and timestamp), retain the target object instead of replacing
+it by a symbolic link.
+.SS Dtfile*forceCopies:
+.sp .5
+If an object exists in the source and target folders, copy the source
+object even if the timestamps and sizes are equal.
+.SS Dtfile*linkFolders:
+.sp .5
+If a folder exists in the source but not the target, create a symbolic link in
+the target pointing to the source instead of copying the source folder.
+.SS Dtfile*linkFiles:
+.sp .5
+If a file exists in the source but not the target, create a symbolic link in the
+target pointing to the source instead of copying the source file.
+.SS Dtfile*copyFolders:
+.sp .5
+If the source is a symbolic link to a folder, make a copy of the folder
+that the source link points at, instead of just copying the link.
+.SS Dtfile*copyFiles:
+.sp .5
+If the source is a symbolic link to a file, makes a copy of the file
+that the source link points at, instead of just copying the link.
+.SS Dtfile*copyTop:
+.sp .5
+If the target folder does not exist, create one.
+.SS Dtfile*move:
+.sp .5
+Following a successful copy operation, remove the souce folder.
+.SS Dtfile*confirmReplace:
+.sp .5
+If an object exists in the source and target directories, display a
+dialog giving a choice of actions before proceeding.
+.SS Dtfile*confirmErrors:
+.sp .5
+If an error occurs processing an object, display a dialog describing the
+error before proceeding.
+.SS Dtfile*popDown:
+.sp .5
+Following a successful copy or move operation, automatically remove the
+dtfile_copy dialog after the interval specified by the delay option.
+.SS Dtfile*delay:
+.sp .5
+The time, in microseconds, that the dtfile_copy dialog is displayed after a
+successful copy operation is completed.
+.SS Dtfile*slow:
+.sp .5
+Pause for a preset time interval between each file operation.

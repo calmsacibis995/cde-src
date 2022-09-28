@@ -1,0 +1,105 @@
+.TH Quit Desktop "05 Apr 1994" "SunSoft" "ToolTalk Policy"
+.SH NAME
+.PP
+Quit - terminate an operation or an entire tool
+.SH SYNOPSIS
+.so ../.synopsis
+	Quit(	in	boolean	\fIsilent\f(CW,	
+		in	boolean	\fIforce\f(CW	
+		[in	messageID	\fIoperation2Quit\f(CW] );
+.ft
+.fi
+.SH DESCRIPTION
+.PP
+Without the optional
+.I operation2Quit
+argument, this request asks the handling procid to quit.  If the
+request succeeds, one or more ToolTalk procids should call
+.BR tt_close (),
+and zero or more processes should exit.  "Zero or
+more", because a single process can instantiate multiple independent
+procids, and a single procid can conceivably be implemented by a set
+of cooperating processes.
+.PP
+With the optional
+.I operation2Quit
+argument, this request asks the handler to terminate the indicated
+request.  (Whether the terminated request must therefore be failed
+depends on its semantics.  Often, termination can be considered to
+mean that the requested operation has been carried out to the
+requester's satisfaction.)
+.PP
+This request should be failed (and the status code set
+appropriately) when the termination is not performed -- for
+example, because the
+.I silent
+argument was false and the user canceled the quit.
+.SH REQUIRED ARGUMENTS
+.TP
+\f(CWboolean\fR \fIsilent\fR
+If True, the handler is not allowed to
+block on user input before terminating itself (or the indicated operation).
+(If false, the handler is nevertheless not required to seek such input.)
+.TP
+\f(CWboolean\fR \fIforce\fR
+Boolean value indicating whether the handler should
+terminate itself (or the indicated operation) even if circumstances
+are such that the tool ordinarily would not perform the termination.
+.IP
+For example, a tool might have a policy of not quitting with
+unsaved changes unless the user has been asked whether the
+changes should be saved.  When
+.I force
+is true, such a tool should terminate even when doing so would lose
+changes that the user has not been asked by the tool about saving.
+.SH OPTIONAL ARGUMENTS
+.TP
+\f(CWmessageID\fR \fIoperation2Quit\fR
+The request that should be terminated.  For a request to be
+terminable, the handler shall have sent a
+.BR Status ()
+notice back to the requester (thus
+identifying itself to the requester).
+.SH ERRORS
+.TP
+\f(BITT_DESKTOP_ECANCELED\fR
+The user overrode the
+.BR Quit ()
+request.
+.TP
+\f(BITT_DESKTOP_ENOMSG\fR
+.I operation2Quit
+does not refer to any message currently known by the handler.
+.SH EXAMPLES
+.PP
+.BR ttdt_session_join ()
+and
+.BR ttdt_message_accept ()
+can be used to register for and help process this message.
+.PP
+These messages can be sent like so:
+.nf
+.ft CW
+.ps -2
+Tt_message msg = tttk_message_create( 0, TT_REQUEST, TT_SESSION,
+			the_recipient_procid, TTDT_QUIT,
+			my_callback );
+tt_message_iarg_add( msg, TT_IN, Tttk_boolean, 0 );
+tt_message_iarg_add( msg, TT_IN, Tttk_boolean, 0 );
+tt_message_send( msg );
+.ps
+.ft
+.fi
+.SH WARNINGS
+.PP
+.BR Quit ()
+.so .edict
+.SH BUGS
+.PP
+The
+.I silent
+should have its polarity reversed, to be like the
+.I inquisitive
+argument of several of the
+.B Media
+messages.

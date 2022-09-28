@@ -1,0 +1,55 @@
+# -------------------------------------------------------------------------
+# Construct shared-library export lists for IBM based on standardized CDE
+# export list description file
+#
+# Usage: elistgen.ibm libfoo.sl libfoo.elist > libfoo.lopt
+#
+#    $1  - the shared library 
+#    $2  - the export list for $1
+#
+#    libfoo.sl    => shared library of interest
+#    libfoo.elist => Meta description of necessary export list.
+#
+#    The output file, "libfoo.lopt" may then be passed to the linker to
+#    reconstruct the shared library, libfoo.sl.
+#
+# Date June 28, 94
+#
+# -------------------------------------------------------------------------
+
+Usage ()
+{
+  echo "`basename $PROG_NAME`: sharedlib elistfile"
+  echo "    sharedlib - share library to extract symbols for"
+  echo "    elistfile - export list to use containing symbols"
+  exit 1
+}
+
+PROG_NAME=$0
+
+if [ -z "$1" ]; then
+   Usage
+fi
+
+if [ -z "$2" ]; then
+   Usage
+fi
+
+echo "#" `date`
+echo "# This linker options list was produced by" $0
+echo "# Input Export-list description taken from" $2
+echo "# Target library:" $1
+echo "# Target Operating System: " `uname`
+echo "# "
+
+ELIST=$2
+
+awk '{ if ($1=="public") 
+           print $2 
+       else if ($1=="private")
+           print $2 
+       else if ($1=="publicC++")
+           print $2 $3 $4
+       else if ($1=="privateC++")
+           print $2 $3 $4
+}'  $ELIST

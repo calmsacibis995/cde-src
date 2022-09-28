@@ -1,0 +1,164 @@
+XCOMM
+XCOMM  Imakefile ($TOP/cdesrc/cde1/dtcm/libDtCmP)
+XCOMM
+XCOMM  @(#)Imakefile	1.17 02 Mar 1994 08:22:55 Copyr 1993 Sun Microsystems, Inc.
+XCOMM
+XCOMM  $Revision: 1.3 $
+XCOMM
+XCOMM  RESTRICTED CONFIDENTIAL INFORMATION:
+XCOMM
+XCOMM  The information in this document is subject to special
+XCOMM  restrictions in a confidential disclosure agreement between
+XCOMM  HP, IBM, Sun, USL, SCO and Univel.  Do not distribute this
+XCOMM  document outside HP, IBM, Sun, USL, SCO, or Univel without
+XCOMM  Sun's specific written approval.  This document and all copies
+XCOMM  and derivative works thereof must be returned or destroyed at
+XCOMM  Sun's request.
+XCOMM
+XCOMM  Copyright 1993 Sun Microsystems, Inc.  All rights reserved.
+XCOMM
+
+#ifdef SunArchitecture
+.KEEP_STATE:
+.PARALLEL:
+#undef DependDependency
+#define DependDependency /**/
+#undef DependTarget
+#define DependTarget() /**/
+#undef DependTarget3
+#define DependTarget3() /**/
+#undef LintTarget
+#define LintTarget() /**/
+#undef NormalLintTarget
+#define NormalLintTarget(x) /**/
+#undef LintLibraryTarget
+#define LintLibraryTarget(L,S) /**/
+#undef InstallLintLibrary
+#define InstallLintLibrary(L,S) /**/
+
+#endif
+
+#ifndef SharedLibDtCmP
+#define SharedLibDtCmP NO
+#define NormalLibDtCmP YES
+#endif
+ 
+#ifndef DoNormalLib
+#define DoNormalLib NormalLibDtCmP
+#endif
+#ifndef DoSharedLib
+#define DoSharedLib SharedLibDtCmP
+#endif
+ 
+#include <Library.tmpl>
+#ifdef SunArchitecture
+STD_DEFINES = -DSVR4 -D_XOPEN_VERSION=4 -D_XOPEN_SOURCE -D__EXTENSIONS__
+PROTO_DEFINES=
+#endif
+        LIBNAME = DtCmP
+         TARGET = lib$(LIBNAME)
+   INSTALLFLAGS = $(INSTINCFLAGS)
+
+       INCLUDES = -I. -I../libDtCm -I../libcsa
+        DEPLIBS = $(DEPDTCMLIB)
+LOCAL_LIBRARIES = 
+
+        DEFINES = -DRFC_MIME -DLINE_COUNT -DV2 -DOW_I18N -DSVR4 -DPTHREAD \
+			-DSunOS=$(OSMAJORVERSION)$(OSMINORVERSION)
+
+#ifdef RsArchitecture
+  EXTRA_DEFINES = -DBIG_ENDIAN -DAIX -DI_HAVE_NO_BOOL \
+                  -DSTRCASECMP_NOT_DEFINED -DRS6000
+#endif
+
+#ifdef HPArchitecture
+  EXTRA_DEFINES = -DBIG_ENDIAN -DHPUX -DS9000 -DI_HAVE_NO_IDENT \
+                  -DI_HAVE_NO_BOOL
+#endif
+
+#ifdef SunArchitecture
+
+#ifndef UseFNS
+#define UseFNS YES
+#endif
+
+#if UseFNS
+
+#if OSMINORVERSION >= 6
+	FNVERS = 2
+#else
+	FNVERS = 1
+#endif
+
+FNS_EXTRA_DEFINES = -DFNS -DFNS_VERS=$(FNVERS) -DFNS_LIBRARY=\"libxfn.so.$(FNVERS)\"
+
+#endif /* UseFNS */
+
+  EXTRA_DEFINES = $(FNS_EXTRA_DEFINES) -D_POSIX_C_SOURCE=199506L
+
+EXTRA_CCOPTIONS = -xstrconst -v -mt
+
+#endif /* SunArchitecture */
+
+           SRCS = \
+                  cm_tty.c  \
+		  cmfns.c \
+		  dtfns.c \
+                  getdate.c \
+		  i18nxlate.c \
+                  props.c  \
+                  resource.c  \
+                  timeops.c \
+                  util.c
+
+           OBJS = \
+                  cm_tty.o  \
+		  cmfns.o \
+		  dtfns.o \
+                  getdate.o \
+		  i18nxlate.o \
+                  props.o  \
+                  resource.o  \
+                  timeops.o \
+                  util.o
+
+        HEADERS = \
+                  cm_tty.h \
+		  cmfns.h \
+		  dtfns.h \
+                  getdate.h \
+                  props.h \
+                  resource.h \
+                  timeops.h \
+                  util.h
+
+LibraryObjectRule()
+ 
+#if DoSharedLib
+#if DoNormalLib
+SharedLibraryTarget($(LIBNAME),$(SODTCMREV),$(OBJS),shared,..)
+#else
+SharedLibraryTarget($(LIBNAME),$(SODTCMREV),$(OBJS),.,.)
+#endif
+InstallSharedLibrary($(LIBNAME),$(SODTCMREV),$(USRLIBDIR))
+#endif
+ 
+#if DoNormalLib
+NormalLibraryTarget($(LIBNAME),$(OBJS))
+InstallLibrary($(LIBNAME),$(USRLIBDIR))
+#endif
+
+LintLibraryTarget($(LIBNAME),$(SRCS))
+InstallLintLibrary($(LIBNAME),$(LINTLIBDIR))
+ 
+includes:: getdate.c
+
+#ifdef SunArchitecture
+depend:
+lint:
+#endif
+ 
+NormalLintTarget($(SRCS))
+
+clean::
+	$(RM) getdate.c

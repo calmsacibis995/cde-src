@@ -1,0 +1,294 @@
+:bil-version	1 0
+:module sdtformat_floppy
+(
+
+:element mainwindow
+(
+	:type			:base-window
+	:icon-file		"SDtRM.ffp.m"
+	:icon-label		"Format"
+	:label			"Format Floppy"
+	:resizable		:false
+	:visible		:true
+	:iconic			:false
+	:help-text		"Usage: sdtformat_floppy -d raw_device -m mount_point [-p popup]\nwhere popup = {format, unlabeled, or unformatted}\ndefault for popup is format\n"
+	:children		(
+		controlpane
+	)
+)
+:element controlpane
+(
+	:type			:container
+	:container-type		:relative
+	:x			0
+	:y			0
+	:width			437
+	:height			231
+	:visible		:true
+	:active			:true
+	:border-frame		:none
+	:north-attachment	(:point 0 0)
+	:south-attachment	(:obj mainwindow 0)
+	:east-attachment	(:obj mainwindow 0)
+	:west-attachment	(:point 0 0)
+	:children		(
+		label
+		textfield
+		optionmenu
+		separator
+		button
+		button2
+		button3
+		button4
+	)
+)
+:element label
+(
+	:type			:label
+	:x			48
+	:y			6
+	:label-type		:string
+	:label			"Are you sure you want to format this floppy?\n\nWarning: Formatting will destroy any information\non the floppy and is not undoable."
+	:label-alignment	:left
+	:active			:true
+	:visible		:true
+	:north-attachment	(:point 0 6)
+	:west-attachment	(:point 0 48)
+)
+:element textfield
+(
+	:type			:text-field
+	:text-type		:alphanumeric
+	:x			54
+	:y			148
+	:label-type		:string
+	:label			"Disk Name:"
+	:label-position		:west
+	:num-columns		29
+	:max-length		80
+	:read-only		:false
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj optionmenu 7)
+	:west-attachment	(:point 0 54)
+)
+:element optionmenu
+(
+	:type			:choice
+	:choice-type		:option-menu
+	:x			71
+	:y			107
+	:label-type		:string
+	:label			"Format:"
+	:label-position		:west
+	:num-columns		1
+	:orientation		:vertical
+	:selection-required	:false
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj label 15)
+	:west-attachment	(:point 0 71)
+	:children		(
+		optionmenu_UNIX_item
+		optionmenu_DOS_High_Density_item
+		optionmenu_NEC_DOS_Medium_Density_item
+	)
+)
+:element optionmenu_UNIX_item
+(
+	:type			:item
+	:item-type		:item-for-choice
+	:label-type		:string
+	:label			"UNIX"
+	:active			:true
+	:selected		:true
+)
+:element optionmenu_DOS_High_Density_item
+(
+	:type			:item
+	:item-type		:item-for-choice
+	:label-type		:string
+	:label			"DOS High Density"
+	:active			:true
+	:selected		:false
+)
+:element optionmenu_NEC_DOS_Medium_Density_item
+(
+	:type			:item
+	:item-type		:item-for-choice
+	:label-type		:string
+	:label			"NEC-DOS Medium Density"
+	:active			:true
+	:selected		:false
+)
+:element separator
+(
+	:type			:separator
+	:line-style		:etched-in
+	:orientation		:horizontal
+	:x			0
+	:y			199
+	:height			8
+	:visible		:true
+	:north-attachment	(:obj textfield 15)
+	:east-attachment	(:obj controlpane 0)
+	:west-attachment	(:obj controlpane 2)
+)
+:element button
+(
+	:type			:button
+	:button-type		:push-button
+	:x			15
+	:y			188
+	:label-type		:string
+	:label-alignment	:center
+	:label			"Format"
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj separator 15)
+	:west-attachment	(:point 0 50)
+)
+:element button2
+(
+	:type			:button
+	:button-type		:push-button
+	:x			91
+	:y			188
+	:label-type		:string
+	:label-alignment	:center
+	:label			"Cancel"
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj separator 15)
+	:west-attachment	(:obj button 15)
+)
+:element button3
+(
+	:type			:button
+	:button-type		:push-button
+	:x			287
+	:y			188
+	:label-type		:string
+	:label-alignment	:center
+	:label			"Help"
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj separator 15)
+	:west-attachment	(:obj button4 15)
+)
+:element button4
+(
+	:type			:button
+	:button-type		:push-button
+	:x			162
+	:y			188
+	:label-type		:string
+	:label-alignment	:center
+	:label			"Cancel & Eject"
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj separator 15)
+	:west-attachment	(:obj button2 15)
+)
+:connection
+(
+	:from			button2
+	:when			:activate
+	:action-type		:execute-code
+	:action			"\n\nexit(0);\n\n"
+)
+:connection
+(
+	:from			textfield
+	:when			:text-changed
+	:action-type		:execute-code
+	:action			"\n\nvol_label = XmTextGetString(widget);\n\n"
+)
+:connection
+(
+	:from			button
+	:to			textfield
+	:when			:activate
+	:action-type		:builtin
+	:action			:disable
+	:arg-type		:void
+)
+:connection
+(
+	:from			button
+	:to			optionmenu
+	:when			:activate
+	:action-type		:builtin
+	:action			:disable
+	:arg-type		:void
+)
+:connection
+(
+	:from			button
+	:to			button3
+	:when			:activate
+	:action-type		:builtin
+	:action			:disable
+	:arg-type		:void
+)
+:connection
+(
+	:from			button
+	:to			button2
+	:when			:activate
+	:action-type		:builtin
+	:action			:disable
+	:arg-type		:void
+)
+:connection
+(
+	:from			button
+	:to			button
+	:when			:activate
+	:action-type		:builtin
+	:action			:disable
+	:arg-type		:void
+)
+:connection
+(
+	:from			button
+	:when			:activate
+	:action-type		:execute-code
+	:action			"\n\nx = x + 1;\n\n"
+)
+:connection
+(
+	:from			optionmenu_UNIX_item
+	:when			:activate
+	:action-type		:execute-code
+	:action			"\n\nbutton_pushed = 0;\n\n"
+)
+:connection
+(
+	:from			optionmenu_DOS_High_Density_item
+	:when			:activate
+	:action-type		:execute-code
+	:action			"\n\nbutton_pushed = 1;\n\n"
+)
+:connection
+(
+	:from			optionmenu_NEC_DOS_Medium_Density_item
+	:when			:activate
+	:action-type		:execute-code
+	:action			"\n\nbutton_pushed = 2;\n\n"
+)
+:connection
+(
+	:from			mainwindow
+	:when			:after-create
+	:action-type		:execute-code
+	:action			"\n\nbutton_pushed = 0;\nvol_label=\"\";\n\n"
+)
+:connection
+(
+	:from			button4
+	:when			:activate
+	:action-type		:call-function
+	:action			CancelAndEject
+)
+)

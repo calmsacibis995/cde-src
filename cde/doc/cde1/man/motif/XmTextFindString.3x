@@ -1,0 +1,80 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Novell, Inc
+...\" **
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH XmTextFindString 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmTextFindString\fP \- A Text function that finds the beginning position of a text string
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/Xm.h>
+.sp \n(PDu
+Boolean XmTextFindString (\fBwidget, start, string, direction, position\fI)
+.ta .5i 1.75i
+.nf
+	Widget		\fBwidget\fI;
+	XmTextPosition	\fBstart\fI;
+	char		*\fBstring\fI;
+	XmTextDirection	\fBdirection\fI;
+	XmTextPosition	*\fBposition\fI;
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+\fIXmTextFindString\fP locates the beginning position of a specified 
+text string.  This routine searches forward or backward for the first
+occurrence of the string starting from the given start position. 
+.ig ++ \" apparently the code doesn't do this
+If a match is not found, the search wraps to the beginning of the buffer
+(to the end, when \fBdirection\fP is \fIXmTEXT_BACKWARD\fP) and continues
+to the initial start position.
+.++
+If it finds a match, the function
+returns the position of the first character of the string in \fBposition\fP.
+.IP "\fBwidget\fP"
+Specifies the Text widget ID.
+.IP "\fBstart\fP"
+Specifies the character position from which the search proceeds.  This
+is an integer number of characters from the beginning of the text
+buffer.  The first character position is 0.
+.IP "\fBstring\fP"
+Specifies the search string.
+.IP "\fBdirection\fP"
+Indicates the search direction.  It is relative to the primary
+direction of the text.  The possible values are
+.IP "\fIXmTEXT_FORWARD\fP"
+The search proceeds toward the end of the text buffer.
+.IP "\fIXmTEXT_BACKWARD\fP"
+The search proceeds toward the beginning of the text buffer.
+.LI "\fBposition\fP"
+Specifies the pointer in which the first character position
+of the string match is returned.  This is an integer number
+of characters from the beginning of the buffer.  The first
+character position is 0.  If the function returns False, 
+this value is undefined.
+.LE
+.PP
+For a complete definition of Text and its associated resources,
+see \fIXmText(3X)\fP.
+.SH RETURN VALUE
+Returns True if a string match is found; otherwise, returns False.
+.SH RELATED INFORMATION
+.na
+\fIXmText(3X)\fP and \fIXmTextFindStringWcs(3X)\fP.
+.ad

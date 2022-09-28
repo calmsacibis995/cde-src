@@ -1,0 +1,81 @@
+XCOMM	@(#)DPS.tmpl	1.2 96/03/19 
+
+/*
+ * DPS Support Template & Rules
+ *
+ * DpsFromPsWrapTarget(pswrap) - generates rules to create/compile
+ *	pswrap_dps.{o,c,h} targets from pswrap.psw file.
+ *
+ * Copyright (c) 1996 Sun Microsystems, Inc.
+ */
+
+/*
+ * DPS Variables
+ */
+
+#ifndef OpenWinHome
+#define OpenWinHome /usr/openwin
+#endif
+#ifndef DpsWrapCmd
+#define DpsWrapCmd $(OPENWINHOME)/bin/pswrap
+#endif
+#ifndef DpsWrapOptions
+#define DpsWrapOptions -a
+#endif
+#ifndef DpsPreProcessCmd
+#define DpsPreProcessCmd CcCmd -E -C -Xs
+#endif
+#ifndef DpsLooseAnsi
+#define DpsLooseAnsi -Xa
+#endif
+#ifndef DpsIncludes
+#define DpsIncludes -I$(OPENWINHOME)/include/X11
+#endif
+#ifndef DpsCCFlags
+#define DpsCCFlags DpsLooseAnsi DpsIncludes
+#endif
+
+OPENWINHOME	= OpenWinHome
+DPSWRAP		= DpsWrapCmd
+DPSWRAPOPTIONS	= DpsWrapOptions
+DPSPREPROCESS	= DpsPreProcessCmd
+DPSCCFLAGS	= DpsCCFlags
+
+/*
+ * DpsFromPsWrap - generate DPS C source from a pswrap file
+ *	file.psw used to generate file_dps.c and file_dps.h source
+ */
+#ifndef DpsFromPsWrap
+#define DpsFromPsWrap(psw,dpsh,dpsc)	$(RM) psw.E			@@\
+	$(DPSPREPROCESS) psw > psw.E					@@\
+	$(DPSWRAP) $(DPSWRAPOPTIONS) psw.E -h dpsh -o dpsc		@@\
+	$(RM) psw.E
+#endif
+
+/*
+ * DpsObjectCompile - compiles DPS C source file into object
+ *	Force a loose Ansi/C compile since pswrap generates poor Ansi/C code
+ */
+#ifndef DpsObjectCompile
+#define DpsObjectCompile()	$(RM) $@				@@\
+	$(CC) -c $(DPSCCFLAGS) $*.c
+#endif
+
+/*
+ * DpsFromPsWrapTarget - generate rules for DPS from pswrap (.psw) files
+ *	'pswfile' argument is the basename of the pswrap file.
+ *	Creates rules for DPS C source and header and compiled object
+ */
+#ifndef DpsFromPsWrapTarget
+#define DpsFromPsWrapTarget(pswfile)					@@\
+									@@\
+Concat(pswfile,_dps.c) Concat(pswfile,_dps.h): Concat(pswfile,.psw)	@@\
+	DpsFromPsWrap(Concat(pswfile,.psw),Concat(pswfile,_dps.h),Concat(pswfile,_dps.c)) @@\
+									@@\
+Concat(pswfile,_dps.o): Concat(pswfile,_dps.c)				@@\
+	DpsObjectCompile()						@@\
+									@@\
+clean::									@@\
+	$(RM) Concat(pswfile,_dps.h) Concat(pswfile,_dps.c)		@@\
+
+#endif

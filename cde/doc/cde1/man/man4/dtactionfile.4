@@ -1,0 +1,1126 @@
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994 Novell, Inc.
+.\" *************************************************************************
+.TH dtactionfile 4
+.SH NAME
+dtactionfile \- format and location of desktop action definition files
+.SH SYNOPSIS
+.nf
+.in +5n
+set \fBDtDbVersion\fP=\fIversion_number\fP
+set \fIVariableName\fP=\fIvariable_value\fP
+
+\fBACTION\fP  \fIaction_name\fP
+{
+.in +5n
+# Comment
+\fIFieldName\fP \fIfield_value\fP
+\fIFieldName\fP \fIfield_value\fP
+        \.
+        \.
+        \.
+.in -5n
+}
+.in -5n
+.fi
+.SH DESCRIPTION
+.PP
+The \fIAction Database\fP provides definitions for the actions recognized by 
+clients participating in the Common Desktop Environment (CDE).  The database
+information may be spread over a number of different files, in a number of
+different directories, on a number of different machines. 
+.PP
+The environment variable \fBDTDATABASESEARCHPATH\fP contains a comma-separated
+list of locations in [host:]/path format, where \fIhost:\fP describes the
+machine relative to which \fI/path\fP is to be interpreted.  This list of
+locations will be searched for files ending in the suffix: \fI.dt\fP. All
+such files will be searched for action definitions, which will be added to
+the \fIAction Database\fP.
+.PP
+The \fIAction Database\fP allows applications to be encapsulated into the
+desktop via either a command line or messaging interface to the application.
+Once an application has been encapsulated by defining one or more actions for
+it, the application can be invoked from the desktop in many different ways:
+.TP
+\(bu
+An icon for the application can be placed in the Application Manager or
+any other folder.
+.TP
+\(bu
+The application can be associated with a class of data files so that
+opening one of the data files invokes the application.
+.TP
+\(bu
+An icon for the application can be placed in the front panel or one of its
+subpanels.
+.TP
+\(bu
+The application can be invoked from other CDE applications such as the mailer.
+.PP
+Actions are polymorphic, that is a single action may behave differently
+depending on the number and kind of arguments that are supplied when it
+is invoked.  For example, the "Open" action may invoke vi(1) if a text file
+name is supplied as an argument, but invoke dticon(1) if a bitmap file is
+supplied. 
+.SH FILE FORMAT
+Each action definition consists of the word, \fBACTION\fP, followed
+by the action name and a list of \fIField/Value\fP pairs, one pair per line.
+This entire list must be enclosed in brackets; the enclosing brackets must
+appear on lines by themselves.
+.SS "Database Version"
+Over time, it is possible that the syntax understood by the
+database loader may change or evolve.  To allow older
+configuration files to continue to be loaded, the database loader supports
+the concept of a version number; the version number indicates
+the version of the database syntax used by a particular database file.
+If a database version number is not specified, then the database
+loader will assume that the file uses the 1.0 syntax, described here.
+If a database file specifies a version number, then it
+must be the first non-blank, non-comment line in the database file;
+if the version is specified anywhere else in the file, then an error
+message is generated, and the remainder of that database file will be
+ignored. The database version number is specified using the following syntax:
+.nf
+.in +5n
+set \fBDtDbVersion\fP=\fIversion_number\fP
+.in -5n
+.fi
+where \fIversion_number\fP consists of a major revision number followed
+by a period followed by a minor revision number.  The \fIversion_number\fP
+for database syntax used in the initial release is: \fB1.0\fP.
+.SS "Comments"
+Any line whose first non-space character is '\fB#\fP' will be treated as a
+comment and will be ignored during the reading of the action database.  
+.SS "String Variables"
+Database entries can reference string variables which may be set
+within the database file. The scope of a string variable is restricted
+to only those record definitions within the database file defining the
+string variable. A string variable is defined using the following syntax:
+.nf
+.in +5n
+set \fIVariableName\fP=\fIvariable_value\fP
+.in -5n
+.fi
+String variables are referenced using either of the standard shell
+variable referenceing syntaxes: $\fIvariable_name\fP or ${\fIvariable_name\fP}.
+A variable name may be made up of any of the alphanumeric characters, and the
+underscore.
+.SS "Environment Variables"
+Database records may refer to environment variables, using either
+of the standard shell variable referencing syntaxes: $\fIenvironment_variable\fP
+or ${\fIenvironment_variable\fP}.  If the environment variable name conflicts
+with a string variable name, the string variable will take precedence.
+.SS "Line Continuation"
+Any field within a record may be continued onto another line, simply by
+ending the line with a '\\' character. The <Newline> character
+must immediately follow the line continuation character.
+.SS "Keywords"
+The value string for certain action fields may reference special
+keywords  enclosed within per-cent character(%) delimiters. References to
+such keywords are evaluated at action invocation time. Check individual
+action field descriptions to see if the use of keywords  is allowed in its
+definition. The following is a list of the recognized keywords:
+.HP
+%DatabaseHost% \(em The name of the host through which the action definition
+was located.
+.HP
+%DisplayHost% \(em The name of the host where the X server displaying 
+CDE is running. N.B. If CDE is displaying to an X terminal, %DisplayHost%
+will fail as an execution host.
+.HP
+%LocalHost%  \(em  The name of the host where the application which is
+invoking the action is executing.
+.HP
+%SessionHost% \(em  The name of the host where the controlling login manager
+(dtlogin) is running.
+.SS "Arguments"
+Actions accept arguments which are typically file names. Certain action fields
+allow references to arguments using the keyword syntax. Normally strings received as values for argument keywords are interpreted as file names.  If the
+value is a relative path name for a file a fully expanded path name will be
+generated in its place.  This behavior may be supressed using the 
+"(fIString\fP)" qualifier. The special keywords hat refer to arguments are:
+.HP
+%Arg_\fIn\fP% \(em This keyword references the \fIn\fPth argument of the
+action (starting with 1).  For example, %Arg_1% refers to the first argument.
+.HP
+%Args% \(em This keyword references all of the remaining arguments of the
+action. If any arguments have already been referenced (within an action 
+field definition) using %Arg_\fIn\fP%, they will not be referenced a second
+time by %Args%.
+.SS "Prompts"
+They keyword syntax may also be used to prompt the user for information
+at action invocation time. A prompt is simply a quoted string embedded in
+'%' delimiters. The string enclosed in quotes is presented to the user as
+the label for a text field in a dialog box.  The user may be conditionally
+prompted for the value of an argument(s) if the argument(s) was not supplied;
+or the user may by prompted for an arbitrary string value unrelated to any
+argument.  If the prompted value is not associated with an action argument,
+then file path expansion will be surpressed for the string.  This allows
+simple string parameters to be supplied to the action at invocation time.
+This behavior may be altered by using the "(\fIFile\fP)" qualifier.
+.HP
+%"\fIprompt string\fP"% \(em This keyword is used to prompt the user for a
+string value when the action is invoked. The value entered by the user into
+the text field is substituted for the keyword.
+.HP
+%Arg_n"prompt string"% \(em This keyword references the \fIn\fPth argument
+of the action (starting with 1). However if fewer than \fIn\fP arguments are
+supplied to the action, the user will be prompted for a value.
+.SS "Qualifiers"
+Argument keywords and prompt keywords may  be further modified by the
+(\fIString\fP) and (\fIFile\fP) qualifiers. These qualifiers must appear
+immediately after the initial '%' of the keyword.  If an 
+argument or prompt is qualified with the (\fIString\fP) qualifier then it
+will be passed on to the action exactly as entered by the user.  If an 
+argument or prompt is qualified with the (\fIFile\fP) qualifier, then it
+will be converted to a full path name (if necessary) before being passed 
+on to the action invocation.
+.HP
+%(File)"Enter File Name: "% \(em  This keyword will be replaced by
+a full file path specification generated from the string entered by the user
+in response to the prompt dialog.
+.HP
+%(String)Arg_1% \(em This argument will not be expanded into a full file path
+specification by the action database reader.  Note that if an argument is
+provided by means of dragging an object icon over an action and dropping it;
+file path expansion may already have been performed for the object.
+.HP
+%(String)Arg_2"Enter Arg2: "% \(em  If argument #2 is not provided the user
+will be prompted for it.  The value entered by the user in the resulting
+dialog box will be used exactly as entered by the user; that is without
+attempting to generate a full file path specification from it.
+.PP
+The following is an example of a typical  action definition:
+.sp
+.nf
+.in +5n
+ACTION PrintText
+{
+.in +5n
+TYPE        COMMAND
+ICON        printer
+ARG_TYPE    Text
+WINDOW_TYPE TERMINAL
+EXEC_STRING sh -c 'pr %Arg_1% | lp'  
+DESCRIPTION Paginate and print a text file to the default printer.
+.in -5n
+}
+.in -5n
+.if
+.sp
+Here the value of the \fBTYPE\fP field is \fICOMMAND\fP; indicating that
+this record defines a command action.  The value of the \fBEXEC_STRING\fP
+field is:
+.nf
+.in +5n
+sh -c 'pr %Arg_1% | lp'
+.in -5n
+.if
+and the value of the \fBDESCRIPTION\fP field is:
+.nf
+.in +5n
+Paginate and print a text file to the default printer.
+.in -5n
+.fi
+.SH "KINDS OF ACTION FIELDS"
+.PP
+The recognized Action fields can be divided into three groups:
+.SS "Presentation Attributes"
+Presentation attributes define how the action is to be presented to
+the user. For example an icon that represents the action is defined
+by the \fBICON\fP attribute and a text string that describes the
+action is defined by the \fBDESCRIPTION\fP attribute. These attributes
+are not used directly by the action invocation code, instead they are
+accessed by applications such as the File Manager that provide a
+user interface to actions.
+.PP
+The recognized action presentation attributes (field names) are:
+.TP
+\(bu
+LABEL
+.TP
+\(bu
+ICON
+.TP
+\(bu
+DESCRIPTION
+.SS "Signature Attributes"
+Signature attributes specify the number and types of arguments that
+are accepted by the action. For example, the \fBARG_TYPE\fP field
+specifies the data types accepted by the action and the \fBARG_COUNT\fP
+field specifies the number of arguments accepted by the action.
+.PP
+These action signature attributes are used by the action invocation
+library to choose the appropriate action definition when an action is invoked.
+.PP
+The recognized action signature attributes (field names) are:
+.TP
+\(bu
+ARG_CLASS
+.TP
+\(bu
+ARG_TYPE
+.TP
+\(bu
+ARG_COUNT
+.PP
+.SS "Invocation Attributes"
+Invocation attributes specify what is to happen when the action is
+invoked. For example the \fBEXEC_STRING\fP attribute specifies an
+execution string to invoke and the \fBTT_OPERATION\fP attribute spec-
+ifies a value to place in the operation field of a ToolTalk message.
+These attributes are used by the action invocation library to carry
+out the invocation of an action.  The set of valid invocation attributes
+for a given action depends on the \fITYPE\fP of the action. The following
+is a complete list of invocation attributes:
+.RS 5n
+.nf
+TYPE
+MAP_ACTION
+EXEC_STRING
+EXEC_HOST
+CWD
+WINDOW_TYPE
+TERM_OPTS
+TT_CLASS
+TT_SCOPE
+TT_OPERATION
+TT_FILE
+TT_ARG\fIn\fP_MODE
+TT_ARG\fIn\fP_VTYPE
+TT_ARG\fIn\fP_REP_TYPE
+TT_ARG_\fIn\FP_VALUE
+.fi
+.RE
+.SH "ACTION SELECTION"
+Actions are selected based on the action name and the match between the
+input arguments and the value of the action's signature attributes.
+Actions with more specific values in their signature attributes take
+precedence over actions with more general values.  For a given signature
+attribute, a single item is more specific than multiple items, which in
+turn is more specific than a wildcard, "\fI*\fP".  For \fBARG_COUNT\fP, an exact
+numerical value, \fIn\fP,  is more specific than a less-than range, \fI<n\fP,
+which is more specific than a greater-than range, \fI>n\fP, which is
+more specific than the wildcard,"\fI*\fP".
+Signature attributes are given
+the following relative weight:  ARG_CLASS > ARG_TYPE > ARG_COUNT.
+.PP
+If two action definitions have equal specificity in their signature
+attributes then the action definition appearing first in the database
+load order takes precedence.  The loading order for action definitions
+is: directories are searched in the order specified on the search path
+(\fBDTDATABASESEARCHPATH\fP) and database files (i.e. files with a '*.dt' suffix)
+within a directory are loaded in collation order of filename.
+.PP
+Consider the following (partial) action definitions for a number of
+actions named "SAMPLE".  They are listed in the precedence order determined
+by the weight and specificity of their signature attributes.
+.sp
+.RS
+.nf
+ACTION SAMPLE
+{
+	DESCRIPTION	This is Sample #1
+	ARG_CLASS	BUFFER
+	ARG_TYPE	GIF,XBM
+	# Here ARG_COUNT defaults to "*"
+	.
+	.
+	.
+}
+ACTION SAMPLE
+{
+	DESCRIPTION	This is Sample #2
+	ARG_CLASS	FILE,BUFFER
+	ARG_TYPE	GIF
+	ARG_COUNT	1
+	.
+	.
+	.
+}
+ACTION SAMPLE
+{
+	DESCRIPTION	This is Sample #3
+	ARG_CLASS	BUFFER,FILE
+	ARG_TYPE	GIF
+	ARG_COUNT	<3
+	.
+	.
+	.
+}
+ACTION SAMPLE
+{
+	DESCRIPTION	This is Sample #4
+	# Here the ARG_CLASS defaults to '*'
+	ARG_TYPE	GIF
+	ARG_COUNT	>1
+	.
+	.
+	.
+}
+.fi
+.RE
+.sp
+.PP
+If we drop 2 gif files on the icon representing "SAMPLE", then we must select 
+an action which can accept 2 arguments of \fBARG_CLASS\fP: \fIFILE\fP
+and \fBARG_TYPE\fP: \fIGIF\fP from among the defined actions named "SAMPLE".
+.PP
+Sample #1 is rejected because it is only suitable for arguments of \fBARG_CLASS\fP:
+\fIBUFFER\fP.  Sample #2 is rejected because it is only suitable for invocations
+with exactly one argument. Sample #3 is selected because it is the first action
+which meets all the criteria, it takes precedence over Sample #4 because the
+ARG_CLASS Specification "\fIBUFFER,FILE\fP" of sample #3 is considered more specific
+than the default, "\fI*\fP".  Had Sample #3 and Sample #4 had the same \fBARG_CLASS\fP
+specification, Sample #3 would still have been chosen because the ARG_COUNT value, "\fI<3\fP",
+is considered more specific than the value, "\fI>1\fP".
+.SH "ACTION TYPES"
+.PP
+Actions can have one of three different kinds of behavior.  They can invoke
+commands, send messages or map to other actions. The \fITYPE\fP field
+determines the behavior of an action.  If an action definition does not
+specify a \fITYPE\fP then the default type, \fICOMMAND\fP, is assumed.
+.RS 1
+.SS "\fBMap Actions\fP"
+A map action is an action that simply refers to another action
+instead of defining any specific behavior.  For example, if the Open
+action for text files is defined to map to the Vi action, then invoking
+Open on a text file in turn causes Vi to be invoked on a text file.
+More than one map action may be chained together but the chain must eventually
+terminate in a non-map action.
+.PP
+The following fields are allowed for Map Actions:
+.TS
+c s s s
+l l l l
+l l l l
+l c c l.
+Presentation Fields
+Field Name	Required	Expands Keywords	Default
+----------	--------	----------------	-------
+\fBLABEL\fP	optional	no	\fIactionName\fP
+\fBICON\fP	optional	no	\fIdefault action icon\fP
+\fBDESCRIPTION\fP	optional	no	<none>
+.TE
+.sp
+.TS
+c s s s
+l l l l
+l l l l
+l c c l.
+Signature Fields
+Field Name	Required	Expands Keywords	Default
+----------	--------	----------------	-------
+\fBARG_CLASS\fP	optional	no	\fB*\fP
+\fBARG_TYPE\fP	optional	no	\fB*\fP
+\fBARG_COUNT\fP	optional	no	\fB*\fP
+.TE
+.sp
+.TS
+c s s s
+l l l l
+l l l l
+l c c l.
+Invocation Fields
+Field Name	Required	Expands Keywords	Default
+----------	--------	----------------	-------
+\fBTYPE\fP	required	no	MAP
+\fBMAP_ACTION\fP	required	no	<none>
+.TE
+.SS "Command Actions"
+Command actions specify a command line to execute which
+invokes the appropriate application. A very important capability of
+command actions is that they are `network aware' \(em in addition to
+specifying a command to execute, the action can specify the
+machine on the network where execution should occur.
+.PP
+The following fields are allowed for Command Actions:
+.TS
+c s s s
+l l l l
+l l l l
+l c c l.
+Presentation Fields
+Field Name	Required	Expands Keywords	Default
+----------	--------	----------------	-------
+\fBLABEL\fP	optional	no	\fIactionName\fP
+\fBICON\fP	optional	no	\fIdefault action icon\fP
+\fBDESCRIPTION\fP	optional	no	<none>
+.TE
+.sp
+.TS
+c s s s
+l l l l
+l l l l
+l c c l.
+Signature Fields
+Field Name	Required	Expands Keywords	Default
+----------	--------	----------------	-------
+\fBARG_CLASS\fP	optional	no	\fB*\fP
+\fBARG_TYPE\fP	optional	no	\fB*\fP
+\fBARG_COUNT\fP	optional	no	\fB*\fP
+.TE
+.sp
+.TS
+c s s s
+l l l l
+l l l l
+l c c l.
+Invocation Fields
+Field Name	Required	Expands Keywords	Default
+----------	--------	----------------	-------
+\fBTYPE\fP	optional	no	COMMAND
+\fBEXEC_STRING\fP	required	yes	<none>
+\fBEXEC_HOST\fP	optional	yes	%DatabaseHost%,%LocalHost%
+\fBCWD\fP	optional	no	application's working directory
+\fBWINDOW_TYPE\fP	optional	no	PERM_TERMINAL
+\fBTERM_OPTS\fP	optional	yes	"-title \fIactionName\fP"
+.TE
+.SS "Message Actions"
+Message actions are used to encapsulate ToolTalk applications.
+ToolTalk actions specify a ToolTalk messages which will
+be received by the appropriate applications.
+.PP
+The following fields are allowed for Message Actions:
+.TS
+c s s s
+l l l l
+l l l l
+l c c l.
+Presentation Fields
+Field Name	Required	Expands Keywords	Default
+----------	--------	----------------	-------
+\fBLABEL\fP	optional	no	\fIactionName\fP
+\fBICON\fP	optional	no	\fIdefault action icon\fP
+\fBDESCRIPTION\fP	optional	no	<none>
+.TE
+.sp
+.TS
+c s s s
+l l l l
+l l l l
+l c c l.
+Signature Fields
+Field Name	Required	Expands Keywords	Default
+----------	--------	----------------	-------
+\fBARG_CLASS\fP	optional	no	\fB*\fP
+\fBARG_TYPE\fP	optional	no	\fB*\fP
+\fBARG_COUNT\fP	optional	no	\fB*\fP
+.TE
+.sp
+.TS
+c s s s
+l l l l
+l l l l
+l c c l.
+Invocation Fields
+Field Name	Required	Expands Keywords	Default
+----------	--------	----------------	-------
+\fBTYPE\fP	required	no	TT_MSG
+\fBTT_CLASS\fP	required	no	<none>
+\fBTT_SCOPE\fP	required	no	<none>
+\fBTT_OPERATION\fP	required	yes	<none>
+\fBTT_FILE\fP	optional	yes	NULL
+\fBTT_ARGn_MODE\fP	required*	no	<none>
+\fBTT_ARGn_VTYPE\fP	required*	yes	<none>
+\fBTT_ARGn_REP_TYPE\fP	optional	no	\fBTT_REP_UNDEFINED\fP
+\fBTT_ARGn_VALUE\fP	optional	yes	NULL** 
+.TE
+.sp
+.nf
+*  \- if \fIarg_n\fP exists.
+** \- if TT_ARGn_MODE exists for \fIarg_n\fP
+.fi
+.RE
+.SH ACTION FIELD SPECIFICATIONS
+The following is an alphabetical list of the action fields along with a
+detailed description of each field.
+
+.SS "ARG_CLASS"
+This field defines a signature attribute, that is the value of this field is one of the items
+used to look up an action. This field is valid for all actions. Keywords are not expanded
+for the \fBARG_CLASS\fP field.
+.PP
+This attribute specifies the class of arguments for which the
+action is valid. If an action is invoked with more than one argument, only the class of
+the first argument is checked against the ARG_CLASS attribute. The legal values for this
+attribute are:
+.HP
+\fBBUFFER\fP \(em The action is defined for arguments that are arbitrary blocks of data held
+in memory.
+.HP
+\fBFILE\fP \(em The action is defined for file name arguments.
+.HP
+\fB*\fP \(em The action is defined for all classes of arguments.
+.PP
+The value of the \fBARG_CLASS\fP attribute can also be a comma-separated
+list of the above values which indicates that the action is defined for
+any one of the specified classes.
+.PP
+This field is optional. If it is not specified the default value of \fI*\fP is used for the \fBARG_CLASS\fP attribute.
+.SS "ARG_COUNT"
+This field defines a signature attribute, that is the value of this field is one of the items 
+used to look up an action.  This field is valid for all actions. Keywords are not expanded
+for the \fBARG_COUNT\fP field.
+.PP
+This attribute specifies the number of arguments for which
+the action is valid.  The legal values for this attribute are \fIN\fP (any non-negative
+integer), <\fIN\fP (less than \fIN\fP), >\fIN\fP (greater than \fIN\fP),
+or "\fI*\fP".
+.PP
+This field is optional.  If it is not specified the default value of \fI*\fP is used for
+the \fBARG_COUNT\fP attribute.
+.SS "ARG_TYPE"
+This field defines a signature attribute, that is the value of this field is one of the
+items used to look up an action.  This field is valid for all actions.  Keywords are
+not expanded for the \fBARG_TYPE\fP field.
+.PP
+This attribute specifies the data type of arguments,
+as determined by the CDE data typing library, for which the action is valid. If the
+action is invoked with more than one argument, only the data type of the first argument
+is checked against the \fBARG_TYPE\fP attribute.
+.PP
+The legal values for this attribute are "\fI*\fP" (all data types are valid)
+or any of the data types defined in the data attributes table. In addition, a
+comma-separated list of data types can be used to indicate that any of the
+specified types is valid.
+.PP
+This is field is optional.
+If it is not specified the default value of "\fB*\fP" is used for the \fBARG_TYPE\fP
+attribute.
+.SS "CWD"
+This field defines an invocation attribute, that is its value directly effects the invocation
+of the associated action.  This field is only valid for \fICOMMAND\fP type actions.
+Keywords are not expanded for the \fBCWD\fP field.
+.PP
+This attribute specifies the current-working-directory that is used when the
+execution string is invoked.  Legal values for this attribute include any
+directory specified in [host:]/path/dir format.
+.PP
+If this attribute is defined; the specified directory will always be used as
+the current-working-directory of the command.
+If the attribute is not set the application that invokes the action may
+specify a current-working-directory.  If no directory is specified by either
+the \fBCWD\fP attribute or the invoking application, the location of the first
+argument of the action is used. If that argument is a directory, the directory
+becomes the current-working-directory. If that argument is a file the directory
+containing it is used. As a last resort, if none of the above conditions are
+met (i.e. neither the action definition nor the invoking application
+specifies the current-working-directory and the action is invoked without any
+arguments) the current-working-directory of the application that invoked the
+action is used.
+.PP
+This attribute is optional.
+.SS "DESCRIPTION"
+This field defines a presentation attribute, that is it effects the appearance
+of the action representation.  This field is valid for all actions.  Keywords
+are not expanded for the \fBDESCRIPTION\fP field.
+.PP
+This attribute provides a textual description of the action that is suitable
+for presentation to a user who requests information about the action. The 
+\fBDESCRIPTION\fP attribute contains no formatting information such as
+newlines; the tool presenting the information (which is typically the CDE
+help system) is expected to perform all formatting.
+.PP
+This field is optional. There is no default value for this attribute.
+.SS "EXEC_HOST"
+This field defines an invocation attribute, that is it directly effects
+the invocation of the action.  This field is only valid for \fICOMMAND\fP
+actions.  Keywords are expanded for this field.
+.PP
+This attribute specifies the host on which the execution string should be
+invoked. Legal values for this attribute include fixed hostnames (e.g. system1)
+and any of the hostname keywords (See \fIKeywords\fP). If a comma-separated
+list of hostnames is provided, execution will be attempted on each of the hosts
+in the order specified until execution succeeds.  There may not be any
+blank characters between the host names and the commas in the host list.
+.PP
+The default value for this  attribute is: %DatabaseHost%,%LocalHost%.  This
+default may be modified using the \fI*ExecutionHosts\fP resource.
+.SS "EXEC_STRING"
+This field defines an invocation attribute, that is it directly effects
+action invocation.  This field is only valid for \fICOMMAND\fP type actions.
+Keywords will be expanded in the \fBEXEC_STRING\fP field.
+.PP
+This attribute specifies an execution string to be invoked. The execution
+string is parsed using the same quoting rules as defined by sh(1) or ksh(1),
+however the execution string is not automatically passed to any shell.
+Therefore if the execution string requires any shell support such as
+stdin/stdout redirection or pipes, the appropriate shell must be specified
+explicitly in the execution string.
+.PP
+The action arguments can be referenced in the execution string using any of
+the argument keywords (see \fIKeywords\fP).  If a keyword references a file,
+the filename is substituted into the execution string. If the execution
+string is to be invoked on a remote system (see \fBEXEC_HOST\fP ), the
+filename is mapped to a name that is valid on the execution host before
+substitution occurs.
+.PP
+This is a required attribute for all \fICOMMAND\fP actions.
+.PP
+Examples of executions strings include:
+.nf
+.in +5n
+EXEC_STRING    vi %Arg_1%
+
+EXEC_STRING    sh -c `ls -l | more'
+
+EXEC_STRING    diff %Arg_1"Original File:"% %Arg_2"Altered File:"%
+
+EXEC_STRING    /bin/ksh -c 'echo "The execution host is:\\$(hostname)"'
+.in -5n
+.fi
+.SS "ICON"
+This field defines a presentation attribute, that is it effects the appearance
+of the action representation.  This field is valid for all actions.  Keywords
+are not expanded for the \fBICON\fP field.
+.PP
+The \fBICON\fP attribute specifies an icon which represents the action. 
+Icons are found using the standard CDE icon search path, so the value can
+be either an absolute pathname (e.g. /foo/icons/myicon.bm), relative
+pathname (e.g. old/myicon.bm) or partial filename (e.g. myicon). 
+In typical usage a partial filename is specified which allows the CDE icon
+search path to obtain the optimum icon for the current environment. 
+(e.g. use a color icon on color systems and a monochrome
+icon on monochrome systems.)
+.PP
+This field is optional.  If \fBICON\fP is not specified, then its value
+is the name of the default action icon.  This name is: "Dtactn", but this
+default name can be altered using the \fIActionIcon\fP X11 resource.
+.SS "LABEL"
+This field defines a presentation attribute, that is it effects the appearance
+of the action representation.  This field is valid for all actions.  Keywords
+are not expanded for the \fBLABEL\fP field.
+.PP
+The \fBLABEL\fP attribute specifies a user-visible string which names the
+action.  The \fBLABEL\fP attribute should be displayed to the user instead
+of the name of the action as the \fBLABEL\fP is localizable and the name of
+the action is not.
+.PP
+This field is optional, if it is not present the \fBLABEL\fP attribute is 
+set to the actual name of the action.
+.SS "MAP_ACTION"
+This field defines an invocation attribute, that is it directly effects
+action invocation.  This field is only valid for \fBMAP\fP type actions.
+Keywords will not be expanded in the \fBMAP_ACTION\fP field.
+.PP
+\fBMAP_ACTION\fP specifies the name of an action that should be invoked.
+The named action is invoked with the same set of arguments that were passed
+to the original action.  The named action itself may be a map action, but the
+chain of actions must eventually terminate at a non-map action.
+.PP
+This is a required attribute for all \fBMAP\fP actions; there is no default
+value.
+.SS "TERM_OPTS"
+This field defines an invocation attribute, that is it directly effects
+action invocation.  This field is only valid for terminal-based \fICOMMAND\fP
+type actions. Keywords will be expanded in the \fBTERM_OPTS\fP field.
+.PP
+This attribute specifies command-line options that are passed to
+the terminal emulator for any of the values of \fBWINDOW_TYPE\fP that are
+terminal based.  (i.e. everything except \fINO_STDIO\fP.) These command-line
+options are typically used to specify a unique geometry, font, color, title, 
+etc.  The default CDE terminal emulator is dtterm(1), this may be changed by
+setting the "*localTerminal" and "*remoteTerminals" X11 resources.
+.PP
+The value of the \fBTERM_OPTS\fP attribute should be an option specifications
+string in a form understood by the terminal emulator, with the cavaet that 
+the "-e" terminal emulator option must not be specified in the \fBTERM_OPTS\fP
+value.  If the option specification string contains blank characters it must
+be quoted.
+.PP
+This attribute is optional.
+The default value of this attribute is: "-title \fIaction_name\fP".
+.SS "TT_ARGn_MODE"
+This field defines an invocation attribute, that is it directly effects
+action invocation.  This field is only valid for \fBTT_MSG\fP type actions.
+Keywords will not be expanded in the \fBTT_ARGn_MODE\fP field.
+Note that action arguments and tooltalk message arguments are counted
+differently.  Action argument counts one-based, while tooltalk message
+argument counts are zero-based.
+.PP
+The \fBTT_ARGn_MODE\fP action attribute defines the value of the ToolTalk
+\fImode\fP attribute for the \fIn\fPth message argument. For example,
+\fBTT_ARG0_MODE\fP defines the mode for the 0th tooltalk message argument.
+The legal values for this action attribute are:
+.HP
+\fITT_IN\fP \(em the \fIn\fPth tooltalk argument is written by the sender
+and read by the handler and any observers.
+.HP
+\fITT_OUT\fP \(em the \fIn\fPth tooltalk argument is written by the handler.
+.HP
+\fITT_INOUT\fP \(em the \fIn\fPth tooltalk argument is written by the sender
+and the handler. 
+.PP
+This field is required for all \fBTT_MSG\fP actions.
+The default value of \fBTT_ARGn_MODE\fP is \fITT_IN\fP.
+.SS "TT_ARGn_REP_TYPE"
+This field defines an invocation attribute, that is it directly effects
+action invocation.  This field is only valid for \fBTT_MSG\fP type actions.
+Keywords will not be expanded in the \fBTT_ARGn_REP_TYPE\fP field.
+Note that action arguments and tooltalk message arguments are counted
+differently.  Action argument counts one-based, while tooltalk message
+argument counts are zero-based.
+.PP
+The \fBTT_ARGn_REP_TYPE\fP tooltalk action attribute defines the
+representation type of the \fIn\fPth message argument value. This attribute
+determines how the \fIn\fPth \fBTT_ARGn_VALUE\fP is interpreted. The
+valid values for this attribute are:
+.HP
+\fITT_REP_UNDEFINED\fP \(em the representation type of the message argument
+value is unknown.  This is the default value. A heuristic is applied in an
+attempt to interpret the argument. If the argument makes sense as an integer
+it will be treated as such; otherwise it will be treated as a string.
+.HP
+\fITT_REP_INTEGER\fP \(em the message argument value is represented as
+an integer.
+.HP
+\fITT_REP_BUFFER\fP \(em the message argument value is represented as a
+pointer to a region in memory.
+.HP
+\fITT_REP_STRING\fP \(em the message argument value is represented as a
+NULL-terminated string.
+.PP
+The \fBTT_ARGn_REP_TYPE\fP field is optional.  Its default value is 
+\fITT_REP_UNDEFINED\fP.
+.SS "TT_ARGn_VALUE"
+This field defines an invocation attribute, that is it directly effects
+action invocation.  This field is only valid for \fBTT_MSG\fP type actions.
+Keywords will be expanded in the \fBTT_ARGn_VALUE\fP field.
+Note that action arguments and tooltalk message arguments are counted
+differently.  Action argument counts one-based, while tooltalk message
+argument counts are zero-based.
+.PP
+The \fBTT_ARGn_VALUE\fP action attribute defines the value of the \fIn\fPth
+message argument. For example, \fBTT_ARG0_VALUE\fP defines the value
+of the 0th message argument.  This attribute can define a fixed value
+(e.g. foo or 3), or reference an argument keyword (e.g.  %Arg_1%). 
+.PP
+If a representation type for the \fIn\fPth message argument value 
+( \fBTT_ARGn_REP_TYPE\fP ) has not been specified and
+if a fixed value is specified or if an action argument which is a string is
+referenced, then the message argument is treated as type \fIint\fP if
+strtol() successfully converts the entire string (modulo leading and trailing
+whitespace) to an integer. Otherwise the message argument is treated as type
+`string'. For example 'TT_ARG0_VALUE 3' defines the value of the 0th message
+argument to be the integer 3, but `TT_ARG0_VALUE 3foo' defines the value of
+the 0th message argument to be the string "3foo".
+.PP
+If the corresponding \fBTT_ARGn_MODE\fP attribute is specified then a value
+for \fBTT_ARGn_VALUE\fP must be obtained.  If it is not supplied by the
+action definition then it will default to NULL.
+.SS "TT_ARGn_VTYPE"
+This field defines an invocation attribute, that is it directly effects
+action invocation.  This field is only valid for \fBTT_MSG\fP type actions.
+Keywords will be expanded in the \fBTT_ARGn_VTYPE\fP field.
+Note that action arguments and tooltalk message arguments are counted
+differently.  Action argument counts one-based, while tooltalk message
+argument counts are zero-based.
+.PP
+The \fBTT_ARGn_VTYPE\fP action attribute defines the value of the ToolTalk
+\fIvtype\fP attribute of the \fIn\fPth message argument. For example,
+\fBTT_ARG0_VTYPE\fP defines the vtype for the 0th argument.
+This attribute may specify a string (e.g. title) or may contain an argument
+keyword (e.g.  %Arg_1%). If an argument keyword is specified it refers to the
+\fBMEDIA\fP attribute of the specified action argument. If the \fBMEDIA\fP
+attribute is not specified, the name of the data type is used.
+.PP
+This field is required for \fBTT_MSG\fP actions.
+There is no default value for the \fBTT_ARGn_VTYPE\fP attribute; it must be
+specified if the corresponding message argument exists (i.e. \fBTT_ARGn_MODE\fP
+has been specified).
+.SS "TT_CLASS"
+This field defines an invocation attribute, that is it directly effects
+action invocation.  This field is only valid for \fBTT_MSG\fP type actions.
+Keywords will not be expanded in the \fBTT_CLASS\fP field.
+.PP
+This attribute defines the value of the ToolTalk `class' message field which
+specifies whether the recipient of the message needs to perform an operation.
+The legal values for this attribute are:
+.HP
+TT_NOTICE \(em  Notice of an event. Sender does not want feedback on this
+message.
+.HP
+TT_REQUEST \(em Request for some action to be taken.
+.PP
+This is a required attribute for \fBTT_MSG\fP actions.
+The TT_CLASS attribute must be specified for all ToolTalk actions; there is no
+default value.
+.SS "TT_FILE"
+This field defines an invocation attribute, that is it directly effects
+action invocation.  This field is only valid for \fBTT_MSG\fP type actions.
+Keywords will be expanded in the \fBTT_FILE\fP field.
+.PP
+This attribute defines the value of the ToolTalk \fIfile\fP field which
+specifies the file involved in the operation. This attribute may name a
+specific file (e.g. /tmp/foo) or may contain an argument keyword (e.g. %Arg_1%).
+This attribute may not name more than one file, so %Args% is not a legal
+value. If a keyword is used to reference an argument that is not a file
+(i.e. it is a buffer or a string), the action invocation fails.
+.PP
+This is a required attribute for \fBTT_MSG\fP actions.
+There is no default value for the \fBTT_FILE\fP attribute. If it is not set,
+the \fIfile\fP attribute of the ToolTalk message is set to NULL.
+.SS "TT_OPERATION"
+This field defines an invocation attribute, that is it directly effects
+action invocation.  This field is only valid for \fBTT_MSG\fP type actions.
+Keywords will be expanded in the \fBTT_OPERATION\fP field.
+.PP
+This attribute defines the value of the ToolTalk `operation' message field
+which specifies the name of the operation to be performed.
+This attribute can be set to any string value. Typical values are those
+specified by the Media Exchange Message Set such as \fIDisplay\fP and
+\fIEdit\fP. The \fBTT_OPERATION\fP attribute must be specified for all
+ToolTalk (i.e. \fBTT_MSG\fP) actions; there is no default value.
+.SS "TT_SCOPE"
+This field defines an invocation attribute, that is it directly effects
+action invocation.  This field is only valid for \fBTT_MSG\fP type actions.
+Keywords will not be expanded in the \fBTT_SCOPE\fP field.
+.PP
+This attribute defines the value of the ToolTalk `scope' message field which
+specifies who will be considered as a possible recipient based on their
+registered interest in a session and/or a file. The legal values for this
+attribute are:
+.HP
+\fITT_SESSION\fP \(em  all processes joined to the indicated session are eligible.
+.HP
+\fITT_FILE\fP \(em all processes joined to the indicated file are eligible.
+.HP
+\fITT_BOTH\fP  \(em all processes joined to either the indicated file or the
+indicated session are eligible.
+.HP
+\fITT_FILE_IN_SESSION\fP \(em  all processes joined to both the indicated session
+and the indicated file are eligible.
+.PP
+The \fBTT_SCOPE\fP attribute must be specified for all ToolTalk actions; there
+is no default value.
+.SS "TYPE"
+This attribute is an invocation attribute.
+The kind of behavior exhibited by a given action is determined by its
+\fBTYPE\fP attribute.  Keywords are not expanded in the \fBTYPE\fP field.
+The legal values for the \fBTYPE\fP attribute are:
+.HP
+\fIMAP\fP \(em the action is not invoked directly; instead it is mapped to another
+action.
+.HP
+\fICOMMAND\fP \(em the action invokes a command.
+.HP
+\fITT_MSG\fP \(em the action sends a ToolTalk message.
+.PP
+\fBTYPE\fP is an optional attribute; if an action does not explicitly define
+a \fBTYPE\fP then the type defaults to \fICOMMAND\fP.
+.SS "WINDOW_TYPE"
+This field defines an invocation attribute, that is it directly effects
+action invocation.  This field is only valid for \fICOMMAND\fP actions.
+Keywords will not be expanded in the \fBWINDOW_TYPE\fP field.
+.PP
+This attribute specifies the type of windowing support required by the
+execution string. Legal values for this attribute include:
+.HP
+\fITERMINAL\fP \(em
+The command is invoked in a terminal window.  When the process exits the
+terminal window is automatically closed.  This value is appropriate for 
+full-screen terminal applications such as vi(1).
+.HP
+\fIPERM_TERMINAL\fP \(em
+The command is invoked in a terminal window. When the process
+exits the terminal window will remain open displaying whatever
+output has been written until the user explicitly closes it. This value
+is appropriate for applications which write their output to stdout
+and then terminate, such as ls(1).
+.HP
+\fINO_STDIO\fP \(em
+No windowing support is provided. This value is appropriate for
+commands that have no output or X Window applications that do
+not use stdin/stdout for communication with the user.
+.PP
+This attribute is not required; \fBWINDOW_TYPE\fP will default to the
+value, \fIPERM_TERMINAL\fP.
+.SH X11 RESOURCES THAT EFFECT ACTIONS
+The behavior of actions on the CDE desktop is primarily controlled by
+the definitions found in the action data base files (i.e. \fI*.dt\fP
+files).  A number of X11 resources may be used to modify various
+built-in defaults for values not explicitly defined.  Some additional
+X11 resources affect the behavior of actions in ways not related to
+definitions in the action database.  The following is a list of
+such X11 resources.
+.sp
+.KS
+.TS
+center;
+cb sss
+lb lb lb lb
+l l l l.
+X11 Resources Which Modify Action Behavior
+Name	Class	Value Type	Default
+_
+actionIcon	ActionIcon	string	"Dtactn"
+autoXhosting	AutoXhosting	string	"False"
+dtexecPath	DtexecPath	string	"/usr/dt/bin/dtexec"
+executionHostLogging	ExecutionHostLogging	string	"False"
+executionHosts	ExecutionHosts	string	T{
+"%DatabaseHost%,
+.nL
+%LocalHost%"
+T}
+localTerminal	LocalTerminal	string	"Dtterm"
+remoteTerminals	RemoteTerminals	string	"Dtterm"
+waitTime	WaitTime	number	3
+.TE
+.KE
+.sp
+.IP "\fIactionIcon\fP (class \fIActionIcon\fP)"
+This resource may be used to define the default action icon used to represent
+actions which do not explicitly define an \fBICON\fP attribute.  If this
+resource is not specified the internal default action icon, \fIDtactn\fP is
+used.
+.IP "\fIautoXhosting\fP (class \fIAutoXhosting\fP)"
+This resource may be used to turn on the auto Xhosting feature.  When this
+feature is enabled, an attempt is made to grant blanket display access to a
+remote execution host before invoking an action on the reomte host.  It should
+not be necessary to turn on autoXhosting in most cases if the user's remote 
+$HOME directory is visible on the local system.  The normal X11 (R4+) 
+user-specific authorization mechanism should transparently allow user access
+to the local display from the remote  system via the keys in the user's 
+.Xauthority file.  If the \fIautoXhosting\fP resource is not set, its value 
+is taken to be "False".
+.IP "\fIdtexecPath\fP (class \fIDtexecPath\fP)"
+This resource may be used to modify the location where the \fIdtexec\fP(1)
+client is found.  If this resource is not set, its value is taken to
+be: \fI/usr/dt/bin/dtexec\fP .
+.IP "\fIexecutionHostLogging\fP (class \fIExecutionHostLogging\fP)"
+This resource may be used to turn on detailed logging of action
+invocation events into the user's $HOME\fI/.dt/errorlog\fP file. If not
+set this resource value defaults to \fIFalse\fP.
+.IP "\fIexecutionHosts\fP (class \fIExecutionHosts\fP)"
+This resource allows the user to define the default execution host list
+for actions which themselves do not explicitly specify the \fBEXEC_HOST\fP
+attribute.  The default value for this resource is:
+"%DatabaseHost%,%LocalHost%".
+.IP "\fIlocalTerminal\fP (class \fILocalTerminal\fP)"
+This resource may be used to specify an alternate default terminal emulator
+for use by terminal-based actions on the local system.  Any terminal
+emulator supplied by the user should (at least) understand the "-title"
+and "-e" command line options as interpreted by dtterm(1). If this 
+resource is not set, the local terminal emulator defaults to: "dtterm".
+.IP "\fIremoteTerminals\fP (class \fIRemoteTerminals\fP)"
+This resource may be used to specify a comma separated list of the form:
+\fI<host>:<emulator path>\fP.  For remote execution of terminal-based
+actions, if the execution host is on the list then the the associated
+terminal emulator will be used.  If this resource is not specified or
+the remote host is not on the specified list  then the default terminal
+emulator, \fIdtterm\fP(1) will be employed.
+.IP "\fIwaitTime\fP (class \fIWaitTime\fP)"
+This resource may be used to modify the waiting period used by the
+\fIdtexec\fP(1) client to determine whether to keep a terminal emulator
+window alive after a terminal-based \fICOMMAND\fP action completes. 
+\fIDtexec\fP employs the heuristic that any action that exits before the
+\fIwaitTime\fP interval has elapsed, must have encountered some kind of
+error.  Therefore, to allow users to see any error messages written to
+the terminal emulator, the window is kept open until explicitly closed
+by the user.  This resource must be numeric and specify the \fIwaitTime\fP
+in seconds.  The default value is 3.
+.SH EXAMPLES
+.SS MAP ACTION
+The following action definition is an example of a map action. This action
+overloads the \fIOpen\fP action so that if a file of type \fIGif\fP is
+selected and the action \fIOpen\fP is selected from the File Manager's
+Action menu, the \fIOpen_Gif\fP action will be invoked with the selected
+file as its' parameter.
+.nf
+.in +5n
+ACTION Open
+{
+.in +5n
+ARG_TYPES       Gif
+TYPE    MAP
+MAP_ACTION      Open_Gif
+.in -5n
+}
+.in -5n
+.fi
+.SS COMMAND ACTION
+The following action definition is an example of a command action. This action
+specifies the execution string for the Open_Gif action.
+.nf
+.in +5n
+ACTION   Open_Gif
+{
+.in +5n
+LABEL   OpenGif
+ICON    open_gif
+DESCRIPTION     Displays "gif" files.
+ARG_TYPE        *
+TYPE    COMMAND
+WINDOW_TYPE      NO_STDIO
+EXEC_HOST	%DisplayHost%,host2,%DatabaseHost%
+EXEC_STRING     /usr/bin/X11/xgif %Arg_1"File Name:"%
+.in -5n
+}
+.in -5n
+.fi
+.PP
+Note that this action specifies  multiple execution hosts. The first host that
+will be tried is the host where the X server is running. If the execution
+string cannot be executed on that host, "host2" will be tried and if that
+fails, the host where the action is defined will be tried. If the
+execution string cannot be executed on any of the hosts, the action will fail.
+.PP
+If this action is invoked without any arguments then the user will be
+prompted for a Gif file name.
+.SS TT_MSG ACTION
+The following action definition sends the ToolTalk Display request message.
+By specifying %Arg_1% for the \fBTT_ARG0_VTYPE\fP field, the \fIMEDIA\fP data
+attribute of the argument will be determined and placed in the toolTalk message
+as the vtype.  This will help determine the tool invoked by toolTalk
+to display the contents of the buffer passed in as %Arg_1%.
+The contents of %Arg_1% itself is passed as the \fBTT_ARG0_VALUE\fP and
+its representation as the contents of a region in memory is indicated by
+the \fBTT_ARG0_REP_TYPE\fP \fITT_REP_BUFFER\fP.  See the ToolTalk documentation
+for more information about toolTalk messags.
+.nf
+.in +5n
+ACTION Display
+{
+.in +5n
+ARG_CLASS	BUFFER
+ARG_COUNT	1
+TYPE    TT_MSG
+TT_CLASS        TT_REQUEST
+TT_SCOPE        TT_SESSION
+TT_OPERATION    Display
+TT_ARG0_MODE    TT_IN
+TT_ARG0_VTYPE   %Arg_1%
+TT_ARG0_VALUE	%Arg_1%
+TT_ARG0_REP_TYPE TT_REP_BUFFER
+.in -5n
+}
+.in -5n
+.fi
+.SH ERRORS
+Errors encountered when loading database files will be written to the
+CDE errorlog file (i.e $HOME\fI/.dt/errorlog\fP).  Runtime errors will
+generally cause an error dialog to be posted.
+An error in an action field specification will cause that field to be
+rejected.  If the accepted fields of an action definition constitute
+a valid action that action will be added to the data base.
+.SH "SEE ALSO"
+.BR  DtDbLoad(3).
+.BR  DtActionDescription(3),
+.BR  DtActionExists(3),
+.BR  DtActionIcon(3),
+.BR  DtActionInvoke(3),
+.BR  DtActionLabel(3),
+.BR  dtdtfile(4),
+.BR  dtdtsfile(4),
+.BR  dtexec(1)
+.BR  dttypes(1)
+
+
+
+
+
+

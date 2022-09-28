@@ -1,0 +1,130 @@
+#!/usr/local/bin/perl
+
+eval "exec /usr/local/bin/perl -S $0 $*"
+    if $running_under_some_shell;
+
+#
+# This relay server is started by inetd.  It's stdin, stdout &
+# stderr have been connected to the remote client requesting
+# service.  This server will open a socket to the remote
+# rcs server and act as a conduit between the client and
+# remote rcs server.
+#
+
+########################################################
+# required files
+########################################################
+push(@INC,"/x/cdesrc/admin/BuildTools/rcs_tools");
+require 'sys/wait.ph';
+require 'RcsSock.pl';
+
+
+#######################################################
+# define local subroutines
+#######################################################
+
+# routine for clean shutdown on error
+sub abort {
+	&sock'close_all;
+	exit;
+}
+$SIG{'INT'} = 'abort';
+
+########################################################
+# check ip addresses
+########################################################
+
+# get the ip address of the incoming connection
+($foofamily,$fooport,$incoming_addr) = unpack('S n N x8', getpeername(STDIN));
+@incoming_addr = unpack('C4', pack('L',$incoming_addr));
+
+# check to see if the ip address is acceptable
+# if not, leave
+# hp corvallis 
+if (($incoming_addr[0] == 15) && ($incoming_addr[1] == 0)) {
+	if (($incoming_addr[2] < 208) || ($incoming_addr[2] >= 216)) {
+		print "\n	Cannot Relay. Unauthorized Hewlett-Packard Machine.\n";	
+		print "		IP Address ", join('.',@incoming_addr), "\n\n";
+		&abort();
+	}
+}
+# usl slate
+elsif (($incoming_addr[0] == 147) && ($incoming_addr[1] == 2)) {
+	if (($incoming_addr[2] != 200) || ($incoming_addr[3] != 7)) {
+		print "\n	Cannot Relay. Unauthorized USL Machine.\n";
+		print "		IP Address ", join('.',@incoming_addr), "\n\n";
+		&abort();
+	}
+}
+# ibm austin
+elsif (($incoming_addr[0] == 129) && ($incoming_addr[1] == 35)) {
+	if (($incoming_addr[2] != 83) && ($incoming_addr[2] != 84)){
+		print "\n	Cannot Relay. Unauthorized IBM Austin Machine.\n";
+		print "		IP Address ", join('.',@incoming_addr), "\n\n";
+		&abort();
+	}
+}
+# sun palo alto
+elsif ($incoming_addr[0] == 129) {
+	if ($incoming_addr[1] != 144) {
+		print "\n	Cannot Relay. Unauthorized SUN Machine.\n";
+		print "		IP Address ", join('.',@incoming_addr), "\n\n";
+		&abort();
+	}
+}
+else { # unauthorized machine
+		print "\n	Cannot Relay. Unauthorized Machine.\n";
+		print "		IP Address ", join('.',@incoming_addr), "\n\n";
+		&abort();
+}
+
+
+########################################################
+# argument processing
+########################################################
+$rhost="cvcs1.external.hp.com";
+$rport= 8790;
+
+
+#
+# open a socket to the real RcsServer
+#
+($SOCK_HANDLE = &sock'open($rhost,$rport)) || 
+	die "Connect to \"$rhost\" failed: $!";
+
+#
+# make sure nothing is buffered.
+#
+select($SOCK_HANDLE); $|=1;
+select(STDIN); $|=1;
+select(STDOUT);$|=1;
+select(STDERR);$|=1;
+
+#
+# transfer that data;
+#
+if ( $child = fork ) {
+	# parent 
+	# read form $SOCK_HANDLE; write to NS
+	while (<$SOCK_HANDLE>) {
+		print STDOUT;
+	}
+	# no further sends on STDOUT
+	shutdown(STDOUT,1);
+	# no further receives on $SOCK_HANDLE
+	shutdown($SOCK_HANDLE,0);
+	exit;
+} 
+# child
+# read from STDIN; write to $SOCK_HANDLE
+while ( <STDIN> ) { 
+	print $SOCK_HANDLE $_;
+}
+
+# no further receives on STDIN
+shutdown(STDIN,0);
+# no further sends on $SOCK_HANDLE
+shutdown($SOCK_HANDLE,1);
+exit;
+
+

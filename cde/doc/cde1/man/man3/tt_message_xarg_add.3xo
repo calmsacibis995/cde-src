@@ -1,0 +1,94 @@
+.TH tt_message_xarg_add 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+tt_message_xarg_add \- add an argument with an XDR-interpreted value to a message object
+.SH SYNOPSIS
+.yS
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'Tt_status tt_message_xarg_add('u
+Tt_status tt_message_xarg_add(Tt_message \f2m\fP,
+	Tt_mode \f2n\fP,
+	const char *\f2vtype\fP,
+	xdrproc_t \f2xdr_proc\fP,
+	void *\f2value\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn tt_message_xarg_add
+function
+adds an argument with an XDR-interpreted value to a message object.
+.P
+To change existing argument values, the application must use only modes
+.Cn TT_OUT
+or
+.Cn TT_INOUT .
+.P
+Adding arguments when replying to a message produces undefined results.
+.P
+The
+.I m
+argument is the opaque handle for the message involved in this operation.
+The
+.I n
+argument specifies who
+(sender, handler, observers) writes and reads a message argument.
+The following modes are defined:
+.VL 8
+.Lc TT_IN
+The argument is written by the sender and read by the
+handler and any observers.
+.Lc TT_OUT
+.br
+The argument is written by the handler and read by the
+sender and any reply observers.
+.Lc TT_INOUT
+.br
+The argument is written by the sender and the
+handler and read by all.
+.LE
+.P
+The
+vtype
+argument describes the type of argument data being added.
+The
+.I xdr_proc
+argument points to the XDR procedure to be used to serialize the data
+pointed to by
+.IR value .
+The
+.I value
+argument is the data to be serialized.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn tt_message_xarg_add
+function returns the status of the operation as one of the following
+.B Tt_status
+values:
+.VL 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_MODE
+.br
+The specified
+.B Tt_mode
+is invalid.
+.Lc TT_ERR_NOMP
+.br
+The
+.Cm ttsession 1
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_POINTER
+.br
+The pointer passed does not point to an object of
+the correct type for this operation.
+.Lc TT_ERR_XDR
+.br
+The XDR procedure failed on the given data, or evaluated to a
+zero-length expression.
+.LE
+.SH "SEE ALSO"
+.Hd Tt/tt_c.h 5.

@@ -1,0 +1,240 @@
+.TH ttPolicy 4 "TT Policy" "1 March 1996" "ToolTalk 1.3" "ToolTalk Policy"
+.BH "1 March 1996"
+.IX "ttPolicy" "" "ttPolicy.4" ""
+.SH NAME
+ttPolicy \- introduction to ToolTalk messaging policy
+.SH DESCRIPTION
+.PP
+ToolTalk is purely an inter-application communication mechanism,
+and does not specify communication policy.  This document sets
+forth messaging conventions that good ToolTalk citizens should adhere
+to.  The purpose of these conventions is threefold:
+.HP 3
+1. Prevent collisions, so that no two tools use the same ToolTalk
+syntax for different semantics.
+.HP 3
+2. Prevent "passing in the night", so that no two tools fail to talk
+to each other just because they use different ToolTalk syntax for
+identical semantics.
+.HP 3
+3. Encourage socialization, as tool authors are exposed to message
+interfaces that they might not have thought to add to their tools.
+.PP
+Most of these conventions consist of descriptions of
+standard ToolTalk messages.
+Conventions not related to any particular standard message are
+described either below, or in the
+.B Intro
+page for the set of messages they apply to.
+.SS Reference page layout
+.PP
+Each message is described on a separate reference page, consisting of:
+.TP 3
+.B Name
+The name of the message and a one-line description of it.
+.TP
+.B Synopsis
+A representation of the message in a
+syntax similar to that understood by the ToolTalk type
+compiler
+.BR tt_type_comp (1).
+The format is essentially
+.IP
+.RI [ fileAttrib ]
+.IR opName (
+.IR requiredArgs ,
+.RI [ optionalArgs ]
+);
+.IP
+A synopsis entry is given for each interesting variant
+of the message.
+.RS 3
+.TP 3
+.I fileAttrib
+An indication of whether the file attribute of the
+message can/should be set.  ToolTalk allows each
+message to refer to a file, and has a mechanism
+(called file-scoping) for delivering messages to
+clients who are "interested" in the named file.
+.TP
+.I opName
+The name of the operation or event is called the
+.I op name
+(or 
+.IR op ).
+It is important that different tools
+not use the same opName to mean different things.
+Therefore, unless a message is a standard one, its
+opName should be made unique.  A good way to do this
+is to prefix it with
+.IR Company_Product ,
+e.g.,
+.ft CW
+Acme_HoarkTool_Hoark_My_Frammistat.
+.ft
+.TP
+.I requiredArgs, optionalArgs
+In the synopsis, arguments are expressed as
+.I mode vtype argumentName.  vtype
+and
+.I argumentName
+are described below.
+.I mode
+is one of \f(CWin\fR, \f(CWout\fR, or \f(CWinout\fR,
+and indicates the direction(s) in which the data
+of that argument flow.
+.RE
+.TP
+.B Description
+An explanation of the operation that the request
+entreats, or the event that the notice announces.
+.TP
+.B Required Arguments
+The arguments that must always be in the message.
+.RS 3
+.TP 3
+.I vtype argumentName
+A description of a particular argument.
+.IP
+A
+.I vtype
+is a programmer-defined string that
+describes what kind of data a message argument
+contains.  ToolTalk uses vtypes for the sole purpose
+of matching sent message instances with registered
+message patterns.
+.IP
+Every vtype should by convention map to a single,
+well-known data type.  The data type of a ToolTalk
+argument is either integer, string, or bytes.  The
+data type of a message or pattern argument is
+determined by which ToolTalk API function is used to
+set its value.
+.IP
+The argument name is merely a comment hinting to human
+readers at the semantics of the argument, much like a
+parameter name in an ANSI C function prototype.
+.RE
+.TP
+.B Optional Arguments
+The extra arguments that may be included in a message.  Any optional
+arguments in a message must be in the specified order, and must follow
+the required arguments.
+.TP
+.B Errors
+A list of the error codes that can be set by the
+handler of the request (or the sender of the notice).
+.TP
+.B Examples
+Scenarios in which the message can be useful, and sample ToolTalk code
+for sending and receiving the message.
+.SS Versioning
+.PP
+All messages are individually versioned.  When no version
+information is available, messages may be assumed to be version
+0.  Version information is carried in a
+.I context slot
+with the slotname \f(CWversion\fR.
+.RI ( Contexts
+are a new feature in ToolTalk 1.1.
+In previous releases, arguments can only be positional.
+That is, they are set and retrieved by ordinal numbers.  Context
+arguments may be set and retrieved by keyword.  These ToolTalk
+messaging policies currently only specify positional
+arguments for passing data.)
+.SH DEFINITIONS
+.PP
+.SS Edict
+.PP
+A notice that looks like a request.  If a request returns no data
+(or if the sender doesn't care about the returned data), it can
+sometimes be useful to broadcast that request to a set of tools.
+Since the message is a notice, no data will be returned, no
+replies will be received, and the sender is not told whether
+any tool gets the message.
+.SS Handler
+.PP
+The distinguished recipient procid of a request.  This procid is
+responsible for carrying out the indicated operation.
+.SS Notice
+.PP
+A message announcing an event.  Zero or more tools may
+receive a given notice.  The sender is not told whether
+any tools receive its notice.  A notice cannot be replied to.
+.SS Procid
+.PP
+A principal that can send and receive ToolTalk messages.  A
+procid is an identity, created and handed over by ToolTalk on
+demand (via \fBtt_open\fR()), that a process must assume in order to
+send and receive messages.  A single process can use multiple
+procids, and a single procid can be used by a group of
+cooperating processes.
+.SS Request
+.PP
+A message that asks an operation to be performed.  A request has a
+distinguished recipient, called a handler, who is responsible for
+performing the indicated operation.  A handler may fail,
+reject, or reply to a request.  Any number of handlers may reject
+a request, but ultimately only one of them can fail it or reply
+to it.  If no running handler can be found to accept a request,
+ToolTalk can automatically start a handler.  If no
+willing handler can be found, or if a handler fails the request,
+then the request is returned to the sender in with a
+.B Tt_state
+of
+.B TT_FAILED.
+.SH ERRORS
+.LP
+An integer status code can be read from a reply via
+.BR tt_message_status ().
+This status defaults to 0 (
+.B TT_OK
+),
+or can be set by the handler via
+.BR tt_message_status_set ().
+In extraordinary circumstances such as
+no matching handler, ToolTalk itself sets the message status, to a
+.B Tt_status
+code.
+.LP
+In addition to the
+.B Tt_status
+values defined by the ToolTalk API,
+the \fBIntro\fR reference page for each set of messages lists the
+error conditions defined for that set of messages.  For each
+error condition, the reference page gives
+.PD 0
+.RS 3
+.HP 2
+\(bu
+Its integer value
+.HP 2
+\(bu
+Its name
+.HP 2
+\(bu
+A string in the "C" locale that explains the error condition.
+.RE
+.PD
+.LP
+ToolTalk allows an arbitrary status string to be included in any
+reply.  Since a standard localized message string can be derived for
+each status code, the
+.BR tt_message_status_string ()
+may be used as a free-form
+elucidation of the status.  For example, if a request is failed
+with
+.B TT_DESKTOP_EPROTO,
+then the status string could be set to
+"\f(CWThe vtype of argument 2 was 'string'; expected 'integer'\fR".
+Handling tools should try to compose the status string in the
+locale of the requestor.  See the
+.BR Get_Locale (Desktop)
+request.
+.SH SEE ALSO
+.PP
+.BR ttsession (1),
+.BR tt_type_comp (1),
+.BR intro (2),
+.BR Get_Locale (Desktop),
+.I Solaris 2.2 Developer's Guide to Internationalization

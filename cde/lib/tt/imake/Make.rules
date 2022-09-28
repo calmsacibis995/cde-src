@@ -1,0 +1,151 @@
+#/*
+#
+# Make.rules 1.4	07 Sep 1993
+#
+# Make.rules - useful make(1) rules
+#
+#*/
+
+#/*
+# Rule to build subdirectories for intermediate files (e.g., .o's)
+#*/
+$(OEUVRE)/pdc/O/.dir	\
+$(OEUVRE)/pdc/g/.dir	\
+$(OEUVRE)/pic/O/.dir	\
+$(OEUVRE)/pic/g/.dir:
+	if [ ! -d $@ ]; then mkdir -p $@; fi
+
+#/*
+# Rules to build derived files.  Lets us keep different
+# versions (e.g., -g, -O, -pic) around at the same time.
+#
+# C++ object code
+#*/
+$(OEUVRE)/pdc/O/%.o: %.C $(OEUVRE)/pdc/O/.dir
+	$(COMPILE.cc) -O $< $(OUTPUT_OPTION)
+$(OEUVRE)/pdc/g/%.o: %.C $(OEUVRE)/pdc/g/.dir
+	$(COMPILE.cc) -g $< $(OUTPUT_OPTION)
+$(OEUVRE)/pic/O/%.o: %.C $(OEUVRE)/pic/O/.dir
+	$(COMPILE.cc) -O $(CCC_PIC) $< $(OUTPUT_OPTION)
+$(OEUVRE)/pic/g/%.o: %.C $(OEUVRE)/pic/g/.dir
+	$(COMPILE.cc) -g $(CCC_PIC) $< $(OUTPUT_OPTION)
+
+#/*
+# C object code
+#*/
+$(OEUVRE)/pdc/O/%.o: %.c $(OEUVRE)/pdc/O/.dir
+	$(COMPILE.c) -O $< $(OUTPUT_OPTION)
+$(OEUVRE)/pdc/g/%.o: %.c $(OEUVRE)/pdc/g/.dir
+	$(COMPILE.c) -g $< $(OUTPUT_OPTION)
+$(OEUVRE)/pic/O/%.o: %.c $(OEUVRE)/pic/O/.dir
+	$(COMPILE.c) -O $(CC_PIC) $< $(OUTPUT_OPTION)
+$(OEUVRE)/pic/g/%.o: %.c $(OEUVRE)/pic/g/.dir
+	$(COMPILE.c) -g $(CC_PIC) $< $(OUTPUT_OPTION)
+
+#/*
+# Rules to build human-readable C++ after cpp tricks (.e.g,
+# parameterized types) are done.
+# 1. Have CC run cpp on the source file.
+# 2. Use perl to take out the C++ comments (which cpp fails to do,
+#    even with the -B option).  (perl handles longer lines than sed)
+# 3. Indent the code.
+# 4. Use sed to strip #line hints and fix indent(1)'s incorrect
+#    handling of C++ "::" token.
+#*/
+i/%.C: i/.dir %.C
+	$(CCC) -E -Qoption $(CPP) -PB $(CPPFLAGS) $*.C | \
+		perl -pe 's,//.*,,;' | \
+		$(INDENT) | sed -e 's/: :/::/' -e '/^#/d' > $@
+i/$(OEUVRE)/g/%.o: i/%.C i/$(OEUVRE)/g/.dir
+	$(COMPILE.cc) $(OUTPUT_OPTION) $< -o $@
+i/$(OEUVRE)/pic/g/%.o: i/%.C i/$(OEUVRE)/pic/g/.dir
+	$(COMPILE.cc) $(OUTPUT_OPTION) $< -o $@
+
+#/*
+# Rules to build Saber-izable C code from C++.
+#*/
+c/%.c: c/.dir %.C
+	$(CCC) -F $(CPPFLAGS) $*.C | $(CPP) -P | $(INDENT) > $@
+
+#/*
+# Add our suffixes to the front of the default suffix list.
+#*/
+.SUFFIXES:
+.SUFFIXES: .files .c++ .c .i .s++ .s $(SUFFIXES)
+
+#/*
+# cpp include files
+#*/
+.C.files:
+	$(CCC) -E -H $(CPPFLAGS) $< 1> /dev/null 2> $*.files
+
+#/*
+# cpp output
+#*/
+.C.i:
+	$(CCC) -E $(CPPFLAGS) $< > $*.i
+.c.i:
+	$(CPP) $(CPPFLAGS) $< > $*.i
+
+#/*
+# cfront output
+#*/
+.C.c:
+	$(CCC) -F $(CPPFLAGS) $< | \
+		sed -e '/^#/d' -e '/^\/\* the end \*\/$$/d' | \
+		$(INDENT) > $*.c
+#/*
+# cfront output, demangled
+#*/
+.c.c++:
+	c++filt < $*.c > $*.c++
+#/*
+# assembler
+#*/
+.C.s:
+	$(CCC) $(CCFLAGS) $(CPPFLAGS) -Qproduce .s $(OUTPUT_OPTION) $<
+.c.s:
+	$(CC) $(CFLAGS) $(CPPFLAGS) -S $(OUTPUT_OPTION) $<
+#/*
+# assembler, demangled
+#*/
+.s.s++:
+	c++filt < $< > $*.s++
+
+#/*
+# Saber
+#*/
+saber/%.o: %.C
+	#load $(SABER_CPPFLAGS) $(CPPFLAGS) $<
+saber/%.o: %.c
+	#load $(SABER_CPPFLAGS) $(CPPFLAGS) $<
+
+All:: all
+
+g:: g.so g.a
+
+clean_pdc_O.o::
+clean_pdc_g.o::
+clean_pic_O.o::
+clean_pic_g.o::
+clean.goal::
+
+clean.:: clean_pdc_O.o clean_pdc_g.o clean_pic_O.o clean_pic_g.o clean.goal
+	if test -d $(OEUVRE)/pdc/O/.dir;then rmdir $(OEUVRE)/pdc/O/.dir;fi
+	if test -d $(OEUVRE)/pdc/O;	then rmdir $(OEUVRE)/pdc/O;	fi
+	if test -d $(OEUVRE)/pdc/g/.dir;then rmdir $(OEUVRE)/pdc/g/.dir;fi
+	if test -d $(OEUVRE)/pdc/g;	then rmdir $(OEUVRE)/pdc/g;	fi
+	if test -d $(OEUVRE)/pic/O/.dir;then rmdir $(OEUVRE)/pic/O/.dir;fi
+	if test -d $(OEUVRE)/pic/O;	then rmdir $(OEUVRE)/pic/O;	fi
+	if test -d $(OEUVRE)/pic/g/.dir;then rmdir $(OEUVRE)/pic/g/.dir;fi
+	if test -d $(OEUVRE)/pic/g;	then rmdir $(OEUVRE)/pic/g;	fi
+
+clean.mk::
+	$(RM) $(MAKEFILE)
+
+cleaner:: clean clean~ clean.mk
+
+clean:: clean.
+
+clean~::
+	$(RM) $(IMAKEFILE)~ $(MAKEFILE)~

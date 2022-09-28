@@ -1,0 +1,71 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH XmFontListGetNextFont 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmFontListGetNextFont\fP \- A font list function that allows applications to access the fonts and character sets in a font list
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/Xm.h>
+.sp \n(PDu
+Boolean XmFontListGetNextFont (\fBcontext, charset, font\fI)
+.ta .5i 1.75i
+.nf
+	XmFontContext	\fBcontext\fI;
+	XmStringCharSet	*\fBcharset\fI;
+	XFontStruct	**\fBfont\fI;
+.wH
+.fi
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+\fIXmFontListGetNextFont\fP  accesses the character set and font for the
+next entry of the font list. The application first uses the
+\fIXmFontListInitFontContext\fP routine to create a font list context.
+The application then calls \fIXmFontListGetNextFont\fP repeatedly with
+the same context.  Each succeeding call accesses the next element of
+the font list.  When finished, the application calls
+\fIXmFontListFreeFontContext\fP to free the allocated font list context.
+.PP 
+This routine allocates memory for the character set string that must be
+freed by the application.
+.PP
+This function is obsolete and exists for compatibility with previous
+releases.  It is replaced by \fIXmFontListNextEntry\fP.
+If \fIXmFontListGetNextFont\fP is passed a context that contains
+a font set entry, it will return the first font of the
+font set.  The next call to the function will move to the next
+entry in the font list.
+.IP "\fBcontext\fP"
+Specifies the font list context
+.IP "\fBcharset\fP"
+Specifies a pointer to a character set string; the routine returns the
+character set for the current font list element
+.IP "\fBfont\fP"
+Specifies a pointer to a pointer to a font structure; the routine
+returns the font for the current font list element
+.SH RETURN VALUE
+Returns True if the returned values are valid; otherwise, returns False.
+.SH RELATED INFORMATION
+.na
+\fIXmFontList(3X)\fP and
+\fIXmFontListNextEntry(3X)\fP.
+.ad

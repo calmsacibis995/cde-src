@@ -1,0 +1,96 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Novell, Inc
+...\" **
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1988 by Massachusetts Institute of Technology
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH XmClipboardInquireFormat 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmClipboardInquireFormat\fP \- A clipboard function that returns a specified format name
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/Xm.h>
+\&#include <Xm/CutPaste.h>
+.sp \n(PDu
+.ta 1i
+.nf
+int \fIXmClipboardInquireFormat\fI (\fBdisplay, window, index, format_name_buf,
+	buffer_len, copied_len\fI)
+.ta .5i 1.6i
+.nf
+	Display	\fB* display\fI;
+	Window	\fBwindow\fI;
+	int	\fBindex\fI;
+	XtPointer	\fBformat_name_buf\fI;
+	unsigned long	\fBbuffer_len\fI;
+	unsigned long	\fB* copied_len\fI;
+.wH
+.fi
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+\fIXmClipboardInquireFormat\fP returns a specified
+format name for the data
+item in the clipboard.  If the name must be truncated, the function
+returns a warning status.
+.IP "\fBdisplay\fP"
+Specifies a pointer to the \fIDisplay\fP structure that was returned in a
+previous call to \fIXOpenDisplay\fP or \fIXtDisplay\fP.
+.IP "\fBwindow\fP"
+Specifies a widget's window ID that relates the application window to the
+clipboard.  The widget's window ID can be obtained by using
+\fIXtWindow\fP.
+The same application instance should pass the same window ID to each of the
+clipboard functions that it calls.
+.IP "\fBindex\fP"
+Specifies which of the ordered format names to obtain.  If this index
+is greater than the number of formats for the data item,
+this function returns a zero in the \fBcopied_len\fP argument.
+.IP "\fBformat_name_buf\fP"
+Specifies the buffer that receives the format name.
+.IP "\fBbuffer_len\fP"
+Specifies the number of bytes in the format name buffer.
+.IP "\fBcopied_len\fP"
+Specifies the number of bytes in the string copied to the buffer.  If this
+argument equals zero, there is no \fBnth\fP format for the data item.
+.SH RETURN VALUE
+.IP "\fIClipboardSuccess\fP"
+The function is successful.
+.IP "\fIClipboardLocked\fP"
+The function failed because the clipboard was locked by another
+application.  The application can continue to call the function again with
+the same parameters until the lock goes away.  This gives the application
+the opportunity to ask if the user wants to keep trying or to give up
+on the operation.
+.nL
+.ne 8
+.IP "\fIClipboardTruncate\fP"
+The data returned is truncated because the user did not provide a buffer
+large enough to hold the data.
+.IP "\fIClipboardNoData\fP"
+The function could not find data on the clipboard corresponding to the
+format requested.
+This could occur because the clipboard is empty; there is data
+on the clipboard but not in the requested format; or the data in
+the requested format was passed by name and is no longer available.
+.SH RELATED INFORMATION
+.na
+\fIXmClipboardStartCopy(3X)\fP.
+.ad

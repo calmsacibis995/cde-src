@@ -1,0 +1,119 @@
+
+#
+#	$Revision: 1.1 $
+#
+#  @(#)Makefile.old	1.37 01/18/94	cde_app_builder/src/libABil
+#
+# 	RESTRICTED CONFIDENTIAL INFORMATION:
+#	
+#	The information in this document is subject to special
+#	restrictions in a confidential disclosure agreement between
+#	HP, IBM, Sun, USL, SCO and Univel.  Do not distribute this
+#	document outside HP, IBM, Sun, USL, SCO, or Univel without
+#	Sun's specific written approval.  This document and all copies
+#	and derivative works thereof must be returned or destroyed at
+#	Sun's request.
+#
+#	Copyright 1993 Sun Microsystems, Inc.  All rights reserved.
+#
+#
+
+# Remove when not needed.
+CDE_EXTRA_STUFF = /net/onebit/export/ow2/app_builder_dev_env
+
+default_targets: all bil_test test_loaduil
+
+PROJECTDIR = ../..
+
+LIBPART = libABil
+LIBS.shared = libABil.a
+
+SOURCES.l = \
+	bil_lex.l
+
+SOURCES.y = \
+	bil_parse.y
+
+SOURCES.c = \
+	abuil_load.c \
+	abuil_print.c \
+	abuil_resource_attr_map.c \
+	abuil_trav.c \
+	abuil_widget_obj_map.c \
+	bil_store.c \
+	bil.c \
+	bil_loadact.c \
+	bil_loadatt.c \
+	bil_loadfile.c \
+	bil_loadobj.c \
+	gil_loadact.c \
+	gil_loadatt.c \
+	gil_loadfile.c \
+	gil_loadobj.c \
+	gil.c \
+	load.c
+
+SOURCES.h.shipped=
+
+SOURCES.h.shared= \
+	abuil_load.h \
+	bil.h \
+	bil_parse.h \
+	gil.h
+
+SOURCES.h.unshared= \
+	abuil_loadP.h \
+	abuil_print.h \
+	bilP.h \
+	bil_loadattP.h \
+	gilP.h \
+	gil_loadattP.h \
+	loadP.h
+
+SOURCES.h = \
+		$(SOURCES.h.shipped)	\
+		$(SOURCES.h.shared)	\
+		$(SOURCES.h.unshared)
+
+LIBRARY = libABil.a
+
+# Compiler flags.
+
+CPPFLAGS += \
+	    -I$(OPENWINHOME)/include \
+	    -I$(MOTIFHOME)/include \
+	    -I$(CDE_EXTRA_STUFF)/include
+	    
+
+# Make information.
+
+.INIT:  $(PROJECTDIR)/Makefile.include
+include $(PROJECTDIR)/Makefile.include
+
+LIBRARIES       = -lABil -lABobj -lAButil -lUil -lMrm -lXm -lXt -lX11 -lgen
+LDFLAGS         = $(LIBDIRS) $(LIBRARIES)                     
+LIBDIRS         = -L. \
+	    	  -L$(PROJECTDIR)/src/libAButil \
+	    	  -L$(PROJECTDIR)/src/libABobj \
+		  -L/opt/dt/lib \
+		  -L/usr/openwin/lib
+
+bil_parse.h + bil_parse.c:	bil_parse.y
+	yacc -d bil_parse.y
+	${RM} bil_parse.h bil_parse.c
+	sed -e "s/\([^A-Za-z]\)yy/\1AByy/g" -e "s/^yy/AByy/" < y.tab.h > bil_parse.h
+	sed -e "s/\([^A-Za-z]\)yy/\1AByy/g" -e "s/^yy/AByy/" < y.tab.c > bil_parse.c
+	${RM} y.tab.h y.tab.c
+    
+bil_lex.c:	bil_lex.l
+	lex bil_lex.l
+	${RM} bil_lex.c
+	sed "s/\<yy/AByy/g" < lex.yy.c > bil_lex.c
+	${RM} lex.yy.c
+
+test_loaduil: test_loaduil.o ${LIBRARY}
+	$(CC) -o $@ $@.o $(LDFLAGS)
+
+bil_test: bil_test.o ${LIBRARY}
+	$(CC) -o $@ $@.o $(LDFLAGS)
+

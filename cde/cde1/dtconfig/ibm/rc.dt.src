@@ -1,0 +1,69 @@
+\#! /bin/ksh
+\# *                                                                      *
+\# * (c) Copyright 1993, 1994 Hewlett-Packard Company                     *
+\# * (c) Copyright 1993, 1994 International Business Machines Corp.       *
+\# * (c) Copyright 1993, 1994 Sun Microsystems, Inc.                      *
+\# * (c) Copyright 1993, 1994 Novell, Inc.                                *
+\# *
+\#
+\# COMPONENT_NAME: DESKTOP rc.dt
+\#
+\# FUNCTIONS:
+\#
+\# ORIGINS: 
+\#
+\# (C) COPYRIGHT International Business Machines Corp. 1994
+\# All Rights Reserved
+\# Licensed Materials - Property of IBM
+\#
+\# US Government Users Restricted Rights - Use, duplication or
+\# disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
+\#
+\####################################################################
+\# rc.dt -
+\#       starts the AIX Windows Desktop Login
+\#       waits for the X Server to start
+\####################################################################
+
+\#
+\# Start the dtsrc subsystem
+\#
+/usr/bin/startsrc -s dtsrc 2>/dev/null 1>/dev/null
+
+\#
+\# Check for error on starting the dtsrc subsystem
+\#
+rc=$?
+if [ "$rc" != "0" ]; then
+	echo "\n\nERROR: The AIX Windows Desktop is not correctly configured\n"
+	exit 1
+fi
+
+echo "Starting AIX Windows Desktop....\c"
+
+\#
+\# Sleep for <= 10 secs for the X server to come up.
+\#
+
+i=10
+while [ "$i" != 0 ]
+do
+	\#
+	\# checking if the X server is up and running.
+	\#
+        XPID=`ps -ef | awk '$8~/^.*\/X$/{print $3}'`
+        if [ -n "$XPID" ]; then                  
+           ps -ef | grep $XPID | grep "dtlogin" | grep -v grep    1>/dev/null
+           rc=$?                                          
+        else                                                                    
+           rc=1                                                                 
+        fi                                                                      
+	if [ "$rc" -eq "0" ]; then
+		break 
+	fi
+	sleep 1
+	echo ".\c"
+	i=`expr $i - 1`  # decrement count
+done
+
+sleep 1

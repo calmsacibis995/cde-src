@@ -1,0 +1,78 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1988 by Massachusetts Institute of Technology
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH XmClipboardLock 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmClipboardLock\fP \- A clipboard function that locks the clipboard
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/Xm.h>
+\&#include <Xm/CutPaste.h>
+.sp \n(PDu
+int \fIXmClipboardLock\fI (\fBdisplay, window\fI)
+.ta .5i 1.5i
+.nf
+	Display	\fB* display\fI;
+	Window	\fBwindow\fI;
+.wH
+.fi
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+\fIXmClipboardLock\fP locks the clipboard from access by another application until
+\fIXmClipboardUnlock\fP is called.  All clipboard functions lock and unlock
+the clipboard to prevent simultaneous access.  This function allows the
+application to keep the clipboard data from changing between calls to
+\fIInquire\fP and
+other clipboard functions.  The application does not need to
+lock the clipboard between calls to \fIXmClipboardStartCopy\fP and
+\fIXmClipboardEndCopy\fP or to \fIXmClipboardStartRetrieve\fP and
+\fIXmClipboardEndRetrieve\fP.
+.PP 
+If the clipboard is already locked by another application, \fIXmClipboardLock\fP
+returns an error status.  Multiple calls to this function by the same
+application increases the lock level.
+.IP "\fBdisplay\fP"
+Specifies a pointer to the \fIDisplay\fP structure that was returned in a
+previous call to \fIXOpenDisplay\fP or \fIXtDisplay\fP.
+.IP "\fBwindow\fP"
+Specifies a widget's window ID that relates the application window to the
+clipboard.  The widget's window ID can be obtained by using
+\fIXtWindow\fP.
+The same application instance should pass the same window ID to each of the
+clipboard functions that it calls.
+.SH RETURN VALUE
+.IP "\fIClipboardSuccess\fP"
+The function is successful.
+.IP "\fIClipboardLocked\fP"
+The function failed because the clipboard was locked by another
+application.  The application can continue to call the function again with
+the same parameters until the lock goes away.  This gives the application
+the opportunity to ask if the user wants to keep trying or to give up
+on the operation.
+.SH RELATED INFORMATION
+.na
+\fIXmClipboardEndCopy(3X)\fP, \fIXmClipboardEndRetrieve(3X)\fP,
+\fIXmClipboardStartCopy(3X)\fP, \fIXmClipboardStartRetrieve(3X)\fP, and
+\fIXmClipboardUnlock(3X)\fP.
+.ad

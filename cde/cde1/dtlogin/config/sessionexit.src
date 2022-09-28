@@ -1,0 +1,32 @@
+\#!/bin/ksh 
+\#####################################################################
+\###  File:              sessionexit
+\###
+\###  Default Location:  /usr/dt/config/sessionexit
+\###
+\###  Purpose:		 To run addition programs under user's id at logout
+\### 			 time after user's session applications have been 
+\###			 terminated.
+\###
+\###                     The /usr/dt/config location can be overwritten by 
+\###                     system software upgrades.  If you want to run
+\###                     additional programs specific to a this workstation and 
+\###                     not be effected by system upgrades, instead create a 
+\###                     similar executable file at /etc/dt/config/sessionexit.
+\###
+\###  Invoked by:        CDE SessionMgr (dtsession)
+\###
+\###  Revision:          @(#)sessionexit.src 1.3 97/05/26 
+\###
+\###  (c) Copyright 1997 Sun Microsystems, Inc.
+\###
+\#####################################################################
+
+if [ "$DTXSERVERLOCATION" != "remote" ]
+then
+    if [ -f /var/dt/tmp/$DTUSERSESSION/sdtvolcheck_pid ]
+    then
+	/bin/kill `/bin/cat /var/dt/tmp/$DTUSERSESSION/sdtvolcheck_pid`
+	/bin/rm /var/dt/tmp/$DTUSERSESSION/sdtvolcheck_pid
+    fi
+fi

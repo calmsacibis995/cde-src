@@ -1,0 +1,188 @@
+XCOMM @(#)ImakeSdm.tmpl	1.15 97/04/29 SMI
+XCOMM Copyright (c) 1996 Sun Microsystems, Inc.
+
+#undef ImakeDependency
+#define ImakeDependency() /**/
+
+#ifndef DoNormalLib
+#define DoNormalLib NormalLibSDtMail
+#endif
+#ifndef DoSharedLib
+#define DoSharedLib SharedLibSDtMail
+#endif
+#if !DoNormalLib && !DoSharedLib
+#undef  DoSharedLib
+#define DoSharedLib YES
+#endif
+#ifndef SharedLibSDtMailRev
+#define SharedLibSDtMailRev 2
+#endif
+
+#ifndef SdmTemplateDbOption
+#define SdmTemplateDbOption	-ptr$(LIBTOPDIR)
+#endif
+
+#ifndef SdmLibraryTemplateDbOption
+#define SdmLibraryTemplateDbOption	-ptr@CompilerWorkAround@ -ptr$(LIBTOPDIR)
+#endif
+
+#ifndef SdmIncludes
+#define SdmIncludes 		-I$(LIBTOPDIR) -I$(LIBTOPDIR)/include
+#endif
+
+#ifndef NoLargeFiles
+#define NoLargeFiles
+#endif
+
+#ifndef SdmDefines
+#if OSMajorVersion > 5 || (OSMajorVersion == 5 && OSMinorVersion > 5)
+#define SdmDefines  		-D_REENTRANT -mt SdmTemplateDbOption -DUSE_SOLARIS_THREADS NoLargeFiles
+#else
+#define SdmDefines  		SdmTemplateDbOption
+#endif
+#endif
+
+
+/* SdmTestDefines omits the SdmTemplateDbOption to avoid non-PIC templates
+ * polluting the master template directory.  Instead, any templates required
+ * for the test programs are created (by default) in the local directory.
+ */
+#ifndef SdmTestDefines
+#if OSMajorVersion > 5 || (OSMajorVersion == 5 && OSMinorVersion > 5)
+#define SdmTestDefines  		-D_REENTRANT -mt -DUSE_SOLARIS_THREADS
+#else
+#define SdmTestDefines  		
+#endif
+#endif
+
+
+#ifndef SdmLocalLibrary
+#define SdmLocalLibrary		-L$(LIBTOPDIR) -lSDtMail
+#endif
+
+#ifndef SdmCclientIncludes
+#define SdmCclientIncludes 	-I$(BINSTALL_INCDIR)/c-client
+#endif
+
+#ifndef SdmCclientLibrary
+#define SdmCclientLibrary 	$(BINSTALL_LIBDIR)/libc-client.a
+#endif
+
+#ifndef SdmLibraryLdFlags
+#define SdmLibraryLdFlags	-L$(BINSTALL_LIBDIR) -R$(DTUSRLIBDIR)
+#endif
+
+#ifndef SdmLclLibrary
+#define SdmLclLibrary 	$(BINSTALL_LIBDIR)/liblcl.a
+#endif
+
+#ifndef SdmSharedLibraryLdFlags
+#define SdmSharedLibraryLdFlags	-G -z nodefs -z text SdmLibraryTemplateDbOption SdmLibraryLdFlags
+#endif
+
+#ifndef SdmTestsDir
+#define SdmTestsDir		$(LIBTOPDIR)/TestApps
+#endif
+
+#ifndef SdmTestSharedLibs
+#define SdmTestSharedLibs -L$(SDMTESTSDIR)/lib -R`pwd`/$(SDMTESTSDIR)/lib -lCtrlObjs -lDataObjs -lDataStore -lDataStructs  -lDataTypes -lManager -lPortObjs -lTranObjs -lUtils
+#endif
+
+SDMTEMPLATEDBOPTION	= SdmTemplateDbOption
+SDMINCLUDES		= SdmIncludes
+SDMDEFINES		= SdmDefines
+SDMTESTDEFINES		= SdmTestDefines
+SDMLIBRARY		= SdmLibrary
+SDMCCLIENTINCLUDES	= SdmCclientIncludes
+SDMCCLIENTLIBRARY	= SdmCclientLibrary
+SDMLCLLIBRARY		= SdmLclLibrary
+SDMSHLIBLDFLAGS		= SdmSharedLibraryLdFlags
+SDMTESTSDIR		= SdmTestsDir
+SDMTESTLIBS		= SdmTestSharedLibs
+
+/*
+ * SdmTestTarget - target for tests step; used in test apps
+ */
+#ifndef SdmTestTarget
+#define SdmTestTarget(depends)						@@\
+tests::	depends
+#endif /* SdmTestTarget */
+
+/*
+ * SdmCleanTest - target for cleaning test apps
+ */
+#ifndef SdmCleanTest
+#define SdmCleanTest(testprog)						@@\
+clean::									@@\
+	$(RM) testprog							@@\
+	$(RM) -r Templates.DB
+#endif /* SdmCleanTest */
+
+/*
+ * SdmTestSubdirs - generate rules to build tests recursively
+ */
+#ifndef SdmTestSubdirs
+#define SdmTestSubdirs(dirs) 						@@\
+NamedTargetSubdirs(tests,dirs,"making tests",NullParameter,tests)
+#endif /* SdmTestSubdirs */
+
+/*
+ * SdmTestInstallLibrary - install test lib symlinks
+ */
+#ifndef SdmTestInstallLibrary
+#define SdmTestInstallLibrary(libname,solist)				@@\
+LinkBuildFileList($(LIBTOPDIR),includes,Concat(lib,libname.so),$(SDMTESTSDIR),lib,$(LIBCURDIR))
+#endif /* SdmTestInstallLibrary */
+
+/*
+ * SdmTestLibraryTarget - create a test shared library
+ */
+#ifndef SdmTestLibraryTarget
+#define SdmTestLibraryTarget(libname,solist)				@@\
+tests:: Concat(lib,libname.so)						@@\
+									@@\
+Concat(lib,libname.so): solist						@@\
+	$(RM) $@ 							@@\
+        $(C++) -o $@ -h $@ $(SDMSHLIBLDFLAGS) solist			@@\
+									@@\
+SdmTestInstallLibrary(libname,solist)					@@\
+									@@\
+clean::									@@\
+	$(RM) Concat(lib,libname.so)
+#endif /* SdmTestLibraryTarget */
+
+#ifndef SdmObjectListFile
+#define SdmObjectListFile Objs.list
+#endif 
+
+/*
+ * SdmObjectListTarget - generates an object list file based on the
+ *			 current subdir and obj list suitable for use
+ *			 by top-level library Imakefile
+ */
+#ifndef SdmObjectListTarget
+#define SdmObjectListTarget(curdir,objs)				@@\
+									@@\
+objlist::	SdmObjectListFile					@@\
+									@@\
+SdmObjectListFile:: 							@@\
+	@echo "Building" SdmObjectListFile "for" curdir			@@\
+	@$(RM) SdmObjectListFile					@@\
+	@for O in objs ; do \						@@\
+		echo curdir/$$O >> SdmObjectListFile ; \		@@\
+	done						 		@@\
+									@@\
+clean::									@@\
+	$(RM) SdmObjectListFile						@@\
+
+#endif /* SdmObjectListTarget */
+
+#ifdef SunArchitecture
+/* The following SDMNOKEEPSTATE variable allows .KEEP_STATE dependency
+ * tracking to be disabled in certain directories where its use is
+ * inappropriate.
+ */
+#ifndef SDMNOKEEPSTATE
+.KEEP_STATE:
+#endif /* SDMNOKEEPSTATE */
+#endif /* SunArchitecture */

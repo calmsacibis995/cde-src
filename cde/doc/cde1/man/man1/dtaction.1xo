@@ -1,0 +1,207 @@
+.TH dtaction 1 "17 Jan 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" *************************************************************************
+.\" ** (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" ** (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" ** (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" ** (c) Copyright 1993, 1994, 1995 Novell, Inc
+.\" *************************************************************************
+.SH NAME
+dtaction \- invoke a Cde action with specified arguments
+.SH SYNOPSIS
+.yS
+dtaction
+[\-contextDir\0\f2context_dir\fP]
+[\-execHost\0\f2host_name\fP]
+[\-termOpts\0\f2terminal_arguments\fP]
+[\-user\0\f2user_name\fP]
+\f2action_name\fP
+[\f2action_arg\fP] ...
+.yE
+.SH DESCRIPTION
+The
+.Cm dtaction
+utility allows applications or shell scripts, which are otherwise not
+connected into the Cde development environment, to invoke action requests.
+.P
+The action called
+.I action_name
+is invoked with the
+.I action_arg
+provided on the command line.
+A single
+.I action_name
+is required;
+the user may provide any number of
+.IR action_arg s.
+Interpretation of the
+.I action_name
+and
+.IR action_arg s
+depends on the
+definition of the action in the action database (see
+.cde .BR dtactionfile (4)).
+.xo .cX dtactionfile ).
+The action may be defined in one of the system action database files,
+or in one of the user's private action database files.
+.P
+The
+.IR action_arg s
+are absolute or relative pathnames of files.
+The utility passes this list of files on to the specified action.
+.P
+Error dialogs are posted when the following conditions are detected:
+.xo .BL
+.cde .VL 3
+.LI \(bu
+could not initialize desktop environment
+.LI \(bu
+invalid user or password
+.LI \(bu
+unable to change ID to the desired user
+.LI \(bu
+no action name specified
+.LE
+.SH OPTIONS
+.xos
+The
+.Cm dtaction
+utility does not support the \*(Zu because it uses
+the X Window System convention of full-word options.
+.xoe
+The following options are available:
+.VL 6
+.LI "\f3\-contextDir\fP \f2context_dir\fP"
+.br
+If the definition of
+.I action_name
+does not define
+a current working directory (see
+.Cn CWD
+in
+.cde .BR dtactionfile (4))
+.xo .cX dtactionfile )
+for command actions,
+the user can use this option to specify a default directory context.
+.LI "\f3\-execHost\fP \f2host_name\fP"
+.br
+The user can use this option to specify an alternative execution host,
+.IR host_name ,
+for a command action.
+If the action is not a command
+action, the
+.Cm dtaction
+utility ignores this option.
+The action is attempted on
+.I host_name
+instead of the hosts specified in the action's
+.Cn EXEC_HOST
+(see
+.cde .BR dtactionfile (4))
+.xo .cX dtactionfile )
+specification.
+An error dialog is posted if it is not possible to invoke the
+specified action on any eligible host.
+.LI "\f3\-termOpts\fP \f2terminal_arguments\fP"
+.br
+This option allows the user to specify arguments intended for the terminal
+emulator that is provided for command actions that are not of type
+.Cn NO_STDIO .
+If there are white-space characters in the
+.I terminal_arguments
+string,
+that string must be quoted to protect it from the shell.
+These arguments are passed unchanged to the terminal emulator.
+The user must ensure that they are reasonable; in particular,
+.I terminal_arguments
+does not allow the argument that specifies the command
+to be run in a terminal emulator window (that is,
+.B \-e
+for
+.Cm dtterm 1).
+.LI "\f3\-user\fP \f2user_name\fP"
+.br
+The
+.B \-user
+option allows a user to specify a user name.
+If
+.Cm dtaction
+is not currently running as that user, a prompt dialog
+collects the indicated user password, or the root user
+password.
+Once a valid password is entered, the
+.Cm dtaction
+utility changes so
+that it is running as the requested user and then
+initiates the requested action.
+.LE
+.SH OPERANDS
+The following operands are supported:
+.VL 6
+.LI \f2action_name\fP
+.br
+The name of the action to be invoked.
+.LI \f2action_arg\fP
+.br
+The absolute or relative file names of files.
+.LE
+.SH STDIN
+Not used.
+.SH "INPUT FILES"
+The input files named as
+.I action_arg
+arguments are
+absolute or relative names of files.
+.P
+The action database files found on
+.I DTDATABASESEARCHPATH
+conform to the format specified in
+.cde .BR dtactionfile (4).
+.xo .cX dtactionfile .
+.SH "ENVIRONMENT VARIABLES"
+The following environment variable affects the execution of
+.Cm dtaction :
+.VL 6
+.LI \f2DTDATABASESEARCHPATH\fP
+.br
+A comma-separated list of directories (with optional host: prefix)
+that tells the action service where to find the action databases.
+.LE
+.SH RESOURCES
+None.
+.SH "ASYNCHRONOUS EVENTS"
+.xo Default.
+.cde The
+.cde .Cm dtaction
+.cde utility takes the standard action for all signals.
+.SH STDOUT
+Not used.
+.SH STDERR
+The
+.Cm dtaction
+utility writes diagnostic error messages to standard error,
+which is redirected to
+.BR $HOME/.dt/errorlog .
+.SH "OUTPUT FILES"
+None.
+.SH "EXTENDED DESCRIPTION"
+None.
+.SH "EXIT STATUS"
+The following exit values are returned:
+.VL 4
+.LI \h"\w'>'u"0
+Successful completion.
+.LI >0
+An invocation error was detected.
+.LE
+.SH "CONSEQUENCES OF ERRORS"
+Default.
+.SH "APPLICATION USAGE"
+None.
+.SH EXAMPLES
+None.
+.SH "SEE ALSO"
+.cde .BR dtactionfile (4),
+.xo .cX dtactionfile ,
+.Cm dtterm 1,
+.Cm dtaction 1.

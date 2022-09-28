@@ -1,0 +1,121 @@
+DESKTOP_VERSION_STRING = DesktopVersionString
+
+/* General case INCLUDES DEFINES LOCAL_LIBRARIES
+ * Each individual architecture may have more or less of the above.
+ * Use EXTRA_DEFINES and EXTRA_INCLUDES to add defines and includes
+ * to an individual architecture.  There is no equivalent for
+ * LOCAL_LIBRARIES.
+ * USE_libraryname in LOCAL_LIBRARIES is by default empty.
+ * It should be set when necessary to the real library macro name.
+ *
+ *******************************************************************
+ **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+ **  (c) Copyright 1993, 1994 International Business Machines Corp.
+ **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+ **  (c) Copyright 1993, 1994 Novell, Inc.
+ *******************************************************************
+ */
+
+DEFINES = -DMESSAGE_CAT -DDT_LITE -DWORDWRAP -UNLS16
+INCLUDES = -I. -I$(BMSLIBSRC)
+#SYS_LIBRARIES = -lm
+
+/* DEPLIBS contains the list of library depencies for a client.
+ * LOCAL_LIBRARIES contains the list of libraries on the link line.
+ * Generally, the dependency form of a library has DEP as a prefix.
+ * e.g. put $(XLIB) in LOCAL_LIBRARIES and $(DEPXLIB) in DEPLIBS.
+ * NOTE: if DEPLIBS is not set here, it is by default null and there
+ *       are no library dependencies for clients.
+ *       You cannot put -Llibpath into DEPLIBS. You must put actual
+ *       paths to the library.
+ */
+#if defined (SunArchitecture)
+DEPLIBS = $(DEPDTWIDGETLIB) $(DEPDTSVCLIB) $(DEPTTLIB) \
+                  $(DEPXMLIB) $(DEPXTOOLLIB) $(DEPXLIB)
+LOCAL_LIBRARIES = $(DTWIDGETLIB) $(DTSVCLIB) $(TTLIB)\
+                  $(XMLIB) $(XTOOLLIB) $(XLIB) -ldl
+EXTRA_DEFINES = -DUSE_SDTSPELL
+#else
+DEPLIBS = $(DEPDTHELPLIB) $(DEPDTWIDGETLIB) $(DEPDTSVCLIB) $(DEPTTLIB)\
+                  $(DEPXMLIB) $(DEPXTOOLLIB) $(DEPXLIB)
+LOCAL_LIBRARIES = $(DTHELPLIB) $(DTWIDGETLIB) $(DTSVCLIB) $(TTLIB)\
+                  $(XMLIB) $(XTOOLLIB) $(XLIB) -ldl
+#endif /* SunArchitecture */
+
+#ifdef HPArchitecture
+   EXTRA_DEFINES =  -DMESSAGE_CAT -DWORDWRAP -DJPN
+   SYS_LIBRARIES = -lm
+#endif  /* HPArchitecture */
+
+#if defined(RsArchitecture)
+   EXTRA_DEFINES =  -DWORDWRAP 
+   EXTRA_CCOPTIONS = -qoptimize=1
+   SYS_LIBRARIES = -lm -liconv
+#endif  /* RsArchitecture */
+
+
+
+#if defined (SunArchitecture)
+
+#if REORDER_PROFILED
+SYS_LIBRARIES = -lm -ldl -lw
+CC = CcCmd -xpg $(BBAFLAGS)
+LOCAL_LDFLAGS = -L/usr/dt/lib -lmcount
+#else
+# SYS_LIBRARIES = -lm -ldl -lw
+#EXTRA_CCOPTIONS = -xF
+EXTRA_CCOPTIONS = -xF -xstrconst -dalign
+LOCAL_LDFLAGS = -M mapfile.reorder
+#endif
+
+#endif
+
+  
+
+
+#if defined(USLArchitecture)
+   SYS_LIBRARIES = -lm -ldl -lw -lgen
+#endif  /* SunArchitecture */
+
+#if defined(HPOSFArchitecture)
+   EXTRA_DEFINES = -DJPN 
+   SYS_LIBRARIES = -lm
+#endif  /* HPOSFArchitecture */
+
+PROGRAMS = dtpad
+
+OBJS1 = dtpad.o version.o fileCB.o fileDlg.o fileIo.o helpCB.o helpDlg.o editCB.o main.o optionsCB.o session.o formatCB.o messageCB.o ttMsgSupport.o
+SRCS1 = dtpad.c version.c fileCB.c fileDlg.c fileIo.c helpCB.c helpDlg.c editCB.c main.c optionsCB.c session.c formatCB.c messageCB.c ttMsgSupport.c
+
+NormalLibraryObjectRule()
+ComplexProgramTarget_1(dtpad,$(LOCAL_LIBRARIES), /**/)
+
+/***** For dtge make a client_OBJS.o using client_main.o ******/
+/***** This implies the existence of client_main.c       ******/
+/***** dtge hidden symbols *******/
+#ifdef BuildHugeObject
+#ifdef HPArchitecture
+#ifdef __hp9000s300
+HIDDEN_SYMBOLS = -h _main -h _Warning -h _HelpSetVolAndLocation \
+-h _DisplayHelp -h _HelpHyperlinkCB -h _HelpCloseCB -h _restoreSession
+#else
+HIDDEN_SYMBOLS = -h main -h Warning -h HelpSetVolAndLocation -h DisplayHelp \
+-h HelpHyperlinkCB -h HelpCloseCB -h restoreSession
+#endif
+#endif
+SpecialRelocatableTarget(dtpad,$(HIDDEN_SYMBOLS),$(OBJS1)) #endif
+#endif
+
+codecenter_dtpad:: $(SRCS1)
+ 	# setopt path "$(DTSRC) $(XMSRC) $(TOOLKITSRC) $(XLIBSRC)"
+	# setopt swap_uses_path
+	# unsetopt win_fork
+	# setopt program_name dtpad
+	# setopt load_flags $(CFLAGS)
+	# setopt ansi
+	# load $(ALLDEFINES) $(SRCS1) $(LDOPTIONS)  $(LOCAL_LIBRARIES) $(SYS_LIBRARIES) $(EXTRA_LIBRARIES)
+	# link
+
+LOCAL_CPP_DEFINES = -DCDE_INSTALLATION_TOP=$(CDE_INSTALLATION_TOP)
+
+CppTextRule(Dtpad,Dtpad.src,$(LOCAL_CPP_DEFINES),)

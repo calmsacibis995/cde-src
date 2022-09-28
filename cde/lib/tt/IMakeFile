@@ -1,0 +1,48 @@
+# %%  (c) Copyright 1993, 1994 Hewlett-Packard Company			
+# %%  (c) Copyright 1993, 1994 International Business Machines Corp.	
+# %%  (c) Copyright 1993, 1994 Sun Microsystems, Inc.			
+# %%  (c) Copyright 1993, 1994 Novell, Inc. 				
+# %%  $Revision: $ 			 				
+#ifdef HideFromImake
+ #
+ # IMakeFile 1.2	30 Jul 1993
+ #
+ # Top-level imakefile for the ToolTalk source product.
+ #
+ # SunPro make will use the makefiles called "MakeFile".
+ # GNU make will use the makefiles called "GNUMakeFile".
+ #
+ # 1. Create the top-level makefile you need by running one of
+ #	sh IMakeFile GNUMakeFile
+ #	sh IMakeFile [MakeFile]
+ #
+ # 2. Set $TOOLS to either "spro" or "gnu" to choose your compiler.
+ #    (The default is "spro", unless $(MAKE) turns out to be "gnumake".)
+ #    The compiler you choose must be in your $PATH.
+ #
+ # 3. Run SunPro make with -f MakeFile, or GNU make with -f GNUMakeFile.
+ #
+ #
+ # This preamble turns this imakefile into a shell script which will
+ # create/update this directory's makefile when invoked as follows:
+ # % sh IMakeFile [[GNU]MakeFile]
+ #
+IMAKEDIR=imake; export IMAKEDIR
+exec make -f $IMAKEDIR/Boot.mk ${1+"$@"}
+#endif HideFromImake
+
+TT_DIR	= .
+SUB-DIRS = mini_isam lib slib bin
+
+include $(TT_DIR)/Make.macros
+
+default: all
+
+All:: $(MAKEFILE)s
+All all install_O clean cleaner clean.mk:: .init
+	for dir in $(SUB-DIRS) ; do \
+		(cd $$dir; $(MAKE) $(MAKE_FLAGS) $@) \
+	done
+
+ # GNU make does not support .INIT, so we fake it
+.init: ttinstall

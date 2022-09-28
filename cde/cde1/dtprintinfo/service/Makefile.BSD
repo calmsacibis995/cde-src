@@ -1,0 +1,32 @@
+#
+# Makefile.BSD
+#
+# Common Desktop Environment (CDE)
+#
+# Makefile for building a BSD dtlpstatd daemon
+#
+#     (c) Copyright 1993, 1994 Hewlett-Packard Company
+#     (c) Copyright 1993, 1994 International Business Machines Corp.
+#     (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+#     (c) Copyright 1993, 1994 Unix System Labs, Inc., a subsidiary
+#         of Novell, Inc.
+#
+
+BIN = dtlpstatd dtlpstat
+GEN = lpstat_svc.c lpstat_xdr.c lpstat.h
+CFLAGS = -O -DNO_MESSAGE_CAT -DNO_SPERROR -DNO_CLNT_CONTROL -DNO_XDR_POINTER
+OTHER = lpstat_bsd.o
+OTHER1 = rlpstat.o lpstat_bsd.o
+LIBS = -lrpc
+
+all: $(BIN)
+
+dtlpstatd: lpstat_proc.o lpstat_svc.o lpstat_xdr.o $(OTHER)
+	$(CC) -o $@ lpstat_proc.o lpstat_svc.o lpstat_xdr.o $(OTHER) $(LIBS)
+
+dtlpstat: dtlpstat.o lpstat_xdr.o $(OTHER1)
+	$(CC) -o $@ dtlpstat.o lpstat_xdr.o $(OTHER1) $(LIBS)
+
+dtlpstat.o: dtlpstat.c lpstat.h
+
+lpstat_proc.o: lpstat_proc.c lpstat.h

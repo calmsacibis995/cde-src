@@ -1,0 +1,136 @@
+# "@(#)Makefile.sun	1.41 96/06/03 SMI"
+
+.KEEP_STATE:
+.PARALLEL:
+
+# Paths
+OBJDIR  = ../../../obj
+BINDIR  = ../../../bin
+INCDIR  = -I../../include -I../.. -I.
+LIBDIR  = ../../../lib
+SHARED_LIBDIR  = ../../../shared_libs
+
+MOTIFHOME = /usr/dt
+OPENWINHOME = /usr/openwin
+CCLIENT = /net/jans/export1/c-client
+
+# Default target is to build shared
+default: shared
+all: shared static
+
+# Hooks to perform removes for make clean
+RM = rm -f
+RM_CMD = $(RM) *.i *.CKP *.ln *.BAK *.bak *.o core errs ,* *~ *.a .emacs_* tags TAGS make.log make.out MakeOut Templates.DB/*.o Templates.DB/Module.DB/* Templates.DB/Dependency.state Templates.DB/Template.opt .make.state
+
+# Compile Time Flags
+RPC_FLAGS = -DRPC_SVC_FG -DPORTMAP
+TMLT_FLAGS = 
+THREAD_FLAGS = -D_REENTRANT
+
+# Make Dependancies and Rules
+ARCH:sh     	=   arch
+OS_VERSION:sh   =   uname -r | awk -F. '{print $1}'
+TODAY_DATE:sh   =   date +"%D  %H:%M"
+
+PROGRAM = sdmtest
+
+OBJS =      Main.o \
+            AsyncTest.o \
+            ConnectionTest.o \
+            DataTypeTest.o \
+            SessionTest.o \
+            MessageStoreTest.o \
+            MessageTest.o \
+            MessageBodyTest.o \
+            MessageEnvelopeTest.o \
+            BasicTest.o \
+            UtilityTest.o \
+            Str.o \
+            SearchTest.o 
+
+# HandShake Directory 
+UIOBJS  =
+
+CPPFLAGS    +=   $(INCDIR) \
+		-I$(EINCLUDE) \
+		-I$(OPENWINHOME)/include \
+		-I$(MOTIFHOME)/include
+
+LDFLAGS 	+=  +w			\
+		-L$(LIBDIR)		\
+		-L$(OPENWINHOME)/lib	\
+		-L$(MOTIFHOME)/lib	\
+		-L$(CCLIENT)/lib	\
+		-R$(CCLIENT)/lib	\
+		-ptr.
+
+
+# Note for when linking against a static c-client library:
+#
+# A circular link dependency exists, since Sdm declares the mm_ callbacks
+# but doesn't internally reference all of them yet.  However, the c-client
+# library calls each of these functions , so -lSdm -lc-client will fail with
+# undefined mm_ symbols.  Using -lc-client -lSdm will fail because Sdm
+# references mail_open, which means the c-client library needs to be
+# downstream of the Sdm library.  The following resolves this cyclical
+# dependency: -lSdm -lc-client -lSdm.
+#
+# However, when using dynamic libraries, the linker matches the symbol
+# definition from upstream libraries (probably because that symbol may be
+# interposed at run-time from anywhere).
+
+# Dynamic Linked Libraries
+
+LDLIBS += -lc-client 
+
+# Static variant - just use the single .a
+static := LDLIBS += -lSDtMail $(DEFAULTLIBS)
+
+static : $(PROGRAM)
+
+# Shared variant - use the individual .so modules
+shared := LDFLAGS += \
+	-L$(SHARED_LIBDIR) \
+	-R$(SHARED_LIBDIR)
+
+shared := LDLIBS += \
+	-lctrlobjs \
+	-ldataobjs \
+	-ldatastore \
+	-ldatastructs \
+	-ldatatypes \
+	-lmanager \
+	-lportobjs \
+	-ltemplateexpand \
+	-ltranobjs \
+	-lutils \
+	$(DEFAULTLIBS)
+
+shared : $(PROGRAM)
+
+DEFAULTLIBS +=  \
+		-lC \
+                -lnsl \
+                -lsocket \
+                -ldl \
+		-mt
+
+SDMDEBFLAGS	= -g
+CCFLAGS += $(SDMDEBFLAGS) $(TMLT_FLAGS) $(THREAD_FLAGS)
+
+all:	$(PROGRAM)
+
+Makefiles:
+	rm -f Makefile
+	ln -s Makefile.sun Makefile
+
+clean:
+	@$(RM_CMD) "#"* $(OBJS) $(PROGRAM)
+
+$(BINDIR)/$(PROGRAM) : $(OBJS)
+
+$(OBJDIR)/%.o:  %.cc
+	$(LINK.cc) -o $(OBJDIR)/$*.o -c $*.cc
+
+$(PROGRAM):  $(OBJS) $(UIOBJS)
+	$(PURIFY) $(LINK.cc) -o $@ $(OBJS) $(UIOBJS) $(LDLIBS)

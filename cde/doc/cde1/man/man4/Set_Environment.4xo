@@ -1,0 +1,65 @@
+.TH Set_Environment 4 "13 May 1994"
+.SH NAME
+Set_Environment request \- set a tool's environment
+.SH SYNOPSIS
+.yS
+.ta \w@Set_Environment(@u
+Set_Environment(in string \f2variable\fP,
+	in string \f2value\fP
+	[...]);
+.yE
+.SH DESCRIPTION
+The
+.I Set_Environment
+request
+replaces the value of the indicated environment variable(s).
+.P
+The
+.I variable
+argument
+is the name of the environment variable to set.
+.P
+The
+.I value
+argument
+is the value of the environment variable.
+If this argument is unset (in other words, has a
+value of
+.BR (char\ *)0 ),
+then the
+variable should be removed from the environment.
+It is not
+an error for the variable not to have existed in the first place.
+.SH "APPLICATION USAGE"
+The
+.Fn ttdt_session_join 3,
+function can be used to register for,
+and transparently process, the
+.I Set_Environment
+request.
+.SH EXAMPLES
+The
+.I Set_Environment
+request can be sent as in the following example:
+.Cs I
+Tt_message msg = tttk_message_create(0, TT_REQUEST, TT_SESSION,
+			the_recipient_procid, TTDT_SET_ENVIRONMENT,
+			my_callback);
+tt_message_arg_add(msg, TT_IN, Tttk_string, "PATH");
+tt_message_arg_add(msg, TT_IN, Tttk_string, "/bin:/usr/ucb");
+tt_message_send(msg);
+.Ce
+.cdes 
+.SH WARNINGS
+.I Set_Environment
+can also be sent as a multicast notice, as an
+.I edict 
+to all tools in the scope of the message.
+The consequences of doing so can be severe and unexpected.
+.cdee
+.SH "SEE ALSO"
+.Fn tt_message_arg_add 3,
+.Fn tt_message_send 3,
+.Fn ttdt_session_join 3;
+.I Get_Environment
+request.

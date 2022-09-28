@@ -1,0 +1,164 @@
+XCOMM
+XCOMM 	$XConsortium: Imakefile /main/cde1_maint/2 1995/09/06 07:52:54 lehors $
+XCOMM
+XCOMM 	@(#)Imakefile	1.8 21 Jan 1994
+XCOMM
+XCOMM 	RESTRICTED CONFIDENTIAL INFORMATION:
+XCOMM	
+XCOMM	The information in this document is subject to special
+XCOMM	restrictions in a confidential disclosure agreement between
+XCOMM	HP, IBM, Sun, USL, SCO and Univel.  Do not distribute this
+XCOMM	document outside HP, IBM, Sun, USL, SCO, or Univel without
+XCOMM	Sun's specific written approval.  This document and all copies
+XCOMM	and derivative works thereof must be returned or destroyed at
+XCOMM	Sun's request.
+XCOMM
+XCOMM	Copyright 1993 Sun Microsystems, Inc.  All rights reserved.
+XCOMM
+XCOMM
+
+#define PassCDebugFlags 'CDEBUGFLAGS=$(CDEBUGFLAGS)'
+
+#include <Library.tmpl>
+#include "../ab.tmpl"
+#include "../ab.rules"
+
+    INCLUDES = -I. -I$(ABINCLUDES)
+
+INSTALLFLAGS = $(INSTINCFLAGS)
+
+    LINTLIBS = $(LINTXLIB) $(LINTXTOOL)
+
+     DEFINES =
+
+SOURCES.h.shipped=
+
+SOURCES.h.shared= \
+	abuil_load.h \
+	abuil_print.h \
+	bil.h \
+	bil_parse.h \
+	gil.h
+
+SOURCES.h.unshared= \
+	abuil_loadP.h \
+	bilP.h \
+	bil_loadattP.h \
+	gilP.h \
+	gil_loadattP.h \
+	loadP.h
+
+SOURCES.l = 
+
+SOURCES.y = \
+	bil_parse.y
+
+SRCS = \
+	abuil_load.c \
+	abuil_print.c \
+	abuil_resource_attr_map.c \
+	abuil_trav.c \
+	abuil_widget_obj_map.c \
+	bil_store.c \
+	bil.c \
+	bil_lexer.c \
+	bil_loadact.c \
+	bil_loadatt.c \
+	bil_loadfile.c \
+	bil_loadobj.c \
+	bil_parse.c \
+	gil_loadact.c \
+	gil_loadatt.c \
+	gil_loadfile.c \
+	gil_loadobj.c \
+	gil.c \
+	load.c
+
+OBJS = \
+	abuil_load.o \
+	abuil_print.o \
+	abuil_resource_attr_map.o \
+	abuil_trav.o \
+	abuil_widget_obj_map.o \
+	bil_store.o \
+	bil.o \
+	bil_lexer.o \
+	bil_loadact.o \
+	bil_loadatt.o \
+	bil_loadfile.o \
+	bil_loadobj.o \
+	bil_parse.o \
+	gil_loadact.o \
+	gil_loadatt.o \
+	gil_loadfile.o \
+	gil_loadobj.o \
+	gil.o \
+	load.o
+
+  SYS_LIBRARIES = -lm
+
+#ifdef RsArchitecture
+SYS_LIBRARIES = -lm -liconv
+#endif
+
+#ifdef	SunArchitecture
+SYS_LIBRARIES = -lm -ldl $(WIDECHARSYSLIB) -lgen
+WAITTARGET = .WAIT
+#endif	/* SunArchitecture */
+
+   INSTALLFLAGS = -m 4755
+       LINTLIBS = $(XINPUTLIB) $(DTHELPLIB) $(DTSVCLIB) $(XMLIB) $(XTOOLLIB) $(XLIB)
+LOCAL_LIBRARIES = $(XINPUTLIB) $(DTHELPLIB) $(DTSVCLIB) $(XMLIB) $(XTOOLLIB) $(XLIB)
+
+LibraryObjectRule()
+
+# Build library
+DERIVED_C_SOURCE=bil_parse.h bil_parse.c
+#ifdef SunArchitecture
+#  For Sun, force parallel make to wait after building C files from .y and .l
+#  files. Some of the other C files include bil_parse.h
+NormalDepLibraryTarget(ABil, $(DERIVED_C_SOURCE) .WAIT $(OBJS), $(OBJS))
+#else
+NormalDepLibraryTarget(ABil, $(DERIVED_C_SOURCE) $(OBJS), $(OBJS))
+#endif
+
+includes:: bil_parse.h
+
+
+bil_parse.h + bil_parse.c:	bil_parse.y
+	$(YACC) -d $(YACCFLAGS) bil_parse.y
+	${RM} bil_parse.h bil_parse.c
+	sed -e "s/\([^A-Za-z]\)yy/\1AByy/g" -e "s/^yy/AByy/" < y.tab.h > bil_parse.h
+	sed -e "s/\([^A-Za-z]\)yy/\1AByy/g" -e "s/^yy/AByy/" < y.tab.c > bil_parse.c
+	${RM} y.tab.h y.tab.c
+    
+bil_lex.c:	bil_lex.l
+	$(LEX) bil_lex.l
+	${RM} bil_lex.c
+	sed -e "s/\([^A-Za-z]\)yy/\1AByy/g" -e "s/^yy/AByy/" < lex.yy.c > bil_lex.c
+	${RM} lex.yy.c
+
+DependTarget()
+
+LOCAL_LIBRARIES= \
+	./libABil.a \
+	../libABobjXm/libABobjXm.a \
+	../libABobj/libABobj.a \
+	../libAButil/libAButil.a
+
+bil_test: bil_test.o $(LOCAL_LIBRARIES)
+	$(CC) $(CFLAGS) -o bil_test bil_test.o $(LOCAL_LIBRARIES)
+
+BuildAbIncludes(shared_includes, $(SOURCES.h.shared),../include/ab_private, ../../libABil)
+
+includes:: shared_includes $(WAITTARGET)
+sdtgilcvt: libABil.a
+dtcodegen: libABil.a
+
+/*
+ * Will add this after more testing:
+ * depend:: $(DERIVED_C_SOURCE)
+ */
+
+clean::
+	$(RM) $(DERIVED_C_SOURCE)

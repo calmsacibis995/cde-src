@@ -1,0 +1,68 @@
+.TH Get_Geometry 4 "1 March 1996" "ToolTalk 1.3" "Desktop Services Message Sets"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.BH "1 March 1996" 
+.IX "Get_Geometry.4" "" "Get_Geometry.4" "" 
+.SH NAME
+Get_Geometry \- get a tool's on-screen geometry
+.SH SYNOPSIS
+.ft 3
+.nf
+.ta \w@Get_Geometry(@u
+Get_Geometry(out width \f2w\fP,
+	out height \f2h\fP,
+	out xOffset \f2x\fP,
+	out yOffset \f2y\fP
+	[in messageID \f2commission\fP]);
+.PP
+.fi
+.SH DESCRIPTION
+The
+.I Get_Geometry
+request
+reports the on-screen geometry of the optionally specified
+window, or of the window primarily associated with the recipient
+procid (if no window is specified).
+.PP
+The
+.IR w ,
+.IR h ,
+.I x
+and
+.I y
+arguments are integer geometry values, in pixels,
+representing width, height, x-coordinate and y-coordinate,
+respectively.
+Negative offset values
+are interpreted according to the
+.BR X11 (7)
+man page.
+.PP
+The
+.I commission
+argument
+is the ID of the ongoing request, if any, that resulted in the creation
+of the window in question.
+.SH "APPLICATION USAGE"
+The
+.BR ttdt_session_join (3),
+and
+.BR ttdt_message_accept (3),
+functions can be used by Xt applications to register for,
+and transparently process, the
+.I Get_Geometry
+request.
+Also,
+.I Get_Geometry
+can be sent by
+.BR ttdt_sender_imprint_on (3).
+.SH "SEE ALSO"
+.na
+.BR ttdt_message_accept (3),
+.BR ttdt_sender_imprint_on (3),
+.BR ttdt_session_join (3);
+.I Set_Geometry
+request.

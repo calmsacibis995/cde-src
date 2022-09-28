@@ -1,0 +1,263 @@
+.TH csa_list_entries 3 "14 Oct 94"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.\" (c) Copyright 1994 X.400 API Association
+.SH NAME
+csa_list_entries \- list the calendar entries that match all the attribute search criteria
+.SH SYNOPSIS
+.yS
+#include <csa.h>
+.sp 0.5v
+.ta \w'CSA_return_code csa_list_entries('u
+CSA_return_code csa_list_entries(CSA_session_handle \f2session\fP,
+	CSA_uint32 \f2number_attributes\fP,
+	CSA_attribute *\f2entry_attributes\fP
+	CSA_enum *\f2list_operators\fP,
+	CSA_uint32 *\f2number_entries\fP,
+	CSA_entry_handle **\f2entries\fP,
+	CSA_extension *\f2list_entries_extensions\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn csa_list_entries
+function lists the entry handles for the calendar entries
+that match all the attribute search criteria.
+Using the
+returned entry handles, the entries can have their
+attributes listed and read, or the entries can updated or
+deleted.
+Only the calendar owner, users with
+.Cn CSA_OWNER_RIGHTS,
+users with
+.Cn CSA_VIEW_PUBLIC_ENTRIES,
+user with
+.Cn CSA_VIEW_CONFIDENTIAL_ENTRIES,
+or users with
+.Cn CSA_VIEW_PRIVATE_ENTRIES
+access rights can list entries in the calendar.
+If
+.I list_operators
+is
+.Cn NULL ,
+this specifies a short hand for an array of operators of
+.Cn CSA_MATCH_EQUAL_TO.
+The criteria are specified by the array of attributes and
+the array of operators.
+Each operator in operators
+specifies how the corresponding attribute value is to be
+matched.
+The following operators are supported:
+.VL 6
+.Lc CSA_MATCH_ANY
+.br
+Matches an entry that contains the corresponding attribute
+regardless of the value.
+.Lc CSA_MATCH_EQUAL_TO
+.br
+Matches an entry that contains an attribute with a value
+equal to the corresponding value.
+.Lc CSA_MATCH_NOT_EQUAL_TO
+.br
+Matches an entry that contains an attribute with a value
+not equal to the corresponding value.
+.Lc CSA_MATCH_GREATER_THAN
+.br
+Matches an entry that contains an attribute with a value
+greater than the corresponding value.
+.Lc CSA_MATCH_LESS_THAN
+.br
+Matches an entry that contains an attribute with a value
+less than the corresponding value.
+.Lc CSA_MATCH_GREATHER_THAN_OR_EQUAL_TO
+.br
+Matches an entry that contains an attribute with a value
+greater than or equal to the corresponding value.
+.Lc CSA_MATCH_LESS_THAN_OR_EQUAL_TO
+.br
+Matches an entry that contains an attribute with a value
+less than or equal to the corresponding value.
+.Lc CSA_MATCH_CONTAIN
+.br
+Applies to character string values only.
+It matches an
+entry that contains the corresponding substring value.
+The
+only operators supported for reminder type attributes are
+.Cn CSA_MATCH_ANY
+and
+.Cn CSA_MATCH_EQUAL_TO.
+Searching of attributes with opaque data type is not
+supported.
+It is implementation specific in what order the
+array of entries will be returned.
+If either
+.IR number_attributes
+is zero or
+.IR entry_attributes
+is
+.Cn NULL ,
+then all of the entries will be returned.
+.LE
+.SH ARGUMENTS
+.HU "Session (Session Handle)"
+Opaque session handle that represents a session with the
+calendaring service.
+.P
+Session handles are created by a logon function call and
+invalidated with a logoff function call.
+If the session
+handle is invalid, then the error
+.Cn CSA_E_INVALID_SESSION_HANDLE
+is returned.
+.HU "Number Attributes (Uint32)"
+Specifies the size of the arrays pointed to by
+.IR entry_attributes
+and
+.IR list_operators .
+If
+.I entry_attributes
+is
+.Cn NULL ,
+then this must be zero.
+.HU "Entry Attributes (Attribute)"
+A pointer to an array of attribute structures specifying
+the matching criteria.
+If
+.IR number_attributes
+is zero, then this must be
+.Cn NULL .
+.HU "List Operators (Enum)"
+A pointer to an array of matching operators.
+.HU "List Entries Extensions (Extension)"
+A pointer to an array of
+.B CSA_extension
+structures for this function.
+The array may contain both
+input extensions for providing additional information to
+the function and output extensions for receiving
+information from the function.
+A value of
+.Cn NULL
+indicates that the caller is not using any extensions.
+See the extensions structure for more information.
+.SH "RETURN VALUE"
+.HU "Number Entries (Uint32)"
+The number of entry handles in entries.
+If this value is
+.Cn NULL ,
+then no entries were found to match the search criteria.
+If more entries were found than can be represented in the
+available memory, then the error
+.Cn CSA_E_INSUFFICIENT_MEMORY
+will be returned.
+.HU "Entries (Entry Handle)"
+A pointer to an array of entry handles that match all the
+search criteria.
+This array is allocated by the service
+and should be freed with a single call to
+.Fn csa_free 3.
+.HU "List Entries Extensions (Extension)"
+If output extensions were passed to the function in the
+extensions list, the results from the service will be
+available in the extension.
+See the extensions structure for more information.
+Whether the function succeeded or
+not, and, if not, why.
+It may be success or one of the
+values listed under ERRORS below.
+.SH ERRORS
+The
+.Fn csa_list_entries
+function returns the following error values:
+.VL 6
+.Lc CSA_E_FAILURE
+.br
+There was a general failure that does not
+fit the description of any other error code.
+.Lc CSA_E_INSUFFICIENT_MEMORY
+.br
+Insufficient memory was available to complete the requested operation.
+.Lc CSA_E_INVALID_ATTRIBUTE
+.br
+An attribute was specified that was not defined by this
+specification and the implementation does not support the
+attribute as an application specific attribute.
+.Lc CSA_E_INVALID_ATTRIBUTE_VALUE
+.br
+An invalid attribute value was specified for an attribute.
+.Lc CSA_E_INVALID_DATA_EXT
+.br
+The data extension requested is invalid.
+.Lc CSA_E_INVALID_ENUM
+.br
+A
+.B CSA_enum
+value is invalid.
+.Lc CSA_E_INVALID_FLAG
+.br
+A flag value in the
+.I flags
+argument was invalid.
+.Lc CSA_E_INVALID_FUNCTION_EXT
+.br
+The function extension requested is invalid.
+.Lc CSA_E_INVALID_PARAMETER
+.br
+A function parameter was invalid.
+.Lc CSA_E_INVALID_SESSION_HANDLE
+.br
+The specified Session Handle is invalid or no longer valid
+(e.g., after logging off).
+.Lc CSA_E_NO_AUTHORITY
+.br
+The user has insufficient authority for this function.
+.Lc CSA_E_SERVICE_UNAVAILABLE
+.br
+The requested calendar service is unavailable.
+.Lc CSA_E_UNSUPPORTED_ATTRIBUTE
+.br
+An attribute was encountered that is unsupported by the calendar service.
+.Lc CSA_E_UNSUPPORTED_DATA_EXT
+.br
+The data extension requested is not supported.
+.Lc CSA_E_UNSUPPORTED_ENUM
+.br
+The specified enumerated value is not valid.
+.Lc CSA_E_UNSUPPORTED_FLAG
+.br
+The flag requested is not supported.
+.Lc CSA_E_UNSUPPORTED_FUNCTION_EXT
+.br
+The specified function extension is not supported or
+.Cn CSA_EXT_REQUIRED
+is set.
+.LE
+.SH "SEE ALSO"
+.Hd csa.h 5,
+.Fn csa_add_calendar 3,
+.Fn csa_add_entry 3,
+.Fn csa_call_callbacks 3,
+.Fn csa_delete_calendar 3,
+.Fn csa_delete_entry 3,
+.Fn csa_free 3,
+.Fn csa_free_time_search 3,
+.Fn csa_list_calendar_attributes 3,
+.Fn csa_list_calendars 3,
+.Fn csa_list_entry_attributes 3,
+.Fn csa_list_entry_sequence 3,
+.Fn csa_logoff 3,
+.Fn csa_logon 3,
+.Fn csa_look_up 3,
+.Fn csa_query_configuration 3,
+.Fn csa_read_calendar_attributes 3,
+.Fn csa_read_entry_attributes 3,
+.Fn csa_read_next_reminder 3,
+.Fn csa_register_callback 3,
+.xo .Fn csa_restore 3,
+.xo .Fn csa_save 3,
+.Fn csa_unregister_callback 3,
+.Fn csa_update_calendar_attributes 3,
+.Fn csa_update_entry_attributes 3.

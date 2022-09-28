@@ -1,0 +1,285 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **
+.TH XmDrawingArea 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmDrawingArea\fP \- The DrawingArea widget class
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/DrawingA.h>
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+DrawingArea is an empty widget that is easily adaptable
+to a variety of purposes.
+It does no drawing and defines no behavior except for invoking
+callbacks.
+Callbacks notify the application when graphics need to be drawn
+(exposure events or widget resize) and when the widget receives input from
+the keyboard or mouse.
+.PP 
+Applications are responsible for defining appearance and behavior as needed
+in response to DrawingArea callbacks.
+.PP 
+DrawingArea is also a composite widget and subclass of
+\fIXmManager\fP that supports
+minimal geometry management for multiple widget or gadget children.
+.SS "Classes"
+DrawingArea inherits behavior and resources from the \fICore\fP,
+\fIComposite\fP, \fIConstraint\fP, and \fIXmManager\fP classes.
+.PP 
+.ne 3
+The class pointer is \fIxmDrawingAreaWidgetClass\fP.
+.PP 
+The class name is \fIXmDrawingArea\fP.
+.SS "New Resources"
+The following table defines a set of widget resources used by the programmer
+to specify data.  The programmer can also set the resource values for the
+inherited classes to set attributes for this widget.  To reference a
+resource by name or by class in a .Xdefaults file, remove the \fIXmN\fP or
+\fIXmC\fP prefix and use the remaining letters.  To specify one of the defined
+values for a resource in a .Xdefaults file, remove the \fIXm\fP prefix and use
+the remaining letters (in either lowercase or uppercase, but include any
+underscores between words).
+The codes in the access column indicate if the given resource can be
+set at creation time (C),
+set by using \fIXtSetValues\fP (S),
+retrieved by using \fIXtGetValues\fP (G), or is not applicable (N/A).
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmDrawingArea Resource Set
+Name	Class	Type	Default	Access
+_
+XmNexposeCallback	XmCCallback	XtCallbackList	NULL	C
+XmNinputCallback	XmCCallback	XtCallbackList	NULL	C
+XmNmarginHeight	XmCMarginHeight	Dimension	10	CSG
+XmNmarginWidth	XmCMarginWidth	Dimension	10 	CSG
+XmNresizeCallback	XmCCallback	XtCallbackList	NULL	C
+XmNresizePolicy	XmCResizePolicy	unsigned char	XmRESIZE_ANY	CSG
+.TE
+.KE
+.in
+.sp 1
+.nL
+.ne 8
+.IP "\fIXmNexposeCallback\fP"
+Specifies the list of callbacks that is
+called when DrawingArea receives an exposure event.
+The callback reason is \fIXmCR_EXPOSE\fP.
+The callback structure also includes the exposure event.
+.PP
+The default bit gravity for Manager windows is \fINorthWestGravity\fP.
+This may cause the \fIXmNexposeCallback\fP procedures not to be invoked
+when the DrawingArea window is made smaller.
+.IP "\fIXmNinputCallback\fP"
+Specifies the list of callbacks that is
+called when the DrawingArea receives a keyboard
+or mouse event (key or button, up or down).
+The callback reason is \fIXmCR_INPUT\fP.
+The callback structure also includes the input event.
+.IP "\fIXmNmarginHeight\fP"
+Specifies the minimum spacing in pixels between the top or bottom edge
+of DrawingArea and any child widget.
+.IP "\fIXmNmarginWidth\fP"
+Specifies the minimum spacing in pixels between the left or right edge
+of DrawingArea and any child widget.
+.IP "\fIXmNresizeCallback\fP"
+Specifies the list of callbacks that is
+called when the DrawingArea is resized.
+The callback reason is \fIXmCR_RESIZE\fP.
+.IP "\fIXmNresizePolicy\fP"
+Controls the policy for resizing DrawingArea widgets.
+Possible values include \fIXmRESIZE_NONE\fP (fixed size),
+\fIXmRESIZE_ANY\fP (shrink or grow as needed), and
+\fIXmRESIZE_GROW\fP (grow only).
+.SS "Inherited Resources"
+DrawingArea inherits behavior and resources from the following
+superclasses.  For a complete description of each resource, refer to the
+man page for that superclass.
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmManager Resource Set
+Name	Class	Type	Default	Access
+_
+XmNbottomShadowColor	XmCBottomShadowColor	Pixel	dynamic	CSG
+XmNbottomShadowPixmap	XmCBottomShadowPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNforeground	XmCForeground	Pixel	dynamic	CSG
+XmNhelpCallback	XmCCallback	XtCallbackList	NULL	C
+XmNhighlightColor	XmCHighlightColor	Pixel	dynamic	CSG
+XmNhighlightPixmap	XmCHighlightPixmap	Pixmap	dynamic	CSG
+XmNinitialFocus	XmCInitialFocus	Widget	NULL	CSG
+XmNnavigationType	XmCNavigationType	XmNavigationType	XmTAB_GROUP	CSG
+XmNshadowThickness	XmCShadowThickness	Dimension	0	CSG
+XmNstringDirection	XmCStringDirection	XmStringDirection	dynamic	CG
+XmNtopShadowColor	XmCTopShadowColor	Pixel	dynamic	CSG
+XmNtopShadowPixmap	XmCTopShadowPixmap	Pixmap	dynamic	CSG
+XmNtraversalOn	XmCTraversalOn	Boolean	True	CSG
+XmNunitType	XmCUnitType	unsigned char	dynamic	CSG
+XmNuserData	XmCUserData	XtPointer	NULL	CSG
+.TE
+.KE
+.in
+.sp 1
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+Composite Resource Set
+Name	Class	Type	Default	Access
+_
+XmNchildren	XmCReadOnly	WidgetList	NULL	G
+XmNinsertPosition	XmCInsertPosition	XtOrderProc	NULL	CSG
+XmNnumChildren	XmCReadOnly	Cardinal	0	G
+.TE
+.KE
+.in
+.sp 1
+.P 
+.wH
+.in 0 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+Core Resource Set
+Name	Class	Type	Default	Access
+_
+XmNaccelerators	XmCAccelerators	XtAccelerators	dynamic	CSG
+XmNancestorSensitive	XmCSensitive	Boolean	dynamic	G
+XmNbackground	XmCBackground	Pixel	dynamic	CSG
+XmNbackgroundPixmap	XmCPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNborderColor	XmCBorderColor	Pixel	XtDefaultForeground	CSG
+XmNborderPixmap	XmCPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNborderWidth	XmCBorderWidth	Dimension	0	CSG
+XmNcolormap	XmCColormap	Colormap	dynamic	CG
+XmNdepth	XmCDepth	int	dynamic	CG
+XmNdestroyCallback	XmCCallback	XtCallbackList	NULL	C
+XmNheight	XmCHeight	Dimension	dynamic	CSG
+XmNinitialResourcesPersistent	XmCInitialResourcesPersistent	Boolean	True	C
+XmNmappedWhenManaged	XmCMappedWhenManaged	Boolean	True	CSG
+XmNscreen	XmCScreen	Screen *	dynamic	CG
+.wH
+.tH
+XmNsensitive	XmCSensitive	Boolean	True	CSG
+XmNtranslations	XmCTranslations	XtTranslations	dynamic	CSG
+XmNwidth	XmCWidth	Dimension	dynamic	CSG
+XmNx	XmCPosition	Position	0	CSG
+XmNy	XmCPosition	Position	0	CSG
+.TE
+.KE
+.in
+.sp 1
+.wH
+.in  
+.SS "Callback Information"
+A pointer to the following structure is passed to each callback:
+.sS
+.iS
+.ta .25i 1.1i
+.nf
+typedef struct
+{
+	int	\fBreason\fI;
+	XEvent	\fB* event\fI;
+	Window	\fBwindow\fI;
+} XmDrawingAreaCallbackStruct;
+.iE
+.sE
+.wH
+.fi
+.IP "\fBreason\fP"
+Indicates why the callback was invoked
+.IP "\fBevent\fP"
+Points to the \fIXEvent\fP that triggered the callback.
+This is NULL for the \fIXmNresizeCallback\fP.
+.IP "\fBwindow\fP"
+Is set to the widget window
+.nL
+.ne 10
+.SS "Translations"
+XmDrawingArea inherits translations from XmManager.
+Before calling the XmManager actions, all events in the inherited
+translations except \fI<BtnMotion>\fP, \fI<EnterWindow>\fP,
+\fI<LeaveWindow>\fP, \fI<FocusIn>\fP, and \fI<FocusOut>\fP also call the
+\fIDrawingAreaInput()\fP action.
+.PP 
+XmDrawingArea has the additional translations listed below.
+These translations may not directly correspond to a
+translation table.
+.iS
+.ta 1.5i
+.nf
+MAny BAny Press:	DrawingAreaInput()
+MAny BAny Release:	DrawingAreaInput()
+.sp \n(PDu
+MAny KAny Press:	DrawingAreaInput()
+	ManagerGadgetKeyInput()
+MAny KAny Release:	DrawingAreaInput()
+.wH
+.fi
+.iE
+.SS "Action Routines"
+The XmDrawingArea action routines are described below:
+.IP "\fIDrawingAreaInput()\fP:"
+Unless the event takes place in a gadget, calls the callbacks for
+\fIXmNinputCallback\fP.
+.IP "\fIManagerGadgetKeyInput()\fP:"
+Causes the current gadget to process a keyboard event.
+.nL
+.ne 10
+.SS "Additional Behavior"
+The XmDrawingArea widget has the additional behavior described below:
+.IP "\fI<Expose>\fP:"
+Calls the callbacks for \fIXmNexposeCallback\fP.
+.IP "\fI<Widget\ Resize>\fP:"
+Calls the callbacks for \fIXmNresizeCallback\fP.
+.P 
+.P 
+.ne 2i
+.SS "Virtual Bindings"
+The bindings for virtual keys are vendor specific.
+For information about bindings for virtual buttons and keys, see \fIVirtualBindings(3X)\fP.
+.SH RELATED INFORMATION
+.na
+\fIComposite(3X)\fP, \fIConstraint(3X)\fP, \fICore(3X)\fP,
+\fIXmCreateDrawingArea(3X)\fP,
+and \fIXmManager(3X)\fP.
+.ad

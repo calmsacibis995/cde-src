@@ -1,0 +1,88 @@
+.\"--- 
+.\"    (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\"    (c) Copyright 1993, 1994 International Business Machines Corp.
+.\"    (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\"    (c) Copyright 1993, 1994 Novell, Inc.
+.\"--- 
+.TH dtconfig 1 "09 February 1995"
+.BH "09 February -1995"
+.\"---
+.\"----------------------------------------------------------------------------
+.SH NAME
+dtconfig \- desktop configuration utility
+.\"----------------------------------------------------------------------------
+.SH SYNOPSIS
+.B dtconfig 
+[
+.BR \-d \||\|\c
+.BR \-e \||\|\c
+.BR \-kill \||\|\c
+.BR \-reset \||\|\c
+.BR \-p \||\|\c
+.BR \-inetd \||\|\c
+.B \-inetd.ow
+]
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- DESCRIPTION 
+.\"--- This section tells concisely what the command does 
+.\"---
+.SH DESCRIPTION
+Desktop configuration utility.  Integrates CDE with the 
+operating system of the underlying platform.  System root login privilege is 
+required to use 
+.BR dtconfig . 
+.\"----------------------------------------------------------------------------
+.SH OPTIONS
+.TP
+.B \-d
+Disables desktop auto-start feature.  At end of boot cycle, platform's native 
+text based login mechanism will be used.
+.TP
+.B \-e
+Enable's desktop auto-start feature.  Desktop login window will display at end
+of platform's boot cycle.
+.TP
+.B \-kill
+Kill desktop (window based) login process and any user sessions associated with
+it.  Return control to system's native text based console.
+.TP
+.B \-reset
+Tell desktop (window based) login process to reread its configuration files
+to incorporate any changes.
+.TP
+.B \-p
+Printer actions for any printer known to platform will be created if such print
+actions do not already exist in the platform's actions database.  This option
+is executed automatically at boot time if desktop auto-start has been enabled.
+.TP
+.B \-inetd
+Adds /usr/dt/bin daemons to the /etc/inetd.conf file.  Specific CDE background
+daemon setup includes rpc.ttdbserverd (ToolTalk), rpc.cmsd (Calendar Manager), 
+and dtspcd (subprocess control).  This -inetd option is called automatically
+by Solaris CDE package installs.  This -inetd option is also useful for CDE 
+daemon setup outside of normal Solaris CDE install, including system setup 
+where /usr/dt has simply been mounted from some remote fileserver exporting 
+the /usr/dt directory.
+.TP
+.B \-inetd.ow
+Switches the ToolTalk and Calendar Manager daemons (rpc.ttdbserverd & rpc.cmsd)
+start lines in /etc/inetd.conf back to the older /usr/openwin/bin area.  This
+option is called automatically by Solaris CDE package remove scripts when 
+needed.  It is also useful outside of normal Solaris package remove operations
+when /usr/dt is about to be manually removed our unmounted.
+.SH RETURN VALUES
+.TP 15
+0
+Successful completion
+.TP
+>0
+Error condition
+.SH FILES
+.PD 0
+.TP 20
+.B /usr/dt/bin/dtconfig 		location of dtconfig utility 
+.PD
+.SH "SEE ALSO"
+.BR dtlogin (1),
+.BR dtprintinfo (1)

@@ -1,0 +1,123 @@
+\#!/bin/sh
+\#
+\# "@(#)dtlogin.rc.src 1.4 94/08/11
+\#
+\# This version of the dtlogin.rc script can be used on the Solaris(TM) 
+\# operating system to initiate CDE tasks such as starting the dtlogin 
+\# process. 
+\#
+\#  Common Desktop Environment
+\#
+\#  (c) Copyright 1993, 1994 Hewlett-Packard Company
+\#  (c) Copyright 1993, 1994 International Business Machines Corp.
+\#  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+\#  (c) Copyright 1993, 1994 Novell, Inc.
+\#
+\# When placed in the /etc/rc2.d directory and named appropriately, such as 
+\# "S99dtlogin", this script will automatically start the dtlogin window 
+\# after the Solaris(TM) system boots to its multi-user level.
+\#
+\# This script is also called indirectly by the CDE dtconfig command.
+
+mode=$1
+
+usage_error() {
+      echo "  $0 start             (start dtlogin process)"
+      echo "  $0 stop              (stop dtlogin process)"
+      echo "  $0 reset             (reset dtlogin process)"
+      echo "  $0 update_printers   (update print actions)"
+      echo " "
+}
+
+if [ ! -d /usr/bin ]
+then			# /usr not mounted
+	exit 1
+fi
+
+set `/usr/bin/id`
+if [ $1 != "uid=0(root)" ]; then
+        echo "$0: must be run as root"
+        exit 1
+fi
+
+
+\# update_printers() 
+\#
+\# Add print actions to workstation's database for all printer's known
+\# to this workstation if action is not already present in the database.
+
+update_printers() {
+   if [ -x /usr/dt/bin/dtprintinfo ] ; then
+       	    /usr/dt/bin/dtprintinfo -populate &
+   fi
+}
+
+\#
+\# Find login server pid from the process tree
+\#
+login_server_pid()
+{
+  grep=/usr/bin/grep
+  ps=/usr/bin/ps
+  cut=/usr/bin/cut
+  awk=/usr/bin/awk
+
+\# In following grep for "dtlogin" processes, explictly exclude any matches 
+\# on this shell file named "dtlogin.rc"
+
+  $ps -u 0 -l | $grep -v dtlogin. | $grep dtlogin | $cut -c1-24 | $awk '{print $4 " " $5}' |
+  while read pid ppid; do
+    parent_login_ps=`$ps -p $ppid | $grep dtlogin`
+    if [ -z "$parent_login_ps" ]; then
+      echo "$pid"
+      break
+    fi
+  done
+}
+
+case "$mode" in
+
+'start')
+	update_printers
+
+	if [ -x CDE_INSTALLATION_TOP/bin/dtlogin ] ; then
+		CDE_INSTALLATION_TOP/bin/dtlogin -daemon &
+	fi
+	;;
+
+
+'stop') 	
+\#       get dtlogin pid
+
+        dtlogin_pid=`login_server_pid`
+
+\#       kill dtlogin process
+
+        if [ "$dtlogin_pid" != "" ] ; then
+             /usr/bin/kill $dtlogin_pid
+        fi
+	;;
+
+'reset') 	
+\#       get dtlogin pid
+
+        dtlogin_pid=`login_server_pid`
+
+\#       reset dtlogin process
+
+        if [ "$dtlogin_pid" != "" ] ; then
+             /usr/bin/kill -HUP $dtlogin_pid
+        fi
+	;;
+
+'update_printers')	
+	update_printers
+	;;
+
+*)
+	usage_error
+	exit 1
+	;;
+esac
+
+exit 0

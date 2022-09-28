@@ -1,0 +1,419 @@
+Usage: 
+    imageutil [ <input file> | <option> ]
+
+<input file> is the pathname of an input TIFF file.
+
+<option> is an option preceded by '-' possibly followed by arguments separated
+by spaces.  The available options are listed below.
+
+Where numeric options are specified, the number may be preceded by "0x" to
+specify a hex value.
+
+Duplicate or conflicting options are allowed; the last (rightmost) one 
+specified is the one used.
+
+Input options; (zero or one output option used):
+
+    -if
+        (default) read from input file(s) specified.  Any parameter
+        not beginning with "-" or part of an option is treated as an
+        input file name.
+
+    -irw
+        read from the default root window from the input display
+        (see -idisplay).
+
+    -iwid <window id> 
+        read from the window or pixmap whose ID is <window id>.
+
+
+Input modifier options:
+
+    -ifnotype
+        (default) use the input file(s) extension, or examine
+        each input file, to determine its file type.  
+
+    -ift <type name>
+        treat all input files following this option as being of the
+        given type name. The type names available depend on the file
+        type(s) supported on the system (see -listefs)
+
+    -itiff
+        same as "-ift TIFF".
+
+    -ijfif
+        same as "-ift JFIF".
+
+    -ipage <page number>
+        read just page (image) number <page number> from all input files
+        specified *after* this option, where zero (0) is the first page in a
+        file.  The default is to read just the first page (-ipage 0).  (Note:
+        EFS file type must support random read if this option is used.)
+
+    -iallpages
+        read all pages (images) from all input files specified *after* this 
+        option.  The default is to read just the first page.
+
+    -idisplay <display>
+        specify the X display connection for reads from X windows, selected
+        by the -iw or -iwid option.  Default is to use the display specified by
+        -display or -odisplay, or to use the value of the environment variable
+        DISPLAY if neither is specified.
+
+    -icrop <x> <y> <w> <h>
+        Read only the rectangle <x> <y> <w> <h> from the input source.
+
+    -image
+        Read from the source into an internal image, then start the pipe with
+        a read from that image.  This is useful for testing or timing tests.
+        Note that if input is from a window (e.g. -irw) the window will be
+        read only on the first repeat (see -repeat).  The mask image if present
+        is always read from the file; this option does not change that.
+
+
+Filter and filter modifier options (zero or more allowed):
+
+    -crop <x> <y> <w> <h>
+        Crop immediately after the read to the specified rectangle.
+
+    -s <width> <height>
+        Scale the image to the given <width> <height>,
+        using the scale method set by "-smethod" (default:
+        sample scaling).
+
+    -smethod <method>
+        Set scaling method, one of:
+            simple      Use simple decimation / replication scaling
+            sample      (default) Use area averaging when scaling down.
+                        Palette images are converted to RGB if scaled down.
+            gray or     If a bitonal image, scale to gray; if not bitonal,
+            grey        same as "sample"
+
+    -sthreshold <threshold>
+        Sets threshold for scaling down bitonal images using sample
+        scaling (-smethod sample). <threshold> is a number; resulting
+        gray pixels (0..255) are considered white when they are
+        greater (lighter) than this value.  Default: 128 (around 190 usually 
+        works better for text).
+
+    -convert <type>
+        Convert image to <type>; one of: "bitonal", "gray", "rgb", "palette"
+        or "ycbcr" (a YCbCr, aka YUV, image.  See -csubsample).
+
+    -cthreshold <threshold>
+        Use thresholding for converting gray or RGB images to bitonal.
+        <threshold> is a number; gray pixels (0..255) are considered 
+        white when they are greater (lighter) than this value.  A threshold
+        of 128 is a logical choice.  Using thresholding is like a FAX machine;
+        not using thresholding (dithering) is like pressing the "halftone"
+        button on a FAX machine.  Default: convert to bitonal using 
+        dithering (do halftoning) - good for images, bad for text.
+
+    -csubsample <subsample>
+        Used only when converting to YCbCr (aka YUV) image, i.e. when
+        -convert ycbcr option is used.  Specifies the amount of subsampling to
+        be done on the Cb and Cr (chrominance) samples.  One of:
+            1   no subsampling - all Cb/Cr samples are retained
+            2   1/2 subsampling in each dimension - only 1/4 of the Cb/Cr
+                samples are retained (recommended for -ocomp jpeg).
+            4   1/4 subsampling in each dimension - only 1/16 of the Cb/Cr
+                samples are retained.
+
+    -cpalette <method> <red levels> [ <green levels> <blue levels> ]
+        Used only when converting to palette image, i.e. when
+        -convert palette option is used.  <method> determines how the 
+        conversion is done; one of the following:
+            "dither": use 8 by 8 area dither; levels must be "4 8 4";
+            "diffusion" (use error diffusion) or "quickdiffusion" (use
+            short-cut error diffusion): levels must each be a power of 2; the
+            product of the levels must be <= 256;
+            "choose": use the "best" colors for the image; <red levels> is the
+            number of palette colors to use; from 1 to 256.
+        <red/green/blue levels> is the number of levels for each component 
+        to dither to; for <method> equal to "choose" only <red levels> should
+        be specified.
+
+    -gamma <factor>
+        Change gamma of gray or rgb images; ignored for other types.
+        <factor> is a real number; values < 1.0 darken the image,
+        values > 1.0 brighten the image.  If the image is a palette image
+        (e.g. from a GIF file) the image is converted to 24 bit RGB first.
+
+    -mirror <direction>
+        Mirror the image in the desired <direction>, one of:
+            "x" - mirror around the X axis, i.e. up and down
+            "y" - mirror around the Y axis, i.e. side-to-side
+
+    -rotate90 <factor>
+        Rotate the image 90 degrees * <factor> in the clockwise
+        direction - negative <factor> causes counter-clockwise
+        rotation, e.g. a <factor> of 1 = 90 degrees, 2 = 180 
+        degrees clockwise, -1 = 90 degrees counter-clockwise
+        (same as <factor> = 3).
+
+    -invert
+        Invert the image if a bitonal or gray image.  Applied
+        after the -convert option if present.
+
+    -comp <compression> 
+        Compress the image using compression type <compression>
+        as specified to the "-ocomp" option; see below.  The compression
+        is done after all filters except that added by "-decomp";
+        see below.
+
+    -compq <JPEG Q factor>
+        If "-comp jpeg" specified, specify the JPEG "Q" factor, the same
+        as specified to the "-ocompq" option; see below.
+
+    -decomp
+        Decompress the image before output.  This option is particularly
+        useful with the "-onull" option to time decompression.
+
+    -checksum
+        Prints a checksum calculated from the image which results after
+        all filter operations have been done.  This option can be useful
+        for testing.
+
+Output options (zero or one output option used):
+
+    -of <file>
+        output an image file to pathname <file>.
+
+    -orw
+        write to the default root window on the output display
+        (see -odisplay).  See note below.
+
+    -ow
+        create a window and output image to it (default).
+        See note below.
+
+    -owid <window id> 
+        write to the window or pixmap whose ID is <window id>.
+        See note below.
+
+    -oimage
+        write to a newly created internal image.  Nothing is later
+        done with the contents of that image.  This option is useful
+        for timing or testing purposes.
+
+    -onull
+        discard the output; write to the "bit bucket" (aka /dev/null).
+        This option is useful for example to time the rest of the pipe.
+
+   *Note: imageutil does not handle exposure events and cannot refresh
+    any displayed output.  For the "-ow" option, it enables backing
+    store on the window it creates.  The image will be lost however
+    if the window is resized, or if no backing store is available
+    from the X server.  No refresh is done for the "-orw" or "-owid"
+    options.
+
+Output modifier options:
+
+    -ocrop <x> <y> <w> <h>
+        Output only the rectangular portion  <x> <y> <w> <h> of the pipe
+        image.
+
+File output modifier options; file output (-of) only
+    -oft <type name>
+        output a file of the given type name (default: "TIFF").  
+        The type names available depend on the file type(s) supported on 
+        the system.
+
+X output modifier options; X output (-ow, -owid) only
+    -odisplay <display>
+    -display <display>
+        specify the X display connection for writes to X windows, selected
+        by the -ow option.  Default is to use the value of the environment 
+        variable DISPLAY.
+
+    -clear
+        clear using XClearWindow() the output window before each output.
+        Useful when -repeat option is used.
+        Warning: don't use this option if output "window" is a pixmap!
+
+    -owxy <x> <y>
+        write the top left corner of the image to the window-relative
+        position (<x>, <y>)
+
+    -odmethod <method>
+        set the dither method for displaying to PseudoColor visuals:
+        one of "dither" (use 8 by 8 area dither) or "diffusion"
+        (use error diffusion)
+
+X create window modifier options; X create window (-owid) only
+    -onowm
+        disable the window manager.  The window will be positioned
+        at the position given by -owpos option, and no borders
+        will be put on the window.  WARNING: window cannot be moved,
+        and may cover the whole screen, making it difficult to 
+        remove the window.
+
+    -owpos <x> <y>
+        position the window's top-left corner at (<x>, <y>).
+        Window manager may override unless -onowm option is used.
+
+    -odefaultvisual
+        use the default visual to create the output window (-ow or default
+        only).  If this option is not specified, imageutil uses a 24 bit
+        TrueColor or DirectColor visual if one exists.
+
+    -oalloc
+        allocate colors specific to the image being displayed as necessary.
+        The default is to use the IL's allocated colors, which may result
+        in a lower quality display but allows multiple images to be displayed
+        at the same time.
+
+    -opcmap
+        create and use a private colormap, possibly resulting in the rest
+        of the screen going "technicolor".  This is best used with the
+        -oalloc option.
+
+File output modifier options; file output (-of) only
+
+    -ores <x res> <y res>
+        Specify the x and y resolution to write in dots per inch (dpi)
+        times 2 (!), e.g. use 600 to mean 300 dpi.
+
+TIFF output modifier options.
+NOTE: specifying any of these options implies TIFF output (-oft TIFF),
+as opposed to using EFS support; mask images will not be written.
+
+    -oappend
+        Append (add) to the output file specified by the -o option.  The 
+        default is to create a new file, overwriting any file with the same 
+        name.
+
+    -opage <start page> <# pages>
+        Write page numbers for each image added to the file.
+
+    -ocomp <compression>
+        Specify the compression type; <compression> is one of:
+            current                 use current compression: uncompressed
+                                    if any operations done on image, else
+                                    compression used in input file
+            uncompressed            no compression
+            g3tiff                  tiff-compatible Group 3
+                                    (bitonal images only)
+            g3                      fax-compatible Group 3 (TIFF class "F")
+                                    (bitonal images only)
+            g32d                    Group 3 2 dimensional encoding (bitonal
+                                    images only; supported by IL versions 2.1
+                                    or greater only)
+            g4                      Group 4 (bitonal images only; supported
+                                    by IL versions 2.1 or greater only)
+            g4lsb                   Group 4 (bitonal images only; supported
+                                    by IL versions 2.1 or greater only) with
+                                    LSB bit order.  Files written with this
+                                    option plus option for single strip (e.g.
+                                    "-ostrip 1000000") are readable by IL v2.0
+                                    and ILv2.1; files written with "g4" or
+                                    without a single strip will not be read
+                                    correctly by those versions and may cause
+                                    a crash.
+            lzw                     LZW
+            packbits                PackBits (bitonal images only)
+            jpeg                    JPEG lossy compression (gray, RGB or 
+                                    YCbCr images only; see -convert, -ocompq)
+        Note: if TIFF file written using EFS (i.e. none of this group of
+        options is used), the following compression is used (TIFF EFS):
+            current compression if image already compressed; else:
+            JPEG if a YCbCr image
+            Packbits if a bitonal image
+            LZW for all other image types
+
+    -ocompq <JPEG Q factor>
+        Use only with "-ocomp jpeg": specifies the "Q" factor for JPEG
+        compression, a number from 0 to 255.  Q stands for "quantitization"
+        and controls the tradeoff of compression size for image quality:
+        0 means use the default Q factor and is the same as omitting
+        the -ocompq option.  1 means least compression, most quality (although 
+        JPEG is still lossy at Q=1); 255 is most compression, least quality,
+        and values in between tradeoff compression and quality.
+
+    -ostrip <strip height>
+        Specify the height of "strips" to be written into the TIFF file.
+        Default: 0, which causes the TIFF default strip height to be used.
+
+General control options (zero or more allowed):
+
+    -pause <nseconds>
+        Pause <nseconds> (default: 0) between pipe executions.
+
+    -repeat <ntimes>
+        Re-execute the pipe <ntimes> (default: 1).
+        Ignored (taken as 1) if writing to a file.
+
+    -sleep <nseconds>
+        Sleep <nseconds> before exiting program. Useful for example
+        to keep window up after image display.  Default: "infinite" if
+        displaying (-ow, -owid), else 0: exit immediately.
+
+Informational options (zero or more allowed):
+
+    -time
+        Display the total time and the time per pipe execution in seconds;
+        these are the same if the value to "-repeat" is one (1), the default.
+        If "-image" option is used then the time measured excludes the
+        initial read from the source and more accurately measures IL
+        execution time.
+
+    -lfiletypes
+        List information on the EFS file types supported.
+
+    -lfile
+        List information on each input file read.
+
+    -lpage
+        List information on each page read from a file.
+
+Examples:
+
+    imageutil file.tif
+        Open the file "file.tif", read the first image in it, create a window
+        the size of the image on display DISPLAY, display the image to it,
+        then sleep "forever".
+
+    imageutil /images/*.tif
+        Create windows displaying all the .tif files in /images
+
+    imageutil /images/*.tif -of foo.tif
+        Create the file foo.tif from the first image (page) in each of the
+        the .tif files in /images
+
+    imageutil -irw -convert gray -s 640 512 -of foo.tif
+        Read the root window from the display DISPLAY, convert it to gray
+        scale, scale to 640 by 512 using sample scaling, and write it
+        to foo.tif.
+
+    imageutil -irw -idisplay other:0 -display my:0 -s 640 512 
+              -repeat 20000 -pause 10
+        Read the root window from "other:0", scale to 640 by 512, and
+        display it in a new window on "my:0".  Repeat this 20000
+        times, pausing 10 seconds between each repetition.
+
+    imageutil file.tif -convert ycbcr -csubsample 2 -ocomp jpeg -of comp.tif
+        Open the file "file.tif", read the first image in it, convert it
+        to YCbCr color space, retaining only 1/4 of the Cb/Cr components and
+        write the image to "comp.tif" using JPEG compression.  This is a 
+        reasonable choice for compressing a color image with JPEG.
+
+    imageutil file.tif -convert ycbcr -csubsample 4 -ocomp jpeg -ocompq 255 
+               -of comp.tif
+        Same as above, except do the most extreme form of compression allowed.
+        The resulting file "comp.tif" may be 1/60 to 1/70 the size of 
+        "file.tif" but will be noticeably worse quality.
+
+    imageutil color.tif -oalloc
+        Display the image "color.tif" fit to the number of colors available
+        in the default colormap.  All colors are allocated from the default
+        colormap until the program exits.  If many colors are being used
+        by other programs the image may display poorly, including being
+        displayed in bitonal form if no colors are available.
+
+    imageutil color.tif -oalloc -opcmap
+        Use a private colormap to display the image "color.tif".  This will
+        give the best display of a color image, but the colors will only
+        be correct when the resulting window is the active one, at which time
+        all other windows colors may be wrong (go "technicolor").
+
+

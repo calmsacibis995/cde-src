@@ -1,0 +1,54 @@
+XCOMM @(#)Imakefile	1.4 96/05/23 SMI
+XCOMM Copyright (c) 1996 Sun Microsystems, Inc.
+
+LIBTOPDIR = ..
+LIBCURDIR = PortObjs
+
+#include "../ImakeSdm.tmpl"
+#include <Library.tmpl>
+
+HEADERS  = \
+	DataChan.hh		\
+	DataChanCclient.hh	\
+	DataChanEditMsg.hh	\
+	DataChanSmtp.hh		\
+	DataChanTclient.hh	\
+	DataPort.hh		\
+	DynamicPredicateUtility.hh
+
+SRCS     = \
+	CclientCallbacks.cc	\
+	DataChan.cc		\
+	DataChanCclient.cc	\
+	DataChanEditMsg.cc	\
+	DataChanSmtp.cc		\
+	DataChanTclient.cc	\
+	DataPort.cc		\
+	DynamicPredicateUtility.cc \
+	PortObjects.cc		\
+	SearchEngine.cc
+
+OBJS     = \
+	CclientCallbacks.o	\
+	DataChan.o		\
+	DataChanCclient.o	\
+	DataChanEditMsg.o	\
+	DataChanSmtp.o		\
+	DataChanTclient.o	\
+	DataPort.o		\
+	DynamicPredicateUtility.o \
+	PortObjects.o		\
+	SearchEngine.o
+
+INCLUDES = $(SDMINCLUDES) $(SDMCCLIENTINCLUDES)
+DEFINES  = $(SDMDEFINES)
+
+LibraryObjectRule()
+
+AllTarget($(OBJS))
+
+SdmObjectListTarget($(LIBCURDIR),$(OBJS))
+
+SdmTestLibraryTarget($(LIBCURDIR),$(OBJS))
+
+DependTarget()

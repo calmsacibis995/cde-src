@@ -1,0 +1,990 @@
+.TH DtHelpDialog 3 "11 Jan 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.\" *************************************************************************
+.SH NAME
+DtHelpDialog \- DtHelpDialog widget class
+.SH SYNOPSIS
+.yS
+#include <Dt/HelpDialog.h>
+.yE
+.SH DESCRIPTION
+The
+DtHelpDialog
+widget provides users with
+functionality for viewing and navigating structured online information
+(Cde help volumes).
+This
+functionality includes text and graphics rendering, embedded hypertext
+links and various navigation methods to move through online help information.
+The widget supports rendering of Cde help volumes, system manual
+pages, text files and character string values.
+.P
+When the user resizes the window, the DtHelpDialog widget
+dynamically reformats its contents to fit the new window
+size if the
+.B DtNhelpType
+of the contents is
+.Cn DtHELP_TYPE_TOPIC
+or
+.Cn DtHELP_TYPE_DYNAMIC_STRING .
+If the
+.B DtNhelpType
+of the contents is
+.Cn DtHELP_TYPE_STRING ,
+.Cn DtHELP_TYPE_MAN_PAGE
+or
+.Cn DtHELP_TYPE_FILE ,
+the contents are not reformatted.
+Instead, scroll bars may appear when
+the user resizes the window smaller than the help contents.
+The exact scrollbar behavior is controlled by the
+.B DtNscrollBarPolicy
+resource.
+.P
+Users can re-specify certain resources for the automatically
+created widgets and gadgets contained within the
+DtHelpDialog
+widget hierarchy.
+The following list identifies the names of these widgets
+(or gadgets):
+.VL
+.LI "Topic Tree \- \f2TocArea\fP"
+.LI "Display Area \- \f2DisplayArea\fP"
+.LI "Button Box \- \f2BtnBox\fP"
+.LE
+.P
+The
+DtHelpDialog
+widget
+honors all default
+and user-specified resource settings, with one exception.
+In the case where an error occurs
+due to an invalid request, the
+DtHelpDialog
+widget posts the proper
+error message in its display area and modifies the
+.B DtNhelpType
+resource
+to reflect the current contents of the display area (that is, a string
+message).
+Applications and users should set the
+.B DtNhelpType
+resource
+to the
+appropriate value with each setting of the
+DtHelpDialog
+widget.
+.HU Classes
+The
+DtHelpDialog
+widget inherits behavior and resources from the
+.IR Core ,
+.IR Composite ,
+.IR Constraint ,
+.I XmManager
+and
+.I XmBulletinBoard
+classes.
+.P
+The class pointer is
+.BR dtHelpDialogClass .
+.P
+The class name is
+.IR DtHelpDialog .
+.HU "New Resources"
+To reference a resource by name or by class in a
+.B \&.Xdefaults
+file, the application must remove the
+.B DtN
+or
+.B DtC
+prefix and use the remaining letters.
+To specify one of the defined
+values for a resource in a
+.B \&.Xdefaults
+file, the application must remove the
+.B Dt
+prefix and use
+the remaining letters (in either lower case or upper case,
+but including any underscores between words).
+The codes in the access column indicate if the given resource can be
+set at creation time (C),
+set by using
+.Fn XtSetValues
+(S), retrieved by using
+.Fn XtGetValues
+(G), or is not applicable (N/A).
+.P
+.cde .ne 15
+.DS
+.S -1
+.TS
+.xo expand box tab(@);
+.cde expand tab(@);
+cf3 ssss
+.xo lf3 1 | lf3 1 | lf3 1 | lf3 1 | lf3
+.xo lf3 1 | lf3 1 | lf3 1 | l   1 | l .
+.cde lf3 1 lf3 1 lf3 1 lf3 1 lf3
+.cde lf3 1 lf3 1 lf3 1 l   1 l .
+DtHelpDialog Resource Set
+_
+Name@Class@Type@Default@Access
+_
+DtNcloseCallback@DtCCloseCallback@XtCallbackList@NULL@C
+DtNcolumns@DtCColumns@Dimension@70@CSG
+.cdes
+DtNexecutionPolicy@DtCExecutionPolicy@unsigned char@DtHELP_-@CSG
+@@@   EXECUTE-
+@@@   _QUERY-
+@@@   _UNALIASED
+.cdee
+DtNhelpFile@DtCHelpFile@char *@NULL@CSG
+DtNhelpOnHelpVolume@DtCHelpOnHelpVolume@char *@See Definition@C
+.cdes
+DtNhelpPrint@DtCHelpPrint@char *@See Definition@CSG
+.cdee
+DtNhelpType@DtCHelpType@unsigned char@See Definition@CSG
+DtNhelpVolume@DtCHelpVolume@char *@NULL@CSG
+DtNhyperLinkCallback@DtCHyperLinkCallback@XtCallbackList@NULL@C
+DtNlocationId@DtCLocationId@char *@See Definition@CSG
+DtNmanPage@DtCManPage@char *@NULL@CSG
+.cdes
+DtNpaperSize@DtCPaperSize@unsigned char@See Definition@C
+DtNprinter@DtCPrinter@char *@NULL@CSG
+.cdee
+DtNrows@DtCRows@Dimension@25@CSG
+DtNscrollBarPolicy@DtCScrollBarPolicy@unsigned char@See Definition@C
+DtNstringData@DtCStringData@char *@NULL@CSG
+DtNtopicTitle@DtCTopicTitle@char *@NULL@CSG
+.cdes
+DtNvisiblePathCount@DtCVisiblePathCount@int@7@C
+.cdee
+.TE
+.S +1
+.DE
+.P
+.VL 6
+.LI \f3DtNcloseCallback\fP
+.br
+Specifies the list of callbacks called when the user activates the Close
+button.
+The callback reason is
+.Cn DtCR_HELP_CLOSE .
+.LI \f3DtNcolumns\fP
+.br
+Specifies the number of columns of text to display in the display
+area of the
+DtHelpDialog
+widget.
+.cdes
+.LI \f3DtNexecutionPolicy\fP
+.br
+Specifies how to handle ``Execute'' hypertext link types
+and embedded scripts.
+The default value is set to
+.Cn DtHELP_EXECUTE_QUERY_UNALIASED
+and supports different semantics based on the usage of a
+command alias.
+Refer to the Cde Help System Author's and
+Programmer's Guide for more information on command alias usage.
+With the default value and no command alias, a
+query dialog will be posted upon user selection of an
+execute hypertext link.
+The dialog will show the command
+that has been specified and give the user the option to
+``Execute Anyway,'' ``Don't Execute'' or request help for
+more information.
+When a command alias is present for the
+selected link, the command will execute silently, and no
+query dialog will be posted.
+.P
+Other values for this resource are
+.Cn DtHELP_EXECUTE_NONE ,
+.Cn DtHELP_EXECUTE_ALL
+and
+.Cn DtHELP_EXECUTE_QUERY_ALL .
+.B DtHELP_EXECUTE_NONE
+forces all execute hypertext links to be ignored.
+.B DtHELP_EXECUTE_ALL
+allows all execute hypertext links to be executed silently upon link
+selection by the user, and
+.B DtHELP_EXECUTE_QUERY_ALL
+forces the query dialog to be posted with every link invocation.
+.cdee
+.LI \f3DtNhelpFile\fP
+.br
+Specifies the absolute pathname of a text file to be read and displayed.
+This resource
+is used when the
+.B DtNhelpType
+is set to
+.Cn DtHELP_TYPE_FILE .
+.LI \f3DtNhelpOnHelpVolume\fP
+.br
+Specifies the help volume that contains the help topics for the help
+user-interface components in the widget.
+This is displayed in an instance
+of the
+DtHelpDialog
+widget when the user requests help from within the widget.
+The default value for this resource is
+.BR Help4Help ,
+which refers to
+the default-supported help volume.
+This resource supports absolute pathnames and pathless help volume names.
+When just a volume name is used, the volume must be placed or
+linked to one of the default search locations, or one of the two help
+search path environment variables must be properly set.
+See the
+.B "ENVIRONMENT VARIABLES"
+section for more information on setting and modifying these
+variables.
+.cdes
+.LI \f3DtNhelpPrint\fP
+.br
+Specifies the location of the
+.Cm dthelpprint 1
+utility used to print help
+topics, manual-page files or help messages from the
+DtHelpDialog
+widget.
+This value defaults to
+.BR /usr/dt/bin/dthelpprint .
+.cdee
+.LI \f3DtNhelpType\fP
+.br
+Specifies the current topic type.
+When the value is
+.Cn DtHELP_TYPE_\%TOPIC ,
+the
+.B DtNlocationId
+and
+.B DtNhelpVolume
+resources are used and the
+requested help topic is displayed.
+When the value is
+.Cn DtHELP_TYPE_\%STRING
+or
+.Cn DtHELP_TYPE_\%DYNAMIC_STRING ,
+the
+.B DtNstringData
+resource is
+used and the requested string is displayed.
+When the value is
+.Cn DtHELP_TYPE_FILE ,
+the
+.B DtNhelpFile
+resource is used and the
+requested text file is displayed.
+When the value is
+.Cn DtHELP_TYPE_\%MAN_PAGE ,
+the
+.B DtNmanPage
+resource is used and the requested system manual page
+is displayed.
+The initial default value is
+.Cn DtHELP_TYPE_\%TOPIC ;
+however,
+each time there is a request to display a help topic, text file, manual
+page or text string, the user should reset
+.B DtNhelpType
+to the proper type.
+.LI \f3DtNhelpVolume\fP
+.br
+Specifies the help volume to use.
+This resource is used in conjunction with the
+.B DtNlocationId
+resource to display help topics.
+This resource supports absolute pathnames and pathless help volume names.
+When using just a volume name, the volume must be placed in or
+linked to one of the default search locations, or one of the two help
+search path environment variables must be properly set.
+See the
+.B "ENVIRONMENT VARIABLES"
+section for more information on setting and modifying these
+variables.
+.LI \f3DtNhyperLinkCallback\fP
+.br
+Specifies the callback that is called when a client-specific hypertext link is
+activated in the display area of the
+DtHelpDialog
+widget.
+Links are activated when the user presses mouse button
+1
+over a hypertext link, or presses
+.tK return
+with the keyboard focus on the
+hypertext link item.
+The callback reason is
+.Cn DtCR_HELP_\%LINK_ACTIVATE .
+.B DtNhyperLinkCallback
+allows applications to register a callback procedure that is used to process
+one of four hypertext link types:
+.Cn DtHELP_LINK_\%APP_DEFINE ,
+.Cn DtHELP_LINK_\%TOPIC ,
+.Cn DtHELP_LINK_\%MAN_PAGE
+or
+.Cn DtHELP_LINK_\%TEXT_FILE .
+For
+.Cn DtHELP_LINK_\%TOPIC ,
+the callback is made only when the
+.I windowHint
+value in the callback structure is
+.Cn DtHELP_NEW_WINDOW .
+.LI \f3DtNlocationId\fP
+.br
+Specifies a help topic to display.
+Applications reference topics within a help
+volume using a location ID.
+Location IDs are author-defined at help volume
+creation time.
+Applications use these location IDs to display the desired help
+topic.
+The default value for this resource is
+.Cn _HOMETOPIC ,
+which refers to
+the help volume's top level topic.
+.B DtNhelpVolume
+must be set to the help volume in which the
+corresponding location ID resides, and
+.B DtNhelpType
+must be set to
+.Cn DtHELP_TYPE_\%TOPIC .
+.LI \f3DtNmanPage\fP
+.br
+Specifies the system manual page to display in the current
+DtHelpDialog
+widget.
+This resource is used when the
+.B DtNhelpType
+is set to
+.Cn DtHELP_TYPE_\%MAN_PAGE .
+.cdes
+.LI \f3DtNpaperSize\fP
+.br
+Controls the value used in the Help-Print dialog for paper size.
+The default value is set to
+.Cn DtHELP_PAPERSIZE_LETTER .
+Other supported values for this resource are:
+.Cn DtHELP_PAPERSIZE_LEGAL ,
+.Cn DtHELP_PAPERSIZE_EXECUTIVE,
+.Cn DtHELP_PAPERSIZE_A4 ,
+.Cn DtHELP_PAPERSIZE_B5 .
+.LI \f3DtNprinter\fP
+.br
+Specifies the printer name to be used when printing within the
+DtHelpDialog
+widget.
+If the value is
+.Cn NULL ,
+the default value is taken from the
+.I LPDEST
+environment variable.
+.cdee
+.LI \f3DtNrows\fP
+.br
+Specifies the number of rows of text to display in the display area of the
+DtHelpDialog
+widget.
+.LI \f3DtNscrollBarPolicy\fP
+.br
+Controls the automatic placement of scroll bars in the text display area.
+If it is set to
+.Cn DtHELP_AS_NEEDED_\%SCROLLBARS ,
+the scroll bars are displayed only
+if the display area exceeds the clip area in one or both dimensions.
+A resource value of
+.Cn DtHELP_STATIC_\%SCROLLBARS
+causes the display area to display the
+scroll bars whenever the
+DtHelpDialog
+widget is managed, regardless of the relationship
+between the clip window and the display area.
+A value of
+.Cn DtHELP_NO_\%SCROLLBARS
+removes scroll bars from the
+DtHelpDialog
+widget.
+The default value is
+.Cn DtHELP_AS_NEEDED_\%SCROLLBARS .
+.LI \f3DtNstringData\fP
+.br
+Specifies the string data
+.RB ( char\ * )
+to display in the current
+DtHelpDialog
+widget.
+This resource is used when the
+.B DtNhelpType
+is set to
+.Cn DtHELP_TYPE_\%STRING .
+.LI \f3DtNtopicTitle\fP
+.br
+Specifies the topic title
+.RB ( char\ * )
+to be used in conjunction with either the
+.B DtNstringData
+or
+.B DtNhelpFile
+resource.
+The topic title is required
+in order to maintain an accurate and descriptive history list.
+The topic title is also used as the default heading for the banner page
+and page header when printing.
+When printing help topics, this resource may be ignored.
+.cdes
+.LI \f3DtNvisiblePathCount\fP
+.br
+Specifies the number of items to display in the
+topic tree area of the widget.
+.cdee
+.LE
+.HU "Inherited Resources"
+The DtHelpDialog widget
+inherits behavior and resources from the following named superclasses.
+For a complete description of each resource, see the
+.cde man page
+.xo entry in \*(ZM
+for that superclass.
+.P
+.cde .ne 10
+.DS
+.S -1
+.TS
+.xo expand box tab(@);
+.cde expand tab(@);
+cf3 ssss
+.xo lf3 1 | lf3 1 | lf3 1 | lf3 1 | lf3
+.xo lf3 1 | lf3 1 | lf3 1 | l   1 | l .
+.cde lf3 1 lf3 1 lf3 1 lf3 1 lf3
+.cde lf3 1 lf3 1 lf3 1 l   1 l .
+XmBulletinBoard Resource Set
+_
+Name@Class@Type@Default@Access
+_
+XmNallowOverlap@XmCAllowOverlap@Boolean@True@CSG
+XmNautoUnmanage@XmCAutoUnmanage@Boolean@True@CG
+XmNbuttonFontList@XmCButtonFontList@XmFontList@dynamic@CSG
+XmNcancelButton@XmCWidget@Widget@dynamic@SG
+XmNdefaultButton@XmCWidget@Widget@dynamic@SG
+XmNdefaultPosition@XmCDefaultPosition@Boolean@True@CSG
+XmNdialogStyle@XmCDialogStyle@unsigned char@dynamic@CSG
+XmNdialogTitle@XmCDialogTitle@XmString@NULL@CSG
+XmNfocusCallback@XmCCallback@XtCallbackList@NULL@C
+XmNlabelFontList@XmCLabelFontList@XmFontList@dynamic@CSG
+XmNmapCallback@XmCCallback@XtCallbackList@NULL@C
+XmNmarginHeight@XmCMarginHeight@Dimension@10@CSG
+XmNmarginWidth@XmCMarginWidth@Dimension@10@CSG
+XmNnoResize@XmCNoResize@Boolean@False@CSG
+XmNresizePolicy@XmCResizePolicy@unsigned char@XmRESIZE_ANY@CSG
+XmNshadowType@XmCShadowType@unsigned char@XmSHADOW_OUT@CSG
+XmNtextFontList@XmCTextFontList@XmFontList@dynamic@CSG
+XmNtextTranslations@XmCTranslations@XtTranslations@NULL@C
+XmNunmapCallback@XmCCallback@XtCallbackList@NULL@C
+.TE
+.S +1
+.DE
+.P
+.cde .ne 10
+.DS
+.S -1
+.TS
+.xo expand box tab(@);
+.cde expand tab(@);
+cf3 ssss
+.xo lf3 1 | lf3 1 | lf3 1 | lf3 1 | lf3
+.xo lf3 1 | lf3 1 | lf3 1 | l   1 | l .
+.cde lf3 1 lf3 1 lf3 1 lf3 1 lf3
+.cde lf3 1 lf3 1 lf3 1 l   1 l .
+XmManager Resource Set
+_
+Name@Class@Type@Default@Access
+_
+XmNbottom-@XmCBottom-@Pixel@dynamic@CSG
+   ShadowColor@   ShadowColor
+XmNbottom-@XmCBottom-@Pixmap@XmUNSPECIFIED-@CSG
+   ShadowPixmap@   ShadowPixmap@@   _PIXMAP
+XmNforeground@XmCForeground@Pixel@dynamic@CSG
+XmNhelpCallback@XmCCallback@XtCallbackList@NULL@C
+XmNhighlightColor@XmCHighlightColor@Pixel@dynamic@CSG
+XmNhighlightPixmap@XmCHighlightPixmap@Pixmap@dynamic@CSG
+XmNinitialFocus@XmCInitialFocus@Widget@dynamic@CSG
+XmNnavigationType@XmCNavigationType@XmNavigation-@XmTAB_GROUP@CSG
+@@   Type
+XmNshadowThickness@XmCShadowThickness@Dimension@dynamic@CSG
+XmNstringDirection@XmCStringDirection@XmString-@dynamic@CG
+@@   Direction
+XmNtopShadowColor@XmCTopShadowColor@Pixel@dynamic@CSG
+XmNtopShadowPixmap@XmCTopShadowPixmap@Pixmap@dynamic@CSG
+XmNtraversalOn@XmCTraversalOn@Boolean@True@CSG
+XmNunitType@XmCUnitType@unsigned char@dynamic@CSG
+XmNuserData@XmCUserData@XtPointer@NULL@CSG
+.TE
+.S +1
+.DE
+.P
+.cde .ne 10
+.DS
+.S -1
+.TS
+.xo expand box tab(@);
+.cde expand tab(@);
+cf3 ssss
+.xo lf3 1 | lf3 1 | lf3 1 | lf3 1 | lf3
+.xo lf3 1 | lf3 1 | lf3 1 | l   1 | l .
+.cde lf3 1 lf3 1 lf3 1 lf3 1 lf3
+.cde lf3 1 lf3 1 lf3 1 l   1 l .
+Composite Resource Set
+_
+Name@Class@Type@Default@Access
+_
+XmNchildren@XmCReadOnly@WidgetList@NULL@G
+XmNinsertPosition@XmCInsertPosition@XtOrderProc@NULL@CSG
+XmNnumChildren@XmCReadOnly@Cardinal@0@G
+.TE
+.S +1
+.DE
+.P
+.cde .ne 10
+.DS
+.S -1
+.TS
+.xo expand box tab(@);
+.cde expand tab(@);
+cf3 ssss
+.xo lf3 1 | lf3 1 | lf3 1 | lf3 1 | lf3
+.xo lf3 1 | lf3 1 | lf3 1 | l   1 | l .
+.cde lf3 1 lf3 1 lf3 1 lf3 1 lf3
+.cde lf3 1 lf3 1 lf3 1 l   1 l .
+Core Resource Set
+_
+Name@Class@Type@Default@Access
+_
+XmNaccelerators@XmCAccelerators@XtAccelerators@dynamic@N/A
+XmNancestorSensitive@XmCSensitive@Boolean@dynamic@G
+XmNbackground@XmCBackground@Pixel@dynamic@CSG
+XmNbackgroundPixmap@XmCPixmap@Pixmap@XmUNSPECIFIED-@CSG
+@@@   _PIXMAP
+XmNborderColor@XmCBorderColor@Pixel@XtDefaultForeground@CSG
+XmNborderPixmap@XmCPixmap@Pixmap@XmUNSPECIFIED-@CSG
+@@@   _PIXMAP
+XmNborderWidth@XmCBorderWidth@Dimension@0@CSG
+XmNcolormap@XmCColormap@Colormap@dynamic@CG
+XmNdepth@XmCDepth@int@dynamic@CG
+XmNdestroyCallback@XmCCallback@XtCallbackList@NULL@C
+XmNheight@XmCHeight@Dimension@dynamic@CSG
+XmNinitialResources-@XmCInitialResources-@Boolean@True@C
+   Persistent@   Persistent
+XmNmappedWhen-@XmCMappedWhen-@Boolean@True@CSG
+   Managed@   Managed
+XmNscreen@XmCScreen@Screen *@dynamic@CG
+XmNsensitive@XmCSensitive@Boolean@True@CSG
+XmNtranslations@XmCTranslations@XtTranslations@dynamic@CSG
+XmNwidth@XmCWidth@Dimension@dynamic@CSG
+XmNx@XmCPosition@Position@0@CSG
+XmNy@XmCPosition@Position@0@CSG
+.TE
+.S +1
+.DE
+.HU "Callback Information"
+A pointer to the following structure is passed to each callback:
+.Cs I
+typedef struct {
+	int	\f2reason\fP;
+	XEvent	*\f2event\fP;
+	char	*\f2locationId\fP;
+	char	*\f2helpVolume\fP;
+	char	*\f2specification\fP;
+	int	\f2hyperType\fP;
+	int	\f2windowHint\fP;
+} DtHelpDialogCallbackStruct;
+.Ce
+.P
+The
+.I reason
+argument
+indicates why the callback was invoked.
+.P
+The
+.I event
+argument
+points to the
+.B XEvent
+that triggered the callback.
+.P
+The
+.I locationId
+argument
+indicates the
+.B DtNlocationId
+for the current topic.
+This value is
+.Cn NULL
+whenever the
+.I hyperType
+value is not
+.Cn DtHELP_LINK_\%TOPIC
+or
+.Cn DtHELP_LINK_APP_DEFINE .
+.P
+The
+.I helpVolume
+argument
+indicates the current help volume.
+This value is
+.Cn NULL
+whenever the
+.I hyperType
+value is not
+.Cn DtHELP_LINK_\%TOPIC
+or
+.Cn DtHELP_LINK_APP_DEFINE .
+.P
+The
+.I specification
+argument
+indicates any author-defined data that was contained within the hypertext
+link selected.
+This value returns
+.Cn NULL
+if no author-defined data was given.
+For hyperlinks of type
+.Cn DtHELP_MAN_PAGE ,
+the
+.I specification
+argument contains the name of the manual page.
+For hyperlinks of type
+.Cn DtHELP_LINK_TEXT_FILE ,
+the
+.I specification
+argument contains that name of the file.
+.P
+The
+.I hyperType
+argument
+indicates the hypertext link type.
+Possible values are:
+.Cn DtHELP_LINK_\%TOPIC ,
+.Cn DtHELP_LINK_\%MAN_PAGE ,
+.Cn DtHELP_LINK_\%APP_DEFINE
+or
+.Cn DtHELP_LINK_\%TEXT_FILE .
+.P
+The
+.I windowHint
+argument
+indicates a hint for the type of window (quick help, existing or new window)
+to use.
+This value contains one of the following three types:
+.Cn DtHELP_POPUP_WINDOW ,
+.Cn DtHELP_CURRENT_WINDOW
+or
+.Cn DtHELP_NEW_WINDOW .
+.HU "Additional Behavior"
+The
+DtHelpDialog
+widget has the additional behavior described below:
+.VL 6
+.LI "\f2<MAny> <KCancel>\fP"
+.br
+Calls the active callbacks for the Close button.
+If a
+.I <BDrag>
+for
+either a selection or scrollbar movement is in process, the
+.I <KCancel>
+aborts that action.
+.LI "\f2<KSpace>, <KActivate>\fP or \f2<BSelect>\fP in Topic Tree Text"
+.br
+Opens the help topic currently selected, displays that topic in the display
+area and updates the topic tree to match the newly displayed topic.
+.LI "\f2<KSpace>, <KActivate>\fP or \f2<BSelect>\fP in Display Area Text"
+.br
+Invokes the hypertext link that contains the current selection.
+.LI "\f2<DoubleClick>\fP in Topic Tree or Display Area Text"
+.br
+Ignored.
+.LI "\f2<BDrag>\fP in Topic Tree or Display Area Text"
+.br
+Selects the text from the drag start
+point to the drag end point.
+Moving and holding the
+.I <BDrag>
+outside the topic tree or display area scrolls the window, selecting the newly
+exposed text.
+.LI "\f2<MCtrl>\fP or \f2<MShift> <BSelect>\fP in Topic Tree Text"
+.sp -0.4v
+.LI "\f2<MCtrl> <KSpace>\fP in Topic Tree Text"
+.sp -0.4v
+.LI "\f2<MCtrl> <KActivate>\fP in Topic Tree Text"
+.br
+Invokes the
+.B DtNhyperLinkCallback
+for the
+DtHelpDialog
+widget, setting the
+.I helpType
+to
+.Cn DtHELP_LINK_\%TOPIC ,
+the
+.I windowHint
+to
+.Cn DtHELP_NEW_WINDOW ,
+the
+.I helpVolume
+to the current volume name and the
+.I locationId
+to the selected item's location ID.
+If no
+.B DtNhyperLinkCallback
+is supplied, the
+action is ignored.
+.br
+.LI "\f2<MCtrl>\fP or \f2<MShift> <BSelect>\fP in Display Area Hypertext Link Text"
+.br
+Invokes the
+.B DtNhyperLinkCallback
+for the
+DtHelpDialog
+widget, honoring all existing
+link settings, but forces the
+.I windowHint
+to
+.Cn DtHELP_NEW_WINDOW .
+If no
+.B DtNhyperLinkCallback
+is supplied, the hypertext link is handled
+internally.
+.LI "\f2<KSelectAll>\fP in Display Area or Topic Tree"
+.br
+Selects all text within the topic tree area or display area.
+.LI "\f2<KDeSelectAll>\fP in Display Area or Topic Tree"
+.br
+Deselects all text within the topic tree area or display area.
+.cdes
+.LI "\f2<KUp>\fP or \f2<KLeft>\fP in Display Area or Topic Tree"
+.br
+Moves the traversal highlight up or left to the next hypertext link item.
+.LI "\f2<KDown>\fP or \f2<KRight>\fP in Display Area or Topic Tree"
+.br
+Moves the traversal highlight down or right to the next hypertext item.
+.cdee
+.LI "\f2<KCopy>\fP in the Display Area or Topic Tree"
+.br
+Copies the currently selected text to the clipboard.
+.LI "\f2<KPageDown>\fP or \f2<MCtrl> <KDown>\fP in Display Area or Topic Tree"
+.br
+Displays the next page of text.
+.LI "\f2<KPageLeft>\fP or \f2<MCtrl> <KLeft>\fP in Display Area or Topic Tree"
+.br
+Scrolls the information to the left.
+.LI "\f2<KPageRight>\fP or \f2<MCtrl> <KRight>\fP in Display Area or Topic Tree"
+.br
+Scrolls the information to the right.
+.LI "\f2<KPageUp>\fP or \f2<MCtrl> <KUp>\fP in Display Area or Topic Tree"
+.br
+Displays the previous page of information.
+.LI "\f2<KBeginData>\fP in the Display Area or Topic Tree"
+.br
+Displays the first page of information.
+.LI "\f2<KEndData>\fP in the Display Area or Topic Tree"
+.br
+Displays the last page of information.
+.LE
+.xos
+.P
+The following operations are supported, but the key
+bindings are implementation-dependent:
+.VL 6
+.LI <\f2implementation-dependent\fP>
+.br
+Moves the traversal highlight up, down, left or right
+to the next hypertext link item.
+.LE
+.xoe
+.HU "Virtual Bindings"
+The bindings for virtual keys are implementation-dependent.
+.cde For information about bindings for virtual buttons and keys, see
+.cde .Fn VirtualBindings 3X.
+.SH "ENVIRONMENT VARIABLES"
+The
+DtHelpDialog
+widget uses two environment variables for locating
+help volumes within the desktop environment:
+.VL 6
+.LI \f2DTHELPSEARCHPATH\fP
+.br
+The system
+search path environment variable for locating
+help volumes on local and remote
+.cde NFS
+mounted systems.
+.LI \f2DTHELPUSERSEARCHPATH\fP
+.br
+The search path environment variable for locating user-specific
+help volumes on local and remote
+.cde NFS
+mounted systems.
+.LE
+.P
+The environment variables contain colon-separated lists of directory paths.
+Each directory path can contain both environment variable names as well as
+special field descriptors that are expanded at runtime.
+.P
+Field descriptors consist of a percent-sign character (%)
+followed by a single character.
+Field descriptors and their substitution values are:
+.VL 6
+.LI \f3%H\fP
+Replaced with the current volume name being searched
+for.
+.LI \f3%L\fP
+Replaced with the current value of the
+.I LANG
+environment variable.
+.LI \f3%%\fP
+Replaced with a single %.
+.LE
+.P
+The default value for
+.I DTHELPUSERSEARCHPATH
+is:
+.Cs I
+$HOME/.dt/help/$DTUSERSESSION/%H:
+$HOME/.dt/help/$DTUSERSESSION/%H.sdl:
+.cde $HOME/.dt/help/$DTUSERSESSION/%H.hv:
+$HOME/.dt/help/%H:
+$HOME/.dt/help/%H.sdl:
+.cde $HOME/.dt/help/%H.hv
+.Ce
+.P
+The
+.I DTHELPUSERSEARCHPATH
+is first searched for the requested volume.
+If the volume is not found, the
+.I DTHELPSEARCHPATH
+value is searched.
+.P
+The default value for
+.I DTHELPSEARCHPATH
+path is:
+.Cs I
+/etc/dt/appconfig/help/%L/%H:
+/etc/dt/appconfig/help/%L/%H.sdl:
+.cde /etc/dt/appconfig/help/%L/%H.hv:
+/etc/dt/appconfig/help/C/%H:
+/etc/dt/appconfig/help/C/%H.sdl:
+.cde /etc/dt/appconfig/help/C/%H.hv:
+/usr/dt/appconfig/help/%L/%H:
+/usr/dt/appconfig/help/%L/%H.sdl:
+.cde /usr/dt/appconfig/help/%L/%H.hv:
+/usr/dt/appconfig/help/C/%H:
+/usr/dt/appconfig/help/C/%H.sdl:
+.cde /usr/dt/appconfig/help/C/%H.hv
+.Ce
+.cdes
+.SH "APPLICATION USAGE"
+The following messages can be generated as a result of an error or improperly
+set resource value in the
+DtHelpDialog
+widget.
+These messages are
+displayed in the widget's display area as well as standard error.
+.HU "Error Messages"
+.TP 6
+\f3String data could not be formatted.\fP
+.br
+The error occurred when formatting help information of type
+.Cn DtHELP_TYPE_\%STRING .
+.TP 6
+\f3Dynamic string data could not be formatted.\fP
+.br
+The error occurred when formatting help information of type
+.Cn DtHELP_TYPE_\%DYNAMIC_STRING .
+.TP 6
+\f3Man Page could not be formatted. The requested man page\fP
+.PD 0
+.TP 6
+\f3is either not present, or corrupt.\fP
+.br
+The error occurred when formatting help information of type
+.Cn DtHELP_TYPE_\%MAN_PAGE .
+.PD
+.TP 6
+\f3Text file could not be formatted. The requested text file\fP
+.PD 0
+.TP 6
+\f3is either not present, or corrupt.\fP
+.br
+The error occurred when formatting help information of type
+.Cn DtHELP_TYPE_FILE .
+.PD
+.TP 6
+\f3Non-supported DtNhelpType value used.\fP
+.br
+The application used a non-supported
+.BR DtNhelpType .
+.TP 6
+\f3Help topic could not be formatted.\fP
+.br
+The application attempted to access a corrupt runtime help file.
+.TP 6
+\f3No DtNhyperLinkCallback supplied for widget.\fP
+.br
+A hypertext link of type
+.Cn DtHELP_NEW_WINDOW
+has been selected, but the
+application has not supplied a hypertext callback to handle it.
+The link is handled like a
+.Cn DtHELP_CURRENT_WINDOW
+jump.
+.TP 6
+\f3Nonexistent DtNlocationId.\fP
+.br
+The requested
+.B DtNlocationId
+is not present in the current help volume.
+.TP 6
+\f3No DtNhyperLinkCallback supplied for widget.\fP
+.br
+A hypertext link of type
+.Cn DtHELP_LINK_\%APP_DEFINE
+or
+.Cn DtHELP_LINK_\%MAN_PAGE
+is selected, but the application has not supplied a hypertext callback
+to handle these link types.
+.TP 6
+\f3Could not find DtNhelpVolume.\fP
+.br
+The Help System is unable to find the help volume requested.
+.TP 6
+\f3Could not open DtNhelpVolume.\fP
+.br
+The Help System found the requested help volume, but does not have the
+permission to open it.
+.cdee
+.SH "SEE ALSO"
+.Hd Dt/HelpQuickD.h 5,
+.Hd Dt/Help.h 5,
+.Fn DtCreateHelpQuickDialog 3,
+.Fn DtHelpSetCatalogName 3;
+.cdes
+.Fn XmManager 3X,
+.Fn XmBulletinBoard 3X,
+.Fn Core 3X,
+.Fn Composite 3X,
+.Fn Constraint 3X,
+.IR dthelptagdtd (4).
+.cdee
+.xos
+.I XmManager
+and
+.I XmBulletinBoard
+in the \*(ZM;
+.cX dthelptagdtd .
+.xoe

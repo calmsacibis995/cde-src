@@ -1,0 +1,102 @@
+				 Test Mode
+			Wed Dec 21 09:10:37 PST 1994
+				  bfreeman
+
+
+			     Goal of Test Mode
+
+The transition to and from Test Mode should be transparent. The user should
+hardly notice they are waiting. In Test Mode the application being created
+should operate as close to generated code as possible. Upon exit from Test
+Mode, all objects should return to how they were in Build Mode.
+
+
+			   Basic Object Behavior
+
+In Build Mode all objects should be configured as they are defined on their
+property sheet, but disabled. Test Mode will allow the user to modify the
+objects to their hearts content; but when returning to Build Mode, the
+objects return to their property sheet definition.
+
+
+				 Test Modes
+
+There are two Test Modes: "Test Project", and "Test Shown Modules". 
+
+In the "Test Project" Mode the application will startup as if it was
+generated code. All initially visible objects will be shown. All iconified
+windows will be iconic. All sensitive objects will be sensitive. All objects
+will have their initial values and correct geometry. And, of course, the
+reverse for all of these is true also. All connections that can be issued
+will be. Those that can not be implemented will tell the user that the
+connection was exercised. Say through a printf statement to the effect. In
+other words, the application will look as if it was just started up from the
+command line, but it'll be slightly impaired.
+
+The "Test Shown Modules" Mode will operate identically as the "Test Project"
+Mode except for its initial startup. In "Test Shown Modules" the current
+state of windows will override their initial state. Windows currently shown
+in Build Mode will be displayed in Test Mode.
+
+Summary
+
+"Test Project"
+    initial visibility
+    iconification/de-iconification
+    sensitivity
+    initial values
+    geometry
+    all connections supported except:
+    	App Framework
+    	Call Function
+    	Drag and Drop
+    	Execute Code
+    	Message Boxes
+    	ToolTalk
+
+"Test Shown Modules"
+    s/a "Test Project" except:
+    	current state of windows overrides their initial state
+
+    
+
+		      Current Test Mode Implementation
+				  Summary
+
+Transition to Test Mode:
+    remove ab windows
+    set the palette inactive
+    initialize test mode
+    trav obj tree removing build mode actions (translations, wm cbs, etc)
+    trav obj tree setting to test mode state
+    	windows
+    	    init for test mode
+    	    	instantiate if needed
+    	    	setup connections
+    	    	enable help
+    	    	wm close on Dialogs and FSB's
+    	    	wm close on main windows
+    	    visibility
+    	    iconification
+    	sensitivity
+    	visibility
+    test mode enabled.
+
+Tracked during Test Mode:
+    wm close
+    menu items
+    map/un-map 
+    initial value
+
+Transition to Build Mode:
+    set the palette active
+    put the ab windows back
+    trav obj tree removing test mode actions (restore build mode actions)
+    iterate over tracking lists restoring the build state
+    test mode is disabled.
+    clean up from test mode
+
+
+    	    
+
+

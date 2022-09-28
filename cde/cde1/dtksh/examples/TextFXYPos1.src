@@ -1,0 +1,64 @@
+\#! CDE_INSTALLATION_TOP/bin/dtksh
+
+\##########################################################################
+\#  (c) Copyright 1993, 1994 Hewlett-Packard Company	
+\#  (c) Copyright 1993, 1994 International Business Machines Corp.
+\#  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+\#  (c) Copyright 1993, 1994 Unix System Labs, Inc., a subsidiary of
+\#      Novell, Inc.
+\##########################################################################
+
+
+\#
+\# This sample shell script verifies that the XmTextFieldPosToXY command
+\# functions correctly.
+\#
+
+\# Pushbutton Callback: exercise the Text functions
+RunTests()
+{
+\#  This position should not be visible
+   if XmTextFieldPosToXY $TEXT 90 X Y; then
+      echo "Text position 90 is at point ("$X","$Y")"
+   else
+      echo "Text position 90 is not currently visible"
+   fi
+
+\#  This position should be visible
+   if XmTextFieldPosToXY $TEXT 3 X Y; then
+      echo "Text position 3 is at point ("$X","$Y")"
+   else
+      echo "Text position 3 is not currently visible"
+   fi
+
+   XmTextFieldXYToPos POS $TEXT $X $Y
+   echo "At point ("$X","$Y") is character position "$POS
+}
+
+
+\######################### Create the Main UI #################################
+
+XtInitialize TOPLEVEL textFXYPos1 TextFXYPos1 "$0" "$@"
+XtSetValues $TOPLEVEL allowShellResize:True
+
+XmCreateTextField TEXT $TOPLEVEL text \
+	columns:20 \
+	value:"line 1 line 2 line 3 line 4 line 5 line 6 line 7 line 8"
+XtManageChild $TEXT
+
+XtRealizeWidget $TOPLEVEL
+
+XtCreateApplicationShell TOPLEVEL2 textFXYPos1a TopLevelShell
+
+XtCreateManagedWidget RC rc XmRowColumn $TOPLEVEL2 \
+         orientation:HORIZONTAL \
+         numColumns:2 \
+         packing:PACK_COLUMN 
+
+XtCreateManagedWidget PB1 pb1 XmPushButton $RC \
+	labelString:"Run XY Position Tests"
+XtAddCallback $PB1 activateCallback "RunTests"
+
+XtRealizeWidget $TOPLEVEL2
+
+XtMainLoop

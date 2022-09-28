@@ -1,0 +1,95 @@
+.TH DtWsmGetWorkspaceList 3 "19 Apr 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.\" *************************************************************************
+.SH NAME
+DtWsmGetWorkspaceList \- get the names of the currently defined workspaces
+.SH SYNOPSIS
+.yS
+#include <Dt/Wsm.h>
+.sp 0.5v
+.ta \w'Status DtWsmGetWorkspaceList('u
+Status DtWsmGetWorkspaceList(Display *\f2display\fP,
+	Window \f2root\fP,
+	Atom **\f2ppaWorkspaces\fP,
+	int *\f2pNumWorkspaces\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn DtWsmGetWorkspaceList
+function
+works with the
+.xos
+workspace manager
+.xoe
+.cdes
+Cde workspace manager,
+.Cm dtwm 1.
+.cdee
+and returns a list of the names (converted into X atoms)
+of the currently defined workspaces.
+.P
+The
+.I display
+argument is the X display.
+.P
+The
+.I root
+argument is the root window of the screen of interest.
+.P
+The
+.I *ppaWorkspaces
+argument is the address of a pointer to receive the
+returned pointer to the workspacelist.
+.P
+The
+.I pNumWorkspaces
+argument is the address of an integer to receive the
+number of elements in the workspacelist.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn DtWsmGetWorkspaceList
+function returns Success and the workspace manager returns in
+.I *ppaWorkspaces
+the list of atoms identifying workspaces, and returns in
+.I pNumWorkspaces
+the number of workspaces.
+.SH "APPLICATION USAGE"
+If the
+.Fn DtWsmGetWorkspaceList
+function
+is not successful, failure may be due to a memory allocation error or failure
+to find the correct workspace information (that is, the
+.xos
+workspace manager
+.xoe
+.cdes
+Cde workspace manager,
+.Cm dtwm 1,
+.cdee
+is not running).
+To get detailed information on the workspaces, the application must first call the
+.Fn DtWsmGetWorkspaceList
+function to get the names of all the workspaces.
+Then, for each workspace in the list, the application must call the
+.Fn DtWsmGetWorkspaceInfo 3
+function.
+The application must use
+.Fn XtFree 3X
+to free data returned in
+.IR *ppaWorkspaces .
+.SH "SEE ALSO"
+.Hd Dt/Wsm.h 5,
+.cdes
+.Cm dtwm 1,
+.cdee
+.cde .Fn XtFree 3X,
+.xos
+.Fn XtFree 3X
+in the \*(Zt;
+.xoe
+.Fn DtWsmGetWorkspaceInfo 3.

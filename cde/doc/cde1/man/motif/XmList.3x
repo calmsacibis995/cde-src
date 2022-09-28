@@ -1,0 +1,1049 @@
+'\" t
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Novell, Inc
+...\" **
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **
+.TH XmList 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmList\fP \- The List widget class
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/List.h>
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+List allows a user to select one or more items
+from a group of choices.  Items are selected from the list in a
+variety of ways, using both the pointer and the keyboard.
+List operates on an array of compound strings that are defined by the application.
+Each compound string becomes an item in the List,
+with the first compound string becoming
+the item in position 1, the second becoming the item in position 2, and so on.
+.PP 
+The size of the List is set by specifying the number of items
+that are visible.
+If the number of visible items is not specified, the height
+of the list controls the number of visible items.  Each item assumes
+the height of the tallest element in the list.
+To create a list that allows the user to scroll easily through a large
+number of items, use the \fIXmCreateScrolledList\fP convenience
+function.
+.PP 
+To select items,
+move the pointer or cursor to the desired item
+and press the \fIBSelect\fP mouse button or the key defined as \fIKSelect\fP.
+There are several
+styles of selection behavior, and they all highlight the selected item or
+items by displaying them in inverse colors.  An appropriate callback is
+invoked
+to notify the application of the user's choice.  The application then takes
+whatever action is required for the specified selection.
+When a List is insensitive, all of the list items are displayed in
+a stippled fill pattern.
+.SS "Selection"
+Each list has one of four selection models:
+.TP
+\(bu
+Single Select
+.TP
+\(bu
+Browse Select
+.TP
+\(bu
+Multiple Select
+.TP
+\(bu
+Extended Select
+.PP 
+In Single Select and Browse Select, at most one item is selected at a
+time.
+In Single Select, pressing \fIBSelect\fP on an item toggles its
+selection state and deselects any other selected item.
+In Browse Select, pressing \fIBSelect\fP on an item selects it and
+deselects any other selected item; dragging \fIBSelect\fP moves the
+selection as the pointer is moved.  Releasing \fIBSelect\fP on an 
+item moves the location cursor to that item.
+.PP 
+In Multiple Select, any number of items can be selected at a time.
+Pressing \fIBSelect\fP on an item toggles its selection state but
+does not deselect any other selected items.
+.PP 
+In Extended Select, any number of items can be selected at a time,
+and the user can easily select ranges of items.
+Pressing \fIBSelect\fP on an item selects it and deselects any other
+selected item.
+Dragging \fIBSelect\fP or pressing or dragging \fIBExtend\fP following a
+\fIBSelect\fP action selects all items between the item under the
+pointer and the item on which \fIBSelect\fP was pressed.
+This action also deselects any other selected items outside that
+range.
+.PP 
+Extended Select also allows the user to select and deselect
+discontiguous ranges of items.
+Pressing \fIBToggle\fP on an item toggles its selection state but
+does not deselect any other selected items.
+Dragging \fIBToggle\fP or pressing or dragging \fIBExtend\fP following a
+\fIBToggle\fP action sets the selection state of all items between
+the item under the pointer and the item on which \fIBToggle\fP was
+pressed to the state of the item on which \fIBToggle\fP was pressed.
+This action does not deselect any other selected items outside that
+range.
+.PP 
+All selection operations available from the mouse are also available
+from the keyboard.
+List has two keyboard selection modes, Normal Mode and Add Mode.
+In Normal Mode, navigation operations and \fIKSelect\fP select the
+item at the location cursor and deselect any other selected
+items.
+In Add Mode, navigation operations have no effect on selection, and
+\fIKSelect\fP toggles the selection state of the item at the location
+cursor without deselecting any other selected items, except in Single
+Select.
+.PP 
+Single and Multiple Select use Add Mode, and Browse Select uses Normal
+Mode.
+.PP 
+Extended Select can use either mode; the user changes modes by pressing
+\fIKAddMode\fP.
+In Extended Select Normal Mode, pressing \fIKSelect\fP has the same
+effect as pressing \fIBSelect\fP; \fIKExtend\fP and shifted navigation
+have the same effect as pressing \fIBExtend\fP following a \fIBSelect\fP
+action.
+In Extended Select Add Mode, pressing \fIKSelect\fP has the same
+effect as pressing \fIBToggle\fP; \fIKExtend\fP and shifted navigation
+have the same effect as pressing \fIBExtend\fP following a \fIBToggle\fP
+action.
+.PP 
+Normal Mode is indicated by a solid location cursor, and Add Mode is
+indicated by a dashed location cursor.
+.SS "Classes"
+List inherits behavior and resources from \fICore\fP and
+\fIXmPrimitive\fP classes.
+.PP 
+The class pointer is \fIxmListWidgetClass\fP.
+.PP 
+The class name is \fIXmList\fP.
+.SS "New Resources"
+The following table defines a set of widget resources used by the programmer
+to specify data.  The programmer can also set the resource values for the
+inherited classes to set attributes for this widget.  To reference a
+resource by name or by class in a .Xdefaults file, remove the \fIXmN\fP or
+\fIXmC\fP prefix and use the remaining letters.  To specify one of the defined
+values for a resource in a .Xdefaults file, remove the \fIXm\fP prefix and use
+the remaining letters (in either lowercase or uppercase, but include any
+underscores between words).
+The codes in the access column indicate if the given resource can be
+set at creation time (C),
+set by using \fIXtSetValues\fP (S),
+retrieved by using \fIXtGetValues\fP (G), or is not applicable (N/A).
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmList Resource Set
+Name	Class	Type	Default	Access
+_
+XmNautomaticSelection	XmCAutomaticSelection	Boolean	False	CSG
+XmNbrowseSelectionCallback	XmCCallback	XtCallbackList	NULL	C
+XmNdefaultActionCallback	XmCCallback	XtCallbackList	NULL	C
+XmNdoubleClickInterval	XmCDoubleClickInterval	int	dynamic	CSG
+XmNextendedSelectionCallback	XmCCallback	XtCallbackList	NULL	C
+XmNfontList	XmCFontList	XmFontList	dynamic	CSG
+XmNitemCount	XmCItemCount	int	0	CSG
+XmNitems	XmCItems	XmStringTable	NULL	CSG
+XmNlistMarginHeight	XmCListMarginHeight	Dimension	0	CSG
+XmNlistMarginWidth	XmCListMarginWidth	Dimension	0	CSG
+XmNlistSizePolicy	XmCListSizePolicy	unsigned char	XmVARIABLE	CG
+XmNlistSpacing	XmCListSpacing	Dimension	0	CSG
+XmNmultipleSelectionCallback	XmCCallback	XtCallbackList	NULL	C
+XmNscrollBarDisplayPolicy	XmCScrollBarDisplayPolicy	unsigned char	XmAS_NEEDED	CSG
+.wH
+.tH
+XmNselectedItemCount	XmCSelectedItemCount	int	0	CSG
+XmNselectedItems	XmCSelectedItems	XmStringTable	NULL	CSG
+XmNselectionPolicy	XmCSelectionPolicy	unsigned char	XmBROWSE_SELECT	CSG
+XmNsingleSelectionCallback	XmCCallback	XtCallbackList	NULL	C
+XmNstringDirection	XmCStringDirection	XmStringDirection	dynamic	CSG
+XmNtopItemPosition	XmCTopItemPosition	int	1	CSG
+XmNvisibleItemCount	XmCVisibleItemCount	int	dynamic	CSG
+.TE
+.KE
+.in
+.sp 1
+.IP "\fIXmNautomaticSelection\fP"
+Invokes \fIXmNbrowseSelectionCallback\fP or \fIXmNextendedSelectionCallback\fP
+when
+BSelect is pressed and the items that are shown as selected change
+if the value is True and the selection
+mode is either \fIXmBROWSE_SELECT\fP or \fIXmEXTENDED_SELECT\fP respectively.
+If False, no selection callbacks are invoked until
+the user releases the mouse button.  See the Behavior section for
+further details on the interaction of this resource with the selection modes.
+.IP "\fIXmNbrowseSelectionCallback\fP"
+Specifies a list of callbacks that is called
+when an item is selected in the browse selection mode.  The reason is
+\fIXmCR_BROWSE_SELECT\fP.
+.IP "\fIXmNdefaultActionCallback\fP"
+Specifies a list of callbacks that is called when an item is double
+clicked or \fIKActivate\fP is pressed.
+The reason is \fIXmCR_DEFAULT_ACTION\fP.
+.nL
+.ne 12
+.IP "\fIXmNdoubleClickInterval\fP"
+If a button click is followed by another button click within the time
+span specified by this resource (in milliseconds), the button clicks
+are considered a double-click action, rather than two single-click
+actions.
+The value must not be negative.
+The default value is the display's multi-click time.
+.IP "\fIXmNextendedSelectionCallback\fP"
+Specifies a list of callbacks that is called
+when items are selected using the extended selection mode.
+The reason is \fIXmCR_EXTENDED_SELECT\fP.
+.IP "\fIXmNfontList\fP"
+Specifies the font list associated with the list items.
+This is used in conjunction with the \fIXmNvisibleItemCount\fP
+resource to determine the height of the List widget.  If this
+value is NULL at initialization, the font list is initialized by
+looking up the parent hierarchy of the widget for an ancestor that
+is a subclass of the XmBulletinBoard or VendorShell widget class.  If
+such an ancestor is found, the font list is initialized to the
+\fIXmNtextFontList\fP of the ancestor widget.  If no such ancestor
+is found, the default is implementation dependent.  Refer to
+\fIXmFontList(3X)\fP for more information on a font list structure.
+.IP "\fIXmNitemCount\fP"
+Specifies the total number of items.
+The value must be the number of items in \fIXmNitems\fP and must not be
+negative.
+It is automatically updated by the list whenever an item is added to or
+deleted from the list.
+.IP "\fIXmNitems\fP"
+Points to an array of compound strings that are to be displayed as the list
+items.
+Refer to \fIXmString(3X)\fP for more information on the creation and
+structure of compound strings.
+\fIXtGetValues\fP for this resource returns the list items themselves,
+not a copy of the list items.
+The application must not free the returned items.
+.IP "\fIXmNlistMarginHeight\fP"
+Specifies the height of the margin between the list border and the items.
+.nL
+.ne 11
+.IP "\fIXmNlistMarginWidth\fP"
+Specifies the width of the margin between the list border and the items.
+.nL
+.ne 10
+.IP "\fIXmNlistSizePolicy\fP"
+Controls the reaction of the List when an item grows horizontally beyond
+the current size of the list work area.
+If the value is \fIXmCONSTANT\fP, the list viewing area does not grow,
+and a horizontal ScrollBar is added for a ScrolledList.
+If this resource is set to \fIXmVARIABLE\fP, the List grows \pto
+match the
+size of the longest item, and no horizontal ScrollBar appears.
+.IP
+When the value of this resource is \fIXmRESIZE_IF_POSSIBLE\fP, the List
+attempts to grow or shrink to match the width of the widest item.
+If it cannot grow to match the widest size, a horizontal ScrollBar is
+added for a ScrolledList if the longest item is wider than the list
+viewing area.
+.nL
+.ne 3
+.IP
+The size policy must be set at the time the List widget is created.
+It cannot be changed at a later time through \fIXtSetValues\fP.
+.IP "\fIXmNlistSpacing\fP"
+Specifies the spacing between list items.
+This spacing increases by the value of the \fIXmNhighlightThickness\fP
+resource in Primitive.
+.IP "\fIXmNmultipleSelectionCallback\fP"
+Specifies a list of callbacks that is called
+when an item is selected in
+multiple selection mode. The reason is \fIXmCR_MULTIPLE_SELECT\fP.
+.nL
+.ne 8
+.IP "\fIXmNscrollBarDisplayPolicy\fP"
+Controls the display of vertical ScrollBars in a ScrolledList.
+When the value of this resource is \fIXmAS_NEEDED\fP, a vertical
+ScrollBar is displayed only when the number of items in the List exceeds
+the number of Visible items.
+When the value is \fIXmSTATIC\fP, a vertical ScrollBar is always
+displayed.
+.IP "\fIXmNselectedItemCount\fP"
+Specifies the number of strings in the selected items list.
+The value must be the number of items in \fIXmNselectedItems\fP and must
+not be negative.
+.nL
+.ne 15
+.IP "\fIXmNselectedItems\fP"
+Points to an array of compound strings that represents the list items that
+are currently selected, either by the user or by the application.
+\fIXtGetValues\fP for this resource returns the list items themselves,
+not a copy of the list items.
+The application must not free the returned items.
+.IP
+Setting \fIXmNselectedItems\fP selects those list items that exactly
+match items in the given \fIXmNselectedItems\fP list.  There may be
+additional items in \fIXmNselectedItems\fP that do not match items in
+the list.  These items remain until \fIXmNselectedItems\fP is updated.
+If \fIXmNitems\fP is changed such that the list now contains items
+matching previously unmatched items in \fIXmNselectedItems\fP, those
+new items will also appear selected.
+.IP
+Any user interaction with the list that causes at least one item to be
+selected or deselected and any call to \fIXmListDeselectAllItems\fP,
+\fIXmListDeselectAllItems\fP, \fIXmListDeselectPos\fP,
+\fIXmListSelectItem\fP, \fIXmListSelectPos\fP, or
+\fIXmListUpdateSelectedList\fP cause \fIXmNselectedItems\fP to be
+updated immediately to exactly reflect the visual state of the list.
+Calls to any other \fIXmList\fP functions do not affect
+\fIXmNselectedItems\fP.
+.IP "\fIXmNselectionPolicy\fP"
+Defines the interpretation of the selection action.  This can be one of the
+following:
+.wH
+.rS 
+.TP
+\(bu
+\fIXmSINGLE_SELECT\fP \- allows only single selections
+.TP
+\(bu
+\fIXmMULTIPLE_SELECT\fP \- allows multiple selections
+.TP
+\(bu
+\fIXmEXTENDED_SELECT\fP \- allows extended selections
+.TP
+\(bu
+\fIXmBROWSE_SELECT\fP" \- allows "drag and browse" functionality
+.wH
+.rE
+.IP "\fIXmNsingleSelectionCallback\fP"
+Specifies a list of callbacks that is called
+when an item is selected in
+single selection mode. The reason is \fIXmCR_SINGLE_SELECT\fP.
+.nL
+.ne 9
+.IP "\fIXmNstringDirection\fP"
+Specifies the initial direction to draw the string.  The values are
+\fIXmSTRING_DIRECTION_L_TO_R\fP and \fIXmSTRING_DIRECTION_R_TO_L\fP.
+The value of this resource is determined at creation time.  If the widget's
+parent is a manager, this value is inherited from the widget's parent,
+otherwise it is set to \fIXmSTRING_DIRECTION_L_TO_R\fP.
+.IP "\fIXmNtopItemPosition\fP"
+Specifies the position of the item that is the first visible item in the
+list.
+Setting this resource is equivalent to calling the \fIXmListSetPos\fP
+function.
+The position of the first item in the list is 1; the position of the
+second item is 2; and so on.
+A position of 0 specifies the last item in the list.
+The value must not be negative.
+.IP "\fIXmNvisibleItemCount\fP"
+Specifies the number of items that can
+fit in the visible space of the list work area.  The List uses this
+value to determine its height.
+The value must be greater than 0.
+.SS "Inherited Resources"
+List inherits behavior and resources from the following
+superclasses.  For a complete description of each resource, refer to the
+man page for that superclass.
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmPrimitive Resource Set
+Name	Class	Type	Default	Access
+_
+XmNbottomShadowColor	XmCBottomShadowColor	Pixel	dynamic	CSG
+XmNbottomShadowPixmap	XmCBottomShadowPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNforeground	XmCForeground	Pixel	dynamic	CSG
+XmNhelpCallback	XmCCallback	XtCallbackList	NULL	C
+XmNhighlightColor	XmCHighlightColor	Pixel	dynamic	CSG
+XmNhighlightOnEnter	XmCHighlightOnEnter	Boolean	False	CSG
+XmNhighlightPixmap	XmCHighlightPixmap	Pixmap	dynamic	CSG
+XmNhighlightThickness	XmCHighlightThickness	Dimension	2	CSG
+.wH
+.tH
+XmNnavigationType	XmCNavigationType	XmNavigationType	XmTAB_GROUP	CSG
+XmNshadowThickness	XmCShadowThickness	Dimension	2	CSG
+XmNtopShadowColor	XmCTopShadowColor	Pixel	dynamic	CSG
+XmNtopShadowPixmap	XmCTopShadowPixmap	Pixmap	dynamic	CSG
+XmNtraversalOn	XmCTraversalOn	Boolean	True	CSG
+XmNunitType	XmCUnitType	unsigned char	dynamic	CSG
+XmNuserData	XmCUserData	XtPointer	NULL	CSG
+.TE
+.KE
+.in
+.sp 1
+.P 
+.wH
+.in 0 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+Core Resource Set
+Name	Class	Type	Default	Access
+_
+XmNaccelerators	XmCAccelerators	XtAccelerators	dynamic	CSG
+XmNancestorSensitive	XmCSensitive	Boolean	dynamic	G
+XmNbackground	XmCBackground	Pixel	dynamic	CSG
+XmNbackgroundPixmap	XmCPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNborderColor	XmCBorderColor	Pixel	XtDefaultForeground	CSG
+XmNborderPixmap	XmCPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNborderWidth	XmCBorderWidth	Dimension	0	CSG
+XmNcolormap	XmCColormap	Colormap	dynamic	CG
+XmNdepth	XmCDepth	int	dynamic	CG
+XmNdestroyCallback	XmCCallback	XtCallbackList	NULL	C
+XmNheight	XmCHeight	Dimension	dynamic	CSG
+XmNinitialResourcesPersistent	XmCInitialResourcesPersistent	Boolean	True	C
+XmNmappedWhenManaged	XmCMappedWhenManaged	Boolean	True	CSG
+XmNscreen	XmCScreen	Screen *	dynamic	CG
+.wH
+.tH
+XmNsensitive	XmCSensitive	Boolean	True	CSG
+XmNtranslations	XmCTranslations	XtTranslations	dynamic	CSG
+XmNwidth	XmCWidth	Dimension	dynamic	CSG
+XmNx	XmCPosition	Position	0	CSG
+XmNy	XmCPosition	Position	0	CSG
+.TE
+.KE
+.in
+.sp 1
+.wH
+.in  
+.SS "Callback Information"
+List defines a new callback structure.  The application must first look at the
+reason field and use only the structure members that are valid for that
+particular reason, because not all fields are relevant for
+every possible reason.  The callback structure is defined as follows:
+.sS
+.iS
+.ta .25i 1.5i
+.nf
+typedef struct
+{
+	int	\fBreason\fI;
+	XEvent	*\fBevent\fI;
+	XmString	\fBitem\fI;
+	int	\fBitem_length\fI;
+	int	\fBitem_position\fI;
+	XmString	*\fBselected_items\fI;
+	int	\fBselected_item_count\fI;
+	int	*\fBselected_item_positions\fI;
+	char	\fBselection_type\fI;
+} XmListCallbackStruct;
+.iE
+.sE
+.nL
+.ne 10
+.IP "\fBreason\fP"
+Indicates why the callback was invoked.
+.IP "\fBevent\fP"
+Points to the \fIXEvent\fP that triggered the callback.  It can be NULL.
+.IP "\fBitem\fP"
+Is the last item selected at the time of the \fBevent\fP that caused the
+callback.
+\fBitem\fP points to a temporary storage space that is reused after the
+callback is finished.
+Therefore, if an application needs to save the item, it should copy the
+item into its own data space.
+.IP "\fBitem_length\fP"
+Is the length in bytes of \fBitem\fP.
+.IP "\fBitem_position\fP"
+Is the position of \fBitem\fP in the List's \fIXmNitems\fP array.
+.IP "\fBselected_items\fP"
+Is a list of items selected at the time of the \fBevent\fP that caused
+the callback.
+\fBselected_items\fP points to a temporary storage space that is reused
+after the callback is finished.
+Therefore, if an application needs to save the selected list, it should
+copy the list into its own data space.
+.IP "\fBselected_item_count\fP"
+Is the number of items in the \fBselected_items\fP list.
+This number must be non-negative.
+.IP "\fBselected_item_positions\fP"
+Is an array of integers, one for each selected item, representing the
+position of each selected item in the List's \fIXmNitems\fP array.
+\fBselected_item_positions\fP points to a temporary storage space that
+is reused after the callback is finished.
+Therefore, if an application needs to save this array, it should copy
+the array into its own data space.
+.IP "\fBselection_type\fP"
+Indicates that the most recent extended selection was the initial
+selection (\fIXmINITIAL\fP), a modification of an existing selection
+(\fIXmMODIFICATION\fP), or an additional noncontiguous selection
+(\fIXmADDITION\fP).
+.IP
+.ne 25
+The following table describes the reasons for which the individual callback
+structure fields are valid:
+.IP
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cb  cb
+lb  li.
+Reason;Valid Fields
+=
+.sp .2
+XmCR_SINGLE_SELECT	reason, event, item, item_length, item_position
+
+XmCR_DEFAULT_ACTION	T{
+reason, event, item, item_length, item_position, selected_items, selected_item_count, selected_item_positions
+T}
+
+
+XmCR_BROWSE_SELECT	reason, event, item, item_length, item_position
+
+XmCR_MULTIPLE_SELECT	T{
+reason, event, item, item_length, item_position, selected_items, selected_item_count, selected_item_positions
+T}
+
+XmCR_EXTENDED_SELECT	T{
+reason, event, item, item_length, item_position, selected_items, selected_item_count, selected_item_positions, selection_type
+T}
+.sp .2
+.TE
+.KE
+.in
+.sp 1
+.SS "Translations"
+XmList includes translations from Primitive.
+The XmList translations are listed below.
+These translations may not directly correspond to a
+translation table.
+.iS
+.ta 1.5i
+.nf
+BSelect Press:	ListBeginSelect()
+BSelect Motion:	ListButtonMotion()
+BSelect Release:	ListEndSelect()
+.sp \n(PDu
+BExtend Press:	ListBeginExtend()
+BExtend Motion:	ListButtonMotion()
+BExtend Release:	ListEndExtend()
+.sp \n(PDu
+BToggle Press:	ListBeginToggle()
+BToggle Motion:	ListButtonMotion()
+BToggle Release:	ListEndToggle()
+BDrag Press:	ListProcessDrag()
+.sp \n(PDu
+.nL
+.ne 7
+KUp:	ListPrevItem()
+MShift KUp:	ListExtendPrevItem()
+.sp \n(PDu
+KDown:	ListNextItem()
+MShift KDown:	ListExtendNextItem()
+.sp \n(PDu
+KLeft:	ListLeftChar()
+MCtrl KLeft:	ListLeftPage()
+.sp \n(PDu
+KRight:	ListRightChar()
+MCtrl KRight:	ListRightPage()
+.sp \n(PDu
+KPageUp:	ListPrevPage()
+KPageDown:	ListNextPage()
+KPageLeft:	ListLeftPage()
+KPageRight:	ListRightPage()
+.sp \n(PDu
+KBeginLine:	ListBeginLine()
+KEndLine:	ListEndLine()
+.sp \n(PDu
+KBeginData:	ListBeginData()
+MShift KBeginData:	ListBeginDataExtend()
+.sp \n(PDu
+KEndData:	ListEndData()
+MShift KEndData:	ListEndDataExtend()
+.sp \n(PDu
+KAddMode:	ListAddMode()
+.sp \n(PDu
+KActivate:	ListKbdActivate()
+.sp \n(PDu
+KCopy Press:	ListCopyToClipboard()
+KSelect Press:	ListKbdBeginSelect()
+KSelect Release:	ListKbdEndSelect()
+.sp \n(PDu
+KExtend Press:	ListKbdBeginExtend()
+KExtend Release:	ListKbdEndExtend()
+.sp \n(PDu
+MAny KCancel:	ListKbdCancel()
+KSelectAll:	ListKbdSelectAll()
+KDeselectAll:	ListKbdDeSelectAll()
+.sp \n(PDu
+KHelp:	PrimitiveHelp()
+KNextField	PrimitiveNextTabGroup()
+KPrevField	PrimitivePrevTabGroup()
+.wH
+.fi
+.iE
+.PP
+The translations for the button events are modified when the XmDisplay's
+\fIenableBtn1Transfer\fP resource is True.
+This option allows the actions for selection and transfer to be integrated
+on Button1 so that the actions for extending the selection can be bound
+to Button2.
+The actions for Button1 that are defined above still apply when the Button1
+press occurs over text that is not selected.
+The following actions apply when the Button1 press occurs over text that
+is selected:
+.PP
+.iS
+.ta 1.5i
+.nf
+BSelect Press:    ListProcessDrag() resulting in copy
+.sp \n(PDu
+BExtend Press:    ListProcessDrag() resulting in move
+BExtend Click:    ListBeginExtend(), ListEndExtend()
+.sp \n(PDu
+BToggle Press:    ListProcessDrag() resulting in copy
+.sp \n(PDu
+BDrag Press:      ListBeginExtend()
+BDrag Motion:     ListButtonMotion()
+BDrag Release:    ListEndExtend()
+.wH
+.fi
+.iE
+.SS "Action Routines"
+The XmList action routines are described below.
+The current selection is always shown with inverted colors.
+.IP "\fIListAddMode()\fP:"
+Toggles the state of Add Mode for keyboard selection.
+.IP "\fIListBeginData()\fP:"
+Moves the location cursor to the first item in the list.
+In Normal Mode, this also deselects any current selection,
+selects the first item in the list, and calls the appropriate selection
+callbacks (\fIXmNbrowseSelectionCallback\fP when
+\fIXmNselectionPolicy\fP is set to \fIXmBROWSE_SELECT\fP,
+\fIXmNextendedSelectionCallback\fP when \fIXmNselectionPolicy\fP is set
+to \fIXmEXTENDED_SELECT\fP).
+.IP "\fIListBeginDataExtend()\fP:"
+If the \fIXmNselectionPolicy\fP is set to \fIXmMULTIPLE_SELECT\fP or
+\fIXmEXTENDED_SELECT\fP,
+moves the location cursor to the first item in the list.
+.IP
+If the \fIXmNselectionPolicy\fP is set to \fIXmEXTENDED_SELECT\fP,
+does the following:
+If an extended selection has been made from the current anchor point,
+restores the selection state of the items in that range to their state
+before the extended selection was done.
+Changes the selection state of the first item and all
+items between it and the current anchor point to the state of the
+item at the current anchor point.
+Calls the \fIXmNextendedSelectionCallback\fP callbacks.
+.IP "\fIListBeginExtend()\fP:"
+If the \fIXmNselectionPolicy\fP is set to \fIXmEXTENDED_SELECT\fP,
+does the following:
+If an extended selection has been made from the current anchor point,
+restores the selection state of the items in that range to their state
+before the extended selection was done.
+Changes the selection state of the item under the pointer and all
+items between it and the current anchor point to the state of the
+.ne 4
+item at the current anchor point.
+If \fIXmNautomaticSelection\fP is set to True, calls the
+\fIXmNextendedSelectionCallback\fP callbacks.
+.IP "\fIListBeginLine()\fP:"
+Moves the horizontal scroll region to the beginning of the line.
+.IP "\fIListBeginSelect()\fP:"
+If the \fIXmNselectionPolicy\fP is set to \fIXmSINGLE_SELECT\fP,
+deselects any current selection and toggles the selection state of the
+item under the pointer.
+.IP
+If the \fIXmNselectionPolicy\fP is set to \fIXmBROWSE_SELECT\fP,
+deselects any current selection and selects the item under the pointer.
+If \fIXmNautomaticSelection\fP is set to True, calls the
+\fIXmNbrowseSelectionCallback\fP callbacks.
+.IP
+If the \fIXmNselectionPolicy\fP is set to \fIXmMULTIPLE_SELECT\fP,
+toggles the selection state of the item under the pointer.
+Any previous selections remain.
+.IP
+If the \fIXmNselectionPolicy\fP is set to \fIXmEXTENDED_SELECT\fP,
+deselects any current selection, selects the item under the pointer, and
+sets the current anchor at that item.
+If \fIXmNautomaticSelection\fP is set to True, calls the
+\fIXmNextendedSelectionCallback\fP callbacks.
+.IP "\fIListBeginToggle()\fP:"
+If the \fIXmNselectionPolicy\fP is set to \fIXmEXTENDED_SELECT\fP,
+does the following:
+Moves the current anchor to the item under the pointer
+without changing the current selection.
+If the item is unselected, it is selected; if the item is selected, it
+is unselected.
+If \fIXmNautomaticSelection\fP is set to True, calls the
+\fIXmNextendedSelectionCallback\fP callbacks.
+.IP "\fIListButtonMotion()\fP:"
+If the \fIXmNselectionPolicy\fP is set to \fIXmBROWSE_SELECT\fP,
+deselects any current selection and selects the item under the
+pointer.
+If \fIXmNautomaticSelection\fP is set to True and the pointer has
+entered a new list item, calls the \fIXmNbrowseSelectionCallback\fP
+callbacks.
+.IP
+.ne 4
+If the \fIXmNselectionPolicy\fP is set to \fIXmEXTENDED_SELECT\fP,
+does the following:
+If an extended selection is being made and an extended selection has
+previously been made from the current anchor point,
+restores the selection state of the items in that range to their state
+before the previous extended selection was done.
+Changes the selection state of the item under the pointer and all
+items between it and the current anchor point to the state of the
+item at the current anchor point.
+If \fIXmNautomaticSelection\fP is set to True and the pointer has
+entered a new list item, calls the \fIXmNextendedSelectionCallback\fP
+callbacks.
+.IP
+If the pointer leaves a scrolled list, this action scrolls the list in
+the direction of the pointer motion.
+.IP "\fIListCopyToClipboard()\fP"
+Copies the content of the selected items to the clipboard as a single
+compound string with each
+item separated by a newline.
+.IP "\fIListEndData()\fP:"
+Moves the location cursor to the last item in the list.
+In Normal Mode, this also deselects any current selection,
+selects the last item in the list, and calls the appropriate selection
+callbacks (\fIXmNbrowseSelectionCallback\fP when
+\fIXmNselectionPolicy\fP is set to \fIXmBROWSE_SELECT\fP,
+\fIXmNextendedSelectionCallback\fP when \fIXmNselectionPolicy\fP is set
+to \fIXmEXTENDED_SELECT\fP).
+.IP "\fIListEndDataExtend()\fP:"
+If the \fIXmNselectionPolicy\fP is set to \fIXmMULTIPLE_SELECT\fP or
+\fIXmEXTENDED_SELECT\fP,
+moves the location cursor to the last item in the list.
+.IP
+If the \fIXmNselectionPolicy\fP is set to \fIXmEXTENDED_SELECT\fP,
+does the following:
+If an extended selection has been made from the current anchor point,
+restores the selection state of the items in that range to their state
+before the extended selection was done.
+Changes the selection state of the last item and all
+items between it and the current anchor point to the state of the
+item at the current anchor point.
+Calls the \fIXmNextendedSelectionCallback\fP callbacks.
+.nL
+.ne 5
+.IP "\fIListEndExtend()\fP:"
+If the \fIXmNselectionPolicy\fP is set to \fIXmEXTENDED_SELECT\fP,
+moves the location cursor to the last item selected or deselected and,
+if \fIXmNautomaticSelection\fP is set to False, calls the
+\fIXmNextendedSelectionCallback\fP callbacks.
+.IP "\fIListEndLine()\fP:"
+Moves the horizontal scroll region to the end of the line.
+.IP "\fIListEndSelect()\fP:"
+If the \fIXmNselectionPolicy\fP is set to \fIXmSINGLE_SELECT\fP or
+\fIXmMULTIPLE_SELECT\fP,
+moves the location cursor to the last item selected or deselected and
+calls the appropriate selection callbacks
+(\fIXmNsingleSelectionCallback\fP when \fIXmNselectionPolicy\fP is set
+to \fIXmSINGLE_SELECT\fP, \fIXmNmultipleSelectionCallback\fP when
+\fIXmNselectionPolicy\fP is set to \fIXmMULTIPLE_SELECT\fP).
+.IP
+If the \fIXmNselectionPolicy\fP is set to \fIXmBROWSE_SELECT\fP or
+\fIXmEXTENDED_SELECT\fP, moves the location cursor to the last item
+selected or deselected and, if \fIXmNautomaticSelection\fP is set to
+False, calls the appropriate selection callbacks
+(\fIXmNbrowseSelectionCallback\fP when \fIXmNselectionPolicy\fP is set
+to \fIXmBROWSE_SELECT\fP, \fIXmNextendedSelectionCallback\fP when
+\fIXmNselectionPolicy\fP is set to \fIXmEXTENDED_SELECT\fP).
+.IP "\fIListEndToggle()\fP:"
+If the \fIXmNselectionPolicy\fP is set to \fIXmEXTENDED_SELECT\fP, moves
+the location cursor to the last item selected or deselected and, if
+\fIXmNautomaticSelection\fP is set to False, calls the
+\fIXmNextendedSelectionCallback\fP callbacks.
+.IP "\fIListExtendNextItem()\fP:"
+If the \fIXmNselectionPolicy\fP is set to \fIXmEXTENDED_SELECT\fP,
+does the following:
+If an extended selection has been made from the current anchor point,
+restores the selection state of the items in that range to their state
+before the extended selection was done.
+Moves the location cursor to the next item and changes the selection
+state of the item and all
+.ne 4
+items between it and the current anchor point
+to the state of the item at the current anchor point.
+Calls the \fIXmNextendedSelectionCallback\fP callbacks.
+.IP "\fIListExtendPrevItem()\fP:"
+If the \fIXmNselectionPolicy\fP is set to \fIXmEXTENDED_SELECT\fP,
+does the following:
+If an extended selection has been made from the current anchor point,
+restores the selection state of the items in that range to their state
+before the extended selection was done.
+Moves the location cursor to the previous item and changes the selection
+state of the item and all items between it and the current anchor point
+to the state of the item at the current anchor point.
+Calls the \fIXmNextendedSelectionCallback\fP callbacks.
+.IP "\fIListScrollCursorVertically(\fBpercentage\fI)\fP:"
+Scrolls the line containing the insertion cursor vertically
+to an intermediate position in the visible window based on an
+input percentage.  A value of 0 indicates the top of the window;
+a value of 100, the bottom of the window.   If this action is called
+with no argument, the line containing the insertion cursor is scrolled
+vertically to a new position designated by the \fBy\fP event passed
+to the routine.
+.IP "\fIListKbdActivate()\fP:"
+Calls the callbacks for \fIXmNdefaultActionCallback\fP.
+If the List's parent is a manager, this action passes the event to the
+parent.
+.IP "\fIListKbdBeginExtend()\fP:"
+If the \fIXmNselectionPolicy\fP is set to \fIXmEXTENDED_SELECT\fP,
+does the following:
+If an extended selection has been made from the current anchor point,
+restores the selection state of the items in that range to their state
+before the extended selection was done.
+Changes the selection state of the item at the location cursor and all
+items between it and the current anchor point to the state of the
+item at the current anchor point.
+If \fIXmNautomaticSelection\fP is set to True, calls the
+\fIXmNextendedSelectionCallback\fP callbacks.
+.IP "\fIListKbdBeginSelect()\fP:"
+If the \fIXmNselectionPolicy\fP is set to \fIXmSINGLE_SELECT\fP,
+deselects any current selection and toggles the state of the item at the
+location cursor.
+.IP
+If the \fIXmNselectionPolicy\fP is set to \fIXmBROWSE_SELECT\fP,
+deselects any current selection and selects the item at the location
+cursor.
+If \fIXmNautomaticSelection\fP is set to True, calls the
+\fIXmNbrowseSelectionCallback\fP callbacks.
+.IP
+If the \fIXmNselectionPolicy\fP is set to \fIXmMULTIPLE_SELECT\fP,
+toggles the selection state of the item at the location cursor.
+Any previous selections remain.
+.IP
+.ne 9
+If the \fIXmNselectionPolicy\fP is set to \fIXmEXTENDED_SELECT\fP,
+moves the current anchor to the item at the location cursor.
+In Normal Mode, deselects any current selection and selects the item at
+the location cursor.
+In Add Mode, toggles the selection state of the item at the location
+cursor and leaves the current selection unchanged.
+If \fIXmNautomaticSelection\fP is set to True, calls the
+\fIXmNextendedSelectionCallback\fP callbacks.
+.IP "\fIListKbdCancel()\fP:"
+If the \fIXmNselectionPolicy\fP is set to \fIXmEXTENDED_SELECT\fP
+and an extended selection is being made from the current anchor point,
+cancels the new selection and restores the selection state of the items
+in that range to their state before the extended selection was done.
+If \fIXmNautomaticSelection\fP is set to True, calls the
+\fIXmNextendedSelectionCallback\fP callbacks, otherwise, and if the
+parent is a manager, passes the event to the parent.
+.IP "\fIListKbdDeSelectAll()\fP:"
+If the \fIXmNselectionPolicy\fP is set to \fIXmSINGLE_SELECT\fP,
+\fIXmMULTIPLE_SELECT\fP, or \fIXmEXTENDED_SELECT\fP in Add Mode,
+deselects all items in the list.
+If the \fIXmNselectionPolicy\fP is set to \fIXmEXTENDED_SELECT\fP in
+Normal Mode, deselects all items in the list (except the item at the
+location cursor if the shell's \fIXmNkeyboardFocusPolicy\fP is
+\fIXmEXPLICIT\fP).
+Calls the appropriate selection callbacks
+(\fIXmNsingleSelectionCallback\fP when \fIXmNselectionPolicy\fP is set
+to \fIXmSINGLE_SELECT\fP, \fIXmNmultipleSelectionCallback\fP when
+\fIXmNselectionPolicy\fP is set to \fIXmMULTIPLE_SELECT\fP,
+\fIXmNextendedSelectionCallback\fP when \fIXmNselectionPolicy\fP is set
+to \fIXmEXTENDED_SELECT\fP).
+.IP "\fIListKbdEndExtend()\fP:"
+If the \fIXmNselectionPolicy\fP is set to \fIXmEXTENDED_SELECT\fP
+and if \fIXmNautomaticSelection\fP is set to False, calls the
+\fIXmNextendedSelectionCallback\fP callbacks.
+.nL
+.ne 9
+.IP "\fIListKbdEndSelect()\fP:"
+If the \fIXmNselectionPolicy\fP is set to \fIXmSINGLE_SELECT\fP or
+\fIXmMULTIPLE_SELECT\fP or if \fIXmNautomaticSelection\fP is set to False,
+calls the appropriate selection callbacks
+(\fIXmNsingleSelectionCallback\fP when \fIXmNselectionPolicy\fP is set
+to \fIXmSINGLE_SELECT\fP, \fIXmNbrowseSelectionCallback\fP when
+\fIXmNselectionPolicy\fP is set to \fIXmBROWSE_SELECT\fP,
+\fIXmNmultipleSelectionCallback\fP when \fIXmNselectionPolicy\fP is set
+to \fIXmMULTIPLE_SELECT\fP, \fIXmNextendedSelectionCallback\fP when
+\fIXmNselectionPolicy\fP is set to \fIXmEXTENDED_SELECT\fP).
+.IP "\fIListKbdSelectAll()\fP:"
+If the \fIXmNselectionPolicy\fP is set to \fIXmSINGLE_SELECT\fP or
+\fIXmBROWSE_SELECT\fP, selects the item at the location cursor.
+If the \fIXmNselectionPolicy\fP is set to \fIXmEXTENDED_SELECT\fP or
+\fIXmMULTIPLE_SELECT\fP,
+selects all items in the list.
+Calls the appropriate selection callbacks
+(\fIXmNsingleSelectionCallback\fP when \fIXmNselectionPolicy\fP is set
+to \fIXmSINGLE_SELECT\fP, \fIXmNbrowseSelectionCallback\fP when
+\fIXmNselectionPolicy\fP is set to \fIXmBROWSE_SELECT\fP,
+\fIXmNmultipleSelectionCallback\fP when \fIXmNselectionPolicy\fP is set
+to \fIXmMULTIPLE_SELECT\fP, \fIXmNextendedSelectionCallback\fP when
+\fIXmNselectionPolicy\fP is set to \fIXmEXTENDED_SELECT\fP).
+.IP "\fIListLeftChar()\fP:"
+Scrolls the list one character to the left.
+.IP "\fIListLeftPage()\fP:"
+Scrolls the list one page to the left.
+.IP "\fIListNextItem()\fP:"
+Moves the location cursor to the next item in the list.
+.IP
+If the \fIXmNselectionPolicy\fP is set to \fIXmBROWSE_SELECT\fP,
+this action also selects the next item, deselects any current
+selection, and calls the \fIXmNbrowseSelectionCallback\fP callbacks.
+.IP
+.ne 8
+If the \fIXmNselectionPolicy\fP is set to \fIXmEXTENDED_SELECT\fP,
+this action in Normal Mode also selects the next item, deselects any
+current selection, moves the current anchor to the next item, and calls
+the \fIXmNextendedSelectionCallback\fP callbacks.
+In Add Mode this action does not affect the selection or the anchor.
+.IP "\fIListNextPage()\fP:"
+Scrolls the list to the next page, moving the location cursor to a new
+item.
+.IP
+If the \fIXmNselectionPolicy\fP is set to \fIXmBROWSE_SELECT\fP,
+this action also selects the new item, deselects any current
+selection, and calls the \fIXmNbrowseSelectionCallback\fP callbacks.
+.IP
+If the \fIXmNselectionPolicy\fP is set to \fIXmEXTENDED_SELECT\fP,
+this action in Normal Mode also selects the new item, deselects any
+current selection, moves the current anchor to the new item, and calls
+the \fIXmNextendedSelectionCallback\fP callbacks.
+In Add Mode this action does not affect the selection or the anchor.
+.IP "\fIListPrevItem()\fP:"
+Moves the location cursor to the previous item in the list.
+.IP
+If the \fIXmNselectionPolicy\fP is set to \fIXmBROWSE_SELECT\fP,
+this action also selects the previous item, deselects any current
+selection, and calls the \fIXmNbrowseSelectionCallback\fP callbacks.
+.IP
+If the \fIXmNselectionPolicy\fP is set to \fIXmEXTENDED_SELECT\fP,
+this action in Normal Mode also selects the previous item, deselects any
+current selection, moves the current anchor to the previous item, and
+calls the \fIXmNextendedSelectionCallback\fP callbacks.
+In Add Mode this action does not affect the selection or the anchor.
+.nL
+.ne 8
+.IP "\fIListPrevPage()\fP:"
+Scrolls the list to the previous page, moving the location cursor to a
+new item.
+.IP
+If the \fIXmNselectionPolicy\fP is set to \fIXmBROWSE_SELECT\fP,
+this action also selects the new item, deselects any current
+selection, and calls the \fIXmNbrowseSelectionCallback\fP callbacks.
+.IP
+If the \fIXmNselectionPolicy\fP is set to \fIXmEXTENDED_SELECT\fP,
+this action in Normal Mode also selects the new item, deselects any
+current selection, moves the current anchor to the new item, and calls
+the \fIXmNextendedSelectionCallback\fP callbacks.
+In Add Mode this action does not affect the selection or the anchor.
+.IP "\fIListProcessDrag()\fP:"
+Drags the content of a one or more selected list items.  Each item
+is separated by a newline.  This action creates a DragContext object
+whose \fIXmNexportTargets\fP resource is set to "COMPOUND_TEXT" and
+the \fIXmNclientData\fP resource is set to the index of the item in
+the list.  If \fIBDrag\fP is pressed on an unselected item, drags
+only that item, excluding any other selected items.
+.IP "\fIListRightChar()\fP:"
+Scrolls the list one character to the right.
+.IP "\fIListRightPage()\fP:"
+Scrolls the list one page to the right.
+.IP "\fIPrimitiveHelp()\fP:"
+Calls the callbacks for \fIXmNhelpCallback\fP if any exist.  If there
+are no help callbacks for this widget, this action calls the help callbacks
+for the nearest ancestor that has them.
+.IP "\fIPrimitiveNextTabGroup()\fP:"
+Moves the focus to the first item contained within the next tab group.  If
+the current tab group is the last entry in the tab group list, it
+wraps to the beginning of the tab group list.
+.IP "\fIPrimitivePrevTabGroup()\fP:"
+Moves the focus to the first item contained within the previous tab group.
+If the beginning of the tab group list is reached, it wraps to the end
+of the tab group list.
+.ne 10
+.SS "Additional Behavior"
+The List widget has the additional behavior described below:
+.IP "\fI<Double\ Click>\fP"
+If a button click is followed by another button click within the time
+span specified by the display's multi-click time, the List interprets
+that as a double click and calls the callbacks for
+\fIXmNdefaultActionCallback\fP.
+The item's colors invert to indicate that it is selected.
+The \fIXmNdoubleClickInterval\fP resource can be used to specify a
+time span that overrides the display's multi-click time.
+.IP "\fI<FocusIn>\fP:"
+If the focus policy is Explicit, sets the focus and draw
+the location cursor.
+.IP "\fI<FocusOut>\fP:"
+If the focus policy is Explicit, removes the focus and erase
+the location cursor.
+.SS "Virtual Bindings"
+The bindings for virtual keys are vendor specific.
+For information about bindings for virtual buttons and keys, see \fIVirtualBindings(3X)\fP.
+.SH RELATED INFORMATION
+.na
+\fICore(3X)\fP, \fIXmCreateList(3X)\fP,
+\fIXmCreateScrolledList(3X)\fP,
+\fIXmFontListAppendEntry(3X)\fP,
+\fIXmListAddItem(3X)\fP,
+\fIXmListAddItems(3X)\fP,
+\fIXmListAddItemUnselected(3X)\fP,
+\fIXmListAddItemsUnselected(3X)\fP,
+\fIXmListDeleteAllItems(3X)\fP,
+\fIXmListDeleteItem(3X)\fP,
+\fIXmListDeleteItems(3X)\fP,
+\fIXmListDeleteItemsPos(3X)\fP,
+\fIXmListDeletePos(3X)\fP,
+\fIXmListDeletePositions(3X)\fP,
+\fIXmListDeselectAllItems(3X)\fP,
+\fIXmListDeselectItem(3X)\fP,
+\fIXmListDeselectPos(3X)\fP,
+\fIXmListGetKbdItemPos
+\fIXmListGetMatchPos(3X)\fP,
+\fIXmListGetSelectedPos(3X)\fP,
+\fIXmListItemExists(3X)\fP,
+\fIXmListItemPos(3X)\fP,
+\fIXmListPosToBounds(3X)\fP,
+\fIXmListReplaceItems(3X)\fP,
+\fIXmListReplaceItemsPos(3X)\fP,
+\fIXmListReplaceItemsPositions(3X)\fP,
+\fIXmListReplaceItemsPosUnselected(3X)\fP,
+\fIXmListReplaceItemsUnselected(3X)\fP,
+\fIXmListSelectItem(3X)\fP,
+\fIXmListSelectPos(3X)\fP,
+\fIXmListSetAddMode(3X)\fP,
+\fIXmListSetBottomItem(3X)\fP,
+\fIXmListSetBottomPos(3X)\fP,
+\fIXmListSetHorizPos(3X)\fP,
+\fIXmListSetItem(3X)\fP,
+\fIXmListSetKbdItemPos(3X)\fP,
+\fIXmListSetPos(3X)\fP,
+\fIXmListUpdateSelectedList(3X)\fP,
+\fIXmListYToPos(3X)\fP,
+\fIXmPrimitive(3X)\fP and
+\fIXmStringCreate(3X)\fP.
+.ad

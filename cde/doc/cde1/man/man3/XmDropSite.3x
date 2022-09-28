@@ -1,0 +1,437 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+...\" **
+...\" **
+...\" **  (c) Copyright 1991, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1991 by Hewlett-Packard Company
+...\" **
+...\" **
+.TH XmDropSite 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmDropSite\fP \- The DropSite Registry
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/DragDrop.h>
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+A client registers a widget or gadget as a drop site using the
+\fIXmDropSiteRegister\fP function.  In addition, this routine
+defines the behavior and capabilities of a drop site by specifying
+appropriate resources.  For example, the \fIXmNimportTargets\fP
+and \fIXmNnumImportTargets\fP resources identify respectively the
+selection target types and number of types supported by a drop
+site.  The visual animation effects associated with
+a drop site are also described with DropSite resources.
+.PP
+Drop site animation effects that occur in response to the pointer
+entering a valid drop site are called drag-under effects.  A receiver
+can select from several animation styles supplied by the toolkit or
+can provide customized animation effects.  Drag-under effects supplied
+by the toolkit include border highlighting, shadow in/out drawing,
+and pixmap representation.
+.PP
+When a preregister drag protocol style is used, the toolkit generates
+drag-under visual effects based on the value of the \fIXmNanimationStyle\fP
+resource.  In dynamic mode, if the drop site \fIXmNdragProc\fP
+resource is NULL, the toolkit also provides animation effects based on
+the \fIXmNanimationStyle\fP resource.  Otherwise, if the \fIXmNdragProc\fP
+routine is specified, the receiver can either assume
+responsibility for animation effects (through the \fIXmNdragProc\fP routine)
+or rely on the toolkit to provide animation. 
+.PP
+Drop sites may overlap.  The initial stacking order corresponds to the
+order in which the drop sites were registered.  When a drop site
+overlaps another drop site, the drag-under effects of the 
+drop site underneath are clipped by the obscuring drop site(s).
+.PP
+The \fIXmDropSiteUpdate\fP routine sets resources for a widget
+that is registered as a drop site.  \fIXmDropSiteRetrieve\fP gets drop 
+site resource values previously specified for a registered widget.  These
+routines are used instead of \fIXtSetValues\fP and \fIXtGetValues\fP.
+.SS "Classes"
+XmDropSite does not inherit from any widget class.
+.SS "New Resources"
+The following table defines a set of widget resources used by the
+programmer to specify data.  To reference a resource by name 
+or by class in a .Xdefaults file, remove the \fIXmN\fP or \fIXmC\fP
+prefix and use the remaining letters.  To specify one of the defined
+values for a resource in a .Xdefaults file, remove the \fIXm\fP prefix
+and use the remaining letters (in either lowercase or uppercase, but include
+any underscores between words).  The codes in the access column
+indicate if the given resource can be set at creation time (\fIC\fP),
+set by using \fIXmDropSiteUpdate\fP (\fIS\fP), retrieved by using
+\fIXmDropSiteRetrieve\fP (\fIG\fP), or is not applicable (\fIN/A\fP).
+.PP
+.sp 1
+.in 0
+.KS
+.TS
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmDropSite Resource Set
+Name	Class	Type	Default	Access
+_
+XmNanimationMask	XmCAnimationMask	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNanimationPixmap	XmCAnimationPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNanimationPixmapDepth	XmCAnimationPixmapDepth	int	0	CSG
+ XmNanimationStyle	XmCAnimationStyle	unsigned char	XmDRAG_UNDER_HIGHLIGHT	CSG
+XmNdragProc	XmCDragProc	XtCallbackProc	NULL	CSG
+XmNdropProc	XmCDropProc	XtCallbackProc	NULL	CSG
+XmNdropRectangles	XmCDropRectangles	XRectangle *	dynamic	CSG
+XmNdropSiteActivity	XmCDropSiteActivity	unsigned char	XmDROP_SITE_ACTIVE	CSG
+XmNdropSiteOperations	XmCDropSiteOperations	unsigned char	XmDROP_MOVE | XmDROP_COPY	CSG
+XmNdropSiteType	XmCDropSiteType	unsigned char	XmDROP_SITE_SIMPLE	CG
+XmNimportTargets	XmCImportTargets	Atom *	NULL	CSG
+XmNnumDropRectangles	XmCNumDropRectangles	Cardinal	1	CSG
+XmNnumImportTargets	XmCNumImportTargets	Cardinal	0	CSG
+.TE
+.KE
+.in
+.sp 1
+.PP
+.IP "\fIXmNanimationMask\fP"
+Specifies a mask to use with the pixmap specified
+by \fIXmNanimationPixmap\fP when the animation style is
+\fIXmDRAG_UNDER_PIXMAP\fP.
+.IP "\fIXmNanimationPixmap\fP"
+Specifies a pixmap for drag-under animation when the 
+animation style is \fIXmDRAG_UNDER_PIXMAP\fP.  The pixmap
+is drawn with its origin at the upper left corner of the
+bounding box of the drop site.  If the drop site window
+is larger than the animation pixmap, the portion of the
+window not covered by the pixmap will be tiled with the
+window's background color.
+.IP "\fIXmNanimationPixmapDepth\fP"
+Specifies the depth of the pixmap specified by the
+\fIXmNanimationPixmap\fP resource.  When the depth is 1, the
+colors are taken from the foreground and background of the
+drop site widget.  For any other value, drop site animation
+occurs only if the \fIXmNanimationPixmapDepth\fP matches the
+depth of the drop site window.  Colors are derived from the
+current colormap.
+.IP "\fIXmNanimationStyle\fP"
+Specifies the drag-under animation style used when a drag enters
+a valid drop site.  The possible values are
+.IP "\fIXmDRAG_UNDER_HIGHLIGHT\fP"
+The drop site uses highlighting effects.
+.IP "\fIXmDRAG_UNDER_SHADOW_OUT\fP"
+The drop site uses an outset shadow.
+.IP "\fIXmDRAG_UNDER_SHADOW_IN\fP"
+The drop site uses an inset shadow.
+.IP "\fIXmDRAG_UNDER_PIXMAP\fP"
+The drop site uses the pixmap specified by \fIXmNanimationPixmap\fP
+to indicate that it can receive the drop.
+.IP "\fIXmDRAG_UNDER_NONE\fP"
+The drop site does not use animation effects.  A client
+using a dynamic protocol, may provide drag-under
+effects in its \fIXmNdragProc\fP routine.
+.LI "\fIXmNdragProc\fP"
+Specifies the procedure that is invoked when the drop site
+receives a crossing, motion, or operation changed message.  This
+procedure is called only when a dynamic protocol is used.
+The type of structure whose address is passed to this 
+procedure is \fIXmDragProcCallbackStruct\fP.
+The reason sent to the procedure is one of
+the following:
+.IP "\fIXmCR_DROP_SITE_ENTER_MESSAGE\fP"
+.IP "\fIXmCR_DROP_SITE_LEAVE_MESSAGE\fP"
+.IP "\fIXmCR_DRAG_MOTION_MESSAGE\fP"
+.IP "\fIXmCR_OPERATION_CHANGED_MESSAGE\fP"
+.PP
+The drag procedure may change the values of some members of the
+\fIXmDragProcCallbackStruct\fP passed to it.
+After the drag procedure returns, the toolkit uses the final values in
+initializing some members of the callback struct passed to the
+appropriate callbacks of the initiator (the DragContext's
+\fIXmNdropSiteEnterCallback\fP, \fIXmNdropSiteLeaveCallback\fP,
+\fIXmNdragMotionCallback\fP, or \fIXmNoperationChangedCallback\fP
+callbacks).
+.LI "\fIXmNdropProc\fP"
+Specifies the procedure that is invoked when a drop
+(excluding a cancel or interrupt action) occurs
+on a drop site regardless of the status of the drop site.  The
+type of the structure whose address is passed to this procedure
+is \fIXmDropProcCallbackStruct\fP.  The reason
+sent to the procedure is \fIXmCR_DROP_MESSAGE\fP.
+.PP
+The drop procedure may change the values of some members of the
+\fIXmDropProcCallbackStruct\fP passed to it.
+After the drop procedure returns, the toolkit uses the final values in
+initializing some members of the \fIXmDropStartCallbackStruct\fP passed
+to the initiator's drop start callbacks (the DragContext's
+\fIXmNdropStartCallback\fP callbacks).
+.LI "\fIXmNdropRectangles\fP"
+Specifies a list of rectangles that describe the shape of a 
+drop site.  The locations of the rectangles are relative to the
+origin of the enclosing object.  When \fIXmNdropRectangles\fP
+is NULL, the drop site is assumed to be the sensitive area of 
+the enclosing widget.  If \fIXmNdropSiteType\fP is
+\fIXmDROP_SITE_COMPOSITE\fP, this resource cannot be specified by
+the application.
+.LI "\fIXmNdropSiteActivity\fP"
+Indicates whether a drop site is active or inactive.  The values
+are \fIXmDROP_SITE_ACTIVE\fP and \fIXmDROP_SITE_INACTIVE\fP.  An
+active drop site can receive a drop, whereas an inactive drop
+site is dormant.  An inactive drop site is treated as if it was
+not a registered drop site and any drag-under visuals associated
+with entering or leaving the drop site do not occur.  However, it
+is still used for clipping drag-under effects.
+.LI "\fIXmNdropSiteOperations\fP"
+Specifies the set of valid operations associated with a drop site.
+This resource is a bit mask that is formed by combining one or
+more of the following values using a bitwise operation such as
+inclusive OR (|):
+\fIXmDROP_COPY\fP, \fIXmDROP_LINK\fP, and \fIXmDROP_MOVE\fP.
+The value \fIXmDROP_NOOP\fP for this resource indicates that no
+operations are valid.
+.LI "\fIXmNdropSiteType\fP"
+Specifies the type of the drop site. The possible values are
+.IP "\fIXmDROP_SITE_SIMPLE\fP"
+The widget does not have any additional children that
+are registered as drop sites.
+.IP "\fIXmDROP_SITE_COMPOSITE\fP"
+The widget will have children that are registered as drop
+sites.
+.LI "\fIXmNimportTargets\fP"
+Specifies the list of target atoms that this drop site accepts.
+.LI "\fIXmNnumDropRectangles\fP"
+Specifies the number of rectangles in the \fIXmNdropRectangles\fP
+list.  If the drop site type is \fIXmDROP_SITE_COMPOSITE\fP, this resource
+can not be specified by the application.
+.LI "\fIXmNnumImportTargets\fP"
+Specifies the number of atoms in the target atom list.
+.LE
+.SS "Callback Information"
+A pointer to the following structure is passed to the
+\fIXmNdragProc\fP routine when the drop site receives
+crossing, motion, or operation changed messages.
+.sS
+.iS
+.ta .25i 1.5i
+.nf
+typedef struct
+{
+        int	\fBreason\fI;
+	XEvent	*\fBevent\fI;
+	Time	\fBtimeStamp\fI;
+	Widget		\fBdragContext\fI;
+	Position	\fBx\fI;
+	Position	\fBy\fI;
+	unsigned char	\fBdropSiteStatus\fI;
+	unsigned char	\fBoperation\fI;
+	unsigned char	\fBoperations\fI;
+	Boolean		\fBanimate\fI;
+} XmDragProcCallbackStruct, *XmDragProcCallback;
+.iE
+.sE
+.IP "\fBreason\fP"
+Indicates why the callback was invoked.
+.IP "\fBevent\fP"
+Points to the \fIXEvent\fP that triggered the callback.
+.IP "\fBtimeStamp\fP"
+Specifies the timestamp of the logical event.
+.IP "\fBdragContext\fP"
+Specifies the ID of the DragContext widget associated with
+the transaction.
+.IP "\fBx\fP"
+Indicates the x-coordinate of the pointer relative
+to the drop site.
+.IP "\fBy\fP"
+Indicates the y-coordinate of the pointer relative
+to the drop site.
+.IP "\fBdropSiteStatus\fP"
+An IN/OUT member that indicates whether or not a drop site is valid.
+.PP
+When the \fBreason\fP is \fIXmCR_DROP_SITE_ENTER_MESSAGE\fP or
+\fIXmCR_OPERATION_CHANGED_MESSAGE\fP, or when the reason is
+\fIXmCR_DRAG_MOTION_MESSAGE\fP or \fIXmCR_DROP_SITE_LEAVE_MESSAGE\fP and
+the pointer is not in the same drop site as on the previous invocation
+of the drag procedure, the toolkit initializes \fBdropSiteStatus\fP as
+follows:
+the toolkit initializes \fBdropSiteStatus\fP to \fIXmDROP_SITE_VALID\fP
+if the DragContext's \fIXmNexportTargets\fP and the DropSite's
+\fIXmNimportTargets\fP are compatible and if the initial value of the
+\fBoperation\fP member is not \fIXmDROP_NOOP\fP.
+Otherwise, the toolkit initializes \fBdropSiteStatus\fP to
+\fIXmDROP_SITE_INVALID\fP.
+.PP
+When the \fBreason\fP is \fIXmCR_DRAG_MOTION_MESSAGE\fP or
+\fIXmCR_DROP_SITE_LEAVE_MESSAGE\fP and the pointer is within the same
+drop site as on the previous invocation of the drag procedure, the
+toolkit initializes \fBdropSiteStatus\fP to the value of
+\fBdropSiteStatus\fP at the time the previous invocation of the drag
+procedure returns.
+.PP
+The drag procedure may change the value of this member.
+After the drag procedure returns, the toolkit uses the final value in
+initializing the \fBdropSiteStatus\fP member of the callback struct
+passed to the appropriate callbacks of the initiator.
+.IP "\fBoperation\fP"
+An IN/OUT member that identifies an operation.
+.PP
+The toolkit initializes \fBoperation\fP by selecting an operation
+from the bitwise AND of the initial value of the \fBoperations\fP member
+and the value of the DropSite's \fIXmNdropSiteOperations\fP resource.
+The toolkit searches this set first for \fIXmDROP_MOVE\fP, then for
+\fIXmDROP_COPY\fP, then for \fIXmDROP_LINK\fP, and initializes
+\fBoperation\fP to the first operation it finds in the set.
+If the toolkit finds none of these operations in the set, it initializes
+\fBoperation\fP to \fIXmDROP_NOOP\fP.
+.PP
+The drag procedure may change the value of this member.
+After the drag procedure returns, the toolkit uses the final value in
+initializing the \fBoperation\fP member of the callback struct
+passed to the appropriate callbacks of the initiator.
+.IP "\fBoperations\fP"
+An IN/OUT member that indicates the set of operations supported for the
+source data.
+.PP
+If the user does not select an operation (by pressing a modifier key),
+the toolkit initializes \fBoperations\fP to the value of the
+DragContext's \fIXmNdragOperations\fP resource.
+If the user does select an operation, the toolkit initializes
+\fBoperations\fP to the bitwise AND of the corresponding operation and
+the value of the DragContext's \fIXmNdragOperations\fP resource.
+If the resulting set of operations is empty, the toolkit initializes
+\fBoperations\fP to \fIXmDROP_NOOP\fP.
+.PP
+The drag procedure may change the value of this member.
+After the drag procedure returns, the toolkit uses the final value in
+initializing the \fBoperations\fP member of the callback struct
+passed to the appropriate callbacks of the initiator.
+.IP "\fBanimate\fP"
+An OUT member that indicates whether the toolkit or
+the receiver client provides drag-under effects for a valid
+drop site.  If \fBanimate\fP is set to True, the toolkit provides 
+drop site animation per the \fIXmNanimationStyle\fP 
+resource value; if it is set to False,
+the receiver generates drag-under animation effects.
+.PP
+A pointer to the following structure is passed to the \fIXmNdropProc\fP
+routine when the drop site receives a drop message:
+.sS
+.iS
+.ta .25i 1.5i
+.nf
+typedef struct
+{
+        int	\fBreason\fI;
+	XEvent	*\fBevent\fI;
+	Time	\fBtimeStamp\fI;
+	Widget		\fBdragContext\fI;
+	Position	\fBx\fI;
+	Position	\fBy\fI;
+	unsigned char	\fBdropSiteStatus\fI;
+	unsigned char	\fBoperation\fI;
+	unsigned char	\fBoperations\fI;
+	unsigned char	\fBdropAction\fI;
+} XmDropProcCallbackStruct, *XmDropProcCallback;
+.iE
+.sE
+.IP "\fBreason\fP"
+Indicates why the callback was invoked.
+.IP "\fBevent\fP"
+Specifies the \fIXEvent\fP that triggered the callback.
+.IP "\fBtimeStamp\fP"
+Specifies the timestamp of the logical event.
+.IP "\fBdragContext\fP"
+Specifies the ID of the DragContext widget associated with the
+transaction.
+.IP "\fBx\fP"
+Indicates the x-coordinate of the pointer relative to the
+drop site.
+.IP "\fBy\fP"
+Indicates the y-coordinate of the pointer relative to the
+drop site.
+.IP "\fBdropSiteStatus\fP"
+An IN/OUT member that indicates whether or not a drop site is valid.
+.PP
+The toolkit initializes \fBdropSiteStatus\fP to \fIXmDROP_SITE_VALID\fP
+if the DragContext's \fIXmNexportTargets\fP and the DropSite's
+\fIXmNimportTargets\fP are compatible and if the initial value of the
+\fBoperation\fP member is not \fIXmDROP_NOOP\fP.
+Otherwise, the toolkit initializes \fBdropSiteStatus\fP to
+\fIXmDROP_SITE_INVALID\fP.
+.PP
+The drop procedure may change the value of this member.
+After the drop procedure returns, the toolkit uses the final value in
+initializing the \fBdropSiteStatus\fP member of the
+\fIXmDropStartCallbackStruct\fP passed to the initiator's drop start
+callbacks (the DragContext's \fIXmNdropStartCallback\fP callbacks).
+.IP "\fBoperation\fP"
+An IN/OUT member that identifies an operation.
+.PP
+The toolkit initializes \fBoperation\fP by selecting an operation
+from the bitwise AND of the initial value of the \fBoperations\fP member
+and the value of the DropSite's \fIXmNdropSiteOperations\fP resource.
+The toolkit searches this set first for \fIXmDROP_MOVE\fP, then for
+\fIXmDROP_COPY\fP, then for \fIXmDROP_LINK\fP, and initializes
+\fBoperation\fP to the first operation it finds in the set.
+If it finds none of these operations in the set, it initializes
+\fBoperation\fP to \fIXmDROP_NOOP\fP.
+.PP
+The drop procedure may change the value of this member.
+After the drop procedure returns, the toolkit uses the final value in
+initializing the \fBoperation\fP member of the
+\fIXmDropStartCallbackStruct\fP passed to the initiator's drop start
+callbacks (the DragContext's \fIXmNdropStartCallback\fP callbacks).
+.IP "\fBoperations\fP"
+An IN/OUT member that indicates the set of operations supported for the
+source data.
+.PP
+If the user does not select an operation (by pressing a modifier key),
+the toolkit initializes \fBoperations\fP to the value of the
+DragContext's \fIXmNdragOperations\fP resource.
+If the user does select an operation, the toolkit initializes
+\fBoperations\fP to the bitwise AND of the corresponding operation and
+the value of the DragContext's \fIXmNdragOperations\fP resource.
+If the resulting set of operations is empty, the toolkit initializes
+\fBoperations\fP to \fIXmDROP_NOOP\fP.
+.PP
+The drop procedure may change the value of this member.
+After the drop procedure returns, the toolkit uses the final value in
+initializing the \fBoperations\fP member of the
+\fIXmDropStartCallbackStruct\fP passed to the initiator's drop start
+callbacks (the DragContext's \fIXmNdropStartCallback\fP callbacks).
+.IP "\fBdropAction\fP"
+An IN/OUT member that identifies the action associated with the drop.
+The possible values are
+.IP "\fIXmDROP\fP"
+A drop was attempted.  If the drop site is valid, drop transfer
+handling proceeds.
+.IP "\fIXmDROP_HELP\fP"
+The user has requested help on the drop site.
+.PP
+The drop procedure may change the value of this member.
+After the drop procedure returns, the toolkit uses the final value in
+initializing the \fBdropAction\fP member of the
+\fIXmDropStartCallbackStruct\fP passed to the initiator's drop start
+callbacks (the DragContext's \fIXmNdropStartCallback\fP callbacks).
+.LE
+.SH "RELATED INFORMATION"
+.na
+\fIXmDragContext(3X)\fP,
+\fIXmDragIcon(3X)\fP,
+\fIXmDropSiteConfigureStackingOrder(3X)\fP,
+\fIXmDropSiteEndUpdate(3X)\fP,
+\fIXmDropSiteQueryStackingOrder(3)\fP,
+\fIXmDropSiteRegister(3X)\fP,
+\fIXmDropSiteStartUpdate(3X)\fP,
+\fIXmDropSiteUpdate(3X)\fP,
+\fIXmDropSiteUnregister(3X)\fP,
+\fIXmDropTransfer(3X)\fP, and
+\fIXmTargetsAreCompatible(3X)\fP.
+.ad

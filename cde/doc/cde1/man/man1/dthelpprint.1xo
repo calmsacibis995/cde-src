@@ -1,0 +1,866 @@
+.TH dthelpprint 1 "08 August 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994 Novell, Inc.
+.\" *************************************************************************
+.SH NAME
+dthelpprint \- print utility for DtHelpDialog and DtHelpQuickDialog widgets
+.SH SYNOPSIS
+.yS
+dthelpprint \f1[\|\f2options\|\f1]
+.yE
+.br
+Options controlling what to print:
+.br
+.ne 6v
+.TS
+tab(@);
+lf3 lf2 lw(3.25i) .
+\-helpType@type@T{
+.na
+type of Help data.
+T}
+\-helpType@type@T{
+.na
+type of Help data.
+type = 0 (help volume), 1 (string), 2 (man page), 3 (help file)
+T}
+\-helpVolume@volume@T{
+.na
+full path of Help volume file.
+T}
+\-locationId@location@T{
+.na
+name of Help topic in the volume.
+T}
+\-allTopics@@T{
+.na
+print all topics, toc, & index.
+T}
+\-subTopics@@T{
+.na
+print topic locationId and all subtopics.
+T}
+\-oneTopic@@T{
+.na
+print topic locationId.
+T}
+\-toc@@T{
+.na
+print Help volume table of contents.
+T}
+\-index@@T{
+.na
+print Help volume index.
+T}
+\-frontMatter@@T{
+.na
+print Help volume front matter.
+T}
+\-manPage@manpagename@T{
+.na
+name of man page.
+T}
+\-stringData@string@T{
+.na
+Help text to print.
+T}
+\-helpFile@filename@T{
+.na
+file containing Help text.
+T}
+\-topicTitle@title@T{
+.na
+title string for Help text.
+T}
+.TE
+.sp 2
+\f1Options controlling how to print:\f1
+.P
+.ne 6v
+.TS
+tab(@);
+lf3 lf2 lw(3.25i) .
+\-printer@printername@T{
+.na
+printer to use.
+T}
+copies@number@T{
+.na
+number of copies to print.
+T}
+\-outputFile@filename@T{
+.na
+write output to this file.
+T}
+\-paperSize@size@T{
+.na
+format content to this paper size.
+T}
+\-paperSize@size@T{
+.na
+format content to this paper size.
+size = {help_papersize_letter|help_papersize_legal|
+help_papersize_executive|help_papersize_a4|
+help_papersize_b5}
+T}
+\-display@displayname@T{
+.na
+display from which to get resources.
+T}
+\-name@name@T{
+.na
+program name used when getting resources.
+T}
+\-class@name@T{
+.na
+class name used when getting resources.
+T}
+\-xrm@resourcestring@T{
+.na
+additional resources.
+T}
+.TE
+.SH DESCRIPTION
+The
+.Cm dthelpprint
+utility is a private utility used by
+.Fn DtHelpDialog 3
+and
+.Fn DtHelpQuickDialog 3
+for printing Help information.
+It is not a public utility, and
+no effort to maintain backwards compatibility will be made across versions.
+That said, it is sometimes useful to use
+.Cm dthelpprint
+directly
+and to configure its operation.
+.P
+The
+.Cm dthelpprint
+utility processes help topics and can send the output
+to a printer or to a specified output file.
+The
+.Cm dthelpprint
+utility is an integral part of the CDE Help System.
+Access to
+.Cm dthelpprint
+is provided by the
+.Cm dthelpview 1
+client's Print dialog, an application's Help window, or through a
+utility line shell.
+.P
+The
+.Cm dthelpprint
+utility can print plain text strings, plain text files, Unix man pages, and
+CDE Help volumes.
+CDE Help volumes are printed without any graphics, 
+and there is no indication of missing graphics.
+The standard 
+.B man(1)
+and
+.B dthelpview(1)
+search paths are used to find manual pages and CDE Help volumes; 
+Help volumes and files may be specified with an absolute pathname.
+.SH OPTIONS
+The
+.Cm dthelpprint
+utility has two sets of utility line options.
+The first set controls what
+should be printed.
+The second set controls how it should be printed.
+All option names must be used exactly as given.
+An alternative to
+specifying options on the utility line is to specify them using
+resources in an app-defaults file.
+This is useful for changing
+the default values from those given below.
+See the \f3RESOURCE OVERVIEW\f1 heading in this manual page for more information.
+.VL 6
+Options controlling what to print:
+.LI "\f3\-helpType\f1 \f2type\f1"
+The type of Help data to print.
+This is a numeric value, as follows:
+0=help volume, 1=string, 2=man page, 3=help file.
+The default value
+is 0, a Help volume.
+.LI "\f3\-helpVolume\f1 \f2volume\f1"
+The name of the volume holding the topics to be printed.
+If
+.I volume
+is unqualified, the standard 
+.Cm dthelpview 1
+search paths are used to locate the volume; these are also covered
+in the \f3ENVIRONMENT VARIABLES\f1 heading in this manual page.
+The volume may also be
+specified relative to the current directory by beginning the volume
+name with "\./" or "\../". 
+This option is useful only in conjunction with a \f3\-helpType\f1 of 0 (zero).
+.LI "\f3\-locationId\f1 \f2location\f1"
+The starting topic for processing topics of a Help volume.
+The
+.I location
+must be a text string used by the author to mark a location in the volume.
+The default value is
+.BR _hometopic ,
+which is the top topic of a CDE Help volume.
+This option is useful only in conjunction with \f3\-helpVolume\f1.
+.LI \f3\-allTopics\f1
+Instructs
+.Cm dthelpprint
+to print the entire help volume, including front matter, table of contents,
+all topics, and an index.
+This option is useful only in conjunction 
+with \f3\-helpVolume\f1.
+.LI \f3\-subTopics\f1
+Instructs
+.Cm dthelpprint
+to print the topic specified by \f3\-locationId\f1 and all the subtopics
+of that topic.
+This option is useful only in conjunction with \f3\-helpVolume\f1.
+.LI \f3\-oneTopic\f1
+Instructs
+.Cm dthelpprint
+to print the topic specified by \f3-locationId\f1.
+This option is useful only in conjunction with \f3\-helpVolume\f1.
+.LI \f3\-toc\f1
+Instructs
+.Cm dthelpprint
+to print the Table of Contents of the specified helpVolume.
+This option is useful only in conjunction with \f3\-helpVolume\f1.
+.LI \f3\-index\f1
+Instructs
+.Cm dthelpprint
+to print the Index of the specified helpVolume.
+This option is useful only in conjunction with \f3\-helpVolume\f1.
+.LI \f3\-frontMatter\f1
+Instructs
+.Cm dthelpprint
+to print the front matter of the specified helpVolume.
+Front matter includes the volume title, abstract, and copyright information.
+This option is useful only in conjunction with \f3\-helpVolume\f1.
+.LI "\f3\-stringData\f1 \f2string\f1"
+Specifies a string to print.
+This option is useful only in conjunction with a \f3\-helpType\f1 of 1.
+.LI "\f3\-manPage\f1 \f2manpagename\f1"
+Specifies the name of the Unix man page to print.
+This option is useful only in conjunction with a \f3\-helpType\f1 of 2.
+.LI "\f3\-helpFile\f1 \f2filename\f1"
+Specifies a file to print.
+This option is useful only in conjunction with a \f3\-helpType\f1 of 3.
+.LE
+.VL 3
+Options controlling how to print:
+.LI "\f3\-printer\f1 \f2printername\f1"
+Specifies which printer to use.
+If this isn't specified as a
+utility-line option or resource, the default value is taken
+from the environment variable
+.IR LPDEST .
+.LI "\f3\-copies\f1 \f2number\f1"
+Specifies how many copies to produce.
+The default value is 1.
+This option is only ignored when generating an output file.
+.LI "\f3\-outputFile\f1 \f2filename\f1"
+Specifies a file to hold the print-ready output.
+If this option
+is specified, no output is sent to the printer.
+.LI "\f3\-paperSize\f1 \f2size\f1"
+Specifies a size of paper to which the output should be formatted.
+There are five valid values for \f2size\f1: \f3help_papersize_letter\f1,
+\f3help_papersize_legal\f1, \f3help_papersize_executive\f1, 
+\f3help_papersize_a4\f1, \f3help_papersize_b5\f1.
+The default
+value is \f3help_papersize_letter\f1.
+.LI "\f3\-display\f1 \f2displayname\f1"
+Specifies the X display used to retrieve resource values.
+Typical format for \f2displayname\f1 is 
+\f3hostname:display_number.screen_number\f1.
+If no screen number is specified, the first screen (0)
+is used.
+See also
+.Cm X 1
+.LI "\f3\-name\f1 \f2name\f1"
+Specifies the application name under which resources are to be obtained.
+The default is
+.BR dthelpprint .
+The resource
+\f3application.name\f1 way also be used to specify the name.
+.LI "\f3\-class\f1 \f2classname\f1"
+Specifies the application class name under which resources are to be obtained.
+The default is
+.Cm dthelpprint .
+The resource
+\f3application.class\f1 may also be used to specify the class name.
+.LI "\f3\-xrm\f1 \f2resourcestring\f1"
+Specifies an addition to the resource database used by this invocation of
+the program.
+.LE
+.SH "RESOURCE OVERVIEW"
+The
+.Cm dthelpprint
+utiity uses resources in addition to utility-line options to configure its 
+operation.
+There are many more resources available for this purpose than 
+utility-line options.
+To set a resource on the utility line, use
+the 
+.B \-xrm
+option.
+.P
+The application class is
+.Cm dthelpprint
+unless specified otherwise with the
+.B application.class
+or
+.B Application.Class
+resources or the 
+.B \-class
+option.
+The application instance name is the name used to run
+the program (usually
+.Cm dthelpprint )
+unless specified otherwise with the
+.B application.name
+or
+.B Application.Name
+resource or the 
+.B \-name
+option.
+In the following coverage of resource specifications,
+the application's class name and instance name can be used
+interchangably; however, if the same resource is specified more
+than once, the instance-specific resource takes precedence over 
+the class resource.
+In addition, when a value can be specified
+using either a resource or utility-line option, the utility-line
+option value takes precedence.
+.P
+The
+.Cm dthelpprint
+utility has three types of resources.
+.VL 15
+.LI "Help Content"
+These resoures specify what to print.
+Typically,
+these values are specified using utility-line options instead
+of resources.
+.LI "Content Processing"
+These resources specify in more detail the configuration of
+how to print.
+These resources include some values that can be specified
+with utility-line options, but also many others.
+.LI "Printer Configuration:"
+The
+.Cm dthelpprint
+utility allows printer-specific configurations to be specified.
+The configuration used is controlled by the value of the
+.B printer
+resource or
+.B \-printer
+option.
+.LE
+.SH "HELP CONTENT RESOURCES"
+These resources specify what to print.
+The syntax for specifying the resources is
+.VL 15
+.LI "\f3Dthelpprint*\f2resource\f3:\f1resource value\f1"
+.LE
+.sp 1
+For example, 
+.B Dthelpprint*helpVolume: aVolume.sdl
+is used to specify the name of the Help volume.
+.HU "Basic Resource Set"
+.TS
+center, expand;
+cf3     cf3     cf3     cf3
+lf3w(2c)        lf3w(2c)        lf3w(2c)        lf3w(2c) .
+Name	Class	Type	Default 
+_
+locationId	LocationId	string	_HOMETOPIC
+helpVolume	HelpVolume	string	NULL
+manPage		ManPage		string	NULL
+stringData	StringData	string	NULL
+helpFile	HelpFile	string	NULL
+topicTitle	TopicTitle	string	NULL
+helpType	HelpType	string	NULL
+.TE
+.P
+These Help-content resources are defined in
+.Fn DtHelpDialog 3 .
+The following content options are specific to
+.Cm dthelpprint.
+Setting the resource to any value makes it
+.BR True .
+.HU "Additional Resource Set"
+.TS
+center, expand;
+cf3     cf3     cf3     cf3
+lf3w(2c)        lf3w(2c)        lf3w(2c)        lf3w(2c) .
+Name	Class	Type	Default 
+_
+allTopics	AllTopics	string	NULL
+subTopics	SubTopics	string	NULL
+oneTopic	OneTopic	string	NULL
+toc	Toc	string	NULL
+index	Index	string	NULL
+frontMatter	FrontMatter	string	NULL
+.TE
+.P
+These Help-content resources have the same meaning as
+the
+.Cm dthelpprint
+utility-line options of the same name.
+.SH "HELP PROCESSING RESOURCES"
+These resources specify how to print.
+The syntax for specifying the resources is:
+.VL 15
+.LI "\f3Dthelpprint*\f2resource\f3:\f1resource value\f1"
+.LE
+.P
+For example, 
+.B Dthelpprint*printer: aPrinter
+is used to specify the name of the printer.
+.HU "Basic Resource Set"
+.TS
+center, expand;
+cf3     cf3     cf3     cf3
+lf3w(2c)        lf3w(2c)        lf3w(2c)        lf3w(2c) .
+Name	Class	Type	Default 
+_
+printer	Printer	string	NULL
+copies	Copies	string	NULL
+outputFile	OutputFile	string	NULL
+paperSize	PaperSize	string	NULL
+display	Display	string	NULL
+.TE
+.P
+These Help-processing resources have the same meaning
+as the
+.Cm dthelpprint
+utility-line options of the same name.
+It is used to specify the name of the printer.
+.HU "Additional Resource Set"
+.TS
+center, expand;
+cf3     cf3     cf3     cf3
+lf3w(2c)        lf3w(2c)        lf3w(2c)        lf3w(2c) .
+Name	Class	Type	Default 
+_
+evenTocHeader	EvenTocHeader	string	see below
+oddTocHeader	OddTocHeader	string	see below
+evenTocFooter	EvenTocFooter	string	see below
+oddTocFooter	OddTocFooter	string	see below
+evenBodyHeader	EvenBodyHeader	string	see below
+oddBodyHeader	OddBodyHeader	string	see below
+evenBodyFooter	EvenBodyFooter	string	see below
+oddBodyFooter	OddBodyFooter	string	see below
+evenIndexHeader	EvenIndexHeader	string	see below
+oddIndexHeader	OddIndexHeader	string	see below
+evenIndexFooter	EvenIndexFooter	string	see below
+oddIndexFooter	OddIndexFooter	string	see below
+echoCommand	EchoCommand	string	echo
+echoArgs	EchoArgs	string	"%s"
+foldCommand	FoldCommand	string	fold
+foldArgs	FoldArgs	string	-w %d %s
+prCommand	PrCommand	string	pr
+prArgs	PrArgs	string	see below
+prOffsetArg	PrOffsetArg	string	-o%d
+manCommand	ManCommand	string	man
+manArgs	ManArgs	string	%s
+redirectCmdAndArgs	RedirectCmdAndArgs	string	> %s
+lpCommand	LpCommand	string	lp
+shCommand	ShCommand	string	see below
+iconvCmdAndArgs	IconvCmdAndArgs	string	see below
+.TE
+.P
+.TS
+center, expand;
+cf3     cf3     cf3     cf3
+lf3w(2c)        lf3w(2c)        lf3w(2c)        lf3w(2c) .
+
+evenTocHeader, oddTocHeader, evenTocFooter, oddTocFooter,
+evenBodyHeader, oddBodyHeader, evenBodyFooter, oddBodyFooter,
+evenIndexHeader, oddIndexHeader, evenIndexFooter, oddIndexFooter
+.TE
+.P
+The values of these resources are used as the header and footer strings
+only when printing Help volumes.
+Header and footer strings are specified
+separately for odd and even pages to support double sided printing.
+The strings may contain symbolic names for dynamic values.  
+.LE
+.P
+Dynamic values are updated each time the string is to be used.
+Valid dynamic values are as follows:
+.TS
+center, expand;
+cf3     cf3
+lf3w(2c)        lf1w(2c) .
+Symbol	Value 
+_
+$LMARGIN	left margin blanks.
+$TODAY	today's date.
+$VOLDATE	date on the help volume file.
+$VOLUME	volume name.
+$VOLUMEFILL	filler for fixed sized 50 column volume name.
+$TOPIC	section topic title.
+$TOPICFILL	filler for fixed sized 50 column section topic title.
+$PAGENUM	page number.
+$PAGENUMFILL	filler for fixed sized 3 column page number.
+$SECTNUM	section number or name.
+$SECTNUMFILL	filler for fixed sized 8 column section number or name.
+.TE
+.P
+The default values for the resources are as follows
+(To improve understanding,
+the blank spaces have been replaced with '.'.):
+.VL 3 
+.LI "evenTocHeader and oddTocHeader:"
+$LMARGIN$VOLUME\\n\\n
+.LI "evenTocFooter and oddTocFooter:"
+\\n$LMARGIN......................................................$SECTNUM\n
+.LI "evenBodyHeader and oddBodyHeader:"
+$LMARGIN$VOLUME$VOLUMEFILL.............$PAGENUMFILLPage.$PAGENUM\n\n
+.LI "evenBodyFooter and oddBodyFooter:"
+\\n$LMARGIN$TOPIC$TOPICFILL.....$SECTNUMFILLSection.$SECTNUM\\n
+.LI "evenIndexHeader and oddIndexHeader:"
+$LMARGIN$VOLUME$VOLUMEFILL.............$PAGENUMFILLPage.$PAGENUM\\n\\n
+.LI "evenIndexFooter and oddIndexFooter:"
+\\n$LMARGIN..................................................................$SECTNUM\\n
+.LE
+.P
+.VL 15
+.LI echoCommand
+The utility used to echo the
+.B stringData
+from stdin to stdout.
+.LI echoArgs
+The argument string to the
+.BR echoCommand .
+The string must use
+.B printf
+formatting and may reference this argument: STRING string.
+.LI foldCommand
+The utility used to fold a long string into a formatted
+string with a maxiumum column width.
+.LI foldArgs
+The argument string to the
+.BR foldCommand .
+The string must use
+.B printf
+formatting and may referece these arguments: INT column width,
+STRING filename.
+.LI prCommand
+The utility used to format a file in preparation for printing.
+.LI prArgs
+The argument string to the
+.B prCommand.
+The string must use
+.B printf
+formatting and may reference these arguments:
+STRING job title, INT page height, STRING filename.
+The default value is
+.B "-h \"%s\" -f -l%d %s"
+.LI prOffsetArg
+Sometimes the prArgs is augmented with the option to offset the contents
+by \f2n\f1 columns.
+The value contains the offset argument.
+The string must use
+.B printf
+formatting and may reference this argument: INT column-offset.
+.LI manCommand
+The utility used to recover a formatted Unix man page.
+.LI manArgs
+The argument string to the
+.B manCommand.
+The string must use
+.B printf
+formatting and may reference these arguments: STRING man-page-name.
+.LI redirectCmdAndArgs
+When stdout is to be redirected to a file, this utility and
+arguments are used.
+The string must use
+.B printf
+formatting and may reference these arguments:  STRING filename
+.LI lpCommand
+The utility is used to print a file.
+The utility must accept
+the standard
+.Cm lp 1
+utility-line arguments.
+.LI shCommand
+The shell script used by
+.B dthelpprint
+to actally invoke the
+.B lpCommand
+on the target file.
+The default value is
+.B /usr/dt/bin/dthelpprint.sh.
+.LI iconvCmdAndArgs
+The utility is used to translate a file from one character set to
+another.
+The argument string must use
+.B printf
+formatting and may reference these arguments:
+STRING from-charset, STRING to-charset, STRING source-file, STRING dest-file.
+The default value is
+.B "iconv -f %s -t %s %s > %s"
+.LE
+.SH "PRINTER CONFIGURATION RESOURCES"
+These resources specify printer configuration.
+This includes
+a default configuration as well as printer-specific configurations.
+The syntax for specifying the resources is
+.VL 3 
+.LI "\f3Dthelpprint*printer.\f2resource\f3:\f1resource value\f1"
+.LI "\f3Dthelpprint*printer.\f2printerName.resource\f3:\f1resource value\f1"
+.LE
+.P
+For example, 
+.VL 3 
+.LI "Dthelpprint*printer.paperSize: help_papersize_legal"
+.LI "Dthelpprint*printer.laser-c4.paperSize: help_papersize_executive"
+.LE
+set the default paper size to legal and the paper size on the
+printer named "laser-c4" to executive.
+.HU "Basic Resource Set"
+.TS
+center, expand;
+cf3     cf3     cf3     cf3
+lf3w(2c)        lf3w(2c)        lf3w(2c)        lf3w(2c) .
+Name	Class	Type	Default 
+_
+paperSize	PaperSize	String	help_papersize_letter
+colsWidth	ColsWidth	Int	0
+rowsHeight	RowsHeight	Int	0
+colsLeftMargin	ColsLeftMargin	Int	10
+colsRightMargin	ColsRightMargin	Int	10
+rowsTopMargin	RowsTopMargin	Int	6
+rowsBottomMargin	RowsBottomMargin	Int	6
+.TE
+.P
+These resources are used to specify the printer configuration,
+specifically with respect to the paper used for printing.
+Paper size can be specified either by using the
+.B paperSize
+resource or by setting an explicit size with the
+.B colsWidth
+and
+.B rowsHeight
+resources.
+The margin values specify the amount of white space
+retained around the page.
+.VL 15
+.LI paperSize
+This resource can be used to set the paper size to predefined dimensions.
+Valid values are
+.B help_papersize_letter,
+(8.5 x 11 in; 69 rows x 91 cols)
+.B help_papersize_legal,
+(8.5 x 14 in; 88 rows x 91 cols)
+.B help_papersize_executive,
+(7.25 x 10.5 in, 66 rows x 77 cols)
+.B help_papersize_a4,
+(210 x 297 mm, 73 rows x 88 cols) and
+.B help_papersize_b5
+(182 x 257 mm, 63 rows x 76 cols).
+If these dimensions are insufficient, the 
+.B colsWidth
+and
+.B rowsHeight
+resources can be used to provide explicit dimensions.
+All dimensions
+are given in columns and rows of text in the default printer font.
+.LI colsWidth
+Width of the paper in columns of characters in the default printer font.
+The value may not be 0 (zero).
+.LI rowsHeight
+Height of the paper in rows of text in the default printer font.
+The value may not be 0 (zero).
+.LI colsLeftMargin
+Width of the left margin in columns of characters in the default printer font.
+.LI colsRightMargin
+Width of the right margin in columns of characters in the default printer font.
+.LI rowsTopMargin
+Height of the top margin in rows of text in the default printer font.
+.LI rowsBottomMargin
+Height of the bottom margin in rows of text in the default printer font.
+.LE
+.SH "ENVIRONMENT VARIABLES"
+The CDE Help system uses two environment variables for locating 
+Help volumes files within the desktop environment:
+.VL 15
+.LI \f2DTHELPSEARCHPATH\f1
+.I System
+search path environment variable for locating
+Help volumes on local and/or remote nfs mounted systems.
+.LI \f2DTHELPUSERSEARCHPATH\f1
+.I Users
+search path environment variable for locating user
+specific Help volumes on local and/or remote nfs mounted systems.
+.LE
+.P
+Refer to
+.Fn DtHelpDialog 3
+or
+.Fn DtHelpQuickDialog 3
+for information of setting the
+.I DTHELP
+environment variables.
+.SH "INPUT FILES"
+The following are input files and resource databases are merged by
+.Cm dthelpprint
+to construct the complete resource database used by the program.
+Resource
+collisions are resolved by having the last value take precedence.
+.VL 15
+.LI \f3/usr/dt/app-defaults/C/Dthelpprint\f1
+.LI \f3/usr/lib/X11/app-defaults/Dthelpprint\f1
+.LI \f3$HOME/Dthelpprint\f1
+.LI "\f1display resources or \f3$HOME/.Xdefaults\f1"
+.LI "\f1screen resources\f1"
+.LI "\f1$XENVIRONMENT or \f3$HOME/.Xdefaults\-<hostname>\f1"
+.LI "\f1utility\-line resources\f1"
+.LE
+.SH "OUTPUT FILES"
+The
+.Cm dthelpprint
+utility
+always generates an output file, either for sending
+to the printer or to place in a user-specified file.
+.VL 15
+.LI "\f3$HOME/.dt/tmp/phlp<process id>_<cnt>.txt\f1"
+These are the temporary files generated by the
+.Cm dthelpprint
+utility.
+These files are placed under the
+user's directory so that remote systems can reach the file
+via NFS.
+.LI "\f3$PWD/db.dthelpprint\f1"
+This file is generated in the current directory when the
+.B debugHelpPrint
+resource is defined.
+The file constains the complete set of
+resources used by
+.Cm dthelpprint
+to configure its operation.
+.LE
+.HU "Warning Messages"
+.VL 15
+.LI "\f3Warning: Illegal or missing paper size. help_papersize_letter used.\f1"
+Indicates an invalid or missing value of the
+.B paperSize
+resource or 
+.B \-paperSize
+option.
+Specify the option on the utility line or set a 
+default resource value.
+.LI "\f3Warning: Missing paper size and height and/or width. help_papersize_letter used.\f1"
+Indicates that the
+.B printer.colsWidth
+or
+.B printer.rowsHeight
+resource was used to override the
+.B paperSize
+resource and at least one is set to 0 (zero) or has an invalid value.
+.LI "\f3Warning: Unable to open display <display>\f1"
+Indicates that the display specified by the 
+.B display
+resource or
+.B \-display
+option could not be opened.
+This means that the display's resources cannot be used to configure
+.Cm dthelpprint .
+.LE
+.HU "Error Messages"
+.VL 15
+.LI "\f3Error: helpType is topic, but no helpVolume specified.\f1"
+Indicates that the 
+.B helpType 
+resource or 
+.B \-helpType
+option was 0 (zero) or unspecified and defaulted to 0 (zero) and no
+helpVolume was specified.
+.LI "\f3Error: unable to locate help volume <volume>\f1"
+Indicates that the Help volume could not be found.
+This occurs when the volume isn't correctly specified by a full
+or relative path or doesn't exist in any directory listed
+by the DtHelp environment variables.
+.LI "\f3Error: problem processing help volume <volume>\f1"
+A problem occurred while processing some part of the Help volume.
+.LI "\f3Error: memory allocation failed\f1"
+The program was unable to allocate necessary memory.
+.LI "\f3Error: unable to get topic information:volume <vol>, locationId <loc>\f1"
+Information about the specified location in the specified volume
+was unavailable or an error occurred while retrieving it from the volume.
+.LI "\f3Error: helpType is string, but no stringData specified.\f1"
+The
+.B helpType 
+resource or
+.B \-helpType
+option is 1 (string) but no
+.B stringData
+resource or
+.B \-stringData
+option was specified.
+.LI "\f3Error: helpType is dynamic string, but no stringData specified.\f1"
+The
+.B helpType 
+resource or
+.B \-helpType
+option is 1 (dynamic string) but no
+.B stringData
+resource or
+.B -stringData
+option was specified.
+.LI "\f3Error: helpType is man page, but no manPage specified.\f1"
+The
+.B helpType 
+resource or
+.B \-helpType
+option is 2 (manual page) but no
+.B manPage
+resource or
+.B \-manPage
+option was specified. 
+.LI "\f3Error: helpType is file, but no helpFile specified.\f1"
+The
+.B helpType 
+resource or
+.B \-helpType
+option is 3 (plain text file) but no
+.B helpFile
+resource or
+.B \-helpFile
+option was specified.  
+.LI "\f3Error: Illegal helpType <number>.\f1"
+The
+.B helpType 
+resource or
+.B \-helpType
+option is not in the range 0 to 3.
+.LI "\f3Error: unable to allocate memory for temporary file\f1"
+The memory needed to create the temporary file name couldn't be allocated.
+.LI "\f3Error: unable to open temporary file\f1"
+The temporary file couldn't be opened for writing.
+.LE
+.SH EXAMPLES
+.VL
+.LI "\f3dthelpprint \-helpVolume Help4Help \-allTopics \-outputFile Help4Help.asc"
+.LI "dthelpprint \-helpVolume Help4Help \-toc \-index \-printer hplj3"
+.LI "dthelpprint \-helpType 1 \-stringData 'test string' \-printer hplj3"
+.LI "dthelpprint \-helpType 2 \-manPage grep \-outputFile grep.man"
+.LI "dthelpprint \-helpType 3 \-helpFile aFile \-printer hplj3\f1"
+.LE
+.SH "SEE ALSO"
+.Fn DtHelpDialog 3,
+.Fn DtHelpQuickDialog 1,
+.Fn dthelpview 1,
+.Fn man 1,
+.BR "\f2CDE Help System Author's and Programmer's Guide\f1."
+
+

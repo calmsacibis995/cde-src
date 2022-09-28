@@ -1,0 +1,49 @@
+.TH Modified 4 "13 May 1994"
+.SH NAME
+Modified notice \- an entity has been modified
+.SH SYNOPSIS
+.yS
+.ta \w@[\f2file\fP] Modified(@u
+[\f2file\fP] Modified(in \f2type ID\fP);
+.yE
+.SH DESCRIPTION
+The
+.I Modified
+notice
+is sent whenever a tool first modifies a volatile,
+non-shared (for example, in-memory) representation of the persistent
+state of an entity (such as a file), with the intention of
+eventually making that representation persistent.
+.P
+The
+.I ID
+argument
+is the identity of the modified entity.
+When its
+.I type
+is
+.BR File ,
+then the
+.I ID
+argument is unset (in other words, has a
+value of
+.BR (char\ *)0 ),
+and it refers to the file or directory
+named in the message's file attribute.
+.SH "APPLICATION USAGE"
+The
+.Fn ttdt_file_join 3,
+function can be used to register for,
+and help process, the
+.I Modified
+request.
+.P
+The
+.I Modified
+request can be sent with
+.Fn ttdt_file_event 3.
+.SH "SEE ALSO"
+.Fn ttdt_file_event 3.
+.Fn ttdt_file_join 3;
+.I Reverted
+notice.

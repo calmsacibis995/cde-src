@@ -1,0 +1,211 @@
+###############################################################################
+#
+#   sdtweb.dt
+#
+#   Action definitions for WebBrowser clients
+#
+#   (c) Copyright 1996 Sun Microsystems, Inc.
+#
+#   @(#)sdtweb.dt	1.2 96/06/20 SMI
+#
+###############################################################################
+
+set DtDbVersion=1.0
+
+###############################################################################
+#
+# WARNING:  This file may be overwritten in subsequent installations of
+#     the Common Desktop Environment (CDE).  Consequently, any system wide
+#     changes should be made to an equivalent database file in
+#     /etc/dt/apconfig/types and not in this file.
+#
+###############################################################################
+
+
+###############################################################################
+#
+#  Netscape WebBrowser Actions
+#
+#  There are three forms of the Netscape actions.  The first will bring
+#  up netscape on the default home page. The next form accepts URL's and 
+#  the final form accepts HTML files.
+#
+#  This assumes either that netscape is in the PATH.  If no netscape
+#  is available then an error dialog is posted.  When possible the
+#  netscape remote protocol is used to bring up a new netscape window.
+##
+
+set netscape_patherr=dterror.ds "Netscape Navigator unavailable.\\n\\nNo netscape command found in your PATH" "Netscape: Path Error" "OK"
+
+ACTION SDtNetscape
+{
+	LABEL		Netscape
+	ICON		SDtnetsc
+	ARG_COUNT	0
+	TYPE		COMMAND
+	WINDOW_TYPE	NO_STDIO
+        EXEC_STRING     sh -c '\
+			sdtwebclient -b netscape || \{ \
+			    $netscape_patherr ; \
+			\}'
+	DESCRIPTION	The Netscape action starts a Netscape WebBrowser \
+			on the default home page. \
+			The `netscape' command must be in your PATH.
+}
+
+ACTION SDtNetscape
+{
+	LABEL		Netscape
+	ICON		SDtnetsc
+	ARG_TYPE	WEB_URL,FILE_URL,MAILTO_URL,RLOGIN_URL
+	ARG_COUNT	1
+	TYPE		COMMAND
+	WINDOW_TYPE	NO_STDIO
+        EXEC_STRING     sh -c '\
+			URL=`/bin/head -1 "%Arg_1%"` ; \
+			sdtwebclient -b netscape "\$URL" || \{ \
+			    $netscape_patherr ; \
+			\}'
+	DESCRIPTION	The Netscape action starts a Netscape WebBrowser \
+			on a Uniform Resource Location (URL) file. \
+			The `netscape' command must be in your PATH.
+}
+
+ACTION SDtNetscape
+{
+	LABEL		Netscape
+	ICON		SDtnetsc
+	ARG_TYPE	HTML
+	ARG_COUNT	1
+	TYPE		COMMAND
+	WINDOW_TYPE	NO_STDIO
+        EXEC_STRING     sh -c '\
+			URL=file:"%Arg_1%" ; \
+			sdtwebclient -b netscape "\$URL" || \{ \
+			    $netscape_patherr ; \
+			\}'
+	DESCRIPTION	The Netscape action starts a Netscape WebBrowser \
+			on a HyperText Markup Language (HTML) document. \
+			The `netscape' command must be in your PATH.
+}
+
+###############################################################################
+#
+#  HotJava WebBrowser
+#
+###############################################################################
+
+set hotjava_patherr=dterror.ds "HotJava Browser unavailable.\\n\\nNo hotjava command found in your PATH" "HotJava: Path Error" "OK"
+
+ACTION SDtHotJava
+{
+        LABEL		HotJava
+        ICON            SDthjava
+        ARG_COUNT	0
+        TYPE            COMMAND
+        WINDOW_TYPE     NO_STDIO
+        EXEC_STRING     sh -c '\
+			sdtwebclient -b hotjava || \{ \
+			    $hotjava_patherr ; \
+			\}'
+	DESCRIPTION	The SDtHotJava action invokes the HotJava WebBrowser. \
+			The `hotjava' command must be in your PATH.
+}
+
+ACTION SDtHotJava
+{
+	LABEL		HotJava
+	ICON		SDthjava
+	ARG_TYPE	WEB_URL,FILE_URL,MAILTO_URL,RLOGIN_URL
+	ARG_COUNT	1
+	TYPE		COMMAND
+	WINDOW_TYPE	NO_STDIO
+        EXEC_STRING     sh -c '\
+			URL=`/bin/head -1 "%Arg_1%"` ; \
+			sdtwebclient -b hotjava "\$URL" || \{ \
+			    $hotjava_patherr ; \
+			\}'
+	DESCRIPTION	The SDtHotJava action starts the HotJava WebBrowser \
+			on a Uniform Resource Location (URL) file. \
+			The `hotjava' command must be in your PATH.
+}
+
+ACTION SDtHotJava
+{
+	LABEL		HotJava
+	ICON		SDthjava
+	ARG_TYPE	HTML
+	ARG_COUNT	1
+	TYPE		COMMAND
+	WINDOW_TYPE	NO_STDIO
+        EXEC_STRING     sh -c '\
+			URL=file:"%Arg_1%" ; \
+			sdtwebclient -b hotjava "\$URL" || \{ \
+			    $hotjava_patherr ; \
+			\}'
+	DESCRIPTION	The SDtHotJava action starts the HotJava WebBrowser\
+			on a HyperText Markup Language (HTML) document. \
+			The `hotjava' command must be in your PATH.
+}
+
+###############################################################################
+#
+#  SDtWebClient WebBrowser
+#
+###############################################################################
+
+set sdtwebclient_patherr=dterror.ds "Web Browser unavailable.\\n\\nNo web browser command found in your PATH.\\nLooked for netscape and hotjava commands" "Web Client: Path Error" "OK"
+
+ACTION SDtWebClient
+{
+        LABEL		WebClient
+        ICON            SDtwebbr
+        ARG_COUNT	0
+        TYPE            COMMAND
+        WINDOW_TYPE     NO_STDIO
+        EXEC_STRING     sh -c '\
+			sdtwebclient || \{ \
+			    $sdtwebclient_patherr ; \
+			\}'
+	DESCRIPTION	The WebClient action invokes a WebBrowser. \
+			It searches your PATH for available browsers; \
+			looking for `netscape' or `hotjava' commands.
+}
+
+ACTION SDtWebClient
+{
+	LABEL		WebClient
+	ICON		SDtwebbr
+	ARG_TYPE	WEB_URL,FILE_URL,MAILTO_URL,RLOGIN_URL
+	ARG_COUNT	1
+	TYPE		COMMAND
+	WINDOW_TYPE	NO_STDIO
+        EXEC_STRING     sh -c '\
+			URL=`/bin/head -1 "%Arg_1%"` ; \
+			sdtwebclient "\$URL" || \{ \
+			    $sdtwebclient_patherr ; \
+			\}'
+	DESCRIPTION	The WebClient action invokes a WebBrowser \
+			on a Uniform Resource Location (URL) file. \
+			It searches your PATH for available browsers; \
+			looking for `netscape' or `hotjava' commands.
+}
+
+ACTION SDtWebClient
+{
+	LABEL		WebClient
+	ICON		SDtwebbr
+	ARG_TYPE	HTML
+	ARG_COUNT	1
+	TYPE		COMMAND
+	WINDOW_TYPE	NO_STDIO
+        EXEC_STRING     sh -c '\
+			URL=file:"%Arg_1%" ; \
+			sdtwebclient "\$URL" || \{ \
+			    $sdtwebclient_patherr ; \
+			\}'
+	DESCRIPTION	The WebClient action invokes a WebBrowser \
+			on a HyperText Markup Language (HTML) document. \
+			It searches your PATH for available browsers; \
+			looking for `netscape' or `hotjava' commands.
+}

@@ -1,0 +1,52 @@
+.TH Signal 4 "13 May 1994"
+.SH NAME
+Signal request \- send a (POSIX-style) signal to a tool
+.SH SYNOPSIS
+.yS
+.ta \w@Signal(@u
+Signal(in string \f2theSignal\fP);
+.fn
+.yE
+.SH DESCRIPTION
+The
+.I Signal
+request
+asks the handling procid to send itself the
+indicated POSIX signal.
+.P
+The
+.I theSignal
+argument
+is the signal to send.
+.SH "APPLICATION USAGE"
+The
+.Fn ttdt_session_join 3,
+function can be used to register for,
+and transparently process, the
+.I Signal
+request.
+.SH EXAMPLES
+The
+.I Signal
+request can be sent as in the following example:
+.Cs I
+Tt_message msg = tttk_message_create(0, TT_REQUEST, TT_SESSION,
+			the_recipient_procid, TTDT_SIGNAL,
+			my_callback);
+tt_message_arg_add(msg, TT_IN, Tttk_string, "SIGHUP");
+tt_message_send(msg);
+.Ce
+.cdes 
+.SH WARNINGS
+.I Signal
+can also be sent as a multicast notice, as an
+.I edict 
+to all tools in the scope of the message.
+The consequences of doing so can be severe and unexpected.
+.cdee
+.SH "SEE ALSO"
+.Fn sigaction 2
+.xo in the \*(ZK;
+.Fn tt_message_arg_add 3,
+.Fn tt_message_send 3,
+.Fn ttdt_session_join 3,

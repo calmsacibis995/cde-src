@@ -1,0 +1,371 @@
+XCOMM
+XCOMM  Imakefile ($TOP/cdesrc/cde1/dtcm/libcsa)
+XCOMM
+XCOMM  @(#)Imakefile 1.20 94/08/12 Copyr 1993 Sun Microsystems, Inc.
+XCOMM
+XCOMM  $Revision: 1.8 $
+XCOMM
+XCOMM  Copyright 1993 Sun Microsystems, Inc.  All rights reserved.
+XCOMM
+
+#include <Library.tmpl>
+
+  SPELLE_SO_REV = 1
+ 
+        LIBNAME = SDtSpellE
+         TARGET = lib$(LIBNAME)
+   INSTALLFLAGS = $(INSTINCFLAGS)
+
+       INCLUDES = -I.
+
+        DEFINES = -DUNIX \
+                  -DRELMAJOR="$(OSMAJORVERSION)" \
+		  -DRELMINOR="$(OSMINORVERSION)" \
+		  -DSVR4 -DREL="$(OSMAJORVERSION)$(OSMINORVERSION)"
+
+#ifdef SunArchitecture
+    EXTRA_DEFINES = -DBIG_ENDIAN -DSunOS=$(OSMAJORVERSION)$(OSMINORVERSION) \
+                    -Dsparc
+  EXTRA_CCOPTIONS = -Kpic -xstrconst -Xc -v
+     REQUIREDLIBS = -lnsl -lc
+     SHLIBLDFLAGS = -G -z defs
+
+.NO_PARALLEL:
+#endif
+
+	/* Standard Library include files */
+
+	SL_HDRS	=	./sl.h		./slascii.h	./slatt.h	\
+			./slattunx.h	./slcalls.h	./slch2iso.h	\
+			./slch2mcs.h	./slch5iso.h	./slch5mcs.h	\
+			./slchcnv.h	./slchrunx.h	./slchrmcs.h	\
+			./slfun.h	./sllang.h	./sllibext.h	\
+			./sllibhdr.h	./slmacros.h	./slmemman.h	\
+			./slmemtyp.h	./slpredef.h	./slundef.h
+
+
+	/* Standard Function include files. */
+
+	SF_HDRS	=	./icfun.h	./sfclitic.h	./sfctrl.h	\
+			./sfdef.h	./sfexthdr.h	./sffun.h	\
+			./sfhdr.h	./sfheader.h	./sftyp.h	\
+			./sfcoldef.h
+
+
+	/* ICS API include files. */
+
+	ICS_API_HDRS	=	./ic.h		./icbuf.h	\
+      	 			./iclngbuf.h	./icsext.h 	\
+				./icsapi.h
+
+
+	/* ICS Core include files. */
+
+	ICS_CORE	=	./icctlbuf.h	./icsplext.h	\
+       				./icsplhdr.h	./icheader.h	\
+        			./ics.h
+
+
+	/* PD include files. */
+
+	PD_HDRS	=	./icpd.h	./pdfun.h 	./pddefine.h	\
+        		./pdmcp.h	./pdexthdr.h	./pdlibhdr.h	\
+        		./pdapi.h	./pdctrl.h
+
+
+	/* Language-Extend include files. */
+
+	LANG_EXT_HDRS	=	./cmasciih.h   ./cmcchh.h    ./cmccstru.h     \
+				./cmcharsh.h   ./cmfrqleh.h  ./cmglob.h       \
+				./cmics.h      ./cmics2.h    ./cmimlexh.h     \
+				./cmimstru.h   ./cmioh.h     ./cmjaotih.h     \
+				./cmjastru.h   ./cmlbitsh.h  ./cmlestru.h     \
+				./cmlexich.h   ./cmlexsch.h  ./cmmostru.h     \
+				./cmmuokkh.h   ./cmmustru.h  ./cmorfoh.h      \
+ 				./cmorfo_.h    ./cmsetsh.h   ./cmstrinh.h     \
+ 				./cmstruc.h    ./cmststru.h  ./cmtmp.h        \
+				./cmutil.h     ./cmhyph.h    ./cmdefin.h      \
+				./cmpstru.h    ./cmsestru.h
+
+
+	/* DC include files. */
+	DC_HDRS		=	./dclib.h
+
+
+
+	/* Standard library source files. */
+
+	SL_SRC	=	./slattglb.c	./slcap.c	./slcfunct.c	\
+			./slchk.c	./slcnv.c	./slrecap.c	\
+			./slfilcov.c	./slfun.c	./slisint.c	\
+			./slmap.c	./slord.c	./slpar.c	\
+			./slrecap.c
+
+
+	/* Standard functions source files. */
+
+	STD_FUNC_SRC	=	./sfglobal.c	./sfaccent.c	./sfadd.c     \
+				./sfbisrch.c	./sfchkwrd.c	./sfdecaux.c  \
+				./sfdecbit.c	./sfdecode.c	./sflstini.c  \
+				./sfmemory.c	./sfremacc.c	./sfdc.c
+
+
+	/* Standard clitic function sources. */
+
+	STD_CLTC_SRC	=	./sfcltchk.c	./sfcltcmp.c	./sfcltdb.c   \
+				./sfcltscr.c
+
+
+	/* Standard correction function sources */
+
+	STD_COR_SRC	=	./sfcorbr8.c	./sfcorbru.c	./sfcorqbr.c  \
+				./sfcor1qd.c	./sfcor2qd.c	./sfcor3qd.c  \
+				./sfcor6qd.c	./sfcor8qd.c	./sfcorrec.c  \
+				./sfcorrig.c	./sfcorsrt.c
+
+	/* ICS function sources. */
+
+	ICS_SRC	=	./iccapcod.c	./iccomcap.c	./icdblver.c	\
+			./icfndchk.c	./icfoldio.c	./icget.c	\
+			./icint.c	./icintget.c	./icpre.c	\
+			./icprever.c	./icremacc.c	./icspl.c	\
+			./ictrm.c	./icverify.c	./icfinver.c	\
+			./iccorucf.c	./icpar.c	./icgreek.c
+
+
+	/* ICS cache sources. */
+
+	ICS_CACHE_SRC	=	./iccchadd.c	./iccchver.c	\
+				./icsplaux.c
+
+
+	/* ICS clitic sources. */
+
+	ICS_CLTC_SRC	=	./icclt.c	./iccltacc.c	\
+				./iccltcap.c	./iccltrp.c	\
+				./iccltstm.c	./iccltuna.c
+
+
+	/* ICS compound function sources. */
+
+	ICS_CMP_SRC	=	./iccmp.c	./iccmpalt.c	\
+				./iccmpdbl.c	./iccmpexc.c	\
+				./iccmpfnd.c	./iccmphhy.c	\
+				./iccmphyp.c	./iccmplmc.c	\
+				./iccmpmnd.c	./iccmpnum.c	\
+				./iccmprmc.c	./iccmpprm.c	\
+				./iccmpsmh.c	./iccmpspc.c	\
+				./iccmpsup.c	./iccmpver.c	\
+				./iccmpvow.c
+
+
+	/* ICS Correction, double word check, RAM verification functions. */
+
+	ICS_MISC_SRC	=	./iccorspl.c	./icdblchk.c	\
+				./icramchk.c	./icramver.c
+
+
+	/* ICS Language Extend function sources. */
+
+	ICS_EXT_SRC	=	./cmorfo.c	./cmchars.c	\
+				./cmlexic.c	./cmfrqlex.c	\
+				./cmcch.c	./cmjaotin.c	\
+				./cmsets.c	./cmstring.c	\
+				./cmlexsc.c	./cmsets.c	\
+				./cmio.c	./cmlbits.c	\
+				./cmascii.c	./cmmuokka.c	\
+				./cmlexio.c	./cminterf.c	\
+				./cmimlex.c	./cmhyph.c
+
+
+	/* Personal dictionary function sources. */
+
+	PD_SRCS	=	./icpd.c	./pdinit.c	./pdapp.c	\
+			./pddb.c	./pdrdinit.c	./pdsearch.c	\
+			./pdsort.c	./pdaltutl.c	./pdword.c	\
+			./pdalt.c	./pdedit.c	./pdadd.c	\
+			./pddel.c	./pdfileio.c	./pddecode.c	\
+			./pdcorrec.c	./pdsdinit.c	./pdutils.c	\
+			./pdchkneg.c	
+
+
+	/* DC function sources. */
+
+	DC_SRC	=	./dcrules.c	./dcutils.c
+
+
+	/* Standard library object files. */
+
+	SL_OBJ	=	./slattglb.o	./slcap.o	./slcfunct.o	\
+			./slchk.o	./slcnv.o	./slrecap.o	\
+			./slfilcov.o	./slfun.o	./slisint.o	\
+			./slmap.o	./slord.o	./slpar.o
+
+
+	/* Standard functions object files. */
+
+	STD_FUNC_OBJ	=	./sfglobal.o	./sfaccent.o	./sfadd.o     \
+				./sfbisrch.o	./sfchkwrd.o	./sfdecaux.o  \
+				./sfdecbit.o	./sfdecode.o	./sflstini.o  \
+				./sfmemory.o	./sfremacc.o	./sfdc.o
+
+
+	/* Standard clitic function objects. */
+
+	STD_CLTC_OBJ	=	./sfcltchk.o	./sfcltcmp.o	./sfcltdb.o   \
+				./sfcltscr.o
+
+
+	/* Standard correction function objects */
+
+	STD_COR_OBJ	=	./sfcorbr8.o	./sfcorbru.o	./sfcorqbr.o  \
+				./sfcor1qd.o	./sfcor2qd.o	./sfcor3qd.o  \
+				./sfcor6qd.o	./sfcor8qd.o	./sfcorrec.o  \
+				./sfcorrig.o	./sfcorsrt.o
+
+	/* ICS function objects. */
+
+	ICS_OBJ	=	./iccapcod.o	./iccomcap.o	./icdblver.o	\
+			./icfndchk.o	./icfoldio.o	./icget.o	\
+			./icint.o	./icintget.o	./icpre.o	\
+			./icprever.o	./icremacc.o	./icspl.o	\
+			./ictrm.o	./icverify.o	./icfinver.o	\
+			./iccorucf.o	./icpar.o	./icgreek.o
+
+
+	/* ICS cache objects. */
+
+	ICS_CACHE_OBJ	=	./iccchadd.o	./iccchver.o	\
+				./icsplaux.o
+
+
+	/* ICS clitic objects. */
+
+	ICS_CLTC_OBJ	=	./icclt.o	./iccltacc.o	\
+				./iccltcap.o	./iccltrp.o	\
+				./iccltstm.o	./iccltuna.o
+
+
+	/* ICS compound function objects. */
+
+	ICS_CMP_OBJ	=	./iccmp.o	./iccmpalt.o	\
+				./iccmpdbl.o	./iccmpexc.o	\
+				./iccmpfnd.o	./iccmphhy.o	\
+				./iccmphyp.o	./iccmplmc.o	\
+				./iccmpmnd.o	./iccmpnum.o	\
+				./iccmprmc.o	./iccmpprm.o	\
+				./iccmpsmh.o	./iccmpspc.o	\
+				./iccmpsup.o	./iccmpver.o	\
+				./iccmpvow.o
+
+
+	/* ICS Correction, double word check, RAM verification functions. */
+
+	ICS_MISC_OBJ	=	./iccorspl.o	./icdblchk.o	\
+				./icramchk.o	./icramver.o
+
+
+	/* ICS Language Extend function objects. */
+
+	ICS_EXT_OBJ	=	./cmorfo.o	./cmchars.o	\
+				./cmlexic.o	./cmfrqlex.o	\
+				./cmcch.o	./cmjaotin.o	\
+				./cmsets.o	./cmstring.o	\
+				./cmlexsc.o	./cmsets.o	\
+				./cmio.o	./cmlbits.o	\
+				./cmascii.o	./cmmuokka.o	\
+				./cmlexio.o	./cminterf.o	\
+				./cmimlex.o	./cmhyph.o
+
+
+	/* Personal dictionary function objects. */
+
+	PD_OBJS	=	./icpd.o	./pdinit.o	./pdapp.o	\
+			./pddb.o	./pdrdinit.o	./pdsearch.o	\
+			./pdsort.o	./pdaltutl.o	./pdword.o	\
+			./pdalt.o	./pdedit.o	./pdadd.o	\
+			./pddel.o	./pdfileio.o	./pddecode.o	\
+			./pdcorrec.o	./pdsdinit.o	./pdutils.o	\
+			./pdchkneg.o
+
+
+	/* DC function objects. */
+
+	DC_OBJ	=	./dcrules.o	./dcutils.o
+
+
+
+	HDRS_1	=	$(SL_HDRS) $(SF_HDRS) $(ICS_API_HDRS)
+
+	HDRS_2	=	$(ICS_CORE) $(PD_HDRS) $(LANG_EXT_HDRS) $(DC_HDRS)
+
+	HEADERS	=	$(HDRS_1) $(HDRS_2)
+			
+			
+	SRCS_1	=	$(SL_SRC) $(STD_FUNC_SRC) $(STD_CLT_SRC)
+
+	SRCS_2	=	$(STD_COR_SRC) $(ICS_SRC) $(ICS_CACHE_SRC)
+
+	SRCS_3	=	$(ICS_CLTC_SRC) $(ICS_CMP_SRC) $(ICS_MISC_SRC)
+
+	SRCS_4	=	$(PD_SRC1) $(PD_SRC2)
+
+	SRCS_5	=	$(PD_SRC3) $(DC_SRC)
+
+	SOURCES	=	$(SRCS_1) $(SRCS_2) $(SRCS_3) $(SRCS_4) $(SRCS_5)
+
+			
+	OBJS_1	=	$(SL_OBJ) $(STD_FUNC_OBJ) $(STD_CLTC_OBJ)
+
+	OBJS_2	=	$(STD_COR_OBJ) $(ICS_OBJ) $(ICS_CACHE_OBJ)
+
+	OBJS_3	=	$(ICS_CLTC_OBJ) $(ICS_CMP_OBJ) $(ICS_MISC_OBJ)
+
+	OBJS_4	=	$(PD_OBJS) $(DC_OBJ)
+
+	OBJECTS	=	$(OBJS_1) $(OBJS_2) $(OBJS_3) $(OBJS_4)
+
+
+LibraryObjectRule()
+ 
+/* For install of developer's build environment */
+LOCAL_BINSTALL_LIBDEST = lib
+
+
+/* DependTarget()
+ | Rather than use above directive, explicitly define depend, since 
+ | DependTarget() is empty in the localtree.rules file.
+ */
+depend:
+	makedepend $(ALLDEFINES) $(SOURCES) $(HEADERS)
+
+/*
+** setup supplied targets
+*/
+
+PLATFORM:sh	= uname -p
+
+all::fixsupp
+fixsupp:
+	${RM} libSDtSpellE.so.1 libSDtSpellE.so
+	@if [ '${CDEBUGFLAGS}' = "-g" ]; \
+	then \
+	   echo "Setting up supplied targets for a ${PLATFORM} debug build:"; \
+	   (set -x; \
+	   cp -p libSDtSpellE.so.1.${PLATFORM}.debug libSDtSpellE.so.1;) \
+	else \
+	   echo "Setting up supplied targets for a ${PLATFORM} optimized build:"; \
+	   (set -x; \
+	   cp -p libSDtSpellE.so.1.${PLATFORM}.opt libSDtSpellE.so.1;) \
+	fi; \
+	(set -x; ln -s libSDtSpellE.so.1 libSDtSpellE.so)
+
+/* SharedLibraryTarget($(LIBNAME),$(SPELLE_SO_REV),$(OBJECTS),.,.) */
+
+/* LintLibraryTarget($(LIBNAME),$(SOURCES)) */
+ 
+/* NormalLintTarget($(SOURCES)) */
+
+clean::
+	$(RM) *.o core *%
+

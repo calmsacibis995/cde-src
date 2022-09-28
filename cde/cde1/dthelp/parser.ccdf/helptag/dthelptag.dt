@@ -1,0 +1,94 @@
+#######################################################################
+#
+#     dthelptag.dt
+#
+#     Actions and DataTypes for authoring Help information.
+#
+#    (c) Copyright 1993 Hewlett-Packard Company
+#    (c) Copyright 1993 International Business Machines Corp.
+#    (c) Copyright 1993 Sun Microsystems, Inc.
+#
+#     $XConsortium: dthelptag.dt /main/cde1_maint/1 1995/07/14 23:47:31 drk $
+#
+######################################################################
+
+###############################################################################
+#
+# WARNING:  This file may be overwritten in subsequent installations of
+#     DT.  Consequently, any system wide changes should be made to
+#     an equivalent database file in /etc/dt/types and not 
+#     in this file.
+#
+###############################################################################
+
+# The Help executables are shipped in /opt/dt/bin,  which may not be
+# part of all the users' paths.  Therefore the following string is
+# defined to add this to the path before invoking the client.
+set HELPTAG_PATH=\$PATH:/opt/dt/bin
+
+DATA_ATTRIBUTES DTHELP_HTG
+{
+        SMALL_ICON      questY.s
+        LARGE_ICON      questY.l
+        ACTIONS         %|nls-1-Open|,%|nls-76-Compile|,%|nls-77-CleanUp|
+        DESCRIPTION     %|nls-16001-#This is a ...#|
+}
+
+DATA_CRITERIA DTHELP_HTG1
+{
+	DATA_ATTRIBUTES_NAME DTHELP_HTG
+        MODE            !d
+        NAME_PATTERN    *.htg
+}
+
+ACTION Open
+{
+        ARG_TYPE        DTHELP_HTG
+	TYPE		MAP		OpenHelpTag
+}
+
+ACTION Compile
+{
+        ARG_TYPE        DTHELP_HTG
+	TYPE		MAP		HelpTag
+}
+
+ACTION CleanUp
+{
+        ARG_TYPE        DTHELP_HTG
+	TYPE		MAP		CleanHelpTag
+}
+
+ACTION OpenHelpTag
+{
+        ARG_COUNT       *
+        ARG_TYPE        DTHELP_HTG
+	TYPE		COMMAND
+	WINDOW_TYPE	NO_STDIO
+	EXEC_STRING	dtpad %(File)Arg_1%
+	DESCRIPTION	%|nls-16002-#The OpenHelpTag ...#|
+}
+
+ACTION HelpTag
+{
+        ARG_COUNT       *
+        ARG_TYPE        DTHELP_HTG
+	TYPE		COMMAND
+	WINDOW_TYPE	NO_STDIO
+	EXEC_STRING	sh -c 'PATH=$HELPTAG_PATH dthelptag -clean \
+				  `basename %(File)Arg_1%|nls-16005-#"HelpTag File:"#|%`; \
+			       PATH=$HELPTAG_PATH dthelptag \
+				  `basename %(File)Arg_1%`'
+	DESCRIPTION	%|nls-16003-#The HelpTag ...#|
+}
+
+ACTION CleanHelpTag
+{
+        ARG_COUNT       *
+        ARG_TYPE        DTHELP_HTG
+	TYPE		COMMAND
+	WINDOW_TYPE	NO_STDIO
+	EXEC_STRING	sh -c 'PATH=$HELPTAG_PATH dthelptag -clean \
+				  `basename %(File)Arg_1%|nls-16005-#"HelpTag File:"#|%`'
+	DESCRIPTION	%|nls-16004-#The CleanHelpTag ...#|
+}

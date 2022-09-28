@@ -1,0 +1,59 @@
+# %%  (c) Copyright 1993, 1994 Hewlett-Packard Company			
+# %%  (c) Copyright 1993, 1994 International Business Machines Corp.	
+# %%  (c) Copyright 1993, 1994 Sun Microsystems, Inc.			
+# %%  (c) Copyright 1993, 1994 Novell, Inc. 				
+# %%  $Revision: $ 			 				
+#ifdef HideFromImake
+ #
+ # IMakeFile 1.2	29 Jul 1993
+ #
+ # This preamble turns this imakefile into a shell script which will
+ # create/update this directory's makefile when invoked as follows:
+ # % sh Imakefile [target]
+ #
+exec make -f - ${1+"$@"} <<EOF
+IMAKEDIR=../imake
+DEFINES		= -DIMAKEDIR=$(IMAKEDIR)
+GNUMakeFile 	:= DEFINES += -Dgnu
+MakeFile GNUMakeFile: IMakeFile $(IMAKEDIR)/Imake.tmpl $(IMAKEDIR)/Imake.rules
+	unset OPENWINHOME; imake -I$(IMAKEDIR) -f IMakeFile -s \$@ $(DEFINES)
+EOF
+exit
+#endif HideFromImake
+
+TT_DIR	= ..
+
+include $(TT_DIR)/Make.macros
+
+default: all
+
+All:: $(MAKEFILE)s
+All all:: $(PROTO_DIR)/lib/StaticOptimizedLib(stt)
+
+$(PROTO_DIR)/lib/%: %
+	$(TTINSTALL) $(@D) $<
+
+clean::
+	$(RM) $(PROTO_DIR)/lib/StaticOptimizedLib(stt)
+
+stt_SOURCES.cc = \
+mp_ce_attrs.cc \
+mp_observer.cc		 mp_observer_utils.cc				\
+mp_otype.cc		 mp_otype_utils.cc	 mp_ptype.cc		\
+mp_ptype_utils.cc	 mp_rpc_implement.cc	 mp_rpc_server.cc	\
+mp_rpc_server_utils.cc	 mp_s_file.cc		 mp_s_file_utils.cc	\
+mp_s_message.cc		 mp_s_message_utils.cc	 mp_s_mp.cc		\
+mp_s_pattern.cc		 mp_s_pattern_utils.cc	 mp_s_procid.cc		\
+mp_s_procid_utils.cc	 mp_s_msg_context.cc	 mp_s_pat_context.cc	\
+mp_s_session.cc		 mp_s_session_prop.cc	 mp_s_session_utils.cc	\
+mp_s_xdr_functions.cc 	 mp_self_procid.cc \
+mp_signature.cc		 mp_signature_utils.cc	 mp_typedb.cc		\
+mp_typedb_utils.cc
+
+LibraryStaticOptimized(stt)
+SourceHygiene(stt)
+
+SaberSources(stt)
+
+WhenAssign(%/mp_typedb.o %/mp_s_session.o	\
+,AppendVal(CPPFLAGS,-I$(OPENWINHOME)/include))

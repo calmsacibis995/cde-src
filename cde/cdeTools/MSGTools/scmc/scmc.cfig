@@ -1,0 +1,183 @@
+#
+# COMPONENT_NAME: (PIITOOLS) AIX PII Tools
+#
+# FUNCTIONS: Standard header file for scmc
+#
+# ORIGINS: 27
+#
+# IBM CONFIDENTIAL -- (IBM Confidential Restricted when
+# combined with the aggregated modules for this product)
+# OBJECT CODE ONLY SOURCE MATERIALS
+# (C) COPYRIGHT International Business Machines Corp. 1988
+# All Rights Reserved
+#
+# US Government Users Restricted Rights - Use, duplication or
+# disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
+#                                                                   
+# This is the scmc cfig file for the 'C' language and some extenstions
+#  Configuration file:  
+#   The configuration file is a file which contains information describing 
+# patterns for use in determining what constitutes a message.  It also 
+# contains the information used to determine which message file the 
+# message is placed in, a prefix for the message name, the set name 
+# for the message, and whether the operator must confirm the substitution.
+# 
+# The configuration file can be specified on the command line ("-f<cfig-name>" )
+# if no file is specified, /usr/lpp/scmc/cfig is used.
+# 
+# The format is as follows:
+# A statement 'Begin keywords' followed by a list of keyword(s) & parameters.
+# A statement 'Begin sub methods' followed by a list of substitution methods.
+# A statement 'Begin language defs' followed by a list of language definitions.
+# comments have a leading # and may be placed anywhere in the file.[B
+# Begin keywords				(This must start in column 0)
+# <keywd>:<lvl>:<pno>:<pst[,pst]...>:<pdl[,pdl]...>:[<m-pfx>]:[<set>]:<subname>
+# .
+# .
+# .
+# Begin sub methods    				(This must start in column 0)
+# <subname>:<format>:<catd>:[<file-name>]
+# .
+# .
+# .
+# <list of language defs, one per line>
+# 
+# 
+# 
+# Definitions (for keyword list):
+# 
+# <keywd>		- A string that occurs before the start of a list of 
+#                   parameters.
+# <lvl>		- The level of operator intervention necessary to preform
+#                   the substitution.  A number from 0 to 64K.
+# <pno>		- The number of the parameter to be substituted out, starting
+#     		  at zero. 
+# <pst[,pst]...>	- A list of possible starting strings for the parameter.  Each
+#                   member of the list seperated by commas.
+# <pdl[,pdl]...>	- A list of possible strings used to seperate parameters.
+# [<m-pfx>]	- An optional prefix to the message name.
+# [<set-name>]	- An optional set name, if no set name is given MS_<file_name>
+#                   will be used.
+# <subname>	- The name of the substitution method.
+# 
+# Definitions (for substitution method list):
+# 
+# <subname>	- The name of the substitution method.
+# <format>        - The string used to replace the parameter.  This string may
+# 		  (and probably should) contain the following special strings.
+#                   These strings represent substitutions.
+# 
+#                      %p - The original parameter.
+#                      %s - The set name of the message.
+#                      %m - The message name of the message.
+#                      %c - The <catd> of the message.
+# 
+# <catd>		- What is to be substituted for the %c in the format string.
+# <file-name> 	- The name of the file that the file that the message is
+# 		  to be placed in.
+# 
+# 
+# NOTE:  ANY custom macros or subroutines used for output wich
+# should be translated can be inserted into the list.  The list
+# is ordered only to make it easier for the operator to look at.
+#
+#
+#
+Begin keywords
+puts:0:0:":\,:M_::MSGSTR
+printf:20:0:":\,:M_::MSGSTR
+# vprintf:0:0:":\,:M_::MSGSTR
+# NLprintf:0:0:":\,:M_::MSGSTR
+wperror:0:0:":\,:E_::MSGSTR
+prerr:0:0:":\,:E_::MSGSTR
+prmsg:0:0:":\,:E_::MSGSTR
+exit_err:0:0:":\,:E_::MSGSTR
+=:10:0:":\,:M_::MSGSTR
+select:20:9:":\,:M_::MSGSTR
+strcpy:20:1:":\,:M_::MSGSTR
+#
+# This is the start of the level 5 keywords
+# Info that will normally be going to a file
+# All file keywords are included,  These
+# will commonly be handling text strings.
+#
+# fputs:5:1:":\,:M_::MSGSTR
+fprintf:25:1:":\,:M_::MSGSTR
+# NLfprintf:5:1:":\,:M_::MSGSTR
+# vfprintf:5:1:":\,:M_::MSGSTR
+#
+# This is the start of the level 10 keywords
+# They consist of the curses or extended curses routines.
+#
+addstr:10:0:":\,:ECM_::MSGSTR
+waddstr:10:1:":\,:ECM_::MSGSTR
+# paddstr:10:1:":\,:ECM_::MSGSTR
+mvaddstr:10:2:":\,:ECM_::MSGSTR
+mvwaddstr:10:3:":\,:ECM_::MSGSTR
+# mvpaddstr:10:3:":\,:ECM_::MSGSTR
+# paddfld:10:1:":\,:ECM_::MSGSTR
+printw:10:0:":\,:ECM_::MSGSTR
+wprintw:10:1:":\,:ECM_::MSGSTR
+# pprintw:10:1:":\,:ECM_::MSGSTR
+mvprintw:10:2:":\,:ECM_::MSGSTR
+mvwprintw:10:3:":\,:ECM_::MSGSTR
+# mvpprintw:10:3:":\,:ECM_::MSGSTR
+# ectitl:10:1:":\,:ECM_::MSGSTR
+#
+# This is the start of the level 15 keywords
+# They consist of the file i/o routines that 
+# will primarily be handling data, but may handle
+# text.
+fwrite:15:3:":\,:FWRM_::MSGSTR
+write:15:0:":\,:M_::MSGSTR
+#
+# The level 20 routines are ones commonly used to manipulate 
+# strings in memory.
+sprintf:15:1:":\,:M_::MSGSTR
+# vsprintf:15:1:":\,:M_::MSGSTR
+# NLsprintf:15:1:":\,:M_::MSGSTR
+#
+#
+#
+# The following is a list of the substitution methods, there
+# must be a substitution defined method for each one referenced 
+# by the keyword list.
+#
+# You may want to add more substitution methods in order to 
+# send the messages from different functions to different
+# message files.
+#
+Begin sub methods
+#
+MSGSTR:catgets(%c, %s, %m, %p):scmc_catd:
+#ERRSTR:NLgetamsg(%c, %s, %m, %p):MF_ERR:err.msg
+#
+# The next section is a list of language specific things, these
+# should not need to be changed except to use the program on a 
+# different language.  These are desigend for 'C'
+#
+# They MUST be in order, and the MUST all be defined.  Unpredictable
+# results will occur if they are not defined properly.
+# Trailing spaces ARE significant, NO parsing of meta or control
+# characters is done. (WYSIWYG!!)
+#
+Begin language defs
+# comment column (-1 for column independent)
+-1
+# begin comment string
+/*
+# end comment string (ignored if comment column is -1)
+*/
+# list of quote characters
+'"
+# list of nest characters
+({[
+# list of close nest characters (These MUST be in the same order as the open nest chars.)
+)}]
+# Begin parameter list string (up to 20 chars)
+(
+# End parameter string (Up to 20 chars);
+)
+# Meta character, DO NOT SET META CHAR TO NULL
+\
+# End of config file.

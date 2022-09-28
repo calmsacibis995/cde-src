@@ -1,0 +1,39 @@
+/**/#pragma ident	"@(#)mclients:xmbind/Imakefile	1.2"
+XCOMM 
+XCOMM (c) Copyright 1989, 1990, 1991, 1992 OPEN SOFTWARE FOUNDATION, INC. 
+XCOMM ALL RIGHTS RESERVED 
+XCOMM 
+XCOMM 
+XCOMM Motif Release 1.2
+XCOMM 
+XCOMM   $XConsortium: Imakefile /main/cde1_maint/2 1995/10/05 15:39:49 mgreess $
+#include	<Motif.tmpl>
+#include	<Motif.rules>
+
+
+#if defined(USLArchitecture)
+#if HasSharedLibraries
+EXTRA_LOAD_FLAGS = -z nodefs
+#endif
+#endif
+
+#if defined(UXPArchitecture)
+#if HasSharedLibraries
+EXTRA_LOAD_FLAGS = -z nodefs
+#endif
+#endif
+
+INCLUDES = -I. -I$(INCLUDESRC) -I$(MINCLUDESRC)
+       DEPLIBS1 = XmClientDepLibs
+LOCAL_LIBRARIES = XmClientLibs $(SYSLIBS)
+
+SRCS1=	xmbind.c
+
+OBJS1=	xmbind.o
+
+PROGRAMS = xmbind
+
+NormalLibraryObjectRule()
+
+MComplexProgramTarget_1(xmbind,$(LOCAL_LIBRARIES),NullParameter)
+

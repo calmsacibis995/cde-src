@@ -1,0 +1,128 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH XmFontList 3X "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmFontList\fP \- Data type for a font list
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/Xm.h>
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+\fIXmFontList\fP is the data type for a font list.  A font list
+consists of font list entries, each of which contains a font or a
+font set (a group of fonts) and is identified with a tag.  The
+font list entry tag is optional; if NULL, the tag
+is set to \fIXmFONTLIST_DEFAULT_TAG\fP.  
+The value of
+\fIXmFONTLIST_DEFAULT_TAG\fP is "XmFONTLIST_DEFAULT_TAG_STRING".
+.PP
+When a compound string is displayed, the font list element tag of the
+compound string segment is matched with a font list entry tag in
+the font list and the matching font list entry is used to display
+the compound string.  A font list entry is chosen as follows:
+.TP
+\(bu
+The first font list entry whose tag matches the tag of the compound
+string segment is used.
+.TP
+\(bu
+If no match has been found and if the tag of the compound string
+segment is \fIXmFONTLIST_DEFAULT_TAG\fP, the first font list
+entry whose tag matches the tag that would result from creating
+an entry with \fIXmSTRING_DEFAULT_CHARSET\fP.
+For example, if creating an entry with \fIXmSTRING_DEFAULT_CHARSET\fP
+would result in the tag "ISO8859-1", the compound string segment
+tag \fIXmFONTLIST_DEFAULT_TAG\fP matches the font list entry tag
+"ISO8859-1".
+.TP
+\(bu
+If no match has been found and if the tag of the compound string
+segment matches the tag that would result from creating a segment
+with \fIXmSTRING_DEFAULT_CHARSET\fP, the first font list entry
+whose tag is \fIXmFONTLIST_DEFAULT_TAG\fP is used.
+.TP
+\(bu
+If no match has been found, the first entry in the font list is
+used.
+.PP
+The font list interface consists of the routines listed
+under "Related Information."
+.PP 
+Font lists are specified in resource files using the following syntax:
+.PP
+\fBresource_spec\fP\fI:\fP  \fBfont_entry\fP [ , \fBfont_entry\fP ]+
+.PP
+The resource value string consists of one or more font list entries
+separated by commas.  Each \fBfont_entry\fP identifies a font or
+font set, and an optional font list entry tag.  A tag specified for a
+single font follows the font name and is separated by \fI=\fP ; otherwise,
+in a font set the tag is separated by a colon.  The colon is required
+whether a tag is specified or not.  A font entry uses the following
+syntax to specify a single font:
+.PP
+         \fBfont_name\fP [ '=' \fBtag\fP ]
+.PP
+For example, this entry specifies a 10 point Times Italic font
+without a font list entry tag.
+.PP
+*fontList:  -Adobe-Times-Medium-I-Normal--10*         
+.PP
+A font entry containing a font set is similar except a semicolon
+separates multiple font names and the specification ends with
+a colon followed by an optional tag.
+.PP
+          \fBfont_name\fP [ ';' \fBfont_name\fP ]+ ':' [ \fBtag\fP ]
+.PP
+A \fBfont_name\fP is an X Logical Font Description (XLFD) string
+and \fBtag\fP is any set of characters from ISO646IRV except
+space, comma, colon, equal sign and semicolon.  An example of a font
+set entry is given below.  It consists of three fonts (except for charsets),
+and an explicit font list entry tag.
+.PP
+.na
+*fontList : -Adobe-Courier-Bold-R-Normal--25-180-100-100-M-150;\\
+.nL
+-JIS-Fixed-Medium-R-Normal--26-180-100-100-C-240;\\
+.nL
+-JIS-Fixed-Medium-R-Normal--26-180-100-100-C-120:MY_TAG
+.ad
+.PP
+.SH RELATED INFORMATION
+.na
+\fIXmFontListAdd(3X)\fP,
+\fIXmFontListAppendEntry(3X)\fP,
+\fIXmFontListCopy(3X)\fP,
+\fIXmFontListCreate(3X)\fP,
+\fIXmFontListEntryCreate(3X)\fP,
+\fIXmFontListEntryFree(3X)\fP,
+\fIXmFontListEntryGetFont(3X)\fP,
+\fIXmFontListEntryGetTag(3X)\fP,
+\fIXmFontListEntryLoad(3X)\fP,
+\fIXmFontListFree(3X)\fP,
+\fIXmFontListFreeFontContext(3X)\fP,
+\fIXmFontListGetNextFont(3X)\fP,
+\fIXmFontListInitFontContext(3X)\fP,
+\fIXmFontListNextEntry(3X)\fP,
+\fIXmFontListRemoveEntry(3X)\fP, and
+\fIXmString(3X)\fP.
+.ad

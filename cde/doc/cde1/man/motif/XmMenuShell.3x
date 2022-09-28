@@ -1,0 +1,297 @@
+'\" t
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Novell, Inc
+...\" **
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH XmMenuShell 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmMenuShell\fP \- The MenuShell widget class
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/MenuShell.h>
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+The MenuShell widget is a custom OverrideShell widget.  An OverrideShell
+widget bypasses \fImwm\fP when displaying itself.  It is designed
+specifically to contain Popup or Pulldown MenuPanes.
+.PP 
+Most application writers never encounter this widget if they use the
+menu-system convenience functions,
+\fIXmCreatePopupMenu\fP or \fIXmCreatePulldown Menu\fP,
+to create a Popup or Pulldown MenuPane.
+The convenience functions automatically create a MenuShell widget as the
+parent of the MenuPane.  However, if the convenience functions are
+not used, the application programmer must create
+the required MenuShell.  In this case, it is important to note that the
+parent of the MenuShell depends on the type of menu system
+being built.
+.nL
+.ne 15
+.TP
+\(bu
+If the MenuShell is for the top-level Popup MenuPane, the MenuShell's
+parent must be the widget from which the Popup MenuPane is popped up.
+.TP
+\(bu
+If the MenuShell is for a MenuPane that is pulled down from a Popup or
+another Pulldown MenuPane, the MenuShell's parent must be the Popup or
+Pulldown MenuPane.
+.TP
+\(bu
+If the MenuShell is for a MenuPane that is pulled down from a MenuBar,
+the MenuShell's parent must be the MenuBar.
+.TP
+\(bu
+If the MenuShell is for a Pulldown MenuPane in an OptionMenu, the
+MenuShell's parent must be the OptionMenu's parent.
+.PP 
+Setting \fIXmNheight\fP, \fIXmNwidth\fP, or \fIXmNborderWidth\fP for
+either a MenuShell or its child sets that resource to the same value
+in both the parent and the child.
+An application should always specify these resources for the child, not
+the parent.
+.PP 
+For the managed child of a MenuShell, regardless of the value of
+the shell's \fIXmNallowShellResize\fP, setting \fIXmNx\fP or \fIXmNy\fP
+sets the corresponding resource of the parent but does not change the
+child's position relative to the parent.
+\fIXtGetValues\fP for the child's \fIXmNx\fP or \fIXmNy\fP yields the
+value of the corresponding resource in the parent.
+The \fBx\fP and \fBy\fP coordinates of the child's upper left outside
+corner relative to the parent's upper left inside corner are both zero
+minus the value of \fIXmNborderWidth\fP.
+.SS "Classes"
+MenuShell inherits behavior and resources from \fICore\fP,
+\fIComposite\fP, \fIShell\fP, and
+\fIOverrideShell\fP classes.
+.PP 
+The class pointer is \fIxmMenuShellWidgetClass\fP.
+.PP 
+The class name is \fIXmMenuShell\fP.
+.SS "New Resources"
+MenuShell overrides the \fIXmNallowShellResize\fP resource in Shell.
+The following table defines a set of widget resources used by the programmer
+to specify data.  The programmer can also set the resource values for the
+inherited classes to set attributes for this widget.  To reference a
+resource by name or by class in a .Xdefaults file, remove the \fIXmN\fP or
+\fIXmC\fP prefix and use the remaining letters.  To specify one of the defined
+values for a resource in a .Xdefaults file, remove the \fIXm\fP prefix and use
+the remaining letters (in either lowercase or uppercase, but include any
+underscores between words).
+The codes in the access column indicate if the given resource can be
+set at creation time (C),
+set by using \fIXtSetValues\fP (S),
+retrieved by using \fIXtGetValues\fP (G), or is not applicable (N/A).
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmMenuShell Resource Set
+Name	Class	Type	Default	Access
+_
+XmNbuttonFontList	XmCButtonFontList	XmFontList	dynamic	CSG
+XmNdefaultFontList	XmCDefaultFontList	XmFontList	dynamic	CG
+XmNlabelFontList	XmCLabelFontList	XmFontList	dynamic	CSG
+.TE
+.KE
+.in
+.sp 1
+.IP "\fIXmNbuttonFontList\fP"
+Specifies the font list used for MenuShell's button descendants.
+If this value is NULL at initialization and if the value of
+\fIXmNdefaultFontList\fP is not NULL, \fIXmNbuttonFontList\fP
+is initialized to the value of \fIXmNdefaultFontList\fP.  If
+the value of \fIXmNdefaultFontList\fP is NULL, \fIXmNbuttonFontList\fP
+is initialized by looking up the parent hierarchy of the widget for
+an ancestor that is a subclass of the XmBulletinBoard, VendorShell,
+or XmMenuShell widget class.  If such an ancestor is found,
+\fIXmNbuttonFontList\fP is initialized to the \fIXmNbuttonFontList\fP
+of the ancestor  widget.  If no such ancestor is found, the default
+is implementation dependent.
+.IP "\fIXmNdefaultFontList\fP"
+Specifies a default font list for MenuShell's descendants.
+This resource is obsolete and exists for compatibility with
+earlier releases.  It has been replaced by \fIXmNbuttonFontList\fP
+and \fIXmNlabelFontList\fP.
+.IP "\fIXmNlabelFontList\fP"
+Specifies the font list used for MenuShell's label descendants
+(Labels and LabelGadgets).  If this value is NULL at initialization
+and if the value of \fIXmNdefaultFontList\fP is not NULL,
+\fIXmNlabelFontList\fP is initialized to the value of
+\fIXmNdefaultFontList\fP.  If the value of \fIXmNdefaultFontList\fP is
+NULL, \fIXmNlabelFontList\fP is initialized by looking up the parent
+hierarchy of the widget for an ancestor that is a subclass of the
+XmBulletinBoard, VendorShell, or XmMenuShell widget class.  If such
+an ancestor is found, \fIXmNlabelFontList\fP is initialized to the
+\fIXmNlabelFontList\fP of the ancestor widget.  If no such ancestor
+is found, the default is implementation dependent.
+.SS "Inherited Resources"
+MenuShell inherits behavior and resources from the following
+superclasses.  For a complete description of each resource, refer to the
+man page for that superclass.
+The following tables define a set of widget resources used by the programmer
+to specify data.  The programmer can set the resource values for these
+inherited classes to set attributes for this widget.  To reference a
+resource by name or by class in a .Xdefaults file, remove the \fIXmN\fP or
+\fIXmC\fP prefix and use the remaining letters.  To specify one of the defined
+values for a resource in a .Xdefaults file, remove the \fIXm\fP prefix and use
+the remaining letters (in either lowercase or uppercase, but include any
+underscores between words).
+The codes in the access column indicate if the given resource can be
+set at creation time (C),
+set by using \fIXtSetValues\fP (S),
+retrieved by using \fIXtGetValues\fP (G),
+or is not applicable (N/A).
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+Shell Resource Set
+Name	Class	Type	Default	Access
+_
+XmNallowShellResize	XmCAllowShellResize	Boolean	True	G
+XmNcreatePopupChildProc	XmCCreatePopupChildProc	XtCreatePopupChildProc	NULL	CSG
+XmNgeometry	XmCGeometry	String	NULL	CSG
+XmNoverrideRedirect	XmCOverrideRedirect	Boolean	True	CSG
+XmNpopdownCallback	XmCCallback	XtCallbackList	NULL	C
+XmNpopupCallback	XmCCallback	XtCallbackList	NULL	C
+XmNsaveUnder	XmCSaveUnder	Boolean	True	CSG
+XmNvisual	XmCVisual	Visual *	CopyFromParent	CSG
+.TE
+.KE
+.in
+.sp 1
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+Composite Resource Set
+Name	Class	Type	Default	Access
+_
+XmNchildren	XmCReadOnly	WidgetList	NULL	G
+XmNinsertPosition	XmCInsertPosition	XtOrderProc	NULL	CSG
+XmNnumChildren	XmCReadOnly	Cardinal	0	G
+.TE
+.KE
+.in
+.sp 1
+.P 
+.wH
+.in 0 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+Core Resource Set
+Name	Class	Type	Default	Access
+_
+XmNaccelerators	XmCAccelerators	XtAccelerators	dynamic	CSG
+XmNancestorSensitive	XmCSensitive	Boolean	dynamic	G
+XmNbackground	XmCBackground	Pixel	dynamic	CSG
+XmNbackgroundPixmap	XmCPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNborderColor	XmCBorderColor	Pixel	XtDefaultForeground	CSG
+XmNborderPixmap	XmCPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNborderWidth	XmCBorderWidth	Dimension	1	CSG
+XmNcolormap	XmCColormap	Colormap	dynamic	CG
+XmNdepth	XmCDepth	int	dynamic	CG
+XmNdestroyCallback	XmCCallback	XtCallbackList	NULL	C
+XmNheight	XmCHeight	Dimension	dynamic	CSG
+XmNinitialResourcesPersistent	XmCInitialResourcesPersistent	Boolean	True	C
+XmNmappedWhenManaged	XmCMappedWhenManaged	Boolean	True	CSG
+XmNscreen	XmCScreen	Screen *	dynamic	CG
+.wH
+.tH
+XmNsensitive	XmCSensitive	Boolean	True	CSG
+XmNtranslations	XmCTranslations	XtTranslations	dynamic	CSG
+XmNwidth	XmCWidth	Dimension	dynamic	CSG
+XmNx	XmCPosition	Position	0	CSG
+XmNy	XmCPosition	Position	0	CSG
+.TE
+.KE
+.in
+.sp 1
+.wH
+.in  
+.SS "Translations"
+The XmMenuShell translations are listed below.
+These translations may not directly correspond to a
+translation table.
+.iS
+.ta 1.5i
+.nf
+BSelect Press:	ClearTraversal()
+BSelect Release:	MenuShellPopdownDone()
+.wH
+.fi
+.iE
+.SS "Action Routines"
+The XmMenuShell action routines are described below:
+.IP "\fIClearTraversal()\fP:"
+Disables keyboard traversal for the menu, enables mouse traversal, and
+unposts any menus posted by this menu.
+.nL
+.ne 6
+.IP "\fIMenuShellPopdownDone()\fP:"
+Unposts the menu hierarchy and, when the shell's keyboard focus policy is
+\fIXmEXPLICIT\fP, restores focus to the widget that had
+the focus before the menu system was entered.
+.IP "\fIMenuShellPopdownOne()\fP:"
+In a toplevel Pulldown MenuPane from a MenuBar, unposts the menu,
+disarms the MenuBar CascadeButton and the MenuBar, and,
+when the shell's keyboard focus policy is \fIXmEXPLICT\fP,
+restores keyboard
+focus to the widget that had the focus before the MenuBar was
+entered.
+In other Pulldown MenuPanes, unposts the menu.
+.P
+In a Popup MenuPane, unposts the menu, and,
+when the shell's keyboard focus policy is \fIXmEXPLICT\fP,
+restores keyboard focus to the
+widget from which the menu was posted.
+.SS "Virtual Bindings"
+The bindings for virtual keys are vendor specific.
+For information about bindings for virtual buttons and keys, see \fIVirtualBindings(3X)\fP.
+.SH RELATED INFORMATION
+.na
+\fIComposite(3X)\fP, \fICore(3X)\fP, \fIOverrideShell(3X)\fP, \fIShell(3X)\fP,
+\fIXmCreateMenuShell(3X)\fP,
+\fIXmCreatePopupMenu(3X)\fP, \fIXmCreatePulldown(3X)\fP, and
+\fIXmRowColumn(3X)\fP.
+.ad

@@ -1,0 +1,150 @@
+# "@(#)Makefile.sun	1.26 96/06/03 SMI"
+
+.KEEP_STATE:
+.PARALLEL:
+
+# Paths
+CPP     = /usr/ccs/lib/cpp
+OBJDIR  = ../../../obj
+INCDIR  = -I../../include -I../.. -I.
+LIBDIR  = ../../../lib
+STATIC_OBJDIR  = static_objs
+SHARED_OBJDIR  = shared_objs
+TEST1   = metatest1
+TEST2   = metatest2
+
+SHARED_LIBDIR  = ../../../shared_libs
+
+MOTIFHOME = /usr/dt
+OPENWINHOME = /usr/openwin
+CCLIENT:sh = NETJANSPATH=/net-jans/c-client ; \
+	if [ -d ${NETJANSPATH} ] ; then \
+	echo ${NETJANSPATH} ; else echo /net/jans/export1/c-client ; fi
+
+# Default target is to build shared
+default: shared
+all: shared static
+
+# Create all required directories up front
+.INIT: $(SHARED_OBJDIR) $(STATIC_OBJDIR)
+
+$(SHARED_OBJDIR) $(STATIC_OBJDIR):
+	@test -d $@ || mkdir $@
+
+TESTS =  c_local_basic.tst c_local_extended.tst \
+	 c_imap_basic.tst c_imap_extended.tst \
+	 c_local_basic_mime.tst c_imap_basic_mime.tst \
+	 c_local_extended_mime.tst c_imap_extended_mime.tst
+
+# Hooks to perform removes for make clean
+RM = rm -f
+RM_CMD = $(RM) *.i *.CKP *.ln *.BAK *.bak *.o core errs ,* *~ *.a .emacs_* \
+	tags TAGS make.log make.out MakeOut $(TESTS)
+
+# Compile Time Flags
+RPC_FLAGS = -DRPC_SVC_FG -DPORTMAP
+TMLT_FLAGS = 
+THREAD_FLAGS = -D_REENTRANT
+
+# Make Dependancies and Rules
+ARCH:sh     	=   arch
+OS_VERSION:sh   =   uname -r | awk -F. '{print $1}'
+TODAY_DATE:sh   =   date +"%D  %H:%M"
+
+PROGRAM = sdmporttest
+
+SRCS =  porttest.cc ptcbody.cc ptcconnection.cc ptcenvelope.cc \
+	ptchelp.cc ptcmdscan.cc ptcmessage.cc ptcoverview.cc \
+	ptcport.cc ptcquit.cc ptcsession.cc ptcstore.cc \
+	ptctoken.cc
+
+OBJS = $(SRCS:%.cc=$(VARIANT)/%.o)
+
+# HandShake Directory 
+UIOBJS  =
+
+CPPFLAGS += $(INCDIR)
+
+VARIANT = $(SHARED_OBJDIR)
+
+$$(VARIANT)/%.o: %.cc
+	$(COMPILE.cc) $< -o $@
+
+LDFLAGS 	+=  +w			\
+		-L$(LIBDIR)		\
+		-L$(CCLIENT)/lib	\
+		-R$(CCLIENT)/lib	\
+		-ptr$(VARIANT)		\
+		-ptr.
+
+LDLIBS += -lc-client
+
+# Static variant - just use the single .a
+static := VARIANT = $(STATIC_OBJDIR)
+static := LDLIBS += -Bstatic -lSDtMail -Bdynamic $(DEFAULTLIBS)
+
+static : $(PROGRAM) cclient_tests
+
+# Shared variant - use the individual .so modules
+shared := LDFLAGS += \
+	-L$(SHARED_LIBDIR) \
+	-R`pwd`/$(SHARED_LIBDIR)
+
+shared := VARIANT = $(SHARED_OBJDIR)
+shared := LDLIBS += \
+	-lctrlobjs \
+	-ldataobjs \
+	-ldatastore \
+	-ldatastructs \
+	-ldatatypes \
+	-lmanager \
+	-lportobjs \
+	-ltemplateexpand \
+	-ltranobjs \
+	-lutils \
+	$(DEFAULTLIBS)
+
+shared: $(PROGRAM) cclient_tests
+
+DEFAULTLIBS +=  \
+		-lC \
+                -lnsl \
+                -lsocket \
+                -ldl \
+		-mt
+
+SDMDEBFLAGS = -g
+CCFLAGS += $(SDMDEBFLAGS) $(TMLT_FLAGS) $(THREAD_FLAGS)
+
+Makefiles:
+	rm -f Makefile
+	ln -s Makefile.sun Makefile
+
+clean_static := VARIANT = $(STATIC_OBJDIR)
+clean_static:
+	@$(RM) $(OBJS)
+	@$(RM) static_objs/*
+
+clean_shared := VARIANT = $(SHARED_OBJDIR)
+clean_shared:
+	@$(RM) $(OBJS) $(SHARED_LIB)
+	@$(RM) shared_objs/*
+
+clean: clean_static clean_shared
+	@$(RM_CMD) "#"* $(PROGRAM)
+	@$(RM) -rf Templates.DB/*
+
+$(PROGRAM):  $$(OBJS) $(UIOBJS)
+	$(PURIFY) $(LINK.cc) -o $@ $(OBJS) $(UIOBJS) $(LDLIBS)
+
+cclient_tests: metatest1 metatest2
+	$(RM) $(TESTS)
+	$(CPP) -P $(TEST1) > c_local_basic.tst
+	$(CPP) -P -DIMAP $(TEST1) > c_imap_basic.tst
+	$(CPP) -P -DEXTENDED $(TEST1) > c_local_extended.tst
+	$(CPP) -P -DIMAP -DEXTENDED $(TEST1) > c_imap_extended.tst
+# The following "mime" tests exercise getstructure and getattributes
+	$(CPP) -P $(TEST2) > c_local_basic_mime.tst
+	$(CPP) -P -DIMAP $(TEST2) > c_imap_basic_mime.tst
+	$(CPP) -P -DEXTENDED $(TEST2) > c_local_extended_mime.tst
+	$(CPP) -P -DIMAP -DEXTENDED $(TEST2) > c_imap_extended_mime.tst

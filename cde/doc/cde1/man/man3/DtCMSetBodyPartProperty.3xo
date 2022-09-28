@@ -1,0 +1,76 @@
+.TH DtCMSetBodyPartProperty 3 "17 January 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH "NAME"
+DtCMSetBodyPartProperty \- set properties for a body part
+.SH "SYNOPSIS"
+.yS
+#include <Bento/DtCM.h>
+.sp 0.5v
+.ta \w'void DtCMSetBodyPartProperty('u
+void DtCMSetBodyPartProperty(DtCMBodyPart *\f2body_part\fP,
+	CMEnv *\f2error\fP,
+	CMGlobalName \f2property\fP,
+	CMGlobalName \f2type_name\fP,
+	CMPtr \f2data\fP,
+	CMSize \f2data_size\fP);
+.yE
+.SH "DESCRIPTION"
+The
+.Fn DtCMSetBodyPartProperty
+function sets arbitrary properties on a body part.
+.P
+The
+.I body_part
+argument is a body-part structure returned by any of the
+.Fn DtCMGetBodyPart 3,
+.Fn DtCMGetNextBodyPart 3,
+or
+.Fn DtCMNewBodyPart 3
+functions.
+The
+.I error
+argument is a pointer to an error return structure.
+The
+.I property
+argument is the name of the property to set or overwrite.
+If the property already exists, its value is replaced with the new data.
+.P
+The
+.I type_name
+argument is the type of the property value
+and can be any type string.
+The value
+.BR DtCMTypesString
+can be used to indicate a null-terminated
+string of characters.
+The
+.I data
+argument is the value to associate with the data.
+The
+.I data_size
+argument is the size of the data value in bytes.
+.SH "RETURN VALUE"
+The
+.Fn DtCMSetBodyPartProperty
+function returns no value.
+If an error occurs,
+.Fn DtCMSetBodyPartProperty
+sets the major code in the
+.I error
+structure to
+.Cn USER_EXCEPTION ,
+and the application can use the
+.Fn CMRexception_number
+function to determine the minor code.
+See the Error API Appendix in the \*(ZB.
+.SH "SEE ALSO"
+.Fn DtCMGetBodyPart 3,
+.Fn DtCMGetBodyPartProperty 3,
+.Fn DtCMGetNextBodyPart 3,
+.Fn DtCMNewBodyPart 3,
+.Hd Bento/DtCM.h 5;
+.Fn CMRexception_number
+in the \*(ZB.

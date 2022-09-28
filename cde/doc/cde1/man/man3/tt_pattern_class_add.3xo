@@ -1,0 +1,74 @@
+.TH tt_pattern_class_add 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+tt_pattern_class_add \- add a value to the class information for a pattern
+.SH SYNOPSIS
+.yS
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'Tt_status tt_pattern_class_add('u
+Tt_status tt_pattern_class_add(Tt_pattern \f2p\fP,
+	Tt_class \f2c\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn tt_pattern_class_add
+function
+adds a value to the class information for the specified pattern.
+.P
+If the class is
+.Cn TT_REQUEST ,
+the sending process expects a reply to the message.
+.P
+If the class is
+.Cn TT_NOTICE ,
+the sending process does not expect a reply to the
+message.
+.P
+The
+.I p
+argument is a unique handle for a message pattern.
+This handle is returned after
+.Fn tt_pattern_create 3
+is called.
+The
+.I c
+argument indicates whether the receiving process is to
+take action after the message is received.
+The following values are defined:
+.VL 8
+.Lc TT_NOTICE
+.br
+A notice of an event.
+The sender does not want feedback on this message.
+.Lc TT_REQUEST
+.br
+A request for some action to be taken.
+The sender must be notified of progress,
+success or failure, and must receive any return values.
+.LE
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn tt_pattern_class_add
+function returns the status of the operation as one of the following
+.B Tt_status
+values:
+.VL 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_NOMP
+.br
+The
+.Cm ttsession 1
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_POINTER
+.br
+The pointer passed does not point to an object of
+the correct type for this operation.
+.LE
+.SH "SEE ALSO"
+.Hd Tt/tt_c.h 5,
+.Fn tt_pattern_create 3.

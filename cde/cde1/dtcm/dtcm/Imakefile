@@ -1,0 +1,337 @@
+XCOMM
+XCOMM  Imakefile ($TOP/cdesrc/cde1/dtcm/dtcm)
+XCOMM
+XCOMM  @(#)Imakefile 1.3 94/01/10 Copyr 1993 Sun Microsystems, Inc.
+XCOMM
+XCOMM  $Revision: 1.16 $
+XCOMM
+XCOMM  RESTRICTED CONFIDENTIAL INFORMATION:
+XCOMM
+XCOMM  The information in this document is subject to special
+XCOMM  restrictions in a confidential disclosure agreement between
+XCOMM  HP, IBM, Sun, USL, SCO and Univel.  Do not distribute this
+XCOMM  document outside HP, IBM, Sun, USL, SCO, or Univel without
+XCOMM  Sun's specific written approval.  This document and all copies
+XCOMM  and derivative works thereof must be returned or destroyed at
+XCOMM  Sun's request.
+XCOMM
+XCOMM  Copyright 1993 Sun Microsystems, Inc.  All rights reserved.
+XCOMM
+
+    TARGET_DTCM = dtcm
+  TARGET_DELETE = dtcm_delete
+  TARGET_INSERT = dtcm_insert
+  TARGET_LOOKUP = dtcm_lookup
+  TARGET_ADMIN  = dtcm_admin
+  TARGET_EDITOR = dtcm_editor
+       PROGRAMS = $(TARGET_DTCM) \
+                  $(TARGET_DELETE) \
+                  $(TARGET_INSERT) \
+                  $(TARGET_LOOKUP) \
+                  $(TARGET_EDITOR)
+
+   INSTALLFLAGS = $(INSTINCFLAGS)
+
+       INCLUDES = -I. -I../libcsa -I../libDtCmP
+
+XCOMM
+XCOMM  on IBM only, libDtHelp introduces dependency on libiconv
+XCOMM
+#ifdef RsArchitecture
+  SYS_LIBRARIES = -lm -liconv
+#else
+#  SYS_LIBRARIES = -lm
+#endif
+
+       DTCMPLIB = ../libDtCmP/libDtCmP.a
+XCOMM
+XCOMM  Take the DTCMLIB out when libDtCm.so is installed correctly
+XCOMM
+        DTCMLIB = -L../libcsa -lcsa
+#ifdef SunArchitecture
+STD_DEFINES = -DSVR4 -D_XOPEN_VERSION=4 -D_XOPEN_SOURCE -D__EXTENSIONS__
+PROTO_DEFINES=
+
+.KEEP_STATE:
+.PARALLEL:
+        DEPLIBS = $(DEPDTWIDGETLIB) $(DEPDTCMLIB) \
+                  $(DEPTTLIB) $(DEPDTSVCLIB) $(DEPXMLIB) $(DEPXTOOLLIB) \
+                  $(DEPXLIB) $(DTCMPLIB)
+
+LOCAL_LIBRARIES = $(DTWIDGETLIB) $(DTCMPLIB) $(DTCMLIB) $(TTLIB) \
+                  $(DTSVCLIB) $(XMLIB) $(XTOOLLIB) $(XLIB) \
+		  $(THREADS_LIBRARY)
+
+#else
+        DEPLIBS = $(DEPDTWIDGETLIB) $(DEPDTHELPLIB) $(DEPDTCMLIB) \
+                  $(DEPTTLIB) $(DEPDTSVCLIB) $(DEPXMLIB) $(DEPXTOOLLIB) \
+                  $(DEPXLIB) $(DTCMPLIB)
+LOCAL_LIBRARIES = $(DTWIDGETLIB) $(DTHELPLIB) $(DTCMPLIB) $(DTCMLIB) $(TTLIB) \
+                  $(DTSVCLIB) $(XMLIB) $(XTOOLLIB) $(XLIB) 
+#endif /* SunArchitecture */
+
+#if defined(RsArchitecture) || defined(USLArchitecture)
+TTY_LIBRARIES = $(LOCAL_LIBRARIES) $(THREADS_LIBRARY)
+#else 
+TTY_LIBRARIES = \
+		  $(DTSVCLIB) $(DTCMPLIB) $(DTCMLIB) $(XTOOLLIB) $(THREADS_LIBRARY)
+#endif     
+
+        DEFINES = -DSVR4
+
+#ifdef RsArchitecture
+  EXTRA_DEFINES = -DAIX -DI_HAVE_NO_BOOL \
+                  -DSTRCASECMP_NOT_DEFINED -DRS6000 -DNOTHREADS
+EXTRA_LIBRARIES	= -lrpcsvc -lPW -ldiag -lc
+#endif
+
+#ifdef HPArchitecture
+#if (!SharedLibcsa || ARCHIVED_LINK)
+        DTCMLIB = -L../libcsa -Wl,-a,archive -lcsa -Wl,-a,default
+#endif
+  EXTRA_DEFINES = -DHPUX -DS9000 -DI_HAVE_NO_IDENT \
+                  -DI_HAVE_NO_BOOL -DNOTHREADS
+EXTRA_LIBRARIES	= -lrpcsvc -lV3 -lPW -lc
+#endif
+
+
+#ifdef SunArchitecture
+
+#ifndef UseFNS
+#define UseFNS YES
+#endif
+
+#if UseFNS
+FNS_EXTRA_DEFINES = -DFNS
+FNS_EXTRA_LIBS =
+#endif
+
+  EXTRA_DEFINES = $(FNS_EXTRA_DEFINES) -D_POSIX_C_SOURCE=199506L -DPTHREAD
+EXTRA_CCOPTIONS = -xstrconst -v -mt
+EXTRA_LIBRARIES = -i -lsocket -lnsl $(WIDECHARSYSLIB) $(I18NSYSLIB) -ldl $(FNS_EXTRA_LIBS)
+THREADS_LIBRARY = -lpthread -lthread
+
+
+#endif /* SunArchitecture */
+
+#if defined(USLArchitecture)
+  EXTRA_LIBRARIES = -lsocket -lnsl -ldl -lgen -lresolv -lw
+#endif
+
+MSGFILES	=	dtcm.msg
+CATFILES	=	$(MSGFILES:.msg=.cat)
+
+         SRCS = \
+                MonthPanel.c \
+                about.c \
+                alarm.c \
+                blist.c \
+                browser.c \
+                calendarA.c \
+                cm_i18n.c \
+                cmtt.c \
+                datefield.c \
+                dayglance.c \
+                deskset.c \
+                dnd.c \
+                dssw.c \
+                editor.c \
+                find.c \
+                font.c \
+                fns.c \
+                format.c \
+                goto.c \
+                graphics.c \
+                group_editor.c \
+                help.c \
+                icon.c \
+                misc.c \
+                monthglance.c \
+		print.c \
+                props.c \
+                props_pu.c \
+                ps_graphics.c \
+                reminders.c \
+                rfp.c \
+                select.c \
+                session.c \
+		submit.c \
+                tempbr.c \
+		thread.c \
+		timezone.c \
+                todo.c \
+                weekglance.c \
+                yearglance.c
+
+  SRCS_DELETE = \
+                cm_delete.c
+
+  SRCS_INSERT = \
+                cm_insert.c
+
+  SRCS_LOOKUP = \
+                cm_lookup.c
+
+  SRCS_ADMIN = \
+                cm_admin.c
+
+  SRCS_EDITOR = \
+                datefield.c \
+                deskset.c \
+                dssw.c \
+                dtcm_editor.c \
+                help.c \
+                misc.c \
+                reminders.c \
+                rfp.c
+
+         OBJS = \
+                MonthPanel.o \
+                about.o \
+                alarm.o  \
+                blist.o  \
+                browser.o \
+                calendarA.o \
+                cm_i18n.o \
+                cmtt.o  \
+                datefield.o \
+                dayglance.o \
+                deskset.o \
+                dnd.o  \
+                dssw.o  \
+                editor.o \
+                find.o  \
+                font.o  \
+                fns.o  \
+                format.o \
+                goto.o  \
+                graphics.o \
+                group_editor.o \
+                help.o  \
+                icon.o \
+                misc.o  \
+                monthglance.o \
+		print.o \
+                props.o \
+                props_pu.o \
+                ps_graphics.o \
+                reminders.o \
+                rfp.o  \
+                select.o \
+                session.o \
+		submit.o \
+                tempbr.o \
+		thread.o \
+		timezone.o \
+                todo.o  \
+                weekglance.o \
+                yearglance.o
+
+  OBJS_DELETE = \
+                cm_delete.o
+
+  OBJS_INSERT = \
+                cm_insert.o
+
+  OBJS_LOOKUP = \
+                cm_lookup.o
+
+  OBJS_ADMIN = \
+                cm_admin.o
+
+  OBJS_EDITOR = \
+                datefield.o \
+                deskset.o \
+                dssw.o \
+                dtcm_editor.o \
+                help.o \
+                misc.o \
+                reminders.o \
+                rfp.o
+
+      HEADERS = \
+                MonthPanel.h \
+                MonthPanelP.h \
+                alarm.h \
+                blist.h \
+                browser.h \
+                calendar.h \
+                cm_i18n.h \
+                cmtt.h \
+                common.h \
+                datefield.h \
+                dayglance.h \
+                deskset.h \
+                dnd.h  \
+                dssw.h  \
+                editor.h \
+		fallback.h \
+                find.h  \
+                format.h \
+                gettext.h \
+                goto.h  \
+                group_editor.h \
+                help.h  \
+                misc.h  \
+                monthglance.h \
+		print.h \
+                props_pu.h \
+                ps_graphics.h \
+                reminders.h \
+                revision.h \
+                rfp.h  \
+                select.h \
+                session.h \
+                tempbr.h \
+		thrdefs.h \
+		timezone.h \
+                todo.h \
+                weekglance.h \
+                yearglance.h
+
+        ICONS = \
+                busy.icon \
+                cmgr.icon \
+                cmgrmask.icon \
+                compose.icon \
+                compose.mask.icon \
+                contract_xbm \
+                drag_mask_xbm \
+                drag_xbm \
+                expand_xbm \
+                icon_pixmap_xbm \
+                postup_xbm \
+                xm_error_xbm \
+                xm_information_xbm \
+                xm_question_xbm \
+                xm_warning_xbm
+
+NormalLibraryObjectRule()
+
+all:: $(PROGRAMS) $(CATFILES)
+
+dtcm.cat : dtcm.msg
+	gencat dtcm.cat dtcm.msg
+
+#ifndef SunArchitecture
+DependTarget()
+#else
+depend:
+lint:
+#endif
+
+NormalProgramTarget($(TARGET_DTCM), $(OBJS), \
+	/**/, $(LOCAL_LIBRARIES), /**/)
+NormalProgramTarget($(TARGET_DELETE), $(OBJS_DELETE), \
+	/**/, $(TTY_LIBRARIES), /**/)
+NormalProgramTarget($(TARGET_INSERT), $(OBJS_INSERT), \
+	/**/, $(TTY_LIBRARIES), /**/)
+NormalProgramTarget($(TARGET_LOOKUP), $(OBJS_LOOKUP), \
+	/**/, $(TTY_LIBRARIES), /**/)
+#NormalProgramTarget($(TARGET_ADMIN), $(OBJS_ADMIN), \
+	/**/, $(TTY_LIBRARIES), /**/)
+NormalProgramTarget($(TARGET_EDITOR), $(OBJS_EDITOR), \
+	/**/, $(LOCAL_LIBRARIES), /**/)
+
+clean::
+	$(RM) $(CATFILES)

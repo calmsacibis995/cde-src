@@ -1,0 +1,77 @@
+'\" t
+.de LI
+.\" simulate -mm .LIs by turning them into .TPs
+.TP \\n()Jn
+\\$1
+..
+.\"--- 
+.\"    (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\"    (c) Copyright 1993, 1994 International Business Machines Corp.
+.\"    (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\"    (c) Copyright 1993, 1994 Novell, Inc.
+.\"--- 
+.TH dtdspmsg 1X "15 May 1995"
+.BH "15 May 1995""
+.SH NAME
+dtdspmsg - Displays a selected message from a message catalog.
+.SH SYNOPSIS
+.B dtdspmsg
+[
+.BI \-s " SetNumber"
+]
+.B \CatalogName MessageNumber
+[
+.B \ 'DefaultMessage' [ Arguments ] ]
+.SH DESCRIPTION
+The dtdspmsg command displays either the text of a particular
+message from a message catalog generated with the gencat command
+or, if the message cannot be retrieved, a default message supplied
+as a parameter to the command.  The dtdspmsg command directs the
+message  to standard output.  This command is intended  for  use
+in shell scripts as a replacement for the echo command.
+
+.P
+The NLSPATH environment variable and the LC_MESSAGES category are
+used to find the specified message catalog if no / (slash) characters
+are used in the value of the CatalogName parameter.  If the catalog
+named by the CatalogName parameter is not found or if the message
+named by the MessageNumber parameter (and optional SetNumber value)
+is not found, then the supplied DefaultMessage value is displayed.
+If a DefaultMessage value is not specified, a system-generated
+error message is displayed.
+
+.P
+The dtdspmsg command allows up to ten string arguments to be
+substituted into the message if it contains the %s, %n$s, %ld, or
+%n$ld printf subroutine conversion specification.  Missing arguments
+for conversion specifications result in a dtdspmsg error message.
+Normal printf subroutine control character escapes (for
+example, \\n) are recognized.
+
+.P
+The use of printf subroutine format strings is recommended in the
+catalog.  This format provides for correct insertion of arguments
+even if the format strings in the message are in a different order
+than the  default  message.  You must enclose the default message
+in single quotation marks if using the %n$s notation for message
+inserts.
+
+.SH OPTIONS
+.BI \-s " SetNumber"
+.B "  Specifies an optional set number.  The default value for
+.I "SetNumber "
+.B is 1.
+
+
+.SH EXAMPLES
+.SS "dtdspmsg -s 1 test.cat 2 'message %s not found' 2"
+Display set number 1, message number 2 of the test.cat catalog.
+If the message is not found, 'message 2 not found' is displayed.
+
+.SH FILE
+.B /usr/dt/bin/dtdspmsg "  This is the executable for the CDE display
+message utility.
+
+.SH "SEE ALSO"
+.na
+.BR catgets(3C)

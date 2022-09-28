@@ -1,0 +1,75 @@
+			
+			     LIFE CYCLE of an AB Object
+
+
+      libABobj		       libABobjXm			 ab
+ -----------------	-------------------------	  ----------------
+						 	1) Drag out object...
+								  |
+        -----------------------------------------------------------
+	|
+	v
+2) Alloc new object: 
+   obj_create()
+	|
+	|
+	v
+3) Parent new object:
+   obj_append_child()
+	|
+	------------------------------------------------------------
+			    					   |
+								   v
+			     				 4) Initialize object
+							  (set default fields):
+							   pal_initialize_obj()
+								   |
+				   ---------------------------------
+				   |
+				   v
+			5) XmConfigure object:
+			   objxm_configure_tree()
+				   |
+				   |
+				   v	
+			6) Instantiate object:
+			   objxm_fully_instantiate_tree()
+				   |
+				   --------------------------------
+								   |
+								   v
+							7) Set build-actions
+							      on object:
+							   abobj_set_build_mode()
+								   |
+				   ---------------------------------
+				   |
+				   v
+			8) Map object:
+			   objxm_map_tree()
+				   |
+				   |
+				   ---------------------------------
+								   |
+								   v
+							9) Edit object props:
+							   abobj_set_*()
+								   |
+				   ---------------------------------
+				   |
+				   v
+			10) Instantiate object Prop edits:
+			   objxm_instantiate_changes()
+				   |
+	  --------------------------
+	  |
+	  v
+11) Destroy object:
+    obj_destroy()
+	  |	   callback->
+	   -------------------------
+				   | 
+				   v
+			12) Destroy object's widgets:
+			    objxmP_destroy()
+

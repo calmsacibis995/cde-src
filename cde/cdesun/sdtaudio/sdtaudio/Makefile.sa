@@ -1,0 +1,55 @@
+MACHINE.sh = /usr/bin/mach
+MACHINE = ${MACHINE.sh:sh}
+
+PURIFY = purify
+
+FLAGS = -g -D${MACHINE} -mt -D__EXTENSIONS__
+CFLAGS = -Xc -v ${FLAGS}
+LDFLAGS = -lm -xildoff
+
+OUTPUT_OPTION = -o $@
+
+ARCHDIR = bin-$(MACHINE)
+
+all:: $(ARCHDIR)
+
+all:: $(ARCHDIR)/saplay $(ARCHDIR)/safiletest $(ARCHDIR)/sarecord
+
+$(ARCHDIR)/%.o: %.c
+	$(COMPILE.c) $(OUTPUT_OPTION) $<
+
+$(ARCHDIR):
+	-mkdir $@
+
+%.ll:%.c
+	$(COMPILE.c) -Zll $(OUTPUT_OPTION) $<
+
+CC: all
+
+CC:= CC = CC +w2
+CC:= CFLAGS = ${FLAGS}
+
+
+SASRCS = sa.c safile.c g711.c
+
+SAOBJS = $(SASRCS:%.c=$(ARCHDIR)/%.o)
+
+$(ARCHDIR)/saplay.pure: $(SAOBJS) $(ARCHDIR)/saplay.o
+	$(PURIFY) $(LINK.c) -o $@ $(ARCHDIR)/saplay.o $(SAOBJS) $(LDFLAGS)
+
+$(ARCHDIR)/saplay: $(SAOBJS) $(ARCHDIR)/saplay.o
+	$(LINK.c) -o $@ $(ARCHDIR)/saplay.o $(SAOBJS) $(LDFLAGS)
+
+$(ARCHDIR)/safiletest: $(SAOBJS) $(ARCHDIR)/safiletest.o
+	$(LINK.c) -o $@ $(ARCHDIR)/safiletest.o $(SAOBJS) $(LDFLAGS)
+
+$(ARCHDIR)/sarecord: $(SAOBJS) $(ARCHDIR)/sarecord.o
+	$(LINK.c) -o $@ $(ARCHDIR)/sarecord.o $(SAOBJS) $(LDFLAGS)
+
+$(ARCHDIR)/sarecord.pure: $(SAOBJS) $(ARCHDIR)/sarecord.o
+	$(PURIFY) $(LINK.c) -o $@ $(ARCHDIR)/sarecord.o $(SAOBJS) $(LDFLAGS)
+
+lock_lint: $(SASRCS:%.c=%.ll) saplay.ll sarecord.ll safiletest.ll
+
+.KEEP_STATE:
+.KEEP_STATE_FILE:.make.state.sa

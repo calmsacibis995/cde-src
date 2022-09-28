@@ -1,0 +1,265 @@
+<chapter id=UsingTermEmulators>dtterm Tasks
+
+<list bullet tight>
+*<xref StartStopTerminalEmulatorSI>
+*<xref XTClosingTerminalTA>
+*<xref CutPasteTextTA>
+*<xref ResizeTerminalWindowTA>
+*<xref XTRunningClientsTA>
+*<xref rlogin>
+<\list>
+
+<s1 id=StartStopTerminalEmulatorSI>Starting dtterm
+
+There are several ways you can start a &ProductName; ``dtterm'' terminal
+emulator:
+
+<list bullet tight>
+* From the Front Panel
+* From File Manager
+* From a command in an existing terminal window
+* From Application Manager
+* From New in the ``dtterm'' Window pulldown menu
+<\list>
+
+<!--s2 id=XTUsingTerminalControlTA-->
+<procedure>To Start dtterm from the Front Panel
+
+     <idx|starting: terminal emulator|
+     <idx|closing: terminal emulator|
+     <idx|Terminal: button|
+     <idx|button: Terminal|
+
+The terminal control is located in the Personal Applications subpanel.
+In the following figure the terminal control
+is highlighted by a red circle.
+
+<figure nonumber entity=fptermOL>
+<\figure>
+
+<list bullet>
+* Click the terminal control.  The busy light blinks indicating that
+the terminal is being activated.
+*The ``dtterm'' window appears after a short time.
+<\list>
+
+<!-- s2 id=ToStartATerminalFromFileManagerTA -->
+<procedure>To Start dtterm from File Manager
+
+<list bullet>
+
+* Choose Open Terminal from the File menu.
+
+<\list>
+
+<figure nonumber entity=fmgrtermOL>
+<\figure>
+
+This opens ``dtterm'' with the same current directory
+as the File Manager view. 
+
+
+<!-- s2 id=XTStartingTermFromCommandLineTA -->
+<procedure>To Start  a Terminal Emulator Other Than dtterm
+To use a terminal emulator other than
+``dtterm'',
+start it from a command line in an
+existing terminal emulator window.
+
+<list bullet tight>
+*At the command line prompt, type the name of the terminal emulator and
+any options you want.  For example, to start ``xterm'', enter:
+
+<ex>
+xterm  [%%options%%] &&
+<\ex>
+
+<lablist>
+\%%options%%\	represents optional items to customize the terminal emulator.
+\``&''\	     	specifies that the terminal emulator runs in the background
+				so you can continue working in your
+				original window while the terminal emulator is 
+				running.
+		
+<\lablist>
+
+The terminal emulator starts in the current workspace
+unless directed otherwise by options. 
+<\list>
+
+<procedure>To Start dtterm from the Window Menu
+<list bullet tight>
+*Choose New from the Window menu in an existing ``dtterm'' window.
+A duplicate ``dtterm'' window appears.
+<\list>
+
+<procedure>Examples
+
+The following command starts a ``dtterm'' window in the workspace ``Project
+Notes'':
+
+<ex>
+dtterm -xrm '*workspaceList: "Project Notes"' &&
+<\ex>
+
+The following command starts a ``dtterm'' window on a screen on the system
+named "lgmcd":
+
+<ex>
+dtterm -display lgmcd:0.1 &&
+<\ex>
+
+<procedure>See Also
+
+<list tight bullet>
+* Refer to the <link dtterm1x>``dtterm (1X)''<\link> man page for details
+about the options available for ``dtterm''.
+<\list>
+
+
+<s1 id=XTClosingTerminalTA>To Close dtterm
+     <idx|closing: ``dtterm''|
+     <idx|window menu: button|
+
+<list order tight>
+* Type ``exit'' at the command line and press Return.
+* !!Or!!, Choose Exit from the Window menu.
+* !!Or!!, choose Close from the window 
+menu pulldown menu (accessed from the button at the upper left corner of
+the window manager frame).
+<\list>
+
+<note>
+Typing ``exit'' at the command line is the preferred method of
+closing ``dtterm''.  Closing it through the menus doesn't terminate
+any background
+processes you started from ``dtterm'', which can sometimes cause
+problems.
+<\note>
+
+<s1 id=CutPasteTextTA>To Copy and Paste Text
+
+     <idx|cutting: text|
+     <idx|pasting: text|
+     <idx|text: cutting and pasting|
+
+<procedure>To Copy Text
+<list order>
+*Using mouse button 1,
+drag the pointer over the text you want to copy.  The text appears 
+highlighted. 
+*Release mouse button 1 after all the text you want
+to copy is highlighted.
+<\list>
+
+The text is not 
+removed from its original position.
+
+<procedure>To Paste Text
+<list order>
+*Position the cursor where you want to insert the text.
+*Click mouse button 2.
+<\list>
+
+A copy of the current selection is pasted at the location you
+indicated.  You can paste additional copies by repeating the above steps.
+
+<newpage>
+
+<s1 id=ResizeTerminalWindowTA>To Resize the Window Contents
+
+     <idx|resizing window|
+     <idx|``resize'' function|
+
+
+When you change the size of a terminal emulator window, applications running in the
+window may not know about the resizing.  Use this procedure to resize the
+application's output.
+
+<list bullet>
+*At the command-line prompt type:
+<ex>
+eval `resize`
+<\ex>
+<\list>
+
+<s1 id=XTRunningClientsTA>To Start Applications in a dtterm Window
+
+<list bullet>
+* Enter the  command to start the application at the command line prompt.
+<\list>
+
+The general syntax for starting an application is:
+
+<ex>
+%%application%% [%%options%%] &&
+<\ex>
+
+<lablist>
+\%%application%%\The application name.
+
+\%%options%%\	a list of optional information to be passed to the
+		application.
+
+\``&''\		specifies that the application runs in the background so
+		you can continue to use the terminal emulator window
+		while the application is running.
+<\lablist>
+
+<procedure>Example
+To start a digital clock from the command line:
+<ex>
+xclock -digital &&
+<\ex>
+
+
+<procedure>See Also
+<list tight bullet>
+*Refer to the man page or other documentation for each application to
+find the command and options to use for that application.
+<\list>
+
+<s1 id=rlogin>To Log On to a Remote System
+<procedure>Using rlogin
+Use the ``rlogin'' command in an existing terminal emulator window to log
+in to a remote host.
+Once the window is acting as a terminal to the remote host, you can run
+applications there, redirecting the display back to your system if you
+desire.
+
+<procedure>Example
+The following command logs onto a system named ``there'', runs
+the client ``xload'', and redirects the display back to your original 
+system.  Assume your system is named ``here''.
+<ex>
+rlogin there
+xload -display here:0
+<\ex>
+
+<procedure>Using remsh
+
+The ``remsh'' command starts a shell on a remote host, performs some
+client (often starting a terminal emulator on that host), and redirects the
+display back to your original system if desired.
+The syntax is:
+<ex>
+remsh %%remote%% -n %%client%% -display %%system:display[.screen]%%
+<\ex>
+where:
+<lablist width=1.5in>
+\%%remote%%\   The remote host name
+\%%client%%\   The program you want to run on the remote host
+\%%system:display[.screen]%%\  The host and display on which the results
+are to be displayed.
+
+<\lablist>
+
+<procedure>Example
+The following command runs ``xload'' on the remote host named
+``there'', and directs output back to your system, ``here''.
+<ex>
+remsh there -n /usr/bin/X11/xload -display here:0.0 &
+<\ex>
+
+The ``remsh'' command is often used when customizing a menu to access other
+hosts.

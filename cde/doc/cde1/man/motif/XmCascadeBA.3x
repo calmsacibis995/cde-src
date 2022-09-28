@@ -1,0 +1,433 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH XmCascadeButton 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmCascadeButton\fP \- The CascadeButton widget class
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/CascadeB.h>
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+CascadeButton links two MenuPanes or a MenuBar to a MenuPane.
+.PP 
+It is used in menu systems and must have a RowColumn parent
+with its \fIXmNrowColumnType\fP resource set to \fIXmMENU_BAR\fP,
+\fIXmMENU_POPUP\fP or \fIXmMENU_PULLDOWN\fP.
+.PP 
+It is the only widget that can have a Pulldown MenuPane attached to it as
+a submenu.  The submenu is displayed when this widget is activated within
+a MenuBar, a PopupMenu, or a PulldownMenu.  Its visuals can
+include a label or pixmap and a cascading indicator when it is in a
+Popup or Pulldown MenuPane; or, it can include only a label or a pixmap
+when it is in a MenuBar.
+.PP 
+The default behavior associated with a CascadeButton depends on the type
+of menu system in which it resides.
+By default, \fIBSelect\fP controls the behavior of the CascadeButton.
+In addition, \fIBMenu\fP controls the behavior of the CascadeButton if
+it resides in a Menu system.
+The actual mouse button used is determined by its RowColumn parent.
+.PP 
+A CascadeButton's visuals differ from most other button gadgets.  When the
+button
+becomes armed, its visuals change from a 2-D to a 3-D look, and it displays
+the submenu that has been attached
+to it.  If no submenu is attached, it simply changes its visuals.
+.PP 
+When a CascadeButton within a Pulldown or Popup MenuPane
+is armed as the result of the user
+moving the mouse pointer into the widget, it does not immediately display its
+submenu.  Instead, it waits a short amount of time to see if the arming
+was temporary (that is, the user was simply passing through the widget), or
+whether the user really wanted the submenu posted.  This time delay is
+configurable via \fIXmNmappingDelay\fP.
+.PP 
+CascadeButton provides a single mechanism for
+activating the widget from the keyboard.  This mechanism is referred to as
+a keyboard mnemonic.
+If a mnemonic has been
+specified for the widget, the user may activate the CascadeButton
+by simply typing the mnemonic while the CascadeButton is visible.
+If the CascadeButton is in a MenuBar and the MenuBar does not have the
+focus, the \fIMAlt\fP modifier must be
+pressed with the mnemonic.
+Mnemonics are typically used to interact with a menu
+via the keyboard interface.
+.PP 
+If in a Pulldown or Popup MenuPane and there is a submenu attached, the
+\fIXmNmarginBottom\fP, \fIXmNmarginLeft\fP, \fIXmNmarginRight\fP, and
+\fIXmNmarginTop\fP resources may
+enlarge to accommodate \fIXmNcascadePixmap\fP.
+\fIXmNmarginWidth\fP defaults
+to 6 if this
+resource is in a MenuBar; otherwise, it takes Label's default, which
+is 2.
+.SS "Classes"
+CascadeButton inherits behavior and resources from \fICore\fP,
+\fIXmPrimitive\fP, and \fIXmLabel\fP classes.
+.PP 
+The class pointer is \fIxmCascadeButtonWidgetClass\fP.
+.PP 
+The class name is \fIXmCascadeButton\fP.
+.SS "New Resources"
+The following table defines a set of widget resources used by the programmer
+to specify data.  The programmer can also set the resource values for the
+inherited classes to set attributes for this widget.  To reference a
+resource by name or by class in a .Xdefaults file, remove the \fIXmN\fP or
+\fIXmC\fP prefix and use the remaining letters.  To specify one of the defined
+values for a resource in a .Xdefaults file, remove the \fIXm\fP prefix and use
+the remaining letters (in either lowercase or uppercase, but include any
+underscores between words).
+The codes in the access column indicate if the given resource can be
+set at creation time (C),
+set by using \fIXtSetValues\fP (S),
+retrieved by using \fIXtGetValues\fP (G), or is not applicable (N/A).
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmCascadeButton Resource Set
+Name	Class	Type	Default	Access
+_
+XmNactivateCallback	XmCCallback	XtCallbackList	NULL	C
+XmNcascadePixmap	XmCPixmap	Pixmap	dynamic	CSG
+XmNcascadingCallback	XmCCallback	XtCallbackList	NULL	C
+XmNmappingDelay	XmCMappingDelay	int	180 ms	CSG
+XmNsubMenuId	XmCMenuWidget	Widget	NULL	CSG
+.TE
+.KE
+.in
+.sp 1
+.IP "\fIXmNactivateCallback\fP"
+Specifies the list of callbacks that is called
+when the user activates the CascadeButton widget,
+and there is no submenu attached to pop up.  The activation occurs by
+releasing a mouse button
+or by typing the mnemonic associated with the widget.  The specific mouse
+button depends on information in the RowColumn parent.  The reason
+sent by the callback is \fIXmCR_ACTIVATE\fP.
+.IP "\fIXmNcascadePixmap\fP"
+Specifies the cascade pixmap displayed on one end of the widget when
+a CascadeButton is used within a Popup or Pulldown MenuPane and a submenu
+is attached.
+The Label class resources \fIXmNmarginBottom\fP, \fIXmNmarginLeft\fP,
+\fIXmNmarginRight\fP, and \fIXmNmarginTop\fP may be modified to ensure
+that room is left for the cascade pixmap.
+The default cascade pixmap is an arrow pointing to the side of the menu
+where the submenu will appear.
+.IP "\fIXmNcascadingCallback\fP"
+Specifies the list of callbacks that is called
+just prior to the mapping of the submenu associated with
+CascadeButton.  The reason sent by the callback is \fIXmCR_CASCADING\fP.
+.IP "\fIXmNmappingDelay\fP"
+Specifies the amount of time, in milliseconds, between when a CascadeButton
+becomes armed and when it maps its submenu.  This delay is used only when
+the widget is within a Popup or Pulldown MenuPane.
+The value must not be negative.
+.IP "\fIXmNsubMenuId\fP"
+Specifies the widget ID for the Pulldown MenuPane to be associated with
+this CascadeButton.  The specified MenuPane is displayed
+when the CascadeButton becomes armed.  The MenuPane must have been created
+with the appropriate parentage depending on the type of menu used.  See
+\fIXmCreateMenuBar(3X)\fP, \fIXmCreatePulldownMenu(3X)\fP, and
+\fIXmCreatePopupMenu(3X)\fP for more information on the menu systems.
+.SS "Inherited Resources"
+CascadeButton inherits behavior and resources from the following
+superclasses.  For a complete description of each resource, refer to the
+man page for that superclass.
+.P 
+.wH
+.in 0 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmLabel Resource Set
+Name	Class	Type	Default	Access
+_
+XmNaccelerator	XmCAccelerator	String	NULL	N/A
+XmNacceleratorText	XmCAcceleratorText	XmString	NULL	N/A
+XmNalignment	XmCAlignment	unsigned char	dynamic	CSG
+XmNfontList	XmCFontList	XmFontList	dynamic	CSG
+XmNlabelInsensitivePixmap	XmCLabelInsensitivePixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNlabelPixmap	XmCLabelPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNlabelString	XmCXmString	XmString	dynamic	CSG
+XmNlabelType	XmCLabelType	unsigned char	XmSTRING	CSG
+XmNmarginBottom	XmCMarginBottom	Dimension	dynamic	CSG
+XmNmarginHeight	XmCMarginHeight	Dimension	2	CSG
+XmNmarginLeft	XmCMarginLeft	Dimension	0	CSG
+XmNmarginRight	XmCMarginRight	Dimension	dynamic	CSG
+XmNmarginTop	XmCMarginTop	Dimension	dynamic	CSG
+XmNmarginWidth	XmCMarginWidth	Dimension	dynamic	CSG
+.wH
+.tH
+XmNmnemonic	XmCMnemonic	KeySym	NULL	CSG
+XmNmnemonicCharSet	XmCMnemonicCharSet	String	XmFONTLIST_DEFAULT_TAG	CSG
+XmNrecomputeSize	XmCRecomputeSize	Boolean	True	CSG
+XmNstringDirection	XmCStringDirection	XmStringDirection	dynamic	CSG
+.TE
+.KE
+.in
+.sp 1
+.wH
+.in  
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmPrimitive Resource Set
+Name	Class	Type	Default	Access
+_
+XmNbottomShadowColor	XmCBottomShadowColor	Pixel	dynamic	CSG
+XmNbottomShadowPixmap	XmCBottomShadowPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNforeground	XmCForeground	Pixel	dynamic	CSG
+XmNhelpCallback	XmCCallback	XtCallbackList	NULL	C
+XmNhighlightColor	XmCHighlightColor	Pixel	dynamic	CSG
+XmNhighlightOnEnter	XmCHighlightOnEnter	Boolean	False	CSG
+XmNhighlightPixmap	XmCHighlightPixmap	Pixmap	dynamic	CSG
+XmNhighlightThickness	XmCHighlightThickness	Dimension	0	CSG
+.wH
+.tH
+XmNnavigationType	XmCNavigationType	XmNavigationType	XmNONE	CSG
+XmNshadowThickness	XmCShadowThickness	Dimension	2	CSG
+XmNtopShadowColor	XmCTopShadowColor	Pixel	dynamic	CSG
+XmNtopShadowPixmap	XmCTopShadowPixmap	Pixmap	dynamic	CSG
+XmNtraversalOn	XmCTraversalOn	Boolean	dynamic	G
+XmNunitType	XmCUnitType	unsigned char	dynamic	CSG
+XmNuserData	XmCUserData	XtPointer	NULL	CSG
+.TE
+.KE
+.in
+.sp 1
+.P 
+.wH
+.in 0 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+Core Resource Set
+Name	Class	Type	Default	Access
+_
+XmNaccelerators	XmCAccelerators	XtAccelerators	dynamic	CSG
+XmNancestorSensitive	XmCSensitive	Boolean	dynamic	G
+XmNbackground	XmCBackground	Pixel	dynamic	CSG
+XmNbackgroundPixmap	XmCPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNborderColor	XmCBorderColor	Pixel	XtDefaultForeground	CSG
+XmNborderPixmap	XmCPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNborderWidth	XmCBorderWidth	Dimension	0	CSG
+XmNcolormap	XmCColormap	Colormap	dynamic	CG
+XmNdepth	XmCDepth	int	dynamic	CG
+XmNdestroyCallback	XmCCallback	XtCallbackList	NULL	C
+XmNheight	XmCHeight	Dimension	dynamic	CSG
+XmNinitialResourcesPersistent	XmCInitialResourcesPersistent	Boolean	True	C
+XmNmappedWhenManaged	XmCMappedWhenManaged	Boolean	True	CSG
+XmNscreen	XmCScreen	Screen *	dynamic	CG
+.wH
+.tH
+XmNsensitive	XmCSensitive	Boolean	True	CSG
+XmNtranslations	XmCTranslations	XtTranslations	dynamic	CSG
+XmNwidth	XmCWidth	Dimension	dynamic	CSG
+XmNx	XmCPosition	Position	0	CSG
+XmNy	XmCPosition	Position	0	CSG
+.TE
+.KE
+.in
+.sp 1
+.wH
+.in  
+.SS "Callback Information"
+A pointer to the following structure is passed to each callback:
+.sS
+.iS
+.ta .25i 1.1i
+.nf
+typedef struct
+{
+	int	\fBreason\fI;
+	\fIXEvent	\fB* event\fI;
+} XmAnyCallbackStruct;
+.iE
+.sE
+.wH
+.fi
+.IP "\fBreason\fP"
+Indicates why the callback was invoked.
+.IP "\fBevent\fP"
+Points to the \fIXEvent\fP that triggered the callback or is NULL
+if this callback was not triggered due to an \fIXEvent\fP.
+.SS "Translations"
+XmCascadeButton includes translations from Primitive.
+XmCascadeButton includes the menu traversal translations from XmLabel.
+These translations may not directly correspond to a
+translation table.
+.PP 
+.ne 2i
+Note that altering translations in \fI#override\fP
+or \fI#augment\fP mode is undefined.
+.PP 
+The translations for a CascadeButton in a MenuBar are listed below.
+These translations may not directly correspond to a
+translation table.
+.iS
+.ta 1.5i
+.nf
+BSelect Press:	MenuBarSelect()
+BSelect Release:	DoSelect()
+KActivate:	KeySelect()
+KSelect:	KeySelect()
+KHelp:	Help()
+MAny KCancel:	CleanupMenuBar()
+.wH
+.fi
+.iE
+.PP 
+The translations for a CascadeButton in a PullDown or Popup
+MenuPane are listed below.
+In a menu system, \fIBMenu\fP also performs the \fIBSelect\fP
+actions.
+These translations may not directly correspond to a
+translation table.
+.iS
+.ta 1.5i
+.nf
+BSelect Press:	StartDrag()
+BSelect Release:	DoSelect()
+KActivate:	KeySelect()
+KSelect:	KeySelect()
+KHelp:	Help()
+MAny KCancel:	CleanupMenuBar()
+.wH
+.fi
+.iE
+.SS "Action Routines"
+The XmCascadeButton action routines are described below:
+.IP "\fICleanupMenuBar()\fP:"
+In a MenuBar, disarms the CascadeButton and the menu and,
+when the shell's keyboard focus policy is \fIXmEXPLICT\fP,
+restores
+keyboard focus to the widget that had the focus before the menu was
+entered.
+.P
+.ne 3.5i
+In a toplevel Pulldown MenuPane from a MenuBar, unposts the menu,
+disarms the MenuBar CascadeButton and the MenuBar, and,
+when the shell's keyboard focus policy is \fIXmEXPLICT\fP,
+restores keyboard
+focus to the widget that had the focus before the MenuBar was
+entered.
+In other Pulldown MenuPanes, unposts the menu.
+.P
+In a Popup MenuPane, unposts the menu and,
+when the shell's keyboard focus policy is \fIXmEXPLICT\fP,
+restores keyboard focus to the
+widget from which the menu was posted.
+.IP "\fIDoSelect()\fP:"
+Calls the callbacks in \fIXmNcascadingCallback\fP,
+posts the submenu attached to the CascadeButton and
+enables keyboard traversal within the menu.
+If the CascadeButton does not have a submenu attached,
+calls the callbacks in \fIXmNactivateCallback\fP,
+the CascadeButton is activated and all posted menus in the cascade are
+unposted.
+.IP "\fIHelp()\fP:"
+Unposts all menus in the menu hierarchy and,
+when the shell's keyboard focus policy is \fIXmEXPLICT\fP,
+restores keyboard focus to
+the widget that had the focus before the menu system was entered.
+Calls the callbacks for \fIXmNhelpCallback\fP if any exist.
+If there are no help callbacks for this widget, this action calls the
+help callbacks for the nearest ancestor that has them.
+.IP "\fIKeySelect()\fP:"
+Calls the callbacks in \fIXmNcascadingCallback\fP,
+and posts the submenu attached to the CascadeButton if keyboard
+traversal is enabled in the menu.
+If the CascadeButton does not have a submenu attached,
+calls the callbacks in \fIXmNactivateCallback\fP,
+the CascadeButton is activated and all posted menus in the cascade are
+unposted.
+.IP "\fIMenuBarSelect()\fP:"
+Unposts any menus posted by the parent menu.
+Arms both the CascadeButton and the MenuBar,
+posts the associated submenu, and enables mouse traversal.
+If the menu is already active, this event
+disables keyboard traversal for the menu and returns
+the menu to mouse traversal mode.
+.IP "\fIStartDrag()\fP:"
+Arms the CascadeButton, posts the associated submenu, and enables mouse
+traversal.
+If the menu is already active, this event
+disables keyboard traversal for the menu and returns
+the menu to mouse traversal mode.
+.nL
+.ne 5
+.SS "Additional Behavior"
+Posting a submenu calls the \fIXmNcascadingCallback\fP callbacks.
+This widget has the additional behavior described below:
+.IP "\fI<EnterWindow>\fP:"
+If keyboard traversal is enabled does nothing.
+Otherwise, in a MenuBar that is armed,
+unposts any MenuPanes associated with another MenuBar entry,
+arms the CascadeButton, and posts the associated submenu.
+In other menus,
+arms the CascadeButton and posts the associated submenu after
+the delay specified by \fIXmNmappingDelay\fP.
+.IP "\fI<LeaveWindow>\fP:"
+If keyboard traversal is enabled does nothing.
+Otherwise, in a MenuBar that is armed,
+disarms the CascadeButton
+if the submenu associated with the CascadeButton is not currently
+posted or if there is no submenu associated with the CascadeButton.
+.P
+In other menus,
+if the pointer moves anywhere except into a submenu associated with the
+CascadeButton, the CascadeButton is disarmed and its submenu is unposted.
+.SS "Virtual Bindings"
+The bindings for virtual keys are vendor specific.
+For information about bindings for virtual buttons and keys, see \fIVirtualBindings(3X)\fP.
+.SH RELATED INFORMATION
+.na
+\fICore(3X)\fP, \fIXmCascadeButtonHighlight(3X)\fP,
+\fIXmCreateCascadeButton(3X),XmCreateMenuBar(3X)\fP, \fIXmCreatePulldownMenu(3X)\fP,
+\fIXmCreatePopupMenu(3X)\fP,
+\fIXmDisplay(3X)\fP,
+\fIXmLabel(3X)\fP, \fIXmPrimitive(3X)\fP, and \fIXmRowColumn(3X)\fP.
+.ad

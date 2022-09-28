@@ -1,0 +1,375 @@
+
+# create the token that names a test message store object
+
+token create token1
+token set token1 servicetype test
+token set token1 serviceoption messagestorename test.mbx
+# token set token1 serviceoption readonly
+
+# create the connection
+
+connection create
+connection startup
+
+# create the input session
+
+session create input
+session startup input
+
+# create and open a message store on that object
+
+store create input store1
+store startup store1
+store open store1 token1
+
+# this attach should fail with an 'already open' error
+
+store attach store1 token1
+
+# perform operations
+
+store getstatus store1
+store checkfornewmessages store1
+
+# test getflags
+
+store getflags store1 *
+store getflags store1 2:3
+store getflags store1 1
+store getflags store1 4,2
+store getflags store1 4,3,2,1
+
+# test setflags
+
+store setflags store1 1 answered
+store getflags store1 1
+store clearflags store1 1 answered
+store getflags store1 1
+store setflags store1 * answered
+store getflags store1 *
+store clearflags store1 * answered
+store getflags store1 *
+store setflags store1 2,4 answered
+store getflags store1 *
+store clearflags store1 2,4 answered
+store getflags store1 *
+
+# test getheaders
+
+store getheaders store1
+store getheaders store1 * to
+store getheaders store1 * from message-id
+store getheaders store1 2:3 subject
+store getheaders store1 1:2 to subject
+store getheaders store1 1 to
+store getheaders store1 1 from date
+store getheaders store1 1,2 to
+store getheaders store1 3,4 from date nosuch-header
+store getheaders store1 3,2
+
+# these tests should fail as they lookup non-existent headers
+
+store getheaders store1 * bookem-dano
+store getheaders store1 1 nosuch-header
+store getheaders store1 2:3 probably-not there-too
+store getheaders store1 1,4 bad-header-list
+
+# test getheaders with abstract header names
+# "Real" headers: RBCC RCC RDate RFrom RSubject RTo 
+# "Pseudo" headers: PBcc PCc PMessageId PReceivedDate PCc PTo PSender PSentDate PSubject PTo
+
+store getheaders store1 * -a
+store getheaders store1 * -a rdate
+store getheaders store1 * -a rdate rsubject
+store getheaders store1 * -a rbcc rcc rdate rfrom rsubject rto
+store getheaders store1 1 -a rfrom
+store getheaders store1 1 -a rfrom rto rsubject
+store getheaders store1 1:2 -a rfrom
+store getheaders store1 2:3 -a rfrom rto rsubject
+store getheaders store1 1,2 -a rfrom
+store getheaders store1 3,4 -a rfrom rto rsubject
+
+store getheaders store1 * -a
+store getheaders store1 * -a psentdate
+store getheaders store1 * -a psentdate psubject
+store getheaders store1 * -a pbcc pcc pmessageid preceiveddate pcc pto psender psentdate psubject pto
+store getheaders store1 1 -a psender
+store getheaders store1 1 -a psender pto psubject
+store getheaders store1 1:2 -a psender
+store getheaders store1 2:3 -a psender pto psubject
+store getheaders store1 1,2 -a psender
+store getheaders store1 3,4 -a psender pto psubject
+
+# test getheaders with abstract header names returning abstract header values
+
+store getheaders store1 * -A
+store getheaders store1 * -A rdate
+store getheaders store1 * -A rdate rsubject
+store getheaders store1 * -A rbcc rcc rdate rfrom rsubject rto
+store getheaders store1 1 -A rfrom
+store getheaders store1 1 -A rfrom rto rsubject
+store getheaders store1 1:2 -A rfrom
+store getheaders store1 2:3 -A rfrom rto rsubject
+store getheaders store1 1,2 -A rfrom
+store getheaders store1 3,4 -A rfrom rto rsubject
+
+store getheaders store1 * -A
+store getheaders store1 * -A psentdate
+store getheaders store1 * -A psentdate psubject
+store getheaders store1 * -A pbcc pcc pmessageid preceiveddate pcc pto psender psentdate psubject pto
+store getheaders store1 1 -A psender
+store getheaders store1 1 -A psender pto psubject
+store getheaders store1 1:2 -A psender
+store getheaders store1 2:3 -A psender pto psubject
+store getheaders store1 1,2 -A psender
+store getheaders store1 3,4 -A psender pto psubject
+
+# test scannamespace
+
+store scannamespace store1 . %
+store scannamespace store1 . SCCS/%
+store scannamespace store1 /etc auto%
+store scannamespace store1 .. sdm%
+store scannamespace store1 .. sdm%/%.cc
+store scannamespace store1 /foo %/bar
+store scannamespace store1 . %/bar/hum
+
+# test scansubscribednamespace
+
+store addtosubscribednamespace store1 /test/space1/alpha
+store addtosubscribednamespace store1 /test/space1/alpha/name2
+store addtosubscribednamespace store1 /test/space1/alpha/name3
+store addtosubscribednamespace store1 /test/space1/beta
+store addtosubscribednamespace store1 /test/space1/beta/name4
+store addtosubscribednamespace store1 /test/space1/beta/name5
+store addtosubscribednamespace store1 /test/space1/beta/name6
+store scansubscribednamespace store1 /test *
+store scansubscribednamespace store1 /test %
+store scansubscribednamespace store1 /test %/*
+store scansubscribednamespace store1 /test %/%
+store scansubscribednamespace store1 /test %/%/*
+store scansubscribednamespace store1 /test %/%/%
+store scansubscribednamespace store1 /test %/%/%/*
+store scansubscribednamespace store1 /test %/%/%/%
+store scansubscribednamespace store1 /test/space1 %
+store scansubscribednamespace store1 /test/space1 %/%
+store scansubscribednamespace store1 /test/space1 %/%/%
+store scansubscribednamespace store1 /test/space1/alpha %
+store scansubscribednamespace store1 /test/space1/alpha %/%
+store scansubscribednamespace store1 /test/space1/alpha %/%/%
+
+store scansubs store1 /test/space1 %/name%
+
+store removefromsubscribednamespace store1 /test/space1/alpha/name2
+store removefromsubscribednamespace store1 /test/space1/beta/name6
+store scansubscribednamespace store1 /test *
+store removefromsubscribednamespace store1 /test/space1/alpha
+store removefromsubscribednamespace store1 /test/space1/alpha/name3
+store removefromsubscribednamespace store1 /test/space1/beta
+store removefromsubscribednamespace store1 /test/space1/beta/name4
+store removefromsubscribednamespace store1 /test/space1/beta/name5
+store scansubscribednamespace store1 /test *
+
+# test deleting messages
+
+store clearflags store1 * deleted
+store expungedeleted store1
+store getstatus store1
+store getstructure store1 *
+store setflags store1 2 deleted
+store expungedeleted store1
+store getstatus store1
+store getstructure store1 *
+store setflags store1 2,3 deleted
+store expungedeleted store1
+store getstatus store1
+store getstructure store1 *
+store setflags store1 * deleted
+store expungedeleted store1
+store getstatus store1
+store getstructure store1 *
+
+# close the port
+
+store close store1
+store shutdown store1
+store delete store1
+
+# create and open a message store on that object
+
+store create input store2
+store startup store2
+store open store2 token1
+
+# test message interface
+
+message create store2 1 msg1
+message create store2 2 msg2
+message create store2 3 msg3
+message create store2 4 msg4
+message status *
+
+# test getflags
+
+message getflags *
+message getflags msg1
+message getflags msg2
+message getflags msg3
+message getflags msg4
+
+# test setflags
+
+message setflags msg1 answered
+message getflags msg1
+message getflags *
+message clearflags msg1 answered
+message getflags msg1
+message setflags msg2 draft delete
+message getflags msg2
+message getflags *
+message clearflags msg2 draft delete
+message getflags msg2
+message getflags *
+
+# test getbodycount
+
+message getbodycount *
+message getbodycount msg1
+message getbodycount msg2
+message getbodycount msg3
+message getbodycount msg4
+
+# test getstructure
+
+message getstructure *
+message getstructure msg1
+message getstructure msg2
+message getstructure msg3
+message getstructure msg4
+
+# test getheaders
+
+message getheaders msg1
+message getheaders msg2
+message getheaders msg3
+message getheaders msg4
+message getheaders msg1 to
+message getheaders msg1 from message-id
+message getheaders msg2 subject
+message getheaders msg3 to subject
+message getheaders msg4 from date nosuch-header
+
+# these tests should fail as they lookup non-existent headers
+
+message getheaders msg1 bookem-dano
+message getheaders msg2 nosuch-header
+message getheaders msg3 probably-not there-too
+message getheaders msg4 bad-header-list
+
+# test getheaders with abstract header names
+# "Real" headers: RBCC RCC RDate RFrom RSubject RTo 
+# "Pseudo" headers: PBcc PCc PMessageId PReceivedDate PCc PTo PSender PSentDate PSubject PTo
+
+message getheaders msg1 -a
+message getheaders msg1 -a rdate
+message getheaders msg1 -a rdate rsubject
+message getheaders msg1 -a rbcc rcc rdate rfrom rsubject rto
+message getheaders msg2 -a
+message getheaders msg2 -a rfrom
+message getheaders msg2 -a rfrom rto rsubject
+message getheaders msg3 -a
+message getheaders msg3 -a rfrom
+message getheaders msg3 -a rfrom rto rsubject
+message getheaders msg4 -a
+message getheaders msg4 -a rfrom
+message getheaders msg4 -a rfrom rto rsubject
+
+message getheaders msg1 -a psentdate
+message getheaders msg1 -a psentdate psubject
+message getheaders msg1 -a pbcc pcc pmessageid preceiveddate pcc pto psender psentdate psubject pto
+message getheaders msg2 -a psender
+message getheaders msg2 -a psender pto psubject
+message getheaders msg3 -a psender
+message getheaders msg3 -a psender pto psubject
+message getheaders msg4 -a psender
+message getheaders msg4 -a psender pto psubject
+
+# test getheaders with abstract header names returning abstract header values
+
+message getheaders msg1 -A
+message getheaders msg1 -A rdate
+message getheaders msg1 -A rdate rsubject
+message getheaders msg1 -A rbcc rcc rdate rfrom rsubject rto
+message getheaders msg2 -A
+message getheaders msg2 -A rfrom
+message getheaders msg2 -A rfrom rto rsubject
+message getheaders msg3 -A
+message getheaders msg3 -A rfrom
+message getheaders msg3 -A rfrom rto rsubject
+message getheaders msg4 -A
+message getheaders msg4 -A rfrom
+message getheaders msg4 -A rfrom rto rsubject
+
+message getheaders msg1 -A psentdate
+message getheaders msg1 -A psentdate psubject
+message getheaders msg1 -A pbcc pcc pmessageid preceiveddate pcc pto psender psentdate psubject pto
+message getheaders msg2 -A psender
+message getheaders msg2 -A psender pto psubject
+message getheaders msg3 -A psender
+message getheaders msg3 -A psender pto psubject
+message getheaders msg4 -A psender
+message getheaders msg4 -A psender pto psubject
+
+# test getcontents
+
+message getcontents msg1
+message getcontents msg2
+message getcontents msg3
+message getcontents msg4
+
+# close the port
+
+store close store2
+store shutdown store2
+store delete store2
+
+##
+## Test attach
+##
+
+store create input store3
+store startup store3
+store attach store3 token1
+
+# test scannamespace
+
+store scannamespace store3 . %
+store scannamespace store3 . SCCS/%
+store scannamespace store3 /etc auto%
+store scannamespace store3 .. sdm%
+store scannamespace store3 .. sdm%/%.cc
+store scannamespace store3 /foo %/bar
+store scannamespace store3 . %/bar/hum
+
+# this test will fail as the port is not yet open
+
+store getstatus store3
+
+# promote to open and try again
+
+store open store3 token1
+store getstatus store3
+
+# close the port
+
+store close store3
+store shutdown store3
+store delete store3
+
+session shutdown input
+session delete input
+
+connection shutdown
+connection delete
+
+quit

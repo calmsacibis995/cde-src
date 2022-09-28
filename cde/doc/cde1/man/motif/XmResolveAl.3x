@@ -1,0 +1,192 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH XmResolveAllPartOffsets 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmResolveAllPartOffsets\fP \- A function that allows writing of upward-compatible applications and widgets
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/XmP.h>
+.sp \n(PDu
+void XmResolveAllPartOffsets (\fBwidget_class, offset, constraint_offset\fI)
+.ta .5i 1.5i
+.nf
+	WidgetClass	\fBwidget_class\fI;
+	XmOffsetPtr	\fB* offset\fI;
+	XmOffsetPtr	\fB* constraint_offset\fI;
+.wH
+.fi
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+The use of offset records requires two extra global variables per widget
+class.
+The variables consist of pointers to arrays of offsets into the
+widget record and constraint record for each part of the widget
+structure.
+The \fIXmResolveAllPartOffsets\fP function
+allocates the offset records needed by an application to guarantee
+upward-compatible access to widget instance and constraint records by
+applications and widgets.
+These offset records are used by the widget to access all of the
+widget's variables.
+A widget needs to take the following steps:
+.TP
+\(bu
+Instead of creating a resource list, the widget creates an offset
+resource list.
+To help you accomplish this, use the \fIXmPartResource\fP
+structure and the \fIXmPartOffset\fP macro.
+The \fIXmPartResource\fP data structure looks just like a
+resource list, but instead of having
+one integer for its offset, it has two shorts.
+This is put into the class record as if it were a normal resource
+list.  Instead of using \fIXtOffset\fP for the offset, the widget uses
+\fIXmPartOffset\fP.
+.PP
+If the widget is a subclass of the Constraint class and it defines
+additional constraint resources, create an offset resource list for
+the constraint part as well.
+Instead of using \fIXtOffset\fP for the offset,
+the widget uses \fIXmConstraintPartOffset\fP in the constraint resource
+list.
+.oS
+.ta 0.25i 0.5i
+.nf
+XmPartResource resources[] = {
+	{	BarNxyz, BarCXyz, XmRBoolean, sizeof(Boolean),
+		XmPartOffset(Bar,xyz), XmRImmediate, (XtPointer)False } };
+.sp .5
+XmPartResource constraints[] = {
+	{	BarNmaxWidth, BarNMaxWidth,
+          XmRDimension, sizeof(Dimension),
+          XmConstraintPartOffset(Bar,max_width),
+          XmRImmediate, (XtPointer)100 } };
+.oE
+.TP
+\(bu
+Instead of putting the widget size in the class record, the widget puts the
+widget part size in the same field.
+If the widget is a subclass of
+the Constraint class, instead of putting the widget constraint record
+size in the class record, the widget puts the widget constraint part size
+in the same field.
+.TP
+\(bu
+Instead of putting \fIXtVersion\fP in the class record, the widget puts
+\fIXtVersionDontCheck\fP in the class record.
+.TP
+\(bu
+Define a variable, of type \fIXmOffsetPtr\fP, to point to
+the offset record.
+If the widget is a subclass of the Constraint class, define a variable
+of type XmOffsetPtr to point to the constraint offset record.
+These can be part of the widget's class record or separate global
+variables.
+.TP
+\(bu
+In class initialization, the widget calls \fIXmResolveAllPartOffsets\fP,
+passing it pointers to the class record, the address of the offset
+record, and the address of the constraint offset record.
+If the widget not is a subclass of the Constraint class, it should pass
+NULL as the address of the constraint offset record.
+This does several things:
+.PP
+Adds the superclass (which, by definition, has already been initialized)
+size field to the part size field
+.PP
+If the widget is a subclass of the Constraint class, adds the superclass
+constraint size field to the constraint size field
+.PP
+Allocates an array based upon the number of superclasses
+.PP
+If the widget is a subclass of the constraint class, allocates an array
+for the constraint offset record
+.PP
+Fills in the offsets of all the widget parts and constraint parts with
+the appropriate values, determined by examining the size fields of all
+superclass records
+.PP
+Uses the part offset array to modify the offset entries in the resource
+list to be real offsets, in place
+.TP
+\(bu
+The widget defines a constant which will be the index to its part
+structure in the offsets array.
+The value should be 1 greater than
+the index of the widget's superclass.
+Constants defined for all Xm
+widgets can be found in \fIXmP.h\fP.
+.oS
+\&#define BarIndex (XmBulletinBIndex + 1)
+.oE
+.nL
+.ne 10
+.TP
+\(bu
+Instead of accessing fields directly, the widget must always go through
+the offset table.
+The \fIXmField\fP and \fIXmConstraintField\fP macros help you access
+these fields.
+Because the \fIXmPartOffset\fP, \fIXmConstraintPartOffset\fP,
+\fIXmField\fP, and \fIXmConstraintField\fP
+macros concatenate things together, you must ensure that there is no space
+after the part argument.
+For example, the following macros do not work because of the space
+after the part (Label) argument:
+.oS
+XmField(w, offset, Label , text, char *)
+XmPartOffset(Label , text).
+.oE
+Therefore, you must not have any spaces after the part (Label)
+argument, as illustrated here:
+.oS
+XmField(w, offset, Label, text, char *)
+.oE
+.ne 10
+You can define macros for each field to make this easier.
+Assume an integer field \fBxyz\fP:
+.oS
+.ta 0.25i
+.nf
+\&#define BarXyz(w) (*(int *)(((char *) w) + \e
+	offset[BarIndex] + XtOffset(BarPart,xyz)))
+.oE
+.PP
+For constraint field \fBmax_width\fP:
+.oS
+.ta 0.25i
+.nf
+\&#define BarMaxWidth(w) \e
+	XmConstraintField(w,constraint_offsets,Bar,max_width,Dimension)
+.oE
+.PP 
+The parameters for \fIXmResolveAllPartOffsets\fP are defined below:
+.IP "\fBwidget_class\fP"
+Specifies the widget class pointer for the created widget
+.IP "\fBoffset\fP"
+Returns the offset record
+.IP "\fBconstraint_offset\fP"
+Returns the constraint offset record
+.SH "RELATED INFORMATION"
+.na
+\fIXmResolvePartOffsets(3X)\fP.
+.ad

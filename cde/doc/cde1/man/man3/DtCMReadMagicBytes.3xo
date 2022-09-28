@@ -1,0 +1,60 @@
+.TH DtCMReadMagicBytes 3 "17 January 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH "NAME"
+DtCMReadMagicBytes \- retrieve the magic-byte sequence
+.SH "SYNOPSIS"
+.yS
+#include <Bento/DtCM.h>
+.sp 0.5v
+.ta \w'char *DtCMReadMagicBytes('u
+char *DtCMReadMagicBytes(const char *\f2path\fP,
+	CMEnv *\f2error\fP);
+.yE
+.SH "DESCRIPTION"
+The
+.Fn DtCMReadMagicBytes
+function retrieves the magic-byte sequence
+from an existing Cde document container.
+This function returns
+.Cn NULL
+if this container is not created with a handler that supports
+application-specific magic-byte sequences, or if the path does not point at
+a container.
+.P
+The
+.I path
+argument is the path checked for magic bytes.
+The
+.I error
+argument is a pointer to an error return structure.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn DtCMReadMagicBytes
+function returns a magic-byte sequence.
+If an error occurs,
+.Fn DtCMReadMagicBytes
+returns
+.Cn NULL ,
+sets the major code in the
+.I error
+structure to
+.Cn USER_EXCEPTION ,
+and the application can use the
+.Fn CMRexception_number
+function to determine the minor code.
+See the Error API Appendix in the \*(ZB.
+.SH "APPLICATION USAGE"
+The application should use the
+.Fn free 3C
+function to release the returned string.
+.SH "SEE ALSO"
+.Fn DtCMOpen 3,
+.Hd Bento/DtCM.h 5;
+.Fn CMRexception_number
+in the \*(ZB;
+.cde .Fn free 3C.
+.xo .Fn free
+.xo in the \*(ZK.

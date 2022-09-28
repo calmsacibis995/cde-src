@@ -1,0 +1,209 @@
+.TH Dt/Wsm.h 5 "9 Apr 1994"
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994 Novell, Inc.
+.\" *************************************************************************
+.SH NAME
+Dt/Wsm.h \-  workspace manager definintions
+.iX "<Dt/Wsm.h>"
+.iX "workspace manager definintions" "<Dt/Wsm.h>"
+.SH SYNOPSIS
+.yS
+#include <Dt/Wsm.h>
+.yE
+.SH DESCRIPTION
+The 
+.Hd Dt/Wsm.h 
+header defines structures, values, and function prototypes for workspace 
+management services.
+.P
+The \f3DtWsmWorkspaceInfo\fP
+structure contains at least the following members:
+.P
+.ne 6v
+.TS
+.xo  lf5 lf5 lw(4i) .
+.cde lf3 lf2 lw(4i) .
+Atom	workspace	T{
+.na
+Workspace name
+T}
+unsigned long	bg	T{
+.na
+Backdrop background pixel
+T}
+unsigned long	fg	T{
+.na
+Backdrop foreground pixel
+T}
+Atom	backdropName	T{
+.na
+Atomized name for backdrop
+T}
+int	colorSetId	T{
+.na
+Number of color set used
+T}
+char	*pchTitle	T{
+.na
+Title of workspace
+T}
+Window	*backdropWindows	T{
+.na
+List of backdrop windows
+T}
+int	numBackdropWindows	T{
+.na
+Number of windows in the list
+T}
+.TE
+.P
+The \f3DtWsmCBContext\fP structure is opaque.
+Workspace management functions that add
+callbacks to uniquely identify callback functions for later
+removal, return the \f3DtWsmCBContext\fP structure.
+.P
+The callback function, \f3DtWsmChangeProc\fP, takes three arguments.
+The \f2widget\fP argument is the widget to be registered with the callback.
+The \f2aWorkspace\fP argument is the name of the new current workspace (converted to an X atom).
+The \f2client_data\fP argument points to the client data to be registered with the callback.
+The
+.Fn DtWsmAddWorkspaceModifiedCallback
+function takes three arguments.
+The \f2widget\fP argument is a realized widget.
+The \f2ws_change\fP argument is the procedure to be called when
+a workspace is modified.
+The \f2client_data\fP argument points to arbitrary client data to be passed 
+back to \f2ws_change\fP.
+.P
+The following workspace modified callback reason constants are defined:
+.VL 30
+.Lc DtWSM_REASON_ADD
+A new workspace was added.
+.Lc DtWSM_REASON_BACKDROP
+The backdrop for the workspace changed.
+.Lc DtWSM_REASON_CURRENT
+A different workspace was made the current workspace.
+.Lc DtWSM_REASON_DELETE
+A workspace was deleted.
+.Lc DtWSM_REASON_TITLE
+The workspace title changed.
+.LE
+.P
+The following are declared as functions:
+.P
+.yS
+.ta \w'DtWsmCBContext DtWsmAddCurrentWorkspaceCallback('u
+DtWsmCBContext DtWsmAddCurrentWorkspaceCallback(Widget \f2widget\fP,
+	DtWsmWsChangeProc \f2ws_change\fP,
+	Pointer \f2client_data\fP);
+.yE
+.P
+.yS
+.ta \w'void DtWsmAddWorkspaceFunctions('u
+void DtWsmAddWorkspaceFunctions(Display *\f2display\fP,
+	Window \f2window\fP);
+.yE
+.P
+.yS
+.ta \w'void DtWsmRemoveWorkspaceFunctions('u
+void DtWsmRemoveWorkspaceFunctions(Display *\f2display\fP,
+	Window \f2window\fP);
+.yE
+.P
+.yS
+.ta \w'DtWsmCBContext DtWsmAddWorkspaceModifiedCallback('u
+DtWsmCBContext DtWsmAddWorkspaceModifiedCallback(Widget \f2widget\fP,
+	DtWsmWsModifiedProc \f2ws_change\fP,
+	Pointer \f2client_data\fP);
+.yE
+.P
+.yS
+.ta \w'void DtWsmRemoveWorkspaceCallback('u
+void DtWsmRemoveWorkspaceCallback(DtWsmCBContext \f2context\fP);
+.yE
+.P
+.yS
+.ta \w'void DtWsmFreeWorkspaceInfo('u
+void DtWsmFreeWorkspaceInfo(DtWsmWorkspaceInfo *\f2pWsInfo\fP);
+.yE
+.P
+.yS
+.ta \w'Status DtWsmGetCurrentBackdropWindows('u
+Status DtWsmGetCurrentBackdropWindows(Display *\f2display\fP,
+	Window \f2root\fP,
+	Window **\f2ppWins\fP,
+	int *\f2pNumWins\fP);
+.yE
+.P
+.yS
+.ta \w'Status DtWsmGetCurrentWorkspace('u
+Status DtWsmGetCurrentWorkspace(Display *\f2display\fP,
+	Window \f2root\fP,
+	Atom *\f2paWorkspace\fP;
+.yE
+.P
+.yS
+.ta \w'Status DtWsmSetCurrentWorkspace('u
+Status DtWsmSetCurrentWorkspace(Widget \f2widget\fP,
+	Atom \f2aWorkspace\fP);
+.yE
+.P
+.yS
+.ta \w'Status DtWsmGetWorkspaceInfo('u
+Status DtWsmGetWorkspaceInfo(Display *\f2display\fP,
+	Window \f2root\fP,
+	Atom \f2aWs\fP,
+	DtWsmWorkspaceInfo **\f2ppWsInfo\fP);
+.yE
+.P
+.yS
+.ta \w'Status DtWsmGetWorkspaceList('u
+Status DtWsmGetWorkspaceList(Display *\f2display\fP,
+	Window \f2root\fP,
+	Atom **\f2ppaWorkspaces\fP,
+	int *\f2pNumWorkspaces\fP);
+.yE
+.P
+.yS
+.ta \w'Status DtWsmGetWorkspacesOccupied('u
+Status DtWsmGetWorkspacesOccupied(Display *\f2display\fP,
+	Window \f2window\fP,
+	Atom **\f2ppaWs\fP,
+	int *\f2pNumWs\fP);
+.yE
+.P
+.yS
+.ta \w'void DtWsmSetWorkspacesOccupied('u
+void DtWsmSetWorkspacesOccupied(Display *\f2display\fP,
+	Window \f2window\fP,
+	Atom *\f2paWs\fP,
+	int \f2numWs\fP);
+.yE
+.P
+.yS
+.ta \w'void DtWsmOccupyAllWorkspaces('u
+void DtWsmOccupyAllWorkspaces(Display *\f2display\fP,
+	Window \f2window\fP)
+.yE
+.P
+.SH "SEE ALSO"
+.cdes
+.Fn DtWsmAddCurrentWorkspaceCallback 3,
+.Fn DtWsmAddWorkspaceFunctions 3,
+.Fn DtWsmAddWorkspaceModifiedCallback 3,
+.Fn DtWsmFreeWorkspaceInfo 3,
+.Fn DtWsmGetCurrentBackdropWindows 3,
+.Fn DtWsmGetCurrentWorkspace 3,
+.Fn DtWsmGetWorkspaceInfo 3,
+.Fn DtWsmGetWorkspaceList 3,
+.Fn DtWsmGetWorkspacesOccupied 3,
+.Fn DtWsmOccupyAllWorkspaces 3,
+.Fn DtWsmRemoveWorkspaceCallback 3,
+.Fn DtWsmRemoveWorkspaceFunctions 3,
+.Fn DtWsmSetCurrentWorkspace 3,
+.Fn DtWsmSetWorkspacesOccupied 3,
+.cdee
+

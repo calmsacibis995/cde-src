@@ -1,0 +1,559 @@
+.\" $Header: string.3c,v 1.1 94/01/05 10:18:56 dlm_hp_cv Exp $
+.TH string 3C
+.ds )H Hewlett-Packard Company
+.ds ]W HP-UX Release 8.05: June 1991
+.SH NAME
+strcat, strncat, strcmp, strncmp, strcasecmp, strncasecmp, strcpy, strncpy, strdup, strlen, strchr, strrchr, strpbrk, strspn, strcspn, strstr, strrstr, strtok, strcoll, strxfrm, nl_strcmp, nl_strncmp, index, rindex \- character string operations
+.SH SYNOPSIS
+.B "#include <string.h>"
+.br
+.B "#include <strings.h>"
+.P
+.B "char *strcat(char *s1, const char *s2);"
+.P
+.B "char *strncat(char *s1, const char *s2, size_t n);"
+.P
+.B "int strcmp(const char *s1, const char *s2);"
+.P
+.B "int strncmp(const char *s1, const char *s2, size_t n);"
+.P
+.B "int strcasecmp(const char *s1, const char *s2);"
+.P
+.B "int strncasecmp(const char *s1, const char *s2, size_t n);"
+.P
+.B "char *strcpy(char *s1, const char *s2);"
+.P
+.B "char *strncpy(char *s1, const char *s2, size_t n);"
+.P
+.B "char *strdup(const char *s);"
+.P
+.B "size_t strlen(const char *s);"
+.P
+.B "char *strchr(const char *s, int c);"
+.P
+.B "char *strrchr(const char *s, int c);"
+.P
+.B "char *strpbrk(const char *s1, const char *s2);"
+.P
+.B "size_t strspn(const char *s1, const char *s2);"
+.P
+.B "size_t strcspn(const char *s1, const char *s2);"
+.P
+.B "char *strstr(const char *s1, const char *s2);"
+.P
+.B "char *strrstr(const char *s1, const char *s2);"
+.P
+.B "char *strtok(char *s1, const char *s2);"
+.P
+.B "int strcoll(const char *s1, const char *s2);"
+.P
+.B "size_t strxfrm(char *s1, const char *s2, size_t n);"
+.P
+.B "int nl_strcmp(const char *s1, const char *s2);"
+.P
+.B "int nl_strncmp(const char *s1, const char *s2, size_t n);"
+.P
+.B "char *index(const char *s, int c);"
+.P
+.B "char *rindex(const char *s, int c);"
+.SS Remarks:
+All functions except
+.I index
+and
+.I rindex
+are declared in both headers, so only
+one of the two headers needs to be included.
+.P
+The
+functions
+.I index
+and
+.I rindex
+are declared only in
+.RB < strings.h >.
+They and
+.RB < strings.h >
+are provided solely for portability of
+.SM BSD
+applications, and are not recommended for new applications
+where portability is important.
+For portable applications, use
+.RB < string.h >,
+.IR strchr ,
+and
+.I strrchr
+instead.
+.SS Remarks:
+.I index
+and
+.I rindex
+and
+.RB < strings.h >
+are provided solely for portability of
+.SM BSD
+applications, and are not recommended for new applications
+where portability is important.
+For portable applications, use
+.I strchr
+and
+.I strrchr
+instead.
+.SH DESCRIPTION
+The arguments
+.IR s1 ,
+.IR s2 ,
+and
+.I s
+point to strings (arrays of characters terminated by a null byte).
+.PP
+Definitions for all these functions, the type
+.BR size_t ,
+and the constant
+.SM
+.B NULL
+are provided in the
+.RB < string.h >
+header.
+.PP
+.I strcat
+appends a copy of string
+.I s2
+to the end of string
+.IR s1 .
+.I strncat
+appends a maximum of
+.I n
+characters.
+It copies fewer if
+.I s2
+is shorter than
+.I n
+characters.
+Each returns a pointer to the null-terminated result (the value of
+.IR s1 ).
+.PP
+.I strcmp
+compares its arguments and returns an integer less than,
+equal to, or greater than zero, depending on whether
+.I s1
+is lexicographically less than, equal to, or
+greater than
+.IR s2 .
+The comparison of corresponding characters is done as if the
+type of the characters were
+.BR "unsigned char" .
+Null pointer values for
+.I s1
+and
+.I s2
+are treated the same as pointers to empty strings.
+.I strncmp
+makes the same comparison but examines a maximum of
+.I n
+characters
+.RI ( n
+less than or equal to zero yields equality).
+.I strcasecmp
+and
+.I strncasecmp
+are identical in function to
+.I strcmp
+and
+.I strncmp
+respectively, but characters are folded by _tolower() (see
+.IR conv (3C))
+prior to comparison.
+The returned lexicographic difference reflects the folding to lowercase.
+.PP
+.I strcpy
+copies string
+.I s2
+to
+.IR s1 ,
+stopping after the null byte has been copied.
+.I strncpy
+copies exactly
+.I n
+characters, truncating
+.I s2
+or adding null bytes to
+.I s1
+if necessary, until a total of
+.I n
+have been written.
+The result is not null-terminated if the length of
+.I s2
+is
+.I n
+or more.
+Each function returns
+.IR s1 .
+Note that
+.I strncpy
+should not be used to copy
+.I n
+bytes of an arbitrary structure.
+If that structure contains a null byte anywhere,
+.I strncpy
+copies fewer than
+.I n
+bytes from the source to the destination
+and fills the remainder with null bytes.
+Use the
+.I memcpy
+function (described on
+.IR memory (3C))
+to copy arbitrary binary data.
+.PP
+.I strdup
+returns a pointer to a new string which is a
+duplicate of the string to which
+.I s1
+points.
+The space for the new string is obtained using the
+.IR malloc (3C)
+or
+.IR malloc (3X)
+function (depending on which is linked with the program).
+.PP
+.I strlen
+returns the number of characters in
+.IR s ,
+not including the terminating null byte.
+.PP
+.I strchr
+.RI ( strrchr )
+returns a pointer to the first (last) occurrence of character
+.I c
+in string
+.IR s ,
+or a null pointer if
+.I c
+does not occur in the string.
+The null byte terminating a string is considered to be part of the string.
+.I index
+.RI ( rindex )
+is identical to
+.I strchr
+.RI ( strrchr ),
+and is provided solely for portability of
+.SM BSD
+applications.
+.PP
+.I strpbrk
+returns a pointer to the first occurrence in string
+.I s1
+of any character from string
+.IR s2 ,
+or a null pointer if no character from
+.I s2
+exists in
+.IR s1 .
+.PP
+.I strspn
+.RI ( strcspn )
+returns the length of the maximum initial segment of string
+.IR s1 ,
+which consists entirely of characters from (not from) string
+.IR s2 .
+.PP
+.I strstr
+.RI ( strrstr )
+returns a pointer to the first (last) occurrence of string
+.I s2
+in string
+.IR s1 ,
+or a
+.SM NULL
+pointer if
+.I s2
+does not occur in the string.
+If
+.I s2
+points to a string of zero length,
+.I strstr
+.RI ( strrstr )
+returns
+.IR s1 .
+.PP
+.I strtok
+considers the string
+.I s1
+to consist of a sequence of zero or more text tokens
+separated by spans of one or more characters from the separator string
+.IR s2 .
+The first call (with a non-null pointer
+.I s1
+specified) returns a pointer to the first character of the first token,
+and writes a null byte into
+.I s1
+immediately following the returned token.
+The function keeps track of its position in the string
+.I s1
+between separate calls, so that subsequent calls
+made with the first argument a null pointer
+work through the string immediately following that token.
+In this way subsequent calls work through the string
+.I s1
+until no tokens remain.
+The separator string
+.I s2
+can be different from call to call.
+When no token remains in
+.IR s1 ,
+a null pointer is returned.
+.PP
+.I strcoll
+returns an integer greater than, equal to, or less than zero,
+according to whether the string pointed to by
+.I s1
+is greater than, equal to, or less than the string pointed to by
+.IR s2 .
+The comparison is based on strings interpreted as appropriate
+to the program's locale (see Locale below).
+In the ``C'' locale
+.I strcoll
+works like
+.IR strcmp .
+.I nl_strcmp
+is provided for historical reasons only and is equivalent to
+.IR strcoll .
+.IR nl_strncmp ,
+also provided only for historical reasons, makes the same comparisons as
+.IR strcoll ,
+but looks at a maximum of
+.I n
+characters
+.RI ( n
+less than or equal to zero yields equality).
+.PP
+.I strxfrm
+transforms the string pointed to by
+.I s2
+and places the resulting string into the array pointed to by
+.IR s1 .
+The transformation is such that if the
+.I strcmp
+function is applied to two transformed strings,
+it returns a value greater than, equal to, or less than zero,
+corresponding to the result of the
+.I strcoll
+function applied to the same two original strings.
+No more than
+.I n
+bytes are placed into the resulting string,
+including the terminating null character.
+If the transformed string fits in no more than
+.I n
+bytes, the length of the resulting string is returned
+(not including the terminating null character).
+Otherwise the return value is the number of bytes that the
+.I s1
+string would occupy
+(not including the terminating null character),
+and the contents of the array are indeterminate.
+.PP
+.I strcoll
+has better performance with respect to
+.I strxfrm
+in cases where a given string is compared
+to other strings only a few times,
+or where the strings to be compared are long
+but a difference in the strings that determines
+their relative ordering usually comes among the first few characters.
+.I strxfrm
+offers better performance in, for example, a sorting routine where a
+number of strings are each transformed just once and the transformed
+versions are compared against each other many times.
+.SH EXTERNAL INFLUENCES
+.SS Locale
+The
+.SM LC_CTYPE
+category determines the interpretation of the bytes
+within the string arguments to the
+.IR strcoll ,
+.IR strxfrm ,
+.IR nl_strcmp ,
+and
+.I nl_strncmp
+functions as single and/or multi-byte characters.
+It also determines the case conversions to be done for the
+.I strcasecmp
+and
+.I strncasecmp
+functions.
+.PP
+The
+.SM LC_COLLATE
+category determines the collation ordering used by the
+.IR strcoll ,
+.IR strxfrm ,
+.IR nl_strcmp ,
+and
+.I nl_strncmp
+functions.  See
+.IR hpnls (5)
+for a description of supported collation features.
+See
+.IR nlsinfo (1)
+to view the collation used for a particular locale.
+.SS International Code Set Support
+Single- and multi-byte character code sets are supported for the
+.IR strcoll ,
+.IR strxfrm ,
+.IR nl_strcmp ,
+and
+.I nl_strncmp
+functions.
+All other functions support only single-byte character code sets.
+.SH WARNINGS
+The functions
+.IR strcat ,
+.IR strncat ,
+.IR strcpy ,
+.IR strncpy ,
+and
+.I strtok
+alter the contents of the array to which
+.I s1
+points.
+They do not check for overflow of the array.
+.PP
+Null pointers for destination strings cause undefined behavior.
+.PP
+Character movement is performed differently in different implementations,
+so moves involving overlapping source and destination strings may
+yield surprises.
+.PP
+The transformed string produced by
+.I strxfrm
+for a language using an 8-bit code set
+is usually at least twice as large as the original string
+and may be as much four times as large
+(ordinary characters occupy two bytes each in the transformed string,
+1-to-2 characters four bytes,
+2-to-1 characters two bytes per original pair,
+and don't-care characters no bytes).
+Each character of a multi-byte code set (Asian languages)
+occupies three bytes in the transformed string.
+.PP
+For the
+.IR strcoll ,
+.IR strxfrm ,
+.IR nl_strcmp ,
+and
+.I nl_strncmp
+functions, the results are undefined if the languages specified by the
+.SM LC_COLLATE
+and
+.SM LC_CTYPE
+categories use different code sets.
+.SH AUTHOR
+.I string
+was developed by AT&T, HP, and the University of California, Berkeley.
+.SH SEE ALSO
+nlsinfo(1), conv(3C), malloc(3C), malloc(3X), memory(3C), setlocale(3C),
+hpnls(5).
+.SH STANDARDS CONFORMANCE
+.IR nl_strcmp ": XPG2"
+.PP
+.IR nl_strncmp ": XPG2"
+.PP
+.IR strcat ": SVID2, XPG2, XPG3, POSIX.1, FIPS 151-1, ANSI C"
+.PP
+.IR strchr ": SVID2, XPG2, XPG3, POSIX.1, FIPS 151-1, ANSI C"
+.PP
+.IR strcmp ": SVID2, XPG2, XPG3, POSIX.1, FIPS 151-1, ANSI C"
+.PP
+.IR strcoll ": XPG3, ANSI C"
+.PP
+.IR strcpy ": SVID2, XPG2, XPG3, POSIX.1, FIPS 151-1, ANSI C"
+.PP
+.IR strcspn ": SVID2, XPG2, XPG3, POSIX.1, FIPS 151-1, ANSI C"
+.PP
+.IR strdup ": SVID2"
+.PP
+.IR strlen ": SVID2, XPG2, XPG3, POSIX.1, FIPS 151-1, ANSI C"
+.PP
+.IR strncat ": SVID2, XPG2, XPG3, POSIX.1, FIPS 151-1, ANSI C"
+.PP
+.IR strncmp ": SVID2, XPG2, XPG3, POSIX.1, FIPS 151-1, ANSI C"
+.PP
+.IR strncpy ": SVID2, XPG2, XPG3, POSIX.1, FIPS 151-1, ANSI C"
+.PP
+.IR strpbrk ": SVID2, XPG2, XPG3, POSIX.1, FIPS 151-1, ANSI C"
+.PP
+.IR strrchr ": SVID2, XPG2, XPG3, POSIX.1, FIPS 151-1, ANSI C"
+.PP
+.IR strspn ": SVID2, XPG2, XPG3, POSIX.1, FIPS 151-1, ANSI C"
+.PP
+.IR strstr ": XPG3, POSIX.1, FIPS 151-1, ANSI C"
+.PP
+.IR strtok ": SVID2, XPG2, XPG3, POSIX.1, FIPS 151-1, ANSI C"
+.PP
+.IR strxfrm ": XPG3, ANSI C"
+.\"
+.\" index	\fIstrcat\fR, \fIstrncat\fR \- append string 2 to string 1 	 \fBstring(3C)\fR
+.\" index	\fIstrcmp\fR, \fIstrncmp\fR \- compare two strings 	 \fBstring(3C)\fR
+.\" index	\fIstrcpy\fR, \fIstrncpy\fR \- copy string 2 to string 1 	 \fBstring(3C)\fR
+.\" index	\fIstrlen\fR \- determine length of a string 	 \fBstring(3C)\fR
+.\" index	\fIstrchr\fR, \fIstrrchr\fR \- get pointer to character in string 	 \fBstring(3C)\fR
+.\" index	\fIstrpbrk\fR \- find occurrence of character from string 2 in string 1 	 \fBstring(3C)\fR
+.\" index	\fIstrcspn\fR, \fIstrspn\fR \- find length of matching substrings 	 \fBstring(3C)\fR
+.\" index	\fIstrspn\fR, \fIstrcspn\fR \- find length of matching substrings 	 \fBstring(3C)\fR
+.\" index	\fIstrtok\fR \- process string of text tokens 	 \fBstring(3C)\fR
+.\" index	\fIstrstr\fR \- process string of text tokens 	 \fBstring(3C)\fR
+.\" index	\fIstrrstr\fR \- process string of text tokens 	 \fBstring(3C)\fR
+.\" index	\fIstrcoll\fR \- process string of text tokens 	 \fBstring(3C)\fR
+.\" index	\fIstrxfrm\fR \- process string of text tokens 	 \fBstring(3C)\fR
+.\" index	\fInl_strcmp\fR, \fInl_strncmp\fR \- compare strings using language-dependent collation 	 \fBstring(3C)\fR
+.\" index	\fIindex\fR \- \s-1BSD\s+1 portability string routine 	 \fBstring(3C)\fR
+.\" index	\fIrindex\fR \- \s-1BSD\s+1 portability string routine 	 \fBstring(3C)\fR
+.\" index	character string operations 	 \fBstring(3C)\fR
+.\" index	string operations, character 	 \fBstring(3C)\fR
+.\" index	strings, concatenate two 	 \fBstring(3C)\fR
+.\" index	length of string, find 	 \fBstring(3C)\fR
+.\" index	compare two strings 	 \fBstring(3C)\fR
+.\" index	concatenate two strings 	 \fBstring(3C)\fR
+.\"
+.\" toc	\fBstring(3C)\fR:\0\0\fIstrcat\fR, \fIstrncat\fR, \fIstrcmp\fR, \fIstrncmp\fR, \fIstrcpy\fR, \fIstrncpy\fR, \fIstrlen\fR, \fIstrchr\fR,\n\fIstrrchr\fR, \fIstrpbrk\fR, \fIstrspn\fR, \fIstrcspn\fR, \fIstrtok\fR, \fInl_strcmp\fR, \fInl_strncmp\fR 	 character string operations
+.\" toc	\fIstrcat\fR, \fIstrncat\fR:\0\0character string operations 	 see \fBstring(3C)\fR
+.\" toc	\fIstrcmp\fR, \fIstrncmp\fR:\0\0character string operations 	 see \fBstring(3C)\fR
+.\" toc	\fIstrcpy\fR, \fIstrncpy\fR:\0\0character string operations 	 see \fBstring(3C)\fR
+.\" toc	\fIstrlen\fR:\0\0character string operations 	 see \fBstring(3C)\fR
+.\" toc	\fIstrchr\fR, \fIstrrchr\fR:\0\0character string operations 	 see \fBstring(3C)\fR
+.\" toc	\fIstrpbrk\fR:\0\0character string operations 	 see \fBstring(3C)\fR
+.\" toc	\fIstrrstr\fR:\0\0character string operations 	 see \fBstring(3C)\fR
+.\" toc	\fIstrspn\fR, \fIstrcspn\fR:\0\0character string operations 	 see \fBstring(3C)\fR
+.\" toc	\fIstrstr\fR:\0\0character string operations 	 see \fBstring(3C)\fR
+.\" toc	\fIstrtok\fR:\0\0character string operations 	 see \fBstring(3C)\fR
+.\" toc	\fIstrcoll\fR:\0\0character string operations 	 see \fBstring(3C)\fR
+.\" toc	\fIstrxfrm\fR:\0\0character string operations 	 see \fBstring(3C)\fR
+.\" toc	\fInl_strcmp\fR, \fInl_strncmp\fR:\0\0character string operations 	 see \fBstring(3C)\fR
+.\" toc	\fIindex\fR:\0\0\s-1BSD\s+1 portability string routine 	 see \fBstring(3C)\fR
+.\" toc	\fIrindex\fR:\0\0\s-1BSD\s+1 portability string routine 	 see \fBstring(3C)\fR
+.\"
+.\" links	string.3c strcat.3c
+.\" links	string.3c strncat.3c
+.\" links	string.3c strcmp.3c
+.\" links	string.3c strncmp.3c
+.\" links	string.3c strcpy.3c
+.\" links	string.3c strncpy.3c
+.\" links	string.3c strdup.3c
+.\" links	string.3c strlen.3c
+.\" links	string.3c strchr.3c
+.\" links	string.3c strrchr.3c
+.\" links	string.3c strpbrk.3c
+.\" links	string.3c strspn.3c
+.\" links	string.3c strcspn.3c
+.\" links	string.3c strstr.3c
+.\" links	string.3c strrstr.3c
+.\" links	string.3c strtok.3c
+.\" links	string.3c strcoll.3c
+.\" links	string.3c strxfrm.3c
+.\" links	string.3c nl_strcmp.3c
+.\" links	string.3c nl_strncmp.3c
+.\" links	string.3c index.3c
+.\" links	string.3c rindex.3c
+.\"
+.\" fileset_database	string.3c PROG-AUX-MAN

@@ -1,0 +1,38 @@
+XCOMM $XConsortium: Imakefile /main/cde1_maint/2 1995/10/23 11:26:38 gtsang $
+DESKTOP_VERSION_STRING = DesktopVersionString
+/*
+ * Imakefile: Dtexec
+ */
+
+INCLUDES = -I. 
+
+/* Following files need a "long long" for large file system support. Use -Xa */
+Main.o := CCOPTIONS = -Xa
+
+DEPLIBS = $(DEPTTLIB)
+LOCAL_LIBRARIES = $(TTLIB) 
+SYS_LIBRARIES   =
+
+#if defined(USLArchitecture)
+DEPLIBS = $(DEPTTLIB) $(DEPXTOOLLIB) $(DEPXLIB)
+LOCAL_LIBRARIES = $(TTLIB) $(XTOOLLIB) $(XLIB)
+#endif
+
+#if defined(UXPArchitecture)
+DEPLIBS = $(DEPTTLIB) $(DEPXTOOLLIB) $(DEPXLIB)
+LOCAL_LIBRARIES = $(TTLIB) $(XTOOLLIB) $(XLIB)
+#endif
+
+PROGRAMS=dtexec
+
+SRCS = Main.c \
+       DtexecCommonErr.c \
+       Version.c
+
+OBJS = Main.o \
+       DtexecCommonErr.o \
+       Version.o
+
+NormalLibraryObjectRule()
+ComplexProgramTarget($(PROGRAMS))
+

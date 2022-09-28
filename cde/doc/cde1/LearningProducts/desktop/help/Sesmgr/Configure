@@ -1,0 +1,374 @@
+<chapter 4 id=configureSessionMgr>Configuring Session Manager
+&headerFix;
+
+
+Session Manager saves and restores sessions.
+	<idx|administering: desktop sessions|
+	<idx|Session Manager|
+
+<procedure>Regular Sessions
+Session Manager saves and restores:
+
+<list bullet>
+
+* Applications that are running
+
+* Application window features such as colors, fonts, size, and location
+
+* Other settings controlled by the X server, such as mouse behavior, audio
+  volume, and keyboard click.
+
+<\list>
+
+Session Manager also lets you: 
+<list bullet>
+* Run a customized shell script after you log in.
+* Change the window manager.
+* Change the fail-safe session.
+<\list>
+
+<s1 id=HowSessionMgrWorksSI>How Session Manager Works
+	<idx|Session Manager: how it works|
+
+Session Manager is
+responsible for loading the appropriate resources, restoring server
+settings, and starting the clients. 
+Session Manager is implemented by the client ``/usr/dt/bin/dtsession''.
+
+
+<s2 id=TypesofSessionsTO>Types of Sessions
+	<idx|desktop: sessions, types of|
+
+There are two types of sessions:
+<list bullet>
+
+* ++Current session++ are stored at logout, enabling 
+  the users to log back in to their log out session. 
+
+* ++Home session++ are stored by the user at some time during a session, 
+enabling the user to return to a known session.
+
+<\list>
+
+<s2 id=FilesUsedToSaveSessionsTO>Location of Session Data
+
+	<idx|location of: session data|
+	<idx|session: session data location|
+
+<procedure>Files
+Session information is stored under the following file names.
+<lablist width=1.25in>
+
+\``dt.session''\ The names of active clients, their window geometries,
+		  their workspace presence status (which workspaces they
+		  are in), whether their state is normalized or minimized, and
+		  start-up string.
+
+\``dt.resources''\ The resources for the active clients including the
+		    Workspace Manager.
+
+\``dt.settings'' \  Server settings and session manager settings, such as
+		     screen saver timeout, audio (beep), and keyboard
+                     repeat.
+
+<\lablist>
+
+<note>
+Session Manager uses special syntax when writing to
+``dt.session'' and ``dt.settings''.  You should not edit these files.
+<\note>
+
+<procedure>Directories
+The location of the session files depends on the session type.
+
+<lablist width=1in>
+\current\``/%%HomeDirectory%%/.dt/sessions/current''
+
+\home\``/%%HomeDirectory%%/.dt/sessions/home''
+
+\Back-up\``/%%HomeDirectory%%/.dt/sessions/current.old''
+<newline>``/%%HomeDirectory%%/.dt/sessions/home.old''
+<\lablist>
+
+<procedure>Back-up sessions
+When the current session is saved at logout, the old session files are
+saved to a ``current.old'' directory.  Similarly, when the user saves a
+home session, the previous home session is saved to ``home.old''.
+If a session directory is lost, you can copy from the  back-up
+sessions directory.  For example, the following command, executed from the
+``/%%HomeDirectory%%/.dt/sessions'' directory, restores a back-up
+session:
+
+	<ex>
+	cp -r current.old  current
+	<\ex>
+
+
+<procedure>Display-dependent sessions 
+Display-dependent sessions are stored in directories in which
+``sessions'' is replaced by the display name.
+For example, the
+display-dependent current session for user ``dm'' on display
+``syskbdc:0'' is stored in the ``/usrs/dm/.dt/syskbdc:0/current'' 
+directory.  Display-dependent sessions have
+precedence over display-independent sessions.
+
+<s2 id=PrecedenceRulesTO>How Session Manager Chooses the Session to Use
+
+	<idx|Session Manager: how it chooses session type|
+	<idx|session type, how Session Manager chooses|
+
+When Session Manager starts a regular session, it searches for the
+existence of a session directory and uses the first session it finds. 
+
+<procedure>Order of search
+
+<lablist tight width=3in>
+\``/%%HomeDirectory%%/.dt/%%display%%/current'' \Display-dependent current session.
+\``/%%HomeDirectory%%/.dt/%%display%%/home'' \Display-dependent home session.
+\``/%%HomeDirectory%%/.dt/sessions/current'' \Display-independent current session.
+\``/%%HomeDirectory%%/.dt/sessions/home'' \Display-independent home session.
+\``/etc/dt/%%language%%'' \System administrator's customized initial session.
+\``/usr/dt/config/%%language%%'' \Default initial session configuration files.
+<\lablist>
+
+
+<procedure>Home sessions
+There are two user interactions involving home sessions:
+<list bullet>
+* When the user saves a home session using the Startup dialog box
+in the Style Manager, the state of the session is stored in
+the ``/%%HomeDirectory%%/.dt/sessions/home'' directory (or, for
+display-dependent session,
+``/%%HomeDirectory%%/.dt/%%display%%/sessions/home'').
+* If the user has selected Return to Home session in the Startup dialog box,
+the ``current'' directory is removed at logout.
+<\list>
+
+
+<s2 id=TheFirstSessionTO>The First Session
+
+	<idx|first session|
+	<idx|desktop: first session|
+	<idx|session: first desktop|
+
+<procedure>Login
+When a user logs into the desktop for the first time,
+Session Manager uses the default session files in
+the ``/etc/dt/%%language%%'' directory and then in the 
+``/usr/dt/config/%%language%%'' directory for the default session
+files
+``sys.session'' and ``sys.resources''.
+
+<procedure>Logout
+When the user logs out, the state of the session is saved in
+``/%%HomeDirectory%%/.dt/sessions/current'' 
+This session is retrieved the next time the user logs in.
+
+
+<s1 id=CustomizingSessions>Customizing Sessions
+
+	<idx|customizing: sessions|
+	<idx|session: customizing|
+
+To customize a session:
+<list bullet>
+* Create a customized first session and distribute it to other systems.
+* Running a script.
+* Start a different window manager.
+* Create display-dependent sessions.
+<\list>
+
+
+<s2 id=CreateCustomFirstSessionTA>To Create a Customized First Session
+
+	<idx|creating: customized first session|
+	<idx|session: first|
+	<idx|first session|
+
+
+
+<list order>
+
+* Log in to obtain the default session.
+
+* Set up the session.  Start the clients you want in your session, and set
+  the appearance and behavior you want with Style Manager or with resources.
+
+* Log out.  This creates a directory ``/%%HomeDirectory%%/.dt/sessions/current''
+  and session files in that directory containing the actual session information.
+
+* Copy the new directory to other systems whose first session you
+  want to customize.  Since sessions are saved in a display-independent
+  syntax, you can copy sessions to displays of different resolutions.
+
+* Remove any display-dependent session directories (directories named
+  ``/%%HomeDirectory%%/.dt/%%displayname%%'') from the other systems.
+
+<\list>
+
+
+
+<s2 id=ToExCommandsAtStartupTA>To Execute Additional Commands at Session Startup
+
+	<idx|``sessionetc'' file|
+	<idx|session startup: script|
+	<idx|session: executing additional commands at startup|
+	<idx|``xsetroot'', executing at session startup|
+
+<list order>
+* Create the shell script file
+``/%%HomeDirectory%%/.dt/sessions/sessionetc''.  (Replace ``sessions''
+with %%display%% for display-dependent sessions.)  Make the file executable.
+
+* Add a line for each process. If the file ``sessionetc'' exists,
+it is executed each time the user logs
+into a desktop session. 
+
+	<idx|executing: additional commands at session startup|
+	<idx|session startup: executing additional commands|
+	<idx|commands: executing at startup|
+
+
+* Use ``sessionetc'' to
+execute additional commands at session startup; for example:
+<\list>
+
+
+<list bullet>
+
+* X commands for processes or settings that are not saved by
+  Session Manager.  For example, you might want to use ``xsetroot'' to
+  customize the root (workspace) pointer.
+
+* Starting X clients (applications) that are not saved by Session Manager. 
+An application cannot be saved and restored by Session Manager if it does not
+set the WM_COMMAND property.
+
+<\list>	
+
+<note>
+Processes started by ``sessionetc'' must be run in the background.
+
+Do not use ``sessionetc'' to start clients that are automatically restored.
+Doing so causes multiple copies of the application to be started; you
+may not be able to see the copies immediately because the windows are
+stacked on top of one another.
+<\note>
+
+<procedure>Example
+The following line customizes the root cursor:
+<ex smaller>
+xsetroot -cursor /users/anna/point /users/anna/mask -fg blue -bg red &&
+<\ex>
+
+
+
+<need begin>
+<s2 id=UseDifferentWindowManager>To Use a Different Window Manager
+
+	<idx|different window manager|
+	<idx|window manager: changing|
+	<idx|``wmStartupCommand'' resource|
+	<idx|Session Manager: starting Workspace Manager|
+	<idx|``mwm'', using instead of ``dtwm''|
+
+In the default configuration, the desktop Workspace Manager (``dtwm'') is
+automatically started by Session Manager.  The ``wmStartupCommand''
+cancels the default behavior and executes the specified command instead.
+
+<list order>
+* Set the ``wmStartupCommand'' resource:
+
+	<ex>
+	dtsession*wmStartupCommand:    %%execution_string%%
+	<\ex>
+
+where %%execution_string%% is the command to start a different Window
+Manager.
+
+* Log out and back in.
+
+<\list>
+
+
+<procedure>Example
+The following line starts ``mwm'':
+<ex smaller>
+dtsession*wmStartupCommand:    /usr/bin/X11/mwm
+<\ex>
+
+<s2 id=ToCreateDisplayDependentSessionTA>To Create a Display-Dependent Session
+
+	<idx|creating: display-dependent session|
+	<idx|display-dependent session: creating|
+	<idx|session: display-dependent|
+	
+Create a display-dependent directory if you want to run different sessions
+on different displays.  The %%display%% directory name must be the real,
+unqualified host name (for example, ``sysabcd:0'' is valid;
+``sysabcd.cv.com:0'' or ``local:0'' are !!not!!).  If the display name
+exceeds 14 characters, truncate the name starting with the last character.
+
+<list order>
+* Log in and out of at least one desktop session.  This will create
+session files in ``/%%HomeDirectory%%/.dt/sessions''.
+* Copy ``/%%HomeDirectory%%/.dt/sessions'' to one or more display-dependent
+directories ``/%%HomeDirectory%%/.dt/%%display%%''.  
+<\list>
+
+
+<procedure>Example
+The following command creates a display-dependent session for
+display ``syscvxdm:0'':
+<ex smaller>
+cp -r /%%HomeDirectory%%/.dt/sessions  /%%HomeDirectory%%/.dt/syscvxdm:0
+<\ex>
+
+The display-dependent session will be used on all subsequent sessions on
+display ``syscvxdm:0''.
+
+
+<s2 id=CustomizeFailsafeTA>To Customize the Fail-Safe Session
+
+	<idx|fail-safe session: customizing|
+	<idx|session: fail-safe|
+	
+The fail-safe session is useful for correcting
+problems in Login Manager and Session Manager configuration files that
+prevent a desktop session from starting properly.
+
+
+<list bullet>
+* Copy the ``/usr/dt/config/Xfailsafe'' file to the ``/etc/dt/config''
+directory.
+* Edit ``/etc/dt/config/Xfailsafe''.  You can insert commands
+between the line that starts ``mwm'' and the the
+line that starts the Terminal Emulator.  The commands you insert must
+be run in the background.
+<ex>
+     &vellipsis;
+  $XDIR/mwm &
+  sleep $DELAY
+  %%new_command%% &
+  $XDIR/dtterm -ls
+<\ex>
+<\list>
+
+The Terminal Emulator ``dtterm'' is run in the foreground. 
+The script terminates and the fail-safe session ends
+when the user exits the Terminal Emulator window.
+
+
+
+
+
+
+
+
+
+
+
+
+
+

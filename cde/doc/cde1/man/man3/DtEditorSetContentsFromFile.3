@@ -1,0 +1,153 @@
+.\" **
+.\" ** (c) Copyright 1994 Hewlett-Packard Company
+.\" ** (c) Copyright 1994 International Business Machines Corp.
+.\" ** (c) Copyright 1994 Novell, Inc.
+.\" ** (c) Copyright 1994 Sun Microsystems, Inc.
+.\" **
+.TH DtEditorSetContentsFromFile 3 ""
+.BH "3 May - 1994"
+.SH NAME
+\fBDtEditorSetContentsFromFile(3) \- Loads data from a file into an Editor widget.\fP
+.iX "DtEditorSetContentsFromFile"
+.iX "DtEditor functions" "DtEditorSetContentsFromFile"
+.sp .5
+.SH SYNOPSIS
+\fB
+\&#include <Dt/Editor.h>
+.sp .5
+DtEditorErrorCode DtEditorSetContentsFromFile (
+.br
+.ta	0.75i 1.75i
+	Widget	\fIwidget\fP,
+.br
+	char	*\fIhostName\fP,
+.br
+	char	*\fIfileName\fP,
+.br
+	DtEditorFormat *\fIfileType\fP)
+.fi
+\fP
+.SH DESCRIPTION
+\fBDtEditorSetContentsFromFile\fP loads the contents a file into the
+Editor widget, \fIwidget\fP, reporting the type of file read.
+.sp .5
+.IP "\fIwidget\fP" 1.00i
+Specifies the editor widget ID.
+.IP "\fIhostName\fP" 1.00i
+The hostname of the system where \fIfileName\fP resides.  It should be set to 
+NULL if the \fIfileName\fP is on the local system.
+.IP "\fIfileName\fP" 1.00i
+Path and name of the file on \fIhostName\fP.  If \fIhostName\fP
+is NULL, it is assumed the path is relative to the local system.
+.sp .5
+.IP "\fIfileType\fP"
+When \fBDtEditorSetContentsFromFile\fP returns, \fIfileType\fP will indicate 
+the type of data read.
+At this point in time, the type will always be reported as \fBDtEDITOR_TEXT\fP.
+.sp .5
+.PP
+For a complete definition of Editor and its associated resources, see
+\fBDtEditor(3)\fP.
+.sp .5
+.SH RETURN VALUE
+\fBDtEditorSetContentsFromFile\fP returns one of the following two values 
+when it sucessfully loads the data into the Editor:
+.ta	2.6i
+.wH
+.rS
+.TP
+\(bu
+\fBDtEDITOR_NO_ERRORS\fP	the file is readable and writable 
+.TP
+\(bu
+\fBDtEDITOR_READ_ONLY_FILE\fP	the file is read only
+read only
+.PP
+.ta	2.6i
+\fBDtEditorSetContentsFromFile\fP returns one of the following two values 
+if it cannot load the data into the Editor:
+.wH
+.rS
+.TP
+\(bu
+\fBDtEDITOR_NONEXISTANT_FILE\fP	file does not exist
+.TP
+\(bu
+\fBDtEDITOR_DIRECTORY\fP	the file is a directory
+.TP
+\(bu
+\fBDtEDITOR_CHAR_SPECIAL_FILE\fP	the file is a character special device
+.TP
+\(bu
+\fBDtEDITOR_BLOCK_MODE_FILE\fP	the file is a block mode device
+.TP
+\(bu
+\fBDtEDITOR_UNREADABLE_FILE\fP	file is unreadable for an unlisted reason
+.sp .5
+.SH EXAMPLES
+.P
+The following code segment loads the contents of the local file, Foo, into
+an Editor widget.
+.P
+.nf
+.ta .25i 1.1i 
+	Widget			editor;
+	DtEditorErrorCode       status;
+	DtEditorFormat		type;
+	char * 			fname = "Foo",
+				hname = NULL;
+
+	status = DtEditorSetContentsFromFile ( editor, hname, fname, &type );
+	switch ( status )
+	{
+	  case DtEDITOR_NO_ERRORS:
+	  {
+	    printf("Read a file of type %d.\\n", type );
+	    break;
+	  }
+	  case DtEDITOR_READ_ONLY_FILE:
+	  {
+	    printf("The file is read only.\\n", type );
+	    break;
+	  }
+	  case DtEDITOR_NONEXISTANT_FILE:
+	  {
+	    printf( "Could not find file.\\n" );
+	    break;
+	  }
+	  case DtEDITOR_UNREADABLE_FILE:
+	  {
+	    printf( "Could not read the file.\\n" );
+	    break;
+	  }
+	  case DtEDITOR_DIRECTORY:
+	  {
+	    printf( "The name given is a directory.\\n" );
+	    break;
+	  }
+	  case DtEDITOR_CHAR_SPECIAL_FILE:
+	  {
+	    printf( "The name given is a character special device.\\n" );
+	    break;
+	  }
+	  case DtEDITOR_BLOCK_MODE_FILE:
+	  {
+	    printf( "The name given is a block mode device.\\n");
+	    break;
+	  }
+	}
+.fi
+.SH APPLICATION USAGE
+If the data is in memory, rather than a disk file, the application should 
+use \fBDtEditorSetContents(3)\fP.
+.SH RELATED INFORMATION
+\fBDtEditor(3)\fP, 
+\fBDtEditorAppend(3)\fP.
+\fBDtEditorAppendFromFile(3)\fP.
+\fBDtEditorGetContents(3)\fP,
+\fBDtEditorInsert(3)\fP.
+\fBDtEditorInsertFromFile(3)\fP.
+\fBDtEditorSaveContentsToFile(3)\fP,
+\fBDtEditorSetContents(3)\fP.
+.sp .5
+

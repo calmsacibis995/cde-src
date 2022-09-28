@@ -1,0 +1,235 @@
+.\" *************************************************************************
+.\" **
+.\" ** (c) Copyright 1993,1994 Hewlett-Packard Company 
+.\" **      All Rights Reserved.
+.\" **
+.\" ** (c) Copyright 1993,1994 International Business Machines Corp. 
+.\" **      All Rights Reserved.
+.\" **  
+.\" ** (c) Copyright 1993,1994 Sun Microsystems, Inc.
+.\" **      All Rights Reserved.
+.\" **
+.\" ** (c) Copyright 1993,1994 Unix Systems Labs, Inc., a susidiary of Novell, Inc
+.\" **      All Rights Reserved.
+.\" **
+.\" *************************************************************************
+.\"----------------------------------------------------------------------------
+.\" %\&Z%%\&M% %\&I% %\&E% SMI;
+.TH DtCmGetCalendarAttributes 3X "26 January 1994"
+.BH "26 January -_1994"
+.\"---
+.\"----------------------------------------------------------------------------
+.SH NAME
+DtCmGetCalendarAttributes(3X) \- List the calendars supported by the CM server.
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- DESCRIPTION 
+.\"--- This section tells concisely what the command (function, device or
+.\"--- file format) does and includes the parameter list. 
+.\"---
+.SH DESCRIPTION
+\&#include <Dt/DtCm.h>
+.sp .5
+DtCmStatus DtCmGetCalendarAttributes (
+.br
+.ta 0.75i 1.75i
+        DtCmCalendar	\fIcal\fP,
+.br
+        DtCmAttributes	\fIattrs\fP,
+.br
+        int		\fInum_attrs\fP)
+.fi
+\fP
+.SH
+\fBDtCmGetCalendarAttributes\fP gets the values of the specified 
+calendar attributes. The names of attributes interested are specified 
+in \fIattrs\fP which is a pointer to an array of \fBDtCmAttribute\fP 
+structure with \fInum_attrs\fP elements. If the value for a specified 
+attribute does not exist, the value field \fIval\fP of the corresponding 
+element is set to \fBNULL.\fP If the function returns error, none of 
+the attribute values will be retrieved.
+.sp .5
+.IP "\fIcal\fP" 1.25i
+Specifies the calendar to get attribute values.
+.IP "\fIattrs\fP" 1.25i
+Specifies the array of \fBDtCmAttribute\fP structures which contains the 
+attribute names and the addresses to return the attribute values.
+.IP "\fInum_attrs\fP" 1.25i
+Specifies the number of elements in \fIattrs\fP.
+.sp .5
+.PP
+The  \fBDtCmAttributes\fP structure is defined with the following code:
+.sp .5
+typedef struct {
+.br
+.ta 0.50i 1.0i 1.5i 2.25i
+	DtCmAttrValType  tag;
+.br
+	union (
+.br
+		long		\fInval\fP;
+.br
+		char *		\fIsval\fP;
+.br
+		DtCmReminderDetail	\fIrval\fP;
+.br
+		DtCmAccessList	\fIlval\fP;
+.br
+		DtCmBuffer	\fIoval\fP;
+.br
+	} aval;
+.br
+} DtCmAttrValue;
+
+.sp
+.fi
+typedef struct {
+.br
+	char *		name;	/* Attribute name */
+.br
+	DtCmAttrValue*	val;	/* Attribute value */
+.br
+.sp
+#define attr_tag		val->tag
+.br
+#define attr_nval		val->aval.nval
+.br
+#define attr_sval		val->aval.sval
+.br
+#define attr_rval		val->aval.rval
+.br
+#define attr_pval		val->aval.pval
+.br
+#define attr_lval		val->aval.lval
+.br
+.sp
+} DtCmAttribute;
+
+.sp
+.br
+typedef DtCmAttribute *	DtCmAttributes;
+
+\fP
+.SH
+
+The following calendar attributes are defined in the library: 
+.sp
+.IP "\fBDT_CM_ATTR_ACCESS_LIST\fP" 2.5i
+The access list of a calendar specifies who does or does not have what 
+access to the calendar. Each entry in the list contains a name field 
+and an access field. The access field of e ach entry specifies the 
+permission granted or denied to the corresponding user and is constructed 
+by OR-ing the following eight access flags: \fBDT_CM_PERMIT_ACCESS, 
+DT_CM_PERMIT_BROWSE, DT_CM_PERMIT_INSERT, DT_CM_PERMIT_UPDATE, 
+DT_CM_DENY_ACCESS, DT_CM_DENY_BROWSE, DT_CM_DENY_INSERT, and 
+DT_CM_DENY_UPDATE\fP. The first four flags grant access, browse, 
+insert and update permission to the user, respectively. The last 
+four flags deny access, browse, insert and update permission to the 
+user, respectively. A user is said to have, say the insert permission, 
+if he/she is not denied of the insert permission and he/she is 
+granted the insert permission.
+.IP "\fBDT_CM_ATTR_CALENDAR_NAME\fP" 2.5i
+The name of the calendar.
+.IP "\fBDT_CM_ATTR_CALENDAR_SIZE\fP" 2.5i
+The size of the calendar in bytes.
+.IP "\fBDT_CM_ATTR_NUM_ENTRIES\fP" 2.5i
+The number of entries contained in the calendar.
+.IP "\fBDT_CM_ATTR_SERVER_VERSION\fP" 2.5i
+The version of the calendar server.
+.IP "\fBDT_CM_ATTR_TIME_ZONE\fP" 2.5i
+The time zone in which all the time values stored in the calendar are expressed.
+.sp
+.PP
+The application is responsible for freeing the returned values. See \fBDtCmFreeAttributeValues\fP.
+
+
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- RETURN VALUES
+.\"--- This section appears in pages from Sections 2 and 3 only.
+.\"--- List the _values_ that the function returns and give _explanations_.
+.\"---
+.SH "RETURN VALUES"
+The function returns a status indicating whether the function is completed successfully.
+
+.TP 15
+attrs
+If the function is successful, the attribute
+values are stored in the value fields in the array pointed to by \fIattrs\fP.
+.\"---
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- ERRORS
+.\"--- This section lists and explains _ERROR-CODES_ that the function may
+.\"--- may generate.  List _ERROR-CODES_ alphabetically.
+.\"---
+.SH ERRORS
+.SH
+.IP "\fBDT_CM_ERR_MEMORY\fP" 2.5i
+Not enough memory.
+.IP "\fBDT_CM_ERR_OBJECT\fP" 2.5i
+Bad object or wrong object type.
+.IP "\fBDT_CM_ERR_SERVER\fP" 2.5i
+Server problem.
+.IP "\fBDT_CM_OK\fP" 2.5i
+The call is completed successfully.
+.PP
+.sp
+.\"---
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- EXAMPLES
+.\"--- This section gives examples of how to use the command (function
+.\"--- or file format).  Always preface an example with an introduction.
+.\"--- If there are multiple examples, use separate subsection headings
+.\"--- for each _example-type_.  Otherwise, omit these headings.
+.\"---
+.SH EXAMPLES
+.SS Simple-FileTyping
+.LP
+This example takes a list of files as arguments and determines the Description
+of that datatype.
+.LP
+.RS
+.ft 3
+.nf
+ 
+#include <Dt/Dts.h>
+ 
+#define ATTRIBUTE       "DESCRIPTION"
+ 
+main(int argc, char **argv)
+{
+        char    *attribute;
+ 
+        /* load datatypes database */
+        DtLoadDataTypes();
+ 
+        argv++;
+        while(*argv) {
+                /* get attribute for file */
+                attribute = DtDtsFileToAttributeValue(*argv, ATTRIBUTE);
+ 
+                if(attribute) {
+                        printf("%s: %s\n", *argv, attribute);
+                }
+                argv++;
+        }
+        DtDtsRelease();
+        exit(0);
+}
+.fi
+.ft
+.RE
+.LP
+
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- SEE ALSO
+.\"--- This section lists references to other man pages, sample files, etc.
+.\"---
+.SH "SEE ALSO"
+.BR DtCmFreeAttributeValues (3X),
+.BR DtCmSetCalendarAttributes (3X),
+.BR DtCmEnumerateCalendarAttributes (3X),
+.BR DtCmOpenCalendar (3X)

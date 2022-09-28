@@ -1,0 +1,200 @@
+XCOMM   $XConsortium: Imakefile /main/cde1_maint/4 1995/10/09 11:47:55 pascale $
+XCOMM
+
+/* this will need to go eventually into the Project.tmpl file... */
+#ifndef	SharedLibDtTerm
+#define	SharedLibDtTerm HasSharedLibraries
+#endif
+
+#ifndef	NormalLibDtTerm
+#define	NormalLibDtTerm (!SharedLibDtTerm | ForceNormalLib)
+#endif
+/*****************************************************************/
+
+#ifndef DoNormalLib
+#define DoNormalLib NormalLibDtTerm
+#endif
+
+#ifndef	DoSharedLib
+#define	DoSharedLib SharedLibDtTerm
+#endif
+
+#ifndef	DoDebugLib
+#define	DoDebugLib DebugLibDtTerm
+#endif
+
+#ifndef	DoProfileLib
+#define	DoProfileLib ProfileLibDtTerm
+#endif
+
+#include <Library.tmpl>
+
+#ifdef	Build_HpVue
+EXTRA_DEFINES = -DBUILD_HPVUE -DHPVUE
+#endif	/* Build_HpVue */
+
+#ifdef  AlphaArchitecture
+DEFINES = -DALPHA_ARCHITECTURE
+#endif
+
+#ifdef  HPArchitecture
+DEFINES = -DHP_ARCHITECTURE
+#endif
+
+#ifdef  IBMArchitecture
+DEFINES = -DIBM_ARCHITECTURE
+#endif
+
+#ifdef  SunArchitecture
+DEFINES = -DSUN_ARCHITECTURE
+EXTRA_DEFINES = -D_TS_ERRNO
+EXTRA_CCOPTIONS = -dalign
+#endif
+
+#ifdef  USLArchitecture
+DEFINES = -DUSL_ARCHITECTURE
+#endif
+
+#ifdef  UXPArchitecture
+DEFINES = -DUXP_ARCHITECTURE
+#endif
+
+INCLUDES = -I. -I.. -I$(DTINCLUDESRC)
+
+LINTLIBS = $(LINTXLIB) $(LINTXTOOL) $(LINTXM)
+
+SRCS1 = \
+	TermPrim.c \
+	TermPrimAction.c \
+	TermPrimBuffer.c \
+	TermPrimBufferWc.c \
+	TermPrimCursor.c \
+	TermPrimDebug.c \
+	TermPrimFunction.c \
+	TermPrimGetPty.c \
+	TermPrimLineDraw.c \
+	TermPrimParse.c \
+	TermPrimParseTable.c \
+	TermPrimParser.c \
+	TermPrimPendingText.c \
+	TermPrimRender.c \
+	TermPrimRenderMb.c \
+	TermPrimRenderFont.c \
+	TermPrimRenderFontSet.c \
+	TermPrimRenderGlyphFont.c \
+	TermPrimRenderLineDraw.c \
+	TermPrimRepType.c \
+	TermPrimScroll.c \
+	TermPrimSelect.c \
+	TermPrimSetPty.c \
+	TermPrimSetUtmp.c \
+	TermPrimSubproc.c \
+	TermPrimUtil.c    \
+	TermPrimVersion.c \
+	TermPrimWMProtocols.c
+
+OBJS1 = \
+	TermPrim.o \
+	TermPrimAction.o \
+	TermPrimBuffer.o \
+	TermPrimBufferWc.o \
+	TermPrimCursor.o \
+	TermPrimDebug.o \
+	TermPrimFunction.o \
+	TermPrimGetPty.o \
+	TermPrimLineDraw.o \
+	TermPrimParse.o \
+	TermPrimParseTable.o \
+	TermPrimParser.o \
+	TermPrimPendingText.o \
+	TermPrimRender.o \
+	TermPrimRenderMb.o \
+	TermPrimRenderFont.o \
+	TermPrimRenderFontSet.o \
+	TermPrimRenderGlyphFont.o \
+	TermPrimRenderLineDraw.o \
+	TermPrimRepType.o \
+	TermPrimScroll.o \
+	TermPrimSelect.o \
+	TermPrimSetPty.o \
+	TermPrimSetUtmp.o \
+	TermPrimSubproc.o \
+	TermPrimUtil.o    \
+	TermPrimVersion.o \
+	TermPrimWMProtocols.o
+
+SRCS = $(SRCS1)
+OBJS = $(OBJS1)
+
+LibraryObjectRule()
+all:: $(OBJS)
+
+LintLibraryTarget(DtTerm,$(SRCS))
+
+#ifdef  AlphaArchitecture
+LinkFile(TermPrimGetPty.c,TermPrimGetPty-bsd.c)
+clean::
+	$(RM) TermPrimGetPty.c
+#endif  /* AlphaArchitecture */
+
+#ifdef	HPArchitecture
+#  if OSMajorVersion > 9
+LinkFile(TermPrimGetPty.c,TermPrimGetPty-svr4.c)
+#  else  /* OSMajorVersion > 9 */
+LinkFile(TermPrimGetPty.c,TermPrimGetPty-bsd.c)
+#  endif  /* OSMajorVersion > 9 */
+clean::
+	$(RM) TermPrimGetPty.c
+#endif	/* HPArchitecture */
+
+#ifdef	IBMArchitecture
+LinkFile(TermPrimGetPty.c,TermPrimGetPty-clone.c)
+clean::
+	$(RM) TermPrimGetPty.c
+#endif	/* IBMArchitecture */
+
+#ifdef	SunArchitecture
+LinkFile(TermPrimGetPty.c,TermPrimGetPty-svr4.c)
+clean::
+	$(RM) TermPrimGetPty.c
+#endif	/* SunArchitecture */
+
+#ifdef	USLArchitecture
+LinkFile(TermPrimGetPty.c,TermPrimGetPty-svr4.c)
+clean::
+	$(RM) TermPrimGetPty.c
+#endif	/* USLArchitecture */
+
+#ifdef	UXPArchitecture
+LinkFile(TermPrimGetPty.c,TermPrimGetPty-svr4.c)
+clean::
+	$(RM) TermPrimGetPty.c
+#endif	/* UXPArchitecture */
+
+includes:: TermPrimGetPty.c
+localincludes:: TermPrimGetPty.c
+
+DependTarget()
+
+HEADERS = TermPrim.h
+
+/********* INCLUDES ***********************************************
+ * The headers that are exported are built from the following
+ * BuildIncludes - provides export to $(TOP)/X11.
+ * BuildMultipleInstall - provides export to $(TOP)/binstall/include
+ *                        and build install packages.
+ * BuildLocalIncludes - This rule creates directories
+ *   for local includes via make includes or make localincludes
+ *   This enables users to use local -I paths to find local includes.
+ */
+BuildLocalIncludes($(HEADERS),../Dt,../TermPrim)
+
+
+#ifndef	Build_HpVue
+/* link headers to X11/cde* directory */
+LOCAL_BINSTALL_INCLUDEDEST = include/Dt
+BuildIncludes($(HEADERS),$(DTINCLUDEDEST),../..)
+BuildMultipleInstall($(HEADERS),$(LOCAL_BINSTALL_INCLUDEDEST))
+#endif	/* Build_HpVue */
+
+includes::

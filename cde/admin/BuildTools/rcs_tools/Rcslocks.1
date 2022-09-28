@@ -1,0 +1,78 @@
+.\" $Header: Rcslocks.1,v 1.1 93/06/28 13:14:14 xbuild_hp_cv Exp $
+.\" @(#) Rcslocks.1 1.1  @(#)Rcslocks.1	1.1  12/11/85  1   
+.TH RCSLOCKS 1 "" "" HP-UX
+.ad b
+.SH NAME
+Rcslocks \- provides listing of locked RCS files
+.SH SYNOPSIS
+\fBRcslocks\fR [\fB\-help\fR] [\fB\-v\fR] [\fB\-u\fR user \
+[\fB\-u\fR user2] ...] [file ...]
+.PP
+.SH DESCRIPTION
+.I  Rcslocks
+is a program which reads the header information of RCS files to 
+determine and list those files which are locked.  If no filenames are provided
+as arguments, 
+.I  Rcslocks
+will search the local RCS directory. This command has been extended to
+check if the RCS vault(s) accessed are accessible by the local machine.
+If not, the RCS vault is assumed to be in remote shared source and an
+attempt is made to run the command remotely.
+.PP
+The command line options are:
+.TP 15
+\fB\-\fIhelp\fR
+Display usage message and exit.
+.TP
+.B \-v
+Verbose listing, which shows the name of the user who has the locked file
+checked\-out.
+.TP
+.B \-u username
+.I Rcslocks
+will only list those files which are checked out by the user(s) specified.
+.TP
+.B filename
+If one or more filenames are listed as arguments, then
+.I Rcslocks
+will examine only the files listed as arguments to see if they are locked.
+A path can be provided for
+RCS files which are provided as an argument, though the output will
+not contain path information.
+.SH EXAMPLES
+The following command lists
+.B stuff (jane)
+to standard out if the file
+.B stuff
+is locked by user
+.B jane
+\.
+.IP
+.B Rcslocks \-v /users/george/etc/RCS/stuff,v
+.SH DEPENDENCIES
+.I Rcslocks
+is dependent on a particular format of RCS ",v" files.
+.SH DIAGNOSTICS
+Error messages are provided when
+.I Rcslocks
+is unable to read the RCS directory or individual RCS files.  Error messages
+are also generated when 
+.I Rcslocks
+is unable to interpret the RCS file header information.
+.SH WARNINGS
+.I Rcslocks
+, when referencing a directory with a non-existent RCS vault, will assume
+that it is remotely accessible.  Currently, the command will not accept
+relative pathnames outside of the directory which contains the RCS 
+vault link.  e.g. Rcslocks foobar/somedir/foo.c will not work. 
+You must either cd to somedir before running the command or use a full
+pathname.
+.SH AUTHOR 
+.I Rcslocks
+was developed by Courtney Loomis and extended to a remote command
+by Marc Ayotte
+Hewlett-Packard Company, OSSD-CV, Corvallis.
+.SH SEE ALSO
+Co(1), Ci(1) Rcsdiff(1), Rcsintro(5), Rcsmerge(1), Rlog(1), Rls(1).
+.SH INTERNATIONAL SUPPORT
+Rcslocks: 8-bit filenames.

@@ -1,0 +1,434 @@
+.TH tttrace 1 "1 March 1996" "ToolTalk 1.3" "ToolTalk Commands" 
+.BH "1 March 1996"
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\"  (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\"  (c) Copyright 1993, 1994 International Business Machines Corp.
+.\"  (c) Copyright 1993, 1994 Novell, Inc.
+.IX "tttrace.1" "" "tttrace.1" "" 
+.SH NAME
+tttrace - trace ToolTalk calls and messages
+.SH SYNOPSIS
+.PP
+.B tttrace
+[\fB-0FCa\fR]
+.RB [ -o
+.I outfile
+]
+.RB [ -S
+.I session
+|
+.IR command ]
+.br
+.B tttrace
+.RB [ -e
+.I script
+|
+.RB -f
+.I scriptfile
+]
+.RB [ -S
+.I session
+|
+.IR command ]
+.ft
+.fi
+.SH DESCRIPTION
+.PP
+.B tttrace
+traces message traffic through the server for the indicated ToolTalk
+.IR session ,
+or runs
+.I command
+with ToolTalk client tracing turned on.  If neither
+.I session
+nor
+.I command
+is given, the default session is traced.  By default, tracing
+terminates when
+.B tttrace
+exits.
+.PP
+Tracing of ToolTalk functions looks like this:
+.br
+[\fIpid\fR] \fIfunction_name\fR(\fIparams\fR) = \fIreturn_value\fR (\fITt_status\fR)
+.PP
+With the
+.B -a
+option, message attributes are printed after a one-line summary
+of the message:
+.br
+.nf
+\fITt_state Tt_paradigm Tt_class\fR (\fITt_disposition\fR in \fITt_scope\fR): \fIstatus\fR == \fITt_status\fR
+.fi
+.PP
+State changes are indicated by:
+.br
+\fIold_state\fR => \fInew_state\fR.
+.PP
+Deliveries are indicated by:
+.br
+Tt_message => procid <\fIrecipient_procid\fR>
+.PP
+When dispatching is being traced, the reason for each dispatch
+is one of:
+.HP 8
+.PD 0
+.BR tt_message_send ()
+.HP 8
+.BR tt_message_reject ()
+.HP 8
+.BR tt_message_fail ()
+.HP 8
+.BR tt_message_reply ()
+.HP 8
+.BR tt_session_join ()
+.HP 8
+.BR tt_file_join ()
+.TP
+.BR tt_message_reply ()
+.PD
+A client called the indicated function.
+.TP
+.BR tt_message_send_on_exit ()
+.B ttsession
+is dispatching on_exit messages for a client that
+disconnected before calling
+.BR tt_close ().
+.TP
+.BR tt_message_accept ()
+.B ttsession
+is dispatching messages that had been blocked while
+a ptype was being started.  The started client has now called
+either
+.BR tt_message_accept ()
+or
+.BR tt_message_reply ()
+to indicate that the ptype should be unblocked.
+.TP
+.BR TT_ERR_PTYPE_START
+A ptype instance was started to receive the message, but the
+start command exited before it connected to
+.BR ttsession .
+.TP
+.BR TT_ERR_PROCID
+.B ttsession
+lost its connection to the client that was working on this request.
+.TP
+ttsession -> ttsession
+Another session wants this session to find recipients for the message.
+.TP
+ttsession <- ttsession
+Another session wants to update (e.g. fail) a message originating in this
+session.
+.PP
+When dispatching is being traced, matching is indicated by one of
+.br
+Tt_message & Tt_pattern {
+.br
+Tt_message & ptype \fIptid\fR {
+.br
+Tt_message & otype \fIotid\fR {
+.PP
+The pattern or signature is printed, followed by
+.br
+} == \fImatch_score\fR; [/* \fImismatch_reason\fR */]
+.SH OPTIONS
+.TP
+.B -0
+Turn off message tracing in
+.IR session ,
+or run
+.I command
+without message tracing (i.e., with only call tracing).
+.TP
+.B -F
+Follow all children forked by
+.I command
+or subsequently started in
+.I session
+by
+.BR ttsession .
+Normally, only the indicated
+.I command
+or
+.B ttsession
+instance is traced.  When
+.B -F
+is specified, the process id is included with each line of trace
+output to indicate which process generated it.
+.TP
+.BR -C
+Do not trace client calls into the ToolTalk API.  Default is
+to trace them.
+.TP
+.BR -a
+Print all attributes, arguments, and context slots of traced messages.
+The default is to use only a single line when printing a message on
+the trace output.
+.TP
+\fB-e\fI script\fR
+Take
+.I script
+as a
+.B tttrace
+setting.  See
+.BR tttracefile (4).
+.TP
+\fB-f\fI scriptfile\fR
+File to read
+.B tttrace
+settings from.  See
+.BR tttracefile (4).
+'-' means read settings from standard input.  Note:
+.B -f -
+causes
+.B tttrace
+to read standard input until EOF, which may prevent
+.I command
+from using standard input.
+.TP
+\fB-o\fI outfile\fR
+File to be used for the trace output.
+.IP
+For session tracing, output goes to standard output of
+.BR tttrace .
+.IP
+For client tracing, output goes by default to standard error of
+.BR tttrace .
+For client tracing,
+.B -o -
+causes trace output to go to standard output of
+.BR tttrace .
+.IP
+If the
+server for
+.I session
+is running on a remote host and either
+.PD 0
+.RS 8
+.HP 2
+\(bu \fIoutfile\fR is not mounted on that host, or
+.HP 2
+\(bu the \fB-o\fR option is omitted,
+.RE
+.IP
+then
+.B tttrace
+will fail.
+.PD
+.TP
+\fB-S\fI session\fR
+Session to trace.  Defaults to the
+.I default session
+-- the session that \f(CWtt_open()\fR would contact.
+.TP
+.I command
+The ToolTalk client command to invoke and trace.
+.SH EXAMPLES
+.PP
+Here we trace a client that registers a pattern and sends a notice
+that matches it:
+.IP
+%
+.B tttrace
+-a
+.I myclientprogram
+.PP
+.nf
+.ta .5i 1i 1.5i 2i 2.5i 3i 3.5i
+.ft CW
+.ps -1
+tt_open() = 0x51708=="7.jOHHM X 129.144.153.55 0" (TT_OK)	
+tt_fd() = 11 (TT_OK)	
+tt_pattern_create() = 0x50318 (TT_OK)	
+tt_pattern_category_set(0x50318, TT_OBSERVE) = 0 (TT_OK)	
+tt_pattern_scope_add(0x50318, TT_SESSION) = 0 (TT_OK)	
+tt_pattern_op_add(0x50318, 0x2f308=="Hello World") = 0 (TT_OK)	
+tt_default_session() = 0x519e0=="X 129.144.153.55 0" (TT_OK)	
+tt_pattern_session_add(0x50318, 0x519e0=="X 129.144.153.55 0") = 0 (TT_OK)	
+tt_pattern_register(0x50318) = 0 (TT_OK)	
+tt_message_create() = 0x51af0 (TT_OK)	
+tt_message_class_set(0x51af0, TT_NOTICE) = 0 (TT_OK)	
+tt_message_address_set(0x51af0, TT_PROCEDURE) = 0 (TT_OK)	
+tt_message_scope_set(0x51af0, TT_SESSION) = 0 (TT_OK)	
+tt_message_op_set(0x51af0, 0x2f308=="Hello World") = 0 (TT_OK)	
+tt_message_send(0x51af0) 	...	
+   TT_CREATED => TT_SENT: 	
+      TT_SENT TT_PROCEDURE TT_NOTICE (TT_DISCARD in TT_SESSION): 0 == TT_OK	
+      id:      0 7.jOHHM X 129.144.153.55 0	
+      op:      Hello World	
+      session: X 129.144.153.55 0	
+      sender:  7.jOHHM X 129.144.153.55 0	
+= 0 (TT_OK)	
+tt_message_receive() 	...	
+   Tt_message => procid <7.jOHHM X 129.144.153.55 0>	
+   TT_SENT TT_PROCEDURE TT_NOTICE (TT_DISCARD in TT_SESSION): 0 == TT_OK	
+   id:         0 7.jOHHM X 129.144.153.55 0	
+   op:         Hello World	
+   session:    X 129.144.153.55 0	
+   sender:     7.jOHHM X 129.144.153.55 0	
+   pattern:    0:7.jOHHM X 129.144.153.55 0	
+= 0x51af0 (TT_OK)
+.fi
+.ps
+.PP
+.BR ttsession 's
+view of this traffic can be seen as follows.  Note that the first message
+traced will almost always be
+.BR ttsession 's
+reply to the request sent it by
+.BR tttrace .
+.IP
+%
+.B tttrace
+-a
+.PP
+.nf
+.ta 1i 1.5i 2i 2.5i 3i 3.5i
+.ft CW
+.ps -1
+tt_message_reply: 	
+ TT_SENT => TT_HANDLED: 	
+  TT_HANDLED TT_PROCEDURE TT_REQUEST (TT_DISCARD in TT_SESSION): 0 == TT_OK	
+  id:         0 2.jOHHM X 129.144.153.55 0	
+  op:         Session_Trace	
+  args:       TT_IN string: "> /tmp/traceAAAa002oL; version 1; states"[...]	
+  session:    X 129.144.153.55 0	
+  sender:     2.jOHHM X 129.144.153.55 0	
+  pattern:    0:X 129.144.153.55 0	
+  handler:    0.jOHHM X 129.144.153.55 0	
+  Tt_message => procid <2.jOHHM X 129.144.153.55 0>	
+tt_message_send: 	
+   TT_CREATED TT_PROCEDURE TT_NOTICE (TT_DISCARD in TT_SESSION): 0 == TT_OK	
+   id:         0 7.jOHHM X 129.144.153.55 0	
+   op:         Hello World	
+   session:    X 129.144.153.55 0	
+   sender:     7.jOHHM X 129.144.153.55 0	
+   TT_CREATED => TT_SENT: 	
+      TT_SENT TT_PROCEDURE TT_NOTICE (TT_DISCARD in TT_SESSION): 0 == TT_OK	
+      id:         0 7.jOHHM X 129.144.153.55 0	
+      op:         Hello World	
+      session:    X 129.144.153.55 0	
+      sender:     7.jOHHM X 129.144.153.55 0	
+   Tt_message & Tt_pattern {	
+      id:         0:7.jOHHM X 129.144.153.55 0	
+      category:   TT_OBSERVE	
+      scopes:     TT_SESSION 	
+      sessions:   X 129.144.153.55 0	
+      ops:		Hello World 	
+   } == 3;	
+   Tt_message => procid <7.jOHHM X 129.144.153.55 0>
+.fi
+.ps
+.PP
+To trace message flow in a specific, non-default session,
+.IP
+.nf
+% \fBtttrace -S "\fR01 15303 1342177284 1 0 13691 129.144.153.55 2\fB"\fR
+.fi
+.SH ENVIRONMENT
+.PP
+.B tttrace
+is implemented purely as a ToolTalk client, using the message
+interface to
+.B ttsession
+and the following environmental hook into libtt.
+.TP
+.BR TT_TRACE_SCRIPT
+If set, tells libtt to turn on client-side tracing as specified in
+the trace script.  If the first character of of the value is '.' or '/',
+the value is taken to be the pathname of file containing the trace script
+to use.  Otherwise, the value is taken to be an inline trace script.
+.SH FILES
+.TP 20
+.B $TMPDIR/tttrace.nnn
+A
+.I named pipe
+(see
+.BR mkfifo (3C))
+in \fB$TMPDIR\fR (see
+.BR tempnam (3S))
+from which trace output for
+.I session
+is read when the
+.B -o
+option is ommitted.
+.SH WARNINGS
+.PP
+Since (with the
+.B -F
+option) tracing can follow clients to remote hosts if the environment
+is properly propagated, it is possible for different processes in
+the same trace output to be labeled with the same process id.
+.SH "SEE ALSO"
+.na
+.PP
+.BR ttsession (1),
+.BR tttracefile (4),
+the
+.BR Session_Trace ()
+ToolTalk request
+.SH DIAGNOSTICS
+.PP
+If
+.I command
+is run, then
+.B tttrace
+will exit with the exit status of
+.IR command .
+Otherwise, exit codes are as follows:
+.PD 0
+.TP 5
+.B 0
+Normal termination.  Any
+.I session
+tracing turned on by this invocation of
+.B tttrace
+has now been turned off.
+.TP
+.B 1
+Usage.
+.B tttrace
+was given invalid command line options.
+.TP
+.B 2
+Failure.
+.B tttrace
+encountered an error while trying to do its job.  An error
+message has been emitted on standard error.
+.TP
+.B 3
+Runaway
+.IR session
+tracing.
+.B tttrace
+could not terminate tracing in
+.I session
+before exiting.
+.TP
+.B 4
+Remote
+.IR session .
+.B ttsession
+is remote, and
+.I outfile
+(if given) is not visible there.  Choose a visible file,
+or run
+.B tttrace
+on that remote host.
+.TP
+.B 5
+Old
+.IR session .
+The
+.B ttsession
+for
+.I session
+does not support the \f(CWSession_Trace()\fR request.  Run
+.B kill -USR1
+on it to turn on old-style tracing.
+.SH NOTES
+.PP
+For security purposes, client-side tracing is disabled inside a client
+when its effective uid or gid is different from its real uid or gid
+and the real uid is not the super-user.

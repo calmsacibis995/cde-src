@@ -1,0 +1,34 @@
+################################################################################
+#
+# File:         /x/toolsrc/BuildTools/rcs_tools/package
+# RCS:          $Header: package,v 1.7 93/06/28 11:42:28 xbuild_hp_cv Exp $
+# Description:  This file defines the RCS tools ninstall package.
+# Author:       Marc Ayotte  Corvallis Workstation Operation
+# Created:      Sat Feb 18 05:51:53 PST 1989
+# Language:     N/A
+# Package:      N/A
+# Status:       Experimental (Do Not Distribute)
+#
+# (c) Copyright 1988, Hewlett-Packard Company, all rights reserved.
+#
+################################################################################
+
+################################################################################
+
+begin rcs_tools ( release ("*") && machine("9000/*"))
+  comment "Sets up RCS access scripts Ci Co etc for UTD-CV trees";
+  directory /x/toolsrc/BuildTools/rcs_tools/;
+
+  begin README
+    comment "README";
+    echo "This package contains the rcs scripts Ci, Co, Rcs, Rcsmerge,";
+    echo "Rcsdiff, Rlog, Rcslocks and Rls.";
+  end # README
+  
+  begin rcstools
+    comment "Ci Co Rcs Rcsmerge Rcsdiff Rlog Rcslocks Rls -->RCS functions";
+    install installscript /tmp/installscript;
+    exec 'chmod +x /tmp/installscript';
+    exec '/tmp/installscript';
+  end # rcstools
+end # rcs_tools

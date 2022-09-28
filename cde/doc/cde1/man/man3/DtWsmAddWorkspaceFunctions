@@ -1,0 +1,80 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+.\" **
+.\" **
+.\" ** (c) Copyright 1994 Hewlett-Packard Company
+.\" ** (c) Copyright 1994 International Business Machines Corp.
+.\" ** (c) Copyright 1994 Sun Microsystems, Inc.
+.\" ** (c) Copyright 1994 Unix Systems Labs, Inc., a subsidiary of Novell, Inc.
+.\" **
+.\" **
+.TH DtWsmAddWorkspaceFunctions 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Common Desktop Environment 1.0: January 1994
+.SH NAME
+\fBDtWsmAddWorkspaceFunctions\fP,
+\fBDtWsmRemoveWorkspaceFunctions\fP \- add or remove workspace
+functions for a window.
+.iX "DtWsmAddWorkspaceFunctions"
+.iX "workspace functions" "DtWsmAddWorkspaceFunctions"
+.iX "DtWsmRemoveWorkspaceFunctions"
+.iX "workspace functions" "DtWsmRemoveWorkspaceFunctions"
+.sp .5
+.SH SYNOPSIS
+\fB
+\&#include <Dt/Wsm.h>
+.sp .5
+void DtWsmAddWorkspaceFunctions (
+.br
+.ta 0.75i 2.20i
+	Display *	\fIdisplay\fP,
+.br
+	Window	\fIwindow\fP)
+.sp .5
+void DtWsmRemoveWorkspaceFunctions (
+.br
+.ta 0.75i 2.20i
+	Display *	\fIdisplay\fP,
+.br
+	Window	\fIwindow\fP)
+.sp .5
+\fP
+.SH DESCRIPTION
+\fBDtWsmAddWorkspaceFunctions\fP enables workspace functions for a
+window. When workspace functions are enabled, the window menu for the
+window displayed by the Common Desktop Environment workspace manager 
+(dtwm) will show entries that allow the window to occupy a different
+set of workspaces, occupy all workspaces, or be removed from this 
+workspace. Workspace functions are
+enabled by default, so this function is typically called to restore
+workspace functions to a window that has had them removed by 
+\fBDtWsmRemoveWorkspaceFunctions\fP.
+.PP
+\fBDtWsmRemoveWorkspaceFunctions\fP removes workspace functions from a
+window. When workspace functions have been removed, the window menu for
+the window displayed by dtwm will not have the entries that allow
+the window to occupy a different set of workspaces, occupy all
+workspaces, or be removed from the current workspace.
+.PP
+Both these functions take these two parameters:
+.sp .5
+.IP "\fIdisplay\fP" 1.00i
+The X display.
+.IP "\fIwindow\fP" 1.00i
+The window that will have its workspace functions affected.
+.PP
+These functions should be called before the window is mapped. 
+Dtwm only looks at the workspace function information at the time the 
+window is managed. If the window is currently managed by dtwm, the 
+window should be withdrawn, the workspace functions changed, and the 
+window mapped once again.
+.sp .5
+.SH RETURN VALUE
+None.
+.sp .5
+.SH RELATED INFORMATION
+\fBdtwm(1X)\fP.
+.sp .5

@@ -1,0 +1,273 @@
+.TH dtcm_admin 1 "9 March 1992"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.SH NAME
+dtcm_admin \- administer the calendar and appointment services database
+.SH SYNOPSIS
+.yS
+dtcm_admin
+[\-d]
+[\-a\0\f2action\fP]
+[\-c\0\f2calendar\fP]
+[\-s\0\f2start_date\fP]
+[\-e\0\f2end_date\fP]
+[\-f\0\f2filename\fP]
+.yE
+.P
+.yS
+dtcm_admin
+\-h
+.yE
+.SH DESCRIPTION
+The
+.Cm dtcm_admin
+utility is the administration interface to the Cde calendar and
+appointment services,
+used to archive and restore data from user calendars.
+.P
+Archiving calendar information dumps
+data from the calendar's database within a specified date range,
+and stores it in an archive file for backup or other purposes.
+.cdes
+This allows the user to
+limit the amount of redundant historical data in a calendar, saving
+disk space and improving the performance of the calendar database manager
+.Cm rpc.cmsd 1.
+.cdee
+.P
+By default,
+.Cm dtcm_admin
+performs a nondestructive operation, which is
+useful for backup or data transfer between calendars;
+the
+.B \-d
+removes the archived data from the calendar.
+.SH OPTIONS
+.xos
+The
+.Cm dtcm_admin
+utility supports the \*(Zu.
+.xoe
+The following options are available:
+.VL 6
+.LI \f3\-a\0\f2action\f1
+.br
+Specify the operation to be performed.
+The supported argument values are
+.B archive
+and
+.BR restore .
+The default action is to archive data.
+.LI \f3\-c\0\f2calendar\f1
+.br
+Specify the name of the calendar on which
+.I action
+will be performed.
+Permission to perform the operation is required.
+Calendar names
+.xo are implementation-dependent, but
+typically take the form
+.IR user @\c
+.IR hostname ,
+where
+.I user
+is a user's login name and
+.I hostname
+is the host machine name.
+.cde An example is
+.cde .BR felix@cat .
+If no target calendar is specified,
+the calendar defaults to
+the current user at the current host machine.
+.LI \f3\-d\fP
+Delete the data from the calendar after archiving it.
+By default the data is not deleted.
+This only has an effect for archive operations.
+.LI \f3\-h\fP
+Write a usage help message to standard output and terminate.
+.cde All other options are ignored.
+.LI \f3\-s\0\f2start_date\f1
+.br
+Specify the beginning of a date range that constrains the effect of the
+operation.
+The
+.I start_date
+option-argument is in the form
+.IR mmddyy ,
+where
+.IR mm ,
+.I dd
+and
+.I yy
+are the two-digit month, day and year modulo 100, respectively.
+The granularity of the range is one day, meaning that the
+operation is performed on every calendar entry whose start time
+falls from 00:00 on the specified
+.I start_date
+date to 23:59, inclusive, on the
+.I end_date
+date.
+If
+.I start_date
+is not specified, all the entries in the calendar dated before or on the
+.I end_date
+date are processed.
+If
+.I end_date
+is not specified, all the entries in the calendar dated on or after the
+.I start_date
+date are processed.
+If neither
+.B \-s
+nor
+.B \-e
+is specified, the operation is performed for the entire input data set.
+.LI \f3\-e\0\f2end_date\f1
+.br
+Specify the end of a date range that constrains the effect of the operation,
+in the same format as
+.BR \-s .
+.LI \f3\-f\0\f2filename\f1
+.br
+Specify the name of a file
+for the output of an archive operation
+or input to a restore operation.
+If this option is omitted,
+archived data is sent to standard output and
+data for a restore operation is taken from the standard input.
+.LE
+.SH OPERANDS
+None.
+.SH STDIN
+When
+.B \-a\ restore
+is specified,
+the standard input is archived data
+.xo in the format described in
+.xo .cX calapptfmt .
+.cde produced by a previous invocation of
+.cde .Cm dtcm_admin .
+The standard input is used only if no
+.B \-f
+.I filename
+option is specified.
+.SH "INPUT FILES"
+When
+.B \-a\ restore
+and
+.B \-f
+.I filename
+are specified,
+the input file named by
+.I filename
+is archived data
+.xo in the format described in
+.xo .cX calapptfmt .
+.cde produced by a previous invocation of
+.cde .Cm dtcm_admin .
+.SH "ENVIRONMENT VARIABLES"
+The following environment variables affect the execution of
+.Cm dtcm_admin :
+.VL 15
+.LI \f2LANG\fP
+Provide a default value for the internationalization variables
+that are unset or null.
+If
+.I LANG
+is unset or null, the corresponding value from the
+implementation-specific default locale will be used.
+If any of the internationalization variables contains an invalid setting, the
+utility behaves as if none of the variables had been defined.
+.LI \f2LC_ALL\fP
+If set to a non-empty string value,
+override the values of all the other internationalization variables.
+.LI \f2LC_MESSAGES\fP
+Determine the locale that is used to affect
+the format and contents of diagnostic
+messages written to standard error
+and informative messages written to standard output.
+.LI \f2NLSPATH\fP
+Determine the location of message catalogues
+for the processing of
+.IR LC_MESSAGES .
+.LE
+.SH "RESOURCES"
+None.
+.SH "ASYNCHRONOUS EVENTS"
+.xo Default.
+.cde The
+.cde .Cm dtcm_admin
+.cde utility takes the standard action for all signals.
+.SH STDOUT
+Unless
+.B \-a\ restore
+and
+.B \-f
+.I filename
+are specified,
+the standard output contains the archived data
+.xo in the format described in
+.xo .cX calapptfmt .
+.cde suitable for later restores by
+.cde .Cm dtcm_admin .
+If
+.B \-f
+.I filename
+is specified, the standard output is not used.
+.SH STDERR
+Used only for diagnostic messages.
+.SH "OUTPUT FILES"
+If
+.B \-a\ archive
+and
+.B \-f
+.I filename
+are specified,
+the file named by
+.I filename
+contains the archived data
+.xo in the format described in
+.xo .cX calapptfmt .
+.cde suitable for later restores by
+.cde .Cm dtcm_admin .
+.SH "EXTENDED DESCRIPTION"
+None.
+.SH "EXIT STATUS"
+The following exit values are returned:
+.VL 4
+.LI \h"\w'>'u"0
+Successful completion.
+.LI >0
+An error occurred.
+.LE
+.SH "CONSEQUENCES OF ERRORS"
+Default.
+.cdes
+.SH FILES
+.TP 20
+.B /usr/spool/calendar/callog.username
+.TP
+.BR /usr/dt/bin/rpc.cmsd
+.cdee
+.SH "APPLICATION USAGE"
+None.
+.SH EXAMPLES
+The following archives calendar data up to the end of 1993:
+.Cs I
+dtcm_admin \-a archive \-e 123193 \-f calendar.1993
+.Ce
+.P
+The following merges another user's calendar data into
+the user's calendar:
+.Cs I
+dtcm_admin \-a archive \-c theboss@bigcheese | dtcm_admin \-a restore
+.Ce
+.SH "SEE ALSO"
+.cde .Cm rpc.cmsd 1,
+.cde .Cm dtcm 1,
+.Cm dtcm_delete 1,
+.Cm dtcm_insert 1,
+.Cm dtcm_lookup 1.

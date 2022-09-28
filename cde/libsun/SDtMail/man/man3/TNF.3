@@ -1,0 +1,111 @@
+.de LI
+.\" simulate -mm .LIs by turning them into .TPs
+.TP \\n()Jn
+\\$1
+..
+.de Lc
+.\" version of .LI that emboldens its argument
+.TP \\n()Jn
+\s-1\f3\\$1\f1\s+1
+..
+.TH TNF 3 "05/20/96"
+.BH "05/20/96"
+.\" @(#)TNF.3	1.6 96/05/20 SMI
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994, 1995, 1996 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994, 1995, 1996 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994, 1995, 1996 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994, 1995, 1996 Novell, Inc.
+.SH NAME
+TNF Probes \- A "howto" for using TNF probes in libSDtMail.
+.SH SYNOPSIS
+.\"
+.PP
+.ft 3
+The TNF probes in libSDtMail can be used to debug applications that
+make use of this library and to gather performance statistics.
+.fi
+.ft 1
+.\" 
+.ta 0.25i 0.50i 0.75i 1.0i 1.25i 1.50i 1.75i 2.0i 2.5i 3.0i
+.SH DESCRIPTION
+The TNF probes are organized into categories according to their function
+and according to their class:
+.nf
+	SdmConnection
+	SdmMessage
+	SdmMessageStore
+	SdmEnvelope
+	SdmSession
+	SdmBodyPart
+	SdmDataPort
+	SdmDpDataChan
+	SdmDpDataChanCclient
+	SdmLockUtility
+.fi
+.PP
+The current global categories are:
+.nf
+	api			libSDtMail api
+	dpapi		dataport api
+	dcapi		data channel api
+	lockapi		mailbox locking api
+.fi
+.\"
+.SH Usage
+To activate these probes "prex" must be used.  Prex permits the user to
+activate and inactivate groups of probes prior to running the executable.
+Here is a sample session:
+.nf
+	% prex dtmail -f ./test.mbox
+	prex> enable $all
+	prex> trace $all
+	prex> connect &debug $all
+	prex> continue
+	% tnfdump /tmp/trace-<pid> > dtmail.dump
+	% tnfprof dtmail.dump > dtmail.prof
+.fi
+.PP
+Provide prex with the exact command line that would be used to start the app.
+The "enable" command, issued in the sample run, turns on all the probes in
+the app and libraries ($all).  "trace" and "connect" are similar commands but
+direct output to different places.  "trace" will send the binary output of a
+probe to /tmp/trace-<pid> whereas "connect &debug" will send the ascii output
+to the screen.  "continue" runs the application.
+.PP
+Once data has put generated to the /tmp/trace-<pid> file, there are tools
+to analyze it.  "tnfdump" will convert this data from binary to ascii and
+"tnfprof" will output a performance anaysis of the data.
+.PP
+Here is another sample session:
+.nf
+	% prex -l "libc_probe.so" dtmail
+	prex> list probes $all
+	prex> enable keys=api
+	prex> enable name=malloc_start
+	prex> enable name=malloc_end
+	prex> connect &debug keys=api
+	prex> connect &debug name=malloc_start
+	prex> connect &debug name=malloc_end
+	prex> continue
+.fi
+.PP
+This session includes the libc_probe.so interposition library.  There are
+several interposition libraries that provide probes for commonly used
+libraries such as libc, Xm, Xt, X11, etc.  In the example, all the probes
+are listed, then only the probes in the "api" group are enabled.  Other 
+groups that can be enabled are listed above.  The individual probes for 
+malloc are also enabled.
+.RE
+.nr )J 0
+.\"
+.PP
+.RE
+.nr )J 0
+.SH "SEE ALSO"
+.na
+.BR prex (3),
+.BR tnfdump (3),
+.BR tnf_probes (3)
+.BR TNF_PROBE (3)
+.BR http://suntools.eng/tools/toolpages/tnftools.html

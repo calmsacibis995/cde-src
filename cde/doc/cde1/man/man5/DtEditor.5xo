@@ -1,0 +1,663 @@
+.TH Dt/Editor.h 5 "15 August 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.\" *************************************************************************
+.SH NAME
+Dt/Editor.h \- editor widget definitions
+.SH SYNOPSIS
+.yS
+#include <Dt/Editor.h>
+.yE
+.SH DESCRIPTION
+The
+.Hd Dt/Editor.h
+header defines structures, enumerations and function prototypes for
+the Editor widget class.
+.P
+The header defines the
+.B DtEditorDataFormat
+enumeration data type,
+with at least the following members:
+.VL 6
+.Lc DtEDITOR_TEXT
+.br
+The data being transferred is a pointer
+to a
+.Cn NULL \-terminated
+string of characters (a \f3char *\fP).
+.Lc DtEDITOR_WCHAR
+.br
+The data being transferred is a
+wide character string (a \f3wchar_t *\fP).
+.Lc DtEDITOR_DATA
+.br
+The data being transferred is a
+sized buffer (a
+.BR DtEditor_DataObj ).
+.LE
+.P
+The header defines the following structure:
+.P
+.Cs I
+typedef struct {
+	unsigned int \f2length\fP;
+	void *\f2buf\fP;
+} DtEditor_DataObj;
+.Ce
+.P
+The
+.I length
+argument is the
+size in bytes of the data buffer.
+The
+.I buf
+argument is a
+pointer to the data buffer.
+.P
+The
+.B DtEditorContentRec
+structure is used to transfer data between
+an application and Editor widget.
+It indicates the type of data being
+transferred along with the actual data.
+.P
+.Cs I
+typedef struct {
+	DtEditorDataFormat \f2type\fP;
+	union {
+		char \f2*string\fP;
+		wchar_t \f2*wchar\fP;
+		DtEditor_DataObj \f2data\fP;
+	} \f2value\fP;
+} DtEditorContentRec;
+.Ce
+.P
+The
+.I type
+argument
+indicates the type of data contained in the structure.
+The
+.I string
+argument
+points to a
+.Cn NULL \-terminated
+string of characters.
+It is valid when
+.I type
+is
+.Cn DtEDITOR_TEXT .
+The
+.I wchar
+argument
+points to a wide character string.
+It is valid when
+.I type
+is
+.Cn DtEDITOR_WCHAR .
+The
+.I data
+argument
+is a
+.B DtEditor_DataObj
+that contains the size of the
+data and a pointer to it.
+It is valid when
+.I type
+is
+.Cn DtEDITOR_DATA .
+.P
+The
+.B DtEditorChangeValues
+structure is used optionally to specify
+the string to search for and its replacement value for
+.Fn DtEditorChange 3.
+.P
+.Cs I
+typedef struct {
+	char *\f2find\fP,
+	char *\f2changeTo\fP,
+} DtEditorChangeValues;
+.Ce
+.P
+The
+.I find
+argument
+is a text string to locate in an DtEditor widget.
+The
+.I changeTo
+argument
+is the replacement string for the one or more occurrences of the string
+specified in
+.IR find .
+It can be
+.Cn NULL .
+.P
+The
+.B DtEditorFormatSettings
+structure is used to optionally specify
+the left margin setting, right margin setting, and alignment style for
+.Fn DtEditorFormat 3.
+.P
+.Cs I
+typedef struct {
+	int \f2leftMargin\fP,
+	int \f2rightMargin\fP,
+	unsigned int \f2alignment\fP,
+} DtEditorFormatSettings;
+.Ce
+.P
+The
+.I leftMargin
+argument
+is the column number of the left boundary when formatting text.
+Text is not extended to the left of this column.
+It must be non-negative.
+The
+.I rightMargin
+argument
+is the column number of the right boundary when formatting text.
+Text is not extended to the right of this column.
+It must be larger than
+.IR leftMargin .
+The
+.I alignment
+argument
+specifies the style of alignment when formatting text (see the
+constants listed in this header).
+.P
+The
+header declares the following variable:
+.Cs I
+WidgetClass      dtEditorWidgetClass;
+.Ce
+.P
+The
+header defines the following constants for use with the
+.Fn DtEditorChange 3
+function:
+.VL 6
+.Lc DtEDITOR_ALL_OCCURRENCES
+.br
+Change all instances of the find string.
+.Lc DtEDITOR_CURRENT_SELECTION
+.br
+Replace the currently selected text with the replacement string.
+.Lc DtEDITOR_NEXT_OCCURRENCE
+.br
+Change the next occurrence of the find string after the insertion
+cursor.
+.LE
+.P
+The
+header defines the following constants for use with the
+.Fn DtEditorFormat 3
+function:
+.VL 6
+.Lc DtEDITOR_FORMAT_ALL
+.br
+Reformats all the text in a DtEditor.
+.Lc DtEDITOR_FORMAT_PARAGRAPH
+.br
+Reformats only the paragraph containing the insertion cursor.
+.Lc DtEDITOR_ALIGN_CENTER
+.br
+Centers each line of text between the left and right margins.
+.Lc DtEDITOR_ALIGN_JUSTIFY
+.br
+Aligns the text flush with both the left and right margins.
+.Lc DtEDITOR_ALIGN_LEFT
+.br
+Aligns the text flush with the left margin.
+.Lc DtEDITOR_ALIGN_RIGHT
+.br
+Aligns the text flush with the right margin.
+.LE
+.P
+The
+header defines the following constant for use with the
+.Fn DtEditorGoToLine 3
+function:
+.VL 6
+.Lc DtEDITOR_LAST_LINE
+.br
+Moves the cursor to the beginning of the last line in the widget.
+.LE
+.P
+The
+header defines the following
+.B DtEditorErrorCode
+constants:
+.VL 6
+.Lc DtEDITOR_NO_ERRORS
+.br
+The function completed its task without errors.
+.cdes
+.Lc DtEDITOR_INSUFFICIENT_MEMORY
+.br
+Not enough system memory is available to complete the task.
+.cdee
+.Lc DtEDITOR_INVALID_TYPE
+.br
+The specified type is not a recognized
+.B DtEditorDataFormat
+when setting or retrieving contents or the specified
+Alignment type is not recognized when formatting text.
+.Lc DtEDITOR_INVALID_RANGE
+.br
+The starting character position in a text replacement is greater than
+the ending character position or the specified Amount To Format
+when formatting text is not recognized.
+.Lc DtEDITOR_NULL_ITEM
+.br
+The data buffer is
+.Cn NULL
+when passing data in a buffer.
+.Lc DtEDITOR_ILLEGAL_SIZE
+.br
+The specified size of a data buffer is negative when passing data in a
+buffer, or the left and right margin values are illegal when formatting text.
+.cdes
+.Lc DtEDITOR_SPELL_FILTER_FAILED
+.br
+The
+.Fn DtEditor
+function cannot successfully execute the filter specified by the
+.B DtNspellFilter
+resource.
+.Lc DtEDITOR_NO_TMP_FILE
+.br
+The
+.Fn DtEditor
+function cannot create a temporary file in the directory returned by
+.Fn tmpnam 3S.
+.cdee
+.Lc DtEDITOR_INVALID_FILENAME
+.br
+No file was specified.
+.Lc DtEDITOR_NONEXISTENT_FILE
+.br
+The file specified for reading does not exist.
+.Lc DtEDITOR_UNREADABLE_FILE
+.br
+The file specified is unreadable for an unspecified reason.
+.Lc DtEDITOR_READ_ONLY_FILE
+.br
+The file is read only.
+.cdes
+.Lc DtEDITOR_NULLS_REMOVED
+.br
+The file contained embedded
+.Cn NULL
+characters, which were removed.
+.cdee
+.Lc DtEDITOR_NO_FILE_ACCESS
+.br
+The file cannot be accessed.
+.Lc DtEDITOR_DIRECTORY
+.br
+The file specified is a directory.
+.Lc DtEDITOR_CHAR_SPECIAL_FILE
+.br
+The file specified is a character-special device.
+.Lc DtEDITOR_BLOCK_MODE_FILE
+.br
+The file specified is a block-mode device.
+.Lc DtEDITOR_UNWRITABLE_FILE
+.br
+The application does not have write permission for the file or directory.
+.Lc DtEDITOR_WRITABLE_FILE
+.br
+The specified file exists and the
+.I overwriteIfExists
+flag is set to
+False.
+.Lc DtEDITOR_SAVE_FAILED
+.br
+The contents of the widget could not be saved for an unspecified reason.
+.LE
+.P
+The
+header defines the following
+enumeration values as reasons for the
+.BR DtNtextSelectCallback :
+.VL 6
+.Lc DtEDITOR_TEXT_SELECT
+.br
+Some text has been selected within the edit window (that is, the selection
+has become non-\c
+.Cn NULL ).
+.Lc DtEDITOR_TEXT_DESELECT
+.br
+No text is selected within the edit window (that is, the selection
+has become
+.Cn NULL ).
+.LE
+.P
+The
+header defines the following constants as reasons for the
+.BR XmNhelpCallback :
+.VL 6
+.Lc DtEDITOR_HELP_EDIT_WINDOW
+.br
+The help request originated in the edit window.
+.cdes
+.Lc DtEDITOR_HELP_STATUS_LINE
+.br
+The help request originated in the status line.
+.Lc DtEDITOR_HELP_STATUS_CURRENT_LINE
+.br
+The help request originated from the Current Line Number
+display in the status line.
+.Lc DtEDITOR_HELP_STATUS_TOTAL_LINES
+.br
+The help request originated from the Total Lines display in
+the status line.
+.Lc DtEDITOR_HELP_STATUS_MESSAGE
+.br
+The help request originated from the Message field in the
+status line.
+.Lc DtEDITOR_HELP_STATUS_OVERSTRIKE
+.br
+The help request originated from the Overstrike indicator
+in the status line.
+.cdee
+.Lc DtEDITOR_HELP_FORMAT_DIALOG
+.br
+The help request originated from the Help button in the
+Format Settings dialog.
+.Lc DtEDITOR_HELP_FORMAT_LEFT_MARGIN
+.br
+The help request originated from the Left Margin field in
+the Format Settings dialog.
+.Lc DtEDITOR_HELP_FORMAT_RIGHT_MARGIN
+.br
+The help request originated from the Right Margin Field in
+the Format Settings dialog.
+.Lc DtEDITOR_HELP_FORMAT_ALIGNMENT
+.br
+The help request originated from the Alignment buttons in the Format Settings
+dialog.
+.Lc DtEDITOR_HELP_CHANGE_DIALOG
+.br
+The help request originated from the Help button in the Find/Change dialog.
+.Lc DtEDITOR_HELP_CHANGE_FIND
+.br
+The help request originated from the Find field in the Find/Change dialog.
+.Lc DtEDITOR_HELP_CHANGE_CHANGE
+.br
+The help request originated from the Change To field in the Find/Change dialog.
+.cdes
+.Lc DtEDITOR_HELP_SPELL_DIALOG
+.br
+The help request originated from the Help button in the Spell dialog.
+.Lc DtEDITOR_HELP_SPELL_MISSPELLED_WORDS
+.br
+The help request originated from the list of misspelled words in the Spell dialog.
+.Lc DtEDITOR_HELP_SPELL_CHANGE
+.br
+The help request originated from the Change To field in the Spell dialog.
+.cdee
+.LE
+.P
+The
+header defines the following as functions:
+.P
+.yS
+.ta \w'Widget DtCreateEditor('u
+Widget DtCreateEditor(Widget \f2parent\fP,
+	char *\f2name\fP,
+	ArgList \f2arglist\fP,
+	Cardinal \f2argcount\fP);
+.yE
+.P
+.yS
+.ta \w'DtEditorErrorCode DtEditorAppend('u
+DtEditorErrorCode DtEditorAppend(Widget \f2widget\fP,
+	DtEditorContentRec *\f2data\fP);
+.yE
+.P
+.yS
+.ta \w'DtEditorErrorCode DtEditorAppendFromFile('u
+DtEditorErrorCode DtEditorAppendFromFile(Widget \f2widget\fP,
+	char *\f2fileName\fP);
+.yE
+.P
+.yS
+.ta \w'Boolean DtEditorChange('u
+Boolean DtEditorChange(Widget \f2widget\fP,
+	DtEditorChangeValues *\f2findChangeStrings\fP,
+	unsigned int \f2instanceToChange\fP);
+.yE
+.P
+.yS
+.ta \w'Boolean DtEditorCheckForUnsavedChanges('u
+Boolean DtEditorCheckForUnsavedChanges(Widget \f2widget\fP);
+.yE
+.P
+.yS
+.ta \w'Boolean DtEditorClearSelection('u
+Boolean DtEditorClearSelection(Widget \f2widget\fP);
+.yE
+.P
+.yS
+.ta \w'Boolean DtEditorCopyToClipboard('u
+Boolean DtEditorCopyToClipboard(Widget \f2widget\fP);
+.yE
+.P
+.yS
+.ta \w'Boolean DtEditorCutToClipboard('u
+Boolean DtEditorCutToClipboard(Widget \f2widget\fP);
+.yE
+.P
+.yS
+.ta \w'Boolean DtEditorDeleteSelection('u
+Boolean DtEditorDeleteSelection(Widget \f2widget\fP);
+.yE
+.P
+.yS
+.ta \w'Boolean DtEditorDeselect('u
+Boolean DtEditorDeselect(Widget \f2widget\fP);
+.yE
+.cdes
+.P
+.yS
+.ta \w'void DtEditorDisableRedisplay('u
+void DtEditorDisableRedisplay(Widget \f2widget\fP);
+.yE
+.P
+.yS
+.ta \w'void DtEditorEnableRedisplay('u
+void DtEditorEnableRedisplay(Widget \f2widget\fP);
+.yE
+.cdee
+.P
+.yS
+.ta \w'Boolean DtEditorFind('u
+Boolean DtEditorFind(Widget \f2widget\fP,
+	char * \f2find\fP);
+.yE
+.P
+.yS
+.ta \w'DtEditorErrorCode DtEditorFormat('u
+DtEditorErrorCode DtEditorFormat(Widget \f2widget\fP,
+	DtEditorFormatSettings *\f2formatSettings\fP,
+	unsigned int \f2amountToFormat\fP);
+.yE
+.P
+.yS
+.ta \w'DtEditorErrorCode DtEditorGetContents('u
+DtEditorErrorCode DtEditorGetContents(Widget \f2widget\fP,
+	DtEditorContentRec *\f2data\fP,
+	Boolean	\f2hardCarriageReturns\fP,
+	Boolean \f2markContentsAsSaved\fP);
+.yE
+.P
+.yS
+.ta \w'XmTextPosition DtEditorGetInsertionPosition('u
+XmTextPosition DtEditorGetInsertionPosition(Widget \f2widget\fP);
+.yE
+.P
+.yS
+.ta \w'XmTextPosition DtEditorGetLastPosition('u
+XmTextPosition DtEditorGetLastPosition(Widget \f2widget\fP);
+.yE
+.P
+.cdes
+.yS
+.ta \w'Widget DtEditorGetMessageTextFieldID('u
+Widget DtEditorGetMessageTextFieldID(Widget \f2widget\fP);
+.yE
+.P
+.cdee
+.yS
+.ta \w'void DtEditorGetSizeHints('u
+void DtEditorGetSizeHints(Widget \f2widget\fP,
+	XSizeHints *\f2pHints\fP);
+.yE
+.P
+.yS
+.ta \w'void DtEditorGoToLine('u
+void DtEditorGoToLine(Widget \f2widget\fP,
+	int \f2lineNumber\fP);
+.yE
+.P
+.yS
+.ta \w'DtEditorErrorCode DtEditorInsert('u
+DtEditorErrorCode DtEditorInsert(Widget \f2widget\fP,
+	DtEditorContentRec *\f2data\fP);
+.yE
+.P
+.yS
+.ta \w'DtEditorErrorCode DtEditorInsertFromFile('u
+DtEditorErrorCode DtEditorInsertFromFile(Widget \f2widget\fP,
+	char *\f2fileName\fP);
+.yE
+.P
+.yS
+.ta \w'void DtEditorInvokeFindChangeDialog('u
+void DtEditorInvokeFindChangeDialog(Widget \f2widget\fP);
+.yE
+.P
+.yS
+.ta \w'void DtEditorInvokeFormatDialog('u
+void DtEditorInvokeFormatDialog(Widget \f2widget\fP);
+.yE
+.P
+.cdes
+.yS
+.ta \w'DtEditorErrorCode DtEditorInvokeSpellDialog('u
+DtEditorErrorCode DtEditorInvokeSpellDialog(Widget \f2widget\fP);
+.yE
+.P
+.cdee
+.yS
+.ta \w'Boolean DtEditorPasteFromClipboard('u
+Boolean DtEditorPasteFromClipboard(Widget \f2widget\fP);
+.yE
+.P
+.yS
+.ta \w'DtEditorErrorCode DtEditorReplace('u
+DtEditorErrorCode DtEditorReplace(Widget \f2widget\fP,
+	XmTextPosition \f2startPos\fP,
+	XmTextPosition \f2endPos\fP,
+	DtEditorContentRec *\f2data\fP);
+.yE
+.P
+.yS
+.ta \w'DtEditorErrorCode DtEditorReplaceFromFile('u
+DtEditorErrorCode DtEditorReplaceFromFile(Widget \f2widget\fP,
+	XmTextPosition \f2startPos\fP,
+	XmTextPosition \f2endPos\fP,
+	char *\f2fileName\fP);
+.yE
+.P
+.cdes
+.yS
+.ta \w'void DtEditorReset('u
+void DtEditorReset(Widget \f2widget\fP);
+.yE
+.P
+.cdee
+.yS
+.ta \w'DtEditorErrorCode DtEditorSaveContentsToFile('u
+DtEditorErrorCode DtEditorSaveContentsToFile(Widget \f2widget\fP,
+	char *\f2fileName\fP,
+	Boolean	\f2overwriteIfExists\fP,
+	Boolean	\f2hardCarriageReturns\fP,
+	Boolean \f2markContentsAsSaved\fP);
+.yE
+.P
+.yS
+.ta \w'Boolean DtEditorSelectAll('u
+Boolean DtEditorSelectAll(Widget \f2widget\fP);
+.yE
+.P
+.yS
+.ta \w'DtEditorErrorCode DtEditorSetContents('u
+DtEditorErrorCode DtEditorSetContents(Widget \f2widget\fP,
+	DtEditorContentRec *\f2data\fP);
+.yE
+.P
+.yS
+.ta \w'DtEditorErrorCode DtEditorSetContentsFromFile('u
+DtEditorErrorCode DtEditorSetContentsFromFile(Widget \f2widget\fP,
+	char *\f2fileName\fP);
+.yE
+.P
+.yS
+.ta \w'void DtEditorSetInsertionPosition('u
+void DtEditorSetInsertionPosition(Widget \f2widget\fP,
+		XmTextPosition \f2position\fP);
+.yE
+.P
+.yS
+.ta \w'void DtEditorTraverseToEditor('u
+void DtEditorTraverseToEditor(Widget \f2widget\fP);
+.yE
+.P
+.yS
+.ta \w'Boolean DtEditorUndoEdit('u
+Boolean DtEditorUndoEdit(Widget \f2widget\fP);
+.yE
+.cdes
+.SH "SEE ALSO"
+.Fn DtCreateEditor 3,
+.Fn DtEditor 3,
+.Fn DtEditorAppend 3,
+.Fn DtEditorAppendFromFile 3,
+.Fn DtEditorChange 3,
+.Fn DtEditorCheckForUnsavedChanges 3,
+.Fn DtEditorClearSelection 3,
+.Fn DtEditorCopyToClipboard 3,
+.Fn DtEditorCutToClipboard 3,
+.Fn DtEditorDeleteSelection 3,
+.Fn DtEditorDeselect 3,
+.Fn DtEditorFind 3,
+.Fn DtEditorFormat 3,
+.Fn DtEditorGetContents 3,
+.Fn DtEditorGetInsertionPosition 3,
+.Fn DtEditorGetLastPosition 3,
+.Fn DtEditorGetMessageTextFieldID 3,
+.Fn DtEditorGetSizeHints 3,
+.Fn DtEditorGoToLine 3,
+.Fn DtEditorInsert 3,
+.Fn DtEditorInsertFromFile 3,
+.Fn DtEditorInvokeFindChangeDialog 3,
+.Fn DtEditorInvokeFormatDialog 3,
+.Fn DtEditorInvokeSpellDialog 3,
+.Fn DtEditorPasteFromClipboard 3,
+.Fn DtEditorReplace 3,
+.Fn DtEditorReplaceFromFile 3,
+.Fn DtEditorReset 3,
+.Fn DtEditorSaveContentsToFile 3,
+.Fn DtEditorSelectAll 3,
+.Fn DtEditorSetContents 3,
+.Fn DtEditorSetContentsFromFile 3,
+.Fn DtEditorSetInsertionPosition 3,
+.Fn DtEditorTraverseToEditor 3,
+.Fn DtEditorUndoEdit 3.
+.cdee

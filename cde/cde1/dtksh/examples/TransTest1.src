@@ -1,0 +1,90 @@
+\#! CDE_INSTALLATION_TOP/bin/dtksh
+
+\##########################################################################
+\#  (c) Copyright 1993, 1994 Hewlett-Packard Company	
+\#  (c) Copyright 1993, 1994 International Business Machines Corp.
+\#  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+\#  (c) Copyright 1993, 1994 Unix System Labs, Inc., a subsidiary of
+\#      Novell, Inc.
+\##########################################################################
+
+
+\#
+\# This sample shell script demonstrates the operation of augmented and
+\# overridden translations.  If the translations are cleared, then both
+\# overriding and augmenting the translations will cause all of the new
+\# translations to take effect.
+\#
+
+Enter()
+{
+   echo "EnterNotify ("$1")"
+}
+
+BtnDown()
+{
+   echo "ButtonDown ("$1")"
+}
+
+Activate()
+{
+   echo "Activate"
+}
+
+Augment()
+{
+   XtAugmentTranslations $PB \
+	'<EnterNotify>:ksh_eval("Enter augmented") 
+ 	<Btn1Down>:ksh_eval("BtnDown 1")
+ 	<Btn3Down>:ksh_eval("BtnDown 3")'
+}
+
+Override()
+{
+   XtOverrideTranslations $PB \
+	'<EnterNotify>:ksh_eval("Enter overridden") 
+	<Btn1Down>:ksh_eval("BtnDown 1")'
+}
+
+Uninstall()
+{
+   XtUninstallTranslations $PB
+}
+
+
+\######################### Create the Main UI #################################
+
+XtInitialize TOPLEVEL transTest1 TransTest1 "$0" "$@"
+XtSetValues $TOPLEVEL allowShellResize:True
+
+XmCreateForm FORM $TOPLEVEL form 
+XtManageChild $FORM
+
+XtCreateManagedWidget PB pb XmPushButton $FORM \
+	labelString:"Test Button"
+XtAddCallback $PB activateCallback "Activate"
+
+XtRealizeWidget $TOPLEVEL
+
+XtCreateApplicationShell TOPLEVEL2 listAdd1a TopLevelShell
+
+XtCreateManagedWidget RC rc XmRowColumn $TOPLEVEL2 \
+         orientation:HORIZONTAL \
+         numColumns:2 \
+         packing:PACK_COLUMN 
+
+XtCreateManagedWidget PB1 pb1 XmPushButton $RC \
+	labelString:"Augment Translations"
+XtAddCallback $PB1 activateCallback "Augment"
+
+XtCreateManagedWidget PB2 pb2 XmPushButton $RC \
+	labelString:"Override Translations"
+XtAddCallback $PB2 activateCallback "Override"
+
+XtCreateManagedWidget PB3 pb3 XmPushButton $RC \
+	labelString:"Uninstall Translations"
+XtAddCallback $PB3 activateCallback "Uninstall"
+
+XtRealizeWidget $TOPLEVEL2
+
+XtMainLoop

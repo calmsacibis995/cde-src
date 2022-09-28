@@ -1,0 +1,423 @@
+.\" Add some macros to assist in X/Open spec conversion:
+.de LI
+.\" simulate -mm .LIs by turning them into .TPs
+.TP \\n()Jn
+\\$1
+..
+.de Lc
+.\" version of .LI that emboldens its argument
+.TP \\n()Jn
+\s-1\f3\\$1\f1\s+1
+..
+.TH dticonfile 4 "23 May, 1994"
+.BH "23 May, 1994"
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994 Novell, Inc.
+.\" *************************************************************************
+.SH NAME
+dticonfile \(mi icon conventions for \s-1CDE\s+1 icons
+.SH SYNOPSIS
+The conventions used within the \s-1CDE\s+1 for icon
+sizes and naming, location, usage, and design are specified.
+.SH DESCRIPTION
+Both X Pixmap and X Bitmap icon file formats are used within the \s-1CDE\s+1.
+X Pixmap (XPM) icons are multi-color images 
+based on the XPM format developed by Arnaud Le Hors.
+A pixmap file is 
+an ascii file which can be read and modified by hand, in addition to the 
+use of color pixmap editors (like the \s-1CDE\s+1 Icon Editor).
+X Bitmap (XBM) 
+icons are monochrome (two-color) images based on the official X11 Bitmap 
+File Format.
+Bitmap files are ascii files.
+However, the data is simply 
+a binary representation of the bitmap, and as such is not easily read or
+modified by hand.
+XBM icons can be created and modified by the \s-1CDE\s+1 Icon 
+Editor.
+The icon editor has the ability to write out any icon in either
+the XPM or XBM file format.
+For a more detailed description of these
+file formats and the icon editor, see the
+.BR dtbmfile (4),
+.BR dtpmfile (4) 
+and
+.BR dticon (1)
+man pages.
+.SS "FILE NAMING"
+\s-1CDE\s+1 icon file names are typically in one of the 
+following forms:
+.PP
+.RS 3
+.nr )J 8
+.LI \f2basename.format\fP
+.br
+.LI \f2basename.size.format\f1
+.PP
+.RE
+.nr )J 0
+.PP
+Basename is the \f2logical\fP name of the icon.  
+The basename for icons that are installed with \s-1CDE\s+1 all begin with 
+either \f2Dt\f1 or \f2Fp\f1.
+\f2Dt\f1 is the default prefix for all
+\s-1CDE\s+1 icons.
+The \f2Fp\f1 prefix is used for icons that appear in the 
+front panel when an icon other than the default \f2Dt\f1 icon is desired.
+In this case, the base name is the same, except for the prefix.
+.PP
+The format is
+.I .pm
+for a pixmap file and
+.I .bm
+for a bitmap file.  
+Size is a single letter
+.I l
+for large,
+.I m
+for medium,
+.I s
+for small, or
+.I t
+for tiny.
+Many of the
+.I logical
+icons are provided in multiple sizes for both color and monochrome.
+This allows the \s-1CDE\s+1 to use the optimal color and size 
+combination for the specific task and configuration the user is running.
+Many bitmap icons have a
+.I mask
+associated with the icon.
+These are named \f2 basename.size\f3_m\f2.format\f1.
+All icons are named so that the longest
+file name associated with that icon will be 14 characters or less, so that it
+can be used on a short file name system.
+The longest file name can be
+described as \f2 Dt\f3xxxxx\f2_m.l.pm\f1,
+where 
+.B xxxx
+is the
+.I logical
+icon name.
+.SS Example
+This is an example of icon files that might be associated with the 
+icon \f2foo\f1.
+The single
+.I logical
+icon \f2foo\f1 contains tiny, 
+small, medium, and large bitmap icons (with mask) and pixmap icons.
+.PP
+.RS 3
+.nr )J 8
+.LI \f3Dtfoo.t.pm\fP
+.br
+.LI \f3Dtfoo.t.bm\fP					
+.br
+.LI \f3Dtfoo.t_m.bm\fP
+.br
+.LI \f3Dtfoo.s.pm\fP
+.br
+.LI \f3Dtfoo.s.bm\fP					
+.br
+.LI \f3Dtfoo.s_m.bm\fP
+.br
+.LI \f3Dtfoo.m.pm\fP
+.br
+.LI \f3Dtfoo.m.bm\fP
+.br
+.LI \f3Dtfoo.m_m.bm\fP
+.br
+.LI \f3Dtfoo.l.pm\fP
+.br
+.LI \f3Dtfoo.l.bm\fP
+.br
+.LI \f3Dtfoo.l_m.bm\fP
+.PP
+.RE
+.nr )J 0
+.SS "ICON SIZES"
+For the default \s-1CDE\s+1 icons, uniform icon sizes 
+have been adopted.
+Icons are of the following sizes, and are 
+named with the corresponding size suffix.
+.PP
+.RS 3
+.nr )J 15
+.LI Large
+48x48 icon with .l suffix
+.LI Medium
+32x32 icon with .m suffix
+.LI Small
+24x24 icon with .s suffix
+.LI Tiny
+16x16 icon with .t suffix
+.PP
+.RE
+.nr )J 0
+.PP
+The icon sizes used varies for different components, and is dependent upon
+the display hardware.
+.SS "Table Of Icon Sizes Used"
+.TS
+center, expand;
+cf3	cf3	cf3
+lf3w(2c)	lf3w(2c)	lf3w(2c) .
+\s-1CDE\s+1 Component	HiRes,MedRes	LoRes(vga)
+_
+Front Panel	48x48	32x32
+FP Subpanels	32x32	24x24
+FP Inset FP	24x24	16x16
+
+WMgr ClientIcon	48x48	32x32
+
+File Mgr (Large)	32x32	32x32
+File Mgr (Small)	16x16	16x16
+.TE
+.SS "ICON COLORS"
+These colors are used in \s-1CDE\s+1 icons.
+The dynamic colors use color cells from one of the color sets
+in the user's color palette (except none, which requires no color cell).  
+.PP
+.cdes
+The eight icon color names are already included in the
+.BR rgb.txt 
+file.
+The eight icon gray color names should be added to each \s-1CDE\s+1 vendor's
+.BR rgb.txt .
+We should also consider making a request for the gray
+logical colors to be included in the default
+.BR rgb.txt
+from MIT .
+.cdee
+.TS
+center;
+cf3	cf3
+lf3w(2c)	lf3w(2c) .
+
+Color Name (rgb.txt)	Symbolic Name (<icon>.pm)
+_
+< dynamic >	none
+< dynamic >	background
+< dynamic >	selectColor
+< dynamic >	topShadowColor
+< dynamic >	bottomShadowColor
+
+black	iconColor1
+white	iconColor2
+red	iconColor3
+green	iconColor4
+blue	iconColor5
+yellow	iconColor6
+cyan	iconColor7
+magenta	iconColor8
+
+iconGray1	iconGray1
+iconGray2	iconGray2
+iconGray3	iconGray3
+iconGray4	iconGray4
+iconGray5	iconGray5
+iconGray6	iconGray6
+iconGray7	iconGray7
+iconGray8	iconGray8
+.TE
+.PP
+\f2???? Note: the information enclosed between the "ICON FILE LOCATIONS" and
+"SEE ALSO" headings,
+.na
+does not go to x/open\fP
+.SH "ICON FILE LOCATIONS"
+The \s-1CDE\s+1 has default locations where it
+looks to find system and user icon files.
+See the \f2dtsearchpath(1)\f1 man page for detailed information on the
+icon lookup path.
+.SH "ICON USAGE IN \s-1CDE\s+1"
+Icons are used in a variety of ways within the \s-1CDE\s+1.
+Below are some of the general areas in which a user can use icons to 
+customize his or her personal \s-1CDE\s+1 configuration.
+A system administrator can also do this on a system or network wide basis.
+For more detailed information on any of these topics, see the documentation
+for that component and/or configuration file.
+.SS "Actions And Data Types"
+An icon is associated with an action or data type using the ICON keyword 
+in the action or data type definition (located in .dt files).
+If you follow \s-1CDE\s+1 naming conventions, you do not 
+need to specify the path or icon suffix.
+The size and format used will 
+be determined at run-time based on the system configuration.
+.SS Example
+.PP
+.sp -1
+.RS 5
+.ta 4m +4m +4m +4m +4m +4m +4m
+.nf
+.ft 3
+ACTION 	IslandPaintOpenDoc
+{
+    ICON           Ipaint
+    WINDOW_TYPE    NO_STDIO
+    EXEC_HOST      MyMachine
+    EXEC_STRING    /usr/bin/IslandPaint %(File)Arg_1"File to open:"
+}
+.PP
+.ft 1
+.fi
+.RE
+.SS "Client Icons"
+An icon is associated with a client's iconified window through the 
+iconImage window manager resource as follows: 
+.br
+     Dtwm*\f2clientName\f1*iconImage: IconFilename 
+.br
+The icon may be a pixmap or bitmap format icon.
+Some clients do not allow their default icon to be overridden.
+.SS Example
+.PP
+.sp -1
+.ta 4m +4m +4m +4m +4m +4m +4m
+.nf
+.ft 3
+Dtwm*IslandPaint*clientIcon: IslandPaint.bm
+.PP
+.ft 1
+.fi
+.SS "Front Panel"
+Icons can be displayed as controls in the front panel using the ICON 
+keyword in control definitions.
+Either pixmap or bitmap format icons 
+can be used.
+For controls which are of type icon with
+.BR \s-1MONITOR_TYPE\s+1
+set to file or mail, an alternate image can be specified using the 
+keyword
+.BR \s-1ALTERNATE_ICON\s+1 .
+The alternate icon is used when the file size 
+has grown.
+Controls of type busy can also have an alternate icon, which 
+is used when new mail is received.
+For controls which allow a
+.BR \s-1PUSH_ACTION\s+1
+or a
+.BR \s-1DROP_ACTION\s+1 ,
+push or drop animation can be defined using multiple 
+icons that create animation visual effects.
+.SS Example
+.PP
+.sp -1
+.RS 5
+.ta 4m +4m +4m +4m +4m +4m +4m
+.nf
+.ft 3
+CONTROL DirectoryTerm
+{
+    TYPE             icon
+    IMAGE            directoryTerm
+    DROP_ACTION      f.action StartDirectoryTerm
+    PUSH_ACTION      f.action StartDirectoryTerm
+    PUSH_ANIMATION   DirAnimation
+}
+
+ANIMATION DirAnimation
+{
+    ANIMATION	frame1 	300
+    ANIMATION	frame2	
+    ...
+}
+.PP
+.ft 1
+.fi
+.RE
+.SS Backdrops
+The backdrop icons show up in a list in the Backdrop Dialog of the 
+Style Manager.
+The user can select a single backdrop per workspace, 
+to be used as the background for that workspace.
+This is a visual 
+clue to help the user distinguish one workspace from another.
+Backdrops 
+are available in both monochrome (bitmap) and color (pixmap) format 
+(all backdrops are unique; there are not bitmap and pixmap versions of 
+the same backdrop).
+Although backdrops use the same file format as other 
+icons, they are not used like what is typically refer to as an
+.IR icon .
+They would be more accurately described as an
+.IR image .
+The image is 
+repeated (tiled) to fill the entire background of a workspace.
+This is 
+not typically done with an icon.
+The \s-1CDE\s+1 comes with a set of standard backdrops.  Some are monochrome 
+and some are in color.
+Custom backdrops can be added to system installed 
+backdrops using the Style Manager and Window Manager backdropDirectories 
+resource.
+Backdrops can be either bitmap or pixmap format.
+A system 
+administrator can add system-wide backdrops to the system-wide default
+backdrop directory,
+.BR /usr/dt/backdrops/C .
+.SS Example
+.PP
+.sp -1
+.ta 4m +4m +4m +4m +4m +4m +4m
+.nf
+.ft 3
+*backdropDirectories: /users/julie/.dt/icons/myBackdrops
+.PP
+.ft 1
+.fi
+.SS "File Manager As Icon Browser"
+The File Manager can be used as an icon browser.
+In this mode, when you 
+change to a directory that contains icons (.bm or .pm files), each icon 
+is displayed next to the icon file name.  
+To enable icon browsing, copy the file
+.B /usr/dt/contrib/types/IconBrowse.dt
+into your
+.BR HOME.dt/types/
+directory .
+Then reload the action database by executing the
+.B ReloadActions
+action. 
+For large icons, or on systems with little memory, this could cause delays 
+on some directories.
+To disable icon browsing, remove your personal copy 
+of the
+.B IconBrowse.dt
+file and reload the action database again.
+.SS "DESIGN RECOMMENDATIONS"
+In order to allow colorful icons while minimizing the number of colors used 
+by the \s-1CDE\s+1, it is recommended that the colors used be 
+limited to those available in the Icon Editor.
+These include the
+.I dynamic"
+OSF/Motif widget colors, as well as a set of static color and static gray 
+colors.
+The dynamic colors include foreground, background, top shadow, 
+bottom shadow, select and a transparent color.
+The static colors include 
+black, white, red, blue, green, yellow, magenta and cyan.
+The static gray 
+colors are simply eight varying shades of gray, from nearly black to nearly 
+white.
+.SH "APPLICATION USAGE"
+None.
+.SH "SEE ALSO"
+.na
+.BR dtpmfile (4),
+.BR dtbmfile (4),
+.BR dtsearchpath (1),
+.BR dticon (1),
+.BR dtfpfile (4),
+.BR dtdtfile (4),
+.BR dtactionfile (4),
+.BR dtdtsfile  (4),
+.BR dtstyle (1),
+.BR dtenvvar (5),
+.BR xmgeticonfilename (3)
+.br
+\f2???? What kind of listing is this last one ????
+

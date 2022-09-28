@@ -1,0 +1,57 @@
+/* $Header: Imakefile,v 1.13 94/07/20 16:10:08 bertanij_hp_cv Exp $ */
+#define IHaveSubdirs
+#define PassCDebugFlags
+
+VOL   = Intromgr
+
+OBJS1 = $(VOL).sdl
+
+JUNK  = $(VOL).err $(VOL).idx $(VOL).snb $(VOL).xrh $(VOL).hmi \
+	$(VOL).idt $(VOL).tpc
+
+SRCS1 = $(VOL).htg 
+
+SRCS2 = helptag.opt
+
+SUBDIRS = graphics
+DEPENDDIRS = graphicsShared
+
+
+MakeSubdirs($(SUBDIRS))
+
+DependSubdirs($(SUBDIRS))
+
+all:: $(OBJS1)
+
+includes::
+
+
+HelpTagRule
+
+LinkFiles(../../../global, $(SRCS2))
+LinkFiles(../.., $(DEPENDDIRS))
+
+
+clean::
+	$(RM) $(OBJS1) $(JUNK)
+
+volclean::
+        $(RM) $(OBJS1) $(JUNK)
+
+
+$(OBJS1): $(VOL).htg                        \
+          helptag.opt                       \
+          ../GettingHelp                    \
+          ../HomeTopic                      \
+          ../MetaInfo                       \
+          ../QuickStart                     \
+          ../Windows                        \
+          ../Glossary                       \
+          ../entityFiles/Files.ent          \
+          ../entityFiles/Graphics.ent       \
+          ../entityFiles/Text.ent           \
+          ../entityFiles/graphicsShared.ent \
+          ../entityFiles/helpchar.ent \
+          ../entityFiles/helplang.ent
+
+

@@ -1,0 +1,110 @@
+.TH Dt/Action.h 5 "24 May 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.\" *************************************************************************
+.SH NAME
+Dt/Action.h \- action service definitions
+.SH SYNOPSIS
+.yS
+#include <Dt/Action.h>
+.yE
+.SH DESCRIPTION
+The
+.Hd Dt/Action.h
+header defines the following
+.Cn DtActionStatus
+constants:
+.Cs I
+DtACTION_OK
+DtACTION_INVALID_ID
+DtACTION_INVOKED
+DtACTION_DONE
+DtACTION_CANCELED
+DtACTION_FAILED
+DtACTION_STATUS_UPDATE
+.Ce
+.P
+The header defines the following data type through
+.BR typedef :
+.Cs I
+typedef unsigned long DtActionInvocationID;
+.Ce
+.P
+The header defines the following callback prototypes:
+.P
+.yS
+.ta \w'typedef void (*DtActionCallbackProc)('u
+typedef void (*DtActionCallbackProc)(DtActionInvocationID \f2id\fP,
+	XtPointer \f2client_data\fP,
+	DtActionArg *\f2args\fP,
+	int \f2argCount\fP,
+	DtActionStatus \f2status\fP);
+.yE
+.P
+.yS
+.ta \w'typedef void (*DtDbReloadCallbackProc)('u
+typedef void (*DtDbReloadCallbackProc)(XtPointer \f2clientData\fP);
+.yE
+.P
+The header defines the following as functions:
+.P
+.yS
+.ta \w'void DtDbReloadNotify('u
+void DtDbReloadNotify(DtDbReloadCallbackProc \f2proc\fP,
+	XtPointer \f2clientData\fP);
+.yE
+.P
+.yS
+void DtDbLoad(void);
+.yE
+.P
+.yS
+.ta \w'Boolean DtActionExists('u
+Boolean DtActionExists(char *\f2s\fP);
+.yE
+.P
+.yS
+.ta \w'char *DtActionLabel('u
+char *DtActionLabel(char *\f2s\fP);
+.yE
+.P
+.yS
+.ta \w'char *DtActionDescription('u
+char *DtActionDescription(char *\f2actionName\fP);
+.yE
+.P
+.yS
+.ta \w'char *DtActionIcon('u
+char *DtActionIcon(char *\f2actionName\fP);
+.yE
+.P
+.yS
+.ta \w'DtActionInvoke('u
+DtActionInvocationID
+DtActionInvoke(Widget \f2w\fP,
+	char *\f2action\fP,
+	DtActionFile *\f2args\fP,
+	int \f2argCount\fP,
+	char *\f2termOpts\fP,
+	char *\f2execHost\fP,
+	char *\f2contextDir\fP,
+	int \f2useIndicator\fP,
+	DtActionCallbackProc \f2statusUpdateCb\fP,
+	XtPointer \f2client_data\fP);
+.yE
+.cdes
+.SH "SEE ALSO"
+.Fn DtActionDescription 3,
+.Fn DtActionExists 3,
+.Fn DtActionIcon 3,
+.Fn DtActionInvoke 3,
+.Fn DtActionLabel 3,
+.Fn DtActionCallbackProc 3,
+.Fn DtDbLoad 3,
+.Fn DtDbReloadNotify 3,
+.Cm dtaction 1.
+.cdee

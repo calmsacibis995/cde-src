@@ -1,0 +1,1078 @@
+.TH dtsearchpath 1 "12 May, 1997"
+.\" CDE Common Source Format, Version 1.0.0
+.\"----------------------------------------------------------------------------
+.\" (c) Copyright 1993,1994 Hewlett-Packard Company
+.\" (c) Copyright 1993,1994 International Business Machines Corp.
+.\" (c) Copyright 1993-1997 Sun Microsystems, Inc.
+.\" (c) Copyright 1993,1994 Novell, Inc.
+.SH NAME
+dtsearchpath \- set desktop search paths
+.SH SYNOPSIS
+.yS
+\f3dtsearchpath\f1 [ \f3-u\f1 \f2\f2username\f1 ] [ \f3-v\f1 ] 
+[ \f3-o\f1 ] [ \f3-csh\f1 ] [ \f3-ksh\f1 ]
+.yE
+.SH DESCRIPTION
+The 
+.Cm dtsearchpath
+command line utility
+sets local and remote locations that desktop components should 
+search for Application Manager groups, for filetype and action
+defintions, 
+for desktop icons, and for help files.
+.P
+The \f3/usr/dt/bin/Xsession\f1 startup script sources
+the user's 
+\f3$HOME/.dtprofile\f1
+script and any scripts located under \f3/etc/dt/config/Xsession.d\f1
+and \f3/usr/dt/config/Xsession.d\f1.
+After sourcing the \f3Xsession.d\f1
+files, the \f3Xsession\f1 script will invoke
+\f3/usr/dt/bin/dtsearchpath\f1 to 
+set and export the environment variables
+.IR DTAPPSEARCHPATH ,
+.IR DTDATABASESEARCHPATH ,
+.IR DTHELPSEARCHPATH ,
+.IR XMICONSEARCHPATH ,
+and
+.I XMICONBMSEARCHPATH
+(see the
+\f3ENVIRONMENT\f1 heading in this man page for a more detailed description).
+.HU "Search Path Syntax"
+Each of the exported search path variables is supported by, that is,
+built from, two comma-separated search path environment variables.
+For example:
+.IR DTAPPSEARCHPATH
+is supported by
+.I DTSPSYSAPPHOSTS
+and
+.IR DTSPUSERAPPHOSTS .
+.I XMICONSEARCHPATH
+is supported by
+.I DTSPSYSICON
+and
+.IR DTSPUSERICON .
+.P
+The input search path environment variables fall into two categories \-
+those that support the host:/path syntax and those that do not.
+If the name of
+the input environment variable contains the string
+.IR HOSTS ,
+it will
+support host:/path syntax.
+The syntax for search paths that support
+host:/path is:
+.Cs I
+search path element
+[ \f2host \f3|\f2 pathname \f3|\f2 hostname+pathname\f1 ]
+host
+<hostname> :
+pathname
+/<\f2absolute path\f1>
+.Ce
+.sp 1
+The syntax for search paths that do not support host:/path is:
+.Cs I
+search path element
+[ \f2pathname\f1 ]
+pathname
+/<\f2absolute path\f1>
+.Ce
+.HU Examples
+To set the Icon search path to include the
+\f3/usr/local/games/icons\f1 subdirectory, 
+the following line would appear
+in a script in the \f3/etc/dt/config/Xsession.d/\f1 subdirectory:
+.br
+\f3DTSPSYSICON=/usr/local/games/icons\f1
+.sp 1
+To set the Database search path to include host \f3marlin\f1,
+the following line would appear
+in a script in the \f3/etc/dt/config/Xsession.d/\f1 subdirectory:
+.br
+\f3DTSPSYSDATABASEHOSTS=marlin:\f1
+.sp 1
+To set the Application Manager path to include the applications on host
+steelhead under subdirectory \f3/usr/local\f1, and under the default
+help location on host \f3halibut\f1,
+the following line would appear
+in a script in the \f3/etc/dt/config/Xsession.d/\f1 subdirectory:
+.br
+\f3DTSPSYSAPPHOSTS=steelhead:/usr/local,halibut:\f1
+.sp 1
+The
+.B dtsearchpath
+command line utility
+parses these path elements and transforms them into a form suitable
+for the desktop components.
+.P
+If a 
+.B host
+element is included,
+then the Tooltalk library's filename mapping capabilities will
+control how
+a path to files on that host are constructed.
+For example, the path to file 
+\f3/tmp/file\f1 on host \f3goby\f1 may be constructed
+as \f3/net/goby/tmp/file\f1 or as \f3/nfs/goby/tmp/file\f1.
+.HU "Default Locations"
+By default, 
+.B dtsearchpath
+sets up three search locations for each subsystem.
+In search 
+order, they are:
+.VL
+.LI \(bu
+The user's personal location, under \f3$HOME/.dt\f1.
+.LI \(bu
+The system administrator's configuration location, under 
+\f3/etc/dt/appconfig\f1.
+.LI \(bu
+The factory default location, under \f3/usr/dt/appconfig\f1.
+.LE
+.HU Precedence
+When searching a path for a particular item, such as an icon file, the 
+desktop will always be satisfied by the first item found.
+For example,
+when searching for an icon whose basename is
+\f3beeper\f1,
+if that icon exists in both the 
+\f3/etc/dt/appconfig/icons\f1
+and the
+\f3/usr/dt/appconfig/icons\f1 subdirectories,
+then the icon under
+\f3/etc/dt/appconfig/icons\f1
+will be found first and used, because that
+element appears first in the 
+\f2XMICONSEARCHPATH\f1.
+The search terminates when the first match occurs.
+.P
+Each of the \f2DTSPSYS\f1 search path environment variables has a
+corresponding \f2DTSPUSER\f1 environment variable which will take
+precedence over the system setting.
+The \f2DTSPUSER\f1 values will
+be prepended to the \f3DT\f1 search path whereas the
+\f2DTSPSYS\f1 values will come after the
+.B $HOME/.dt
+configuration location but before the factory default location.
+The relationship between the system administrator's customization and the
+default \f3/etc/dt\f1 configuration location is up to the user of the 
+\f2DTSPSYS\f1 value.
+.SH OPTIONS
+.VL 15
+.LI "\f3\-u  user\f1"
+Causes
+.B dtsearchpath
+to return the search paths for the specified user.
+This option is useful
+for system administrators who need to understand the search paths for
+a particular user.
+.LI \f3\-v\f1
+The verbose option causes
+.B dtsearchpath
+to print to standard output values of the search environment better formated 
+for viewing by human eye.  By default, the command instead returns values 
+suitable for evaluation by a Bourne Shell script.
+.LI \f3\-ksh\f1
+The K-shell option causes
+.B dtsearchpath
+to print to standard output values of the search environment suitable
+for evaluation by a K-shell or Bourne Shell script (this is the default 
+behavior for dtsearchpath). 
+.LI \f3\-csh\f1
+The C-shell option causes
+.B dtsearchpath
+to print to standard output values of the search environment suitable
+for evaluation by a C-shell script.  Note: a "-c" option is also accepted by
+dtsearchpath for compatibility with earlier Sun CDE 1.0 and CDE 1.0.x releases.
+The option "-csh" became the a vendor standard after CDE 1.0.x had been 
+released.
+.LI \f3\-o\f1
+The don't-optimize option causes
+.B dtsearchpath
+to add a path to the search path even if the path does not exist.
+.LE
+.SH "RETURN VALUES"
+.VL 15
+.LI 0
+Command completed successfully.
+.LI 1
+Command invoked with incorrect usage.
+.LE
+.SH ENVIRONMENT
+The values set by 
+.B dtsearchpath
+are passed through to the individual desktop subsystems, such as
+the action
+database and the help system, by means of environment variables.
+.P
+The \f2DTSPSYSAPPHOSTS\f1 variable is the primary environment
+variable and drives the remaining search paths for filetypes and
+actions, for desktop icons, and for help files.
+.P
+In the following list, all values are derived from three places:  the
+user's \f3$HOME\f1 directory (\f3$HOME/.dt\f1),
+the system configuration directory (\f3/etc/dt/appconfig\f1),
+and the factory defaults directory (\f3/usr/dt/appconfig\f1).
+The values are listed as tranformed for the individual desktop
+subsystems.
+.P
+To verify these values, execute
+.B dtsearchpath
+with the verbose (\f3-v\f1) option.
+.sp 1
+.IR DTAPPSEARCHPATH ,
+.IR DTSPSYSAPPHOSTS ,
+.IR DTSPUSERAPPHOSTS :
+Used to discover application hosts and their registry subdirectories.
+The default transformed value is:
+.br
+\f3$HOME/.dt/appmanager
+.br
+/etc/dt/appconfig/appmanager/%L
+.br
+/etc/dt/appconfig/appmanager/C
+.br
+/usr/dt/appconfig/appmanager/%L
+.br
+/usr/dt/appconfig/appmanager/C\f1
+.br
+Where \f3%L\f1 is the value of the
+.I LANG
+environment variable.
+.P
+The value of
+.I DTAPPSEARCHPATH
+can be altered by either of two
+environment variables:
+.I DTSPSYSAPPHOSTS
+and/or
+.IR DTSPUSERAPPHOSTS .
+.I DTSPSYSAPPHOSTS
+is for use by system administrators.
+Values are
+specified by adding a ksh script to the
+.B /etc/dt/config/Xsession.d
+directory that exports the variable.
+.sp 1
+export DTSPSYSAPPHOSTS=marlin:,goby:/vipapps,/opt
+.br
+The expected syntax for
+.I DTSPSYSAPPHOSTS
+is a comma-separated list.
+.I DTSPSYSAPPHOSTS
+accepts host:, host:/path, or just /path. 
+The effect
+is to insert a searchpath after the configuration location 
+(\f3/etc/dt/appconfig/appmanager\f1) and before the factory default location
+(\f3/usr/dt/appconfig/appmanager\f1).
+.br
+\f3$HOME/.dt/appmanager
+.br
+/etc/dt/appconfig/appmanager/%L
+.br
+/etc/dt/appconfig/appmanager/C
+.br
+/nfs/marlin/etc/dt/appconfig/appmanager/%L
+.br
+/nfs/marlin/etc/dt/appconfig/appmanager/C
+.br
+/nfs/goby/vipapps/appconfig/appmanager/%L
+.br
+/nfs/goby/vipapps/appconfig/appmanager/C
+.br
+/opt/appconfig/appmanager/%L
+.br
+/opt/appconfig/appmanager/C
+.br
+/usr/dt/appconfig/appmanager/%L
+.br
+/usr/dt/appconfig/appmanager/C\f1
+.sp 1
+If the system administrator wants the local configuration directory to
+appear in a different location within the configurable search paths,
+the special host term 'localhost:' can be inserted anywhere into the
+environment variable:
+.sp 1
+export DTSPSYSAPPHOSTS=marlin:,localhost:,goby:/vipapps,/opt
+.br
+The resulting value for
+.I DTAPPSEARCHPATH
+would be:
+.br
+\f3$HOME/.dt/appmanager
+.br
+/nfs/marlin/etc/dt/appconfig/appmanager/%L
+.br
+/nfs/marlin/etc/dt/appconfig/appmanager/C
+.br
+/etc/dt/appconfig/appmanager/%L
+.br
+/etc/dt/appconfig/appmanager/C
+.br
+/nfs/goby/vipapps/appconfig/appmanager/%L
+.br
+/nfs/goby/vipapps/appconfig/appmanager/C
+.br
+/opt/appconfig/appmanager/%L
+.br
+/opt/appconfig/appmanager/C
+.br
+/usr/dt/appconfig/appmanager/%L
+.br
+/usr/dt/appconfig/appmanager/C\f1
+.sp 1
+In fact, the value 'localhost:' can be inserted anywhere in the
+.I DTSPSYSAPPHOSTS
+value and its order within the
+.I DTSPSYSAPPHOSTS
+will be reflected in the 
+.I DTAPPSEARCHPATH
+value.
+.br
+.I DTSPUSERAPPHOSTS
+is for use by end users.
+Values are specified by exporting
+the value in the user's .dtprofile.
+.sp 1
+export DTSPUSERAPPHOSTS=appsvr:,/myapps
+.br
+.I DTSPUSERAPPHOSTS
+also accepts host:, host:/path, and /path
+specifications.
+The effect is to insert a searchpath before any other
+searchpath.
+.br
+\f3/nfs/appsvr/etc/dt/appconfig/appmanager/%L
+.br
+/nfs/appsvr/etc/dt/appconfig/appmanager/C
+.br
+/myapps/appmanager/%L
+.br
+/myapps/appmanager/C
+.br
+$HOME/.dt/appmanager
+.br
+/etc/dt/appconfig/appmanager/%L
+.br
+/etc/dt/appconfig/appmanager/C
+.br
+/usr/dt/appconfig/appmanager/%L
+.br
+/usr/dt/appconfig/appmanager/C\f1
+.sp 1
+.IR DTDATABASESEARCHPATH ,
+.IR DTSPSYSDATABASEHOSTS ,
+.IR DTSPUSERDATABASEHOSTS :
+.br
+Used to collect filetype and action definitions, as expressed in
+\f3*.dt\f1 files.
+The default transformed value is:
+.br
+\f3$HOME/.dt/types
+.br
+/etc/dt/appconfig/types/%L
+.br
+/etc/dt/appconfig/types/C
+.br
+/usr/dt/appconfig/types/%L
+.br
+/usr/dt/appconfig/types/C\f1
+.br
+Where \f3%L\f1 is the value of the
+.I LANG
+environment variable.
+.P
+The value of
+.I DTDATABASESEARCHPATH
+can be altered by either of two
+environment variables:
+.I DTSPSYSDATABASEHOSTS
+and/or
+.IR DTSPUSERDATABASEHOSTS .
+.br
+.I DTSPSYSDATABASEHOSTS
+is for use by system administrators.
+Values are
+specified by adding a ksh script to the \f3/etc/dt/config/Xsession.d\f1
+directory that exports the variable.
+.sp 1
+export DTSPSYSDATABASEHOSTS=marlin:,goby:/vipapps,/opt
+.br
+The expected syntax for
+.I DTSPSYSDATABASEHOSTS
+is a comma-separated
+list.
+.I DTSPSYSDATABASEHOSTS
+accepts host:, host:/path, or just /path.
+The effect is to insert a searchpath after the configuration location
+(\f3/etc/dt/appconfig/types\f1) and before the factory default location
+(\f3/usr/dt/appconfig/types\f1).
+.br
+\f3$HOME/.dt/types
+.br
+/etc/dt/appconfig/types/%L
+.br
+/etc/dt/appconfig/types/C
+.br
+marlin:/etc/dt/appconfig/types/%L
+.br
+marlin:/etc/dt/appconfig/types/C
+.br
+goby:/vipapps/appconfig/types/%L
+.br
+goby:/vipapps/appconfig/types/C
+.br
+/opt/appconfig/types/%L
+.br
+/opt/appconfig/types/C
+.br
+/usr/dt/appconfig/types/%L
+.br
+/usr/dt/appconfig/types/C\f1
+.sp 1
+As is the case for
+.IR DTAPPSEARCHPATH ,
+the placement of the local configuration
+directory can be affected by the adding special host term 'localhost:'
+to the
+.I DTSPSYSDATABASEHOSTS
+environment variable.
+.sp 1
+export DTSPSYSDATABASEHOSTS=marlin:,localhost:,goby:/vipapps
+.br
+The resulting value for
+.I DTDATABASESEARCHPATH
+would be:
+.br
+\f3$HOME/.dt/types
+.br
+marlin:/etc/dt/appconfig/types/%L
+.br
+marlin:/etc/dt/appconfig/types/C
+.br
+/etc/dt/appconfig/types/%L
+.br
+/etc/dt/appconfig/types/C
+.br
+goby:/vipapps/appconfig/types/%L
+.br
+goby:/vipapps/appconfig/types/C
+.br
+/usr/dt/appconfig/types/%L
+.br
+/usr/dt/appconfig/types/C\f1
+.P
+.I DTSPUSERDATABASEHOSTS
+is for use by end users.
+Values are specified by
+exporting the value in the user's .dtprofile.
+.P
+export DTSPUSERDATABASEHOSTS=dbsvr:,/mytypes
+.br
+.I DTSPUSERDATABASEHOSTS
+also accepts host:, host:/path, and /path
+specifications.
+The effect is to insert a searchpath before any other
+searchpath.
+.br
+\f3dbsvr:/etc/dt/appconfig/types/%L
+.br
+dbsvr:/etc/dt/appconfig/types/C
+.br
+/mytypes/types/%L
+.br
+/mytypes/types/C
+.br
+$HOME/.dt/types
+.br
+/etc/dt/appconfig/types/%L
+.br
+/etc/dt/appconfig/types/C
+.br
+/usr/dt/appconfig/types/%L
+.br
+/usr/dt/appconfig/types/C\f1
+.sp 1
+.IR XMICONSEARCHPATH ,
+.IR XMICONBMSEARCHPATH ,
+.IR DTSPSYSICON ,
+.IR DTSPUSERICON :
+.br
+Used to locate desktop icons.
+The default transformed value is:
+.br
+\f3$HOME/.dt/icons/0M.pm
+.br
+$HOME/.dt/icons/0M.bm
+.br
+$HOME/.dt/icons/%B
+.br
+/etc/dt/appconfig/icons/%L/0M.pm
+.br
+/etc/dt/appconfig/icons/%L/0M.bm
+.br
+/etc/dt/appconfig/icons/%L/%B
+.br
+/etc/dt/appconfig/icons/C/0M.pm
+.br
+/etc/dt/appconfig/icons/C/0M.bm
+.br
+/etc/dt/appconfig/icons/C/%B
+.br
+/usr/dt/appconfig/icons/%L/0M.pm
+.br
+/usr/dt/appconfig/icons/%L/0M.bm
+.br
+/usr/dt/appconfig/icons/%L/%B
+.br
+/usr/dt/appconfig/icons/C/0M.pm
+.br
+/usr/dt/appconfig/icons/C/0M.bm
+.br
+/usr/dt/appconfig/icons/C/%B
+.P
+Where
+.B %B
+is the basename of the requested icon,
+.B %M
+is the magnitude 
+(size) of the icon, and
+.B %L
+is the value of the
+.I LANG
+environment variable.
+.P
+The value of
+.I XMICONSEARCHPATH
+can be altered by either of two
+environment variables:
+.I DTSPSYSICON
+and/or
+.IR DTSPUSERICON .
+.I DTSPSYSICON
+is for use by system administrators.
+Values are
+specified by adding a ksh script to the
+.B /etc/dt/config/Xsession.d
+directory that exports the variable.
+.sp 1
+export DTSPSYSICON=/vipapps/icons
+.P
+The expected syntax for
+.I DTSPSYSICON
+is a comma-separated list.
+.I DTSPSYSICON
+accepts the /path format.
+The effect
+is to insert a searchpath after the configuration location 
+(\f3/etc/dt/appconfig/icons\f1) and before the factory default location
+(\f3/usr/dt/appconfig/icons\f1).
+.br
+\f3$HOME/.dt/icons/0M.pm
+.br
+$HOME/.dt/icons/0M.bm
+.br
+$HOME/.dt/icons/0M
+.br
+/etc/dt/appconfig/icons/%L/0M.pm
+.br
+/etc/dt/appconfig/icons/%L/0M.bm
+.br
+/etc/dt/appconfig/icons/%L/0M
+.br
+/etc/dt/appconfig/icons/C/0M.pm
+.br
+/etc/dt/appconfig/icons/C/0M.bm
+.br
+/etc/dt/appconfig/icons/C/0M
+.br
+/vipapps/icons/%L/0M.pm
+.br
+/vipapps/icons/%L/0M.bm
+.br
+/vipapps/icons/%L/0M
+.br
+/vipapps/icons/C/0M.pm
+.br
+/vipapps/icons/C/0M.bm
+.br
+/vipapps/icons/C/0M
+.br
+usr/dt/appconfig/icons/%L/0M.pm
+.br
+/usr/dt/appconfig/icons/%L/0M.bm
+.br
+/usr/dt/appconfig/icons/%L/0M
+.br
+/usr/dt/appconfig/types/C/0M.pm
+.br
+/usr/dt/appconfig/types/C/0M.bm
+.br
+/usr/dt/appconfig/types/C/0M\f1
+.P
+The placement of the local configuration directory can be affected by
+the adding the path term
+.B /etc/dt/appconfig
+to the
+.I DTSPSYSICON
+environment variable.
+.sp 1
+export DTSPSYSICON=/vipapps/icons,/etc/dt/appconfig
+.P
+The resulting value for
+.I XMICONSEARCHPATH
+would be:
+.P
+\f3$HOME/.dt/icons/0M.pm
+.br
+$HOME/.dt/icons/0M.bm
+.br
+$HOME/.dt/icons/0M
+.br
+/vipapps/icons/%L/0M.pm
+.br
+/vipapps/icons/%L/0M.bm
+.br
+/vipapps/icons/%L/0M
+.br
+/vipapps/icons/C/0M.pm
+.br
+/vipapps/icons/C/0M.bm
+.br
+/vipapps/icons/C/0M
+.br
+/etc/dt/appconfig/icons/%L/0M.pm
+.br
+/etc/dt/appconfig/icons/%L/0M.bm
+.br
+/etc/dt/appconfig/icons/%L/0M
+.br
+/etc/dt/appconfig/icons/C/0M.pm
+.br
+/etc/dt/appconfig/icons/C/0M.bm
+.br
+/etc/dt/appconfig/icons/C/0M
+.br
+usr/dt/appconfig/icons/%L/0M.pm
+.br
+/usr/dt/appconfig/icons/%L/0M.bm
+.br
+/usr/dt/appconfig/icons/%L/0M
+.br
+/usr/dt/appconfig/types/C/0M.pm
+.br
+/usr/dt/appconfig/types/C/0M.bm
+.br
+/usr/dt/appconfig/types/C/0M\f1
+.sp 1
+.I DTSPUSERICON
+is for use by end users.
+Values are specified by
+exporting the value in the user's .dtprofile.
+.P
+export DTSPUSERICON=$HOME/myicons
+.P
+.I DTSPUSERICON
+accepts /path specifications.
+The effect is to insert a
+searchpath before any other searchpath.
+.P
+\f3$HOME/myicons/0M.pm
+.br
+$HOME/myicons/0M.bm
+.br
+$HOME/myicons/0M
+.br
+$HOME/.dt/icons/0M.pm
+.br
+$HOME/.dt/icons/0M.bm
+.br
+$HOME/.dt/icons/0M
+.br
+/etc/dt/appconfig/icons/%L/0M.pm
+.br
+/etc/dt/appconfig/icons/%L/0M.bm
+.br
+/etc/dt/appconfig/icons/%L/0M
+.br
+/etc/dt/appconfig/icons/C/0M.pm
+.br
+/etc/dt/appconfig/icons/C/0M.bm
+.br
+/etc/dt/appconfig/icons/C/0M
+.br
+/usr/dt/appconfig/icons/%L/0M.pm
+.br
+/usr/dt/appconfig/icons/%L/0M.bm
+.br
+/usr/dt/appconfig/icons/%L/0M
+.br
+/usr/dt/appconfig/types/C/0M.pm
+.br
+/usr/dt/appconfig/types/C/0M.bm
+.br
+/usr/dt/appconfig/types/C/0M\f1
+.sp 1
+.IR DTHELPSEARCHPATH ,
+.IR DTSPSYSHELP ,
+.IR DTSPUSERHELP :
+.P
+Used to locate help volumes and families for the desktop help
+subsystem.
+The default transformed value is:
+.br
+\f3$HOME/.dt/help/<session>/%H
+.br
+$HOME/.dt/help/<session>/%H.sdl
+.br
+$HOME/.dt/help/<session>/%H.hv
+.br
+$HOME/.dt/help/%H
+.br
+$HOME/.dt/help/%H.sdl
+.br
+$HOME/.dt/help/%H.hv
+.br
+/etc/dt/appconfig/help/%L/%H
+.br
+/etc/dt/appconfig/help/%L/%H.sdl
+.br
+/etc/dt/appconfig/help/%L/%H.hv
+.br
+/etc/dt/appconfig/help/C/%H
+.br
+/etc/dt/appconfig/help/C/%H.sdl
+.br
+/etc/dt/appconfig/help/C/%H.hv
+.br
+/usr/dt/appconfig/help/%L/%H
+.br
+/usr/dt/appconfig/help/%L/%H.sdl
+.br
+/usr/dt/appconfig/help/%L/%H.hv
+.br
+/usr/dt/appconfig/help/C/%H
+.br
+/usr/dt/appconfig/help/C/%H.sdl
+.br
+/usr/dt/appconfig/help/C/%H.hv\f1
+.P
+Where
+.B %H
+is the basename of the requested help volume, and
+.B %L
+is the 
+value of the
+.I LANG
+environment variable.
+.P
+The value of
+.I DTHELPSEARCHPATH
+can be altered by either of two
+environment variables:
+.I DTSPSYSHELP
+and/or
+.IR DTSPUSERHELP .
+.I DTSPSYSHELP
+is for use by system administrators.
+Values are
+specified by adding a ksh script to the
+.B /etc/dt/config/Xsession.d
+directory that exports the variable.
+.P
+export DTSPSYSHELP=/vipapps/help
+.P
+The expected syntax for
+.I DTSPSYSHELP
+is a comma-separated list.
+.I DTSPSYSHELP
+accepts the /path format.
+The effect
+is to insert a searchpath after the configuration location 
+(\f3/etc/dt/appconfig/help\f1) and before the factory default location
+(\f3/usr/dt/appconfig/help\f1).
+.br
+\f3$HOME/.dt/help/<session>/%H
+.br
+$HOME/.dt/help/<session>/%H.sdl
+.br
+$HOME/.dt/help/<session>/%H.hv
+.br
+$HOME/.dt/help/%H
+.br
+$HOME/.dt/help/%H.sdl
+.br
+$HOME/.dt/help/%H.hv
+.br
+/etc/dt/appconfig/help/%L/%H
+.br
+/etc/dt/appconfig/help/%L/%H.sdl
+.br
+/etc/dt/appconfig/help/%L/%H.hv
+.br
+/etc/dt/appconfig/help/C/%H
+.br
+/etc/dt/appconfig/help/C/%H.sdl
+.br
+/etc/dt/appconfig/help/C/%H.hv
+.br
+/vipapps/help/%L/%H
+.br
+/vipapps/help/%L/%H.sdl
+.br
+/vipapps/help/%L/%H.hv
+.br
+/vipapps/help/C/%H
+.br
+/vipapps/help/C/%H.sdl
+.br
+/vipapps/help/C/%H.hv
+.br
+/usr/dt/appconfig/help/%L/%H
+.br
+/usr/dt/appconfig/help/%L/%H.sdl
+.br
+/usr/dt/appconfig/help/%L/%H.hv
+.br
+/usr/dt/appconfig/help/C/%H
+.br
+/usr/dt/appconfig/help/C/%H.sdl
+.br
+/usr/dt/appconfig/help/C/%H.hv\f1
+.sp 1
+The placement of the local configuration directory can be affected by
+the adding the path term \f3/etc/dt/appconfig\f1
+to the
+.I DTSPSYSHELP
+environment variable.
+.P
+export DTSPSYSHELP=/vipapps/help,/etc/dt/appconfig
+.P
+The resulting value for
+.I DTHELPSEARCHPATH
+would be:
+.br
+\f3$HOME/.dt/help/<session>/%H
+.br
+$HOME/.dt/help/<session>/%H.sdl
+.br
+$HOME/.dt/help/<session>/%H.hv
+.br
+$HOME/.dt/help/%H
+.br
+$HOME/.dt/help/%H.sdl
+.br
+$HOME/.dt/help/%H.hv
+.br
+/vipapps/help/%L/%H
+.br
+/vipapps/help/%L/%H.sdl
+.br
+/vipapps/help/%L/%H.hv
+.br
+/vipapps/help/C/%H
+.br
+/vipapps/help/C/%H.sdl
+.br
+/vipapps/help/C/%H.hv
+.br
+/etc/dt/appconfig/help/%L/%H
+.br
+/etc/dt/appconfig/help/%L/%H.sdl
+.br
+/etc/dt/appconfig/help/%L/%H.hv
+.br
+/etc/dt/appconfig/help/C/%H
+.br
+/etc/dt/appconfig/help/C/%H.sdl
+.br
+/etc/dt/appconfig/help/C/%H.hv
+.br
+/usr/dt/appconfig/help/%L/%H
+.br
+/usr/dt/appconfig/help/%L/%H.sdl
+.br
+/usr/dt/appconfig/help/%L/%H.hv
+.br
+/usr/dt/appconfig/help/C/%H
+.br
+/usr/dt/appconfig/help/C/%H.sdl
+.br
+/usr/dt/appconfig/help/C/%H.hv\f1
+.sp 1
+.I DTSPUSERHELP
+is for use by end users.
+Values are specified by
+exporting the value in the user's .dtprofile.
+.P
+export DTSPUSERHELP=$HOME/myhelp
+.P
+.I DTSPUSERHELP
+accepts /path specifications.
+The effect is to insert a
+searchpath before any other searchpath.
+.br
+\f3$HOME/myhelp/%H
+.br
+$HOME/myhelp/%H.sdl
+.br
+$HOME/myhelp/%H.hv
+.br
+$HOME/.dt/help/<session>/%H
+.br
+$HOME/.dt/help/<session>/%H.sdl
+.br
+$HOME/.dt/help/<session>/%H.hv
+.br
+$HOME/.dt/help/%H
+.br
+$HOME/.dt/help/%H.sdl
+.br
+$HOME/.dt/help/%H.hv
+.br
+/etc/dt/appconfig/help/%L/%H
+.br
+/etc/dt/appconfig/help/%L/%H.sdl
+.br
+/etc/dt/appconfig/help/%L/%H.hv
+.br
+/etc/dt/appconfig/help/C/%H
+.br
+/etc/dt/appconfig/help/C/%H.sdl
+z.br
+/etc/dt/appconfig/help/C/%H.hv
+.br
+/usr/dt/appconfig/help/%L/%H
+.br
+/usr/dt/appconfig/help/%L/%H.sdl
+.br
+/usr/dt/appconfig/help/%L/%H.hv
+.br
+/usr/dt/appconfig/help/C/%H
+.br
+/usr/dt/appconfig/help/C/%H.sdl
+.br
+/usr/dt/appconfig/help/C/%H.hv\f1
+.P
+(See also the \f3OPTIMIZATIONS\f1 heading in this man page.)
+.P
+At the conclusion of \f3dtsearchpath\f1, \f2DTSPSYS\f1 and
+\f2DTSPUSER\f1 variables are explicitly unset, so that only the
+\f2DT*SEARCHPATH\f1 values remain.
+.sp 1
+.IR MANPATH ,
+.IR DTMANPATH :
+.br
+In addition to setting the application search paths,
+.B dtsearchpath
+augments the \f2MANPATH\f1 environment variable with the path to the
+CDE man pages,
+.B /usr/dt/man.
+For example, if the value of \f2MANPATH\f1 prior to execution of:
+.B dtsearchpath
+is
+.br
+\f3/net/manserver/usr/man:/usr/man\f1
+.br
+then the augmented value will be:
+.br
+\f3/usr/dt/man:/net/manserver/usr/man:/usr/man\f1.
+.sp 1
+If the \f2MANPATH\f1 environment variable is not set prior to the
+invocation of
+.BR dtsearchpath ,
+the system-defined default value of \f2MANPATH\f1 will be included in the
+augmented \f2MANPATH\f1 value.
+For example, if the system-defined 
+default value is:
+.br
+\f3/usr/man:/usr/local/man\f1
+.br
+then
+.B dtsearchpath
+will generate a \f2MANPATH\f1 value of:
+.br
+\f3/usr/dt/man:/usr/man:/usr/local/man\f1
+.SH LOCALES
+Each of the search path elements contain a path that references the
+.I LANG
+variable using the
+.B %L
+construct.
+When the user
+selects a different language from the greeting screen and logs in, the
+search path will already be set up.
+At the same time, the
+factory defaults are still included, but after the localized elements.
+.P
+For example, if the user chooses
+the german locale
+from the greeting screen, then his/her
+\f2DTDATABASESEARCHPATH\f1
+will already include these elements, as specified by the \f2LANG\f1 value
+set at session startup:
+.br
+\f3$HOME/.dt/types
+.br
+/etc/dt/appconfig/types/%L
+.br
+/etc/dt/appconfig/types/C
+.br
+/usr/dt/appconfig/types/%L
+.br
+/usr/dt/appconfig/types/C \f1
+.P
+(See also the \f3OPTIMIZATIONS\f1 heading in this man page.)
+.P
+Note that the search path does not use locales under the user's 
+\f3$HOME\f1 directory.
+Whether the user adds personal icons under
+\f3$HOME/.dt/icons\f1 or personal applications under 
+\f3$HOME/.dt/appmanager\f1, they will be found regardless of the language
+selected at login.
+.SH OPTIMIZATIONS
+Before exporting the search paths to the user's environment,
+.B dtsearchpath
+first checks to ensure that each subdirectory exists.
+If a directory
+does not exist at login, then that element will not be added to the
+user's search path, to save needless file system accesses by the
+desktop components.
+.SH FILES
+.VL 15
+.LI \f3$HOME/.dtprofile\f1
+Enables setting of the user's
+.I DTSPUSER
+environment variables.
+.LI \f3Xsession.d/*\f1
+Enables setting of the system
+.I DTSPSYS
+environment variables.
+.LE
+.SH NOTES
+In order to inject the values from
+.B dtsearchpath
+into the user's environment, the command must be
+\f2eval'd\f1,
+as is done by the 
+\f3Xsession\f1
+login script. 
+.P
+eval `/usr/dt/bin/dtsearchpath`
+.sp 1
+Simply running 
+.B dtsearchpath
+from the command line will have no affect on the parent shell. 
+.P
+It is not possible to affect the DT search paths after logging in.
+Components such as the Window Manager and File Manager inherit the
+values from
+.B dtsearchpath
+by being invoked from the same shell.
+Hence, if the system
+administrator creates a new search path element for the end user,
+the user will not be able to access it until the next login.
+.SH "SEE ALSO"
+.BR dtappgather (1).
+

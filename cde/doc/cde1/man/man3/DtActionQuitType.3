@@ -1,0 +1,142 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+.\" *************************************************************************
+.\" **
+.\" ** (c) Copyright 1993,1994 Hewlett-Packard Company 
+.\" **      All Rights Reserved.
+.\" **
+.\" ** (c) Copyright 1993,1994 International Business Machines Corp. 
+.\" **      All Rights Reserved.
+.\" **  
+.\" ** (c) Copyright 1993,1994 Sun Microsystems, Inc.
+.\" **      All Rights Reserved.
+.\" **
+.\" **
+.\" *************************************************************************
+.\"---
+.\".TH _title _#S_ "_dd_ _Month_ _19yy_"
+.TH DtActionQuitType 3 "02 May 1994"
+.\".BH "_dd_ _Month_ -_19yy_"
+.BH \*(DT 
+.\"---
+.\"---------------------------------------------------------------------------
+.SH NAME
+DtActionQuitType(3) \(em  the API for determining the potential
+response to a quit request against outstanding actions.
+.\"---
+.\"---------------------------------------------------------------------------
+.\"---
+.\"--- SYNOPSIS 
+.\"--- This section is a syntax diagram.  Use the following lines for pages in
+.\"--- manual Sections 1, 1M, 5 and 8:
+.\"---
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <X11/Intrinsic.h> 
+\&#include <Dt/Action.h>
+.sp \n(PDu
+DtActionStatus DtActionQuitType (
+.ta .5i 1.75i
+.nf
+	DtActionInvocationID   \fIid\fP,
+	int                    \fIsilent\fP,
+	int                    \fIforce\fP)
+.wH
+.fi
+.iE
+.sE
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- DESCRIPTION 
+.\"--- This section tells concisely what the command (function, device or
+.\"--- file format) does and includes the parameter list. 
+.\"---
+.SH DESCRIPTION
+\fBDtActionQuitType\fP can be used to determine if an \fIid\fP still
+references still-running action(s), and if so, how they would behave
+in response to a \fBDtActionQuit\fP call.  Since a single \fIid\fP
+may reference several actions, the "worst case" scenario will be
+returned.
+
+If the return value suggests that a \fBDtACTION_DONE_FORCED\fP
+or \fBDtACTION_DONE_DROPPED\fP status would be returned via
+a \fBDtActionStatusUpdateCallbackProc\fP in response to a
+\fBDtActionQuit\fP call, the application may wish to alert the
+user of outstanding actions.
+
+.IP \fIid\fP
+Specifies an invocation ID, as returned by \fBDtActionInvoke\fP.
+.IP \fIsilent\fP
+A boolean that indicates whether the action(s) are allowed to block
+on user input before terminating.   See \fBDtActionQuit\fP.
+.IP \fIforce\fP
+A boolean that indicates whether the action(s) should terminate
+immediately.  See \fBDtActionQuit\fP.
+.PP
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- RETURN VALUES
+.\"--- This section appears in pages from Sections 2 and 3 only.
+.\"--- List the _values_ that the function returns and give _explanations_.
+.\"---
+.SH "RETURN VALUES"
+.LP
+\fBDtACTION_INVALID_ID\fP - the specified \fIid\fP is not valid.   It is
+possible that the \fIid\fP was once valid, but that all action(s)
+associated with the \fIid\fP have since completed.
+
+\fBDtACTION_DONE\fP - if \fBDtActionQuit\fP is called, it is expected
+that the action(s) will quit gracefully and return meaningful data,
+if any.
+
+\fBDtACTION_DONE_FORCED\fP - if \fBDtActionQuit\fP is called, it is
+expected that the action(s) will have to be forcefully quit, and that
+any returned data only reflects the state of the data when the action(s)
+were quit.
+
+\fBDtACTION_DONE_DROPPED\fP - if \fBDtActionQuit\fP is called, it is
+expected that the action(s) will have to be abandoned.   The action(s)
+may or may not quit on their own, and any returned data only reflects
+the state of the data when the action(s) were abandoned.
+.\"---
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- ERRORS
+.\"--- This section lists and explains _ERROR-CODES_ that the function may
+.\"--- may generate.  List _ERROR-CODES_ alphabetically.
+.\"---
+.SH ERRORS
+.LP
+This function does not return error codes.
+.\"---
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- WARNINGS
+.\"--- This section lists warnings about special conditions.
+.\"---
+.\"--- Warnings are NOT diagnostics.
+.\"---
+.SH WARNINGS
+.LP
+\fBDtActionQuitType\fP returns "best guess" information.
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- SEE ALSO
+.\"--- This section lists references to other man pages, sample files, etc.
+.\"---
+.SH "SEE ALSO"
+.BR  DtDbLoad(3),
+.BR  DtActionLabel(3),
+.BR  DtActionDescription(3),
+.BR  DtActionExists(3),
+.BR  DtActionInvoke(3),
+.BR  DtActionQuit(3),
+.BR  DtActionStatusUpdateCallbackProc(3),
+.BR  dtdtfile(4),
+.BR  dtspcd(1X),
+.BR  ttsession(1)

@@ -1,0 +1,90 @@
+.de Lc
+.\" version of .LI that emboldens its argument
+.TP \\n()Jn
+\s-1\f3\\$1\f1\s+1
+..
+.TH tt_message_user 3 "1 March 1996" "ToolTalk 1.3" "ToolTalk Functions"
+.BH "1 March 1996"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.IX "tt_message_user" "" "tt_message_user(3)" ""
+.SH NAME
+tt_message_user \- retrieve the user information associated with a message object
+.SH SYNOPSIS
+.ft 3
+.nf
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'void *tt_message_user('u
+void *tt_message_user(Tt_message \f2m\fP,
+	int \f2key\fP);
+.PP
+.fi
+.SH DESCRIPTION
+The
+.BR tt_message_user (\|)
+function
+retrieves the user information stored in data cells associated with the
+specified message object.
+.PP
+The user data is part of the message object
+(that is, the storage buffer in the
+application); it is not a part of the actual message.
+The application can, therefore, only
+retrieve user information that the application placed in the message.
+.PP
+The
+.I m
+argument is the opaque handle for the message involved in this operation.
+The
+.I key
+argument is the user data cell to be retrieved.
+The user data cell must be unique for this message.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.BR tt_message_user (\|)
+function returns the data cell,
+a piece of arbitrary user data that can hold a
+.BR "void\ *" .
+The application can use
+.BR tt_ptr_error (3)
+to extract one of the following
+.B Tt_status
+values from the returned data:
+.PP
+.RS 3
+.nr )J 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_NOMP
+.br
+The
+.BR ttsession (1)
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_POINTER
+.br
+The pointer passed does not point to an object of
+the correct type for this operation.
+.PP
+.RE
+.nr )J 0
+.SH "APPLICATION USAGE"
+The application should use
+.BR tt_free (3)
+to free any data stored in the address returned by the
+ToolTalk API.
+.PP
+The user data cell is intended to hold an address.
+If the address selected is equal to one of the
+.B Tt_status
+enumerated values, the result of the
+.BR tt_ptr_error (3)
+function will not be reliable.
+.SH "SEE ALSO"
+.na
+.BR tt_c (5),
+.BR tt_ptr_error (3),
+.BR tt_free (3).

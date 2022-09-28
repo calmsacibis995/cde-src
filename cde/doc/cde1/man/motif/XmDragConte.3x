@@ -1,0 +1,966 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+...\" **
+...\" **
+...\" **  (c) Copyright 1991, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1991 by Hewlett-Packard Company
+...\" **
+...\" **
+.TH XmDragContext 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmDragContext\fP \- The DragContext widget class
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/DragDrop.h>
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+DragContexts are special widgets used in drag and drop transactions.
+A DragContext is implemented as a widget, but a client does not
+explicitly create a DragContext widget.  Instead, a client initiates
+a drag and drop transaction by calling \fIXmDragStart\fP, and this
+routine initializes and returns a DragContext widget.  There is a
+unique DragContext for each drag operation.  The toolkit frees a
+DragContext when a transaction is complete; therefore, an application
+programmer should not explicitly destroy a DragContext.
+.PP
+Initiator and receiver clients both use DragContexts to track
+the state of a transaction.  When the initiator and receiver of
+a transaction are in the same client, they share the same
+DragContext instance.  If they are in different clients, there
+are two separate DragContexts.  In this case, the initiator calls
+\fIXmDragStart\fP and the toolkit provides a DragContext for the
+receiver client.  The only resources pertinent to the receiver
+are \fIXmNexportTargets\fP and \fIXmNnumExportTargets\fP.  These
+can both be passed as arguments to the \fIXmDropSiteRetrieve\fP
+function to obtain information about the current drop site.
+.PP
+In general, in order to receive data, a drop site must share at least
+one target type and operation in common with a drag source.  The
+DragContext resource, \fIXmNexportTargets\fP, identifies the selection
+targets for the drag source.  These export targets are compared with the
+\fIXmNimportTargets\fP resource list specified by a drop site.
+The DragContext resource, \fIXmNdragOperations\fP, identifies the
+valid operations that can be applied to the source data by the
+initiator.  The drop site counterpart resource is
+\fIXmNdropSiteOperations\fP, which indicates a drop site's supported
+operations.
+.PP
+A client uses DragIcon widgets to define the drag-over animation
+effects associated with a given drag and drop transaction. 
+An initiator specifies a set of drag icons, selects a blending
+model, and sets foreground and background cursor colors with
+DragContext resources.
+.PP
+The type of drag-over visual used to represent a drag operation
+depends on the drag protocol style.  In preregister mode, the server
+is grabbed, and either a cursor or a pixmap may be used as a drag-over
+visual.  In dynamic mode, drag-over visuals must be implemented
+with the X cursor.  If the resulting drag protocol style is
+Drop Only or None and the \fIXmNdragInitiatorProtocolStyle\fP is 
+\fIXmDRAG_DYNAMIC\fP or \fIXmDRAG_PREFER_DYNAMIC\fP,  
+then a dynamic visual style (cursor) is used.  Otherwise, a preregister
+visual style is used.
+.SS "Classes"
+DragContext inherits behavior and resources from \fICore\fP.
+.PP
+The class pointer is \fIxmDragContextClass\fP.
+.PP
+The class name is \fIXmDragContext\fP.
+.SS "New Resources"
+The following table defines a set of widget resources used by the
+programmer to specify data.  The programmer can also set the
+resource values for the inherited classes to set attributes for
+this widget.  To reference a resource by name or by class in
+a .Xdefaults file, remove the \fIXmN\fP or \fIXmC\fP prefix and use
+the remaining letters.  To specify one of the defined values for a
+resource in a .Xdefaults file, remove the \fIXm\fP prefix and use
+the remaining letters (in either lowercase or uppercase, but include
+any underscores between words).  The codes in the access column
+indicate if the given resource can be set at creation time (\fIC\fP),
+set by using \fIXtSetValues\fP (\fIS\fP), retrieved by using
+\fIXtGetValues\fP (\fIG\fP), or is not applicable (\fIN/A\fP).
+.PP
+.sp 1
+.in 0
+.KS
+.TS
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmDragContext Resource Set
+Name	Class	Type	Default	Access
+_
+XmNblendModel	XmCBlendModel	unsigned char	XmBLEND_ALL	CG
+XmNclientData	XmCClientData	XtPointer	NULL	CSG
+XmNconvertProc	XmCConvertProc	XtConvertSelectionIncrProc	NULL	CSG
+XmNcursorBackground	XmCCursorBackground	Pixel	dynamic	CSG	
+XmNcursorForeground	XmCCursorForeground	Pixel	dynamic	CSG
+XmNdragDropFinishCallback	XmCCallback	XtCallbackList	NULL	CSG
+XmNdragMotionCallback	XmCCallback	XtCallbackList	NULL	C
+XmNdragOperations	XmCDragOperations	unsigned char	XmDROP_COPY | XmDROP_MOVE	C
+XmNdropFinishCallback	XmCCallback	XtCallbackList	NULL	C
+XmNdropSiteEnterCallback	XmCCallback	XtCallbackList	NULL	C
+XmNdropSiteLeaveCallback	XmCCallback	XtCallbackList	NULL	C
+XmNdropStartCallback	XmCCallback	XtCallbackList	NULL	C
+XmNexportTargets	XmCExportTargets	Atom *	NULL	CSG
+XmNincremental	XmCIncremental	Boolean	False	CSG
+XmNinvalidCursorForeground	XmCCursorForeground	Pixel	dynamic	CSG
+XmNnoneCursorForeground	XmCCursorForeground	Pixel	dynamic	CSG
+XmNnumExportTargets	XmCNumExportTargets	Cardinal	0	CSG
+XmNoperationChangedCallback	XmCCallback	XtCallbackList	NULL	C
+XmNoperationCursorIcon	XmCOperationCursorIcon	Widget	dynamic	CSG
+XmNsourceCursorIcon	XmCSourceCursorIcon	Widget	dynamic	CSG
+XmNsourcePixmapIcon	XmCSourcePixmapIcon	Widget	dynamic	CSG
+XmNstateCursorIcon	XmCStateCursorIcon	Widget	dynamic	CSG
+XmNtopLevelEnterCallback	XmCCallback	XtCallbackList	NULL	C
+XmNtopLevelLeaveCallback	XmCCallback	XtCallbackList	NULL	C
+XmNvalidCursorForeground	XmCCursorForeground	Pixel	dynamic	CSG
+.TE
+.KE
+.in
+.sp 1
+.PP
+.IP "\fIXmNblendModel\fP"
+Specifies which combination of DragIcons are blended to produce
+a drag-over visual.
+.IP "\fIXmBLEND_ALL\fP"
+Blends all three DragIcons - the source, state and operation icon.
+The icons are layered from top to bottom with the operation icon
+on top and the source icon on the bottom.
+The hotspot is derived from the state icon.
+.IP "\fIXmBLEND_STATE_SOURCE\fP"
+Blends the state and source icons only.  The hotspot is derived
+from the state icon.
+.IP "\fIXmBLEND_JUST_SOURCE\fP"
+Specifies that only the source icon is used, which the initiator
+updates as required.
+.IP "\fIXmBLEND_NONE\fP"
+Specifies that no drag-over visual is generated.  The client
+tracks the drop site status through callback routines and updates
+the drag-over visuals as necessary.
+.LI "\fIXmNclientData\fP"
+Specifies the client data to be passed to the \fIXmNconvertProc\fP
+when it is invoked.
+.LI "\fIXmNconvertProc\fP"
+Specifies a procedure of type \fIXtConvertSelectionIncrProc\fP that
+converts the source data to the format(s) requested by the receiver
+client.
+The \fBwidget\fP argument passed to this procedure is the DragContext
+widget.
+The selection atom passed is _MOTIF_DROP.
+If \fIXmNincremental\fP is False, the procedure should ignore the
+\fBmax_length\fP, \fBclient_data\fP, and \fBrequest_id\fP arguments and
+should handle the conversion atomically.
+Data returned by \fIXmNconvertProc\fP must be allocated using
+\fIXtMalloc\fP and will be freed automatically by the toolkit after the
+transfer.
+For additional information on selection conversion procedures, see \*EX
+Toolkit Intrinsics \- C Language Interface\fP.
+.LI "\fIXmNcursorBackground\fP"
+Specifies the background pixel value of the cursor.
+.LI "\fIXmNcursorForeground\fP"
+Specifies the foreground pixel value of the cursor when the state icon
+is not blended.  This resource defaults to the foreground color of the
+widget passed to the \fIXmDragStart\fP function.
+.LI "\fIXmNdragDropFinishCallback\fP"
+Specifies the list of callbacks that are called when the transaction is
+completed.  The type of the structure whose address is passed to this
+callback is \fIXmDragDropFinishCallbackStruct\fP.  The reason sent by
+the callback is \fIXmCR_DRAG_DROP_FINISH\fP.
+.LI "\fIXmNdragMotionCallback\fP"
+Specifies the list of callbacks that are invoked when the pointer moves.
+The type of structure whose address is passed to this callback is
+\fIXmDragMotionCallbackStruct\fP.   The reason sent by the callback
+is \fIXmCR_DRAG_MOTION\fP.
+.LI "\fIXmNdragOperations\fP"
+Specifies the set of valid operations associated with an initiator
+client for a drag transaction.
+This resource is a bit mask that is formed by combining one or
+more of the following values using a bitwise operation such as
+inclusive OR (|):
+\fIXmDROP_COPY\fP, \fIXmDROP_LINK\fP, \fIXmDROP_MOVE\fP.
+The value \fIXmDROP_NOOP\fP for this resource indicates that no
+operations are valid.
+For Text and TextField widgets, this resource is set to
+\fIXmDROP_COPY\fP | \fIXmDROP_MOVE\fP; for List widgets, it is set to
+\fIXmDROP_COPY\fP.
+.LI "\fIXmNdropFinishCallback\fP"
+Specifies the list of callbacks that are invoked when the drop
+is completed.   The type of the structure whose address is passed to 
+this callback is \fIXmDropFinishCallbackStruct\fP.   The reason sent
+by the callback is \fIXmCR_DROP_FINISH\fP.
+.LI "\fIXmNdropSiteEnterCallback\fP"
+Specifies the list of callbacks that are invoked when the pointer enters
+a drop site.  The type of the structure whose address is passed to this
+callback is \fIXmDropSiteEnterCallbackStruct\fP.  The reason sent by the
+callback is \fIXmCR_DROP_SITE_ENTER\fP.
+.LI "\fIXmNdropSiteLeaveCallback\fP"
+Specifies the list of callbacks that are invoked when the pointer leaves
+a drop site.  The type of the structure whose address is passed to this
+callback is \fIXmDropSiteLeaveCallbackStruct\fP.  The reason sent by
+the callback is \fIXmCR_DROP_SITE_LEAVE\fP.
+.LI "\fIXmNdropStartCallback\fP"
+Specifies the list of callbacks that are invoked when a drop is
+initiated.  The type of the structure whose address is passed to this
+callback is \fIXmDropStartCallbackStruct\fP.  The reason sent by the
+callback is \fIXmCR_DROP_START\fP.
+.LI "\fIXmNexportTargets\fP"
+Specifies the list of target atoms associated with this source.
+This resource identifies the selection targets this source
+can be converted to.
+.LI "\fIXmNincremental\fP"
+Specifies a Boolean value that indicates whether the transfer on the
+initiator side uses the Xt incremental selection transfer mechanism
+described in \*EX Toolkit Intrinsics \- C Language Interface\fP.
+If the value is True, the initiator uses incremental transfer; if the
+value is False, the initiator uses atomic transfer.
+.LI "\fIXmNinvalidCursorForeground\fP"
+Specifies the foreground pixel value of the cursor when the state
+is invalid.  This resource defaults to the value of the
+\fIXmNcursorForeground\fP resource.
+.LI "\fIXmNnoneCursorForeground\fP"
+Specifies the foreground pixel value of the cursor when the state
+is none.  This resource defaults to the value of the 
+\fIXmNcursorForeground\fP resource.
+.LI "\fIXmNnumExportTargets\fP"
+Specifies the number of entries in the list of export targets.
+.LI "\fIXmNoperationChangedCallback\fP"
+Specifies the list of callbacks that are invoked when the drag
+is started and when the user requests that a different operation
+be applied to the drop.
+The type of the structure whose address is passed to this callback
+is \fIXmOperationChangedCallbackStruct\fP.  The reason sent by the
+callback is \fIXmCR_OPERATION_CHANGED\fP.
+.LI "\fIXmNoperationCursorIcon\fP"
+Specifies the cursor icon used to designate the type of operation
+performed by the drag transaction.  If  NULL, \fIXmScreen\fP
+resources provide default icons for copy, link, and move
+operations.
+.LI "\fIXmNsourceCursorIcon\fP"
+Specifies the cursor icon used to represent the source when
+a dynamic visual style is used.  If NULL, the
+\fIXmNdefaultSourceCursorIcon\fP resource of \fIXmScreen\fP provides
+a default cursor icon.
+.LI "\fIXmNsourcePixmapIcon\fP"
+Specifies the pixmap icon used to represent the source when
+a preregister visual style is used.  The icon is used in conjunction
+with the colormap of the widget passed to \fIXmDragStart\fP.
+If NULL, \fIXmNsourceCursorIcon\fP is used.  
+.LI "\fIXmNstateCursorIcon\fP"
+Specifies the cursor icon used to designate the state of a drop site.
+If NULL, \fIXmScreen\fP resources provide default icons for a valid, 
+invalid, and no drop site condition.
+.LI "\fIXmNtopLevelEnterCallback\fP"
+Specifies the list of callbacks that are called when the pointer enters
+a top-level window or root window (due to changing screens).  The type
+of the structure whose address is passed to this callback is
+\fIXmTopLevelEnterCallbackStruct\fP.  The reason sent by the
+callback is \fIXmCR_TOP_LEVEL_ENTER\fP.
+.LI "\fIXmNtopLevelLeaveCallback\fP"
+Specifies the list of callbacks that are called when the pointer
+leaves a top level window or the root window (due to changing
+screens).  The type of the structure whose address is
+passed to this callback is \fIXmTopLevelLeaveCallbackStruct\fP.  The
+reason sent by the callback is \fIXmCR_TOP_LEVEL_LEAVE\fP.
+.LI "\fIXmNvalidCursorForeground\fP"
+Specifies the foreground pixel value of the cursor designated as a
+valid cursor icon.
+.LE
+.SS "Inherited Resources"
+DragContext inherits behavior and resources from the following
+superclass.  For a complete description of each resource, refer
+to the \fICore\fP man page.
+.PP
+.wH
+.in 0 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+Core Resource Set
+Name	Class	Type	Default	Access
+_
+XmNaccelerators	XmCAccelerators	XtAccelerators	dynamic	CSG
+XmNancestorSensitive	XmCSensitive	Boolean	dynamic	G
+XmNbackground	XmCBackground	Pixel	dynamic	CSG
+XmNbackgroundPixmap	XmCPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNborderColor	XmCBorderColor	Pixel	XtDefaultForeground	CSG
+XmNborderPixmap	XmCPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNborderWidth	XmCBorderWidth	Dimension	0	CSG
+XmNcolormap	XmCColormap	Colormap	dynamic	CG
+XmNdepth	XmCDepth	int	dynamic	CG
+XmNdestroyCallback	XmCCallback	XtCallbackList	NULL	C
+XmNheight	XmCHeight	Dimension	dynamic	CSG
+XmNinitialResourcesPersistent	XmCInitialResourcesPersistent	Boolean	True	C
+XmNmappedWhenManaged	XmCMappedWhenManaged	Boolean	True	CSG
+XmNscreen	XmCScreen	Screen *	dynamic	CG
+.wH
+.tH
+XmNsensitive	XmCSensitive	Boolean	True	CSG
+XmNtranslations	XmCTranslations	XtTranslations	dynamic	CSG
+XmNwidth	XmCWidth	Dimension	dynamic	CSG
+XmNx	XmCPosition	Position	0	CSG
+XmNy	XmCPosition	Position	0	CSG
+.TE
+.KE
+.in
+.sp 1
+.wH
+.in  
+.PP
+.SS "Callback Information"
+Each of the DragContext callbacks has an associated callback
+structure. 
+.PP
+.nL
+.PP
+A pointer to the following structure is passed to the
+\fIXmNdragDropFinishCallback\fP callback.
+.ne 10
+.sS
+.iS
+.ta .25i 1.5i
+.nf
+typedef struct
+{
+	int	\fBreason\fI;
+	XEvent	*\fBevent\fI;
+	Time	\fBtimeStamp\fI;
+}XmDragDropFinishCallbackStruct, *XmDragDropFinishCallback;
+.iE
+.sE
+.IP "\fBreason\fP"
+Indicates why the callback was invoked.
+.IP "\fBevent\fP"
+Points to the \fIXEvent\fP that triggered the callback.
+.IP "\fBtimestamp\fP"
+Specifies the time at which either the drag or the drop was completed.
+.PP
+A pointer to the following structure is passed to callbacks for
+\fIXmNdragMotionCallback\fP. 
+.nL
+.ne 10
+.sS
+.iS
+.ta .25i 1.5i
+.nf
+typedef struct
+{
+	int	\fBreason\fI;
+	XEvent	*\fBevent\fI;
+	Time	\fBtimeStamp\fI;
+	unsigned char	\fBoperation\fI;
+	unsigned char	\fBoperations\fI;
+	unsigned char	\fBdropSiteStatus\fI;
+	Position	\fBx\fI;
+	Position	\fBy\fI;
+}XmDragMotionCallbackStruct, *XmDragMotionCallback;
+.iE
+.sE
+.IP "\fBreason\fP"
+Indicates why the callback was invoked.
+.IP "\fBevent\fP"
+Points to the \fIXEvent\fP that triggered the callback.
+.IP "\fBtimeStamp\fP"
+Specifies the timestamp of the logical event.
+.IP "\fBoperation\fP"
+Identifies an operation.
+.PP
+If the toolkit has just called a DropSite's \fIXmNdragProc\fP, the
+toolkit initializes \fBoperation\fP to the value of the \fBoperation\fP
+member of the \fIXmDragProcCallbackStruct\fP at the time the DropSite's
+\fIXmNdragProc\fP returns.
+.PP
+If the toolkit has not called an \fIXmNdragProc\fP and the pointer is
+within an active drop site, the toolkit initializes \fBoperation\fP by
+selecting an operation from the bitwise AND of the initial value of the
+\fBoperations\fP member and the value of the DropSite's
+\fIXmNdropSiteOperations\fP resource.
+The toolkit searches this set first for \fIXmDROP_MOVE\fP, then for
+\fIXmDROP_COPY\fP, then for \fIXmDROP_LINK\fP, and initializes
+\fBoperation\fP to the first operation it finds in the set.
+If the toolkit finds none of these operations in the set, it initializes
+\fBoperation\fP to \fIXmDROP_NOOP\fP.
+.PP
+If the toolkit has not called an \fIXmNdragProc\fP and the pointer is
+not within an active drop site, the toolkit initializes \fBoperation\fP
+by selecting an operation from the initial value of the \fBoperations\fP
+member.
+The toolkit searches this set first for \fIXmDROP_MOVE\fP, then for
+\fIXmDROP_COPY\fP, then for \fIXmDROP_LINK\fP, and initializes
+\fBoperation\fP to the first operation it finds in the set.
+If the toolkit finds none of these operations in the set, it initializes
+\fBoperation\fP to \fIXmDROP_NOOP\fP.
+.IP "\fBoperations\fP"
+Indicates the set of operations supported for the source data.
+.PP
+If the toolkit has just called a DropSite's \fIXmNdragProc\fP, the
+toolkit initializes \fBoperations\fP to the bitwise AND of the
+DropSite's \fIXmNdropOperations\fP and the value of the \fBoperations\fP
+member of the \fIXmDragProcCallbackStruct\fP at the time the DropSite's
+\fIXmNdragProc\fP returns.
+If the resulting set of operations is empty, the toolkit initializes
+\fBoperations\fP to \fIXmDROP_NOOP\fP.
+.PP
+If the toolkit has not called an \fIXmNdragProc\fP and the user does not
+select an operation (by pressing a modifier key), the toolkit
+initializes \fBoperations\fP to the value of the DragContext's
+\fIXmNdragOperations\fP resource.
+.PP
+If the toolkit has not called an \fIXmNdragProc\fP and the user does
+select an operation, the toolkit initializes \fBoperations\fP to the
+bitwise AND of the corresponding operation and the value of the
+DragContext's \fIXmNdragOperations\fP resource.
+If the resulting set of operations is empty, the toolkit initializes
+\fBoperations\fP to \fIXmDROP_NOOP\fP.
+.IP "\fBdropSiteStatus\fP"
+Indicates whether or not a drop site is valid.
+.PP
+If the toolkit has just called a DropSite's \fIXmNdragProc\fP, the
+toolkit initializes \fBdropSiteStatus\fP to the value of the
+\fBdropSiteStatus\fP member of the \fIXmDragProcCallbackStruct\fP at the
+time the DropSite's \fIXmNdragProc\fP returns.
+.PP
+If the toolkit has not called an \fIXmNdragProc\fP, it initializes
+\fBdropSiteStatus\fP as follows:
+the toolkit initializes \fBdropSiteStatus\fP to \fIXmNO_DROP_SITE\fP if
+the pointer is over an inactive drop site or is not over a drop site.
+The toolkit initializes \fBdropSiteStatus\fP to \fIXmDROP_SITE_VALID\fP
+if all the following conditions are met:
+.TP
+\(bu
+The pointer is over an active drop site.
+.TP
+\(bu
+The DragContext's \fIXmNexportTargets\fP and the DropSite's
+\fIXmNimportTargets\fP are compatible.
+.TP
+\(bu
+The initial value of the \fBoperation\fP member is not
+\fIXmDROP_NOOP\fP.
+Otherwise, the toolkit initializes \fBdropSiteStatus\fP to
+\fIXmDROP_SITE_INVALID\fP.
+.nL
+.PP
+A pointer to the following structure is passed for the 
+\fIXmNdropFinishCallback\fP callback:
+.ne 10
+.sS
+.iS
+.ta .25i 1.5i
+.nf
+typedef struct
+{
+	int	\fBreason\fI;
+	XEvent	*\fBevent\fI;
+	Time	\fBtimeStamp\fI;
+	unsigned char	\fBoperation\fI;
+	unsigned char	\fBoperations\fI;
+	unsigned char	\fBdropSiteStatus\fI;
+	unsigned char	\fBdropAction\fI;
+	unsigned char	\fBcompletionStatus\fI;
+}XmDropFinishCallbackStruct, *XmDropFinishCallback;
+.iE
+.sE
+.IP "\fBreason\fP"
+Indicates why the callback was invoked.
+.IP "\fBevent\fP"
+Points to the \fIXEvent\fP that triggered the callback.
+.IP "\fBtimeStamp\fP"
+Specifies the time at which the drop was completed.
+.IP "\fBoperation\fP"
+Identifies an operation.
+.PP
+If the pointer is over an active drop site when the drop begins, the
+toolkit initializes \fBoperation\fP to the value of the \fBoperation\fP
+member of the \fIXmDropProcCallbackStruct\fP at the time the DropSite's
+\fIXmNdropProc\fP returns.
+.PP
+If the pointer is not over an active drop site when the drop begins, the
+toolkit initializes \fBoperation\fP by selecting an operation from the
+initial value of the \fBoperations\fP member.
+The toolkit searches this set first for \fIXmDROP_MOVE\fP, then for
+\fIXmDROP_COPY\fP, then for \fIXmDROP_LINK\fP, and initializes
+\fBoperation\fP to the first operation it finds in the set.
+If it finds none of these operations in the set, it initializes
+\fBoperation\fP to \fIXmDROP_NOOP\fP.
+.IP "\fBoperations\fP"
+Indicates the set of operations supported for the source data.
+.PP
+If the pointer is over an active drop site when the drop begins, the
+toolkit initializes \fBoperations\fP to the bitwise AND of the
+DropSite's \fIXmNdropOperations\fP and the value of the \fBoperations\fP
+member of the \fIXmDropProcCallbackStruct\fP at the time the DropSite's
+\fIXmNdropProc\fP returns.
+If the resulting set of operations is empty, the toolkit initializes
+\fBoperations\fP to \fIXmDROP_NOOP\fP.
+.PP
+If the pointer is not over an active drop site when the drop begins and
+if the user does not select an operation (by pressing a modifier key),
+the toolkit initializes \fBoperations\fP to the value of the
+DragContext's \fIXmNdragOperations\fP resource.
+.PP
+If the pointer is not over an active drop site when the drop begins and
+if the user does select an operation, the toolkit initializes
+\fBoperations\fP to the bitwise AND of the corresponding operation and
+the value of the DragContext's \fIXmNdragOperations\fP resource.
+If the resulting set of operations is empty, the toolkit initializes
+\fBoperations\fP to \fIXmDROP_NOOP\fP.
+.IP "\fBdropSiteStatus\fP"
+Indicates whether or not a drop site is valid.
+.PP
+If the pointer is over an active drop site when the drop begins, the
+toolkit initializes \fBdropSiteStatus\fP to the value of the
+\fBdropSiteStatus\fP member of the \fIXmDropProcCallbackStruct\fP at the
+time the DropSite's \fIXmNdropProc\fP returns.
+.PP
+If the pointer is not over an active drop site when the drop begins, the
+toolkit initializes \fBdropSiteStatus\fP to \fIXmNO_DROP_SITE\fP.
+.IP "\fBdropAction\fP"
+Identifies the drop action.  The values are: \fIXmDROP\fP,
+\fIXmDROP_CANCEL\fP, \fIXmDROP_HELP\fP, and \fIXmDROP_INTERRUPT\fP.
+The value \fIXmDROP_INTERRUPT\fP is currently unsupported; if
+specified, it will be interpreted as an \fIXmDROP_CANCEL\fP.
+.IP "\fBcompletionStatus\fP"
+An IN/OUT member that indicates the status of the drop action.
+After the last callback procedure has returned, the final value of this
+member determines what visual transition effects will be applied.
+There are two values:
+.IP "\fIXmDROP_SUCCESS\fP"
+The drop was successful.
+.IP "\fIXmDROP_FAILURE\fP"
+The drop was unsuccessful.
+.LE
+.nL
+.PP
+A pointer to the following structure is passed to callbacks for
+\fIXmNdropSiteEnterCallback\fP:
+.ne 10
+.sS
+.iS
+.ta .25i 1.5i
+.nf
+typedef struct
+{
+	int	\fBreason\fI;
+	XEvent	*\fBevent\fI;
+	Time	\fBtimeStamp\fI;
+	unsigned char	\fBoperation\fI;
+	unsigned char	\fBoperations\fI;
+	unsigned char	\fBdropSiteStatus\fI;
+	Position	\fBx\fI;
+	Position	\fBy\fI;
+}XmDropSiteEnterCallbackStruct, *XmDropSiteEnterCallback;
+.iE
+.sE
+.IP "\fBreason\fP"
+Indicates why the callback was invoked.
+.IP "\fBevent\fP"
+Points to the \fIXEvent\fP that triggered the callback.
+.IP "\fBtimestamp\fP"
+Specifies the time the crossing event occurred.
+.IP "\fBoperation\fP"
+Identifies an operation.
+.PP
+If the toolkit has just called a DropSite's \fIXmNdragProc\fP, the
+toolkit initializes \fBoperation\fP to the value of the \fBoperation\fP
+member of the \fIXmDragProcCallbackStruct\fP at the time the DropSite's
+\fIXmNdragProc\fP returns.
+.PP
+If the toolkit has not called an \fIXmNdragProc\fP, it initializes
+\fBoperation\fP by selecting an operation from the bitwise AND of the
+initial value of the \fBoperations\fP member and the value of the
+DropSite's \fIXmNdropSiteOperations\fP resource.
+The toolkit searches this set first for \fIXmDROP_MOVE\fP, then for
+\fIXmDROP_COPY\fP, then for \fIXmDROP_LINK\fP, and initializes
+\fBoperation\fP to the first operation it finds in the set.
+If the toolkit finds none of these operations in the set, it initializes
+\fBoperation\fP to \fIXmDROP_NOOP\fP.
+.IP "\fBoperations\fP"
+Indicates the set of operations supported for the source data.
+.PP
+If the toolkit has just called a DropSite's \fIXmNdragProc\fP, the
+toolkit initializes \fBoperations\fP to the bitwise AND of the
+DropSite's \fIXmNdropOperations\fP and the value of the \fBoperations\fP
+member of the \fIXmDragProcCallbackStruct\fP at the time the DropSite's
+\fIXmNdragProc\fP returns.
+If the resulting set of operations is empty, the toolkit initializes
+\fBoperations\fP to \fIXmDROP_NOOP\fP.
+.PP
+If the toolkit has not called an \fIXmNdragProc\fP and the user does not
+select an operation (by pressing a modifier key), the toolkit
+initializes \fBoperations\fP to the value of the DragContext's
+\fIXmNdragOperations\fP resource.
+.PP
+If the toolkit has not called an \fIXmNdragProc\fP and the user does
+select an operation, the toolkit initializes \fBoperations\fP to the
+bitwise AND of the corresponding operation and the value of the
+DragContext's \fIXmNdragOperations\fP resource.
+If the resulting set of operations is empty, the toolkit initializes
+\fBoperations\fP to \fIXmDROP_NOOP\fP.
+.IP "\fBdropSiteStatus\fP"
+Indicates whether or not a drop site is valid.
+.PP
+If the toolkit has just called a DropSite's \fIXmNdragProc\fP, the
+toolkit initializes \fBdropSiteStatus\fP to the value of the
+\fBdropSiteStatus\fP member of the \fIXmDragProcCallbackStruct\fP at the
+time the DropSite's \fIXmNdragProc\fP returns.
+.PP
+If the toolkit has not called an \fIXmNdragProc\fP, it initializes
+\fBdropSiteStatus\fP as follows:
+the toolkit initializes \fBdropSiteStatus\fP to \fIXmDROP_SITE_VALID\fP
+if the DragContext's \fIXmNexportTargets\fP and the DropSite's
+\fIXmNimportTargets\fP are compatible and if the initial value of the
+\fBoperation\fP member is not \fIXmDROP_NOOP\fP.
+Otherwise, the toolkit initializes \fBdropSiteStatus\fP to
+\fIXmDROP_SITE_INVALID\fP.
+.IP "\fBx\fP"
+Indicates the x-coordinate of the pointer in root window coordinates.
+.IP "\fBy\fP"
+Indicates the y-coordinate of the pointer in root window coordinates.
+.nL
+.PP
+A pointer to the following structure is passed to callbacks for
+\fIXmNdropSiteLeaveCallback\fP.
+.ne 10
+.sS
+.iS
+.ta .25i 1.5i
+.nf
+typedef struct
+{
+	int	\fBreason\fI;
+	XEvent	*\fBevent\fI;
+	Time	\fBtimeStamp\fI;
+}XmDropSiteLeaveCallbackStruct, *XmDropSiteLeaveCallback;
+.iE
+.sE
+.IP "\fBreason\fP"
+Indicates why the callback was invoked.
+.IP "\fBevent\fP"
+Points to the \fIXEvent\fP that triggered the callback.
+.IP "\fBtimeStamp\fP"
+Specifies the timestamp of the logical event.
+.PP
+A pointer to the following structure is passed for the 
+\fIXmNdropStartCallback\fP callback:
+.ne 10
+.sS
+.iS
+.ta .25i 1.5i
+.nf
+typedef struct
+{
+	int	\fBreason\fI;
+	XEvent	*\fBevent\fI;
+	Time	\fBtimeStamp\fI;
+	unsigned char	\fBoperation\fI;
+	unsigned char	\fBoperations\fI;
+	unsigned char	\fBdropSiteStatus\fI;
+	unsigned char	\fBdropAction\fI;
+	Position	\fBx\fI;
+	Position	\fBy\fI;
+}XmDropStartCallbackStruct, *XmDropStartCallback;
+.iE
+.sE
+.IP "\fBreason\fP"
+Indicates why the callback was invoked.
+.IP "\fBevent\fP"
+Points to the \fIXEvent\fP that triggered the callback.
+.IP "\fBtimeStamp\fP"
+Specifies the time at which the drag was completed.
+.IP "\fBoperation\fP"
+Identifies an operation.
+.PP
+If the pointer is over an active drop site when the drop begins, the
+toolkit initializes \fBoperation\fP to the value of the \fBoperation\fP
+member of the \fIXmDropProcCallbackStruct\fP at the time the DropSite's
+\fIXmNdropProc\fP returns.
+.PP
+If the pointer is not over an active drop site when the drop begins, the
+toolkit initializes \fBoperation\fP by selecting an operation from the
+initial value of the \fBoperations\fP member.
+The toolkit searches this set first for \fIXmDROP_MOVE\fP, then for
+\fIXmDROP_COPY\fP, then for \fIXmDROP_LINK\fP, and initializes
+\fBoperation\fP to the first operation it finds in the set.
+If it finds none of these operations in the set, it initializes
+\fBoperation\fP to \fIXmDROP_NOOP\fP.
+.IP "\fBoperations\fP"
+Indicates the set of operations supported for the source data.
+.PP
+If the pointer is over an active drop site when the drop begins, the
+toolkit initializes \fBoperations\fP to the bitwise AND of the
+DropSite's \fIXmNdropOperations\fP and the value of the \fBoperations\fP
+member of the \fIXmDropProcCallbackStruct\fP at the time the DropSite's
+\fIXmNdropProc\fP returns.
+If the resulting set of operations is empty, the toolkit initializes
+\fBoperations\fP to \fIXmDROP_NOOP\fP.
+.PP
+If the pointer is not over an active drop site when the drop begins and
+if the user does not select an operation (by pressing a modifier key),
+the toolkit initializes \fBoperations\fP to the value of the
+DragContext's \fIXmNdragOperations\fP resource.
+.PP
+If the pointer is not over an active drop site when the drop begins and
+if the user does select an operation, the toolkit initializes
+\fBoperations\fP to the bitwise AND of the corresponding operation and
+the value of the DragContext's \fIXmNdragOperations\fP resource.
+If the resulting set of operations is empty, the toolkit initializes
+\fBoperations\fP to \fIXmDROP_NOOP\fP.
+.IP "\fBdropSiteStatus\fP"
+Indicates whether or not a drop site is valid.
+.PP
+If the pointer is over an active drop site when the drop begins, the
+toolkit initializes \fBdropSiteStatus\fP to the value of the
+\fBdropSiteStatus\fP member of the \fIXmDropProcCallbackStruct\fP at the
+time the DropSite's \fIXmNdropProc\fP returns.
+.PP
+If the pointer is not over an active drop site when the drop begins, the
+toolkit initializes \fBdropSiteStatus\fP to \fIXmNO_DROP_SITE\fP.
+.IP "\fBdropAction\fP"
+An IN/OUT member that identifies the drop action.
+The values are \fIXmDROP\fP, \fIXmDROP_CANCEL\fP, \fIXmDROP_HELP\fP,
+and \fIXmDROP_INTERRUPT\fP.  The value of \fBdropAction\fP can be
+modified to change the action actually initiated.  
+The value \fIXmDROP_INTERRUPT\fP is currently unsupported; if
+specified, it will be interpreted as a \fIXmDROP_CANCEL\fP.
+.IP "\fBx\fP"
+Indicates the x-coordinate of the pointer in root window coordinates.
+.IP "\fBy\fP"
+Indicates the y-coordinate of the pointer in root window coordinates.
+.nL
+.PP
+A pointer to the following structure is passed to the 
+\fIXmNoperationChangedCallback\fP callback:
+.ne 10
+.sS
+.iS
+.ta .25i 1.5i
+.nf
+typedef struct
+{
+	int	\fBreason\fI;
+	XEvent	*\fBevent\fI;
+	Time	\fBtimeStamp\fI;
+	unsigned char	\fBoperation\fI;
+	unsigned char	\fBoperations\fI;
+	unsigned char	\fBdropSiteStatus\fI;
+}XmOperationChangedCallbackStruct, *XmOperationChangedCallback;
+.iE
+.sE
+.IP "\fBreason\fP"
+Indicates why the callback was invoked.
+.IP "\fBevent\fP"
+Points to the \fIXEvent\fP that triggered the callback.
+.IP "\fBtimestamp\fP"
+Specifies the time at which the crossing event occurred.
+.IP "\fBoperation\fP"
+Identifies an operation.
+.PP
+If the toolkit has just called a DropSite's \fIXmNdragProc\fP, the
+toolkit initializes \fBoperation\fP to the value of the \fBoperation\fP
+member of the \fIXmDragProcCallbackStruct\fP at the time the DropSite's
+\fIXmNdragProc\fP returns.
+.PP
+If the toolkit has not called an \fIXmNdragProc\fP and the pointer is
+within an active drop site, the toolkit initializes \fBoperation\fP by
+selecting an operation from the bitwise AND of the initial value of the
+\fBoperations\fP member and the value of the DropSite's
+\fIXmNdropSiteOperations\fP resource.
+The toolkit searches this set first for \fIXmDROP_MOVE\fP, then for
+\fIXmDROP_COPY\fP, then for \fIXmDROP_LINK\fP, and initializes
+\fBoperation\fP to the first operation it finds in the set.
+If the toolkit finds none of these operations in the set, it initializes
+\fBoperation\fP to \fIXmDROP_NOOP\fP.
+.PP
+If the toolkit has not called an \fIXmNdragProc\fP and the pointer is
+not within an active drop site, the toolkit initializes \fBoperation\fP
+by selecting an operation from the initial value of the \fBoperations\fP
+member.
+The toolkit searches this set first for \fIXmDROP_MOVE\fP, then for
+\fIXmDROP_COPY\fP, then for \fIXmDROP_LINK\fP, and initializes
+\fBoperation\fP to the first operation it finds in the set.
+If the toolkit finds none of these operations in the set, it initializes
+\fBoperation\fP to \fIXmDROP_NOOP\fP.
+.IP "\fBoperations\fP"
+Indicates the set of operations supported for the source data.
+.PP
+If the toolkit has just called a DropSite's \fIXmNdragProc\fP, the
+toolkit initializes \fBoperations\fP to the bitwise AND of the
+DropSite's \fIXmNdropOperations\fP and the value of the \fBoperations\fP
+member of the \fIXmDragProcCallbackStruct\fP at the time the DropSite's
+\fIXmNdragProc\fP returns.
+If the resulting set of operations is empty, the toolkit initializes
+\fBoperations\fP to \fIXmDROP_NOOP\fP.
+.PP
+If the toolkit has not called an \fIXmNdragProc\fP and the user does not
+select an operation (by pressing a modifier key), the toolkit
+initializes \fBoperations\fP to the value of the DragContext's
+\fIXmNdragOperations\fP resource.
+.PP
+If the toolkit has not called an \fIXmNdragProc\fP and the user does
+select an operation, the toolkit initializes \fBoperations\fP to the
+bitwise AND of the corresponding operation and the value of the
+DragContext's \fIXmNdragOperations\fP resource.
+If the resulting set of operations is empty, the toolkit initializes
+\fBoperations\fP to \fIXmDROP_NOOP\fP.
+.IP "\fBdropSiteStatus\fP"
+Indicates whether or not a drop site is valid.
+.PP
+If the toolkit has just called a DropSite's \fIXmNdragProc\fP, the
+toolkit initializes \fBdropSiteStatus\fP to the value of the
+\fBdropSiteStatus\fP member of the \fIXmDragProcCallbackStruct\fP at the
+time the DropSite's \fIXmNdragProc\fP returns.
+.PP
+If the toolkit has not called an \fIXmNdragProc\fP, it initializes
+\fBdropSiteStatus\fP as follows:
+the toolkit initializes \fBdropSiteStatus\fP to \fIXmNO_DROP_SITE\fP if
+the pointer is over an inactive drop site or is not over a drop site.
+The toolkit initializes \fBdropSiteStatus\fP to \fIXmDROP_SITE_VALID\fP
+if all the following conditions are met:
+.TP
+\(bu
+The pointer is over an active drop site
+.TP
+\(bu
+The DragContext's \fIXmNexportTargets\fP and the DropSite's
+\fIXmNimportTargets\fP are compatible
+.TP
+\(bu
+The initial value of the \fBoperation\fP member is not
+\fIXmDROP_NOOP\fP
+Otherwise, the toolkit initializes \fBdropSiteStatus\fP to
+\fIXmDROP_SITE_INVALID\fP.
+.nL
+.PP
+A pointer to the following structure is passed to callbacks for
+\fIXmNtopLevelEnterCallback\fP:
+.ne 10
+.sS
+.iS
+.ta .25i 1.5i
+.nf
+typedef struct
+{
+	int	\fBreason\fI;
+	XEvent	*\fBevent\fI;
+	Time	\fBtimestamp\fI;
+	Screen	\fBscreen\fI;
+	Window	\fBwindow\fI;
+	Position	\fBx\fI;
+	Position	\fBy\fI;
+	unsigned char	\fBdragProtocolStyle\fI;
+}XmTopLevelEnterCallbackStruct, *XmTopLevelEnterCallback;
+.iE
+.sE
+.IP "\fBreason\fP"
+Indicates why the callback was invoked.
+.IP "\fBevent\fP"
+Points to the \fIXEvent\fP that triggered the callback.
+.IP "\fBtimeStamp\fP"
+Specifies the timestamp of the logical event.
+.IP "\fBscreen\fP"
+Specifies the screen associated with the top-level window or root
+window being entered.
+.IP "\fBwindow\fP"
+Specifies the ID of the top-level window or root window being entered.
+.IP "\fBx\fP"
+Indicates the x-coordinate of the pointer in root window coordinates.
+.IP "\fBy\fP"
+Indicates the y-coordinate of the pointer in root window coordinates.
+.IP "\fBdragProtocolStyle\fP"
+Specifies the protocol style adopted by the initiator.  The values
+are \fIXmDRAG_DROP_ONLY\fP, \fIXmDRAG_DYNAMIC\fP, \fIXmDRAG_NONE\fP,
+and \fIXmDRAG_PREREGISTER\fP.
+.nL
+.PP
+A pointer to the following structure is passed to callbacks for
+\fIXmNtopLevelLeaveCallback\fP:
+.ne 10
+.sS
+.iS
+.ta .25i 1.5i
+.nf
+typedef struct
+{
+	int	\fBreason\fI;
+	XEvent	*\fBevent\fI;
+	Time	\fBtimestamp\fI;
+	Screen	\fBscreen\fI;
+	Window	\fBwindow\fI;
+}XmTopLevelLeaveCallbackStruct, *XmTopLevelLeaveCallback;
+.iE
+.sE
+.IP "\fBreason\fP"
+Indicates why the callback was invoked.
+.IP "\fBevent\fP"
+Points to the \fIXEvent\fP that triggered the callback.
+.IP "\fBtimeStamp\fP"
+Specifies the timestamp of the logical event.
+.IP "\fBscreen\fP"
+Specifies a screen associated with the top-level window or root
+window being left.
+.IP "\fBwindow\fP"
+Specifies the ID of the top-level window or root window being left.
+.PP
+.SS "Translations"
+The XmDragContext translations are listed below.
+These translations may not directly correspond to a
+translation table.
+.iS
+.ta 1.5i
+.nf
+BDrag Motion:	DragMotion()
+BDrag Release:	FinishDrag()
+.sp \n(PDu
+KCancel:	CancelDrag()
+KHelp:	HelpDrag()
+.nL
+.wH
+.fi
+.iE
+.SS "Action Routines"
+The XmDragContext action routines are described below:
+.IP "\fICancelDrag()\fP:"
+Cancels the drag operation and frees the associated
+DragContext.
+.IP "\fIDragMotion()\fP:"
+Drags the selected data as the pointer is moved.
+.IP "\fIFinishDrag()\fP:"
+Finishes the drag operation and starts the drop operation.
+.IP "\fIHelpDrag()\fP:"
+Initiates a conditional drop that enables the receiver to provide
+help information to the user.  The user can cancel or continue the
+drop operation in response to this information.
+.SS "Virtual Bindings"
+The bindings for virtual keys are vendor specific.
+For information about bindings for virtual buttons and keys,
+see \fIVirtualBindings(3X)\fP.
+.PP
+.SH "RELATED INFORMATION"
+.na
+\fICore(3X)\fP,
+\fIXmDisplay(3X)\fP,
+\fIXmDragCancel(3X)\fP,
+\fIXmDragIcon(3X)\fP,
+\fIXmDragStart(3X)\fP,
+\fIXmDropSite(3X)\fP,
+\fIXmDropTransfer(3X)\fP, and
+\fIXmScreen(3X)\fP.
+.ad

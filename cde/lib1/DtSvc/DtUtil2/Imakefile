@@ -1,0 +1,220 @@
+XCOMM $XConsortium: Imakefile /main/cde1_maint/6 1995/10/08 22:20:55 pascale $
+#ifndef DoNormalLib
+#define DoNormalLib NormalLibDtSvc
+#endif
+#ifndef DoSharedLib
+#define DoSharedLib SharedLibDtSvc
+#endif
+
+#include <Library.tmpl>
+
+#if defined(REORDER_PROFILED)
+    C++ = CC -pg $(BBAFLAGS)
+    CC = cc -xpg $(BBAFLAGS)
+    LD = cc
+#endif
+
+/* KEEP all DT macros LOCAL so that you can find local headers, etc. */
+/* DTINCLUDESRC points to local directories */
+LOCALDTINCLUDESRC = ../include/Dt
+LOCALDTSVCSRC = ..
+
+/* General case INCLUDES DEFINES
+ * Each individual architecture may have more or less of the above.
+ * Use EXTRA_DEFINES and EXTRA_INCLUDES to add defines and includes
+ * to an individual architecture.
+ */
+DEFINES = -DXK_MISCELLANY -DMULTIBYTE \
+          -DCDE_INSTALLATION_TOP=\"$(CDE_INSTALLATION_TOP)\" \
+          -DCDE_CONFIGURATION_TOP=\"$(CDE_CONFIGURATION_TOP)\" \
+
+INCLUDES =  -I. -I../include
+
+#ifdef SCOArchitecture
+EXTRA_DEFINES = -DMESSAGE_CAT -DMULTIBYTE
+#endif
+
+#ifdef HPArchitecture
+EXTRA_DEFINES = -DMESSAGE_CAT -DMULTIBYTE
+EXTRA_CCOPTIONS = $(ESLIT_OPTION) /* set in hp.cf */
+#endif
+
+#if defined(RsArchitecture) 
+#endif
+
+#ifdef SunArchitecture
+EXTRA_DEFINES = \
+	-DNO_REGCOMP \
+	-DOSMAJORVERSION=$(OSMAJORVERSION) \
+	-DOSMINORVERSION=$(OSMINORVERSION)
+#endif
+
+#ifdef USLArchitecture
+EXTRA_DEFINES=-DNO_REGCOMP
+#endif
+
+#ifdef UXPArchitecture
+EXTRA_DEFINES=-DNO_REGCOMP
+#endif
+
+#ifdef AlphaArchitecture
+EXTRA_DEFINES = -DMESSAGE_CAT -DMULTIBYTE
+#endif
+
+INSTALLFLAGS = $(INSTINCFLAGS)
+
+LINTLIBS = $(LINTXLIB) $(LINTXTOOL) $(LINTXM) 
+
+
+HEADERS = \
+	ChkpntP.h \
+	Collate.h \
+	CommandM.h \
+	Connect.h \
+	DataTypes.h \
+	DtNlUtils.h \
+	DtP.h \
+	DtPStrings.h \
+	DtosP.h \
+	DtpadM.h \
+	EnvControl.h \
+	EnvControlP.h \
+	FileM.h \
+	FileUtil.h \
+	GetDispRes.h \
+        HashP.h \
+	HourGlass.h \
+	IconFile.h \
+	Indicator.h \
+	IndicatorM.h \
+	Init.h \
+	Lock.h \
+	Message.h \
+	Msg.h \
+	MsgP.h \
+	Regex.h \
+	Service.h \
+	ServiceP.h \
+	Setlocale.h \
+	SharedProcs.h \
+	SmCreateDirs.h \
+	Spc.h \
+	StandardM.h \
+	StyleM.h \
+	SvcTT.h \
+	Unistd.h \
+	UserMsg.h \
+	Utility.h \
+	UtilityP.h
+
+#ifdef SunArchitecture
+LCX_HEADERS = \
+	XlationSvc.h \
+	LocaleXlate.h
+
+SRCS_EXTRA = \
+	SunDtHelp.c \
+        XlationSvc.c \
+        LocaleXlate.c
+#else
+SRCS_EXTRA=
+#endif
+
+SRCS = \
+	$(SRCS_EXTRA) \
+	$(LCXSRCS) \
+	ChkpntClient.c \
+	ChkpntListen.c \
+	DtEnvMap.c \
+	DtNlUtils.c \
+	EnvControl.c \
+	FileUtil.c \
+	GetDispRes.c \
+	GetMessage.c \
+	HourGlass.c \
+	SharedProcs.c \
+	SmCreateDirs.c \
+	UErrNoBMS.c \
+	Utility.c \
+	ActIndicator.c \
+	CmdUtility.c \
+	DtGetMessage.c \
+	DtUtil.c \
+	CommonErr.c \
+	GetEmbed.c \
+        Hash.c \
+	PrintXErr.c \
+	XmWrap.c \
+	addToRes.c \
+	lock.c \
+	SvcTT.c
+
+/* WARNING!!!!
+ * Any .o's added to this list need to be added to DTUTIL2_OBJS
+ * and SHARED_DTUTIL2_OBJS in the DtSvc Imakefile.
+ */
+
+#ifdef SunArchitecture
+OBJS_EXTRA = \
+	SunDtHelp.o \
+        XlationSvc.o \
+        LocaleXlate.o
+#else
+OBJS_EXTRA=
+#endif
+
+OBJS = \
+        $(OBJS_EXTRA) \
+	ChkpntClient.o \
+	ChkpntListen.o \
+	DtEnvMap.o \
+	DtNlUtils.o \
+	EnvControl.o \
+	FileUtil.o \
+	GetDispRes.o \
+	GetMessage.o \
+	HourGlass.o \
+	SharedProcs.o \
+	SmCreateDirs.o \
+	UErrNoBMS.o \
+	Utility.o \
+	ActIndicator.o \
+	CmdUtility.o \
+	DtGetMessage.o \
+	DtUtil.o \
+	CommonErr.o \
+	GetEmbed.o \
+        Hash.o \
+	PrintXErr.o \
+	XmWrap.o \
+	addToRes.o \
+	lock.o \
+	SvcTT.o
+
+LibraryObjectRule()
+all:: $(OBJS)
+
+LintLibraryTarget(DtSvc,$(SRCS))
+
+/* includes exported to build tree */
+BuildIncludes($(HEADERS),$(DTINCLUDEDEST),../..)
+/* local includes for use by DtSvc */
+BuildLocalIncludes($(HEADERS),$(LOCALDTINCLUDESRC),../../DtUtil2)
+
+/* For install of developer's build environment */
+LOCAL_BINSTALL_DEST = include/Dt
+BuildMultipleInstall($(HEADERS),$(LOCAL_BINSTALL_DEST))
+
+#ifdef SunArchitecture
+/* export internal lcx headers */
+LOCAL_BINSTALL_INCLUDEDEST2 = include/Misc
+BuildMultipleInstall($(LCX_HEADERS),$(LOCAL_BINSTALL_INCLUDEDEST2))
+
+LCX_FILES = AIX.lcx    CDE.lcx    HP-UX.lcx  SunOS.lcx
+LOCAL_BINSTALL_LCX_DEST = misc/dtlcx
+BuildMultipleInstall($(LCX_FILES),$(LOCAL_BINSTALL_LCX_DEST))
+#endif /* SunArchitecture */
+
+DependTarget()
+
+includes::

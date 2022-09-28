@@ -1,0 +1,102 @@
+.TH Set_Locale 4 "13 May 1994"
+.SH NAME
+Set_Locale request \- set a tool's locale
+.SH SYNOPSIS
+.yS
+.ta \w@Set_Locale(@u
+Set_Locale(in string \f2category\fP,
+	in string \f2locale\fP
+	[...]);
+.yE
+.SH DESCRIPTION
+The
+.I Set_Locale
+request
+reports the
+.xo XPG4
+.cde POSIX
+locale of the indicated locale categories.
+.P
+The
+.I category
+argument
+is the locale category to set.
+A locale category is a
+group of data types whose output formatting varies according to
+locale in a similar way.
+ISO C and \*(XX locale categories are:
+.Cs I
+LC_ALL
+LC_COLLATE
+LC_CTYPE
+LC_MESSAGES
+LC_MONETARY
+LC_NUMERIC
+LC_TIME
+.Ce
+.P
+The
+.I locale
+argument
+is the name of the
+locale to set the indicated category to.
+The value of
+.I locale
+is implementation-defined.
+.suns
+For example, Solaris defines such locales as
+.BR C ,
+.BR de ,
+.BR fr ,
+.BR it ,
+etc.
+.sune
+.SH ERRORS
+The ToolTalk service may return the following error
+in processing the
+.I Set_Locale
+request:
+.VL 6
+.Lc TT_DESKTOP_EINVAL
+.br
+The
+.I locale
+argument is not valid on the handler's host.
+.LE
+.SH "APPLICATION USAGE"
+The
+.Fn ttdt_session_join 3,
+function can be used to register for,
+and transparently process, the
+.I Set_Locale
+request.
+.SH EXAMPLES
+The
+.I Set_Locale
+request can be sent as in the following example:
+.Cs I
+Tt_message msg = tttk_message_create(0, TT_REQUEST, TT_SESSION,
+			the_recipient_procid, TTDT_SET_LOCALE,
+			my_callback);
+tt_message_arg_add(msg, TT_IN, Tttk_string, "LC_MONETARY");
+tt_message_arg_add(msg, TT_IN, Tttk_string, "de");
+tt_message_send(msg);
+.Ce
+.cdes 
+.SH WARNINGS
+.I Set_Locale
+can also be sent as a multicast notice, as an
+.I edict 
+to all tools in the scope of the message.
+The consequences of doing so can be severe and unexpected.
+.cdee
+.SH "SEE ALSO"
+.Fn setlocale 3C
+.xo in the \*(Zk,
+.sun .I Solaris 2.3 Developer's Guide to Internationalization;
+.Fn tt_message_arg_add 3,
+.Fn tt_message_send 3,
+.Fn ttdt_sender_imprint_on 3,
+.Fn ttdt_session_join 3;
+.I Get_Locale
+request.

@@ -1,0 +1,84 @@
+.\" *************************************************************************
+.\" **  (c) Copyright 1994 Hewlett-Packard Company
+.\" **  (c) Copyright 1994 International Business Machines Corp.
+.\" **  (c) Copyright 1994 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1994 Novell, Inc.
+.\" *************************************************************************
+.TH dtsessionfile 4
+.SH NAME
+dtsessionfile \- format and location of desktop session files
+.SH DESCRIPTION
+At session startup, the session manager will restart any applications
+that were saved as part of the session. The system default set of
+applications to be
+restored as part of the user's Initial Session can be found in
+/usr/dt/config/$LANG/sys.session. This file should not be edited as
+it will be unconditionally overwritten upon subsequent desktop
+installations.
+.PP
+A system administrator may replace the set of applications that
+are restored as part of the user's Initial Session by creating
+a file named /etc/dt/config/$LANG/sys.session. Unlike the resource
+files, this file will be used as a complete replacement for the
+desktop default file, so it is valid to make a copy of the system
+default file and make any necessary modifications.
+.SH FILE FORMAT
+A session file contains a line for each application to be started 
+during a user's Initial Session. Empty lines or lines beginning with
+a "#" are ignored. Each application to be started should have a line
+in the session file of the form:
+
+  dtsmcmd -cmd "application command line and options"
+
+For example, to start the file manager with options:
+
+  dtsmcmd -cmd "/usr/dt/bin/dtfile -dir ~ -geometry +700+0"
+
+More specifically, a session file consists of one or
+more SessionLine's:
+.sp 1
+.PD 0
+.TP 15
+SessionLine
+= Comment | SessionSpec | <empty line>
+.PD 0
+.TP 15
+Comment
+= "#" {<any character except null or newline>}
+.PD 0
+.TP 15
+SessionSpec
+= "dtsmcmd -cmd " Quote CommandSpec Quote
+.PD 0
+.TP 15
+Quote
+= """
+.PD 0
+.TP 15
+CommandSpec
+= "<application command line and options>"
+
+Elements separated by vertical bar (|) are alternatives.
+Curly braces ({...}) indicate zero or more repetitions of
+the enclosed elements.  Quotes ("...") are
+used around literal characters.
+
+.SH FILES
+.sp 1
+.PD 0
+.TP 35
+.B /usr/dt/config/$LANG/sys.session
+The desktop default set of applications for the
+user's Initial Session.
+.PD 0
+.TP 35
+.B /etc/dt/config/$LANG/sys.session
+System administrator specified set of applications for
+the user's Initial Session.
+.\"---
+.\"--- Related man pages
+.\"---
+.PD
+.SH "SEE ALSO"
+dtsession(1)
+.PD

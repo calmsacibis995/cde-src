@@ -1,0 +1,54 @@
+XCOMM
+XCOMM  "@(#)Imakefile	1.6 97/01/08 Sun Microsystems, Inc."
+XCOMM
+#ifdef SunArchitecture
+.KEEP_STATE:
+.PARALLEL:
+
+#undef DependDependency
+#define DependDependency /**/
+#undef DependTarget
+#define DependTarget() /**/
+#undef DependTarget3
+#define DependTarget3() /**/
+#undef LintTarget
+#define LintTarget() /**/
+#undef NormalLintTarget
+#define NormalLintTarget(x) /**/
+#undef LintLibraryTarget
+#define LintLibraryTarget(L,S) /**/
+#undef InstallLintLibrary
+#define InstallLintLibrary(L,S) /**/
+
+#endif
+
+   TARGET_ADMIN = sdtcm_admin
+       PROGRAMS = sdtcm_admin
+
+
+   TOP_INCLUDES = -I/usr/openwin/include -I$(TOP)/binstall/include/Misc
+       INCLUDES = -I. -I.. -I../libcsa -I../libDtCmP
+       DTCMPLIB = ../libDtCmP/libDtCmP.a
+        DTCMLIB = -i -L../libcsa -lcsa
+LOCAL_LIBRARIES = $(DTCMPLIB) $(DTCMLIB) $(DTSVCLIB) $(XTOOLLIB) $(XLIB)
+EXTRA_CCOPTIONS = -xstrconst -v
+EXTRA_LIBRARIES =
+
+#ifdef SunArchitecture
+  EXTRA_DEFINES = -D_POSIX_C_SOURCE=199506L -D__EXTENSIONS__
+ 
+#endif
+         SRCS = sdtcm_admin.c
+         OBJS = sdtcm_admin.o
+
+NormalLibraryObjectRule()
+
+ComplexProgramTarget($(TARGET_ADMIN))
+
+#ifdef SunArchitecture
+depend::
+lint::
+#endif
+
+DependTarget()
+

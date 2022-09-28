@@ -1,0 +1,50 @@
+.TH Set_Situation 4 "13 May 1994"
+.SH NAME
+Set_Situation request \- set a tool's current working directory
+.SH SYNOPSIS
+.yS
+.ta \w@Set_Situation(@u
+Set_Situation(in string \f2path\fP);
+.yE
+.SH DESCRIPTION
+The
+.I Set_Situation
+request
+sets the current working directory.
+.P
+The
+.I path
+argument
+is the pathname of the working directory that the recipient should use.
+.SH "APPLICATION USAGE"
+The
+.Fn ttdt_session_join 3,
+function can be used to register for,
+and transparently process, the
+.I Set_Situation
+request.
+.SH EXAMPLES
+The
+.I Set_Situation
+request can be sent as in the following example:
+.Cs I
+Tt_message msg = tttk_message_create(0, TT_REQUEST, TT_SESSION,
+			the_recipient_procid, TTDT_GET_SITUATION,
+			my_callback);
+tt_message_arg_add(msg, TT_OUT, Tttk_string, 0);
+tt_message_send(msg);
+.Ce
+.cdes 
+.SH WARNINGS
+.I Set_Situation
+can also be sent as a multicast notice, as an
+.I edict 
+to all tools in the scope of the message.
+The consequences of doing so can be severe and unexpected.
+.cdee
+.SH "SEE ALSO"
+.Fn tt_message_arg_add 3,
+.Fn tt_message_send 3,
+.Fn ttdt_session_join 3;
+.I Get_Situation
+request.

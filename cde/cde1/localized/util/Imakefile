@@ -1,0 +1,21 @@
+XCOMM $XConsortium: Imakefile /main/cde1_maint/1 1995/07/17 11:31:01 drk $
+
+           SRCS = merge.c
+           OBJS = merge.o
+
+all:: merge
+
+/* ensure that makeMessCat is executable */
+includes::
+	chmod a+x makeMessCat
+
+SingleProgramTarget(merge,$(OBJS),NullParameter,NullParameter)
+DependTarget()
+
+/* For install of developer's build environment */
+LOCAL_BINSTALL_BINDEST = bin
+BuildMultipleInstall(makeMessCat,$(LOCAL_BINSTALL_BINDEST))
+
+#ifdef SunArchitecture
+.NO_PARALLEL:
+#endif

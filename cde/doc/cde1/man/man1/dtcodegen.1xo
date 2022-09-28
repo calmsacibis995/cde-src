@@ -1,0 +1,469 @@
+.TH dtcodegen 1 "28 July 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.SH NAME
+dtcodegen \- generate code from a Cde application building services project or module file
+.SH SYNOPSIS
+.yS
+dtcodegen
+[\-changed]
+[\-main]
+[\-merge]
+[\-nomerge]
+.cde [\-module\0\f2mymod\fP] 
+.cde [\-p|\-project\0\f2myproj\fP] 
+.cde [\-np|\-noproject]
+[\-showall]
+[\-noshowall]
+[\-s|\-silent]
+[\-v|\-verbose]
+.cde [\f2file\fP\0.\|.\|.]
+.xo \f2file\fP\0.\|.\|.
+.yE
+.P
+.yS
+dtcodegen
+\-help
+.yE
+.SH DESCRIPTION
+The 
+.Cm dtcodegen
+utility reads
+.cde Builder Interface Language (BIL)
+files created by the Cde application building services
+graphical user interface and produces C,
+Motif and Cde source code for the user interface and
+application elements defined.
+The
+.cde BIL
+files supplied can
+be individual module files
+.cde (files with a
+.cde .B \&.bil
+.cde suffix)
+or a project file
+.cde (files with a
+.cde .B \&.bip
+.cde suffix)
+that contains references to zero or more module files.
+.SH OPTIONS
+.xos
+The
+.Cm dtcodegen
+utility does not support the \*(Zu because it uses
+the X Window System convention of full-word options.
+.xoe
+The following options are available:
+.VL 6
+.LI \f3\-changed\fP
+.br
+Generate only source code for those modules that have changed since
+the last time
+.Cm dtcodegen
+was run.
+.LI \f3\-help\fP
+.br
+Write a help message to standard output explaining all
+.Cm dtcodegen
+options and then terminate.
+.LI \f3\-main\fP
+.br
+Produce the project files associated with the application's
+.Fn main
+routine.
+.LI \f3\-merge\fP
+.br
+Merge generated stubs files with previous versions,
+perpetuating changes made or custom edits done to the previous stubs file.
+This is the default behavior.
+.LI \f3\-nomerge\fP
+.br
+Do not merge existing and new
+.B _stubs.c
+files.
+This option overrides the default merging behavior.
+If both
+.B \-merge
+and
+.B \-nomerge
+are used, the one given last on the command line takes precedence.
+.cdes
+.LI \f3\-module\0\f2mymod\f1
+.br
+Generate code for the module
+.IR mymod ,
+(which is expected to be defined in the file 
+.I mymod \c
+.BR \&.bil ).
+Using multiple
+.B \-module
+options includes multiple modules in the generated code.
+.LI \f3\-p\||\|\-project\0\f2myproj\f1
+.br
+Generate code for the project
+.IR myproj ,
+(which is expected to be defined in the file 
+.I myproj \c
+.BR \&.bip ).
+.LI \f3\-noproject\fP
+.br
+Ignore the
+.I project\c
+.B \&.bip
+project file and use default project settings instead.
+This is useful in producing an application from one or a few module files
+(for example, for testing)
+as an alternative to generating the entire project.
+.cdee
+.LI \f3\-showall\fP
+.br
+Cause the generated application to show (map) all application
+windows (main windows and dialogs) at startup, ignoring whether they are
+set to be initially visible or not.
+If no project is specified on the command line,
+.cdes
+either by using
+.B \-project
+or by specifying a 
+.I project \c
+.B \&.bip 
+file as an operand,
+.cdee
+.Cm dtcodegen
+performs as if
+.B \-showall
+had been specified.
+(The
+.B \-noshowall
+option suppresses this behavior).
+.LI \f3\-noshowall\fP
+.br
+Cause the generated application to show at startup (map) only those
+windows (main windows and dialogs) whose initially visible attribute is true.
+If a project is specified on the command line,
+.cdes
+either by using
+.B \-project
+or by specifying a 
+.I project \c
+.B \&.bip 
+file as an operand,
+.cdee
+.Cm dtcodegen
+performs as if
+.B \-noshowall
+had been specified.
+(The
+.B \-showall
+option suppresses this behavior).
+.LI \f3\-s\||\|\-silent\f1
+.br
+Work silently, producing no output except error messages while generating 
+source code.
+.LI \f3\-v\||\|\-verbose\f1
+.br
+Be more verbose in providing progress and status messages 
+during the generation of source code.
+.LE
+.SH OPERANDS
+The following operand is supported:
+.VL 6
+.LI \f2file\fP
+A pathname of a project or module file.
+.cdes
+It is not necessary to specify the
+.B \&.bip
+or
+.B \&.bil
+extension for any file because
+.Cm dtcodegen
+uses a sequence of search algorithms in the current directory to determine
+what files should be read in order to satisfy the specified command line.
+.P
+If no
+.I file
+operands are given, 
+.Cm dtcodegen
+searches the current directory for a project file (a file with a
+.B \&.bip
+suffix).
+If one is found, it is used as if it had been specified on
+the command line.
+If more than one is found, the first one encountered is used.
+.P
+If one or more
+.I file
+operands are specified,
+.Cm dtcodegen
+checks to see if any of them is a project file in the current working 
+directory, and uses the first one found.
+If none of the
+.I file
+operands are project files, then the directory is
+searched for a project file.
+This search is similar to the no-operand case, but is modified to look
+for a project file that contain modules corresponding to other
+.I file
+operands.
+.P
+Operands other than the project file are taken to be module names.
+.LE
+.P
+See the EXAMPLES section for more on the interpretation of filename operands
+and how the search features of
+.Cm dtcodegen
+may be used.
+.cdee
+.xo .LE
+.SH RESOURCES
+None.
+.SH STDIN
+Not used.
+.SH "INPUT FILES"
+All input files are text files
+.xo in the format used by the Cde application building services
+.xo graphical user interface.
+.xo See
+.xo .cX appbuildfiles .
+.cde in the BIL format.
+.cde See
+.cde .IR BIL (4).
+.SH "ENVIRONMENT VARIABLES"
+The following environment variables affect the execution of
+.Cm dtcodegen :
+.VL 15
+.LI \f2LANG\fP
+Provide a default value for the internationalization variables
+that are unset or null.
+If
+.I LANG
+is unset or null, the corresponding value from the
+implementation-specific default locale will be used.
+If any of the internationalization variables contains an invalid setting, the
+utility behaves as if none of the variables had been defined.
+.LI \f2LC_ALL\fP
+If set to a non-empty string value,
+override the values of all the other internationalization variables.
+.LI \f2LC_MESSAGES\fP
+Determine the locale that is used to affect
+the format and contents of diagnostic
+messages written to standard error
+and informative messages written to standard output.
+.LI \f2NLSPATH\fP
+Determine the location of message catalogues
+for the processing of
+.IR LC_MESSAGES .
+.LE
+.SH "ASYNCHRONOUS EVENTS"
+.xo Default.
+.cde The
+.cde .Cm dtcodegen
+.cde utility takes the standard action for all signals.
+.SH STDOUT
+When
+.B \-help
+is specified,
+.Cm dtcodegen
+writes to standard output a usage message
+in an unspecified format.
+Otherwise, standard output is not used.
+.SH STDERR
+When
+.B \-verbose
+is specified,
+.Cm dtcodegen
+writes to standard error informational progress messages
+and diagnostic messages in an unspecified format.
+Otherwise, standard error is used only for diagnostic messages.
+.SH "OUTPUT FILES"
+The
+.Cm dtcodegen
+utility produces the following files:
+.VL 6
+.LI \f2modname\f3_ui.c\f1
+.br
+The primary source code file for module
+.IR modname ,
+containing C code to create the objects in the module and 
+establish connections for those objects.
+.LI \f2modname\f3_ui.h\f1
+.br
+Declarations and C externs for module
+.IR modname .
+.LI \f2modname\f3_stubs.c\f1
+.br
+Callback functions for the element handlers specific to module
+.IR modname .
+.LI \f2project\f3.c\f1
+.br
+If
+.Cm dtcodegen
+is generating code for a project, this file contains
+.Fn main
+plus any callback functions that are common across modules.
+.LI \f2project\f3.h\f1
+.br
+If
+.Cm dtcodegen
+is generating code for a project, this file contains
+declarations for any callback functions and C externs 
+that are common across interfaces.
+.LI \f3\&.dtcodegen.log\f1
+.br
+A record of per-module code generation and the date and time of
+each module as it was processed.
+This data is required to provide support for the
+.B \-changed
+option as part of determining which files need to be regenerated and
+which ones do not.
+.LE
+.P
+Additional application code should be added to the
+.IR modname \c
+.BR _stubs.c ,
+.IR project \c
+.B \&.c
+and
+.IR project \c
+.B \&.c
+files, as appropriate, because their contents are merged across runs of
+.Cm dtcodegen .
+.SH "EXTENDED DESCRIPTION"
+None.
+.SH "EXIT STATUS"
+The following exit values are returned:
+.VL 4
+.LI \h"\w'>'u"0
+successful completion
+.LI >0
+an error occurred
+.LE
+.SH "CONSEQUENCES OF ERRORS"
+Because code generation involves the sequential production of a set 
+of application files, errors that cause the
+.Cm dtcodegen
+utility to exit prematurely also may result in some module or
+project source files having been generated while others were not.
+Attempts to build the application from this mix of new and old
+generated code produce undefined results.
+.SH "APPLICATION USAGE"
+Typically the
+.Cm dtcodegen
+utility is used indirectly through the
+.xo Cde application building services graphical user interface.
+.cde Cde Application Builder's Code Generator dialog.
+This allows application code to be generated while the user is working
+with the Application Builder rather than through a separate interface or
+shell command line.
+.cdes
+The Code Generator dialog provides a graphical user interface for
+.Cm dtcodegen
+that makes it easy to generate code, build the resulting application
+and then execute it.
+.cdee
+.P
+In some cases, however, it may be desirable to use the
+.Cm dtcodegen
+utility directly.
+A common example of this usage is to employ the
+code generator from within an application Makefile to produce 
+a portion of the application code from pre-existing project or module files.
+.SH EXAMPLES
+Run the code generator on the application defined by the
+project file
+.BR "myproject.bip" :
+.Cs I
+.xo dtcodegen myproject.bip
+.cde dtcodegen \-p myproject
+.Ce
+.P
+.ne 4
+Run the code generator for the project
+.xo in file
+.BR myproject.bip ,
+but only generate code for the module
+.xo in file
+.BR modulename.bil :
+.Cs I
+.xo dtcodegen myproject.bip modulename.bil
+.cde dtcodegen myproject.bip modulename
+.Ce
+.P
+.cdes
+Search the current working directory for a project file that
+references the module
+.B mymodule
+and then silently generate code for just that module:
+.Cs I
+dtcodegen \-silent mymodule
+.Ce
+.P
+In the following example:
+.Cs I
+dtcodegen name1 name2
+.Ce
+if the project file
+.B name1.bip
+exists, it is used and code is generated for module
+.BR name2.bil .
+Otherwise, both
+.B name1
+and
+.B name2
+are taken as the name of modules, the current working directory is
+searched for a project file that references both modules, and code
+for those two modules is generated.
+.P
+Run the code generator, which searches the current working
+directory for a project file to be processed, and generates all code
+associated with that project:
+.Cs I
+dtcodegen
+.Ce
+.cdee
+.P
+Generate just the files associated with the main routine
+for the project
+.xo in file
+.xo .BR myproject-file ,
+.cde .BR myproject ,
+namely 
+.B myproject.c
+and
+.BR myproject.h :
+.Cs I
+.xo dtcodegen \-main myproject-file
+.cde dtcodegen \-main \-p myproject
+.Ce
+.P
+.ne 4
+Search the current working directory for a project file and,
+if one is found, generate code for only those modules that have changed
+since the code generator was last run:
+.Cs I
+dtcodegen \-changed
+.Ce
+.P
+Generate, for the project
+.xo in file
+.BR myproject.bip ,
+code only for those modules among the set
+.xo of files named
+.BR module1 ,
+.B module2
+and 
+.B module3
+that have changed since the last time the code generator was run:
+.Cs I
+.xo dtcodegen \-changed myproject.bip module1 module2 module3
+.cde dtcodegen \-changed \-p myproject module1 module2 module3
+.Ce
+.SH "SEE ALSO"
+.xo None.
+.cdes
+.Cm dtbuilder 1,
+.IR BIL (4).
+.cdee

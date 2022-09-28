@@ -1,0 +1,64 @@
+.TH DtCMReleaseBodyPart 3 "17 January 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH "NAME"
+DtCMReleaseBodyPart \- release a DtCMBodyPart structure
+.SH "SYNOPSIS"
+.yS
+#include <Bento/DtCM.h>
+.sp 0.5v
+.ta \w'void DtCMReleaseBodyPart('u
+void DtCMReleaseBodyPart(DtCMBodyPart *\f2body_part\fP,
+	CMEnv *\f2error\fP);
+.yE
+.SH "DESCRIPTION"
+The
+.Fn DtCMReleaseBodyPart
+function frees any transient storage and any Bento objects
+associated with a body part.
+.P
+The
+.I body_part
+argument is a body-part structure returned by any of the
+.Fn DtCMGetBodyPart 3,
+.Fn DtCMGetNextBodyPart 3,
+or
+.Fn DtCMNewBodyPart 3
+functions.
+The
+.I error
+argument is a pointer to an error return structure.
+.SH "RETURN VALUE"
+The
+.Fn DtCMReleaseBodyPart
+function returns no value.
+If an error occurs,
+.Fn DtCMReleaseBodyPart
+sets the major code in the
+.I error
+structure to
+.Cn USER_EXCEPTION ,
+and the application can use the
+.Fn CMRexception_number
+function to determine the minor code.
+See the Error API Appendix in the \*(ZB.
+.SH "APPLICATION USAGE"
+The application should call
+.Fn DtCMReleaseBodyPart
+for each
+.Fn DtCMBodyPart
+structure returned by the
+.Fn DtCMGetBodyPart 3,
+.Fn DtCMGetNextBodyPart 3,
+or
+.Fn DtCMNewBodyPart 3
+functions.
+.SH "SEE ALSO"
+.Fn DtCMGetBodyPart 3,
+.Fn DtCMGetNextBodyPart 3,
+.Fn DtCMNewBodyPart 3,
+.Hd Bento/DtCM.h 5;
+.Fn CMRexception_number
+in the \*(ZB.

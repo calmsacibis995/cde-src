@@ -1,0 +1,121 @@
+SHELL=/bin/csh
+#
+# This makefile should reside in ELTDEF.  It includes rules
+# for generating ELTDEF.$(EXE) in that directory.
+#
+
+.SUFFIXES: .e .o
+
+COPYCMD = cp
+ARCCMD = arc u
+UNARCCMD = arc x
+ARCDELCMD = arc d
+DELETECMD = -rm -f
+OBJ = o
+EXE = e
+
+STDHDRS = $(UTIL)basic.h $(UTIL)trie.h \
+	$(UTIL)sparse.h $(UTIL)common.h $(UTIL)dtddef.h
+
+ELTHDRS = eltdef.h proto.h $(UTIL)dtdext.h $(STDHDRS)
+
+OBJECTS = eltdef.$(OBJ) eltutil.$(OBJ) entity.$(OBJ) scan.$(OBJ) \
+	$(UTIL)util.a
+
+# Default rule for object files for main programs
+.c.o:
+	 cc -c -g -I $(UTIL) $<
+
+.o.e:
+# Default rule for executables
+	-hp9000s800 && ld /lib/crt0.o $(OBJECTS) $(UTIL)util.a \
+		-lc /usr/lib/xdbend.o -o $@
+	-hp9000s300 && ld /lib/crt0.o $(OBJECTS) $(UTIL)util.a \
+		-lc /usr/lib/end.o -o $@
+
+# all is the default target.  
+#
+# copyfiles is a dependency to ensure that the copies are done each
+# time.  The program fclndir performs the copies.
+all : if.h copyfiles
+
+if.h : eltdef.$(EXE) $(IFFILE)
+	./eltdef.$(EXE) $(IFFILE)
+
+copyfiles :
+	$(UTIL)fclndir.$(EXE) entity2.h ../parser/entity2.h
+	$(UTIL)fclndir.$(EXE) globdec.h ../parser/globdec.h
+	$(UTIL)fclndir.$(EXE) globdef.h ../parser/globdef.h
+	$(UTIL)fclndir.$(EXE) signon.h ../parser/signon.h
+	$(UTIL)fclndir.$(EXE) signonx.h ../parser/signonx.h
+	$(UTIL)fclndir.$(EXE) if.h ../parser/if.h
+	$(UTIL)fclndir.$(EXE) pval.h ../parser/pval.h
+	$(UTIL)fclndir.$(EXE) efile.c ../parser/efile.c
+	$(UTIL)fclndir.$(EXE) entfile.c ../parser/entfile.c
+	$(UTIL)fclndir.$(EXE) pfile.c ../parser/pfile.c
+	$(UTIL)fclndir.$(EXE) sfile.c ../parser/sfile.c
+	$(UTIL)fclndir.$(EXE) stfile.c ../parser/stfile.c
+	$(UTIL)fclndir.$(EXE) tfile.c ../parser/tfile.c
+
+eltdef.$(EXE) : $(OBJECTS)
+
+eltdef.$(OBJ) : eltdef.c $(STDHDRS) delim.h entity.h \
+	$(UTIL)chartype.h eltdef.h proto.h dtd.h \
+	$(UTIL)entdef.h
+
+eltutil.$(OBJ) : eltutil.c $(ELTHDRS) $(UTIL)version.h \
+	delim.h $(UTIL)entext.h $(UTIL)entdef.h
+ 
+entity.$(OBJ) : entity.c $(ELTHDRS) $(UTIL)entext.h \
+	$(UTIL)entout.c $(UTIL)entdef.h
+
+scan.$(OBJ) : scan.c $(ELTHDRS) $(UTIL)scanutil.c delim.h
+
+delim.h : $(UTIL)context.$(EXE) context.dat delim.dat
+# Actually all context output depends on these files ("dependencies").
+# However, listing each of the CONTEXT-generated files as a target 
+# causes CONTEXT to be run multiple times (needlessly).
+	$(UTIL)context.$(EXE)
+
+delim.dat : $(APPL)delim.elt
+# get application-specific delim.dat
+	$(COPYCMD) $(APPL)delim.elt delim.dat
+	touch delim.dat
+
+# Special targets like clean, arc, etc.
+
+clean : minimal
+	$(DELETECMD) *.$(EXE)
+
+mini minimal minimum : 
+	$(DELETECMD) case.c
+	$(DELETECMD) context.h
+	$(DELETECMD) delim.h
+	$(DELETECMD) entity.h
+	$(DELETECMD) dtd.h
+	$(DELETECMD) string.h
+	$(DELETECMD) entity2.h
+	$(DELETECMD) globdec.h
+	$(DELETECMD) globdef.h
+	$(DELETECMD) signon.h
+	$(DELETECMD) signonx.h
+	$(DELETECMD) if.h
+	$(DELETECMD) pval.h
+	$(DELETECMD) efile.c
+	$(DELETECMD) entfile.c
+	$(DELETECMD) pfile.c
+	$(DELETECMD) sfile.c
+	$(DELETECMD) stfile.c
+	$(DELETECMD) tfile.c
+	$(DELETECMD) *.$(OBJ)
+	$(DELETECMD) *.m
+	$(DELETECMD) error
+
+arc package : 
+	if exist eltdef.arc $(COPYCMD) eltdef.arc old.arc
+	$(ARCCMD) eltdef.arc *.c *.h makefile context.dat 
+# Remove files that are generated during the process
+	-$(ARCDELCMD) eltdef.arc case.c context.h delim.h entity.h dtd.h
+
+unarc dearc :
+	$(UNARCCMD) eltdef.arc

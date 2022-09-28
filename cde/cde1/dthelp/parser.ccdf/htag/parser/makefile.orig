@@ -1,0 +1,247 @@
+SHELL=/bin/csh
+#
+# This makefile should reside in the PARSER directory.  It 
+# includes rules for generating PARSER.E in that directory.
+#
+.SUFFIXES: .e .o .c
+
+MAKEPROG = make
+COPYCMD = cp
+ARCCMD = arc u
+UNARCCMD = arc x
+ARCDELCMD = arc d
+DELETECMD = -rm -f
+
+# ELTHDRS declare/define entity-related stuff
+ELTHDRS = $(UTIL)entdef.h $(UTIL)entext.h
+
+# PARSEHDRS are header files used by many parser routines
+PARSEHDRS = $(UTIL)basic.h $(UTIL)trie.h \
+	$(UTIL)common.h $(UTIL)dtddef.h \
+	$(UTIL)dtdext.h $(UTIL)sparse.h \
+	parser.h proto.h 
+
+# APPLHDRS are application-dependent
+APPLHDRS = $(APPL)global.h $(APPL)charconv.h $(APPL)roman8.h \
+	$(APPL)fproto.h 
+
+# ALLHDERS is a combination of practically all header files used here
+ALLHDRS = $(PARSEHDRS) $(ELTHDRS) $(APPLHDRS) $(UTIL)version.h \
+	delim.h pval.h globdec.h signonx.h userinc.h 
+
+#
+# Files with extensions of .o are application-independent, compiled
+# from MARKUP source files.
+# 
+OBJECTS = parser.o actutil.o addinput.o \
+	closent.o code.o cyclent.o dcurelt.o \
+	end.o entity.o \
+	error.o findpar.o getsign.o \
+	ifdata.o input.o level.o lookent.o \
+	minim.o optstrg.o param.o parent.o \
+	parname.o parutil.o parvalok.o pi.o \
+	scan.o setpar.o start.o string.o struct.o \
+	text.o 
+
+# Files with extensions of .t are application-dependent, compiled from
+# source files residing in the application directory.  These files are
+# copied into the /PARSER directory via the target "dependfiles" (below).
+# 
+APPLOBJECTS = *.t
+
+# Implicit rules for constructing objects and executables 
+
+.c.o:
+	cc -c -g -I $(UTIL) -I $(APPL) $<
+
+.o.e:
+	ld /lib/crt0.o $(OBJECTS) $(APPLOBJECTS) $(UTIL)util.a \
+	-lm -lc -o parser.e
+
+# Default target 
+all : delim.h dependfiles parser.e 
+
+#
+# Actually all context output depends on the listed files.
+# However, listing each of the CONTEXT-generated files as a target 
+# causes CONTEXT to be run multiple times (needlessly).
+#
+delim.h : $(UTIL)context.e context.dat delim.dat
+	$(UTIL)context.e
+
+#
+# DEPENDFILES obtains application-specific files from the 
+# application directory.
+#
+dependfiles : 
+	(pushd $(PAPPL) ; $(MAKEPROG) depend ; popd )
+
+parser.e : $(OBJECTS) $(APPLOBJECTS) $(UTIL)util.a
+
+parser.o : parser.c $(PARSEHDRS) $(ELTHDRS) if.h \
+	delim.h parser.h $(UTIL)sparse.h $(UTIL)chartype.h
+
+actutil.o : actutil.c $(PARSEHDRS) if.h delim.h signon.h 
+
+addinput.o : addinput.c $(PARSEHDRS)
+
+# May be replaced by interface
+closent.o : closent.c $(PARSEHDRS)
+
+# Code for code entities included in code.c
+# Globdef.h instead of globdec.h included here
+code.o : code.c entfile.c $(APPLHDRS) globdef.h
+
+cyclent.o : cyclent.c $(PARSEHDRS) $(ELTHDRS)
+
+# May be replaced by interface
+dcurelt.o : dcurelt.c $(PARSEHDRS)
+
+# May be replaced by interface
+#dmpline.o : dmpline.c $(PARSEHDRS)
+
+# Code from <END-CODE> actions included in end.c
+end.o : end.c efile.c $(APPLHDRS)
+
+entity.o : entity.c $(PARSEHDRS) $(ELTHDRS) delim.h 
+
+# May be replaced by interface
+#eprefix.o : eprefix.c $(PARSEHDRS)
+
+# May be replaced by interface
+#errline.o : errline.c $(PARSEHDRS)
+
+error.o : error.c $(PARSEHDRS) $(ELTHDRS)
+
+# May be replaced by interface
+#esuffix.o : esuffix.c $(PARSEHDRS)
+
+# May be replaced by interface
+#exit.o : exit.c $(PARSEHDRS)
+
+findpar.o : findpar.c $(PARSEHDRS)
+
+# May be replaced by interface
+#getc.o : getc.c $(PARSEHDRS)
+
+# May be replaced by interface
+getsign.o : getsign.c $(PARSEHDRS)
+
+ifdata.o : ifdata.c $(PARSEHDRS)
+
+input.o : input.c $(PARSEHDRS) delim.h 
+
+level.o : level.c $(PARSEHDRS)
+
+lookent.o : lookent.c $(PARSEHDRS) $(ELTHDRS)
+
+minim.o : minim.c $(PARSEHDRS) delim.h 
+
+# May be replaced by interface
+#openent.o : openent.c $(PARSEHDRS)
+
+# May be replaced by interface
+#openfrst.o : openfrst.c $(PARSEHDRS)
+
+optstrg.o : optstrg.c $(PARSEHDRS)
+
+param.o : param.c $(PARSEHDRS) $(ELTHDRS) delim.h $(UTIL)paramu.c
+
+#pardef.o : pardef.c $(PARSEHDRS)
+
+#parcount.o : parcount.c $(PARSEHDRS)
+
+parent.o : parent.c $(PARSEHDRS)
+
+parname.o : parname.c $(PARSEHDRS)
+
+parutil.o : parutil.c $(PARSEHDRS) $(ELTHDRS) $(UTIL)version.h delim.h 
+
+parvalok.o : parvalok.c $(PARSEHDRS)
+
+#Code from <PI-CODE> actions included in pi.c
+pi.o : pi.c pfile.c $(APPLHDRS)
+
+#Procs.c included in procscmp.c
+#procscmp.o : procscmp.c procs.c $(APPLHDRS)
+
+scan.o : scan.c $(PARSEHDRS) entity2.h $(UTIL)entdef.h \
+	dtd.h arc.h delim.h $(UTIL)sref.h
+
+# May be replaced by interface
+#setopt.o : setopt.c $(PARSEHDRS)
+
+setpar.o : setpar.c $(PARSEHDRS)
+
+# May be replaced by interface
+#signmsg.o : signmsg.c $(PARSEHDRS)
+
+#Code from <START-CODE> actions included in start.c
+start.o : start.c sfile.c $(APPLHDRS)
+
+# May be replaced by interface
+#startdoc.o : startdoc.c $(PARSEHDRS)
+
+#Code from <STRING-CODE> actions included in string.c
+string.o : string.c stfile.c $(APPLHDRS)
+
+struct.o : struct.c $(PARSEHDRS) $(ELTHDRS) delim.h 
+
+#Code from <TEXT-CODE> actions included in text.c
+text.o : text.c tfile.c $(APPLHDRS)
+
+# May be replaced by interface
+#trace.o : trace.c $(PARSEHDRS)
+
+# Get application-specific delim.dat
+delim.dat : $(APPL)delim.par
+	$(COPYCMD) $(APPL)delim.par delim.dat
+	touch delim.dat
+
+# Special targets like clean, arc, etc.
+
+clean : minimal
+	$(DELETECMD) *.e
+
+mini minimal minimum : 
+	$(DELETECMD) arc.h
+	$(DELETECMD) dtd.h
+	$(DELETECMD) entity2.h
+	$(DELETECMD) globdec.h
+	$(DELETECMD) globdef.h
+	$(DELETECMD) signon.h
+	$(DELETECMD) signonx.h
+	$(DELETECMD) if.h
+	$(DELETECMD) pval.h
+	$(DELETECMD) efile.c
+	$(DELETECMD) entfile.c
+	$(DELETECMD) pfile.c
+	$(DELETECMD) sfile.c
+	$(DELETECMD) stfile.c
+	$(DELETECMD) tfile.c
+	$(DELETECMD) context.h
+	$(DELETECMD) delim.h
+	$(DELETECMD) case.c
+	$(DELETECMD) *.o
+	$(DELETECMD) *.t
+
+arc package : 
+	if exist parser.arc $(COPYCMD) parser.arc old.arc
+	$(ARCCMD) parser.arc *.c *.h makefile context.dat
+#
+# Remove files generated during the ELTDEF process; they are not
+# part of the source.  Also remove files copied in from the application
+# directory; they are application-dependent source files and are 
+# arc'ed in that directory.
+#
+	-$(ARCDELCMD) parser.arc dtd.h context.h delim.h entity2.h
+	-$(ARCDELCMD) parser.arc globdec.h globdef.h if.h signon.h signonx.h
+	-$(ARCDELCMD) parser.arc string.h efile.c entfile.c pfile.c
+	-$(ARCDELCMD) parser.arc sfile.c stfile.c tfile.c
+	-$(ARCDELCMD) parser.arc calculat.c custom.c default.c figure.c
+	-$(ARCDELCMD) parser.arc grphpar.c make.c option.c out.c table.c
+	-$(ARCDELCMD) parser.arc tex.c xref.c global.h fproto.h charconv.h
+	-$(ARCDELCMD) parser.arc tex.h
+
+unarc dearc :
+	$(UNARCCMD) parser.arc

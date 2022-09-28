@@ -1,0 +1,460 @@
+'\" t
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Novell, Inc
+...\" **
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH XmScale 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmScale\fP \- The Scale widget class
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/Scale.h>
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+Scale is used by an application to indicate a
+value from within a range of values, and it allows the user to input or modify
+a value from the same range.
+.PP 
+A Scale has an elongated rectangular region similar to a
+ScrollBar.  A slider inside this region
+indicates the current value along the Scale.  The user can also
+modify the Scale's value by moving the slider within the
+rectangular region of the Scale.  A Scale can also include a label set
+located outside the Scale region.
+These can indicate the relative value at various positions
+along the scale.
+.PP 
+A Scale can be either input/output or output only.  An input/output
+Scale's value can be set by the application and also
+modified by the user with the slider.  An output-only Scale
+is used strictly as an indicator of the current value of something
+and cannot be modified interactively by the user.
+The \fICore\fP resource \fIXmNsensitive\fP specifies whether the user can
+interactively modify the Scale's value.
+Alternately, the resource \fIslidingMode\fP can be set to provide an
+output only Scale.
+The gauge has a different look from the Scale so that the end user can
+distinguish an output only Scale from an input/output Scale.
+The gauge does not display the slider control, and uses color inside the
+rectangular region to indicate the current value.
+.PP
+The user can specify resources in a resource file for the automatically
+created gadget that contains the title of the Scale widget.  The name of the
+gadget is "Title".
+.SS "Classes"
+Scale inherits behavior and resources from
+\fICore\fP, \fIComposite\fP, \fIConstraint\fP, and \fIXmManager\fP classes.
+.PP 
+The class pointer is \fIxmScaleWidgetClass\fP.
+.PP 
+The class name is \fIXmScale\fP.
+.SS "New Resources"
+The following table defines a set of widget resources used by the programmer
+to specify data.  The programmer can also set the resource values for the
+inherited classes to set attributes for this widget.  To reference a
+resource by name or by class in a .Xdefaults file, remove the \fIXmN\fP or
+\fIXmC\fP prefix and use the remaining letters.  To specify one of the defined
+values for a resource in a .Xdefaults file, remove the \fIXm\fP prefix and use
+the remaining letters (in either lowercase or uppercase, but include any
+underscores between words).
+The codes in the access column indicate if the given resource can be
+set at creation time (C),
+set by using \fIXtSetValues\fP (S),
+retrieved by using \fIXtGetValues\fP (G), or is not applicable (N/A).
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmScale Resource Set
+Name	Class	Type	Default	Access
+_
+XmNdecimalPoints	XmCDecimalPoints	short	0	CSG
+XmNdragCallback	XmCCallback	XtCallbackList	NULL	C
+XmNfontList	XmCFontList	XmFontList	dynamic	CSG
+XmNhighlightOnEnter	XmCHighlightOnEnter	Boolean	False	CSG
+XmNhighlightThickness	XmCHighlightThickness	Dimension	2	CSG
+XmNmaximum	XmCMaximum	int	100	CSG
+XmNminimum	XmCMinimum	int	0	CSG
+XmNorientation	XmCOrientation	unsigned char	XmVERTICAL	CSG
+XmNprocessingDirection	XmCProcessingDirection	unsigned char	dynamic	CSG
+XmNscaleHeight	XmCScaleHeight	Dimension	0	CSG
+XmNscaleMultiple	XmCScaleMultiple	int	dynamic	CSG
+XmNscaleWidth	XmCScaleWidth	Dimension	0	CSG
+XmNshowValue	XmCShowValue	Boolean	False	CSG
+slidingMode	SlidingMode	XtEnum	"slider"	C
+.wH
+.tH
+XmNtitleString	XmCTitleString	XmString	NULL	CSG
+XmNvalue	XmCValue	int	dynamic	CSG
+XmNvalueChangedCallback	XmCCallback	XtCallbackList	NULL	C
+.TE
+.KE
+.in
+.sp 1
+.IP "\fIXmNdecimalPoints\fP"
+Specifies the number of decimal points to shift the slider value when
+displaying it.  For example, a slider value of 2,350
+and an \fIXmdecimalPoints\fP
+value of 2 results in a display value of 23.50.
+The value must not be negative.
+.IP "\fIXmNdragCallback\fP"
+Specifies the list of callbacks that is called
+when the slider position changes as the slider is being
+dragged.  The reason sent by the callback is \fIXmCR_DRAG\fP.
+.IP "\fIXmNfontList\fP"
+Specifies the font list to use for the title text string specified by
+\fIXmNtitleString\fP, and the label displayed when \fIXmNshowValue\fP
+is True.  If this value is NULL at initialization, the
+font list is initialized by looking up the parent hierarchy of the
+widget for an ancestor that is a subclass of the XmBulletinBoard,
+VendorShell, or XmMenuShell widget class.  If such an ancestor is
+found, the font list is initialized to the \fIXmNlabelFontList\fP
+of the ancestor widget.  If no such ancestor is found, the default
+is implementation dependent.  Refer to \fIXmFontList(3X)\fP for more
+information on the creation and structure of a font list.
+.IP "\fIXmNhighlightOnEnter\fP"
+Specifies whether the highlighting rectangle is drawn when the cursor moves
+into the widget.
+If the shell's focus policy is \fIXmEXPLICIT\fP, this resource is
+ignored, and the widget is highlighted when it has the focus.
+If the shell's focus policy
+.ne 10
+is \fIXmPOINTER\fP and if this resource is
+True, the highlighting rectangle is drawn when the the cursor moves into
+the widget.
+If the shell's focus policy is \fIXmPOINTER\fP and if this resource is
+False, the highlighting rectangle is not drawn when the the cursor moves
+into the widget.
+The default is False.
+.IP "\fIXmNhighlightThickness\fP"
+Specifies the size of the
+slider's border drawing rectangle used for enter window and
+traversal highlight drawing.
+.IP "\fIXmNmaximum\fP"
+Specifies the slider's maximum value.
+\fIXmNmaximum\fP must be greater than \fIXmNminimum\fP.
+.IP "\fIXmNminimum\fP"
+Specifies the slider's minimum value.
+\fIXmNmaximum\fP must be greater than \fIXmNminimum\fP.
+.IP "\fIXmNorientation\fP"
+Displays Scale vertically or horizontally.
+This resource can have values of \fIXmVERTICAL and XmHORIZONTAL\fP.
+.IP "\fIXmNprocessingDirection\fP"
+Specifies whether the value for \fIXmNmaximum\fP is on the right or
+left side of \fIXmNminimum\fP for horizontal Scales
+or above or below \fIXmNminimum\fP for vertical Scales.
+This resource can have values of \fIXmMAX_ON_TOP, XmMAX_ON_BOTTOM,XmMAX_ON_LEFT\fP, and \fIXmMAX_ON_RIGHT\fP.
+If the XmScale is oriented vertically, the default value is
+\fIXmMAX_ON_TOP\fP.
+If the XmScale is oriented horizontally, the default value
+may depend on the value of the \fIXmNstringDirection\fP resource.
+.IP "\fIXmNscaleHeight\fP"
+Specifies the height of the slider area.
+The value should be in the specified unit type (the default is pixels).
+If no value is specified a default height is computed.
+.IP "\fIXmNscaleMultiple\fP"
+Specifies the amount to move the slider when the user takes an action
+that moves the slider by a multiple increment.
+The default is (\fIXmNmaximum\fP \- \fIXmNminimum\fP) divided by 10,
+with a minimum of 1.
+.IP "\fIXmNscaleWidth\fP"
+Specifies the width of the slider area.
+The value should be in the specified unit type (the default is pixels).
+If no value is specified a default width is computed.
+.nL
+.ne 6
+.IP "\fIXmNshowValue\fP"
+Specifies whether a label for the current slider
+value should be displayed next to the slider.  If the value is True, the
+current slider value is displayed.
+.IP "\fIslidingMode\fP"
+Specifies a read-only look for the XmScale.
+When \fIslidingMode\fP is "thermometer", the slider control on the XmScale is not
+displayed.
+The color of the XmScale indicates the current value.
+When \fIslidingMode\fP is "slider" the look of the XmScale widget is not changed.
+.IP "\fIXmNtitleString\fP"
+Specifies the title text string to appear in the Scale widget window.
+.IP "\fIXmNvalue\fP"
+Specifies the slider's current position along the scale,
+between \fIXmNminimum\fP and \fIXmNmaximum\fP.
+The value is constrained to be within these inclusive bounds.
+The initial value of this resource is the larger of 0 and \fIXmNminimum\fP.
+.IP "\fIXmNvalueChangedCallback\fP"
+Specifies the list of callbacks that is called
+when the value of the slider has changed.  The reason
+sent by the callback is \fIXmCR_VALUE_CHANGED\fP.
+.SS "Inherited Resources"
+Scale inherits behavior and resources from the following
+superclasses.  For a complete description of each resource, refer to the
+man page for that superclass.
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmManager Resource Set
+Name	Class	Type	Default	Access
+_
+XmNbottomShadowColor	XmCBottomShadowColor	Pixel	dynamic	CSG
+XmNbottomShadowPixmap	XmCBottomShadowPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNforeground	XmCForeground	Pixel	dynamic	CSG
+XmNhelpCallback	XmCCallback	XtCallbackList	NULL	C
+XmNhighlightColor	XmCHighlightColor	Pixel	dynamic	CSG
+XmNhighlightPixmap	XmCHighlightPixmap	Pixmap	dynamic	CSG
+XmNinitialFocus	XmCInitialFocus	Widget	NULL	CSG
+XmNnavigationType	XmCNavigationType	XmNavigationType	XmTAB_GROUP	CSG
+XmNshadowThickness	XmCShadowThickness	Dimension	2	CSG
+XmNstringDirection	XmCStringDirection	XmStringDirection	dynamic	CG
+XmNtopShadowColor	XmCTopShadowColor	Pixel	dynamic	CSG
+XmNtopShadowPixmap	XmCTopShadowPixmap	Pixmap	dynamic	CSG
+XmNtraversalOn	XmCTraversalOn	Boolean	True	CSG
+XmNunitType	XmCUnitType	unsigned char	dynamic	CSG
+XmNuserData	XmCUserData	XtPointer	NULL	CSG
+.TE
+.KE
+.in
+.sp 1
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+Composite Resource Set
+Name	Class	Type	Default	Access
+_
+XmNchildren	XmCReadOnly	WidgetList	NULL	G
+XmNinsertPosition	XmCInsertPosition	XtOrderProc	NULL	CSG
+XmNnumChildren	XmCReadOnly	Cardinal	0	G
+.TE
+.KE
+.in
+.sp 1
+.P 
+.wH
+.in 0 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+Core Resource Set
+Name	Class	Type	Default	Access
+_
+XmNaccelerators	XmCAccelerators	XtAccelerators	dynamic	CSG
+XmNancestorSensitive	XmCSensitive	Boolean	dynamic	G
+XmNbackground	XmCBackground	Pixel	dynamic	CSG
+XmNbackgroundPixmap	XmCPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNborderColor	XmCBorderColor	Pixel	XtDefaultForeground	CSG
+XmNborderPixmap	XmCPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNborderWidth	XmCBorderWidth	Dimension	0	CSG
+XmNcolormap	XmCColormap	Colormap	dynamic	CG
+XmNdepth	XmCDepth	int	dynamic	CG
+XmNdestroyCallback	XmCCallback	XtCallbackList	NULL	C
+XmNheight	XmCHeight	Dimension	dynamic	CSG
+XmNinitialResourcesPersistent	XmCInitialResourcesPersistent	Boolean	True	C
+XmNmappedWhenManaged	XmCMappedWhenManaged	Boolean	True	CSG
+XmNscreen	XmCScreen	Screen *	dynamic	CG
+.wH
+.tH
+XmNsensitive	XmCSensitive	Boolean	True	CSG
+XmNtranslations	XmCTranslations	XtTranslations	dynamic	CSG
+XmNwidth	XmCWidth	Dimension	dynamic	CSG
+XmNx	XmCPosition	Position	0	CSG
+XmNy	XmCPosition	Position	0	CSG
+.TE
+.KE
+.in
+.sp 1
+.wH
+.in  
+.SS "Callback Information"
+A pointer to the following structure is passed to each callback:
+.sS
+.iS
+.ta .25i 1.1i
+.nf
+typedef struct
+{
+	int	\fBreason\fI;
+	XEvent	\fB* event\fI;
+	int	\fBvalue\fI;
+} XmScaleCallbackStruct;
+.iE
+.sE
+.wH
+.fi
+.IP "\fBreason\fP"
+Indicates why the callback was invoked
+.IP "\fBevent\fP"
+Points to the \fIXEvent\fP that triggered the callback
+.IP "\fBvalue\fP"
+Is the new slider value
+.SS "Behavior"
+XmScale behavior is described below:
+.IP "\fIBSelect\ Press\fP\ or\ \fIBDrag\ Press\fP:"
+(in region between an end of the Scale and the slider): Moves the
+slider by one multiple increment in the direction of the end of the
+Scale and calls the \fIXmNvalueChangedCallback\fP callbacks.
+If \fIXmNprocessingDirection\fP is \fIXmMAX_ON_RIGHT\fP or
+\fIXmMAX_ON_BOTTOM\fP, movement toward the right or
+bottom increments the Scale value,
+and movement toward the left or top decrements the Scale value.
+If \fIXmNprocessingDirection\fP is \fIXmMAX_ON_LEFT\fP or
+\fIXmMAX_ON_TOP\fP, movement toward the right or
+bottom decrements the Scale value,
+and movement toward the left or top increments the Scale value.
+If the button is held down longer than a delay period, the slider is
+moved again by the same increment and the same callbacks are called.
+.IP
+(in slider):  Activates the interactive dragging of the slider.
+.IP "\fIBSelect\ Motion\fP\ or\ \fIBDrag\ Motion\fP:"
+If the button press occurs within the slider, the subsequent motion
+events move the slider to the position of the pointer and call the
+callbacks for \fIXmNdragCallback\fP.
+.IP "\fIBSelect\ Release\fP\ or\ \fIBDrag\ Release\fP:"
+If the button press occurs within the slider and the slider position
+is changed, the callbacks for \fIXmNvalueChangedCallback\fP are called.
+.IP "\fIMCtrl\ BSelect\ Press\fP:"
+\fI(in region between an end of the Scale and the slider)\fP: Moves the
+slider to that end of the Scale and calls the
+\fIXmNvalueChangedCallback\fP callbacks.
+If \fIXmNprocessingDirection\fP is \fIXmMAX_ON_RIGHT\fP or
+\fIXmMAX_ON_BOTTOM\fP,
+movement toward the right or bottom increments the Scale value,
+and movement toward
+the left or top
+decrements
+the Scale value.
+If \fIXmNprocessingDirection\fP is \fIXmMAX_ON_LEFT\fP or
+\fIXmMAX_ON_TOP\fP, movement toward the right or
+bottom decrements the Scale value,
+and movement toward the left or top increments the Scale value.
+.IP "\fIKUp\fP:"
+For vertical Scales,
+moves the slider up one increment and calls the
+\fIXmNvalueChangedCallback\fP callbacks.
+If \fIXmNprocessingDirection\fP is \fIXmMAX_ON_TOP\fP, movement toward
+the top increments the Scale value.
+If \fIXmNprocessingDirection\fP is \fIXmMAX_ON_BOTTOM\fP, movement toward
+the top decrements the Scale value.
+.IP "\fIKDown\fP:"
+For vertical Scales,
+moves the slider down one increment and calls the
+\fIXmNvalueChangedCallback\fP callbacks.
+If \fIXmNprocessingDirection\fP is \fIXmMAX_ON_BOTTOM\fP, movement toward
+the bottom increments the Scale value.
+If \fIXmNprocessingDirection\fP is \fIXmMAX_ON_TOP\fP, movement toward
+the bottom decrements the Scale value.
+.IP "\fIKLeft\fP:"
+For horizontal Scales,
+moves the slider one increment to the left and calls the
+\fIXmNvalueChangedCallback\fP callbacks.
+If \fIXmNprocessingDirection\fP is \fIXmMAX_ON_LEFT\fP, movement toward
+the left increments the Scale value.
+If \fIXmNprocessingDirection\fP is \fIXmMAX_ON_RIGHT\fP, movement toward
+the left decrements the Scale value.
+.IP "\fIKRight\fP:"
+For horizontal Scales,
+moves the slider one increment to the right and calls the
+\fIXmNvalueChangedCallback\fP callbacks.
+If \fIXmNprocessingDirection\fP is \fIXmMAX_ON_RIGHT\fP, movement toward
+the right increments the Scale value.
+If \fIXmNprocessingDirection\fP is \fIXmMAX_ON_LEFT\fP, movement toward
+the right decrements the Scale value.
+.IP "\fIMCtrl\ KUp\fP\ or\ \fIKPageUp\fP:"
+For vertical Scales,
+moves the slider up one multiple increment and calls the
+\fIXmNvalueChangedCallback\fP callbacks.
+If \fIXmNprocessingDirection\fP is \fIXmMAX_ON_TOP\fP, movement toward
+the top increments the Scale value.
+If \fIXmNprocessingDirection\fP is \fIXmMAX_ON_BOTTOM\fP, movement toward
+the top decrements the Scale value.
+.IP "\fIMCtrl\ KDown\fP\ or\ \fIKPageDown\fP:"
+For vertical Scales,
+moves the slider down one multiple increment and calls the
+\fIXmNvalueChangedCallback\fP callbacks.
+If \fIXmNprocessingDirection\fP is \fIXmMAX_ON_BOTTOM\fP, movement toward
+the bottom increments the Scale value.
+If \fIXmNprocessingDirection\fP is \fIXmMAX_ON_TOP\fP, movement toward
+the bottom decrements the Scale value.
+.IP "\fIMCtrl\ KLeft\fP\ or\ \fIKPageLeft\fP:"
+For horizontal Scales,
+moves the slider one multiple increment to the left and calls the
+\fIXmNvalueChangedCallback\fP callbacks.
+If \fIXmNprocessingDirection\fP is \fIXmMAX_ON_LEFT\fP, movement toward
+the left increments the Scale value.
+If \fIXmNprocessingDirection\fP is \fIXmMAX_ON_RIGHT\fP, movement toward
+the left decrements the Scale value.
+.IP "\fIMCtrl\ KRight\fP\ or\ \fIKPageRight\fP:"
+For horizontal Scales,
+moves the slider one multiple increment to the right and calls the
+\fIXmNvalueChangedCallback\fP callbacks.
+If \fIXmNprocessingDirection\fP is \fIXmMAX_ON_RIGHT\fP, movement toward
+the right increments the Scale value.
+If \fIXmNprocessingDirection\fP is \fIXmMAX_ON_LEFT\fP, movement toward
+the right decrements the Scale value.
+.IP "\fIKBeginLine\fP\ or\ \fIKBeginData\fP:"
+Moves the slider to the minimum value and calls the
+\fIXmNvalueChangedCallback\fP callbacks.
+.IP "\fIKEndLine\fP\ or\ \fIKEndData\fP:"
+Moves the slider to the maximum value and calls the
+\fIXmNvalueChangedCallback\fP callbacks.
+.IP "\fIKNextField\fP:"
+Traverses to the first item in the next tab group.  If
+the current tab group is the last entry in the tab group list, it
+wraps to the beginning of the tab group list.
+.IP "\fIKPrevField\fP:"
+Traverses to the first item in the previous tab group.
+If the beginning of the tab group list is reached, it wraps to the end
+of the tab group list.
+.IP "\fIKHelp\fP:"
+Calls the callbacks for \fIXmNhelpCallback\fP if any exist.
+If there are no help
+callbacks for this widget, this action calls the help callbacks
+for the nearest ancestor that has them.
+.SS "Virtual Bindings"
+The bindings for virtual keys are vendor specific.
+For information about bindings for virtual buttons and keys, see \fIVirtualBindings(3X)\fP.
+.SH RELATED INFORMATION
+.na
+\fIComposite(3X)\fP, \fIConstraint(3X)\fP, \fICore(3X)\fP,
+\fIXmCreateScale(3X)\fP,
+\fIXmManager(3X)\fP,
+\fIXmScaleGetValue(3X)\fP, and
+\fIXmScaleSetValue(3X)\fP.
+.ad

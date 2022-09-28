@@ -1,0 +1,114 @@
+.TH DtActionQuitType 3 "02 May 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994 Novell, Inc.
+.\" *************************************************************************
+.SH NAME
+DtActionQuitType \- determine the potential response to a quit request against outstanding actions
+.iX "DtActionQuitType"
+.SH SYNOPSIS
+.yS
+#include <Dt/Action.h>
+.sp 0.5v
+.ta \w'DtActionStatus DtActionQuitType('u
+DtActionStatus DtActionQuitType(DtActionInvocationID \f2id\fP,
+	int \f2silent\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn DtActionQuitType
+function can be used to determine if a specific invocation ID
+references actions still running, and if so, how they will behave
+in response to a
+.Fn DtActionQuit 3
+call.
+.P
+The
+.I id
+argument specifies an invocation ID, as returned by
+.Fn DtActionInvoke 3.
+.P
+The
+.I silent
+argument is a Boolean that indicates whether the actions
+are allowed to block on user input before terminating (see
+.Fn DtActionQuit 3).
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn DtActionQuitType
+function returns the action status code that is expected
+to occur if
+.Fn DtActionQuit 3
+is called with the same values of the
+.I id
+and
+.I silent
+arguments.
+This status code is one of the following:
+.VL 6
+.Lc DtACTION_DONE
+.br
+The actions that were the result of the original
+.Fn DtActionInvoke 3
+call are expected to terminate normally and return meaningful data, if any.
+.Lc DtACTION_DONE_FORCED
+.br
+It is expected that the actions have to be forcibly
+quit, and that any returned data only reflects the state of the data when
+the actions were quit.
+.Lc DtACTION_DONE_DROPPED
+.br
+It is expected that the actions have to be abandoned.
+The actions may or may not quit on their own, and any returned data
+only reflects the state of the data when the actions were abandoned.
+.LE
+.P
+If unsuccessful, the
+.Fn DtActionQuitType
+function returns:
+.VL 6
+.Lc DtACTION_INVALID_ID
+.br
+The specified
+.I id
+is not valid.
+It is possible that the
+.I id
+was once valid, but that all actions
+associated with the
+.I id
+have since completed.
+.LE
+.SH "APPLICATION USAGE"
+Since a single
+.I id
+can reference several actions, and each action
+can behave differently to a quit request, the returned
+.B DtActionStatus
+is prioritized to indicate a
+.Cn DtACTION_DONE_FORCED
+if any one of the actions have to be forcibly quit; otherwise, it
+indicates a
+.Cn DtACTION_DONE_DROPPED
+if any one of the actions have to be dropped, or it shows a
+.Cn DtACTION_DONE
+to indicate that all actions represented by
+.I id
+terminated normally.
+.P
+If the return value is
+.Cn DtACTION_DONE_FORCED
+or
+.Cn DtACTION_DONE_DROPPED ,
+the application may wish to alert the
+user of outstanding actions that may, for example, need to be terminated
+manually, as the action service may not be able to terminate them
+programmatically.
+.SH "SEE ALSO"
+.Hd Dt/Action.h 5,
+.Fn DtActionInvoke 3,
+.Fn DtActionCallbackProc 3,
+.Fn DtActionQuit 3.

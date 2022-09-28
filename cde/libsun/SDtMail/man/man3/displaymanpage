@@ -1,0 +1,91 @@
+#! /bin/csh
+
+#
+# @(#)displaymanpage	1.4 96/05/07 SMI
+#
+# Display a manual page using troff/pageview if possible; else 
+# use nroff/more.
+#
+
+setenv TEMPFILE "/tmp/man.tmp.$$"
+
+if ($#argv == "0") then
+  echo "`basename $0`: must specify one or more names of manual pages to display"
+  echo 'If first argument is -hires then images displayed larger to use entire screen'
+  exit 1
+endif
+
+@ errors = 0
+
+#
+# if '-hires' is the first argument, set pageview up to display in larger
+# format so the entire screen is used
+#
+
+if ("$1" == '-hires') then
+  setenv PAGEVIEW "-dpi 100"
+  shift
+endif
+
+foreach FILE ($*)
+if (! -e "$FILE") then
+  echo "${FILE}: does not exist - cannot be displayed"
+  @ errors = $errors + 1
+  continue
+endif
+if (-d "$FILE") then
+  echo "${FILE}: is a directory - cannot be displayed"
+  @ errors = $errors + 1
+  continue
+endif
+if (! -f "$FILE") then
+  echo "${FILE}: not a regular file - cannot be displayed"
+  @ errors = $errors + 1
+  continue
+endif
+file ${FILE} | fgrep -s -i 'roff'
+if ("${status}" != 0) then
+  echo "${FILE}: not a manual page - cannot be displayed"
+  @ errors = $errors + 1
+  continue
+endif
+end
+
+if ($errors != 0) then
+  echo "errors in naming files to print: no files displayed"
+  exit 1
+endif
+
+if (-x /usr/doctools/bin/troff) then
+  set TROFF="/usr/doctools/bin/troff"
+  if (-e /usr/doctools/tmac/ansun) then
+    set MACPAC="ansun"
+  else
+    set MACPAC="an"
+  endif
+else
+  set TROFF="troff"
+  if (-e /usr/lib/tmac/ansun) then
+    set MACPAC="ansun"
+  else
+    set MACPAC="an"
+  endif
+endif
+
+foreach FILE ($*)
+  rm -f ${TEMPFILE}
+  if (-x /usr/doctools/bin/troff) then
+    /usr/doctools/bin/troff -m${MACPAC} -Tpage ${FILE} &
+  else
+    nroff -man ${FILE} > ${TEMPFILE}
+    if (${?PAGER} != 0) then
+	$PAGER ${TEMPFILE}
+    else
+	more -s ${TEMPFILE}
+    endif
+  endif
+  rm -f ${TEMPFILE}
+end
+
+exit 1
+

@@ -1,0 +1,4 @@
+PKG=SUNWdtbas
+ARCH=i386
+VERSION=1000
+REMOVED_FILES=dt/bin/sdtdbcache

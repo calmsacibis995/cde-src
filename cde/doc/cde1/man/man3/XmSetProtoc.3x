@@ -1,0 +1,92 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH XmSetProtocolHooks 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmSetProtocolHooks\fP \- A VendorShell function that allows pre and post actions to be executed when a protocol message is received from MWM
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/Xm.h>
+\&#include <Xm/Protocols.h>
+.sp \n(PDu
+.ta 1i
+.nf
+void XmSetProtocolHooks (\fBshell, property, protocol, prehook, pre_closure,
+	posthook, post_closure\fI)
+.ta .5i 2i
+.nf
+	Widget	\fBshell\fI;
+	Atom	\fBproperty\fI;
+	Atom	\fBprotocol\fI;
+	XtCallbackProc	\fBprehook\fI;
+	XtPointer	\fBpre_closure\fI;
+	XtCallbackProc	\fBposthook\fI;
+	XtPointer	\fBpost_closure\fI;
+.sp \n(PDu
+.ta 1i
+.nf
+void XmSetWMProtocolHooks (\fBshell, protocol, prehook, pre_closure,
+	posthook, post_closure\fI)
+.ta .5i 2i
+.nf
+	Widget	\fBshell\fI;
+	Atom	\fBprotocol\fI;
+	XtCallbackProc	\fBprehook\fI;
+	XtPointer	\fBpre_closure\fI;
+	XtCallbackProc	\fBposthook\fI;
+	XtPointer	\fBpost_closure\fI;
+.wH
+.fi
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+\fIXmSetProtocolHooks\fP is used by shells that want to have pre and post actions
+executed when a protocol message is received from MWM.
+Since there is no guaranteed ordering in execution of event handlers or
+callback lists, this allows the shell to control the flow while leaving the
+protocol manager structures opaque.
+.PP 
+\fIXmSetWMProtocolHooks\fP is a convenience interface.
+It calls \fIXmSetProtocolHooks\fP
+with the property value set to the atom returned by
+interning \fIWM_PROTOCOLS\fP.
+.IP "\fBshell\fP"
+Specifies the widget with which the protocol property is associated
+.IP "\fBproperty\fP"
+Specifies the protocol property
+.IP "\fBprotocol\fP"
+Specifies the protocol atom (or an int cast to Atom)
+.IP "\fBprehook\fP"
+Specifies the procedure to call before calling entries on the client callback-list
+.IP "\fBpre_closure\fP"
+Specifies the client data to be passed to the prehook when it is invoked
+.IP "\fBposthook\fP"
+Specifies the procedure to call after calling entries on the client callback-list
+.IP "\fBpost_closure\fP"
+Specifies the client data to be passed to the posthook when it is invoked
+.PP 
+For a complete definition of VendorShell and its associated resources, see
+\fIVendorShell(3X)\fP.
+.SH RELATED INFORMATION
+.na
+\fIVendorShell(3X)\fP,
+\fIXmInternAtom(3X)\fP, and \fIXmSetWMProtocolHooks(3X)\fP.
+.ad

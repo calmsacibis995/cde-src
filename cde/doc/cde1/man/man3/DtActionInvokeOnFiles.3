@@ -1,0 +1,289 @@
+.\" *************************************************************************
+.\" **
+.\" ** (c) Copyright 1993,1994 Hewlett-Packard Company 
+.\" **      All Rights Reserved.
+.\" **
+.\" ** (c) Copyright 1993,1994 International Business Machines Corp. 
+.\" **      All Rights Reserved.
+.\" **  
+.\" ** (c) Copyright 1993,1994 Sun Microsystems, Inc.
+.\" **      All Rights Reserved.
+.\" **
+.\" **
+.\" *************************************************************************
+.\"---
+.\".TH _title _#S_ "_dd_ _Month_ _19yy_"
+.TH DtActionInvokeOnFiles 3 "17 Jan 1994"
+.\".BH "_dd_ _Month_ -_19yy_"
+.BH \*(DT 
+.\"---
+.\"---------------------------------------------------------------------------
+.SH NAME
+DtActionInvokeOnFiles(3) \(em  the API for invoking a CDE action with file arguments.
+.\"---
+.\"---------------------------------------------------------------------------
+.\"---
+.\"--- SYNOPSIS 
+.\"--- This section is a syntax diagram.  Use the following lines for pages in
+.\"--- manual Sections 1, 1M, 5 and 8:
+.\"---
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <X11/Intrinsic.h> 
+\&#include <Dt/Action.h>
+.sp \n(PDu
+void DtActionInvokeOnFiles (
+.ta .5i 1.75i
+.nf
+	Widget	\fIw\fP,
+	char	\fI*actionName\fP,
+	int	\fIargCount\fP,
+	fileArgp	\fIargs\fP,
+	char	\fI*termOpts\fP,
+	char	\fI*execHost\fP,
+	char	\fI*contextHost\fP,
+	char	\fI*contextDir\fP,
+	int	\fIuseIndicator\fP)
+.wH .fi
+.iE
+.sE
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- DESCRIPTION 
+.\"--- This section tells concisely what the command (function, device or
+.\"--- file format) does and includes the parameter list. 
+.\"---
+.SH DESCRIPTION
+\fBDtActionInvokeOnFiles\fP provides a way to invoke desktop actions on arguments
+which represent files.
+.P
+The actions and datatypes databases must have been initialized and loaded 
+(using \fBDtInitialize(3)\fP and \fBDtDbLoad(3)\fP before \fBDtActionInvokeOnFiles\fP
+can run successfully.  A number of action-instance-specific parameters are
+provided which allow modification of the Action's behavior.
+.IP \fIw\fP
+a Widget which will become the parent of any dialogs or error messages which
+may result from the action invocation.  This widget should be a toplevel
+application shell widget which will continue to exist for the expected lifetime
+of the action.  This parameter must have a non-NULL value.
+.IP \fIactionName\fP
+The name of the action which is to be invoked.  There may be more than one
+action with the same name.  The action selected for a particular invocation
+depends on the  type and number of arguments provided.  This parameter
+must have a non-NULL value.
+.IP \fIargCount\fP
+The number of arguments provided in the array referenced by \fIargs\fP.
+.IP \fIargs\fP
+An array of \fIfileArg\fP structures containing information about the
+arguments for this action invocation.  If there are no arguments then the
+value of fileArgs may be NULL.
+.IP \fItermOpts\fP
+A (optional) string providing special execution information for the terminal
+emulator used for Command actions of Window Type: TERMINAL or PERM_TERMINAL.
+If this string contains embedded blanks then it must be quoted.  This string
+is typically used to pass on title, geometry, color, font, etc. information
+to the terminal emulator.  It must be in a form recognizable by the expected
+terminal emulator.  This parameter may be NULL.
+.IP \fIexecHost\fP
+An (optional) string identifying a preferred execution host for this action.
+The \fIexecHost\fP specified here will be placed at the head of the list of
+execution hosts defined in the action definition.  This parameter will generally
+be a NULL pointer.
+.IP \fIcontextHost\fP
+An (optional) string identifying a default host in whose context file names are
+to be interpreted.  This value is only used if the action definition does not
+explicitly specify a hostname in the \fBCWD\fP field of the action definition.
+This parameter will generally be a NULL pointer.
+.IP \fIcontextDir\fP
+An (optional) string identifying a default working directory for the action.
+File name arguments are interpreted relative to this directory.  This value is
+only used if the action definition does not explicitly specify a working 
+directory in the \fBCWD\fP field of the action definition.
+This parameter will generally be a NULL pointer.
+.IP \fIuseIndicator\fP
+If \fIuseIndicator\fP is non-zero then the activity indicator light on the
+front panel will be made to flash in conjunction with this action.
+.PP
+DtActionInvokeOnFiles searches the action database for an entry which matches the 
+specified action name, and accepts files of the, type and number
+provided. If a matching action is found, then information from that action
+will be used as a pattern for construction the final execution string or 
+message.  The supplied objects will be inserted into the indicated positions
+within the execution string or message. If any required parameters are missing, then the user will be prompted to supply them, by means of a dialog box.
+.nf
+
+typedef struct  {   /* file argument info */
+            char    *name;  /* ...file name ([host:]/path/basename format) */
+            char    *type;  /* ... (opt.) file type string */
+            char    *host;  /* ... (opt.) the host on which to interpret the
+                               file path name */
+} fileArg, *fileArgp;
+
+.fi
+.PP
+Optional pointers may be NULL.  For FILE objects, \fIname\fP is required;
+this is the name of the file being referenced.
+The \fItype\fP string is optional, if a non-NULL value is provided, it is
+used as the type of the file; otherwise the type of the file is determined
+using the datatypes database.  The \fIhost\fP field is optional; if a non-NULL
+value is provided, the file \fIname\fP will be interpreted relative to this
+host; otherwise it will be interpreted relative to the context host for the
+action.
+.PP
+\fBDtActionInvokeOnFiles\fP accepts a pointer to an array of fileArg structures in
+the \fIargs\fP parameter.  It is up to the caller to allocate space
+for this array.  The caller may free this space after \fBDtActionInvokeOnFiles\fP
+returns.
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- RETURN VALUES
+.\"--- This section appears in pages from Sections 2 and 3 only.
+.\"--- List the _values_ that the function returns and give _explanations_.
+.\"---
+.SH "X11 RESOURCES"
+.PP
+This section describes the X11 resources recognized by the Action Library and
+its subcomponents.  In general the resource class string always begins with an
+upper case letter. The corresponding resource name sting begins with the lower
+case of the same letter.  These resources can be defined for all clients using
+the Action Library API by specifying "*resourceName: value". For example, to
+set the terminal emulator to "xterm" for all clients, use 
+"*localTerminal: xterm". The resources can also be defined on a per client
+basis. For example, use "Dtfile*localTerminal: xterm" to set the terminal
+emulator to "xterm" for the "dtfile" client only.
+.PP
+The following X11 resources are recognized:
+.TP
+\(bu 
+LocalTerminal \(em specifies an alternate local terminal emulator
+.TP
+\(bu
+RemoteTerminal \(em specifies a comma-separated list of host/terminal emulator pairs.
+.TP
+\(bu
+AutoXhosting \(em turns the autoXhosting feature on or off.
+.TP
+\(bu
+WaitTime \(em defines a threshold time interval for "successful" command completion.
+.PP
+The \fILocalTerminal\fP resource defines an alternate local terminal emulator
+to be used by Command actions of Window Type TERMINAL or PERM_TERMINAL.
+The default terminal emulator is: "dtterm".  
+.PP
+The \fIRemoteTerminal\fP resource defines a comma-separated list of 
+"host:terminal emulator" pairs.  When a remote command action is executed on
+one of the hosts in the list, the terminal emulator associated with that host
+will be used for that command. All specified terminal emulators must recognize
+the "-e" parameter. (see xterm(1)).  The default is to use \fIlocalTerminal\fP.
+.PP
+The \fIAutoXhosting\fP resource can be used to turn the "automatic Xhosting"
+feature on or off. In situations where remote clients are required to open
+windows on the local display, they must be granted display access. This can be
+done by providing the remote client access to the key for this display 
+(via xauth(1x)) or by granting blanket access to the remote system via
+xhost(1x). If the \fIautoXhosting\fP resource value is "True" then blanket
+access is automatically granted to a given remote system, using xhost,
+whenever a remote action to that system is invoked.  The default value for
+this resource is: "False".
+.PP
+The \fIWaitTime\fP resource can be used to assign an alternative integer value,
+in seconds, to the threshold successful return time interval.  
+If a Command action of Window Type: TERMINAL fails; then the terminal emulator
+may be unmapped before the user has a chance to read the stderr from the
+failed command. This resource provides a workaround to this problem. If a 
+TERMINAL window command exits before WaitTime seconds have elapsed then the
+terminal emulator window is forced to remain open, as if it were of type
+PERM_TERMINAL.  The default value of \fIWaitTime\fP is 3 seconds.
+.SH "RETURN VALUES"
+.PP
+The \fBDtActionInvokeOnFiles\fP function does not return a value.  Actions are
+invoked on a "fire and forget basis".
+.\"---
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- ERRORS
+.\"--- This section lists and explains _ERROR-CODES_ that the function may
+.\"--- may generate.  List _ERROR-CODES_ alphabetically.
+.\"---
+.SH ERRORS
+.PP
+This function does not return error codes, however the user will be notified
+of severe errors interactively via error dialogs.  Low level errors (e.g.
+errors encountered reading the action database) will be reported in the 
+desktop errorlog file (usually in $HOME/.dt/errorlog).
+.\"---
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- EXAMPLES
+.\"--- This section gives examples of how to use the command (function
+.\"--- or file format).  Always preface an example with an introduction.
+.\"--- If there are multiple examples, use separate subsection headings
+.\"--- for each _example-type_.  Otherwise, omit these headings.
+.\"---
+.SH EXAMPLES
+.P
+Given the following action definition:
+.nf
+
+ACTION Edit
+{
+	LABEL		"Text Edit Action"
+	TYPE		COMMAND
+	WINDOW_TYPE	TERMINAL
+	EXEC_STRING	"textedit %Args%"
+	DESCRIPTION	This action will invoke the "edit" command on an
+			arbitrary number of arguments.  A terminal emulator
+			will be provided for this action's I/O. EXEC_HOST and
+			CWD are not specified so the defaults will be used
+			for both quantities.
+}
+
+.fi
+The following invocation:  
+.nf
+
+	DtActionInvokeOnFiles(w,"Edit",1,aap,NULL,NULL,NULL,NULL,1);
+
+.fi
+will invoke the action "Edit", on the argument supplied by \fIaap\fP. The
+working directory for the action, will default to the current working
+directory; The execution host will be the default execution host
+.P
+If variable \fIaap\fP points to an array of \fIfileArg\fP data structures 
+containing the following information:
+.nf
+
+    {
+            name="/myhome/file1";
+            type="TEXT";
+            host="remotehost";
+    }	/* file argument #1 */ 
+
+    {
+            name="file2";
+            type=NULL
+            host=NULL;
+    }  /* file argument #2 */
+
+.fi
+and assuming the "remotehost" filesystem is mounted at "/nfs/remotehost", then
+the "Edit" action will result in the execution string:
+.sp
+.nf
+    textedit /nfs/remotehost/myhome/file1 file2
+.fi
+.sp
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- SEE ALSO
+.\"--- This section lists references to other man pages, sample files, etc.
+.\"---
+.SH "SEE ALSO"
+.BR  DtDbLoad (3),
+.BR  DtActionLabel(3),
+.BR  DtActionDescription(3),
+.BR  DtActionExists(3),
+.BR  dtdtfile(4)
+

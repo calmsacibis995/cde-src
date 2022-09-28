@@ -1,0 +1,45 @@
+XCOMM $XConsortium: config.tmpl /main/cde1_maint/2 1995/12/04 18:06:14 barstow $
+
+#ifdef RsArchitecture
+SHELL=/bin/ksh
+#endif
+
+#ifdef SunArchitecture
+.NO_PARALLEL:
+#endif
+
+OBJS1 =  \
+	sys.resources  \
+	sys.session  \
+	sys.font  \
+	sys.dtwmrc \
+	Xresources \
+	dtfile.config
+
+#ifdef SunArchitecture
+OBJS = $(OBJS1) Xresources.ow
+#else
+OBJS = $(OBJS1)
+#endif
+
+all:: $(OBJS)
+
+depend::
+
+FileLinkRule($(CDESRC)/dtsession/sys.resources,sys.resources.nls)
+FileLinkRule($(CDESRC)/dtsession/sys.session,sys.session.nls)
+FileLinkRule($(CDESRC)/dtsession/sys.font,sys.font.nls)
+FileLinkRule($(CDESRC)/dtwm/sys.dtwmrc,sys.dtwmrc.nls)
+FileLinkRule($(CDESRC)/dtlogin/config/Xresources,Xresources.nls)
+#ifdef SunArchitecture
+FileLinkRule($(CDESRC)/dtlogin/config/Xresources.ow,Xresources.ow.nls)
+#endif
+FileLinkRule($(CDESRC)/dtfile/dtfile.config,dtfile.config.nls)
+
+clean::
+	$(RM) $(OBJS)
+	for i in *.nls; do \
+		[ -z $$i ] && continue; \
+		[ -h $$i ] && $(RM) $$i; \
+	done; true; 
+

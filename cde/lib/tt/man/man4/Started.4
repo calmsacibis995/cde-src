@@ -1,0 +1,81 @@
+.TH Started 4 "1 March 1996" "ToolTalk 1.3" "Desktop Services Message Sets"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.BH "1 March 1996" 
+.IX "Started.4" "" "Started.4" "" 
+.SH NAME
+Started \- a tool has started
+.SH SYNOPSIS
+.ft 3
+.nf
+.ta \w@Started(@u
+Started(in string \f2vendor\fP,
+	in string \f2toolName\fP,
+	in string \f2toolVersion\fP);
+.PP
+.fi
+.SH DESCRIPTION
+The
+.I Started
+notice announces that
+a tool has started.
+.PP
+The
+.I vendor
+argument
+is the vendor of the started tool.
+.PP
+The
+.I toolName
+argument
+is the name of the started tool.
+.PP
+The
+.I toolVersion
+argument
+is the version of the started tool.
+.SH "APPLICATION USAGE"
+.SH EXAMPLES
+A pattern observing the
+.I Started
+request can be registered as
+in the following example:
+.PP
+.sp -1
+.RS 5
+.ta 4m +4m +4m +4m +4m +4m +4m
+.nf
+.ft 3
+Tt_pattern pat = tt_pattern_create();
+tt_pattern_category_set(pat, TT_OBSERVE);
+tt_pattern_scope_add(pat, TT_SESSION);
+char *ses = tt_default_session();
+tt_pattern_session_add(pat, ses);
+tt_free(ses);
+tt_pattern_op_add(pat, Tttk_Started);
+tt_pattern_op_add(pat, Tttk_Stopped);
+tt_pattern_callback_add(pat, my_callback);
+tt_pattern_register(pat);
+.PP
+.ft 1
+.fi
+.RE
+The
+.I Started
+request can be sent with
+.BR ttdt_open (3).
+.SH "SEE ALSO"
+.na
+.BR tt_free (3),
+.BR tt_pattern_callback_add (3),
+.BR tt_pattern_category_set (3),
+.BR tt_pattern_op_add (3),
+.BR tt_pattern_register (3),
+.BR tt_pattern_scope_add (3),
+.BR tt_pattern_session_add (3),
+.BR ttdt_open (3);
+.I Stopped
+notice.

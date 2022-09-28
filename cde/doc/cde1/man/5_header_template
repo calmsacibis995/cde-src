@@ -1,0 +1,340 @@
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994 Novell, Inc.
+.\" *************************************************************************
+.\"--- The above copyrights must appear at the top of each man page.
+.\"---
+.\"--- *** THIS IS THE SECTION 5 HEADER FILE MAN PAGE TEMPLATE/STYLE GUIDE ***
+.\"---
+.\"--- 
+.\"--- Naming conventions:
+.\"--- See man_template1 and man_template3 for naming conventions.
+.\"--- 
+.\"--- Substitute the appropriate text for items beginning and ending with `_'
+.\"--- (for example, _Title_ and _Name_). 
+.\"--- Be sure to use upper or lower case indicated for each item.
+.\"--- 
+.\"--- general style items:
+.\"--- 
+.\"--- Use Cde whenever you want CDE.  The scripts will then pick up the
+.\"--- correct trademark name for the X/Open version and use CDE for the man
+.\"--- page.
+.\"--- 
+.\"--- Always spell out standard input, output, and error.
+.\"--- 
+.\"--- Never use "print" unless you are describing literal printing 
+.\"--- operations; use "write to standard output [error]."
+.\"--- 
+.\"--- Be careful not to say "character" when you mean "byte."
+.\"--- 
+.\"--- Never change the case of a symbol such as a function name.  If it
+.\"--- starts lowercase, you cannot start a sentence with it.
+.\"--- 
+.\"--- Do not use the second person form of address or imperatives when
+.\"--- referring to the reader or application.
+.\"--- 
+.\"--- Avoid passive voice.
+.\"--- 
+.\"--- Call utilities utilities, not commands.  Utilities appear in italics.
+.\"--- Use the following macro with a second argument for the section number.
+.\"--- For example:   .Cm tt_session 1
+.\"--- There is no section number for same page usage.
+.\"--- 
+.\"--- Variable list example:
+.\"--- .VL 12
+.\"--- .LI foo
+.\"--- text text text
+.\"--- .LI averylongtagneedsabreak
+.\"--- .br
+.\"--- text text text
+.\"--- .Lc R_OK
+.\"--- text text text
+.\"--- .LE
+.\"--- 
+.\"--- Bulleted list example:
+.\"--- .VL 3
+.\"--- .LI \(bu
+.\"--- text text text
+.\"--- .LI \(bu
+.\"--- text text text
+.\"--- .LE
+.\"--- 
+.\"--- Environment variables example:
+.\"--- Use italics and all uppercase. Do not prefix with a $ in regular text,
+.\"--- (only shell script examples)
+.\"--- .I SHELL
+.\"--- .IR LC_MESSAGES
+.\"--- .LI \f2LANG\fP  [.VL list version]
+.\"--- 
+.\"--- Pathnames example:
+.\"--- Use bold font
+.\"--- .B /etc/passwd
+.\"--- .BR \&.profile    [note the \& to protect leading dot]
+.\"--- .LI \f3/tmp\fP
+.\"---
+.\"---  Functions in SYNOPSIS example:
+.\"--- .SH SYNOPSIS
+.\"--- .yS
+.\"--- #include <Dt/Wsm.h>
+.\"--- .sp 0.5v
+.\"--- .ta \w'DtWsmCBContext DtWsmAddCurrentWorkspaceCallback('u
+.\"--- DtWsmCBContext DtWsmAddCurrentWorkspaceCallback(Widget \f2widget\fP,
+.\"--- 	DtWsmWsChangeProc \f2ws_change\fP,
+.\"--- 	Pointer \f2client_data\fP)
+.\"--- .sp 0.5v
+.\"--- .ta \w'typedef void (*DtWsmWsChangeProc)('u
+.\"--- typedef void (*DtWsmWsChangeProc)(Widget \f2widget\fP,
+.\"--- 	Atom \f2aWs\fP,
+.\"--- 	Pointer \f2client_data\fP)
+.\"--- .yE
+.\"---
+.\"--- Functions in TEXT example (bold for X/Open; use \- for minus):
+.\"--- .B \-x
+.\"--- .BR \-y ;
+.\"--- .BI \-f " makefile"   [note space]
+.\"--- \f3\(mif\ \fPmakefile\fP   [version of previous if you're breaking
+.\"---				    across two lines]
+.\"--- .LI \f3\-a\0\f2level\f1 [.VL version; note usage of \0 as an internal
+.\"--- 					space and the return to font 1]
+.\"---
+.\"--- 
+.\"--- *** Typographical Conventions
+.\"---
+.\"--- Use the following to denote font changes: italic = \f2, bold = \f3
+.\"--- regular font = \f1.
+.\"--- 
+.\"--- Bold font is used for options and commands, filenames, keywords and 
+.\"--- typenames.  It is also used to identify brackets surrounding optional 
+.\"--- items in syntax, [].
+.\"---
+.\"--- Italic strings are used for emphasis or to identify the first instance
+.\"--- of a word requiring definition.  Italic also denotes: variable names, 
+.\"--- which are also shown in capitals; commands or utilities; external 
+.\"--- variables; X Window System widgets; functions - these are shown as
+.\"--- follows: \f2name\fP(), name without parentheses are either external
+.\"--- variables or function family names.
+.\"---
+.\"--- Regular font is used for the names of constants and literals.
+.\"---
+.\"--- The notation <file.h> indicates a header file.
+.\"--- 
+.\"--- Names surrounded by braces, for example, {ARG_MAX}, represent symbolic
+.\"--- limits or configuration values that may be declared in appropriate
+.\"--- headers by means of the C #define construct.
+.\"---
+.\"--- Ellipses, . . . , are used to show that additional arguments are
+.\"--- optional.
+.\"--- 
+.\"--- Syntax and code examples are shown in fixed-width font.  Brackets 
+.\"--- shown in this font, [ ], are part of the syntax and do not indicate
+.\"--- optional items.
+.\"---
+.\"--- Variables within syntax statements are shown in italic fixed-width font.
+.\"---
+.\"----------------------------------------------------------------------------
+.\"--- .TH Macro
+.\"--- The .TH macro specifies information that applies to the man page as
+.\"--- a whole.
+.\"--- _Title_ is the name of the man page.  This should correspond to the
+.\"--- first word under the NAME heading.  _#_ specifies the manual section in 
+.\"--- which the page appears, where # is the number of the section.
+.\"---
+.\"--- .TH _Title _#_ 
+.\"---
+.\"----------------------------------------------------------------------------
+.\"--- NAME
+.\"--- Give the name of the entry and briefly state its purpose.
+.\"--- This section is used by cross-referencing programs.  Hence, do not
+.\"--- use any font changes or troff escape sequences in this section.
+.\"--- After the name, use one space, a backslash minus \-, and then another 
+.\"--- space before the summary.
+.\"--- Do not start the summary sentence with a capital letter or use
+.\"--- any punctuation at the end.
+.\"--- The summary line must be on one line (it can wrap). The reason for this
+.\"--- is that some man page implementations build an index of man page values
+.\"--- by reading through and getting the single line that follows the .SH NAME
+.\"--- line.  The line doesn't have to fit on a terminal screen, but there
+.\"--- can be only one physical new line on the line.
+.\"--- Make the summary a simple declarative sentence.
+.\"---  
+.\"--- NAME example:
+.\"--- 
+.\"--- .SH NAME
+.\"--- <DtWsm.h> \-  window/workspace manager definintions
+.\"---
+.SH Name
+_header filename_ \- _summary-line_
+.\"---
+.\"----------------------------------------------------------------------------
+.\"--- SYNOPSIS
+.\"--- This section summarizes the use of the entry being described.
+.\"--- 
+.\"--- Begin the synopsis with the .yS macro and end the synopsis with the
+.\"--- .yE macro.
+.\"--- Use the .sp 0.5v request where a blank line would appear in a program.
+.\"--- Use font 2 \f2 for substitutables.
+.\"--- Use .ta for tabs.
+.\"--- Do not use any spaces before or after parentheses.
+.\"---
+.\"--- SYNOPSIS example:
+.\"--- 
+.\"--- .SH SYNOPSIS
+.\"--- .yS
+.\"--- #include <DtWsm.h>
+.\"--- .yE
+.\"---
+.SH SYNOPSIS
+.yS
+_#include-header filename_
+.yE
+.\"---
+.\"----------------------------------------------------------------------------
+.\"--- DESCRIPTION
+.\"--- This section tells what structures are defined.
+.\"--- List what members each structure contains and define them. 
+.\"--- List constants and define them.  
+.\"--- List callback prototypes and declared functions.  
+.\"--- 
+.\"--- example of first line in DESCRIPTION:
+.\"--- 
+.\"--- The \f3<DtWsm.h>\fP
+.\"--- header defines the DtWorkspaceInfo, DtWmInfo, and DtWsmCBContext 
+.\"--- structures.
+.\"--- 
+.\"--- example of a list of members contained in each Structure: 
+.\"--- 
+.\"--- The \f3DtWmHints\fP
+.\"--- structure contains the following members:
+.\"--- .PP
+.\"--- .ne 6v
+.\"--- .TS
+.\"--- .xo   lf5 lf5 lw(4i) .
+.\"--- .cde  lf3 lf2 lw(4i) .
+.\"--- long	flags	T{
+.\"--- .na
+.\"--- marks valid fields
+.\"--- T}
+.\"--- long	functions	T{
+.\"--- .na
+.\"--- special dtwm functions
+.\"--- T}
+.\"--- long	behaviors	T{
+.\"--- .na
+.\"--- special dtwm behaviors
+.\"--- T}
+.\"--- Window	attachWindow	T{
+.\"--- .na
+.\"--- (reserved)
+.\"--- T}
+.\"--- .TE
+.\"--- 
+.\"--- example of constants defined:
+.\"--- 
+.\"--- The following workspace atom name constants are defined:
+.\"--- .VL 15
+.\"--- .LI _XA_DT_WORKSPACE_ALL
+.\"--- Name to request all workspaces.
+.\"--- .LI _XA_DT_WORKSPACE_CURRENT
+.\"--- Name to request the _DT_WORKSPACE_CURRENT property (client -> dtwm). 
+.\"--- This property is a single atom, representing the current workspace.  It is
+.\"--- updated each time the workspace changes.  This property is placed on the mwm
+.\"--- window.  
+.\"--- .LE
+.\"--- 
+.\"--- The following workspace function constants are defined:
+.\"--- .VL 15
+.\"--- .LI DTWM_FUNC_ALL
+.\"--- TBD.
+.\"--- .LI DTWM_FUNC_OCCUPYWS
+.\"--- TBD.
+.\"--- .LE
+.\"--- 
+.\"--- The following window manager hint constants are defined:
+.\"--- .VL 15
+.\"--- .LI DT_WM_BEHAVIOR_PANEL
+.\"--- TBD.
+.\"--- .LI DT_WM_BEHAVIOR_SUB_PANEL_RESTORED
+.\"--- .LE
+.\"--- 
+.\"--- example of callback prototypes declared:
+.\"--- 
+.\"--- The following are declared as callback prototypes:
+.\"--- .PP
+.\"--- .yS
+.\"--- .ta \w'DtWsmWsChangeProc('u
+.\"---  DtWsmWsChangeProc Widget \f2widget\fP;
+.\"--- 	Atom \f2aWs\fP;
+.\"--- 	Pointer \f2client_data\fP;
+.\"--- .ta \w'DtWsmWsModifiedProc('u
+.\"---  DtWsmWsModifiedProc Widget \f2widget\fP;
+.\"--- 	Widget \f2widget\fP;
+.\"--- 	Atom \f2aWs\fP;
+.\"--- 	DtWsmWsReason \f2reason\fP;
+.\"--- 	Pointer \f2client_data\fP;
+.\"--- .yE
+.\"--- 
+.\"--- example of declared functions: 
+.\"--- The following are declared as functions:
+.\"--- .PP
+.\"--- .yS
+.\"--- .ta \w'DtWsmCBContext DtWsmAddCurrentWorkspaceCallback('u
+.\"--- DtWsmCBContext DtWsmAddCurrentWorkspaceCallback(Widget \f2widget\fP,
+.\"--- 	DtWsmWsChangeProc \f2ws_change\fP,
+.\"--- 	Pointer \f2client_data\fP);
+.\"--- .ta \w'void DtWsmRemoveCurrentWorkspaceCallback('u
+.\"--- void DtWsmRemoveCurrentWorkspaceCallback(Widget \fIwidget\fP,
+.\"--- 	DtWsmWsChangeProc \fIws_change\fP,
+.\"--- 	Pointer \f2client_data\fP,
+.\"--- 	DtWsmCBContext \f2context\fP);
+.\"--- .ta \w'void DtWsmAddWorkspaceFunctions('u
+.\"--- void DtWsmAddWorkspaceFunctions(Display *\f2display\fP,
+.\"--- 	Window \f2window\fP);
+.\"--- .ta \w'void DtWsmRemoveWorkspaceFunctions('u
+.\"--- void DtWsmRemoveWorkspaceFunctions(Display *\f2display\fP,
+.\"--- 	Window \f2window\fP);
+.\"--- .ta \w'DtWsmCBContext DtWsmAddWorkspaceModifiedCallback('u
+.\"--- DtWsmCBContext DtWsmAddWorkspaceModifiedCallback(Widget \f2widget\fP,
+.\"--- 	DtWsmWsModifiedProc \f2ws_change\fP,
+.\"--- 	Pointer \f2client_data\fP)
+.\"--- .PP
+.\"--- 
+.\"----------------------------------------------------------------------------
+.\"--- "SEE ALSO"
+.\"--- This section lists related information.
+.\"--- 
+.\"--- SEE ALSO example:
+.\"--- 
+.\"--- .SH "SEE ALSO"
+.\"--- .Fn XtAppInitialize 3,
+.\"--- .Fn XtToolkitInitialize 3,
+.\"--- .Fn XtCreateApplicationContext 3.
+.\"--- 
+.SH "SEE ALSO"
+
+.Fn reference to a function_name (include section number after the function),
+.Fn reference to another function_name (include section number after the 
+function).
+.\"---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

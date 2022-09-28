@@ -1,0 +1,95 @@
+XCOMM $XConsortium: Imakefile /main/cde1_maint/3 1995/10/23 11:50:16 gtsang $
+/*                                                                      *
+ * (c) Copyright 1993, 1994 Hewlett-Packard Company                     *
+ * (c) Copyright 1993, 1994 International Business Machines Corp.       *
+ * (c) Copyright 1993, 1994 Sun Microsystems, Inc.                      *
+ * (c) Copyright 1993, 1994 Novell, Inc.                                *
+ */
+
+DESKTOP_VERSION_STRING = DesktopVersionString
+#
+# Imakefile: for DT startup transition program
+#
+
+
+/* General case INCLUDES DEFINES LOCAL_LIBRARIES
+ * Each individual architecture may have more or less of the above.
+ * Use EXTRA_DEFINES and EXTRA_INCLUDES to add defines and includes
+ * to an individual architecture.  There is no equivalent for
+ * LOCAL_LIBRARIES.
+ * USE_libraryname in LOCAL_LIBRARIES is by default empty.
+ * It should be set when necessary to the real library macro name.
+ */
+
+        DEFINES = -DMESSAGE_CAT
+       INCLUDES = -I.
+DEPLIBS = $(DEPXTOOLLIB) $(DEPXLIB)
+LOCAL_LIBRARIES = $(XTOOLLIB) $(XLIB)
+#  SYS_LIBRARIES = -lm
+
+
+#if defined(ApolloArchitecture) 
+#if  defined(SHLIB)
+LOCAL_LIBRARIES= -A inlib,$(XTOOLLIB)
+#endif
+#endif
+
+
+#ifdef HPArchitecture
+EXTRA_DEFINES = -DHP_COLOR
+#endif
+
+#if defined(SunArchitecture)
+#SYS_LIBRARIES = -lm -ldl -lw -lgen -lC
+SYS_LIBRARIES = -lsocket
+EXTRA_CCOPTIONS = -xstrconst -dalign 
+#endif
+
+#if defined(USLArchitecture)
+/* needed to turn off unresolved symbol detection for shlibs */
+#if HasSharedLibraries
+EXTRA_LOAD_FLAGS = -z nodefs
+#endif
+SYS_LIBRARIES = -lm -ldl $(WIDECHARSYSLIB) -lgen
+#endif
+
+#if defined(UXPArchitecture)
+/* needed to turn off unresolved symbol detection for shlibs */
+#if HasSharedLibraries
+EXTRA_LOAD_FLAGS = -z nodefs
+#endif
+SYS_LIBRARIES = -lm -ldl $(WIDECHARSYSLIB) -lgen
+#endif
+
+#ifdef RsArchitecture
+#endif
+
+   SRCS1 = dthello.c solaris.c version.c
+   SRCS = $(SRCS1)
+   OBJS = dthello.o solaris.o version.o  \
+          $(CDELIBSRC)/DtSvc/DtUtil2/EnvControl.o \
+          $(CDELIBSRC)/DtSvc/DtUtil2/DtNlUtils.o \
+          $(CDELIBSRC)/DtSvc/DtUtil2/GetDispRes.o
+
+NormalLibraryObjectRule()
+ComplexProgramTarget(dthello)
+
+CppTextRule(Dthello,Dthello.src,,)
+
+/***** For dtge make a client_OBJS.o using client_main.o ******/
+/***** This implies the existence of client_main.c       ******/
+/***** dtge hidden symbols *******/
+#ifdef BuildHugeObject
+#ifdef HPArchitecture
+#ifdef __hp9000s300
+HIDDEN_SYMBOLS = -h _main -h _GetMessage -h _CheckMonitor  \
+         -h _GetPaletteDefinition -h _SwitchAItoPS -h _SaveDefaultPalette  \
+         -h _InitializeDtcolor -h _box_line_width  -h _Xestrcmp
+#else
+HIDDEN_SYMBOLS = -h main -h GetMessage -h CheckMonitor  \
+         -h GetPaletteDefinition -h SwitchAItoPS -h SaveDefaultPalette \
+         -h InitializeDtcolor -h box_line_width -h Xestrcmp
+#endif
+#endif
+SpecialRelocatableTarget(dthello,$(HIDDEN_SYMBOLS),$(OBJS))
+#endif

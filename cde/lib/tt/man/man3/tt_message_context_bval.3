@@ -1,0 +1,84 @@
+.de Lc
+.\" version of .LI that emboldens its argument
+.TP \\n()Jn
+\s-1\f3\\$1\f1\s+1
+..
+.TH tt_message_context_bval 3 "1 March 1996" "ToolTalk 1.3" "ToolTalk Functions"
+.BH "1 March 1996"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.IX "tt_message_context_bval" "" "tt_message_context_bval(3)" ""
+.SH NAME
+tt_message_context_bval \- retrieve the byte-array value and length of a message's context
+.SH SYNOPSIS
+.ft 3
+.nf
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'Tt_status tt_message_context_bval('u
+Tt_status tt_message_context_bval(Tt_message \f2m\fP,
+	const char *\f2slotname\fP,
+	unsigned char **\f2value\fP,
+	int *\f2len\fP);
+.PP
+.fi
+.SH DESCRIPTION
+The
+.BR tt_message_context_bval (\|)
+function
+retrieves the byte-array value and length of a message's context.
+.PP
+If there is no context slot associated with
+.IR slotname ,
+.BR tt_message_context_bval (\|)
+returns a
+.BR \s-1NULL\s+1
+pointer in
+.I slotname
+and zero in
+.IR len .
+.PP
+The
+.I m
+argument is the opaque handle for the message involved in this operation.
+The
+.I slotname
+argument describes the context of this message.
+The
+.I value
+argument points to the location to return the value.
+The
+.I len
+argument is the length of the value in bytes.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.BR tt_message_context_bval (\|)
+function returns the status of the operation as one of the following
+.B Tt_status
+values:
+.PP
+.RS 3
+.nr )J 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_NOMP
+.br
+The
+.BR ttsession (1)
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_POINTER
+.br
+The pointer passed does not point to an object of
+the correct type for this operation.
+.Lc TT_ERR_SLOTNAME
+.br
+The specified slotname is syntactically invalid.
+.PP
+.RE
+.nr )J 0
+.SH "SEE ALSO"
+.na
+.BR tt_c (5).

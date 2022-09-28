@@ -1,0 +1,1388 @@
+<chapter id=ConfiguringTheFrontPanelCI>Modifying the Front Panel
+     <idx begin|Front Panel: customizing|
+     <idx begin|control: customizing Front Panel controls|
+
+
+<procedure>Introduction and Configuration Files
+	<list bullet tight>
+	* <xref IntroFPConfig>
+	* <xref ConfigurationFileRequirements>
+	* <xref PrecedenceOfControls>
+	* <xref ExampleofFPDatabase>
+	<\list>
+
+<procedure>Organization of the Front Panel Definition
+	<list bullet tight>
+	* <xref OrgFrontPanelDefTO>
+	* <xref OutsideIn>
+	* <xref GeneralSyntax>
+        * <xref ToOverRidePrecedence> 
+	* <xref	ExampleofFPDatabase>
+	<\list>
+
+<procedure>Modifying the Main Panel
+	<list bullet tight>
+	* <xref AddDeleteControl>
+	* <xref ControlLabels>
+	<\list>
+
+<procedure>Creating and Modifying Subpanels
+	<list bullet tight>
+	* <xref ModifySubpanelsSI>
+	* <xref CreateNewSubpanel>
+	* <xref ConfigureDynamicMod>
+	* <xref ConfigureDynamicToggles>
+	<\list>
+
+<procedure>Defining Front Panel Controls
+	<list bullet tight>
+	* <xref BehaviorOfControls>
+	* <xref CreateButtonStartsApplicationTA>
+	* <xref CreateControlButtonDropTA>
+	* <xref CreateFileMonitorControlTA>
+	* <xref CreateToggleControlTA>
+	* <xref CreateWindowControlTA>
+	* <xref AnimateControlTA>
+	* <xref CreateDropZoneTU>
+	* <xref OnItemHelp>
+	<\list>
+
+<procedure>Customizing the Workspace Switch
+	<list bullet tight>
+	* <xref AddDeleteWorkspacesTA>
+	* <xref ToConfigureWorkspaceSwitchTA>
+	<\list>
+
+<procedure>General Front Panel Configuration
+	<list bullet tight>
+	* <xref ToChangeFPLocationTA>
+	* <xref ControlLabels>
+	* <xref PanelDecoration>
+	* <xref ToChangeButtonBehavior>
+	* <xref CreateNewFrontPanelTA>
+	<\list>
+
+
+
+<s1 id=IntroFPConfig>Introduction
+
+There are several ways you can customize the Front Panel:
+
+
+<procedure>User Customizations
+
+The easiest way to customize the Front Panel is to use the functionality
+provided by the subpanel drop zones and and toggle buttons.
+
+<list bullet>
+
+* You can add controls to subpanels by
+dragging an object from the Application Manager or File Manager to
+a control install drop zone in the subpanel.
+
+* The toggle buttons beside each subpanel control let you specify which
+control in the subpanel is displayed in the Main Panel.
+
+<\list>
+
+
+<procedure>Advanced Customization
+These modifications require you to manually edit a configuration file:
+
+	<list bullet>
+	* Adding new controls to the Main Panel
+	* Removing controls from subpanels
+	* Adding or removing subpanels
+        * Adding special types of controls, such as client windows.
+        * Changing certain default behaviors&emdash;for example, whether
+          or not the subpanel control install zones and toggle buttons
+          appear.
+	<\list>
+
+
+<procedure>Continue...
+
+See <xref ConfigurationFileRequirements>.
+
+
+<s1 id=ConfigurationFileRequirements>Names and Locations for Front Panel Configuration Files
+
+The Front Panel is defined in one or more configuration files.  To provide
+maximum flexiblity in configuring the panel, these files can be personal,
+system-wide, or located on other systems.
+
+<procedure>Default Front Panel Configuration File
+The default Front Panel is defined in ``/opt/dt/types/C/dtwm.fp''.
+
+<procedure>Location and File Name Requirements
+
+The Front Panel definition can be distributed among any number of files
+located locally or on remote systems.
+
+Files used to define the Front Panel must meet these requirements;
+
+<list bullet>
+
+* The file name must end in ``.fp''.  For example, ``mail.fp'' is a valid
+  Front Panel configuration file name.
+
+* The file must be located along the application search path.  The
+  application search path search path consists the concatenation of 
+  the value of the environment variables: DTDATABASESEARCHPATH plus
+  DTDATABASESEARCHPATH.  
+
+<\list>
+
+
+<procedure>Default Search Path
+The default search path is defined by the default value of the
+DTAPPSEARCHPATH.  Directories are searched in this order:
+
+	<list bullet tight>
+	* ``/%%HomeDirectory%%/.dt/types''. For personal customizations.
+	* ``/etc/opt/dt/appconfig/types/C''. For system-wide customizations.
+	* ``/opt/dt/types/C''.  Built-in Front Panel.
+	<\list>
+
+
+<procedure>Continue...
+
+See <xref PrecedenceOfControls>.
+
+
+<s1 id=PrecedenceOfControls>Precedence Rules in Assembling Front Panel Defintiions
+
+
+The Front Panel is assembled from all the definitions in ``.fp'' files
+residing along the search path.
+
+<procedure>Order in Which Files are Read
+<list bullet>
+* The directories are read in the order in which they appear in the search
+path.  For example, if the variables are defined as follows:
+
+<image>
+DTUSERAPPSEARCHPATH=%%dir%%__a__:%%dir%%__b__:%%dir%%__c__
+DTAPPSEARCHPATH=%%dir%%__d__:%%dir%%__e__
+<\image>
+
+then the directories are read in the order: %%dir%%__a__,%%dir%%__b__,
+%%dir%%__c__,%%dir%%__d__,%%dir%%__e__. 
+
+* Within a directory, files are read in alphabetical order.
+<\list>
+
+<procedure>Precedence Rules
+
+Where there is conflict between components of the definition, these
+rules apply:
+
+<list bullet>
+
+* If components have the same name (for example, two controls named
+  "Editor"), the component read first is used.
+
+  Since the system searches personal configuration files (using
+  DTUSERDATABASESEARCHPATH)
+  before system configuration files (using DTDATABASESEARCHPATH), personal
+  customizations have precedence.
+
+* If component definitions specify the same position (POSITION_HINTS)
+  within a container, they are placed in the container in the order in
+  which they are read. 
+
+<\list>
+
+<procedure>Related Topics
+<list bullet tight>
+* <xref ToOverRidePrecedence>
+<\list>
+
+<s1 id=ToOverRidePrecedence>To Override Precedence (Lock Out Personal Customization)
+
+There may be times when you want to prevent personal customizations
+from overriding system-wide controls.  For example, a system administrator
+who has created a control for starting an application may want to be
+assured that any changes later made to the control definition are
+propagated to all users. 
+
+The LOCKED field in a control, box, subpanel, or switch definition provides
+a way to ensure a component is used, even if it is defined again earlier
+in the search path.  See <xref LockedDe>.
+
+<procedure>Related Topics
+<list bullet tight>
+* <xref ExampleofFPDatabase>
+<\list>
+
+
+
+
+<s1 id=ExampleofFPDatabase>Examples of Using the Database for a System Customization
+
+<procedure>Example 1: Adding a Subpanel
+
+The default Front Panel defined in ``/opt/dt/types/C/dtwm.fp'' does not
+contain a subpanel for the Mail control.  You can use this procedure to add
+one on a system-wide basis:
+
+<list order>
+
+* Log in as super-user.
+
+* Create a file ``/etc/opt/dt/appconfig/types/C/mailsubpanel.fp''
+
+* Add the following lines to the file:
+
+	<ex smaller>
+	SUBPANEL            MailSubpanel
+	{
+	  CONTAINER_NAME    Mail
+	  TITLE             Communication
+	}  
+	<\ex>
+
+* Save the file.
+
+* Restart the Workspace Manager by choosing Restart Workspace Manager from
+  the Workspace menu.
+
+<\list>
+
+<procedure>Example 2: Rearranging Controls
+
+You want to interchange positions of the Mail and Help controls.
+
+<list order>
+
+* Log in as super-user.
+
+* Create the file ``/etc/opt/dt/appconfig/types/C/load.fp''.
+
+* Copy the control definitions for Mail and Help to the new file.
+  Exchange the values for POSITION_HINTS.
+
+<ex smaller>
+CONTROL Mail
+{
+  TYPE			mail
+  CONTAINER_NAME	Top
+  CONTAINER_TYPE	BOX
+#                       The following value previously was 12.
+  POSITION_HINTS	5
+  IMAGE			mail
+  ALTERNATE_IMAGE	mail02
+  PUSH_ACTION		f.action MAILER
+  DROP_ACTION		f.action MAIL_A_FILE
+  PUSH_RECALL		true
+  CLIENT_NAME		Mail
+}
+
+CONTROL Help
+{
+  TYPE             icon
+  CONTAINER_NAME   Top
+  CONTAINER_TYPE   BOX
+#                  The following value previously was 5.
+  POSITION_HINTS   12
+  LABEL            Top Level Help
+  IMAGE            help
+  PUSH_ACTION      f.action OpenHelpManager
+}
+<\ex>
+
+* Save the file.
+
+
+<\list>
+
+
+<s1 id=OrgFrontPanelDefTO>Organization of the Front Panel Definition
+     <idx|Front Panel: definition|
+     <idx|definition: Front Panel|
+
+
+The Front Panel definition provides the ability to build a customized
+Front Panel from a set of building-blocks, or constructs.  These constructs
+have required syntax that defines what the constructs looks like, how they
+behave, and their relationship to one another.
+
+The definitions for the constructs can be located in one file or divided
+among many files located locally or elsewhere in the network
+(see <xref ConfigurationFileRequirements>). 
+
+
+
+<s1 id=OutsideIn>Introducing the The Front Panel Constructs
+
+
+<figure nonumber entity=FrontPanelBoxes>
+The Front Panel is build from a set of constructs.
+<\figure>
+
+
+The Front Panel is defined as a set of constructs assembled from the
+outside in:
+
+<list bullet>
+
+* The main PANEL is the top-level container, or parent,  for the entire
+  Front Panel. 
+
+* Inside the PANEL is one or more BOXes.  The BOXes are containers
+  for CONTROLs. 
+
+* Inside each BOX is one or more CONTROLs. 
+<\list>
+
+<procedure>Special Boxes
+
+There are two special types of boxes:
+
+<list bullet>
+
+* A SUBPANEL is a box associated with a particular control (the control
+   is the container for the subpanel).
+  Subpanels "slide up" from the control with which they are associated.
+
+* The SWITCH is a special box containing the buttons for changing
+  workspaces plus additional controls.	The switch can be placed inside
+  another box.
+
+<\list>
+
+
+<s1 id=GeneralSyntax>General Syntax of the Front Panel Definition
+
+
+<procedure>Construct Definitions
+
+Each construct in the Front Panel is defined separately using the syntax:
+
+<ex>
+%%CONSTRUCT%%       %%name%%
+{
+  %%KEYWORD%%       %%value%%
+  %%KEYWORD%%       %%value%%
+  %ellipsis;
+}  
+<\ex>
+
+
+<procedure>The PANEL Definition
+The PANEL is the top-level construction. Its
+definition includes:
+<list bullet tight>
+* The Front Panel name
+* Fields describing the general appearance and behavior of the entire Front
+Panel 
+<\list>
+
+<ex>
+PANEL                 %%front_panel_name%%
+{
+    %%KEYWORD%%       %%value%%
+    %%KEYWORD%%       %%value%%
+    &ellipsis;
+}
+<\ex>
+
+
+The !!front_panel_name!! is a unique name for the Front Panel.  
+The default name is WHAT.  A system can contain multiple PANEL
+definitions; the resource ``Dtwm*frontPanel*name'' specifies which PANEL
+to use. 
+
+
+<procedure>BOX Definitions
+
+A BOX definition describes:
+<list bullet tight>
+* The BOX name
+* Which PANEL the box is in
+* The position of the box in the PANEL
+* Fields describing appearance and behavior specific to the box
+<\list>
+
+<ex>
+BOX                    %%box_name%%
+{
+   CONTAINER_NAME      %%front_panel_name%%
+   POSITION_HINTS      %%position%%
+   %%KEYWORD%%           %%value%%
+   %%KEYWORD%%           %%value%%
+   &ellipsis;
+}
+<\ex>
+
+
+<procedure>CONTROL Definitions
+
+A CONTROL definition describes:
+
+<list bullet tight>
+* The CONTROL name
+* Whether the control is in a box, subpanel, or switch
+* Which box, subpanel, or switch the control is in
+* The position of the CONTROL in the BOX.
+* Fields describing appearance and behavior of the control
+<\list>
+
+<ex>
+CONTROL                %%control_name%%
+{
+   CONTAINER_TYPE      BOX %%or%% SUBPANEL %%or%% SWITCH
+   CONTAINER_NAME      %%box_name or subpanel_name or switch_name%%
+   TYPE                %%control_type%%
+   POSITION_HINTS      %%position%% 
+   %%KEYWORD%%           %%value%%
+   %%KEYWORD%%           %%value%%
+   &ellipsis;
+}
+<\ex>
+
+
+<procedure>SUBPANEL Definitions
+
+A SUBPANEL definition describes:
+
+<list bullet tight>
+* The SUBPANEL name
+* The name of the control to which the subpanel is attached
+* Fields describing appearance and behavior specific to the subpanel
+<\list>
+
+<ex>
+SUBPANEL               %%subpanel_name%%
+{
+   CONTAINER_NAME      %%control_name%%
+   %%KEYWORD%%           %%value%%
+   %%KEYWORD%%           %%value%%
+   &ellipsis;
+}
+<\ex>
+
+<procedure>SWITCH Definition
+
+The SWITCH definition describes:
+<list bullet tight>
+* The SWITCH name
+* Which BOX the SWITCH is in
+* The position of the SWITCH within the BOX
+* Fields describing the appearance and behavior of the SWITCH
+<\list>
+
+<ex>
+SWITCH                 %%switch_name%%
+{
+   CONTAINER_NAME      %%box_name%%
+   POSITION_HINTS      %%position%%
+   %%KEYWORD%%         %%value%%
+   %%KEYWORD%%         %%value%%
+   &ellipsis;
+
+}
+<\ex>
+
+<!-- MODULE AddDeleteControl fp200015.TAa -->
+<s1 id=AddDeleteControl>To Add a Control in the Main Panel
+
+Modifying the ++main panel++ requires you to edit a
+++front panel configuration file++.
+
+You can:
+<list bullet>
+* Add, remove, or replace controls.
+* Attach subpanels to controls, or deattach existing subpanels.
+<\list>
+
+
+
+     <idx|Front Panel: adding control|
+     <idx|Front Panel: deleting control|
+     <idx|adding: Front Panel control|
+     <idx|removing: Front Panel control|
+     <idx|deleting: Front Panel control|
+
+
+<procedure>To Add a Control
+<list order>
+
+* Open an exising Front Panel configuration file for editing, or create a new one.
+
+* Define the control in the file.  The control definition must include the
+  parent container (CONTAINER_NAME).  The parent container can be:
+
+   <list bullet>
+   * The box named ``Top''.
+   * The switch named ``Switch''.
+   <\list>
+
+*  Use POSITION_HINTS to specify the left-to-right placement of the
+   control.
+
+<\list>
+
+
+<procedure>Example
+You want to add a load meter between the clock and date.
+The following control defined in ``/%%HomeDirectory%%/.dt/types/''
+does this.
+
+<ex smaller>
+CONTROL           LoadMeter
+ TYPE             client
+ CONTAINER_NAME   Top
+ CONTAINER_TYPE   Box
+ POSITION_HINTS   2
+ CLIENT_NAME      vueload
+ PUSH_ACTION      f.exec "xload -name vueload -nolabel"
+ PUSH_RECALL      true
+ HELP_TOPIC       FPLoad
+}
+ 
+
+<\ex>
+
+Note that this value for position hints is the same as the value
+for the Date control (defined in ``/opt/dt/type/C/dtwm.fp'').  Since
+personal controls have precedence, LoadMeter will be put in
+position 2 and Date will be bumped to position 3.
+
+
+
+<s1 id=ControlLabels>To Label Controls in the Main Panel
+
+
+<list order>
+* Add the following line to the PANEL definition:
+<ex>
+DISPLAY_CONTROL_LABELS   True
+<\ex>
+
+* Add a LABEL field to each control.  (The %%control_name%% is used if
+  no LABEL is specified.)
+<\list>
+
+
+
+<s1 id=ModifySubpanelsSI>How Subpanels are "Attached" to Controls
+
+
+     <idx|creating: subpanel|
+     <idx|modifying: subpanels|
+     <idx|configuring: subpanels|
+     <idx|subpanel: configuring|
+     <idx|printer subpanel: configuring|
+     <idx|tool subpanel, configuring|
+
+
+A subpanel is "attached" to a control in the main panel.  The attachment
+is done using the CONTAINER_NAME keyword in the subpanel definition.
+For example:
+
+
+<ex smaller>
+CONTROL           Printer
+{
+   &ellipsis;
+}
+
+SUBPANEL          PrintSubpanel
+{
+   CONTAINER_NAME Printer
+     &ellipsis;
+}
+<\ex>
+
+
+<s1 id=CreateNewSubpanel>To Create a New Subpanel
+
+
+<list order>
+
+* Locate the %%control_name%% of the control in the Main Panel to which you
+  want to attach the subpanel. (If you are using the default Front Panel, 
+  the control is defined in ``/opt/dt/types/C/dtwm.fp''.
+
+* Create a new ``*.fp'' file in:
+
+  <list bullet tight>
+  * ``/etc/opt/dt/appconfig/types/C'' for system customization.
+  * ``/%%HomeDirectory%%/.dt/types'' for personal customization.
+  <\list>
+
+
+* Define the subpanel:
+
+<ex smaller>
+SUBPANEL          %%subpanel_name%%
+{
+   CONTAINER_NAME %%control_name%%
+   %%KEYWORD      value%%	
+   %%KEYWORD      value%%	
+     &ellipsis;
+}
+<\ex>
+
+See <xref SubpanelDE> for reference information about subpanel syntax.
+
+* After saving the new configuration file, choose Restart Workspace Manager
+  from the Workspace menu.
+<\list>
+
+
+
+<s1 id=ConfigureDynamicMod>To Turn Dynamic Control Installation Off
+
+By default, subpanels contain Control Install drop zones.  When a user
+drops an object on the control, the object is installed into the subpanel.
+
+To turn off Control Install and remove the drop zone from the subpanel, add
+the following field to the subpanel definition: 
+
+<ex>
+CONTROL_INSTALL    False
+<\ex>
+
+
+
+<s1 id=ConfigureDynamicToggles>To Turn the Subpanel Toggles Off
+
+By default, each subpanel control includes a radio button that lets the user
+place the control in main panel. 
+
+Turning off the buttons prevents the user from changing the main panel
+control associated with the subpanel.  To turn off the buttons, add the
+following field to the subpanel definition:
+
+<ex>
+SHOW_TOGGLES      False
+<\ex>
+
+
+
+
+
+<s1 id=BehaviorOfControls>Types of Front Panel Controls
+     <idx|creating: Front Panel control|
+     <idx|Front Panel: controls, defining|
+     <idx|Front Panel: controls, creating|
+     <idx|control: defining Front Panel|
+     <idx|control: creating Front Panel|
+
+
+Several fields in a control definition determine the behavior of a control:
+
+<list bullet>
+
+* The TYPE field defines the fundamental behavior of the control&emdash;for
+  whether it is a push button, a client window, etc.
+
+* Other fields in the definition further fine the behaviro&emdash;for example,
+  by describing what the push button does or what client window it is.
+
+<\list>
+
+<procedure>Control TYPEs
+<lablist>
+<labheads>\Control TYPE	\Control behavior
+
+\``icon''\		 Push button and/or drop zone that runs an action
+			 or a command. 
+
+\``mail''\		Changes appearance when a specified
+			monitored file increases in size.
+
+\``file_monitor''\      Changes appearance when a specified
+			file changes from empty or non-existent to a
+			non-empty file.
+
+\``client''\		A client window in the Front Panel.
+
+<``blank''\		Placeholder used to adjust spacing of controls.
+
+\``clock''\		Clock.
+
+\``date''\		Date.
+
+\``busy''\		Busy light. The control "blinks"
+			(togges images) when an action is invoked.
+<\lablist>
+
+
+
+<procedure>Other Behavior Fields
+
+Many control types have other fields that define behavior.  For example,
+an ``icon'' control might have a PUSH_ACTION and DROP_ACTION field to
+describe its push button and drop zone behavior. Type ``client'' controls
+use the CLIENT_NAME field to describe the window to be placed in the
+Front Panel.
+
+
+<procedure>Combining Functionality
+To a certain extent, you can mix behaviors.  For example, you can create a
+control that is a push button, file monitor, and drop zone; however,
+you cannot make a client window into a push button.
+
+
+
+<s1 id=CreateButtonStartsApplicationTA>To Create a Push Button for an Application
+
+     <idx|creating: button for application|
+     <idx|button: creating for application|
+     <idx|application: creating button to activate|
+
+The easiest way to add an application to the Front Panel is to drag the
+application icon from the Application Manager to a Control Install zone.
+This procedure describes how to create an application control manually.
+
+<list bullet>
+
+* Use the TYPE field to specify type ``icon''.
+
+* Use the PUSH_ACTION field to describe the behavior of the push button.
+  There are two ways to describe the command to be executed:
+
+	<list bullet>
+
+	* Use ``f.action'' to specify an action:
+	<ex>
+	PUSH_ACTION  f.action %%action_name%%
+	<\ex>
+
+	If the action accepts a file argument, you can specify the
+	file argument using the syntax:
+
+	<ex>
+	PUSH_ACTION f.action "%%action_name%% %%filename%%"
+	<\ex>
+
+	* Use ``f.exec'' to specify a command line:
+
+	<ex>
+	PUSH_ACTION  f.exec "%%command%%"
+	<\ex>
+
+	<\list>
+
+* Use the IMAGE field to specify the icon for the control.
+<\list>
+
+<procedure>Example
+
+The following control, which will be put in the Personal Applications
+subpanel, runs a game the user has acquired:
+
+<ex smaller>
+CONTROL Ball
+{
+  TYPE           icon
+  CONTAINER_NAME PersAppsSubpanel
+  CONTAINER_TYPE SUBPANEL
+  IMAGE          ball
+  PUSH_ACTION    f.exec "/users/anna/bin/games/Ball"
+  HELP_STRING    "Choose this control to play Ball."
+}
+<\ex>
+
+<procedure>Example
+This control will be located in the upper left corner 
+of the switch.
+It starts an action named CutDisp.
+
+<ex smaller>
+CONTROL StartCutDisp
+{
+  TYPE             icon
+  CONTAINER_NAME   Switch
+  POSITION_HINTS   first
+  IMAGE            cutdisp
+  HELP_STRING      "Choose this control to run cutdisp."
+  PUSH_ACTION      f.action CutDisp
+}
+<\ex>
+
+<procedure>Example
+The following control will be located on the far right side
+of the Main Panel.  It starts Text Editor with the data file
+``/users/ellen/PhoneList''.
+
+<ex smaller>
+CONTROL            EditPhoneList
+{
+  TYPE             button
+  CONTAINER_NAME   Top
+  POSITION_HINTS   last
+  IMAGE            PhoneBook
+  HELP_STRING      "This control displays Ellen's phone list."
+  PUSH_ACTION      f.action "TextEditor /users/ellen/PhoneList"
+}
+<\ex>
+
+ 
+<procedure>See Also
+<list bullet tight>
+* <xref RefPushActionDE> reference.
+<\list>
+
+<s1 id=CreateControlButtonDropTA>To Create a Push Button and Drop Zone
+
+     <idx|creating: button and drop zone|
+     <idx|button: creating|
+     <idx|drop zone: creating|
+     <idx|zone, creating drop|
+
+<list order>
+
+* Use the PUSH_ACTION field to describe the functionality of the push
+  button.  Use ``f.action'' or ``f.exec'' to specify the command.
+
+* Use the DROP_ACTION field to describe the functionality of the drop zone.
+  You must use ``f.action'' for the command, and write the action so that
+  it accepts a file argument.
+
+<\list>
+
+You can use the same action for the push and drop action.
+
+<procedure>Example
+The following control, located in the Personal Applications subpanel,
+runs the X client ``xwud'', which takes a file argument.
+
+<ex smaller>
+CONTROL           Run_xwud
+{
+  CONTAINER_NAME  PerAppsSubpanel
+  POSITION_HINTS  2
+  IMAGE           Project1.l.bm
+  PUSH_ACTION     f.action RunXwud
+  DROP_ACTION     f.action RunXwud
+}
+<\ex>
+
+To create the RunXuwd action, double-click CreateAction in the 
+DesktopTools subdirectory of the Application Manager.
+Fill in these text boxes:
+
+<ex smaller>
+Name:            RunXwud
+Command Line:    xwud -in $1
+Filename Prompt: File to display:
+<\ex>
+
+and use the Window Type options menu to select: X Windows.
+You must double-click ReloadApps in the 
+DesktopTools subdirectory of the Application Manager for
+the action to take effect.
+ 
+<procedure>See Also
+<list bullet tight>
+* <xref RefPushActionDE> reference.
+* <xref RefDropActionDE> reference.
+<\list>
+
+
+<s1 id=CreateFileMonitorControlTA>To Create a Control that Monitors a File
+
+     <idx|creating: control that monitors file|
+     <idx|control: creating control that monitors file|
+     <idx|monitoring file|
+
+There are two types of controls that monitor a file&emdash;``monitor_file''
+and ``mail''. 
+
+<procedure>Monitor Empty File
+
+This control type monitors a file, detecting whether it is empty or non-empty.
+
+<list order>
+* Use the TYPE field to specify type ``monitor_file''.
+
+* Use the FILE_NAME field to specify the file to be monitored.
+
+* Use the IMAGE field to specify the icon used when the monitored file is
+  empty, or if the file doesn't exist.
+
+* Use the ALTERNATE_IMAGE field to specify the icon used when the file is
+  not empty.
+
+<\list>
+
+<procedure>Monitor Mail File
+
+This control type monitors a file, changing appearance when information is
+added to the file.
+
+<list order>
+
+* Use the TYPE field to specify type ``mail''.
+
+* Use the FILE_NAME field to specify the file to be monitored.
+
+* Use the IMAGE field to specify the icon used when the monitored file is
+  unchanged since the last time it was opened.
+
+* Use the ALTERNATE_IMAGE field to specify the icon used when the file gets
+  larger. (The IMAGE icon is restored when you open the file&emdash;for
+  example, when you start the mail program.)
+
+<\list>
+
+
+<procedure>Example
+The following control looks for the presence of a file named ``calendar'' that
+you expect to be anonymously ftp-ed to your system. The control is
+placed at the top of the Personal Applications subpanel.
+
+<ex smaller>
+CONTROL           MonitorCalendar
+{
+  TYPE            monitor_file
+  CONTAINER_NAME  PersonalApps
+  CONTAINER_TYPE  SUBPANEL
+  POSITION_HINTS  first
+  FILE_NAME       /users/ftp/calendar
+  PUSH_ACTION     f.exec "/usr/dt/bin/dtpad /users/ftp/calendar"
+  IMAGE           calendar_no
+  ALTERNATE_IMAGE calendar_yes
+}
+<\ex>
+
+
+ 
+<procedure>See Also
+<list bullet tight>
+* <xref RefMonitorFileDE> reference.
+* <xref FrontPanelReferenceSI> provides additional information about syntax
+and keywords.  
+<\list>
+
+
+<s1 id=CreateToggleControlTA>To Create a One-Instance (Toggle) Control
+
+     <idx|one-instance control, creating|
+     <idx|toggle control, creating|
+     <idx|creating: toggle control|
+     <idx|control: creating toggle control|
+
+<list order>
+
+* Use the PUSH_RECALL field to set push-recall to True.
+
+*   Use the CLIENT_NAME to attach the client to the control.  The CLIENT_NAME
+  you provide must match the window class name (WM_CLASS) of the client
+  (usually the same as the client name).
+
+* Use the PUSH_ACTION field to describe the functionality of the push button.
+
+<\list>
+
+A one-instance control checks to see whether the
+process started by the button is already running.
+If the process is not running, the push button functionality is
+invoked.
+If the process is already running, the window is moved to the top of the
+window stack in the current workspace. 
+
+<procedure>Example
+The following control runs one instance of the datebook application.
+
+<ex smaller>
+CONTROL     
+{
+  TYPE            icon
+  CONTAINER_NAME  Top
+  CONTAINER_TYPE  BOX
+  POSITION_HINTS  15
+  PUSH_RECALL     True
+  CLIENT_NAME     datebook
+  PUSH_ACTION     f.exec "/usr/local/bin/X11/datebook
+  IMAGE           $HOME/.dt/icons/datebook
+}
+<\ex>
+
+ 
+<procedure>See Also
+<list bullet tight>
+* <xref RefPushRecallDE> reference.
+* <xref FrontPanelReferenceSI> provides additional information about syntax
+and keywords.
+* The ``xprop(1)'' man page explains using ``xprop'' to obtain the WM_CLASS
+of a client.
+* The ``xwininfo(1)'' man page covers how to find out the size of a window in
+pixels.
+<\list>
+
+
+<s1 id=CreateWindowControlTA>To Create a Client Window Control
+
+     <idx|creating: client window control|
+     <idx|client: window control, creating|
+     <idx|window control, client|
+     <idx|control: client window|
+
+<list order>
+
+* Use the TYPE field to specify type ``client''.
+
+* Use the CLIENT_NAME field to specify the client to be started.  Choose a
+unique client name (!!note!! the name of the executable file).
+
+<ex>
+CLIENT_NAME %%client_name%%
+<\ex> 
+
+* Use the CLIENT_GEOMETRY field to specify the size of the client
+window in pixels.  
+
+* Save the configuration file and choose Restart Workspace Manager from the
+  Workspace menu.
+
+*  Start the client from a command line.  The client is linked to the empty
+  client control through the %%client_name%%:
+
+<ex>
+%%executable%% -name %%client_name%% &
+<\ex> 
+
+<\list>
+
+In order to place a client window in the Front Panel, the client must
+have a ``- name'' command-line option.
+
+<procedure>Example
+
+The following control displays a 30 &times; 20 pixel load meter.
+<ex smaller>
+CONTROL RemoteLoad
+{
+  TYPE            client
+  CONTAINER_NAME  Top
+  CLIENT_NAME     ScribeLoad
+  CLIENT_GEOMETRY 30x20
+  PUSH_ACTION     f.exec 
+}
+<\ex>
+
+To start the xterm window, execute:
+<ex smaller>
+remsh hpwrite -n "/usr/bin/X11/xload -nolabel -name ScribeLoad" -display hphere:0 &
+<\ex>
+
+
+ 
+<procedure>See Also
+<list bullet tight>
+* <xref RefClientNameDE> reference.
+<\list>
+
+
+<s1 id=AnimateControlTA>To Animate a Button
+
+     <idx|animating button|
+     <idx|button: animating|
+
+You can attach an animation squence to be used when the user chooses the
+control or drops an object on it.
+
+<list order>
+
+* Add the PUSH_ANIMATION and/or DROP_ANIMATION fields to the control
+  definition.  The value is the name of the ANIMATION sequence.
+
+* Specify the animation sequence using the ANIMATION construct.
+<\list>
+
+A control must be type ``icon'' and have a PUSH_ACTION or DROP_ACTION.
+
+
+
+<procedure>Example
+The following lines animate a control that starts the Framemaker&tm;
+application.  The time delay between icons is 300 milliseconds.
+The example assumes you've create icon files ``frame1'', ``frame2'', etc.
+
+<ex smaller>
+CONTROL Frame
+{
+&ellipsis;
+ PUSH_ANIMATION FrameAnimation
+   &ellipsis;
+}
+
+ANIMATION FrameAnimation
+{
+  frame1       300
+  frame2
+    &ellipsis;
+}
+<\ex>
+
+
+ 
+<procedure>See Also
+<list bullet tight>
+* <xref RefPushAnimationDE> reference. 
+* <xref RefDropAnimationDE> reference.
+<\list>
+
+
+<s1 id=CreateDropZoneTU>Example: Creating a Drop Zone to Start a Terminal
+
+     <idx|example: creating drop zone to start terminal|
+     <idx|creating: drop zone to start terminal|
+     <idx|drop zone: used to start terminal|
+     <idx|starting: creating drop zone to start terminal|
+     <idx|terminal: create drop zone that starts|
+
+This procedure creates new control located in Personal Applications subpanel.  The control is a
+drop zone.  Dropping a directory on the control opens
+a Terminal Emulator set to that directory.  If the user chooses (clicks)
+the control, it displays a prompt for the directory name.
+
+
+<procedure>Create a Configuration File
+<list order>
+* Open the new file ``/%%HomeDirectory%%/.dt/types/term.fp'' for
+editing. 
+<\list>
+
+<procedure>Add the control
+<list order continue>
+* Define the control.  
+<ex smaller>
+CONTROL DirectoryTerm
+{
+  TYPE            icon
+  IMAGE           DirectoryTerm
+  CONTAINER_NAME  PersAppsSubpanel
+  CONTAINER_TYPE  SUBPANEL
+  DROP_ACTION     f.action StartDirectoryTerminal
+  PUSH_ACTION     f.action StartDirectoryTerminal
+}
+<\ex>
+* Create the file ``/%%HomeDirectory%%/.dt/types/DirTerm.vf'' and enter
+the action.  When you are done, save the file.
+<ex smaller>
+ACTION         StartDirectoryTerminal
+{
+  ARG_TYPES    DIRECTORY
+  WINDOW_TYPE  NO_STDIO
+  EXEC_STRING  hpterm
+}
+<\ex>
+
+* If the pixmap doesn't exist, use the Icon Editor
+to create it.
+<\list>
+
+<procedure>Activate the changes
+<list order continue>
+* Save the file.
+* Open the DesktopTools subdirectory of the Application Manager and double-click
+ReloadApps.
+* Choose Restart Workspace Manager from the Workspace Menu.
+<\list>
+
+
+
+<s1 id=OnItemHelp>To Provide On-Item Help for a New Control
+
+The user obtains on-item help on the Front Panel by:
+
+<list bullet>
+* Choosing On Front Panel from the Help subpanel and then clicking
+  a Front Panel icon.
+
+* Setting the keyboard focus to a control and then pressing F1 (or Help).
+<\list>
+ 
+
+<procedure>Providing a Help String
+
+A help string is specified in the control definition:
+
+<ex>
+HELP_STRING    %%help_string%%
+<\ex>
+
+The help string is displayed in the help viewer when the user invokes
+on-item help for the control.  The help string cannot include formatting
+(such as headings) or links.
+
+<procedure>Providing a Help Topic
+
+A help topic is information authored using the full capabilities of
+the help system.  Authoring a help topic requires you to use the CDE Help
+Developer's Kit.
+
+
+The control definition includes two fields that associate an authored topic
+with the control:
+<lablist>
+\HELP_TOPIC\The topic id for the on-item help topic.
+\HELP_VOLUME\The name of the help volume associated with the application.
+<\lablist>
+
+
+<s1 id=AddDeleteWorkspacesTA>To Change the Number of Workspaces
+
+     <idx|changing: number of workspaces|
+     <idx|adding: workspaces|
+     <idx|workspace: adding|
+
+
+<procedure>To Change the Default Number of Workspaces
+<list bullet>
+* Modify the following resource in the Window Manager app-defaults file:
+
+<ex>
+Dtwm*workspaceList:  %%name%% [%%name%% &ellipsis;] 
+<\ex>
+<\list>
+
+The resource can also be used for personal customizations.
+
+
+<procedure>End-user Customization
+<list bullet>
+* Move the pointer over one of the workspace buttons in the workspac
+switch and press mouse button 3.  This displays the Workspace Control
+menu.
+* Choose Add Workspace or Delete Workspace from the menu.
+<\list>
+
+
+<s1 id=ToConfigureWorkspaceSwitchTA>To Change the Number of Rows
+
+     <idx|configuring: workspace switch|
+     <idx|workspace: switch, configuring|
+     <idx|switch, configuring workspace|
+
+<list bullet>
+* Use the NUMBER_OF_ROWS field in the SWITCH definition.
+<\list>
+
+<procedure>Example
+<ex smaller>
+SWITCH              Switch
+{
+  CONTAINER_NAME   %%box_name%%
+  NUMBER_OF_ROWS   3
+  &ellipsis;
+}
+<\ex>
+
+
+<s1 id=ToCreateANewPanelDescription>To Create a New Panel Description
+
+
+<list bullet>
+* Create a new Front Panel configuration file in
+  ``/etc/opt/dt/appconfig/types/C'' or ``/%%HomeDirectory%%/.dt/types''.
+* Copy the default PANEL desciption from ``/opt/dt/types/C/dtwm.fp''
+  to the new file.
+* Edit the PANEL description. 
+<\list>
+The new PANEL description has precedence over the default one.
+
+<s1 id=ToChangeFPLocationTA>To Change the Default Front Panel Location
+
+     <idx|changing: Front Panel location|
+     <idx|Front Panel: changing location|
+     <idx|location of: Front Panel|
+
+
+<list bullet>
+* Create a new PANEL description (see <xref ToCreateANewPanelDescription>).
+
+* Use the GEOMETRY field in the PANEL definition to specify the location.
+<\list>
+
+ 
+<procedure>Example
+The following panel is in the upper right corner.
+<ex smaller>
+PANEL           SpecialFrontPanel
+{
+  GEOMETRY      -1+1
+   &ellipsis;
+}
+<\ex>
+
+
+
+
+<s1 id=PanelDecoration>To Change the Window Decoration on the Panel
+
+<list bullet>
+* Create a new PANEL description (see <xref ToCreateANewPanelDescription>).
+
+* Use any of the following fields in the PANEL definition. Valid values
+are ``True'' (display the component) and ``False''.
+
+<lablist tight width=3in>
+\``DISPLAY_HANDLES''\ Resize handles
+\``DISPLAY_MENU''\    Window Menu button.
+\``DISPLAY_MINIMIZE''\Minimize button.
+<\lablist>
+
+<\list>
+
+<s1 id=ToChangeButtonBehavior>To Change the Click Behavior of Controls
+
+By default, push button controls in the Front Panel are activated
+by double-clicking them. 
+
+<list bullet>
+
+* Create a new PANEL description (see <xref ToCreateANewPanelDescription>).
+
+* Use the CONTROL_BEHAVIOR field in the PANEL definition to specify the
+click behavior. Valid values are ``single_click'' and ``double_click''.
+<\list>
+
+
+
+<s1 id=CreateNewFrontPanelTA>To Create an Entirely New Front Panel 
+
+     <idx|creating: new Front Panel|
+     <idx|Front Panel: creating new|
+
+<list order>
+
+* Create the PANEL construct for the new Front Panel. Give it a unique name:
+
+<ex>
+PANEL %%front_panel_name%%
+{
+   &ellipsis;
+}
+<\ex>
+
+* Create the new boxes and controls. If you want to use existing boxes, you
+  must change the CONTAINER_NAME value in each box definition to specify
+  the new %%front_panel_name%%.
+
+* Set the following resource to specify the new Front Panel.
+
+<ex>
+Dtwm*frontPanel*name: %%front_panel_name%%
+
+<\ex>
+
+* Choose Restart Workspace Manager from the Workspace menu to active the
+ changes. 
+<\list>
+
+Creating a new Front Panel may be preferable when you want to make
+extensive changes.
+
+
+
+
+
+
+

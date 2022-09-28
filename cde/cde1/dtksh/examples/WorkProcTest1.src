@@ -1,0 +1,39 @@
+\#! CDE_INSTALLATION_TOP/bin/dtksh
+
+\##########################################################################
+\#  (c) Copyright 1993, 1994 Hewlett-Packard Company	
+\#  (c) Copyright 1993, 1994 International Business Machines Corp.
+\#  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+\#  (c) Copyright 1993, 1994 Unix System Labs, Inc., a subsidiary of
+\#      Novell, Inc.
+\##########################################################################
+
+
+\#
+\# This sample shell script demonstrates the usage of an Xt workproc
+\#
+
+integer count=5
+
+\# The work proc will be called five time, at which point it will return
+\# '1', which will cause it to be automatically unregistered.
+function WorkProc1
+{
+   count=$count-1
+   echo "WorkProc1 ("$count")"
+   if [ "$count" -eq 0 ] 
+   then
+      return 1
+   else
+      return 0
+   fi
+}
+
+
+\######################### Create the Main UI #################################
+
+XtInitialize TOPLEVEL workProcTest1 WorkProcTest1 "$0" "$@"
+
+XtAddWorkProc ID1 "WorkProc1"
+
+XtMainLoop

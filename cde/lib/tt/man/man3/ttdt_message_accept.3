@@ -1,0 +1,221 @@
+.de LI
+.\" simulate -mm .LIs by turning them into .TPs
+.TP \\n()Jn
+\\$1
+..
+.de Lc
+.\" version of .LI that emboldens its argument
+.TP \\n()Jn
+\s-1\f3\\$1\f1\s+1
+..
+.TH ttdt_message_accept 3 "1 March 1996" "ToolTalk 1.3" "ToolTalk Functions"
+.BH "1 March 1996"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.IX "ttdt_message_accept.3" "" "ttdt_message_accept.3" "" 
+.SH NAME
+ttdt_message_accept \- accept a contract to handle a ToolTalk request
+.SH SYNOPSIS
+.ft 3
+.nf
+#include <Tt/tttk.h>
+.sp 0.5v
+.ta \w'Tt_pattern *ttdt_message_accept('u
+Tt_pattern *ttdt_message_accept(Tt_message \f2contract\fP,
+	Ttdt_contract_cb \f2cb\fP,
+	void *\f2clientdata\fP,
+	Widget \f2shell\fP,
+	int \f2accept\fP,
+	int \f2sendStatus\fP);
+.PP
+.fi
+.SH DESCRIPTION
+The
+.BR ttdt_message_accept (\|)
+function
+registers in the default session for
+.BR \s-1TT_HANDLER\s+1 -\c
+addressed requests:
+.PP
+.PP
+.RS 3
+.nr )J 4
+.LI (1)
+.IR Get_Geometry ,
+.IR Set_Geometry ,
+.IR Get_Iconified ,
+.IR Set_Iconified ,
+.IR Get_Mapped ,
+.IR Set_Mapped ,
+.IR Raise ,
+.IR Lower ,
+.IR Get_XInfo ,
+.IR Set_XInfo
+.LI (2)
+.IR Pause ,
+.IR Resume
+.LI (3)
+.IR Quit ,
+.IR Get_Status
+.PP
+.RE
+.nr )J 0
+.PP
+If the
+.I shell
+argument is not
+.BR \s-1NULL\s+1 ,
+the ToolTalk service
+handles messages in (1) transparently;
+otherwise, it treats them like messages in (3).
+.PP
+If
+.I shell
+is non-\c
+.BR \s-1NULL\s+1
+and
+.I cb
+is
+.BR \s-1NULL\s+1 ,
+then
+the ToolTalk service
+handles messages in (2) transparently by passing
+.I shell
+and the appropriate boolean value to
+.BR XtSetSensitive (3X).
+If
+.I cb
+is
+.BR \s-1NULL\s+1 ,
+then
+the ToolTalk service
+treats messages in (2) like (3).
+.PP
+If
+.I cb
+is not
+.BR \s-1NULL\s+1 ,
+.BR ttdt_message_accept (\|)
+passes messages in (3) to the
+.I cb
+callback; otherwise it fails with
+.BR \s-1TT_DESKTOP_ENOTSUP\s+1 .
+.PP
+If
+.I accept
+is True,
+.BR ttdt_message_accept (\|)
+calls
+.BR tt_message_accept (3)
+with a
+.I contract
+argument.
+If
+.I contract
+has a returned value from
+.BR tt_message_status (\|)
+of
+.BR \s-1TT_WRN_START_MESSAGE\s+1 ,
+it is the message that caused the tool to be started.
+The tool should join any scopes it wants to serve before accepting
+.IR contract ,
+so that it will receive any other messages already dispatched to its
+ptype.
+Otherwise, those messages will cause other instances of the
+ptype
+to be started.
+If that is in fact desired (for example,
+because the tool can only service one message at a time), then
+the tool should undeclare its
+ptype
+while it is busy.
+.PP
+If
+.I sendStatus
+is True,
+.BR ttdt_message_accept (\|)
+sends a
+.IR Status
+notice to the requester, using the
+arguments (if any) passed to
+.BR ttdt_open (\|).
+.SH "RETURN VALUE"
+Upon successful completion, the
+.BR ttdt_message_accept (\|)
+function
+returns a null-terminated array of
+.BR Tt_pattern ,
+and associates this array with
+.IR contract ;
+otherwise, it returns an error pointer.
+The application can use
+.BR tt_ptr_error (3)
+to extract one of the following
+.B Tt_status
+values from the returned handle:
+.PP
+.RS 3
+.nr )J 8
+.Lc TT_ERR_NOMP
+.br
+The
+.BR ttsession (1)
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_POINTER
+.br
+The pointer passed does not point to an object
+of the correct type for this operation.
+.Lc TT_ERR_UNIMP
+.br
+The
+.BR ttsession (1)
+for the default session is of a version that does not support
+.BR tt_message_accept (\|).
+If
+.I contract
+is a
+.BR \s-1TT_WRN_START_MESSAGE\s+1 ,
+messages to the tool's
+ptype
+will remain blocked until
+.I contract
+is rejected, replied to, or failed.
+.PP
+.RE
+.nr )J 0
+.SH "APPLICATION USAGE"
+The
+.BR ttdt_message_accept (\|)
+function
+is what a tool calls when it wants to accept responsibility for
+handling (that is, failing or rejecting) a request.
+.PP
+If
+.I contract
+is destroyed by
+.BR tttk_message_destroy (3),
+then the patterns will also be destroyed.
+Otherwise, the caller
+is responsible for iterating over the array and destroying each
+pattern.
+.SH EXAMPLES
+See
+.BR ttdt_session_join (3)
+for an example of a
+.B Ttdt_contract_cb
+callback that can be used with
+.BR ttdt_message_accept (\|).
+.SH "SEE ALSO"
+.na
+.BR tttk (5),
+.BR ttdt_open (3),
+.BR ttmedia_ptype_declare (3),
+.BR tt_ptype_declare (3),
+.BR ttdt_session_join (3),
+.BR ttdt_file_join (3),
+.BR tt_ptype_undeclare (3),
+.BR tt_ptype_undeclare (3),
+.BR XtSetSensitive (3X).

@@ -1,0 +1,76 @@
+.TH DtTermSubprocReap 3 "21 Apr 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.\" *************************************************************************
+.SH NAME
+DtTermSubprocReap \- allow a DtTerm widget to clean up after subprocess termination
+.SH SYNOPSIS
+.yS
+#include <Dt/Term.h>
+.sp 0.5v
+.ta \w'void DtTermSubprocReap('u
+void DtTermSubprocReap(pid_t \f2pid\fP,
+	int *\f2stat_loc\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn DtTermSubprocReap
+function allows DtTerm widgets to function correctly
+in applications that have installed a
+.Cn SIGCHLD
+signal handler.
+.P
+The
+.I pid
+argument specifies the process ID of the child process
+.Fn wait 2
+returns.
+.P
+The
+.I stat_loc
+argument specifies the termination information
+.Fn wait 2
+returns.
+.SH "RETURN VALUES"
+The
+.Fn DtTermSubprocReap
+function returns no value.
+.SH "APPLICATION USAGE"
+The
+.Fn DtTermSubprocReap
+function allows an application to install its own
+.Cn SIGCHLD
+signal handler.
+.P
+The application must install its own
+.Cn SIGCHILD
+signal handler and call
+.Fn DtTermSubprocReap
+if the DtTerm widget was created with the
+.B DtSubprocessTerminatorCatch
+resource set to
+.Cn False .
+.P
+The application must call the
+.Fn DtTermSubprocReap
+function after performing a
+.Fn wait 2
+(or associated function) on a terminated child process.
+If the child process is associated with a DtTerm
+widget, the widget's data structures are cleaned
+up and the associated callbacks invoked.
+.SH "SEE ALSO"
+.Hd Dt/Term.h 5,
+.xo .IR DtTerm ;
+.cde .IR DtTerm (3);
+.cde .BR signal (5),
+.cde .Fn wait 2.
+.xos
+.Fn sigaction ,
+.Fn wait
+in the \*(ZK.
+.xoe

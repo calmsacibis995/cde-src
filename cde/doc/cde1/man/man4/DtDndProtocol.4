@@ -1,0 +1,285 @@
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994 Novell, Inc.
+.\" *************************************************************************
+.TH DtDndProtocol 4 "17 June 1994"
+.BH "17 June - 1994"
+.SH NAME
+DtDndProtocol \(em drag and drop matching and transfer protocols
+.iX "DtDndProtocol"
+.\"--- 
+.SH DESCRIPTION
+.LP
+The drag and drop protocols provide policy for 
+matching and data transfer between the drag initiator and 
+the drop receiver of file names, selected text spans, and 
+application defined structured data formats.  
+.LP
+The drag and drop protocols use the standard X11 selection targets where available with the addition of several new selection targets where required.
+.LP
+These protocols provide for the transfer of the following types of data:
+.TP 2
+.I \(bu
+File Names
+.TP 2
+.I \(bu
+Selected Text
+.TP 2
+.I \(bu
+Structured Data
+.SH "PROTOCOL OVERVIEW"
+.LP
+Each protocol consists of the following:
+.SS "Drag and Drop API Protocol"
+.LP
+Each protocol described corresponds to a specific DtDndProtocol enumeration.
+.SS "Export/Import Targets"
+.LP
+The Motif drag and drop API provides support for matching of the data 
+transfer protocol between the drag initiator and the various drop receivers. 
+This allows the user to readily determine which drop sites will accept the 
+dragged data.  
+.LP
+The drag initiator sets the 
+.I XmNexportTargets 
+resource of the 
+.I XmDragContext
+to the list of target atoms that describe the data being dragged. 
+The drop receiver sets the 
+.I XmNimportTargets 
+resource of the 
+.I XmDropSite
+to the list of target atoms that describe the data 
+that it will accept. 
+The Motif drag and drop subsystem allows drops when the 
+.I XmNexportTargets 
+and 
+.I XmNimportTargets 
+have at least one target in common.
+.SS "Data Transfer Protocol"
+.LP
+Once the drag initiator has dropped on the drop receiver, the transfer 
+of data is begun. The transfer is accomplished using X selections and 
+is controlled by the drop receiver.
+.LP
+The drop receiver starts all transfers by converting the ICCCM 
+.I TARGETS
+target to get the set of available selection targets. It then chooses 
+the appropriate selections from that set and requests that the drag 
+initiator convert each requested selection. Each protocol has a set 
+of selection targets that are used to transfer all the necessary data. 
+These target conversions are usually initiated by calling 
+.I
+XmDropTransferStart.
+.SS "Move Completion"
+.LP
+When the operation of the drop is 
+.I XmDROP_MOVE
+, the drop receiver must complete the move using an appropriate method. 
+For most data transfers, this is accomplished by converting the ICCCM 
+.I DELETE
+target to tell the drag initiator that it may delete the data. 
+For most file name transfers, this is accomplished via the file system.
+.SH "FILE NAME TRANSFER PROTOCOL"
+The transfer protocol is used to exchange file names. 
+.SS "Drag and Drop API"
+.LP
+The protocol used when a 
+.I DtDndProtocol of 
+.I DtDND_FILENAME_TRANSFER 
+is specified.
+.SS "Export/Import Targets"
+.LP
+The export or import targets are 
+.I FILE_NAME 
+and optionally 
+.I _DT_NET_FILE
+if capable of providing the file name in network canonical form using 
+.I tt_file_netfile()
+and 
+.I tt_netfile_file()
+.
+.SS "Data Transfer Protocol"
+.LP
+If the ICCCM 
+.I HOST_NAME 
+target is available it is converted. If the returned host name is 
+different than the host name for the drop receiver and the 
+.I _DT_NETFILE 
+target is available it is converted. The drag initiator uses 
+.I tt_file_netfile()
+to encode the file names and the drop receiver uses 
+.I tt_netfile_file()
+to decode the file names.
+.LP
+If the hosts are the same for both the drag initiator and the drop receiver 
+or either the 
+.I HOST_NAME or the 
+.I _DT_NETFILE
+targets are not available from the drag initiator, the drop receiver 
+converts the ICCCM 
+.I FILE_NAME 
+target. No encoding of the file names occurs in this case.
+.SS "Move Completion"
+.LP
+Moves of file names can be accomplished atomically using standard file 
+system operations. Drop receivers are encouraged to use the file system. 
+The drop receiver may alternately choose to use the ICCCM 
+.I DELETE 
+target to complete the 
+.I XmDROP_MOVE 
+and the drag initiator must be ready to comply.
+.SH "STRUCTURED DATA FORMAT TRANSFER PROTOCOL"
+The transfer protocol is used to exchange structured data 
+in an application defined format. 
+.SS "Drag and Drop API"
+.LP
+The protocol used when a 
+.I DtDndProtocol
+of 
+.I DtDND_DATA_TRANSFER 
+is specified.
+.SS "Export/Import Targets"
+.LP
+The export and import targets are application defined. 
+These can be any target that describes the format of the data.
+.LP
+To support drop receivers which wish to accept any data format the 
+.I _DT_UNTYPED 
+is used. The drop receiver which wants to accept any data format would 
+include 
+.I _DT_UNTYPED 
+in the import targets along with any other desired targets. 
+The drag initiator always includes the 
+.I _DT_UNTYPED 
+target in its export targets along with format specific targets.
+.SS "Data Transfer Protocol"
+.LP
+The drop receiver would choose the most desired target from the 
+available targets and convert it to get the data being dragged.
+.LP
+If the drop receiver will accept any data formats and the 
+.I _DT_UNTYPED 
+target is available it is converted to get the data in whatever format 
+the drag initiator chooses.
+.LP
+If the 
+.I _DT_DATA_LABEL 
+target is available it is converted to get a label that can 
+be presented to the user.
+.SS "Move Completion"
+.LP
+The move is completed by converting the ICCCM 
+.I DELETE
+target.
+.SH "TEXT TRANSFER PROTOCOL"
+The text transfer protocol is used to exchange text selections. 
+.SS "Drag and Drop API"
+.LP
+The protocol used when a 
+.I DtDndProtocol 
+of 
+.I DtDND_TEXT_TRANSFER 
+is specified.
+.SS "Export/Import Targets"
+.LP
+The export or import targets are any of the following; the target 
+describing the character encoding of the text selection, 
+.I COMPOUND_TEXT
+, 
+.I STRING
+or 
+.I TEXT
+.
+.SS "Data Transfer Protocol"
+.LP
+The transfer of text selections follows the protocols described in the 
+ICCCM manual. If the character encoding of the drag initiator and drop 
+receiver are the same that target should be converted to get the 
+text selection. If the character encoding are different, the drop 
+receiver should attempt to convert the standard text targets in the 
+following order; 
+.I COMPOUND_TEXT
+, 
+.I STRING
+or 
+.I TEXT
+.SS "Move Completion"
+.LP
+The move is completed by converting the ICCCM DELETE target.
+.SH "SELECTION TARGETS"
+The following table describes the selection targets used in the 
+drag and drop data matching and transfer protocols.
+.TP 15
+.I Atom (Type)
+Description
+.TP 15
+.I TARGETS (ATOM)
+A list of valid target atoms. 
+See ICCCM section 2.6.2.
+.TP 15
+.I DELETE (NULL)
+Used to delete the dropped data. If the drop receiver wishes to perform 
+a move operation on the data, after copying the data it should 
+request conversion of the DELETE target. 
+See ICCCM section 2.6.3.1.
+.TP 15
+.I COMPOUND_TEXT (COMPOUND_TEXT)
+The text selection in compound text format. 
+See ICCCM section 2.7.1.
+.TP 15
+.I STRING (STRING)
+The text selection in ISO Latin-1 format. 
+See ICCCM section 2.7.1.
+.TP 15
+.I TEXT (TEXT)
+The text selection in the format preferred by the selection holder. 
+See ICCCM section 2.7.1.
+.TP 15
+.I HOST_NAME (TEXT)
+The name of the machine running the client as seen from the 
+machine running the server. 
+See ICCCM section 2.6.2.
+.TP 15
+.I FILE_NAME (TEXT)
+The full path name of the files. 
+See ICCCM section 2.6.2.
+.TP 15
+.I _DT_NETFILE (TEXT)
+The full path name of the files, each encoded using 
+.I tt_file_netfile() 
+and decoded using 
+.I tt_netfile_file()
+.
+.TP 15
+.I _DT_UNTYPED (TEXT)
+The data in the owner's choice of formats. 
+This provides the polymorphism of the TEXT target for data that is not text.
+.TP 15
+.I _DT_DATA_LABEL (TEXT)
+The label or name of the data suitable for presentation to the user.
+.\"----------------------------------------------------------------------------
+.SH "SEE ALSO"
+.BR DtDndDragStart (3),
+.BR DtDndVaDragStart (3),
+.BR DtDndVaDropRegister (3),
+.BR DtDndDropUnregister (3),
+.BR XmDragContext (3),
+.BR XmDragStart (3),
+.BR XmDropRegister (3),
+.BR XmDropSite (3),
+.BR DtDropTransferStart (3),
+.BR tt_file_netfile (3),
+.BR tt_netfile_file (3),
+.BR "X11/R5 Inter-Client Communications Conventions Manual (ICCCM)"
+.SH COPYRIGHT
+.LP
+(c) Copyright 1994 Hewlett-Packard Company
+.br
+(c) Copyright 1994 International Business Machines Corp.
+.br
+(c) Copyright 1994 Sun Microsystems, Inc.
+.br
+(c) Copyright 1994 Unix Systems Labs, Inc., a susidiary of Novell, Inc.

@@ -1,0 +1,359 @@
+XCOMM
+XCOMM	RESTRICTED CONFIDENTIAL INFORMATION:
+XCOMM	
+XCOMM	The information in this document is subject to special
+XCOMM	restrictions in a confidential disclosure agreement between
+XCOMM	HP, IBM, Sun, USL, SCO and Univel.  Do not distribute this
+XCOMM	document outside HP, IBM, Sun, USL, SCO, or Univel without
+XCOMM	Sun's specific written approval.  This documment and all copies
+XCOMM	and derivative works thereof must be returned or destroyed at
+XCOMM	Sun's request.
+XCOMM
+XCOMM	Copyright 1993, 1994, 1995 Sun Microsystems, Inc.  All rights reserved.
+XCOMM
+XCOMM	@(#)Imakefile	1.105 04/17/97
+XCOMM
+
+/*
+ * I turned this off so that it would stop trying to rebuild imake.
+ * Imake is another component, let them build it.
+ */
+#undef  ImakeDependency
+#define ImakeDependency()	/**/
+
+PROGRAMS	=	dtmail
+
+#ifdef SunArchitecture
+DEPLIBS		=	$(DEPTTLIB) $(DEPDTSVCLIB) $(DEPTTLIB)\
+			$(DEPDTWIDGETLIB) $(DEPXMLIB) $(DEPXTOOLLIB) \
+			$(DEPXLIB) ../MotifApp/libMotifApp.a
+#else
+DEPLIBS		=	$(DEPDTHELPLIB) $(DEPTTLIB) $(DEPDTSVCLIB) $(DEPTTLIB)\
+			$(DEPDTWIDGETLIB) $(DEPXMLIB) $(DEPXTOOLLIB) \
+			$(DEPXLIB) ../MotifApp/libMotifApp.a
+#endif /* SunArcihitecture */
+
+INSTALLFLAGS	=	$(INSTINCFLAGS)
+
+
+LINKCC		=	$(C++) -ptr@WorkAround@ -ptr.
+
+INCLUDES	=	-I. -I../include -I../include/MotifApp \
+			-I../include/utils
+
+
+DEFINES		=	\
+			-DRELEASE_NOTES \
+			-DDTMAIL_TOOLTALK \
+			-DDTEDITOR 
+
+#ifdef RsArchitecture
+#undef DTMAILLIB
+MOTIFAPPLIB	=	../MotifApp/libMotifApp.a
+CCLIENTLIB	=	
+#else
+MOTIFAPPLIB	=	-L../MotifApp -lMotifApp
+SDTMAILLIB	=	-L/usr/dt/lib -lSDtMail
+#if OSMajorVersion > 5 || (OSMajorVersion == 5 && OSMinorVersion > 5)
+CCLIENTLIB	=	-lc-client -lnsl -lsocket
+#else
+CCLIENTLIB	=	-lc-client -lnsl -lsocket $(I18NSYSLIB)
+#endif
+LCLLIB		=	-llcl
+#undef DTMAILLIB
+#endif
+
+
+#ifdef SunArchitecture
+LOCAL_LIBRARIES =	$(MOTIFAPPLIB) $(SDTMAILLIB) $(CCLIENTLIB) \
+			$(DTSVCLIB) $(TTLIB) $(LCLLIB) \
+			$(DTWIDGETLIB) $(XMLIB) $(XTOOLLIB) $(XLIB)
+#else
+LOCAL_LIBRARIES =	$(MOTIFAPPLIB) $(SDTMAILLIB) $(CCLIENTLIB) \
+			$(DTHELPLIB) $(DTSVCLIB) $(LCLLIB) \
+			$(DTWIDGETLIB) $(XMLIB) $(XTOOLLIB) $(XLIB)
+#endif /* SunArchitecture */
+
+#ifdef RsArchitecture
+EXTRA_DEFINES = -DIBM_MOTIF -DBIG_ENDIAN -DAIX -DI_HAVE_NO_BOOL \
+		-DSTRCASECMP_NOT_DEFINED
+NONSHAREDLIBCOBJ = nonsharelibC.o
+#endif
+
+#ifdef HPArchitecture
+EXTRA_DEFINES	=	-DHPUX -DBIG_ENDIAN -DI_HAVE_NO_IDENT \
+			-DI_HAVE_NO_BOOL -DNEED_MMAP_WRAPPER
+#endif
+
+#ifdef SunArchitecture
+
+#if !defined(i386) && !defined(__ppc)
+ENDIAN		=	-DBIG_ENDIAN
+#endif
+
+#ifndef SUNPRODIR
+SUNPRO_DIR	=	/opt/SUNWspro
+#else
+SUNPRO_DIR	=	SUNPRODIR
+#endif
+
+C++LIBPATH	=	-L$(SUNPRO_DIR)/lib
+
+#ifdef USE_SPRO_V3
+SPRO_V3_OPTIONS =      -noex -USPRO_V2
+#ifdef DEBUGTREE
+SPRO_V3_OPTIONS +=	-xsb
+#endif	/* DEBUGTREE */
+#else
+EXTRA_CCOPTIONS	+=	-DSPRO_V2
+#endif  /* USE_SPRO_V3 */
+
+#ifndef NoLargeFiles
+#define NoLargeFiles
+#endif
+
+#if OSMajorVersion > 5 || (OSMajorVersion == 5 && OSMinorVersion > 5)
+EXTRA_DEFINES	=	$(ENDIAN) -DSunOS=$(OSMAJORVERSION)$(OSMINORVERSION) -D_REENTRANT NoLargeFiles
+#else
+EXTRA_DEFINES	=	$(ENDIAN) -DSunOS=$(OSMAJORVERSION)$(OSMINORVERSION)
+#endif
+
+#if REORDER_PROFILED
+EXTRA_C++OPTIONS =	-xF +w $(SPRO_V3_OPTIONS)
+EXTRA_CCOPTIONS =	-xF -xstrconst -Xa -v
+LOCAL_LDFLAGS   =       -L/usr/dt/lib -lmcount
+CC              =       cc -xpg $(BBAFLAGS)
+C++             =       CC -pg $(BBAFLAGS)
+#else
+EXTRA_C++OPTIONS =	-xF +w $(SPRO_V3_OPTIONS)
+EXTRA_CCOPTIONS =	-xF -xstrconst -Xa -v
+
+#if OSMajorVersion > 5 || (OSMajorVersion == 5 && OSMinorVersion > 5)
+LOCAL_LDFLAGS   =       -mt -Qoption ld -M,mapfile.reorder,-i
+#else
+LOCAL_LDFLAGS   =       -Qoption ld -M,mapfile.reorder,-i
+#endif
+
+#endif
+
+MT_LIBS		=	$(C++_LIB) $(WIDECHARSYSLIB)
+
+#ifdef __ppc
+/* LINKCC is no longer set to cc, now using CC. */
+/* Since LINKCC is cc ... so "-lC" is specified ... AND "-i" specified
+ * to ignore "LD_LIBRARY_PATH", need path here unless libC path is
+ * specified in "sun.cf" or linked to "/usr/lib".
+ */
+SYS_LIBRARIES	=	 $(MT_LIBS) $(C++LIBPATH) -ldl -lC 
+#else
+SYS_LIBRARIES	=	 $(MT_LIBS) -ldl -lC 
+#endif
+
+.KEEP_STATE:
+.PARALLEL:
+#endif /* SunArchitecture */
+
+#ifdef USLArchitecture
+SYS_LIBRARIES	=	-lgen -lresolv $(I18NSYSLIB) -lnsl -lm
+#endif
+
+#ifdef AlphaArchitecture
+EXTRA_DEFINES	=	-DI_HAVE_NO_IDENT -DNEED_MMAP_WRAPPER
+SYS_LIBRARIES	=	-ltt -lm -lcxx -lc
+#endif /* AlphaArchitecture */
+
+HEADERS 	= \
+			AttachArea.h \
+			Attachment.h \
+                        Dialog.h \
+                        DialogShell.h \
+                        DialogWindow.h \
+                        DraftDialog.h \
+                        FindDialog.h \
+                        Fonts.h \
+			Icon.h \
+                        NoOpCmd.h \
+                        PasswordDialogManager.h \
+                        RoamApp.h \
+                        RoamCmds.h \
+                        RoamMenuWindow.h \
+                        SendMsgDialog.h \
+			Sort.hh \
+			SortCmd.hh \
+                        TemplateDialog.h \
+                        ViewMsgDialog.h \
+			Views.h
+
+HEADERS_HH 	= \
+			DtEditor.hh \
+			DtMailDialogCallbackData.hh \
+			DtMailEditor.hh \
+			DtMailHelp.hh \
+			DtMailTypes.hh \
+                        DtMailWDM.hh \
+			DtVirtArray.hh \
+                        Editor.hh \
+                        MailBox.hh \
+			MailConnection.hh \
+                        MailSession.hh \
+                        MsgHndArray.hh \
+                        MsgScrollingList.hh \
+                        RoamInterruptibleCmd.hh \
+                        SpellCheckerHelp.hh \
+			Threads.hh \
+                        Undelete.hh \
+                        XmStrCollector.h \
+                        XtArgCollector.h
+
+ 
+SRCS 		= \
+			AliasListUiItem.C \
+			AlternatesListUiItem.C \
+			AntiCheckBoxUiItem.C \
+			AttachArea.C \
+			Attachment.C \
+			CheckBoxUiItem.C \
+			ComposeCmds.C \
+			CustomListUiItem.C \
+			DateFieldUiItem.C \
+                        Dialog.C \
+                        DialogShell.C \
+                        DraftDialog.C \
+			dtb_utils.C \
+			dtmailopts.C \
+			DtEditor.C \
+                        DtMailGenDialog.C \
+			DtMailEditor.C \
+                        DtMailWDM.C \
+			DtVirtArray.C \
+                        Editor.C\
+                        FileBoxUiItem.C \
+                        FindDialog.C \
+                        Fonts.C \
+			Icon.C \
+			IgnoreListUiItem.C \
+			ListUiItem.C \
+			MailConnection.C \
+			MailRcSource.C \
+                        MailSession.C \
+			MoveMenuListUiItem.C \
+                        MsgHndArray.C \
+                        MsgScrollingList.C \
+                        NoOpCmd.C \
+			options_util.C \
+			options_ui.C \
+			options_stubs.C \
+			OptCmd.C \
+                        PasswordDialogManager.C \
+			PropUi.C \
+			RadioBoxUiItem.C \
+                        RoamApp.C \
+                        RoamCmds.C \
+                        RoamInterruptibleCmd.C \
+                        RoamMenuWindow.C \
+                        ScaleUiItem.C \
+                        SendMsgDialog.C \
+			Sort.C \
+			SortCmd.C \
+			SpinBoxUiItem.C \
+			StringTab.c \
+			TemplateListUiItem.C \
+			TemplateDialog.C \
+			TextFieldUiItem.C \
+			Threads.C \
+			ToolbarConfig.C \
+			ToolbarListUiItem.C \
+                        Undelete.C \
+                        ViewMsgDialog.C \
+			Views.C \
+			WMSaveSession.C	\
+                        XmStrCollector.C \
+                        XtArgCollector.C 
+
+OBJS 		= \
+			$(NONSHAREDLIBCOBJ) \
+			AliasListUiItem.o \
+			AlternatesListUiItem.o \
+			AntiCheckBoxUiItem.o \
+			AttachArea.o \
+			Attachment.o \
+			CheckBoxUiItem.o \
+			ComposeCmds.o \
+			CustomListUiItem.o \
+			DateFieldUiItem.o \
+                        Dialog.o \
+                        DialogShell.o \
+			DraftDialog.o \
+			dtb_utils.o \
+			dtmailopts.o \
+			DtEditor.o \
+                        DtMailGenDialog.o \
+			DtMailEditor.o \
+                        DtMailWDM.o \
+			DtVirtArray.o \
+                        Editor.o \
+			FileBoxUiItem.o \
+                        FindDialog.o \
+                        Fonts.o \
+			Icon.o \
+			IgnoreListUiItem.o \
+			ListUiItem.o \
+			MailConnection.o \
+			MailRcSource.o \
+                        MailSession.o \
+			MoveMenuListUiItem.o \
+                        MsgHndArray.o \
+                        MsgScrollingList.o \
+                        NoOpCmd.o \
+			options_util.o \
+			options_ui.o \
+			options_stubs.o \
+			OptCmd.o \
+                        PasswordDialogManager.o \
+			PropUi.o \
+			RadioBoxUiItem.o \
+                        RoamApp.o \
+                        RoamCmds.o \
+                        RoamInterruptibleCmd.o \
+                        RoamMenuWindow.o \
+			ScaleUiItem.o \
+                        SendMsgDialog.o \
+			Sort.o \
+			SortCmd.o \
+			SpinBoxUiItem.o \
+			StringTab.o \
+			TemplateListUiItem.o \
+			TemplateDialog.o \
+			TextFieldUiItem.o \
+			Threads.o \
+			ToolbarConfig.o \
+			ToolbarListUiItem.o \
+                        Undelete.o \
+                        ViewMsgDialog.o \
+			Views.o \
+			WMSaveSession.o	\
+                        XmStrCollector.o \
+                        XtArgCollector.o
+
+NormalLibraryObjectRule()
+
+ComplexProgramTarget(dtmail)
+
+clean::
+	$(RM) -r Templates.DB
+
+#ifdef __ppc
+/* TEMP ONLY:  reset debug to (-g) to avoid CC crash on (-g0). */
+AttachArea.o:
+      $(RM) $@
+      $(C++) -c $(C++FLAGS) -g $(_NOOP_) AttachArea.C
+
+SendMsgDialog.o:
+      $(RM) $@
+      $(C++) -c $(C++FLAGS) -g $(_NOOP_) SendMsgDialog.C
+
+RoamApp.o:
+      $(RM) $@
+      $(C++) -c $(C++FLAGS) -g $(_NOOP_) RoamApp.C
+#endif
+

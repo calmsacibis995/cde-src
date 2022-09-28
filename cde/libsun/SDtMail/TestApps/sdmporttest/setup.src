@@ -1,0 +1,20 @@
+/* @(#)setup.src	1.1 96/07/24 SMI */
+
+#ifdef IMAP
+token set token1 servicetype imap
+token set token1 serviceoption hostname kontiki
+token set token1 serviceoption username imaptest
+token set token1 serviceoption password imaptestpassword
+#else
+token set token1 servicetype local
+#endif /* IMAP */
+
+token set token1 serviceclass messagestore
+token set token1 servicechannel cclient
+token set token1 serviceoption debug true
+
+#define ANNOUNCE(MESSAGE, OUTPUTFILE) \
+! /usr/bin/sh -c "printf \"MESSAGE:\t\" >> OUTPUTFILE "
+
+#define VERIFY_SUM(SUM, INPUTFILE, OUTPUTFILE) \
+! /usr/bin/sh -c "if [ \"`sum /tmp/sdm.out`\" = \"SUM /tmp/sdm.out\" ] ; then echo PASS ; else echo FAIL ; fi >> OUTPUTFILE"

@@ -1,0 +1,73 @@
+#
+# @(#)Makefile.imagetool	1.30 96/03/08
+# Copyright (c) 1996 by Sun Microsystems, Inc.
+#
+# ImageTool Makefile
+#
+
+SOURCES.c	= ce.c deskset.c display.c dither.c dragdrop.c fileui.c gif.c gifcompr.c \
+		  gifencod.c help.c image.c imageinfoui.c imagetool.c imagetool_dps.c \
+		  jfif.c menus.c misc.c open.c pageviewui.c paletteui.c photocd.c ppm.c \
+		  popup.c print.c print_prev.c printprevui.c printui.c props.c \
+		  propsui.c ps.c ps_optionsui.c rast.c save.c select.c session.c \
+		  state.c tiff.c tt.c ui_imagetool.c xpm.c xv.c DrawingAVis.c \
+		  snap_dlog_stubs.c snap_dlog_ui.c dtb_utils.c multivis.c \
+		  imagesnap_proj.c 
+
+SOURCES.h	= display.h help.h image.h imagetool.h misc.h \
+	          popup.h ppm.h props.h session.h state.h tags.h tt.h \
+	          ui_imagetool.h DrawingAVis.h DrawingAVisP.h \
+		  snap_dlog_ui.h dtb_utils.h multivis.h
+
+SOURCES.icon    = degrees.xbm pan_cursor.xbm pan_cursor_mask.xbm
+SOURCES.ad      = Sdtimage.ad
+SOURCES.msg     = SUNW_SDTIMAGE.msg
+
+#SOURCES.man	= imagetool.1
+#SOURCES.types	= imagetool.ptype
+SOURCES.info	= 
+SOURCES.psw	= imagetool.psw
+SOURCES.action  = sdtimage.dt
+PROGRAM		= sdtimage
+PROJECTDIR	= .
+STRIPCMD        = $(STRIPME:stripit=strip -x $@)
+
+MANSECT   	= 1
+
+XILHOME:sh	= echo ${XILHOME:-/opt/SUNWits/Graphics-sw/xil}
+
+default:	all
+
+include ${PROJECTDIR}/Makefile.master
+
+#
+# CDE internal includes, XIL includes and X11 includes
+#
+DTINCLUDESRC 	= $(TOP)/binstall/include
+CPPFLAGS       += -I$(DTINCLUDESRC) -I$(XILHOME)/include
+CPPFLAGS       += -I$(OPENWINHOME)/include/X11 
+
+#
+# Link Libraries
+#
+LDFLAGS        += -L$(OPENWINHOME)/lib
+LDLIBS         += -ltt -ltiff -ldga -ldps -lm 
+
+#
+# For our nightly builds, and for testing, you can set the environment
+# variable ADD_RUN_PATH to be another library to be *pre-pended* to
+# -R/usr/openwin/lib.  This variable *must* end in a ":" for the
+# concatenation to work properly.  Kludge.
+#
+# Add the xil library to the LD_RUN_PATH.
+#   Have to include the other paths from Makefile.master.new. 
+#
+LDFLAGS         += -R$(ADD_RUN_PATH)/usr/openwin/lib:/opt/SUNWits/Graphics-sw/xil/lib
+
+all:	$(PROGRAM)
+
+clean:	master_clean
+
+.KEEP_STATE:
+
+.INIT:	$(SOURCES.action) $(SOURCES.icon) $(SOURCES.ad) $(SOURCES.msg)

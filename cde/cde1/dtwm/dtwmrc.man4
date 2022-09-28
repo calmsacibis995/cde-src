@@ -1,0 +1,1182 @@
+.\"$Header: dtwmrc.man4,v 1.8 93/08/13 13:57:46 xbuild Exp $
+.\"
+.\"   Initialization code
+.\"
+.de EX                \"Begin example
+.ne 5
+.if n .sp 1
+.if t .sp .5
+.nf
+.in +.5i
+..
+.de EE
+.fi
+.in -.5i
+.if n .sp 1
+.if t .sp .5
+..
+.\"(c)1987,1988,1989,1990,1992 Hewlett-Packard Company\
+.\"(c)1989,1990,1991,1992 Open Software Foundation\
+.\"All Rights Reserved
+..
+.TH DTWMRC 4X
+.ds )H Hewlett-Packard Company
+.ds ]W HP DT 3.0 (7/92)
+.ds Rc Resource Description File
+.ds rC resource description file
+.SH NAME
+ dtwmrc - The HP DT Workspace Manager \*(Rc.
+.sp 1
+.SH DESCRIPTION
+.sp 1
+The \fIdtwm \*(rC\fR is a supplementary resource file
+that controls much of the operation of the 
+HP Visual User Environment Window Manager (\fIdtwm\fP).
+It contains descriptions of resources that are to be used by dtwm,
+and that cannot be easily written using standard X Window System,
+Version 11 resource syntax:
+.RS
+.TS
+tab(;);
+l l .
+;\fBDtwm*\fIresource_id\fR
+.TE
+.RE
+.P
+The \*(rC
+contains entries that are cross-referenced by entries in 
+the 
+resource defaults files (for
+example, \fB/usr/dt/app-defaults/Dtwm\fR).
+For example, the \*(rC enables you to specify different
+types of window menus; on the other hand,
+the default resource file enables you to
+specify \fIwhich\fR of these window menus the manager should
+use for
+a particular window.
+.P
+The specifications of the \*(rC supported by the HP DT
+workspace manager are a strict superset of the
+specifications supported by
+the HP/OSF Motif Window Manager (\fBmwm 1.0\fR).  In other
+words, the \fB/usr/lib/X11/system.mwmrc\fR or \fB$HOME/.mwmrc\fR
+file that you've used for \fBmwm\fR is immediately
+usable by \fBdtwm\fR:
+Simply open the \fBdtwm\fR
+\*(rC with a text
+editor (make a copy first!), then cut and paste 
+specifications from your current \fB.mwmrc\fR 
+file into it.  When you restart the workspace manager,
+your menu, key, and button definitions take
+immediate effect.
+.P
+.SS Location
+The workspace manager searches for one of the following 
+\fI\*(rCs\fR, where $LANG is the value
+of the language environment on a per-user basis:
+.sp 1
+.B $HOME/.dt/$LANG/dtwmrc
+.sp 1
+.B $HOME/.dt/dtwmrc
+.sp 1
+.B /usr/dt/config/$LANG/sys.dtwmrc
+.sp 1
+.B /usr/dt/config/sys.dtwmrc
+.P
+The first file found is the first used.
+.P
+If none is found, then a set of \fIbuilt-in\fR specifications
+is used.  
+.P
+A particular \fI\*(rC\fR
+can be selected using the \fBconfigFile\fR resource.
+.P
+The following shows how a different \*(rC can
+be specified from the command line:
+.P
+.RS
+.TS
+tab(;);
+l l .
+;\fB/usr/dt/bin/dtwm -xrm "Dtwm*configFile: mydtwmrc"\fP
+.TE
+.RE
+.SS "Resource Types"
+.sp 1
+The following types of resources can be described in the \fIdtwm
+\*(rC\fP:
+.TP 15
+.B Buttons
+Workspace manager functions can be bound (associated) with button events.
+.TP 15
+.B Keys
+Workspace manager functions can be bound (associated) with key press events.
+.TP 15
+.B Menus
+Menu panes can be used for the window menu and other menus posted
+with key bindings and button bindings.
+.TP 15
+.B Front Panel
+The dtwm front panel can be configured for a custom content or layout.
+.sp 1
+.SH "\fBDTWM RESOURCE DESCRIPTION FILE SYNTAX\fP"
+The \fIdtwm \*(rC\fP
+is a standard text file that contains items
+of information separated by blanks, tabs, and new lines characters.
+Blank lines are ignored.
+Items or characters can be quoted to avoid special interpretation
+(e.g., the comment character can be quoted to prevent it from being
+interpreted as the comment character).
+A quoted item can be contained in double quotes (\fB"\fP).
+.P
+Single characters can be quoted by preceding them by the back-slash
+character (\fB\\\fP), except for workspace names, which
+may contain no back-slash characters.
+.P
+All text from an unquoted \fB#\fP to the end of the line is regarded 
+as a comment and is not interpreted as part of a resource description.
+If \fB!\fP is the first character in a line, the line is regarded as a comment.
+.SS "Workspace Manager Functions"
+Workspace manager functions can be accessed with button and key bindings, and
+with workspace manager menus.
+Functions are indicated as part of the specifications for button and key
+binding sets, and menu panes.
+The function specification has the following syntax:
+
+.TS
+tab(~), center;
+ll.
+\fIfunction\fP =~\fIfunction_name\fP [\fIfunction_args\fP]
+\fIfunction_name\fP =~\fIworkspace manager function\fP
+\fIfunction_args\fP =~{\fIquoted_item\fB | \fIunquoted_item\fR}
+.TE
+
+The following functions are supported.
+If a function is specified that isn't one of the supported functions then it
+is interpreted by dtwm as \fIf.nop\fP.
+.sp 1
+.RS
+.IP \fBf.action\fP
+This function causes the specified \fIaction\fR to be invoked
+by means of the message server.
+.IP \fBf.beep\fP
+This function causes a beep.
+.IP "\fBf.circle_down\fP [\fBicon | window\fP]"
+This function causes the window or icon that is on the top of the window
+stack to be put on the bottom of the window stack (so that it is no
+longer obscuring any other window or icon).
+This function affects only those windows and icons
+that are obscuring other windows and icons,
+or that are obscured by other windows and icons.
+Secondary windows (i.e. transient windows) are restacked with their
+associated primary window.
+Secondary windows always stay on top of the associated primary window and
+there can be no other primary windows between the secondary windows and
+their primary window.  If an \fBicon\fP function argument is specified, then
+the function applies only to icons.
+If a \fBwindow\fP function argument is specified then the function applies
+only to windows.
+.IP "\fBf.circle_up\fP [\fBicon | window\fP]"
+This function raises the window or icon on the bottom of the window stack
+(so that it is not obscured by any other windows).
+This function affects only those windows and icons
+that are obscuring other windows and icons,
+or that are obscured by other windows and icons.
+Secondary windows (i.e. transient windows) are restacked with their
+associated primary window.
+If an \fIicon\fP function argument is specified then the
+function applies only to icons.
+If an \fIwindow\fP function argument is specified then the function applies
+only to windows.
+.IP "\fBf.exec\fP or \fB!\fP"
+This function causes \fIcommand\fP to be executed (using the
+value of the \fI$SHELL\fP environment variable if it is set,
+otherwise \fI/bin/sh\fP).
+The \fB!\fP notation can be used in place of the \fBf.exec\fP function
+name.
+.IP "\fBf.focus_color\fP"
+This function sets the colormap focus to a client window.
+If this function is done in a root context, then the default colormap
+(setup by the \fIX Window System\fP for the screen where dtwm is running)
+is installed and there is no specific client window colormap focus.
+This function is treated as \fIf.nop\fP if \fIcolormapFocusPolicy\fP is not
+explicit.
+.IP "\fBf.focus_key\fP"
+This function sets the keyboard input focus to a client window or icon.
+This function is treated as \fIf.nop\fP if \fIkeyboardFocusPolicy\fP is not
+explicit or the function is executed in a root context.
+.IP "\fBf.goto_workspace\fP"
+This function causes the workspace manager to switch to the
+specified \fIworkspace\fR.  If no workspace exists by the specified
+name, then no action occurs.
+.IP "\fBf.help\fP [\fItopic\fR [\fIvolume\fR]]"
+This function displays help on the
+specified \fItopic\fR and \fIvolume\fR.  If no \fIvolume\fR is given,
+then the workspace manager \fIvolume\fR is assumed. If no \fItopic\fR 
+is given, then help on the front panel is shown.
+.IP "\fBf.help_mode\fP"
+This function causes the workspace manager to enter into help mode. 
+In help mode, the pointer changes shape to indicate that the window
+manager is waiting for you to select a front panel control. Any help
+defined for the control is then shown in a help window.
+.IP "\fBf.kill\fP"
+If the WM_DELETE_WINDOW protocol is set up, the client is sent a
+client message event indicating that the client window should be deleted.
+If the WM_SAVE_YOURSELF protocol is set up and the WM_DELETE_WINDOW
+protocol is not set up, the client is sent a
+client message event indicating that the client needs to prepare to be
+terminated.
+If the client does not have the WM_DELETE_WINDOW or WM_SAVE_YOURSELF
+protocol set up,
+this function causes a client's X connection to be terminated
+(usually resulting in termination of the client).
+Refer to the description of the \fIquitTimeout\fP resource and the
+\fIWM_PROTOCOLS\fP property.
+.IP "\fBf.lower\fP [\fB-\fIclient\fR]"
+This function lowers a client window to the bottom of the window stack
+(where it obscures no other window).
+Secondary windows (i.e. transient windows) are restacked with their
+associated primary window.
+The \fIclient\fP argument indicates the name or class of a client to
+lower.
+If the \fIclient\fP argument is not specified then the context that the
+function was invoked in indicates the window or icon to lower.
+.IP "\fBf.maximize\fP"
+This function causes a client window to be displayed with its maximum
+size.
+.IP "\fBf.menu\fP"
+This function associates a cascading (pull-right) menu 
+with a menu pane entry or a menu with a button or key binding.
+The \fImenu_name\fP function argument identifies the menu to be used.
+.IP "\fBf.minimize\fP"
+This function causes a client window to be minimized (iconified).
+When a window is minimized with no icon box in use, and if the
+\fBlowerOnIconify\fP resource has the value True (the default), the icon is
+placed on the bottom of the window
+stack (such that it obscures no other window).  If an icon box is used,
+then the client's icon changes to its iconified form inside the icon box.
+Secondary windows (i.e. transient windows) are minimized with their
+associated primary window.
+There is only one icon for a primary window and all its secondary windows.
+.IP "\fBf.move\fP"
+This function allows a client window or icon to be moved interactively.
+.IP "\fBf.next_cmap\fP"
+This function installs the next colormap in the list of colormaps for
+the window with the colormap focus.
+.IP "\fBf.next_key\fP [\fBicon | window | transient\fP]"
+This function sets the keyboard input focus to the next window/icon in the set
+of windows/icons managed by the workspace manager 
+(the ordering of this set is based on the stacking of windows on the screen).
+This function is treated as \fIf.nop\fP if \fIkeyboardFocusPolicy\fP is not
+explicit.
+The keyboard input focus is only moved to windows that do not have an
+associated secondary window that is application modal.
+If the \fBtransient\fP argument is specified, then transient (secondary)
+windows are traversed (otherwise, if only \fBwindow\fP is specified,
+traversal is done only to the last focused window in a transient
+group).
+If an \fBicon\fP function argument is specified, then the
+function applies only to icons.
+If a \fBwindow\fP function argument is specified, then the function applies
+only to windows.
+.IP "\fBf.next_workspace\fP"
+This function causes the workspace manager to switch to
+the next workspace.  If you're viewing
+the last workspace, the switch
+occurs to the first workspace.
+.IP "\fBf.nop\fP"
+This function does nothing.
+.IP "\fBf.normalize\fP"
+This function causes a client window to be displayed with its normal size.
+Secondary windows (i.e. transient windows) are placed in their normal state
+along with their associated primary window. 
+.IP "\fBf.normalize_and_raise\fP"
+This function causes a client window to be displayed with its normal size and raised to the top of the window stack.
+Secondary windows (i.e. transient windows) are placed in their normal state
+along with their associated primary window. 
+.IP "\fBf.occupy_all\fP"
+This function causes the associated window to be placed in
+all workspaces.
+.IP "\fBf.pack_icons\fP"
+This function is used to relayout icons 
+(based on the layout policy being used)
+on the root window or in the icon box.
+In general this causes icons to be "packed" into the icon grid.
+.IP "\fBf.pass_keys\fP"
+This function is used to enable/disable (toggle) processing of key bindings
+for workspace manager functions.  When it disables key binding processing all
+keys are passed on to the window with
+the keyboard input focus and no workspace manager functions are invoked.
+If the \fIf.pass_keys\fP function is invoked with a key binding to
+disable key binding processing the
+same key binding can be used to enable key binding processing. 
+.IP "\fBf.post_wmenu\fP"
+This function is used to post the window menu.  If a key is used to post
+the window menu and a window menu button is present, the window menu is
+automatically
+placed with its top-left corner at the bottom-left corner of the
+window menu button for the client window.  If no window menu button is
+present,  the window menu is placed
+at the top-left corner of the client window.
+.IP "\fBf.prev_cmap\fP"
+This function installs the previous colormap in the list of colormaps for
+the window with the colormap focus.
+.IP "\fBf.prev_key\fP [\fBicon | window | transient\fP]"
+This function sets the keyboard input focus to the previous window/icon in
+the set of windows/icons managed by the workspace manager 
+(the ordering of this set is based on the stacking of windows on the screen).
+This function is treated as \fIf.nop\fP if \fIkeyboardFocusPolicy\fP is not
+explicit.
+The keyboard input focus is only moved to windows that do not have an
+associated secondary window that is application modal.
+If the \fItransient\fP argument is specified, then transient (secondary)
+windows are traversed (otherwise, if only \fIwindow\fP is specified,
+traversal is done only to the last focused window in a transient
+group).
+If an \fIicon\fP function argument is specified then the
+function applies only to icons.
+If an \fIwindow\fP function argument is specified then the function applies
+only to windows.
+.IP "\fBf.prev_workspace\fP"
+This function causes the workspace manager to switch to
+the previous workspace.  If you're viewing
+the first workspace, the switch
+occurs to the last workspace.
+.IP "\fBf.quit_dtwm\fP"
+This function terminates dtwm (but NOT the X window system).
+.IP "\fBf.raise\fP [\fB-\fIclient\fR]"
+This function raises a client window to the top of the window stack
+(where it is obscured by no other window).  Secondary windows (i.e.
+transient windows) are restacked with their 
+associated primary window.
+The \fIclient\fP argument indicates the name or class of a client to
+raise.
+If the \fIclient\fP argument is not specified then the context that
+the function was invoked in indicates the window or icon to raise.
+.IP "\fBf.raise_lower\fP"
+This function raises a client window to the top of the window stack if
+it is partially obscured by another window, otherwise it lowers the window
+to the bottom of the window stack.
+Secondary windows (i.e. transient windows) are restacked with their
+associated primary window.
+.IP "\fBf.refresh\fP"
+This function causes all windows to be redrawn.
+.IP "\fBf.refresh_win\fP"
+This function causes a client window to be redrawn.
+.IP "\fBf.remove\fP"
+This function causes a client window to be removed from the
+current workspace.  If the client window exists only 
+in this workspace, no action occurs.
+.IP "\fBf.resize\fP"
+This function allows a client window to be interactively resized.
+.IP "\fBf.restart\fP"
+This function causes dtwm to be restarted (effectively terminated
+and re-executed).
+.IP "\fBf.send_msg\fI message_number\fR"
+This function sends a client message of the type _MOTIF_WM_MESSAGES with the
+\fImessage_type\fP indicated by the \fImessage_number\fR function argument.
+The
+client message is sent if \fImessage_number\fR is included in the
+client's _MOTIF_WM_MESSAGES property.  A menu item label is grayed out if
+the menu item is used to do \fIf.send_msg\fR of a message that is not
+included in the client's _MOTIF_WM_MESSAGES property.  
+.IP "\fBf.separator\fP"
+This function causes a menu separator to be put in the menu pane at the
+specified location (the label is ignored).
+.IP "\fBf.set_behavior\fP"
+This function causes the workspace manager to restart with the default 
+behavior (if a custom behavior is configured) or a custom behavior (if a 
+default behavior is configured).
+.IP "\fBf.title\fP"
+This function inserts a title in the menu pane at the specified location.
+.IP "\fBf.toggle_frontpanel\fP"
+This function causes the front panel component of the workspace
+manager to be minimized or, alternately, normalized.
+.IP "\fBf.version\fP"
+This function causes the workspace manager to display its
+release version in a dialog box.
+.IP "\fBf.workspace_presence\fP"
+This function posts the workspace presence dialog box. This allows you
+to view and set the workspace in which a particular window resides. The
+root context is disallowed for this function.
+.IP "\fBf.workspace_rename\fP"
+This function posts the workspace rename dialog box. This allows you
+to rename the current workspace.
+.P
+Each function may be constrained as to which resource types can specify 
+the function (e.g., menu pane) and also what context the function can
+be used in (e.g., the function is done to the selected client window).
+Function contexts are
+.P
+
+.TP 15
+.B root
+No client window or icon has been selected as an object for
+the function.
+.TP 15
+.B window
+A client window has been selected as an object for the function.
+This includes the window's title bar and frame.
+Some functions are applied only when the window is
+in its normalized state (e.g., f.maximize) or its maximized state
+(e.g., f.normalize).
+.TP 15
+.B icon
+An icon has been selected as an object for the function.
+.P
+If a function is specified in a type of resource where it is not supported
+or is invoked in a context that does not apply
+then the function is treated as \fIf.nop\fP.
+The following table indicates the resource types and function contexts in
+which workspace manager functions apply.
+.sp 1
+.TS
+tab(~), center;
+cBp7 cBp7 cBp7
+lp6 lp6 lp6 .
+Function~Contexts~Resources
+=
+.sp
+f.action~root,icon,window~button,key,menu
+f.beep~root,icon,window~button,key,menu
+f.circle_down~root,icon,window~button,key,menu
+f.circle_up~root,icon,window~button,key,menu
+f.exec~root,icon,window~button,key,menu
+f.focus_color~root,icon,window~button,key,menu
+f.focus_key~root,icon,window~button,key,menu
+f.goto_workspace~root,icon,window~button,key,menu
+f.help~root,icon,window~button,key,menu
+f.help_mode~root,icon,window~button,key,menu
+f.kill~icon,window~button,key,menu
+f.lower~root,icon,window~button,key,menu
+f.maximize~icon,window(normal)~button,key,menu
+f.menu~root,icon,window~button,key,menu
+f.minimize~window~button,key,menu
+f.move~icon,window~button,key,menu
+f.next_cmap~root,icon,window~button,key,menu
+f.next_key~root,icon,window~button,key,menu
+f.next_workspace~root,icon,window~button,key,menu
+f.nop~root,icon,window~button,key,menu
+f.normalize~icon,window(maximized)~button,key,menu
+f.normalize_and_raise~icon,window~button,key,menu
+f.occupy_all~icon, window~button,key,menu
+f.pack_icons~root,icon,window~button,key,menu
+f.pass_keys~root,icon,window~button,key,menu
+f.post_wmenu~root,icon,window~button,key
+f.prev_cmap~root,icon,window~button,key,menu
+f.prev_key~root,icon,window~button,key,menu
+f.prev_workspace~root,icon,window~button,key,menu
+f.quit_dtwm~root~button,key,menu
+f.raise~root,icon,window~button,key,menu
+f.raise_lower~icon,window~button,key,menu
+f.refresh~root,icon,window~button,key,menu
+f.refresh_win~window~button,key,menu
+f.remove~root,icon,window~button,key,menu
+f.resize~window~button,key,menu
+f.restart~root~button,key,menu
+f.send_msg~icon,window~button,key,menu
+f.separator~root,icon,window~menu
+f.set_behavior~root,icon,window~button,key,menu
+f.title~root,icon,window~menu
+f.toggle_frontpanel~root,icon,window~button,key,menu
+f.version~root,icon,window~button,key,menu
+f.workspace_presence~window~button,key,menu
+f.workspace_rename~root,icon,window~button,key,menu
+.TE
+.sp 1
+.SH "\fBWORKSPACE MANAGER EVENT SPECIFICATION\fP"
+Events are indicated as part of the specifications for button and key
+binding sets, and menu panes.
+.P
+Button events have the following syntax:
+.P
+.in+4
+.TS
+tab(~);
+l l.
+\fIbutton\fP =~[\fImodifier_list\fP]\fB<\fIbutton_event_name\fB>\fR
+\fImodifier_list\fP =~\fImodifier_name\fP {\fImodifier_name\fP}
+.TE
+.in-4
+.P
+All modifiers specified are interpreted as being exclusive
+(this means that only the specified modifiers can be present when the
+button event occurs).
+The following table indicates the values that can be used
+for \fImodifier_name\fP.\*F
+.FS
+The [Alt] key is frequently labeled [Extend] or [Meta].
+Alt and Meta can be used interchangeably in event specification.
+.FE
+.sp 1
+.TS
+tab(~),center;
+cbp7 cbp7
+= | =
+lp6 lp6.
+Modifier~Description
+Ctrl~Control Key
+Shift~Shift Key
+Alt~Alt/Meta Key
+Meta~Meta/Alt Key
+Lock~Lock Key
+Mod1~Modifier1
+Mod2~Modifier2
+Mod3~Modifier3
+Mod4~Modifier4
+Mod5~Modifier5
+.TE
+.sp 1
+The following table indicates the values that can be used for
+\fIbutton_event_name\fP.
+.sp 1
+.TS
+tab(~),center;
+cbp7 cbp7
+= | =
+lp6 lp6.
+Button~Description
+Btn1Down~Button 1 Press
+Btn1Up~Button 1 Release
+Btn1Click~Button 1 Press and Release
+Btn1Click2~Button 1 Double Click
+Btn2Down~Button 2 Press
+Btn2Up~Button 2 Release
+Btn2Click~Button 2 Press and Release
+Btn2Click2~Button 2 Double Click
+Btn3Down~Button 3 Press
+Btn3Up~Button 3 Release
+Btn3Click~Button 3 Press and Release
+Btn3Click2~Button 3 Double Click
+Btn4Down~Button 4 Press
+Btn4Up~Button 4 Release
+Btn4Click~Button 4 Press and Release
+Btn4Click2~Button 4 Double Click
+Btn5Down~Button 5 Press
+Btn5Up~Button 5 Release
+Btn5Click~Button 5 Press and Release
+Btn5Click2~Button 5 Double Click
+.TE
+.sp 1
+Key events that are used by the workspace manager for menu mnemonics
+and for binding to workspace manager functions are single key presses;
+key releases are ignored.
+Key events have the following syntax:
+.P
+.in+4
+.TS
+tab(~);
+l l.
+\fIkey\fP =~[\fImodifier_list\fP]\fB<Key>\fIkey_name\fR
+\fImodifier_list\fP =~\fImodifier_name\fP {\fImodifier_name\fP}
+.TE
+.in-4
+.P
+All modifiers specified are interpreted as being exclusive
+(this means that only the specified modifiers can be present when the
+key event occurs).
+Modifiers for keys are the same as those that apply to buttons.
+The \fIkey_name\fP is an X11 keysym name.
+Keysym names can be found in the keysymdef.h file
+(remove the \fIXK_\fP prefix).
+.sp 1
+.SH "\fBBUTTON BINDINGS\fP"
+The \fBbuttonBindings\fP resource value is the name of a set of button 
+bindings that are used to configure workspace manager behavior.
+A workspace manager function can be done when a button press  occurs with 
+the pointer over a framed client window,
+an icon or the root window.
+The context for indicating where the button press applies is also the
+context for invoking the workspace manager function when the button press
+is done
+(significant for functions that are context sensitive).  
+.P
+The button binding syntax is
+.P
+.EX
+.B
+\fBButtons\fP \fIbindings_set_name\fP
+\fB{\fP
+    \fIbutton\fP    \fIcontext\fP    \fIfunction\fP
+    \fIbutton\fP    \fIcontext\fP    \fIfunction\fP
+                         .
+                         .
+    \fIbutton\fP    \fIcontext\fP    \fIfunction\fP
+\fB}\fP
+.EE
+.P
+The syntax for the \fIcontext\fP specification is
+  
+.TS
+tab(~), center;
+ll.
+\fIcontext\fP =~\fIobject\fP[\fB|\fIcontext\fR]
+\fIobject\fP =~\fBroot | icon | window | title | frame | border | app\fR
+.TE
+
+The context specification indicates where the pointer must be for the
+button binding to be effective.
+For example, a context of \fBwindow\fP indicates that the pointer must
+be over a client window or
+window management frame for the button binding to be effective.
+The \fBframe\fP context is for the window management frame around a
+client window
+(including the border and titlebar), the \fBborder\fP context is
+for the border part of the window management frame
+(not including the titlebar), the \fBtitle\fP
+context is for the title area of the window management frame,
+and the \fBapp\fP context is for the application window
+(not including the window management frame).  
+
+If an \fIf.nop\fP function is specified for a button binding, the button
+binding is not done.
+.sp 1
+.SH "\fBKEY BINDINGS\fP"
+The \fBkeyBindings\fP resource value is the name of a set of key 
+bindings that are used to configure workspace manager behavior.  A window
+manager function can be done when a particular key is pressed. 
+The context in which the key binding applies is indicated in the key
+binding specification.
+The valid contexts are the same as those that apply to button bindings.
+  
+The key binding syntax is
+.P
+.EX
+.B
+\fBKeys\fP \fIbindings_set_name\fP
+\fB{\fP
+    \fIkey\fP    \fIcontext\fP    \fIfunction\fP
+    \fIkey\fP    \fIcontext\fP    \fIfunction\fP
+                .
+                .
+    \fIkey\fP    \fIcontext\fP    \fIfunction\fP
+\fB}\fP
+.EE
+.P
+If an \fIf.nop\fP function is specified for a key binding, the key
+binding is not done.
+If an \fIf.post_wmenu\fP or \fIf.menu\fP function is bound to a 
+key, dtwm automatically uses the same key for removing the menu from
+the screen after it has been popped up.
+
+The \fIcontext\fP specification syntax is the same as for button bindings.
+For key bindings, the \fBframe\fP, \fBtitle\fP, \fBborder\fP, and \fBapp\fP 
+contexts are equivalent to the \fBwindow\fP context.
+The context for a key event is the window or icon that has the keyboard
+input focus (\fBroot\fR if no window or icon has the keyboard input focus).
+.sp 1
+.SH "\fBMENU PANES\fP"
+Menus can be popped up using the \fIf.post_wmenu\fP and
+\fIf.menu\fP workspace manager functions.
+The context for workspace manager functions that are done from 
+a menu is \fIroot\fP, \fIicon\fP or \fIwindow\fP depending on how the
+menu was popped up.
+In the case of the \fIwindow\fP menu or menus popped up with a key
+binding, the location of the keyboard input
+focus indicates the context.
+For menus popped up using a button binding,
+the context of the button binding is the context of the menu.
+  
+The menu pane specification syntax is
+.P
+.EX
+.B
+\fBMenu\fP \fImenu_name\fP
+\fB{\fP
+    \fIlabel\fP  [\fImnemonic\fR]  [\fIaccelerator\fR]   \fIfunction\fP
+    \fIlabel\fP  [\fImnemonic\fR]  [\fIaccelerator\fR]   \fIfunction\fP
+                .
+                .
+    \fIlabel\fP  [\fImnemonic\fR]  [\fIaccelerator\fR]   \fIfunction\fP
+\fB}\fP
+.EE
+.P
+Each line in the \fIMenu\fP specification identifies the label for a menu
+item and the function to be done if the menu item is selected.
+Optionally a menu button mnemonic and a menu button keyboard accelerator
+may be specified.
+Mnemonics are functional only when the menu is posted
+and keyboard traversal applies.
+.P
+The \fIlabel\fP may be a string or a bitmap file.
+The label specification has the following syntax:
+
+.TS
+tab(~), center;
+ll.
+\fIlabel\fP =~\fItext\fB | \fIbitmap_file\fR
+\fIbitmap_file\fP =~\fB@\fIfile_name\fR
+\fItext\fP =~\fIquoted_item\fB | \fIunquoted_item\fR
+.TE
+  
+The string encoding for labels must be compatible with the menu font that 
+is used.
+Labels are greyed out for menu items that do the \fIf.nop\fP function 
+or an invalid function or a function that doesn't apply in the current
+context.
+
+A \fImnemonic\fP specification has the following syntax
+.sp 1
+.in+4
+.TS
+tab(~);
+l l.
+\fImnemonic\fP =~\fB_\fIcharacter\fR
+.TE
+.in-4
+.sp 1
+The first matching \fIcharacter\fP in the label is underlined.
+If there is no matching \fIcharacter\fP in the label, no 
+mnemonic is registered with the workspace manager for that label.
+Although the \fIcharacter\fP must exactly match a character in the
+label,
+the mnemonic does not execute if any modifier (such as Shift) is pressed with 
+the character key.
+.sp 1
+The \fIaccelerator\fP specification is a key event specification with
+the same syntax as is used for key bindings to workspace manager functions.
+.sp 1
+.SH "\fBFRONT PANEL CONTENT AND LAYOUT\fP"
+The \fI\*(rC\fR enables you to specify the content 
+and layout of the front panel, including the number of controls,
+their size and arrangement within the front panel, and their
+operation.
+.P
+The layout is arranged horizontally, in terms of \fIboxes\fR
+of \fIcontrols\fR.
+.P
+The front panel specification syntax is demonstrated in the
+\fBsys.dtwmrc\fR
+system file included in the \fB/usr/dt/config\fR directory.
+Please refer to that file for working examples of the front
+panel specification language.
+.sp 1
+.SH "\fBFRONT PANEL SPECIFICATION SYNTAX\fP"
+The front panel specification language for HP DT 3.0 is 
+keyword-oriented, rather than field-oriented as it was in HP DT 2.0,
+to make front panels easier to construct. 
+.P
+Each major construct has the general form of:
+.EX
+\fIcomponent\fP <component_name>
+{
+    [\fIattribute\fP
+    ...]
+    \fIcomponent_ref\fP
+    ...
+}
+.EE
+.P
+where \fIcomponent\fP can be PANEL, BOX, or CONTROL.
+\fIcomponent_ref\fP is a reference to another \fIcomponent\fP
+definition. Nested definitions are not allowed.
+.P
+A front panel is constructed hierarchically, by first specifying 
+a PANEL which includes references to one or more BOXes. Then
+the BOXes is specified. Each box refers to one or more CONTROLs.
+Finally, each CONTROL is specified. A CONTROL specification
+may be referred to by more than one BOX.
+.P
+The following conventions are used for describing the panel definition
+language:
+.IP ""
+Items shown in italics (e.g. \fIbox_ref\fP) represent language constructs.
+.IP ""
+Items shown in upper case (e.g. "PANEL") are keywords.
+.IP ""
+Variables are enclosed in angle brackets (e.g. <panel_name>).
+.IP ""
+Optional elements are enclosed in square brackets (`[', `]').
+.IP ""
+Repeated elements are indicated with an ellipsis ("...").
+.IP ""
+Disjuncts are enclosed in parentheses and separated by a vertical bar
+(e.g. "(primary | secondary | subpanel)").
+
+.sp 1
+.EX
+\fIpanel_definition\fP = 
+
+PANEL <panel_name>
+{
+    [\fIpanel_attribute\fP
+    ...]
+    \fIbox_ref\fP
+    ...
+}
+
+
+\fIpanel_attribute\fP =
+(
+    HELP_STRING    <string>           |
+    HELP_TOPIC     <help_topic_name>
+)
+
+
+\fIbox_ref\fP =
+
+    BOX  <box_name>
+
+.EE
+.P
+The panel definition is the top-level front panel construct. It
+lists the boxes that make up the front panel. It may also contain
+a help string (HELP_STRING), or refer to a predefined dtwm 
+help topic (HELP_TOPIC). Panel help is a second level fallback. It is
+triggered during item help or context help when there is no help 
+specified for the active control or box.
+
+.sp 1
+.EX
+\fIbox_definition\fP =
+
+BOX <box_name>
+{
+    [\fIbox_attribute\fP
+    ...]
+    (\fIcontrol_ref\fP | \fIswitch_ref\fP)
+    ...
+}
+
+
+\fIcontrol_ref\fP =
+
+    CONTROL  <control_name>
+
+
+\fIswitch_ref\fP =
+
+    SWITCH  <switch_name>
+
+
+\fIbox_attribute\fP =
+(
+    TYPE             \fIbox_type\fP          |
+    BACKGROUND_TILE  <pixmap>          |
+    COLOR_SET        <number>          |
+    HELP_STRING      <string>          |
+    HELP_TOPIC       <help_topic_name> |
+    LAYOUT_POLICY    \fIlayout_type\fP       |
+)
+
+
+\fIbox_type\fP =
+(
+    primary     |
+    secondary   |
+    subpanel
+)
+
+
+\fIlayout_type\fP =
+(
+    standard    |
+    as_needed
+)
+.EE
+.P
+The box definition describes each box in the front panel. There are
+three types of boxes. The \fBprimary\fP box is larger. Controls in a
+\fBprimary\fP box may contain subpanels. The \fBsecondary\fP box is
+smaller and has a ribbed background by default. Controls in
+\fBsecondary\fP boxes cannot contain subpanels. Both \fBprimary\fP and
+\fBsecondary\fP boxes are horizontal.  
+.P
+A box of type \fBsubpanel\fP
+is vertically oriented and associated with a control in a \fBprimary\fP
+box (see the SUBPANEL attribute for controls). A subpanel has
+a small button automatically added to the bottom for dismissing 
+the subpanel. Subpanels are useful for adding functionality to the front
+panel without permanently increasing the size of the front panel.
+.P
+A \fBstandard\fP box layout is one in which the height of each
+\fBprimary\fP and \fBsecondary\fP box 
+is fixed based on the resolution of the screen.
+This restriction can be relaxed by choosing a LAYOUT_POLICY of
+\fBas_needed\fP. This allows the height of the box 
+to grow based on the size of the controls inside.
+Subpanels are not affected by LAYOUT_POLICY.
+The width of each \fBsubpanel\fP box is determined by the widest 
+control label. 
+.P
+A box can be given a distinctive background with BACKGROUND_TILE. The
+value can be a predefined pixmap image (see
+\fBXmInstallImage(3X)\fP), or a bitmap or X pixmap file name. The
+default background for a \fBprimary\fP or \fBsubpanel\fP box is
+\fBbackground\fP. The default background for \fBsecondary\fP box
+is \fBrib\fP.
+.P
+You can choose a different HP DT color set for a box by using the
+COLOR_SET attribute. There are eight HP DT color sets, numbered 1 to 8.
+By default, \fBprimary\fP and \fBsubpanel\fP boxes use the primary color
+set (specified by the \fBprimaryColorSetId\fP resource).
+\fBSecondary\fP boxes default to the secondary color set (specified by the
+\fBsecondaryColorSetId\fP resource).
+.P
+Help for a box is a first level fallback. It is
+triggered during item help or context help when there is no help 
+specified for the active control.
+.P
+Finally, the box definition includes the list of controls that
+are contained in the box. The workspace switch (SWITCH) is a 
+special control. There can be only one workspace switch and it must
+be in a \fBprimary\fP or \fBsecondary\fP box. Also, there can
+be only one \fBbusy\fP control and it must be in a \fBsecondary\fP box.
+
+.sp 1
+.EX
+\fIcontrol_definition\fP =
+
+CONTROL <control_name>
+{
+    [\fIcontrol_attribute\fP
+    ...]
+}
+
+
+\fIcontrol_attribute\fP =
+(
+    TYPE               \fIcontrol_type\fP          |
+    ALTERNATE_IMAGE    <image_file_name>     |
+    CLIENT_GEOMETRY    \fIgeometry_string\fP       |
+    CLIENT_NAME        <string>              |
+    DROP_ACTION        \fIcommand_definition\fP    |
+    DROP_ANIMATION     <animation_name>      |
+    HELP_STRING        <string>              |
+    HELP_TOPIC         <help_topic_name>     |
+    IMAGE              <image_file_name>     |
+    LABEL              <string>              |
+    MONITOR_FILE       <file_name>           |
+    PUSH_ACTION        \fIcommand_definition\fP    |
+    PUSH_ANIMATION     <animation_name>      |
+    PUSH_RECALL        (true | false)        |
+    SUBPANEL           <box_name>
+)
+
+
+\fIcontrol_type\fP =
+(
+    clock          |
+    date           |
+    blank          |
+    busy           |
+    button         |
+    client         |
+    iconbox        |
+    mail           |
+    monitor_file
+)
+
+
+\fIgeometry_string\fP =
+
+    [width][xheight]
+
+
+\fIcommand_definition\fP = 
+(
+    f.action    <action_specification>    |
+    f.exec      <command_specification>   |
+    f.help      <help_topic_name>         |
+    f.help_mode	
+)
+.EE
+.P
+A control definition is needed for each control you have in your front
+panel. Controls exhibit different behavior based on their \fBtype\fP:
+.sp 1
+.TS
+tab(~), center, box;
+lfi lfi
+l l.
+type~description
+_
+clock~analog clock
+date~show month, day, and day of the week
+blank~space holder
+busy~activity light and logout
+button~push button control
+client~embedded client
+iconbox~controls appearance of iconbox
+mail~special for monitoring arriving mail
+monitor_file~monitors an empty/non-empty file
+.TE
+.sp 1
+.P
+The \fBclock\fP and \fBdate\fP controls are self-explanatory. The
+format for the date control can be set via the \fBformat\fP resource
+(see \fBdtwm (1X)\fP).
+.P
+The \fBblank\fP control can be used to insert spaces between controls or
+save positions for future expansion.
+.P
+The \fBbusy\fP control alternates between its IMAGE and
+ALTERNATE_IMAGE to indicate system activity. This control is
+configured by default to perform the logout function when pressed.
+Because of this, the \fBbusy\fP control has special placement behavior.
+It is always moved to the right side of the box it is in. As a box
+fills up, controls that overlap the \fBbusy\fP control are removed.
+The can be only one \fBbusy\fP control and it must be in a 
+\fBsecondary\fP box.
+.P
+The behavior of the \fBbutton\fP control type is determined by its
+PUSH_ACTION.
+.P
+Other clients, such as xload, may be embedded in the front panel in
+controls of type \fBclient\fP. Set the CLIENT_GEOMETRY if you want to
+alter the size of the area that the client occupies. You may need to
+change the LAYOUT_POLICY of the enclosing box to \fBas_needed\fP.
+Clients are matched to their controls using the WM_CLASS window
+property. To insure a match, set the CLIENT_NAME for the control
+to the same string that the client puts in the first member
+of this property. You may examine this property using the xprop (1X)
+command. Normally, you can start the client with a \fB-name\fP command
+line option to set the property to match your control.
+.P
+The \fBiconbox\fP control causes dtwm to create an iconbox to hold
+the window icons. The control recalls the iconbox to the screen 
+after it has been closed. Note that using this control prevents
+enabling and disabling of the iconbox using dtstyle.
+.P
+Controls of type \fBmail\fP have been tuned to be mail indicators. The
+ALTERNATE_IMAGE is displayed if the mail file (set with MONITOR_FILE)
+grows in size. The normal IMAGE is displayed if the control is pressed
+or the mail file shrinks in size. The default mail file is
+/usr/mail/$LOGNAME.
+.P
+Controls of type \fBmonitor_file\fP follow the empty/non-empty state
+of the monitored file. If the file is missing or empty, the normal 
+IMAGE is shown. If the file exists and is non-empty, the ALTERNATE_IMAGE
+is shown. There is no default file, you must set one using
+MONITOR_FILE.
+.P
+A control can be made into a drop zone by adding a DROP_ACTION. If a
+DROP_ANIMATION is specified, that animation is used when an item
+is actually dropped on the control.
+.P
+Help for a control may be a simple textual string (HELP_STRING) or
+a predefined help topic (HELP_TOPIC). This help is triggered when
+the control is selected during item help mode, or when context help on
+the control is requested by pressing the help key (normally F1) when
+the control has the keyboard focus.
+.P
+A control can contain an IMAGE, a LABEL, or both. If you choose both, it
+may be necessary to change the LAYOUT_POLICY of the box to \fBas_needed\fP.
+.P
+A control with a PUSH_ACTION may also have a PUSH_ANIMATION. This
+animation is done when the user presses on the control. 
+.P
+Normally, a
+\fBbutton\fP performs the PUSH_ACTION each time it is depressed. If
+you wish to have only one copy of a client started, you can set
+PUSH_RECALL to \fBtrue\fP for the control. This way, when the client's
+window appears on the screen, the control can keep track of the client
+and simply bring it to the top on subsequent presses rather than
+starting another copy. The rules used for matching are the same as for
+controls of type \fBclient\fP. See the discussion on CLIENT_NAME.
+.P
+A control in a \fBprimary\fP box may also have a subpanel. Use SUBPANEL
+to name the subpanel to use. A control with a subpanel has an
+additional small button added to its top. Press this button to
+show the subpanel.
+
+.sp 1
+.EX
+\fIswitch_definition\fP =
+
+SWITCH  <switch_name>
+{
+    [\fIswitch_attribute\fP
+    ...]
+}
+
+
+\fIswitch_attribute\fP =
+(
+    NUMBER_OF_ROWS      <number>          |
+    LAYOUT_POLICY       \fIlayout_type\fP       |
+    HELP_STRING         <string>          |
+    HELP_TOPIC          <help_topic_name>
+)
+.EE
+.sp 1
+.P
+The workspace switch is a special type of control. You can control the
+number of rows of workspace buttons with NUMBER_OF_ROWS. The default
+value for NUMBER_OF_ROWS is 2. 
+If LAYOUT_POLICY is set to \fBas_needed\fP, then the width of the switch
+buttons is determined by the longest workspace title. When
+LAYOUT_POLICY has the default value of \fBstandard\fP, the geometry of
+the switch and its contents depends on the resolution of the screen.
+There can only be one workspace switch and it must be in a 
+\fBprimary\fP or \fBsecondary\fP box.
+.sp 1
+.EX
+\fIanimation\fP = 
+
+ANIMATION <animation_name>
+{
+    <image_file_name>       [<time_delay>]
+    ...
+}
+
+.EE
+.sp 1
+.P
+ANIMATIONs are referred to by controls using PUSH_ANIMATION or
+DROP_ANIMATION. Each ANIMATION is a list of images with optional
+time delays (in milliseconds).
+
+.sp 1
+.SH "INCLUDING FILES"
+You may include other files into your dtwmrc file by using the
+\fBinclude\fP construct. For example:
+.EX
+INCLUDE
+{
+    /users/bob/panels/fp.special
+    /users/bob/personal/my.bindings
+}
+.EE
+.sp 1
+causes the files named to be read in and interpreted as an
+additional part of the dtwmrc file. 
+.P
+\fBInclude\fP is a top-level construct. It cannot be nested
+inside another construct. 
+
+.sp 1
+.SH WARNINGS
+Enabling the iconbox control in the front panel forces the resource
+\fBuseIconBox\fP to True. This prevents the Style Manager 
+(\fBdtstyle\fP) from turning the iconbox on and off an may cause its
+dialog to show incorrect information about the iconbox.
+.P
+Errors that occur as a result of parsing or trying to use
+the \*(rC are reported to a log file under your home directory:
+\fB$HOME/.dt/errorlog\fR.  Be sure to check this text file if
+the appearance or behavior of \fBdtwm\fR is not what you
+expect.
+.sp 1
+.SH FILES
+.sp 1
+ $HOME/.dt/$LANG/dtwmrc
+ $HOME/.dt/dtwmrc
+ /usr/dt/config/$LANG/sys.dtwmrc
+ /usr/dt/config/sys.dtwmrc
+ $HOME/.dt/errorlog
+.sp 1
+.SH COPYRIGHT
+(c) Copyright 1989,1990,1991,1992 by Open Software Foundation, Inc.
+.br
+(c) Copyright 1987,1988,1989,1990,1992 by Hewlett-Packard Company.
+.br
+All rights reserved.
+.sp 1
+.SH ORIGIN
+Open Software Foundation, Inc.
+Hewlett-Packard Company.
+.sp1
+.SH SEE ALSO
+\fBdtwm(1X)\fP, \fBdtstyle(1X)\fP, \fBXmInstallImage(3X)\fP, and \fBX(1)\fP.
+.\"""""""""""""""""""""""        eof       """"""""""""""""""""""""""

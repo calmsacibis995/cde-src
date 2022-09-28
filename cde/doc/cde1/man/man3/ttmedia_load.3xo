@@ -1,0 +1,246 @@
+.TH ttmedia_load 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+ttmedia_load \- send a Display, Edit or Compose request
+.SH SYNOPSIS
+.yS
+#include <Tt/tttk.h>
+.sp 0.5v
+.ta \w'Tt_message ttmedia_load('u
+Tt_message ttmedia_load(Tt_message \f2context\fP,
+	Ttmedia_load_msg_cb \f2cb\fP,
+	void *\f2clientdata\fP,
+	Tttk_op \f2op\fP,
+	const char *\f2media_type\fP,
+	const unsigned char *\f2contents\fP,
+	int \f2len\fP,
+	const char *\f2file\fP,
+	const char *\f2docname\fP,
+	int \f2send\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn ttmedia_load
+function
+is used to create and optionally send a Media Exchange request
+to display, edit or compose a document.
+.P
+The
+.I cb
+argument will be passed
+.I clientdata
+when the reply is received, or when intermediate versions
+of the document are checkpointed through
+.IR Deposit
+requests.
+The
+.I op
+argument must be one of
+.Cn TTME_DISPLAY ,
+.Cn TTME_EDIT
+or
+.Cn TTME_COMPOSE .
+The
+.I media_type
+argument names the data format of the document, and is usually the
+primary determinant of which application will be chosen to
+handle the request.
+The
+.I contents
+and
+.I len
+arguments specify the document; if they are
+.Cn NULL
+and zero, respectively, and
+.I file
+is not
+.Cn NULL ,
+then the document is assumed to be contained in
+.IR file .
+If
+.I docname
+is not
+.Cn NULL ,
+then
+.Fn ttmedia_load
+uses it as the title of the document.
+If
+.I send
+is True, the message is sent before being returned.
+.P
+The
+.I context
+argument describes the environment to use.
+If
+.I context
+is not zero, messages created by
+.Fn ttmedia_load
+inherit from
+.I context
+all contexts whose slotname begins with the characters
+.Cn ENV_ .
+.P
+The
+.B Ttmedia_load_msg_cb
+argument is a callback defined as:
+.Cs I
+.ta \w'Tt_message (*Ttmedia_load_msg_cb)('u
+Tt_message (*Ttmedia_load_msg_cb)(Tt_message \f2msg\fP,
+	void *\f2clientdata\fP),
+	Tttk_op \f2op\fP,
+	unsigned char *\f2contents\fP,
+	int \f2len\fP,
+	char *\f2file\fP);
+.Ce
+.P
+The
+.I msg
+argument is the
+reply to the load request, or a
+.IR Deposit
+request with a
+.IR messageID
+argument naming the identifier (see
+.Fn tt_message_id 3)
+of the load request.
+In the latter case, the client
+program becomes responsible for either failing or replying
+to the request.
+In either case,
+.I msg
+should be destroyed after being processed.
+.P
+The
+.I op
+argument is the
+op of
+.IR msg .
+It must be either
+.Cn TTME_DEPOSIT
+or the
+.I op
+passed to
+.Fn ttmedia_load 3.
+.P
+The
+.IR contents ,
+.I len
+and
+.I file
+arguments represent the
+contents of the arriving document.
+If
+.I len
+is zero, then the document is contained in
+.IR file .
+If
+.I contents
+or
+.I file
+are non-\c
+.Cn NULL ,
+they can be freed using
+.Fn tt_free .
+.P
+The
+.I clientdata
+argument is the
+.I clientdata
+passed to
+.Fn ttmedia_load .
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn ttmedia_load
+function returns the request it was asked to build;
+otherwise, it returns an error pointer.
+The application can use
+.Fn tt_ptr_error 3
+to extract one of the following
+.B Tt_status
+values from the returned handle:
+.VL 8
+.Lc TT_ERR_NOMEM
+.br
+There is insufficient memory available to perform the function.
+.Lc TT_ERR_NOMP
+.br
+The
+.Cm ttsession 1
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_OVERFLOW
+.br
+The ToolTalk service has more active messages than it can handle.
+(The maximum number of active messages is
+.ne 2
+implementation specific, but is at least 2000.)
+.Lc TT_ERR_PROCID
+.br
+The specified process identifier is out of date or invalid.
+.LE
+.SH "APPLICATION USAGE"
+After the request created by
+.Fn ttmedia_load
+is sent, the application will probably want to use
+.Fn ttdt_subcontract_manage
+immediately afterwards to manage the standard interactions with the
+handler of the request.
+.P
+A
+.B Ttmedia_load_msg_cb
+callback should return
+.Cn NULL
+if it processes
+.I msg
+successfully, or a
+.Fn tt_error_pointer
+cast to
+.B Tt_message
+if processing results in an error.
+It should return the
+.I msg
+if it does not consume it, in which case
+the ToolTalk service
+will pass
+.Cn TT_CALLBACK_CONTINUE
+down the call stack, so that
+.I msg
+will be offered to other callbacks or (more likely) be returned
+from
+.Fn tt_message_receive 3.
+Applications will rarely want
+.I msg
+to get processed by other callbacks or in the main event loop.
+.SH EXAMPLES
+This is the typical algorithm of a
+.BR Ttmedia_load_msg_cb :
+.Cs I
+Tt_message
+myLoadMsgCB(Tt_message  msg,
+        void           *clientData,
+        Tttk_op         op,
+        unsigned char  *contents,
+        int             len,
+        char           *file)
+{
+        if (len > 0) {
+                /* Replace data with len bytes in contents */
+        } else if (file != 0) {
+                /* Replace data with data read from file */
+        }
+        if (op == TTME_DEPOSIT) {
+                tt_message_reply(msg);
+        }
+        tttk_message_destroy(msg);
+        return 0;
+}
+.Ce
+.SH "SEE ALSO"
+.Hd Tt/tttk.h 5,
+.Fn ttmedia_load_reply 3,
+.Fn ttmedia_ptype_declare 3,
+.Fn ttmedia_Deposit 3,
+.Fn tt_free 3,
+.Fn tt_message_receive 3.

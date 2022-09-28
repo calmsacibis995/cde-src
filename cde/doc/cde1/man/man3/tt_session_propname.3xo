@@ -1,0 +1,77 @@
+.TH tt_session_propname 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+tt_session_propname \- returns an element of the list of property names for a session
+.SH SYNOPSIS
+.yS
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'char *tt_session_propname('u
+char *tt_session_propname(const char *\f2sessid\fP,
+	int \f2n\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn tt_session_propname
+function
+returns the
+.IR n th
+element of the list of currently defined property names for
+the specified session.
+.P
+The
+.I sessid
+argument is the name of the session joined.
+The application can use the
+.I sessid
+value returned when
+.Fn tt_default_session
+is called.
+The
+.I n
+argument is the number of the item in the property name list for which a name is to be
+obtained.
+The list numbering begins with zero.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn tt_session_propname
+function returns the name of the specified property
+from the session property list.
+If there are
+.I n
+properties or fewer,
+.Fn tt_session_propname
+returns
+.Cn NULL .
+The application can use
+.Fn tt_ptr_error 3
+to extract one of the following
+.B Tt_status
+values from the returned pointer:
+.VL 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_NOMP
+.br
+The
+.Cm ttsession 1
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_NUM
+.br
+The integer value passed was invalid (out of range).
+.Lc TT_ERR_SESSION
+.br
+The specified ToolTalk session is out of date or invalid.
+.LE
+.SH "APPLICATION USAGE"
+The application should use
+.Fn tt_free 3
+to free any data stored in the address returned by the
+ToolTalk API.
+.SH "SEE ALSO"
+.Hd Tt/tt_c.h 5,
+.Fn tt_ptr_error 3,
+.Fn tt_free 3.

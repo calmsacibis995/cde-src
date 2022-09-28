@@ -1,0 +1,215 @@
+.TH dtappgather 1 "29 Nov, 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\"----------------------------------------------------------------------------
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+dtappgather \- gather application files for presentation by the 
+Application Manager
+.SH SYNOPSIS
+.yS
+[ \f3-r\f1 ]
+.yE
+.SH DESCRIPTION
+The 
+Application Manager
+presents personal, system, and factory applications in
+an easy-to-access window.
+The
+Application Manager
+is implemented as a special File Manager view of a 
+subdirectory that is built on a per-user, per-session basis.
+The
+.Cm dtappgather
+utility is responsible for creating and refreshing
+the user's
+Application Manager 
+subdirectory.
+.P
+The
+.Cm dtappgather
+utility 
+is run at login and whenever the user invokes the
+.B ReloadApps
+action.
+The user's individual subdirectory for the 
+Application Manager,
+.BR /var/dt/appconfig/appmanager/$DTUSERSESSION,
+is opened when the user presses the Application Manager control
+on the Front Panel.
+.P
+The sequence of events is as follows:
+.VL
+.LI \(bu
+When the user logs in, the \f3Xsession\f1 script sources in the
+.B Xsession.d
+script that sets the \f2DTUSERSESSION\f1 environment
+variable.
+.LI \(bu
+\f3Xsession\f1 then invokes the
+\f3dtsearchpath\f1
+utility to set the \f2DTAPPSEARCHPATH\f1 environment variable.
+.LI \(bu
+After 
+\f3dtsearchpath\f1
+returns with the \f2DTAPPSEARCHPATH\f1 assembled,
+the \f3Xsession\f1 script calls
+.Cm dtappgather .
+.LI \(bu
+As its main function,
+.Cm dtappgather
+traverses the \f2DTAPPSEARCHPATH\f1,
+examining each possible source of applications and, where
+there are existing source subdirectories, creates symbolic links between
+the source and the user's \f2DTUSERSESSION\f1 subdirectory.
+.LI \(bu
+Finally,
+.Cm dtappgather
+turns off write permissions on the resulting subdirectory to ensure its
+integrity.
+.P
+A similar sequence occurs when the user double-clicks the \f3ReloadApps\f1
+action after logging in.
+.P
+Although the value of the \f2DTAPPSEARCHPATH\f1 can be modified in a
+local shell, the
+Application Manager
+view based on its value is not functional until you log out and
+log back in.
+Since this can be a tedious venture, you can verify the
+Application Manager
+view by executing
+.Cm dtsearchpath 1
+and
+.Cm dtappgather
+in the local shell.
+For
+example, to add host
+.B trout
+as a system-wide
+application server, set the
+.Cm dtsearchpath 1
+input environment variable,
+.IR DTSPSYSAPPHOSTS :
+.sp 1
+.BR DTSPSYSAPPHOSTS=trout :
+.sp 1
+Then, execute
+.Cm dtsearchpath 1
+to update the
+.I DTAPPSEARCHPATH
+environment
+variable.
+.sp 1
+.B eval `dtsearchpath`
+.sp 1
+Finally, gather the new applications by executing
+.Cm dtappgather .
+The
+Application Manager
+will show the new application groups but will not be functional.
+.LE
+.SH OPTIONS
+The
+\f3-r\f1
+option causes
+.Cm dtappgather
+to retain the previous contents of the Application Manager, although
+discarding broken links.
+At login,
+.Cm dtappgather
+destroys the user's previous \f2DTUSERSESSION\f1 subdirectory before
+creating a new one.
+At \f3ReloadApps\f1 time, the \f3-r\f1 option
+is used to minimize visual disruption of any opened
+Application Manager
+views.
+.SH RETURN VALUES
+The command always returns 0 (zero) for successful completion.
+.SH ENVIRONMENT
+.VL 15
+.LI \f2DTAPPSEARCHPATH\f1
+Set by the 
+.Cm dtsearchpath 1
+utility.
+\f2DTAPPSEARCHPATH\f1 controls the places
+where 
+.Cm dtappgather 
+will gather applications.
+The default locations consist of
+\f3$HOME/.dt/appmanager\f1 (for end users),
+\f3/etc/dt/appconfig/appmanager/$LANG\f1 (for system administrators), and
+\f3/usr/dt/appconfig/appmanager/$LANG\f1 (for factory applications).
+.LI \f2DTUSERSESSION\f1
+Controls the location of the end user's subdirectory where the
+Application Manager will be rooted.
+The subdirectory name includes
+both the user's \f2$LOGNAME\f1 and \f2$DISPLAY\f1 in order to
+ensure the user's view of the Application Manager remains consistent
+across sessions.
+.LE
+.SH LOCALES
+When searching for system administrator and factory default 
+Application Manager
+files,
+.Cm dtappgather
+always uses a value of \f2$LANG\f1 equal to \f3C\f1.
+When the
+user picks a language at login, the corresponding \f2$LANG\f1
+subdirectories are searched.
+If multiple \f2$LANG\f1 subdirectories exist
+in \f3/etc/dt/appconfig/appmanager\f1, all \f2$LANG\f1 subdirectories will
+appear in the Application Manager; however, if multiple \f2$LANG\f1
+subdirectories exist in
+.B /usr/dt/appconfig/appmanager
+then the
+language-specific subdirectory based on the current value of \f2$LANG\f1 is
+chosen instead of the \f3C\f1 subdirectory.
+.sp 1
+Regardless of locale, all the action files that exist under the user's
+\f3$HOME/.dt/appmanager\f1 subdirectory will be symbolically linked
+to the user's
+Application Manager
+subdirectory.
+.SH FILES
+.VL 15
+.LI \f3/usr/dt/bin/Xsession\f1
+Among its tasks at login,
+the \f3Xsession\f1 script invokes 
+.Cm dtsearchpath 1,
+and then
+.Cm dtappgather .
+.LI \f3/var/dt/appconfig/appmanager/$DTUSERSESSION\f1
+This subdirectory is where
+.Cm dtappgather
+assembles the 
+Application Manager
+view for the particular user and CDE session.
+.LE
+.SH NOTES
+In the case of multiple search locations having the same name,
+.Cm dtappgather
+picks only the first and discards the rest.
+For example, if the
+system administrator sets
+.br
+\f3DTSPSYSAPPHOSTS=tuna:,trout:\f1
+.br
+and if both hosts, \f3tuna\f1 and \f3trout\f1, have an
+\f3/etc/dt/appconfig/appmanager/C/Editors\f1 folder, then only the
+\f3Editors\f1 folder from \f3tuna\f1 (the first host) will appear
+in the user's Application Manager.
+.sp 1
+After building the user's \f3DTUSERSESSION\f1,
+.Cm dtappgather
+turns off write permissions on that subdirectory to disallow alteration
+by the end user.
+Although the end user can resize the
+window and rearrange the icons within the window, the Application
+Manager is intended to be a read-only source of local
+and networked applications.
+.SH "SEE ALSO"
+.BR dtappintegrate (1),
+.BR dtsearchpath (1).

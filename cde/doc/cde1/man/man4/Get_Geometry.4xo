@@ -1,0 +1,59 @@
+.TH Get_Geometry 4 "13 May 1994"
+.SH NAME
+Get_Geometry request \- get a tool's on-screen geometry
+.SH SYNOPSIS
+.yS
+.ta \w@Get_Geometry(@u
+Get_Geometry(out width \f2w\fP,
+	out height \f2h\fP,
+	out xOffset \f2x\fP,
+	out yOffset \f2y\fP
+	[in messageID \f2commission\fP]);
+.yE
+.SH DESCRIPTION
+The
+.I Get_Geometry
+request
+reports the on-screen geometry of the optionally specified
+window, or of the window primarily associated with the recipient
+procid (if no window is specified).
+.P
+The
+.IR w ,
+.IR h ,
+.I x
+and
+.I y
+arguments are integer geometry values, in pixels,
+representing width, height, x-coordinate and y-coordinate,
+respectively.
+Negative offset values
+are interpreted according to the
+.cde .BR X11 (7)
+.cde man page.
+.xo \*(Zl.
+.P
+The
+.I commission
+argument
+is the ID of the ongoing request, if any, that resulted in the creation
+of the window in question.
+.SH "APPLICATION USAGE"
+The
+.Fn ttdt_session_join 3,
+and
+.Fn ttdt_message_accept 3,
+functions can be used by Xt applications to register for,
+and transparently process, the
+.I Get_Geometry
+request.
+Also,
+.I Get_Geometry
+can be sent by
+.Fn ttdt_sender_imprint_on 3.
+.SH "SEE ALSO"
+.Fn ttdt_message_accept 3,
+.Fn ttdt_sender_imprint_on 3,
+.Fn ttdt_session_join 3;
+.I Set_Geometry
+request.

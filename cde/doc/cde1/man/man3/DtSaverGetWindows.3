@@ -1,0 +1,120 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+.\" *************************************************************************
+.\" **
+.\" ** (c) Copyright 1993,1994 Hewlett-Packard Company 
+.\" **      All Rights Reserved.
+.\" **
+.\" ** (c) Copyright 1993,1994 International Business Machines Corp. 
+.\" **      All Rights Reserved.
+.\" **  
+.\" ** (c) Copyright 1993,1994 Sun Microsystems, Inc.
+.\" **      All Rights Reserved.
+.\" **
+.\" **
+.\" *************************************************************************
+.\"---
+.\".TH _title _#S_ "_dd_ _Month_ _19yy_"
+.TH DtSaverGetWindows 3 "24 Jul 1994"
+.\".BH "_dd_ _Month_ -_19yy_"
+.BH \*(DT 
+.\"---
+.\"---------------------------------------------------------------------------
+.SH NAME
+DtSaverGetWindows(3) \(em  the API to obtain the list of windows on which
+a screen saver application should draw when invoked by the Desktop. 
+.\"---
+.\"---------------------------------------------------------------------------
+.\"---
+.\"--- SYNOPSIS 
+.\"--- This section is a syntax diagram.  Use the following lines for pages in
+.\"--- manual Sections 1, 1M, 5 and 8:
+.\"---
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Dt/Saver.h>
+.sp \n(PDu
+Boolean DtSaverGetWindows (
+.ta .5i 1.75i
+.nf
+	Display *    \fldisplay\fP,
+	Window **    \flwindows\fP,
+	int *        \flcount\fP)
+.wH
+.fi
+.iE
+.sE
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- DESCRIPTION 
+.\"--- This section tells concisely what the command (function, device or
+.\"--- file format) does and includes the parameter list. 
+.\"---
+.SH DESCRIPTION
+\fBDtSaverGetWindows\fP returns a list of windows on which a screen saver
+application should draw when invoked by the Desktop. The display parameter is
+the application's display connection. The windows parameter is a pointer to
+memory in which the pointer to the list of windows shall be returned. The
+count parameter is a pointer to memory in which the window count shall be 
+returned. When the return code is True, the API has returned valid information 
+in the windows and count parameters. When the return code is False, the API 
+is indicating that the window list could not be obtained. A return code of
+False is an indication that the screen saver application was not invoked
+by the Desktop, but rather by another means, such as the command line.
+.P
+.IP \fIdisplay\fP
+Specifies the application's display connection. 
+.IP \fIwindow\fP
+Returns the list of windows on which a screen saver application should draw.
+.IP \fIcount\fP
+Returns the window list count.
+.P
+\fBNOTE:\fP The \fBwindows\fP value is malloc'd by this
+routine, and the memory for it needs to be freed using \fBfree()\fP.
+.P
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- RETURN VALUES
+.\"--- This section appears in pages from Sections 2 and 3 only.
+.\"--- List the _values_ that the function returns and give _explanations_.
+.\"---
+.\"---
+.\"----------------------------------------------------------------------------
+.SH RETURN VALUES
+.P
+Upon successful completion, returns \fBTrue\fP if window list and count could
+be obtained. The memory pointer to by window should be freed by \fBfree()\fP.
+Otherwise, returns \fBFalse\fP if the window list could not be obtained 
+or the memory allocated.
+.P
+.\"---
+.\"--- ERRORS
+.\"--- This section lists and explains _ERROR-CODES_ that the function may
+.\"--- may generate.  List _ERROR-CODES_ alphabetically.
+.\"---
+.SH ERRORS
+.PP
+This function does not return error codes.
+.\"---
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- EXAMPLES
+.\"--- This section gives examples of how to use the command (function
+.\"--- or file format).  Always preface an example with an introduction.
+.\"--- If there are multiple examples, use separate subsection headings
+.\"--- for each _example-type_.  Otherwise, omit these headings.
+.\"---
+.sp
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- SEE ALSO
+.\"--- This section lists references to other man pages, sample files, etc.
+.\"---
+.SH "SEE ALSO"
+.\"--- .BR  \fBDtSessionRestorePath(3)\fP
+

@@ -1,0 +1,163 @@
+XCOMM $XConsortium: Imakefile /main/cde1_maint/4 1995/10/04 13:34:09 gtsang $
+/* tt/lib/util/Imakefile */
+
+/* The default for the defines NormalLibtt and SharedLibtt are set in
+ * config/Project.tmpl.
+ * If NormalLibtt and ! SharedLibtt, only non-pic code is built in
+ *    current directory.
+ * If NormalLibtt and SharedLibtt, non-pic code is built in the current
+ *    directory and pic code is built in the shared subdirectory.
+ * If !NormalLibtt and SharedLibtt, only pic code is built in the 
+ *    current directory.
+ * The default defines for NormalLibtt and SharedLittt can be overwritten 
+ *    in many places. See the file config/ExtensionsToImake for 
+ *    information.
+ */
+#ifndef DoNormalLib
+#define DoNormalLib NormalLibtt
+#endif
+#ifndef DoSharedLib
+#define DoSharedLib SharedLibtt
+#endif
+
+#include <Library.tmpl>
+
+TT_DIR = ../..
+#include "../../tooltalk.tmpl"
+/* We don't need the local CDE or X includes here (see tooltalk.tmpl) */
+
+CDEINCLUDES=
+
+/* General case INCLUDES DEFINES
+ * Each individual architecture may have more or less of the above.
+ * Use EXTRA_DEFINES and EXTRA_INCLUDES to add defines and includes
+ * to an individual architecture.
+ */
+DEFINES = -DTT_VERSION_STRING=\"$(TT_VERSION)\"
+INCLUDES = -I../../lib
+
+/* put EXTRA_DEFINES and EXTRA_INCLUDES and anything else below */
+#ifdef HPArchitecture
+EXTRA_C++OPTIONS = $(ESLIT++_OPTION)
+#endif
+
+#ifdef SunArchitecture
+EXTRA_DEFINES = -D_REENTRANT -DSVR4 -DOS_VERSION=OSMajorVersion -DOS_MINOR_VERSION=OSMinorVersion
+EXTRA_INCLUDES = -I../../mini_isam
+#endif
+
+/* To get definitions of iswprint and iswspace */
+/* This really should be EXTRA_C++FLAGS, but is that used? */
+#ifdef RsArchitecture
+EXTRA_C++OPTIONS = -D_ILS_MACROS
+#endif
+
+#ifdef USLArchitecture
+#endif
+
+#ifdef UXPArchitecture
+#endif
+
+/*** NOTE!
+ *** Every time a .o is added below it needs to be added to
+ *** the lib/tt/lib Imakefile in UTIL_OBJS and SHARED_UTIL_OBJS
+ ***/
+
+SRCS = \
+tt_file_system.C \
+tt_file_system_entry_utils.C \
+tt_gettext.C \
+tt_string_match.C \
+copyright.C \
+tt_string.C \
+tt_xdr_utils.C \
+tt_path.C \
+tt_log.C \
+tt_int_rec.C \
+tt_new.C \
+tt_object.C \
+tt_base64.C \
+tt_object_list.C \
+tt_enumname.C \
+tt_ldpath.C \
+tt_new_ptr.C \
+tt_host.C \
+tt_host_equiv.C \
+tt_host_equiv_utils.C \
+tt_object_table.C \
+tt_host_utils.C \
+tt_global_env.C \
+tt_port.C \
+tt_string_map.C \
+tt_string_map_utils.C \
+tt_map_entry.C \
+tt_map_entry_utils.C \
+tt_Xlib.C \
+tt_entry_pt.C \
+tt_threadspecific.C \
+tt_trace_parser.C \
+tt_tracefile_parse.C \
+tt_trace_stream.C \
+tt_trace.C \
+tt_audit.C \
+tt_iostream.C
+
+
+OBJS = \
+tt_file_system.o \
+tt_file_system_entry_utils.o \
+tt_gettext.o \
+tt_string_match.o \
+copyright.o \
+tt_string.o \
+tt_xdr_utils.o \
+tt_path.o \
+tt_log.o \
+tt_int_rec.o \
+tt_new.o \
+tt_object.o \
+tt_base64.o \
+tt_object_list.o \
+tt_enumname.o \
+tt_ldpath.o \
+tt_new_ptr.o \
+tt_host.o \
+tt_host_equiv.o \
+tt_host_equiv_utils.o \
+tt_object_table.o \
+tt_host_utils.o \
+tt_global_env.o \
+tt_port.o \
+tt_string_map.o \
+tt_string_map_utils.o \
+tt_map_entry.o \
+tt_map_entry_utils.o \
+tt_Xlib.o \
+tt_entry_pt.o \
+tt_threadspecific.o \
+tt_trace_parser.o \
+tt_tracefile_parse.o \
+tt_trace_stream.o \
+tt_trace.o \
+tt_audit.o \
+tt_iostream.o
+
+/* Build the .o's */
+LibraryObjectRule()
+
+#ifdef __ppc
+/*  In case debug is on (-g0) ... reset to (-g) to avoid compiler crash (TEMP ONLY)! */
+tt_file_system.o:
+	$(_NULLCMD_)
+	$(RM) $@
+	$(C++) -c $(C++FLAGS) -g $(_NOOP_) $(SHLIBDEF) $(SHAREDCODEDEF) $(C++PICFLAGS) $*.C
+#endif
+
+all:: $(OBJS)
+
+/* Library built up one level */
+LintLibraryTarget(tt,$(SRCS))
+
+DependTarget()
+
+includes::

@@ -1,0 +1,162 @@
+.TH Display 4 "1 March 1996" "ToolTalk 1.3" "Document and Media Exchange Message Sets"
+.de LI
+.\" simulate -mm .LIs by turning them into .TPs
+.TP \\n()Jn
+\\$1
+..
+.de Lc
+.\" version of .LI that emboldens its argument
+.TP \\n()Jn
+\s-1\f3\\$1\f1\s+1
+..
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.BH "1 March 1996" 
+.IX "Display.4" "" "Display.4" "" 
+.SH NAME
+Display \- display a document
+.SH SYNOPSIS
+.ft 3
+.nf
+.ta \w'[\f2file\fP] Display('u
+[\f2file\fP] Display(in \f2mediaType contents\fP
+	[in title \f2docName\fP]);
+.PP
+.fi
+.SH DESCRIPTION
+The
+.I Display
+request causes the handler to display (present or manifest)
+a document to the user.
+For example, an audio manipulation utility would be said to
+``display'' audio documents when it plays them.
+.PP
+The handler must decide issues such as:
+.PP
+.RS 3
+.nr )J 3
+.LI \(bu
+When the display operation can be deemed completed
+.LI \(bu
+What user gesture signals the completion of the display
+.LI \(bu
+What the handling tool should do with itself after replying
+.PP
+.RE
+.nr )J 0
+.PP
+The
+.I contents
+argument
+is the contents of the document.
+If this argument is unset
+(in other words, has a value of
+.BR (char\ *)0 ) ,
+then the contents of the document are in
+the file named in the message's
+.I file
+attribute.
+The data type
+.RI ( mediaType )
+of the
+.I contents
+argument should be
+.BR string ,
+unless nulls are valid in the given media type,
+in which case the data type must be
+.BR bytes .
+.PP
+The
+.I docName
+argument contains the name of the document.
+If the
+.I docName
+argument is absent and the
+.I file
+attribute is set,
+the file name is considered to be the title of the document.
+This string would be suitable for display in a window title bar, for example.
+.SH "APPLICATION USAGE"
+The
+.BR ttmedia_ptype_declare (3)
+function can be used to register for,
+and help process, this message.
+.PP
+This message can be sent with the
+.BR ttmedia_load (3)
+function.
+.PP
+When the document to be displayed
+is read-only or unlikely to be modified
+the
+.I Display
+message is frequently used instead of the
+.I Edit
+message.
+.SH EXAMPLES
+To display a PostScript document, the application can send a
+.I Display
+request with a first argument whose vtype is
+.BR PostScript ,
+and whose value is a vector of bytes such as:
+.PP
+.sp -1
+.RS 5
+.ta 4m +4m +4m +4m +4m +4m +4m
+.nf
+.ft 3
+\&%!\en/inch {72 mul} def...
+.PP
+.ft 1
+.fi
+.RE
+.PP
+The
+.B \en
+in the example represents the newline character.
+.PP
+To display a PostScript document contained in a file,
+the application can send a
+.I Display
+request with the
+.I file
+attribute set to that file
+and with an unset first argument whose vtype is
+.BR PostScript .
+.SH ERRORS
+The ToolTalk service may return one of the following errors
+in processing the
+.I Display
+request:
+.PP
+.RS 3
+.nr )J 6
+.Lc TT_DESKTOP_ENOENT
+.br
+The file that was alleged to contain the document does not exist.
+.Lc TT_DESKTOP_ENODATA
+.br
+The in-mode
+.I contents
+argument had no value and the
+.I file
+attribute
+of the message was not set.
+.Lc TT_MEDIA_ERR_FORMAT
+.br
+The document is not a valid instance of the media type.
+.PP
+.RE
+.nr )J 0
+.SH "SEE ALSO"
+.na
+.BR ttmedia_ptype_declare (3),
+.BR ttmedia_load (3);
+.IR Intro ,
+.IR Deposit ,
+.IR Edit ,
+.I Status
+requests.

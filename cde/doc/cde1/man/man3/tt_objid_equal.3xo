@@ -1,0 +1,91 @@
+.TH tt_objid_equal 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+tt_objid_equal \- test whether two objids are equal
+.SH SYNOPSIS
+.yS
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'int tt_objid_equal('u
+int tt_objid_equal(const char *\f2objid1\fP,
+	const char *\f2objid2\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn tt_objid_equal
+function
+tests whether two
+objids
+are equal.
+.P
+The
+.Fn tt_objid_equal 3
+function is recommended rather than
+.Fn strcmp 3
+for this purpose because the
+.Fn tt_objid_equal 3
+function returns 1 even in the
+case where one
+objid
+is a forwarding pointer for the other.
+.P
+The
+.I objid1
+argument is the identifier of the first object involved in this operation.
+The
+.I objid2
+argument is the identifier of the second object involved in this operation.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn tt_objid_equal
+function returns an integer that indicates whether the
+objids
+are equal.
+The application can use
+.Fn tt_int_error 3
+to extract one of the following
+.B Tt_status
+values from the returned integer:
+.VL 4
+.LI 0
+The
+.I objid1
+and
+.I objid2
+objects are not equal.
+.LI 1
+The
+.I objid1
+and
+.I objid2
+objects are equal.
+.LE
+.P
+The application can use
+.Fn tt_int_error 3
+to determine if the integer is valid.
+The
+.Fn tt_objid_equal
+function returns one of the following
+.B Tt_status
+values:
+.VL 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_NOMP
+.br
+The
+.Cm ttsession 1
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_OBJID
+.br
+The
+objid
+passed to the ToolTalk service does not reference an existing object spec.
+.LE
+.SH "SEE ALSO"
+.Hd Tt/tt_c.h 5,
+.Fn tt_int_error 3.

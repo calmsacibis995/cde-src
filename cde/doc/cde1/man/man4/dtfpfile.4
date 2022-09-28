@@ -1,0 +1,741 @@
+.\" *************************************************************************
+.\" **
+.\" ** (c) Copyright 1993,1994 Hewlett-Packard Company 
+.\" ** (c) Copyright 1993,1994 International Business Machines Corp. 
+.\" ** (c) Copyright 1993,1994 Sun Microsystems, Inc.
+.\" ** (c) Copyright 1993,1994 Unix SystemLabes, Inc., a subsidiary of Novell, Inc.
+.\" **
+.\" *************************************************************************
+.TH \fBdtfpfile\fP 4
+.SH NAME
+\fIdtfpfile\fP \(em  format and locations for front panel configuration files.
+.SH SYNOPSIS
+.nf
+\fIRecordType\fP  \fIrecord_name\fP
+{
+.in +5n
+# Comment
+\fIKeyword\fP \fIValue\fP
+\fIKeyword\fP \fIValue\fP
+        \.
+        \.
+        \.
+.in -5n
+}
+.fi
+.SH DESCRIPTION
+.PP
+The front panel database provides definitions for the components
+which define the content and functionality of the front panel.  Files 
+containing front panel definitions must end with the \fI.fp\fP suffix.
+Like the Action/Data Type database, the front panel database is constructed
+by reading all files, ending in the \fI.fp\fP suffix, found in the search path
+specified by the \fBDTDATABASESEARCHPATH\fP environment variable.  
+.PP
+See \fIdtdtfile(4)\fP for a complete description of the
+directory locations where these database files are found and for a description
+of the specific syntax for the database files.
+.SH FILE FORMAT
+The general syntax of the Front Panel configuration files is as described 
+above in the SYNOPSIS section of this man page.  Descriptions of \fIComments,
+Versions\fP and \fIVariables\fP can be found in \fIdtdtfile(4).\fP
+.PP
+The front panel defines a new set of \fIRecord Types\fP each with a set of
+\fIKeyword, Value\fP pairs.
+There are a total of six record types defined \fB(PANEL, BOX, SUBPANEL, 
+SWITCH, CONTROL and ANIMATION)\fP. Each record type has a set of
+keywords defined for it.  Many of the keywords are used for 
+multiple record types.  In the following tables containing the listing
+of the keywords for each record type, a \fB*\fP in the Default column of the
+table indicates that this value must be specified.
+.bp
+.SS "Record Types"
+.TP
+.B \PANEL \fI"front panel name"\fP
+.sp .5
+The \fBPANEL\fP record type defines the outermost container of the front
+panel.  It can contain one or more \fBBOX\fP'es and optionally repositioning
+handles, a menu and minimize button.
+The keywords defined for \fBPANEL\fP are as follows.
+.sp .5
+.in 0
+.KS
+.sp 1
+.in 0
+.TS
+center;
+cBp7 sss
+lBp7 lBp7 lBp7
+lp7 lp7 lp7.
+\fBPANEL\fP Record Type Keyword Set
+Keyword	Value	Default
+_
+PANEL_GEOMETRY	[+/- x-offset][+/- y-offset]	Null
+DISPLAY_HANDLES	(True/False)	True
+DISPLAY_MENU	(True/False)	True
+DISPLAY_MINIMIZE	(True/False)	True
+RESOLUTION	(high/medium/low/match_display)	match_display
+CONTROL_BEHAVIOR	(double_click/single_click)	double_click
+DISPLAY_CONTROL_LABELS	(True/False)	False
+SUBPANEL_UNPOST	(True/False)	True
+LOCKED	(True/False)	False
+HELP_STRING	string	Null
+HELP_TOPIC	topic name	Null
+HELP_VOLUME	volume name	FPanel
+.TE
+.in
+.sp 1
+.KE
+.in
+.sp .5
+.sp .5
+.TP
+.B \BOX \fI"box name"\fP
+.sp .5
+The \fBBOX\fP record type defines a container within a \fBPANEL\fP that can
+hold a row of \fPCONTROLS\fP and at most one \fBSWITCH\fP container.
+Multiple \fBBOX\fP'es within a \fBPANEL\fP are stacked vertically.
+The keywords defined for \fBBOX\fP are as follows.
+.sp .5
+.in 0
+.KS
+.sp 1
+.in 0
+.TS
+center;
+cBp7 sss
+lBp7 lBp7 lBp7
+lp7 lp7 lp7.
+\fBBOX\fP Record Type Keyword Set
+Keyword	Value	Default
+_
+CONTAINER_NAME	front panel name	Null \fB*\fP
+POSITION_HINTS	(first/last/1-99)	first
+LOCKED	(True/False)	False
+DELETE	(True/False)	False
+HELP_STRING	string	Null
+HELP_TOPIC	topic name	Null
+HELP_VOLUME	volume name	FPanel
+.TE
+.in
+.sp 1
+.KE
+.in
+.sp .5
+.sp .5
+.TP
+.B \SUBPANEL \fI"subpanel name"\fP
+.sp .5
+The \fBSUBPANEL\fP record type defines a secondary container for \fPCONTROL\fPs
+which "slide up" from the front panel.  \fBSUBPANEL\fPs can also contain a
+drop zone where new controls can be dynamically added.
+The keywords defined for \fBSUBPANEL\fP are as follows.
+.sp .5
+.in 0
+.KS
+.sp 1
+.in 0
+.TS
+center;
+cBp7 sss
+lBp7 lBp7 lBp7
+lp7 lp7 lp7.
+\fBSUBPANEL\fP Record Type Keyword Set
+Keyword	Value	Default
+_
+CONTAINER_NAME	control name	Null \fB*\fP
+CONTROL_INSTALL	(True/False)	True
+TITLE	string	Null
+LOCKED	(True/False)	False
+DELETE	(True/False)	False
+HELP_STRING	string	Null
+HELP_TOPIC	topic name	Null
+HELP_VOLUME	volume name	FPanel
+.TE
+.in
+.sp 1
+.KE
+.in
+.sp .5
+.sp .5
+.TP
+.B \SWITCH \fI"switch name"\fP
+.sp .5
+The \fBSWITCH\fP record type defines a container within a \fBBOX\fP which
+contains a set of push buttons each of which give access to a corresponding
+workspace.  See \fIdtwm(1)\fP for a description of the multiple workspace
+capabilities.  Also contained within the \fBSWITCH\fP container is an
+optional set of \fBCONTROL\fPs.  These are presented in a column on each
+side of the push buttons.
+The keywords defined for \fBSWITCH\fP are as follows.
+.sp .5
+.in 0
+.KS
+.sp 1
+.in 0
+.TS
+center;
+cBp7 sss
+lBp7 lBp7 lBp7
+lp7 lp7 lp7.
+\fBSWITCH\fP Record Type Keyword Set
+Keyword	Value	Default
+_
+CONTAINER_NAME	box name	Null \fB*\fP
+POSITION_HINTS	(first/last/1-99)	first
+NUMBER_OF_ROWS	(1-N)	2
+LOCKED	(True/False)	False
+DELETE	(True/False)	False
+HELP_STRING	string	Null
+HELP_TOPIC	topic name	Null
+HELP_VOLUME	volume name	FPanel
+.TE
+.in
+.sp 1
+.KE
+.in
+.sp .5
+.sp .5
+.TP
+.B \CONTROL \fI"control name"\fP
+.sp .5
+The \fBCONTROL\fP record type defines the main functional component of the
+front panel.  \fBCONTROL\fP's typically have actions defined for them that
+are invoked on selection and/or drag & drop.  \fBCONTROL\fP's are displayed
+with icons or labels and can have iconic animations associated with them.
+The keywords defined for \fBCONTROL\fP are as follows.
+.sp .5
+.in 0
+.KS
+.sp 1
+.in 0
+.TS
+center;
+cBp7 sss
+lBp7 lBp7 lBp7
+lp7 lp7 lp7.
+\fBCONTROL\fP Record Type Keyword Set
+Keyword	Value	Default
+_
+TYPE	(blank/busy/icon/client/clock/date/file)	Null \fB*\fP
+CONTAINER_TYPE	(BOX/SWITCH/SUBPANEL)	Null \fB*\fP
+CONTAINER_NAME	(box name/switch name/subpanel name)	Null \fB*\fP
+POSITION_HINTS	(first/last/1-99)	first
+ICON	image name	Null
+ALTERNATE_ICON	image name	Null
+LABEL	string	Null
+PUSH_ACTION	action_name	Null
+PUSH_ANIMATION	animation name	Null
+DROP_ACTION	action_name	Null
+DROP_ANIMATION	animation name	Null
+PUSH_RECALL	(True/False)	False
+MONITOR_TYPE	(none/mail/file)	none
+CLIENT_NAME	client name	Null
+CLIENT_GEOMETRY	[width x height]	Null
+FILE_NAME	file name	Null
+DATE_FORMAT	format string	%b%n%e
+LOCKED	(True/False)	False
+DELETE	(True/False)	False
+HELP_STRING	string	Null
+HELP_TOPIC	topic name	Null
+HELP_VOLUME	volume name	FPanel
+.TE
+.in
+.sp 1
+.KE
+.in
+.sp .5
+.sp .5
+.TP
+.B \ANIMATION \fI"animation name"\fP
+.sp .5
+\fBANIMATION\fPs are a sequence of image name/time delay pairs that are 
+displayed by a \fBCONTROL\fP upon a \fBPUSH_ACTION\fP and/or 
+\fBDROP_ACTION.\fP
+.sp .5
+.in 0
+.KS
+.sp 1
+.in 0
+.TS
+center;
+cBp7 sss
+lBp7 lBp7 lBp7
+lp7 lp7 lp7.
+\fBANIMATION\fP Record Type Keyword Set
+Keyword	Value	Default
+_
+ANIMATION	image name, [millisecond delay]	None, 200
+.TE
+.in
+.sp 1
+.KE
+.in
+.sp 4.5
+.SS "Keyword and Value Descriptions"
+.PP
+The following list contains a description of each of the keywords defined by
+the front panel.
+.sp 1.5
+.B \ALTERNATE_ICON
+.in +2n
+.br
+\(bu
+Used for record types of: \fBCONTROL\fP
+.br
+\(bu
+Used with control types of: busy and icon
+.PP
+\fBALTERNATE_ICON\fP defines an image to be used to replace the normal 
+image within a mail or monitor_file control in the front panel. The image
+is displayed when the file being monitored changes. For the busy control, 
+\fBALTERNATE_ICON\fP is cycled with \fBICON\fP to give the blinking effect.
+.in -2n
+.sp 2.5
+.B \ANIMATION
+.in +2n
+.br
+\(bu
+Used for record types of: \fBANIMATION\fP
+.br
+\(bu
+Used with control keywords of: \fBPUSH_ANIMATION\fP and \fBDROP_ANIMATION\fP
+.PP
+\fBANIMATION\fP defines a sequence of images to be displayed for either a 
+\fBPUSH_ACTION\fP or \fBDROP_ACTION\fP. Each animation within the list is 
+displayed in order with a default time separation of 200 milliseconds. For 
+a slower or faster sequence, the image name value can be followed by the 
+amount of time to display the image.  If no time value is specified the
+previously specified value is used.
+.in -2n
+.sp 2.5
+.B \CLIENT_GEOMETRY
+.in +2n
+.br
+\(bu
+Used for record types of: \fBCONTROL\fP
+.br
+\(bu
+Used with control types of: client
+.br
+\(bu
+Used with control keywords of: \fBCLIENT_NAME\fP
+.PP
+\fBCLIENT_GEOMETRY\fP specifies the size (in pixels) needed for the 
+window of a client displayed within the front panel.
+.in -2n
+.sp 2.5
+.B \CLIENT_NAME
+.in +2n
+.br
+\(bu
+Used for record types of: \fBCONTROL\fP
+.br
+\(bu
+Used with control types of: client or icon
+.br
+\(bu
+Used with control keywords of: \fBPUSH_RECALL\fP
+.PP
+\fBCLIENT_NAME\fP specifies a name used to associate a control with an 
+executable. It is necessary for control types of client (an X client 
+running within the front panel) and for icon when the keyword 
+\fBPUSH_RECALL\fP is True. The value client name is the name of the 
+executable or can be set via a command line parameter for some 
+clients (xterm -name panelterm).  The client name for a running client can
+be found by executing xprop.  The first string of the WM_CLASS property is
+the value used.
+.in -2n
+.sp 2.5
+.B \CONTAINER_NAME
+.in +2n
+.br
+\(bu
+Used for record types of: \fBBOX, SUBPANEL, SWITCH, CONTROL\fP
+.PP
+\fBCONTAINER_NAME\fP associates a component with it parent. For example,
+the \fBCONTAINER_NAME\fP value for a \fBSWITCH\fP tells the front panel which 
+\fBBOX\fP to place it into. Since controls can reside several different 
+component types, \fBCONTAINER_NAME\fP is used in conjunction with 
+\fBCONTAINER_TYPE\fP to define a controls parent.
+.in -2n
+.sp 2.5
+.B \CONTAINER_TYPE
+.in +2n
+.br
+\(bu
+Used for record types of: \fBCONTROL\fP
+.PP
+\fBCONTAINER_TYPE\fP defines a controls parent type. This is used to 
+uniquely identify a control so that it can be created within the proper parent.
+.in -2n
+.sp 2.5
+.B \CONTROL_BEHAVIOR
+.in +2n
+.br
+\(bu
+Used for record types of: \fBPANEL\fP
+.PP
+\fBCONTROL_BEHAVIOR\fP provides the mechanism for setting the user model 
+for front panel controls. Controls can be set to invoke their 
+\fBPUSH_ACTION\fP by either single click or double click.
+.in -2n
+.sp 2.5
+.B \CONTROL_INSTALL
+.in +2n
+.br
+\(bu
+Used for record types of: \fBSUBPANEL\fP
+.PP
+\fBCONTROL_INSTALL\fP enables or disables dynamic control installation 
+into subpanels. A value of True causes the control installation area 
+to be displayed within the subpanel.
+.in -2n
+.sp 2.5
+.B \DATE_FORMAT
+.in +2n
+.br
+\(bu
+Used for record types of: \fBCONTROL\fP
+.br
+\(bu
+Allowed for control types of: date
+.PP
+\fBDATE_FORMAT\fP specifies the layout of the date string for a control of 
+type date. This format is used by the unix command strftime. See 
+strftime(3) for a description of the format.
+.in -2n
+.sp 2.5
+.B \DELETE\fP
+.in +2n
+.br
+\(bu
+Used for record types of: \fBBOX, SUBPANEL, SWITCH, CONTROL\fP
+.PP
+\fBDELETE\fP is used to override and remove and non-locked component from 
+the front panel. This is necessary to eliminate system default front 
+panel components without replacing the default files. To use \fBDELETE\fP
+a copy of the component definition with the additioinal \fBDELETE\fP keyword
+is stored in a .fp file in the users or application types directory.
+.in -2n
+.sp 2.5
+.B \DISPLAY_CONTROL_LABELS
+.in +2n
+.br
+\(bu
+Used for record types of: \fBPANEL\fP
+.PP
+\fBDISPLAY_CONTROL_LABELS\fP specifies whether the controls contained within 
+the front panels boxes will have their labels displayed.
+.in -2n
+.sp 2.5
+.B \DISPLAY_HANDLES
+.in +2n
+.br
+\(bu
+Used for record types of: \fBPANEL\fP
+.PP
+\fBDISPLAY_HANDLES\fP, if set to True causes the move handles to be 
+displayed along the left and right edges of the front panel.
+.in -2n
+.sp 2.5
+.B \DISPLAY_MENU
+.in +2n
+.br
+\(bu
+Used for record types of: \fBPANEL\fP
+.PP
+\fBDISPLAY_MENU\fP, if set to True with \fBDISPLAY_HANDLES\fP also set to 
+True causes the system menu button to be displayed in the upper left 
+hand corner of the front panel.
+.in -2n
+.sp 2.5
+.B \DISPLAY_MINIMIZE
+.in +2n
+.br
+\(bu
+Used for record types of: \fBPANEL\fP
+.PP
+\fBDISPLAY_MINIMIZE\fP, if set to True with \fBDISPLAY_HANDLES\fP also set 
+to True causes the minimize button to be displayed in the upper right
+hand corner of the front panel.
+.in -2n
+.sp 2.5
+.B \DROP_ACTION
+.in +2n
+.br
+\(bu
+Used for record types of: \fBCONTROL\fP
+.PP
+\fBDROP_ACTION\fP specifies the function that is invoked when a drop occurs 
+on the control.
+.in -2n
+.sp 2.5
+.B \DROP_ANIMATION
+.in +2n
+.br
+\(bu
+Used for record types of: \fBCONTROL\fP
+.br
+\(bu
+Allowed for all control types except: client
+.PP
+\fBDROP_ANIMATION\fP specifies the name of an animation record to be 
+displayed when a drop occurs on the control. The control must have
+a \fBDROP_ACTION\fP defined for the animation to be used.
+.in -2n
+.sp 2.5
+.B \FILE_NAME
+.in +2n
+.br
+\(bu
+Used for record types of: \fBCONTROL\fP
+.br
+\(bu
+Allowed for control types of: icon and file
+.PP
+For the control type of file, \fBFILE_NAME\fP is the name of the file to be 
+used for the control. The files file type, actions and images are extracted
+from the action database for the control. For control types of main and 
+monitor_file, \fBFILE_NAME\fP specifies the name of the file the front panel
+is to monitor for either mail arrival or some other user defined data.
+For control types of monitor_file, the \fBALTERNATE_ICON\fP image is displayed
+when the monitored file is non-empty. The \fBICON\fP image is displayed 
+if the file is empty or non-existent. For controls types mail, the
+\fBALTERNATE_ICON\fP image is displayed when the file increases in size.
+.in -2n
+.sp 2.5
+.B \HELP_STRING
+.in +2n
+.br
+\(bu
+Used for record types of:  \fBPANEL, BOX, SUBPANEL, SWITCH and CONTROL\fP
+.PP
+\fBHELP_STRING\fP specifies an on-line help string to display when 
+help is requested over a front panel component. Since each component 
+type can have a help string associated with it, there is a precedence
+used in deciding which help string to display. Control help takes precedence
+over box help, switch help and subpanel help. Box help takes precedence 
+over panel help.
+.PP
+The \fBHELP_STRING\fP value is used only if no \fBHELP_TOPIC\fP value has 
+been defined.
+.in -2n
+.sp 2.5
+.B \HELP_TOPIC
+.in +2n
+.br
+\(bu
+Used for record types of:  \fBPANEL, BOX, SUBPANEL, SWITCH and CONTROL\fP
+.PP
+\fBHELP_TOPIC\fP specifies an on-line help topic which is used with 
+either the default help volume or a help volume specified by the
+\fBHELP_VOLUME\fP keyword to display help information when requested 
+over a front panel component. Like the \fBHELP_STRING\fP keyword, each
+component type can have a help topic associated with it and the same
+precedence rules are used.
+.in -2n
+.sp 2.5
+.B \HELP_VOLUME
+.in +2n
+.br
+\(bu
+Used for record types of: \fBPANEL, BOX, SUBPANEL, SWITCH and CONTROL\fP 
+.PP
+\fBHELP_VOLUME\fP, when used in conjunction with \fBHELP_TOPIC\fP, defines
+the help information to be displayed for a front panel component.
+.in -2n
+.sp 2.5
+.B \ICON
+.in +2n
+.br
+\(bu
+Used for record types of: \fBCONTROL\fP
+.br
+\(bu
+Allowed for controls types of: icon, file, and busy.
+.PP
+\fBICON\fP specifies image to be displayed within a control.
+.in -2n
+.sp 2.5
+\fBLABEL\fP
+.in +2n
+.br
+\(bu
+Used for record types of: \fBCONTROL\fP
+.br
+\(bu
+Allowed for control types of:  icon, file, clock and busy.
+.PP
+\fBLABEL\fP specifies the string to be displayed when a control is 
+in a subpanel.
+.in -2n
+.sp 2.5
+\fBLOCKED\fP
+.in +2n
+.br
+\(bu
+Used for record types of: \fBPANEL, BOX, SUBPANEL, SWITCH and CONTROL\fP
+.PP
+\fBLOCKED\fP provides the mechanism to prevent a component definition 
+of identical type, name and parent from overriding (replacing) this
+definition. Since the front panel can be defined within multiple 
+configuration files, it provides the flexibility override components
+found earlier in the search path.  Like Actions and Filetypes, this gives
+the ability to customize the front panel at several levels.
+.in -2n
+.sp 2.5
+.B \MONITOR_TYPE
+.in +2n
+.br
+\(bu
+Used for record types of: \fBCONTROL\fP
+.br
+\(bu
+Allowed for control types of: icon and file
+.PP
+\fBMONITOR_TYPE\fP specifies the method of checking the file being monitored,
+specified by the keyword \fBMONITOR_FILE.\fP
+.in -2n
+.sp 2.5
+.B \NUMBER_OF_ROWS
+.in +2n
+.br
+\(bu
+Used for record types of: \fBSWITCH\fP
+.PP
+\fBNUMBER_OF_ROWS\fP provides control over the layout of the workspace 
+switch buttons.
+.in -2n
+.sp 2.5
+.B \PANEL_GEOMETRY
+.in +2n
+.br
+\(bu
+Used for record types of: \fBPANEL\fP
+.PP
+\fBPANEL_GEOMETRY\fP specifies a non-default location to position the
+front panel when it is created.  By default, the front panel is centered
+along the bottom of the display.
+.in -2n
+.sp 2.5
+.B \POSITION_HINTS
+.in +2n
+.br
+\(bu
+Used for record types of: \fBBOX, SWITCH, and CONTROL\fP
+.PP
+\fBPOSITION_HINTS\fP specifies the ordering of boxes in the front panel,
+the switch and controls in boxes and controls in subpanels. When two 
+components have the same value for \fBPOSITION_HINTS\fP, the first one 
+read from the configuration file is placed first.
+.in -2n
+.sp 2.5
+.B \PUSH_ACTION
+.in +2n
+.br
+\(bu
+Used for record types of: \fBCONTROL\fP
+.PP
+\fBPUSH_ACTION\fP specifies the function that is invoked when a selection 
+occurs on the control.
+.in -2n
+.sp 2.5
+.B \PUSH_ANIMATION
+.in +2n
+.br
+\(bu
+Used for record types of: \fBCONTROL\fP
+.br
+\(bu
+Allowed for all control types except: client
+.PP
+\fBPUSH_ANIMATION\fP specifies the name of an animation record to be 
+displayed when a selection occurs on the control. The control must 
+have a \fBPUSH_ACTION\fP defined for the animation to be used.
+.in -2n
+.sp 2.5
+.B \PUSH_RECALL
+.in +2n
+.br
+\(bu
+Used for record types of: \fBCONTROL\fP
+.br
+\(bu
+Used with control keywords of: \fBCLIENT_NAME\fP
+.PP
+\fBPUSH_RECALL\fP, when True specifies that only one process can be 
+started by the control. If the process is already running, it is 
+displayed within the current workspace and shuffled to the top of
+the window stack. The value for the \fBCLIENT_NAME\fP keyword is used
+to identify the process for push recall behavior.
+.in -2n
+.sp 2.5
+.B \RESOLUTION
+.in +2n
+.br
+\(bu
+Used for record types of: \fBPANEL\fP
+.PP
+\fBRESOLUTION\fP, allows the icon set for the front panel to be forced 
+to a particular set. By default, the front panel will determine the 
+display resolution at runtime and choose the high resolution icon set if 
+the display width is 1024 pixels or wider.
+.in -2n
+.sp 2.5
+.B \SUBPANEL_UNPOST
+.in +2n
+.br
+\(bu
+Used for record types of: \fBPANEL\fP
+.PP
+\fBSUBPANEL_UNPOST\fP, when True, causes a subpanel to hide itself 
+whenever a \fBPUSH_ACTION\fP occurs on one of the subpanels controls.
+If the subpanel has been "torn off" of the front panel, the 
+behavior of the subpanel is forced to remain posted upon \fBPUSH_ACTION\fPs.
+.in -2n
+.sp 2.5
+.B \TITLE
+.in +2n
+.br
+\(bu
+Used for record types of: \fBSUBPANEL\fP
+.PP
+\fBTITLE\fP, specifies the string to be displayed in the title area of 
+the subpanel.
+.in -2n
+.sp 2.5
+.B \TYPE
+.in +2n
+.br
+\(bu
+Used for record types of: \fBCONTROL\fP
+.PP
+A number of different control types are defined by the front panel.
+.PP
+\fIblank\fP - Space-holder control.
+.br
+\fIbusy\fP - Busy light.
+.br
+\fIclient\fP - A client window.
+.br
+\fIclock\fP - Front panel clock.
+.br
+\fIdate\fP - Front panel date.
+.br
+\fIfile\fP - References a file on the file system. Uses the files actions and image.
+.br
+\fIicon\fP - Front panel general control.
+.in -2n
+.SH FILES
+The default Front Panel configuration file can be found in 
+\fI/usr/dt/appconfig/types/C/dtwm.fp.\fP
+.sp
+Files containing the attributes of dynamically created Front Panel components
+can be found in the directory \fI$HOME/.dt/types/fp_dynamic.\fP
+.SH ERRORS
+Errors encountered when loading Front Panel database files are written to the
+CDE errorlog file.  Records containing errors are rejected.
+.SH "SEE ALSO"
+.BR  dtwm(1),
+.BR  dtdtfile(4)

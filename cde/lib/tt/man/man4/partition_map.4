@@ -1,0 +1,80 @@
+.TH partition_map 4 "1 March 1996" "ToolTalk 1.3" "ToolTalk Commands" 
+.BH "1 March 1996"
+.\" (c) Copyright 1993, 1995 Sun Microsystems, Inc.
+.\"  (c) Copyright 1993, 1995 Hewlett-Packard Company
+.\"  (c) Copyright 1993, 1995 International Business Machines Corp.
+.\"  (c) Copyright 1993, 1995 Novell, Inc.
+.IX "partition_map.4" "" "partition_map.4" "" 
+.SH NAME
+partition_map - tell 
+.BR rpc.ttdbserverd (1M)
+to locate its databases in an alternate file system
+.SH SYNOPSIS
+.PP
+.B partition_map
+.SH DESCRIPTION
+.PP
+For each filesystem that
+.B rpc.ttdbserverd
+needs to store information about, it creates a directory called
+TT_DB at the mountpoint of that file system.  In that directory
+it creates the databases it needs to store its tables and indices.
+If the partition is not writable, then
+.B rpc.ttdbserverd
+can be told, via
+.BR partition_map (4),
+to create the databases in another file system.
+.PP
+The
+.B partition_map
+file is called "partition_map" and resides in /etc/tt.
+If $TT_PARTITION_MAP is set, it is used
+in place of /etc/tt/partition_map.
+.PP
+.BR rpc.ttdbserverd (1M)
+reads the partition map upon startup and rereads the map if it
+receives signal USR2.
+.SS Format rules
+.PP
+The format rules for a
+.B partition_map
+are:
+.HP 3
+1. Any line beginning with a "#" or white-space and a "#" is a comment.
+.HP 3
+2. Blank lines are comments.
+.HP 3
+3. Words are delimited by white space.
+.HP 3
+4. The first word in a non-comment line is the partition from which
+to map.
+.HP 3
+5. The second word in a non-comment line is the partition to which
+to map. Although the TT_DB directories are by default at the root
+of their file systems, the user may in fact map to any local filename
+that is writeable by UID root.
+.SH ENVIRONMENT
+.TP
+.SM TT_PARTITION_MAP
+If $TT_PARTITION_MAP is set, it is used
+in place of /etc/tt/partition_map.
+.SH EXAMPLES
+.PP
+This example maps "/cdrom" to "/usr":
+.IP
+.nf
+# cannot write to /cdrom
+/cdrom /usr
+.fi
+.PP
+This example maps "/cdrom" to "/usr/TT_maps/cdrom":
+.IP
+.nf
+# cannot write to /cdrom
+/cdrom /usr/TT_maps/cdrom
+.fi
+.SH "SEE ALSO"
+.na
+.PP
+.BR rpc.ttdbserverd (1M),
+.BR hostname_map (4)

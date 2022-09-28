@@ -1,0 +1,62 @@
+XCOMM $XConsortium: Imakefile /main/cde1_maint/5 1995/10/17 18:46:16 barstow $
+.SUFFIXES: .ptype .done
+
+LOCALDEPFILES = dtfile.done dticon.done dtpad.done dtcm.done dtmail.done dtdbcache.done dtterm.done
+
+#if SunCDE
+EXTRADEPFILES = sdtimage.done
+#endif
+
+all:: types.xdr
+
+types.xdr: $(LOCALDEPFILES) $(EXTRADEPFILES)
+
+/* could be moved to config somewhere */
+/* The following is necessary for 2 reasons:
+   Shared library trees need to set the environment variable to 
+   find libtt in the build tree.
+   We need to also choose between binstall paths or build tree paths
+   for tt_type_comp.
+*/
+
+#if UseAltBuildScheme
+TTLIBPATH = $(SHAREDLIBPATH)=$(BINSTALL_LIBDIR)
+TT_TYPE_COMP = $(TTLIBPATH) $(BINSTALL_BINDIR)/tt_type_comp
+#else
+#ifdef UXPArchitecture
+TTLIBPATH = $(SHAREDLIBPATH)=$$$(SHAREDLIBPATH):$(TTSRC)/lib
+#else
+#if defined(USLArchitecture) 
+TTLIBPATH = $(SHAREDLIBPATH)=$(TTSRC)/lib:../../lib/Xt:/usr/X/lib
+#else
+TTLIBPATH = $(SHAREDLIBPATH)=$(TTSRC)/lib
+#endif
+#endif
+TT_TYPE_COMP = $(TTLIBPATH) $(TTSRC)/bin/tt_type_comp/tt_type_comp
+#endif
+
+#if defined(SunArchitecture) || defined(USLArchitecture) || defined(UXPArchitecture) || defined(AlphaArchitecture)
+
+SHAREDLIBPATH = LD_LIBRARY_PATH
+#endif
+#ifdef RsArchitecture
+SHAREDLIBPATH = LIBPATH
+#endif
+#ifdef HPArchitecture
+SHAREDLIBPATH = SHLIB_PATH
+#endif
+
+#ifdef AlphaArchitecture
+.ptype.done:
+	$(RM) $@
+	LD_LIBRARY_PATH="../../lib/tt/lib" TTPATH=. $(TT_TYPE_COMP) -sd user -m $< && touch $@
+#else
+.ptype.done:
+	$(RM) $@
+	TTPATH=. $(TT_TYPE_COMP) -sd user -m $< && touch $@
+#endif
+
+clean::
+	$(RM) *.done types.xdr
+
+depend::

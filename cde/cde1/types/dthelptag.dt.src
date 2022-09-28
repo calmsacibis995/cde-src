@@ -1,0 +1,180 @@
+\###############################################################################
+\#
+\#     dthelptag.dt
+\#
+\#     Actions and DataTypes for authoring Help information.
+\#
+\#    (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+\#    (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+\#    (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+\#    (c) Copyright 1993, 1994, 1995 Novell, Inc.
+\#
+\#     $XConsortium: dthelptag.dt.src /main/cde1_maint/4 1995/10/31 11:38:02 rcs $
+\#
+\###############################################################################
+set DtDbVersion=1.0
+
+\###############################################################################
+\#
+%|nls-10-#\# WARNING:...#|
+\#
+\###############################################################################
+
+%|nls-16001-# The ...|
+set HELPTAG_PATH=\$PATH:CDE_INSTALLATION_TOP/bin
+
+\###################################################################
+\#
+%|nls-11-#\# Data Attributes#|
+\#
+\###################################################################
+DATA_ATTRIBUTES DTHELP_HTG
+{
+        ACTIONS         Open,Compile,CleanUp
+        ICON            Dthsrc
+        NAME_TEMPLATE   %s.htg
+        MIME_TYPE	text/plain
+        DESCRIPTION     %|nls-16002-#This is a ...#|
+        TYPE_LABEL      %|nls-31052-#DTHELP_HTG#|
+}
+
+DATA_CRITERIA DTHELP_HTG1
+{
+	DATA_ATTRIBUTES_NAME DTHELP_HTG
+        MODE            f
+        NAME_PATTERN    *.htg
+}
+
+\###################################################################
+
+DATA_ATTRIBUTES DTHELP_CTG
+{
+        ACTIONS         Open,CompileCanon,CleanUp
+        ICON            Dthsrc
+        NAME_TEMPLATE   %s.ctg
+        MIME_TYPE	text/plain
+        DESCRIPTION     %|nls-16003-#This is a ...#|
+        TYPE_LABEL      %|nls-31053-#DTHELP_CTG#|
+}
+
+DATA_CRITERIA DTHELP_CTG1
+{
+	DATA_ATTRIBUTES_NAME DTHELP_CTG
+        MODE            f
+        NAME_PATTERN    *.ctg
+}
+
+\###################################################################
+
+DATA_ATTRIBUTES DTHELP_ERR
+{
+        ACTIONS         Open
+        ICON		Dthtop
+        NAME_TEMPLATE   %s.err
+        MIME_TYPE	text/plain
+        DESCRIPTION     %|nls-16004-#A DTHELP_ERR file is a ...#|
+        TYPE_LABEL      %|nls-31054-#DTHELP_ERR#|
+}
+
+DATA_CRITERIA DTHELP_ERR1
+{
+        DATA_ATTRIBUTES_NAME DTHELP_ERR
+        NAME_PATTERN    *.err
+        MODE            f
+}
+
+\###################################################################
+\###################################################################
+\#
+%|nls-12-#\# Actions#|
+\#
+\###################################################################
+ACTION Open
+{
+        LABEL           %|nls-1-Open|
+        ARG_TYPE        DTHELP_HTG,DTHELP_CTG
+	TYPE		MAP
+        MAP_ACTION      OpenHelpTag
+}
+
+\#######
+
+ACTION Compile
+{
+        LABEL           %|nls-16005-#Compile|
+        ARG_TYPE        DTHELP_HTG
+	TYPE		MAP
+        MAP_ACTION	HelpTag
+}
+
+\#######
+
+ACTION CompileCanon
+{
+        LABEL           %|nls-16006-#CompileCanon|
+        ARG_TYPE        DTHELP_CTG
+	TYPE		MAP
+        MAP_ACTION	HelpTagCanon
+}
+
+\#######
+
+ACTION CleanUp
+{
+        LABEL           %|nls-16007-#CleanUp|
+        ARG_TYPE        DTHELP_HTG,DTHELP_CTG
+	TYPE		MAP
+        MAP_ACTION	CleanHelpTag
+}
+
+\#######
+
+ACTION OpenHelpTag
+{
+        LABEL           %|nls-16008-#OpenHelpTag|
+	TYPE		COMMAND
+	WINDOW_TYPE	NO_STDIO
+	EXEC_STRING	dtpad "%(File)Arg_1%"
+	DESCRIPTION	%|nls-16009-#The OpenHelpTag ...#|
+}
+
+\#######
+
+ACTION HelpTag
+{
+        LABEL           %|nls-16010-#HelpTag|
+	TYPE		COMMAND
+	WINDOW_TYPE	NO_STDIO
+	EXEC_STRING	sh -c 'PATH=$HELPTAG_PATH dthelptag -clean \
+				  `basename "%(File)Arg_1"%|nls-16011-#HelpTag File:|"%"`; \
+			       PATH=$HELPTAG_PATH dthelptag \
+				  `basename "%(File)Arg_1%`"'
+	DESCRIPTION	%|nls-16012-#The HelpTag ...#|
+}
+
+\#######
+
+ACTION HelpTagCanon
+{
+        LABEL           %|nls-16013-#HelpTagCannon|
+	TYPE		COMMAND
+	WINDOW_TYPE	NO_STDIO
+	EXEC_STRING	sh -c 'PATH=$HELPTAG_PATH dthelptag -clean \
+				  `basename "%(File)Arg_1"%|nls-16011-#HelpTag File:|"%"`; \
+			       PATH=$HELPTAG_PATH dthelptag -canon \
+				  `basename "%(File)Arg_1%"`'
+	DESCRIPTION	%|nls-16014-#The HelpTagCanon ...#|
+}
+
+\#######
+
+ACTION CleanHelpTag
+{
+        LABEL           %|nls-16015-#CleanHelpTag|
+	TYPE		COMMAND
+	WINDOW_TYPE	NO_STDIO
+	EXEC_STRING	sh -c 'PATH=$HELPTAG_PATH dthelptag -clean \
+				  `basename "%(File)Arg_1"%|nls-16011-#HelpTag File:|"%"`'
+	DESCRIPTION	%|nls-16016-#The CleanHelpTag ...#|
+}
+\########################### EOF ##############################################

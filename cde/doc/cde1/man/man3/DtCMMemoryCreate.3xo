@@ -1,0 +1,102 @@
+.TH DtCMMemoryCreate 3 "17 January 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH "NAME"
+DtCMMemoryCreate \- create or open a Cde document container in memory
+.SH "SYNOPSIS"
+.yS
+#include <Bento/DtCM.h>
+.sp 0.5v
+.ta \w'CMContainer DtCMMemoryCreate('u
+CMContainer DtCMMemoryCreate(CMSession \f2session\fP,
+	CMEnv *\f2error\fP,
+	CMPtr \f2buffer\fP,
+	CMSize \f2buffer_size\fP,
+	CMRefCon *\f2ref_con\fP);
+.yE
+.SH "DESCRIPTION"
+The
+.Fn DtCMMemoryCreate
+function creates a Cde document container in memory.
+If the application supplies a buffer,
+.Fn DtCMMemoryCreate
+opens the container.
+The containers are appropriate
+for temporary storage or sending through data interchange connections.
+.P
+The
+.I session
+argument is a session handle from the
+.Fn DtCMStartSession 3
+function or
+.Fn CMRStartSession .
+The
+.I error
+argument is a pointer to an error return structure.
+.P
+The
+.I buffer
+argument is a pointer to a buffer.
+If the pointer is
+.Cn NULL ,
+then
+.Fn DtCMMemoryCreate
+creates a new buffer and uses that buffer for the container.
+If the buffer is not
+.Cn NULL ,
+then a valid container exists in the region pointed to by
+the buffer, and
+.Fn DtCMMemoryCreate
+opens this container.
+.P
+The
+.I buffer_size
+argument is the size of the buffer in bytes.
+For new buffers, this is the initial size.
+Buffers are dynamically resized as they grow, but they cannot shrink.
+If zero is passed, then an initial size of 10\|240 bytes is provided.
+The buffer increases by 50% of its current size each time it
+is expanded.
+If the
+.I buffer
+argument is not
+.Cn NULL ,
+then the size indicates the current size of the buffer.
+It is an error to pass a valid buffer with a size of zero.
+.P
+The
+.I ref_con
+argument is a pointer to a
+.BR CMRefCon
+structure that contains the reference constant for the handler.
+The reference constant is a private structure used by the handler
+to maintain state.
+It is required to destroy
+the memory associated with a Bento memory container if it was
+created by this function.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn DtCMMemoryCreate
+function returns a container handle to the open container.
+If an error occurs,
+.Fn DtCMMemoryCreate
+sets the major code in the
+.I error
+structure to
+.Cn USER_EXCEPTION ,
+and the application can use the
+.Fn CMRexception_number
+function to determine the minor code.
+See the Error API Appendix in the \*(ZB.
+.SH "APPLICATION USAGE"
+Picking a buffer size that is too small may affect performance,
+because excessive growth is required.
+.SH "SEE ALSO"
+.Fn DtCMMemoryDestroy 3,
+.Fn DtCMMemoryInfo 3,
+.Hd Bento/DtCM.h 5;
+.Fn CMRStartSession ,
+.Fn CMRexception_number
+in the \*(ZB.

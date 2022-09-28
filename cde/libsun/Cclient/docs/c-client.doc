@@ -1,0 +1,309 @@
+c-client primary interface documentation
+09/25/95
+
+-- TYPES
+
+BODY - 
+
+DRIVER - mail driver dispatch structure, common to all drivers
+
+ENVELOPE - 
+
+MAILHANDLE - 
+
+MAILSTREAM - 
+
+MESSAGECACHE -
+
+NETMBX - 
+
+SEARCHPGM - A structure that defines a "search program" which the c-client
+  uses to search mailbox contents and return restrictive results.
+
+  These functions take a SEARCHPGM as an argument:can use from the following functions:
+    - mail_free_searchpgm
+    - mail_local_search
+    - mail_search_full
+    - mail_search_msg
+    - valid_local_search
+
+  These functions return a SEARCHPGM as a result:
+    - mail_criteria
+    - mail_newsearchpgm
+
+SEARCHPGMLIST - A structure that allows a list of "SEARCHPGM"s to be defined
+  and can use from the following functions:
+    - mail_free_searchpgmlist
+
+  These functions return a SEARCHPGMLIST as a result:
+    - mail_newsearchpgmlist
+
+STRINGLIST - 
+
+-- FUNCTIONS
+
+mail_close_full - close a mailbox
+  Synopsis: MAILSTREAM *mail_close_full (MAILSTREAM *stream,long options)
+  Arguments:
+	MAILSTREAM *stream
+	long options
+  Returns: NIL always
+
+mail_create - create a mailbox
+  Synopsis: long mail_create (MAILSTREAM *stream,char *mailbox)
+  Arguments:
+	MAILSTREAM *stream
+	char *mailbox
+  Returns: T on success, NIL on failure
+  Example: 
+
+mail_delete - delete a mailbox
+  Synopsis: long mail_delete (MAILSTREAM *stream,char *mailbox)
+  Arguments:
+	MAILSTREAM *stream
+	char *mailbox
+  Returns: T on success, NIL on failure
+  Example:
+
+mail_elt - mail fetch cache element
+  Synopsis: MESSAGECACHE *mail_elt (MAILSTREAM *stream,unsigned long msgno)
+  Arguments:
+    MAILSTREAM *stream -
+    unsigned long msgno -
+  Returns: cache element of this message
+  Example: for (i = 1; i <= stream->nmsgs; ++i) mail_elt(stream, i)->searched = T;
+
+mail_fetchbody_full - fetch message body part text
+  Synopsis: char *mail_fetchbody_full (MAILSTREAM *stream,unsigned long msgno,char *sec,unsigned long *len,long flags)
+  Arguments:
+    MAILSTREAM *stream - 
+    unsigned long msgno -
+    char *sec - 
+    unsigned long *len -
+    long flags - 
+  Returns: pointer to section of message body
+  Example: 
+
+mail_fetchfast_full - Mail fetch fast information
+  Synopsis: void mail_fetchfast_full (MAILSTREAM *stream,char *sequence,long flags)
+  Arguments:
+    MAILSTREAM *stream - 
+    char *sequence - 
+    long flags - 
+  Example:
+
+mail_fetchflags_full - mail fetch flags
+  Synopsis: void mail_fetchflags_full (MAILSTREAM *stream,char *sequence,long flags)
+  Arguments:
+    MAILSTREAM *stream - 
+    char *sequence - 
+    long flags - 
+  Example: 
+
+mail_fetchfrom - fetch From string for menu
+  Synopsis: void mail_fetchfrom (char *s,MAILSTREAM *stream,unsigned long msgno,long length)
+  Arguments:
+    char *s - 
+    MAILSTREAM *stream -
+    unsigned long msgno - 
+    long length - 
+  Example: 
+
+mail_fetchheader_full - fetch message header
+  Synopsis: char *mail_fetchheader_full (MAILSTREAM *stream,unsigned long msgno,STRINGLIST *lines,unsigned long *len,long flags)
+  Arguments:
+    MAILSTREAM *stream - 
+    unsigned long msgno - 
+    STRINGLIST *lines - 
+    unsigned long *len - 
+    long flags -
+  Returns: message header in RFC822 format
+  Example:  printf ("%s",mail_fetchheader_full (stream,last,lines,&len,fuidflags));
+
+mail_fetchstructure_full - mail fetch message structure
+  Synopsis: ENVELOPE *mail_fetchstructure_full (MAILSTREAM *stream,unsigned long msgno,BODY **body,long flags)
+  Arguments:
+    MAILSTREAM *stream - 
+    unsigned long msgno - 
+    BODY **body - 
+    long flags - 
+  Returns: envelope of this message, body returned in body value
+  Example: mail_fetchstructure_full (stream,last,&body,fuidflags);
+
+mail_fetchsubject - fetch Subject string for menu
+  Synopsis: void mail_fetchsubject (char *s,MAILSTREAM *stream,unsigned long msgno,long length)
+  Arguments:
+    char *s -
+    MAILSTREAM *stream -
+    unsigned long msgno -
+    long length -
+  Example:
+
+mail_fetchtext_full - fetch message text (body only)
+  Synopsis: char *mail_fetchtext_full (MAILSTREAM *stream,unsigned long msgno,unsigned long *len,long flags)
+  Arguments:
+    MAILSTREAM *stream - 
+    unsigned long msgno -
+    unsigned long *len - 
+    long flags - 
+  Returns: message text in RFC822 format
+  Example: puts (mail_fetchtext_full (stream,last, &len, fuidflags));
+
+mail_find_all_local - not sure...related to mail_list
+  Synopsis: void mail_find_all_local(MAILSTREAM *stream, char *pat)
+  Arguments: 
+	MAILSTREAM *stream -
+	char *pat - 
+
+mail_free_handle - release mail handle
+  Synopsis: void mail_free_handle (MAILHANDLE **handle)
+  Arguments:
+	MAILHANDLE **handle
+  Example:
+
+mail_lelt - mail fetch long cache element
+  Synopsis: MESSAGECACHE *mail_elt (MAILSTREAM *stream,unsigned long msgno)
+  Arguments:
+	MAILSTREAM *stream
+	unsigned long msgno
+  Returns:
+  Example:
+
+mail_link - add (link in) a "driver" to the list of active mail drivers
+  Synopsis: void mail_link (DRIVER *driver);
+  Arguments: 
+	DRIVER *driver - driver to link into list of active mail drivers
+  Example: mail_link (&imapdriver);
+
+mail_list - return list of all mailboxes matching parameters
+  Synopsis: void mail_list (MAILSTREAM *stream,char *ref,char *pat)
+  Arguments: 
+	MAILSTREAM *stream -
+	char *ref - reference
+	char *pat - pattern
+  NOTE: calls 'mm_list' to process list elements
+  Example: mail_list (NIL,NIL,"%")
+
+mail_lsub - list subscribed mailboxes
+  Synopsis: void mail_lsub (MAILSTREAM *stream,char *ref,char *pat)
+  Arguments: 
+	MAILSTREAM *stream
+	char *ref - 
+	char *pat - 
+  NOTE: calls 'mm_lsub' to process list elements
+  Example: 
+
+mail_makehandle - make mail handle
+  Synopsis: MAILHANDLE *mail_makehandle (MAILSTREAM *stream)
+  Arguments:
+	MAILSTREAM *stream
+  Returns: MAILHANDLE associated with passed in stream
+  Example:
+
+mail_msgno - fetch UID
+  Synopsis: unsigned long mail_msgno (MAILSTREAM *stream,unsigned long uid)
+  Arguments:
+    MAILSTREAM *stream -
+    unsigned long uid -
+  Returns: msgno or 0
+  Example: i = mail_msgno (stream, msgno);
+
+mail_open - open a mailbox
+  Synopsis: MAILSTREAM *mail_open (MAILSTREAM *stream,char *name,long options)
+  Arguments:
+	MAILSTREAM *stream
+	char *name
+	long options
+  Returns: stream to use on success, NIL on failure
+  Example: MAILSTREAM *test = mail_open (NIL,stream->mailbox,OP_PROTOTYPE);
+
+mail_parameters - manipulate driver parameters
+  Synopsis: void *mail_parameters (MAILSTREAM *stream,long function,void *value)
+  Arguments: 
+	MAILSTREAM *stream - 
+	long function - function from mail.h
+	void *value - value to associate with function if function requires argument
+  Built-in functions: DISABLE_DRIVER, ENABLE_DRIVER, GET_CACHE, GET_DRIVERS, GET_GETS, SET_CACHE, SET_GETS
+	Built in functions do not require a "stream" to be specified; all other
+	functions operate on either a driver associated with a stream (if given)
+	or operate on all drivers if no stream is provided.
+  Example: mail_parameters (stream, ENABLE_DRIVER, (void *)"imap4");
+  Example: mail_parameters (stream, SET_LOOKAHEAD, (void *)interval);
+
+mail_rename - rename a mailbox
+  Synopsis: long mail_rename (MAILSTREAM *stream,char *old,char *newname)
+  Arguments:
+	MAILSTREAM *stream
+	char *old
+	char *newname
+  Returns: T on success, NIL on failure
+  Example: 
+
+mail_status - return status of mailbox
+  Synopsis: long mail_status (MAILSTREAM *stream,char *mbx,long flags)
+  Arguments:
+	MAILSTREAM *stream
+	char *mbx
+	long flags
+  Returns: T on success, NIL on failure
+  Example: 
+
+mail_stream - return MAILSTREAM for a given MAILHANDLE
+  Synopsis: MAILSTREAM *mail_stream (MAILHANDLE *handle)
+  Arguments:
+	MAILHANDLE *handle
+  Returns: MAILSTREAM associated with specified MAILHANDLE
+  Example: 
+
+mail_subscribe - subscribe to mailbox
+  Synopsis: long mail_subscribe (MAILSTREAM *stream,char *mailbox)
+  Arguments:
+	MAILSTREAM *stream -
+  Returns: T on success, NIL on failure
+  Example: 
+
+mail_uid - fetch UID
+  Synopsis: unsigned long mail_uid (MAILSTREAM *stream,unsigned long msgno)
+  Arguments:
+    MAILSTREAM *stream -
+    unsigned long msgno -
+  Returns: UID
+  Example: j = stream->nmsgs ? mail_uid (stream,stream->nmsgs) : stream->uid_last;
+
+mail_unsubscribe - unsubscribe to mailbox
+  Synopsis: long mail_unsubscribe (MAILSTREAM *stream,char *mailbox)
+  Arguments:
+	MAILSTREAM *stream
+	char *mailbox
+  Returns: T on success, NIL on failure
+  Example:
+
+mail_valid - validate mailbox, return first driver that claims to handle mailbox
+  Synopsis: DRIVER *mail_valid (MAILSTREAM *stream,char *mailbox,char *purpose)
+  Arguments: 
+	MAILSTREAM *stream - if specified, see if the specified factory can handle the given mailbox
+			   - if not specified, return a factory that can handle the given mailbox
+	char *mailbox - name of mailbox to find driver that can handle it
+	char *purpose - string used to construct error message upon failure
+  Returns: driver factory on success, NIL on failure
+  Example: DRIVER *factory = mail_valid (stream,mbx,"get status of mailbox");
+
+mail_valid_net - validate that given mailbox is a network mailbox can be handled by given driver, return host/mailbox
+  Synopsis: DRIVER *mail_valid_net (char *name,DRIVER *drv,char *host,char *mailbox)
+  Arguments: 
+	char *name - name of mailbox to validate
+	DRIVER *drv - driver to validate against mailbox
+	char *host - if non-NIL, copy host name into the address provided
+	char *mailbox - if non-NIL, copy mailbox name into the address provided
+  Returns: driver factory on success, NIL on failure
+  Example: DRIVER *ret = mail_valid_net (name,&nntpdriver,NIL,mbx);
+
+mail_valid_net_parse - parse network mailbox and breakdown into components
+  Synopsis: long mail_valid_net_parse (char *name,NETMBX *mb)
+  Arguments: 
+	char *name - mailbox to parse 
+	NETMBX *mb - netmbx structure to fill in from parse of mailbox
+  Returns: T on success, NIL on failure
+  Example: if (!mail_valid_net_parse (name, &mb)) return NIL;
+
+

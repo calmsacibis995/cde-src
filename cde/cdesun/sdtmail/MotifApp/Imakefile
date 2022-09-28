@@ -1,0 +1,177 @@
+XCOMM   @(#)Imakefile	1.26  @(#)Imakefile	1.26 04/01/97 10:58:58
+XCOMM
+XCOMM   COMPONENT_NAME: DESKTOP
+XCOMM
+XCOMM   FUNCTIONS: none
+XCOMM
+XCOMM   ORIGINS: 27
+XCOMM
+XCOMM
+XCOMM   (C) COPYRIGHT International Business Machines Corp. 1993
+XCOMM   All Rights Reserved
+XCOMM   Licensed Materials - Property of IBM
+XCOMM   US Government Users Restricted Rights - Use, duplication or
+XCOMM   disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
+XCOMM
+
+/*
+ * turned this off so that it would stop trying to rebuild imake.
+ * Imake is another component, let them build it.
+ */
+#undef  ImakeDependency
+#define ImakeDependency()	/**/
+
+#undef DoSharedLib	/* Never ! */
+#define DoNormalLib NormalLibMotifApp
+
+#include <Library.tmpl>
+
+INSTALLFLAGS	=	$(INSTINCFLAGS)
+INCLUDES	=	-I../include/MotifApp -I../include \
+			-I../include/utils
+
+
+#ifdef RsArchitecture
+EXTRA_DEFINES	=	-DIBM_MOTIF -DBIG_ENDIAN -DAIX -DI_HAVE_NO_BOOL \
+			-DSTRCASECMP_NOT_DEFINED -DFUNCPROTO
+#endif
+
+#ifdef HPArchitecture
+EXTRA_DEFINES	=	-DBIG_ENDIAN -DHPUX -DS9000 -DI_HAVE_NO_IDENT \
+			-DFUNCPROTO -DXTFUNCPROTO -DI_HAVE_NO_BOOL 
+EXTRA_C++OPTIONS =	+p
+#endif
+
+#ifdef SunArchitecture
+
+#if !defined(i386)
+ENDIAN =	-DBIG_ENDIAN
+#endif
+
+#ifndef NoLargeFiles
+#define NoLargeFiles
+#endif
+
+#if OSMajorVersion > 5 || (OSMajorVersion == 5 && OSMinorVersion > 5)
+EXTRA_DEFINES	=	$(ENDIAN) -D_REENTRANT -DSunOS=$(OSMAJORVERSION)$(OSMINORVERSION) NoLargeFiles
+#else
+EXTRA_DEFINES	=	$(ENDIAN) -DSunOS=$(OSMAJORVERSION)$(OSMINORVERSION)
+#endif
+
+#ifdef USE_SPRO_V3
+SPRO_V3_OPTIONS =      -noex -xO0 -USPRO_V2
+#ifdef DEBUGTREE
+SPRO_V3_OPTIONS +=      -xsb
+#endif
+#endif
+
+#if REORDER_PROFILED
+EXTRA_C++OPTIONS =     -xF +p +w $(SPRO_V3_OPTIONS)
+C++              =     CC -pg $(BBAFLAGS)
+#else
+EXTRA_C++OPTIONS =     -xF +p +w $(SPRO_V3_OPTIONS)
+#endif
+
+.KEEP_STATE:
+.PARALLEL:
+
+#endif /* SunArchitecture */
+
+HEADERS = 
+
+SRCS = \
+                        Application.C \
+                        AskFirstCmd.C \
+                        BusyPixmap.C \
+                        ButtonGadgetInterface.C \
+                        ButtonInterface.C \
+                        Cmd.C \
+                        CmdInterface.C \
+                        CmdList.C \
+                        DialogManager.C \
+                        ExistingButtonInterface.C \
+                        Help.C \
+                        IconifyCmd.C \
+                        InfoDialogManager.C \
+                        InterruptibleCmd.C \
+                        Main.C \
+                        MainWindow.C \
+                        ManageCmd.C \
+                        MenuBar.C \
+                        MenuButton.C \
+                        MenuWindow.C \
+			MotifCmds.C \
+                        NoUndoCmd.C \
+                        PixmapCycler.C \
+                        PromptDialogManager.C \
+                        QuestionDialogManager.C \
+                        QuitCmd.C \
+                        ScrollingList.C \
+                        SelectFileCmd.C \
+			ToggleButtonInterface.C \
+                        UIComponent.C \
+                        UndoCmd.C \
+                        WarnNoUndoCmd.C \
+                        WorkingDialogManager.C
+
+OBJS = \
+                        Application.o \
+                        AskFirstCmd.o \
+                        BusyPixmap.o \
+                        ButtonGadgetInterface.o \
+                        ButtonInterface.o \
+                        Cmd.o \
+                        CmdInterface.o \
+                        CmdList.o \
+                        DialogManager.o \
+                        ExistingButtonInterface.o \
+                        Help.o \
+                        IconifyCmd.o \
+                        InfoDialogManager.o \
+                        InterruptibleCmd.o \
+                        Main.o \
+                        MainWindow.o \
+                        ManageCmd.o \
+                        MenuBar.o \
+                        MenuButton.o \
+                        MenuWindow.o \
+			MotifCmds.o \
+                        NoUndoCmd.o \
+                        PixmapCycler.o \
+                        PromptDialogManager.o \
+                        QuestionDialogManager.o \
+                        QuitCmd.o \
+                        ScrollingList.o \
+                        SelectFileCmd.o \
+			ToggleButtonInterface.o \
+                        UIComponent.o \
+                        UndoCmd.o \
+                        WarnNoUndoCmd.o \
+                        WorkingDialogManager.o
+
+LibraryObjectRule()
+
+XCOMM Normal library target MotifApp
+NormalLibraryTarget(MotifApp,$(OBJS))
+
+XCOMM install Normal library target MotifApp
+InstallLibrary(MotifApp,$(USRLIBDIR))
+
+LintLibraryTarget(MotifApp,$(SRCS))
+InstallLintLibrary(MotifApp,$(LINTLIBDIR))
+
+/*BuildIncludes($(HEADERS),.,.)*/
+/*InstallMultiple($(HEADERS),$(INCDIR))*/
+
+DependTarget()
+
+NormalLintTarget($(SRCS))
+
+#ifdef SunArchitecture
+clean::
+	$(RM) -r .sb
+	$(RM) .make.state*
+#endif
+clean::
+	$(RM) -r shared
+	$(RM) lib* cscope.files cscope.out a.out core

@@ -1,0 +1,128 @@
+.TH Edit 4 "13 May 1994"
+.SH NAME
+Edit request \- compose or edit a document
+.SH SYNOPSIS
+.yS
+.ta \w'[\f2file\fP] Edit('u
+[\f2file\fP] Edit([out|inout] \f2mediaType contents\fP
+	[in title \f2docName\fP]);
+.yE
+.SH DESCRIPTION
+The
+.I Edit
+request causes the handler to edit a document
+and reply with the new contents when the editing is completed.
+.P
+It is up to the handler to decide issues such as:
+.VL 3
+.LI \(bu
+When the editing operation can be deemed completed
+.LI \(bu
+What user gesture signals the completion of the editing
+.LI \(bu
+What the handling tool should do with itself after replying
+.LE
+.P
+If the handling tool supports some form of intermediate save operation
+during editing,
+it must send a
+.I Deposit
+request back to the tool that requested the
+.IR Edit .
+.P
+The
+.I contents
+argument
+is the contents of the document.
+If this argument is unset
+(in other words, has a value of
+.BR (char\ *)0 ) ,
+then the contents of the document are in
+the file named in the message's
+.I file
+attribute.
+The data type
+.RI ( mediaType )
+of the
+.I contents
+argument should be
+.BR string ,
+unless nulls are valid in the given media type,
+in which case the data type must be
+.BR bytes .
+.P
+If the
+.I contents
+argument is of mode
+.BR out ,
+then a new document must be composed
+and its contents returned in this argument.
+.P
+The
+.I docName
+argument contains the name of the document.
+If the
+.I docName
+argument is absent and the
+.I file
+attribute is set,
+the file name is considered to be the title of the document.
+This string would be suitable for display in a window title bar, for example.
+.SH "APPLICATION USAGE"
+The
+.Fn ttmedia_ptype_declare 3
+function can be used to register for,
+and help process, this message.
+.P
+This message can be sent with the
+.Fn ttmedia_load 3
+function.
+.SH EXAMPLES
+To edit an X11 XBM bitmap, the application can send an
+.I Edit
+request with a first argument whose vtype is
+.BR XBM ,
+and whose value is a string such as:
+.Cs I
+#define foo_width 44\en#define foo_height 94\en
+.Ce
+.P
+The
+.B \en
+in the example represents the ISO C newline character.
+.P
+To edit an X11 XBM bitmap contained in a file, the application can send an
+.I Edit
+request naming that file in its
+.I file
+attribute,
+with a first argument whose vtype is
+.BR XBM ,
+and whose value is not set.
+.SH ERRORS
+The ToolTalk service may return one of the following errors
+in processing the
+.I Edit
+request:
+.VL 6
+.Lc TT_DESKTOP_ENOENT
+.br
+The file that was alleged to contain the document does not exist.
+.Lc TT_DESKTOP_ENODATA
+.br
+The in-mode
+.I contents
+argument had no value and the
+.I file
+attribute
+of the message was not set.
+.Lc TT_MEDIA_ERR_FORMAT
+.br
+The document is not a valid instance of the media type.
+.LE
+.SH "SEE ALSO"
+.Fn ttmedia_ptype_declare 3,
+.Fn ttmedia_load 3;
+.IR Intro ,
+.I Display
+requests.

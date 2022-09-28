@@ -1,0 +1,71 @@
+XCOMM $XConsortium: app-defaults.tmpl /main/cde1_maint/1 1995/12/04 17:04:06 barstow $
+
+#ifdef RsArchitecture
+SHELL=/bin/ksh
+#endif
+
+#ifdef SunArchitecture
+.NO_PARALLEL:
+#endif
+
+OBJS =  \
+        Dthelpview  \
+        Dtlogin  \
+        Dthello  \
+        Dtsession  \
+        Dtscreen  \
+        Dtwm  \
+        Dtfile  \
+        Dtstyle  \
+        Dtpad  \
+        Dticon  \
+        Dtcreate \
+        Dtcalc \
+        Dtcm \
+	Dtterm \
+	Dtmail \
+	Dtbuilder \
+        Dt
+
+#ifdef SunCDE
+EXTRA_OBJS = \
+	Sdtimage \
+	Sdtaudio \
+	Sdtfprop
+#endif /* SunCDE */
+
+all:: $(OBJS) $(EXTRA_OBJS)
+
+FileLinkRule($(CDESRC)/dthelp/dthelpview/Dthelpview,Dthelpview.nls)
+FileLinkRule($(CDESRC)/dtlogin/config/Dtlogin,Dtlogin.nls)
+FileLinkRule($(CDESRC)/dthello/Dthello,Dthello.nls)
+FileLinkRule($(CDESRC)/dtsession/Dtsession,Dtsession.nls)
+FileLinkRule($(CDESRC)/dtscreen/Dtscreen,Dtscreen.nls)
+FileLinkRule($(CDESRC)/dtwm/Dtwm.defs,Dtwm.nls)
+FileLinkRule($(CDESRC)/dtfile/Dtfile,Dtfile.nls)
+FileLinkRule($(CDESRC)/dtstyle/Dtstyle,Dtstyle.nls)
+FileLinkRule($(CDESRC)/dtpad/Dtpad,Dtpad.nls)
+FileLinkRule($(CDESRC)/dticon/Dticon,Dticon.nls)
+FileLinkRule($(CDESRC)/dtcreate/Dtcreate,Dtcreate.nls)
+FileLinkRule($(CDESRC)/dtcalc/Dtcalc,Dtcalc.nls)
+FileLinkRule($(CDESRC)/dtcm/dtcm/Dtcm.ad,Dtcm.nls)
+FileLinkRule($(CDESRC)/dtterm/Dtterm.ad,Dtterm.nls)
+FileLinkRule($(CDESRC)/dtmail/dtmail/Dtmail,Dtmail.nls)
+FileLinkRule($(CDESRC)/dtappbuilder/src/ab/Dtbuilder.ad,Dtbuilder.nls)
+FileLinkRule($(DTSVCSRC)/DtUtil2/Dt.ad,Dt.nls)
+
+#ifdef SunCDE
+FileLinkRule($(SUNCDESRC)/sdtmail/sdtmail/Dtmail,Dtmail.nls)
+FileLinkRule($(SUNCDESRC)/sdtimage/Sdtimage.ad,Sdtimage.nls)
+FileLinkRule($(SUNCDESRC)/sdtaudio/sdtaudio/Sdtaudio.ad,Sdtaudio.nls)
+FileLinkRule($(SUNCDESRC)/sdtfile/sdtfprop/Sdtfprop,Sdtfprop.nls)
+#endif /* SunCDE */
+
+depend::
+
+clean::
+	$(RM) $(OBJS)
+	-for i in *.nls; do \
+		[ -z "$$i" ] && continue; \
+		[ -h "$$i" ] && $(RM) $$i; \
+	done; true;

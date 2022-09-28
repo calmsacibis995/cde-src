@@ -1,0 +1,109 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+.\" **
+.\" **
+.\" ** (c) Copyright 1994 Hewlett-Packard Company
+.\" ** (c) Copyright 1994 International Business Machines Corp.
+.\" ** (c) Copyright 1994 Sun Microsystems, Inc.
+.\" ** (c) Copyright 1994 Unix Systems Labs, Inc., a subsidiary of Novell, Inc.
+.\" **
+.\" **
+.TH DtWsmGetWorkspaceInfo 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Common Desktop Environment 1.0: January 1994
+.SH NAME
+\fBDtWsmGetWorkspaceInfo\fP \- get detailed information on a workspace.
+.iX "DtWsmGetWorkspaceInfo"
+.iX "workspace functions" "DtWsmGetWorkspaceInfo"
+.sp .5
+.SH SYNOPSIS
+\fB
+\&#include <Dt/Wsm.h>
+.sp .5
+Status DtWsmGetWorkspaceInfo (
+.br
+.ta 0.75i 2.20i
+	Display *	\fIdisplay\fP,
+.br
+	Window	\fIroot\fP,
+.br
+	Atom	\fIaWs\fP,
+.br
+	DtWsmWorkspaceInfo **	\fIppWsInfo\fP)
+.fi
+\fP
+.SH DESCRIPTION
+\fBDtWsmGetWorkspaceInfo\fP is designed to work with the
+Common Desktop Environment window/workspace manager (dtwm).
+.PP
+\fBDtWsmGetWorkspaceInfo\fP returns detailed information on a specific
+workspace. 
+.sp .5
+.IP "\fIdisplay\fP" 1.00i
+The X display.
+.IP "\fIroot\fP" 1.00i
+The root window of the screen of interest.
+.IP "\fIaWs\fP" 1.00i
+The workspace name (converted to an X atom).
+.IP "\fIppWsInfo\fP" 1.00i
+Address of a variable to receive the returned pointer to the workspace
+information data. This data should be freed by calling
+\fBDtWsmFreeWorkspaceInfo\fP when it is no longer needed.
+.PP
+The workspace information is returned in a structure of this form:
+.sp .5
+.ta .25i 1.2i
+.nf
+\fBtypedef struct
+{
+	Atom	\fIworkspace\fB;
+	unsigned long	\fIbg\fB;
+	unsigned long	\fIfg\fB;
+	Atom	\fIbackdropName\fB;
+	int	\fIcolorSetId\fB;
+	char *	\fIpchTitle\fB;
+	Window *	\fIbackdropWindows\fB;
+	int	\fInumBackdropWindows\fB;
+} DtWsmWorkspaceInfo;\fP
+.sp .5
+.IP "\fIworkspace\fP" 1.20i
+The workspace name (converted to an X atom).
+.IP "\fIbg\fP" 1.20i
+The pixel id used for the background color of the backdrop.
+.IP "\fIfg\fP" 1.20i
+The pixel id used for the foreground color of the backdrop.
+.IP "\fIbackdropName\fP" 1.20i
+The backdrop file name (converted to an X atom).
+.IP "\fIcolorSetId\fP" 1.20i
+The number of the colorset used for this workspace. This affects the
+backdrop color as well as the color of the button for htis workspace on
+the front panel.
+.IP "\fIpchTitle\fP" 1.20i
+The title displayed in the button for this workspace on the front panel.
+This string is interpreted in the language (LANG) in which dtwm is
+running.
+.IP "\fIbackdropWindows\fP" 1.20i
+A pointer to an array of windows that make up the backdrop. This may be
+useful for applications that are interested in some events on the
+root window. Since the backdrop covers the root window, button events are
+caught by the backdrop before they reach the root.
+.IP "\fInumBackdropWindows\fP" 1.20i
+The number of elements in the \fIbackdropWindows\fP array.
+.sp .5
+.PP
+.sp .5
+.SH RETURN VALUE
+.IP "\fBSuccess\fP" 1.00i
+The workspace information was allocated and returned successfully. 
+.IP "not \fBSuccess\fP" 1.00i
+The function failed and no data was allocated or returned. This may 
+be due to a memory allocation error or failure to get the correct
+workspace information (i.e. dtwm was not running).
+.sp .5
+.SH RELATED INFORMATION
+\fBdtwm(1X)\fP, \fBDtWsmGetWorkspaceList(3X)\fP, 
+\fBDtWsmFreeWorkspaceInfo(3X)\fP.
+.sp .5

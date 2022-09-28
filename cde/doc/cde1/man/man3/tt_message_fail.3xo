@@ -1,0 +1,70 @@
+.TH tt_message_fail 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+tt_message_fail \- indicate a message cannot be handled
+.SH SYNOPSIS
+.yS
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'Tt_status tt_message_fail('u
+Tt_status tt_message_fail(Tt_message \f2m\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn tt_message_fail
+function
+informs the ToolTalk service that the process cannot handle the request just
+received.
+.P
+This function also informs the ToolTalk service that the message is not be
+offered to other processes of the same ptype.
+The ToolTalk service will send the
+message back to the sender with state
+.Cn TT_FAILED .
+.P
+The
+.I m
+argument is the opaque handle for the message involved in this operation.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn tt_message_fail
+function returns the status of the operation as one of the following
+.B Tt_status
+values:
+.VL 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_NOMP
+.br
+The
+.Cm ttsession 1
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_NOTHANDLER
+.br
+This application is not the handler for this message.
+.Lc TT_ERR_POINTER
+.br
+The pointer passed does not point to an object of
+the correct type for this operation.
+.LE
+.P
+The status value must be greater than
+.Cn TT_ERR_LAST
+to avoid confusion with the ToolTalk service status values.
+.SH "APPLICATION USAGE"
+To distinguish this case from the case where a message failed because no
+matching handler could be found,
+the application should place an explanatory message code in the
+status attribute of the message with
+.Fn tt_message_status_set 3
+and
+.Fn tt_message_status_string_set 3
+before calling
+.Fn tt_message_fail .
+.SH "SEE ALSO"
+.Hd Tt/tt_c.h 5,
+.Fn tt_message_status_set 3,
+.Fn tt_message_status_string_set 3.

@@ -1,0 +1,28 @@
+XCOMM @(#)Imakefile	1.4 96/06/20 SMI
+XCOMM Copyright (c) 1996 Sun Microsystems, Inc.
+
+#define IHaveSubdirs
+#define PassCDebugFlags 'C++DEBUGFLAGS=$(C++DEBUGFLAGS)'
+
+LIBTOPDIR = ..
+LIBCURDIR = TestApps
+
+#ifdef SunArchitecture
+#define SDMNOKEEPSTATE
+.NO_PARALLEL:
+#endif
+
+#include "../ImakeSdm.tmpl"
+
+SUBDIRS = sdmporttest sdmtest
+
+MakeSubdirs($(SUBDIRS))
+
+SdmTestSubdirs($(SUBDIRS))
+
+DependSubdirs($(SUBDIRS))
+
+#if 0
+clean::
+	$(RM) -r lib
+#endif

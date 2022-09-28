@@ -1,0 +1,139 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Novell, Inc
+...\" **
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH XmProcessTraversal 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmProcessTraversal\fP \- A function that determines which component receives keyboard events when a widget has the focus
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/Xm.h>
+.sp \n(PDu
+Boolean XmProcessTraversal (\fBwidget, direction\fI)
+.ta .5i 2i
+.nf
+	Widget	\fBwidget\fI;
+	XmTraversalDirection	\fBdirection\fI;
+.wH
+.fi
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+\fIXmProcessTraversal\fP determines which component of a hierarchy
+receives keyboard events when the hierarchy that contains the given
+widget has keyboard focus.
+Using \fIXmProcessTraversal\fP to traverse to MenuBars,
+Pulldown MenuPanes, or Popup MenuPanes is not supported.
+.IP "\fBwidget\fP"
+Specifies the widget ID of the widget whose hierarchy is to be traversed.
+The hierarchy is only traversed up to the top of the shell.  If that shell
+does not currently have the focus, any changes to the element with focus within
+that shell will not occur until the next time the shell recieves focus.
+.IP "\fBdirection\fP"
+Specifies the direction of traversal
+.PP 
+.ne 5
+The \fBdirection\fP parameter can have the following values, which cause
+the routine to take the corresponding actions:
+.TP
+\(bu
+\fIXmTRAVERSE_CURRENT\fP \- Finds the hierarchy and the tab group that
+contain \fBwidget\fP.
+If this tab group is not the active tab group, makes it the active tab
+group.
+If \fBwidget\fP is an item in the active tab group, makes it the active
+item.
+If \fBwidget\fP is the active tab group, makes the first traversable
+item in the tab group the active item.
+.TP
+\(bu
+\fIXmTRAVERSE_DOWN\fP \- Finds the hierarchy that contains \fBwidget\fP.
+Finds the active item in the active tab group and makes the item below
+it the active item.
+If there is no item below, wraps.
+.TP
+\(bu
+\fIXmTRAVERSE_HOME\fP \- Finds the hierarchy that contains \fBwidget\fP.
+Finds the active item in the active tab group and makes the first
+traversable item in the tab group the active item.
+.TP
+\(bu
+\fIXmTRAVERSE_LEFT\fP \- Finds the hierarchy that contains \fBwidget\fP.
+Finds the active item in the active tab group and makes the item to the
+left the active item.
+If there is no item to the left, wraps.
+.TP
+\(bu
+\fIXmTRAVERSE_NEXT\fP \- Finds the hierarchy that contains \fBwidget\fP.
+Finds the active item in the active tab group and makes the next item
+in child order the active item.
+.TP
+\(bu
+\fIXmTRAVERSE_NEXT_TAB_GROUP\fP \- Finds the hierarchy that contains
+\fBwidget\fP.
+Finds the active tab group (if any) and makes the next tab group the
+active tab group in the hierarchy.
+.TP
+\(bu
+\fIXmTRAVERSE_PREV\fP \- Finds the hierarchy that contains \fBwidget\fP.
+Finds the active item in the active tab group and makes the previous
+item in child order the active item.
+.TP
+\(bu
+\fIXmTRAVERSE_PREV_TAB_GROUP\fP \- Finds the hierarchy that contains
+\fBwidget\fP.
+Finds the active tab group (if any) and makes the previous tab group the
+active tab group in the hierarchy.
+.TP
+\(bu
+\fIXmTRAVERSE_RIGHT\fP \- Finds the hierarchy that contains
+\fBwidget\fP. 
+Finds the active item in the active tab group and makes the item to the
+right the active item.
+If there is no item to the right, wraps.
+.TP
+\(bu
+\fIXmTRAVERSE_UP\fP \- Finds the hierarchy that contains \fBwidget\fP.
+Finds the active item in the active tab group and makes the item above
+it the active item.
+If there is no item above, wraps.
+.SS CAUTIONS
+.TP
+\(bu
+\fIXmProcessTraversal\fP will not allow traversal to a
+widget in a different shell.
+.TP
+\(bu
+\fIXmProcessTraversal\fP will only allow traversal to
+widgets that are currently mapped.
+.TP
+\(bu
+You cannot call \fIXmProcessTraversal\fP from inside
+a focusCallback routine (or you will get a segmentation fault).
+.SH RETURN VALUE
+Returns True if the setting succeeded.
+Returns False if the keyboard focus policy is not \fIXmEXPLICIT\fP, if
+there are no traversable items, or if the call to the routine has
+invalid parameters.
+.SH RELATED INFORMATION
+.na
+\fIXmGetVisibility(3X)\fP and
+\fIXmIsTraversable(3X)\fP.
+.ad

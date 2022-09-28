@@ -1,0 +1,371 @@
+#!/usr/local/bin/perl
+
+eval "exec /usr/local/bin/perl -S $0 $*"
+    if $running_under_some_shell;
+
+#### PLACE REMOTELY
+########################################################
+# required files
+########################################################
+# Add the test directory to the locations to search for
+# libraries.
+push(@INC,"/x/cdesrc/admin/BuildTools/rcs_tools");
+require 'RcsSock.pl';
+require 'RcsUtility.pl';
+
+########################################################
+# define variables
+########################################################
+&InitializeVariables();
+$exitValue = 0;
+# don't buffer stdout and stderr
+select(STDERR); $| =1;
+select(STDOUT); $| =1;
+#$Debug = 1;
+#
+# valid local RCS paths
+@validRcsPaths = ("/xr5RCS","/xr4RCS","/xtoolRCS","/x/xr6RCS");
+
+#######################################################
+# define local subroutines
+#######################################################
+#
+# The following are signal handlers for abort due a specific signal
+#
+sub abortHUP {
+        local(@errormessage);
+        @errormessage = ("*** Client terminated with signal 1 -> SIGHUP ***");
+        &Exit(1,@errormessage);
+}
+sub abortINT {
+        local(@errormessage);
+        &Exit(1,@errormessage);
+}
+sub abortQUIT {
+        local(@errormessage);
+        @errormessage = ("*** Client terminated with signal 3 -> SIGQUIT ***");
+        &Exit(1,@errormessage);
+}
+sub abortTERM {
+        local(@errormessage);
+        @errormessage = ("*** Client terminated with signal 15 -> SIGTERM ***");
+        &Exit(1,@errormessage);
+}
+
+sub GetCibFilePaths {
+	local($returnValue,$dirname,$dirnameRCS,$tmpdirnameRCS,$fileBasename);
+	$returnValue = 0;
+	foreach (@allFiles) {
+		$file = $_;
+                /(.*\/)?(.+)/;
+                $dirname = $1;
+                $fileBasename = $2;
+                $dirname = "." if ($dirname eq "");
+		print "dirname = $dirname\n" if $Debug;
+		$dirnameRCS = "${dirname}/RCS";
+		$tmpdirnameRCS = $dirnameRCS;
+		if (-l $dirnameRCS) { 
+			# Resolve the link as far as you can
+			while (defined($tmpdirnameRCS = readlink($dirnameRCS))) {
+				$dirnameRCS = $tmpdirnameRCS;
+			}
+			#
+			# remove RCS extension
+			$dirnameRCS =~ s%\/RCS$%%;
+		print "dirnameRCS = $dirnameRCS\n" if $Debug;
+			if (!opendir(BOGUSHANDLE,"$dirnameRCS")) { # is RCS real?
+				# path on remote system
+				push(@allRemoteExchangeFiles,"${dirnameRCS}/${fileBasename}");
+				push(@originalFiles,$file);
+			}
+			else { # can be opened, local RCS
+				push(@allLocalExchangeFiles,"${dirnameRCS}/${fileBasename}");
+			}
+		}
+		else { # if it is not a link, this is an error
+			print STDERR "\n	WARNING! Only symbolically linked RCS directories can be used\n";
+			print STDERR "	          File $dirname will NOT be processed\n";
+			$returnValue = 1;
+		}
+	}
+	return $returnValue;
+}
+
+				
+
+
+sub GetRcsDir {
+   $realRCSdir = "RCS";
+	if (! -l "RCS") {
+		die "	must be in a directory with an RCS symlink";
+	}
+	else {
+   	while (defined($tmpRCSdir = readlink($realRCSdir))) {
+     	 $realRCSdir = $tmpRCSdir;
+   	}
+   	if (opendir(BOGUSHANDLE,"RCS")){
+      	$DoProcessLocalFiles = "true";
+      	closedir(BOGUSHANDLE);
+   	}
+   }
+	$realDir = $realRCSdir;
+	$realDir =~ s%\/RCS$%%;
+	return $realRCSdir;
+	
+}
+
+#
+# if the path for a local file does not match the valid RCS paths,
+# reject the file.
+#
+sub checkForValidRcsPaths {
+	local($returnValue,@tmpLocalExchangeFiles,$file,$path,$validpath);
+	@tmpLocalExchangeFiles = (@allLocalExchangeFiles);
+	undef(@allLocalExchangeFiles);
+	$returnValue = 0;
+	foreach $file (@tmpLocalExchangeFiles) {
+                $validpath = 0;
+		foreach $path (@validRcsPaths) {
+			if ($file =~ m%$path%) {
+                                $validpath = 1;
+				push(@allLocalExchangeFiles,$file);
+				last;
+			}
+		}
+		if (!$validpath) {
+			print STDERR "\n	ERROR - You are not authorized to write $file
+			to the RCS vault\n	       that $file points to.\n";
+			$returnValue = 1;
+		}
+	}
+	return $returnValue;
+}
+				
+
+########################################################
+# Catch signals
+########################################################
+$SIG{'INT'} = 'abortINT';
+$SIG{'HUP'} = 'abortHUP';
+$SIG{'QUIT'} = 'abortQUIT';
+$SIG{'TERM'} = 'abortTERM';
+
+##############################################################
+# argument processing - this must be specific for each command
+##############################################################
+
+
+#
+# get the files and do appropriate error checking
+# see if the files are local or remote
+#
+# for some reason while(@ARGV) cannot be in a subroutine
+while ( @ARGV ) {
+	$tstfile=shift;
+	$tmp = $tstfile;
+	if ("$tmp" ne "RCS")  {
+		$_ = $tmp;
+		if ((m%^RCS$%) || (m%\/RCS$%) || (m%\/RCS\/.*$%) || (m%^RCS\/.*$%)) {
+			print STDERR "	ERROR - The RCS directory should not be in the path for $tmp\n";
+			print STDERR "	        $tmp NOT processed. See the man page for Cib\n";
+		}
+		else {
+			push(@allFiles, $tstfile);
+		}
+	}
+}
+
+if (! defined(@allFiles)) {
+	@errorMessage = ("ERROR - NO FILES to Process.");
+	&Exit(1,@errorMessage);
+}
+
+#
+# get the correct file paths in the RCS vaults
+#
+$tmpReturnValue = &GetCibFilePaths();
+# reset the exit value if necessary
+if (!$exitValue) {
+	$exitValue = $tmpReturnValue;
+}
+
+####################################################################
+# debug argument processing
+####################################################################
+if ( $Debug ) {
+	print "rhost= $rhost\n";
+	print "port= $port\n";
+	print "allFiles= \"@allFiles\"\n";
+	print "allLocalExchangeFiles = @allLocalExchangeFiles\n";
+	print "allRemoteExchangeFiles = @allRemoteExchangeFiles\n";
+}
+
+
+##################################################################
+# Process the local files
+# Run local Rcs commands
+##################################################################
+
+if (defined(@allLocalExchangeFiles)) {
+	#
+	# check to see if these are valid RCS paths locally
+	#
+	$tmpReturnValue = &checkForValidRcsPaths();
+	# reset the exit value if necessary
+	if ((!$exitValue) && ($tmpReturnValue)){
+		$exitValue = $tmpReturnValue;
+	}
+
+	$tmpExitValue = system "/x/toolsrc/BuildTools/rcs_tools/old/putbinaries @allLocalExchangeFiles";
+	if ((!$exitValue) && ($tmpExitValue)){
+		$exitValue = 1;
+	}
+}
+	
+if (defined(@allRemoteExchangeFiles)) {
+	##################################################################
+	# Open the connection
+	##################################################################
+	if (! ($SOCK_HANDLE = &sock'open($rhost,$port))) {
+		@errorMessage = ("Connect to \"$rhost\" failed: $!");
+		&Exit(1,@errorMessage);
+	}
+
+	print $SOCK_HANDLE  "USER: $userName\n";
+	# don't pass anything to wild card handler.
+	print $SOCK_HANDLE "$RemoteRcsPrg\n";
+	print "$RemoteRcsPrg @allRemoteExchangeFiles\n" if $Debug;
+
+	# make the encryption directory
+	$cryptdir = "/tmp/crypt$$";
+	if (! mkdir("$cryptdir",0755)) {
+		undef(@errorMessage);
+		push(@errorMessage,"Cannot create local encryption directory $cryptdir");
+		push(@errorMessage,"This is needed for file encryption.");
+		push(@errorMessage,"Contact your RCS administrator");
+		&Exit(1,@errorMessage);
+	}
+
+
+	NEXTFILE:
+	while (@allRemoteExchangeFiles) {
+		$currentLocalFile = shift(@originalFiles);
+		$currentWorkingFile = `basename $currentLocalFile`;
+		chop $currentWorkingFile;
+		$sendcurrentRemoteFile = shift(@allRemoteExchangeFiles);
+
+		#
+		# set to determine whether RCS vault file should be made
+		# executable. This must be asked of each file.
+		#
+		$remoteFileMustBeExecutable = 0;
+		undef(@RcsArgs);
+		if (-x $currentLocalFile) {
+			$remoteFileMustBeExecutable = 1;
+		   push(@rcsArgs, "-E");
+		}
+
+	
+		# open the current file
+		if (! open(TMPCIFILE,$currentLocalFile)) {
+			print STDERR "	ERROR: Cannot open: \"$currentLocalFile\" $! \n";
+			$exitValue = 1;
+			next NEXTFILE;
+		}
+		#
+		# if the file is already compressed, don't recompress and tell server
+		if ($currentLocalFile =~ m%\.Z$%) { #file is already compressed
+		   push(@rcsArgs, "-C");
+			$cryptfile = "${currentWorkingFile}.N";
+			$uufile = "${cryptdir}/${currentWorkingFile}.N.uu";
+			if (! open(CRYPTFILE,"|crypt desZthPl |uuencode $cryptfile >$uufile")) {
+				print STDERR "	ERROR: Cannot open: \"$uufile\" $! \n";
+				$exitValue = 1;
+				next NEXTFILE;
+			}
+		}
+		else { # not already compressed
+			$cryptfile = "${currentWorkingFile}.Z.N";
+			$uufile = "${cryptdir}/${currentWorkingFile}.Z.N.uu";
+			if (! open(CRYPTFILE,"|compress -c |crypt desZthPl |uuencode $cryptfile >$uufile")) {
+				print STDERR "	ERROR: Cannot open: \"$uufile\" $! \n";
+				$exitValue = 1;
+				next NEXTFILE;
+			}
+		}
+		while (<TMPCIFILE>){
+			print CRYPTFILE $_;
+		}
+		close TMPCIFILE;
+		close CRYPTFILE;
+
+		if ((! -s $uufile) || (! open(CIFILE,$uufile))) {
+			print STDERR "	ERROR: Cannot open: encryption file \"$uufile\" $! \n";
+			$exitValue = 1;
+			next NEXTFILE;
+		}
+
+		# signal beginning of individual file check in
+		print $SOCK_HANDLE ">>### BEGIN INDIVIDUAL FILE CHECK IN ###<<\n";
+		#
+		# push the command for this particular file (3rd times a charm)
+		#
+		print "$RemoteRcsPrg rcsArgs $sendcurrentRemoteFile\n" if $Debug;
+		print $SOCK_HANDLE "$RemoteRcsPrg @rcsArgs $sendcurrentRemoteFile\n";
+	
+		print $SOCK_HANDLE ">>### BEGIN FILE SEND: ###<<\n";
+		
+		print "Sending \"$cryptfile\"\n" if $Debug;
+		print $SOCK_HANDLE "$cryptfile\n";
+
+		while (<CIFILE>) {
+			print $SOCK_HANDLE $_;
+		}
+		close(CIFILE);
+		print $SOCK_HANDLE ">>### END FILE SEND: ###<<\n";
+		print $SOCK_HANDLE ">>### END ALL FILE SEND: ###<<\n";
+	
+		# wait for signal that previous check in is done
+		$tmpExitValue = 1; # anticipate the worst
+		while (<$SOCK_HANDLE>) {
+			&checkForDeadServer($_);
+			if (m%^>>### END INDIVIDUAL FILE CHECK IN ###<<$%) { 
+				# if ci failed don't do unlinks and chmods below
+				$tmpExitValue = <$SOCK_HANDLE>;
+				&checkForDeadServer($tmpExitValue);
+				chop $tmpExitValue;
+				last;
+			}
+			else {
+				print;
+			}
+		}
+
+		#
+		# put ci status into exit value if error.
+		# don't change exit Value if it already shows error
+		#
+		if ((! $exitValue) && ($tmpExitValue)) {
+			$exitValue = 1;
+		}
+		#
+		# chmod -w
+		#
+		if (! $tmpExitValue) {
+			if (system "chmod -w $currentLocalFile") {
+				print STDERR "	Warning - could not chmod -w $currentLocalFile\n";
+			}
+		}
+	}
+	# signal remotely that all information has been sent for this file
+	print $SOCK_HANDLE ">>### CI ALL DONE ###<<\n";
+	#
+	# clean up encryption directory
+	#
+	if ( -d $cryptdir) {
+		unlink <$cryptdir/*>;
+		rmdir ("$cryptdir");
+	}
+	&sock'close($SOCK_HANDLE);
+}
+&Exit($exitValue,@nullErrorMessage);

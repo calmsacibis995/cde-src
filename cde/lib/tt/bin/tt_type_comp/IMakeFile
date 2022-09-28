@@ -1,0 +1,59 @@
+# %%  (c) Copyright 1993, 1994 Hewlett-Packard Company			
+# %%  (c) Copyright 1993, 1994 International Business Machines Corp.	
+# %%  (c) Copyright 1993, 1994 Sun Microsystems, Inc.			
+# %%  (c) Copyright 1993, 1994 Novell, Inc. 				
+# %%  $Revision: $ 			 				
+#ifdef HideFromImake
+ #
+ # IMakeFile 1.3	30 Jul 1993
+ #
+ # This preamble turns this imakefile into a shell script which will
+ # create/update this directory's makefile when invoked as follows:
+ # % sh IMakeFile [[GNU]MakeFile]
+ #
+IMAKEDIR=../../imake; export IMAKEDIR
+exec make -f $IMAKEDIR/Boot.mk ${1+"$@"}
+#endif HideFromImake
+
+TT_DIR	= ../..
+
+include $(TT_DIR)/Make.macros
+
+default: all
+
+All:: $(MAKEFILE)s all
+all: DynamicOptimizedProg(tt_type_comp)
+
+install_O:: $(INSTALL_DIR)/bin/tt_type_comp
+
+$(INSTALL_DIR)/bin/%: $(OEUVRE)/pic/O/%
+	$(TTINSTALL) $(@D) $<
+
+tt_type_comp_SOURCES.cc = \
+	mp_type_comp.cc \
+	mp_types_table.cc \
+	mp_types_gram.cc \
+	mp_types_lex.cc
+
+ProgramDynamicOptimized(tt_type_comp)
+SourceHygiene(tt_type_comp)
+
+mp_types_gram.cc + mp_types_gram.h : mp_types_gram.y
+	$(YACC.y) -d mp_types_gram.y
+	sed 's/^\([int]*[ ]*\)yyparse(/\1_Tt_types_table::yyparse(/' y.tab.c > mp_types_gram.cc
+	$(RM) y.tab.c
+	mv y.tab.h mp_types_gram.h
+
+mp_types_lex.cc : mp_types_lex.l mp_types_gram.h
+	$(LEX.l) mp_types_lex.l | sed -e '/^# define output/d' -e '/^# define input/d' -e '/^# define unput/d' -e 's/^yylex()/int _Tt_types_table::yylex()/' -e 's/^[int]*[ ]*yylook(/int _Tt_types_table::yylook(/' -e 's/^[int]*[ ]*yyback(/int _Tt_types_table::yyback(/' -e 's/(p, m)/(int *p, int m)/' -e 's/lex_input/input/' -e 's/lex_output/output/' -e '/^	int \*p;/ d' -e '/lex library/ q' > mp_types_lex.cc
+
+AppendVal(CPPFLAGS,-I$(TT_DIR)/slib)
+WhenAssign(%/mp_type_comp.o,AppendVal(CPPFLAGS,$(CPPFLAGS_version)))
+
+AppendVal(LDFLAGS,-L$(PROTO_DIR)/lib/$(OEUVRE)/pic/O -L$(PROTO_DIR)/lib/$(OEUVRE)/pdc/O)
+
+AppendVal(LDLIBS,-ltt -lstt)
+loc_LDLIBS_spro		= -Bstatic
+loc_LDLIBS_SunOS4	= -lce -lX -lI18N -ldl
+loc_LDLIBS_SunOS5	= -lnsl -lsocket -lintl -ldl -lc -lw
+AppendVal(LDLIBS,$(loc_LDLIBS_$(OS)) $(loc_LDLIBS_$(Tools)))

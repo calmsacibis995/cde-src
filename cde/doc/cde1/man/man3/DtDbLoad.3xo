@@ -1,0 +1,85 @@
+.TH DtDbLoad 3 "17 Jan 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.\" *************************************************************************
+.SH NAME
+DtDbLoad \- load actions and data types database
+.SH SYNOPSIS
+.yS
+#include <Dt/Action.h>
+.sp 0.5v
+.ta \w'void DtDbLoad('u
+void DtDbLoad(void);
+.yE
+.SH DESCRIPTION
+The
+.Fn DtDbLoad
+function loads the actions and data types database
+into the application.
+When the function returns, the database has been loaded.
+.xos
+See
+.cX dtdtfile
+for the general syntax and location of the actions
+and data types database.)
+.xoe
+.P
+.cdes
+An environment variable determines the set of directories to be searched.
+The
+.Fn DtDbLoad
+function loads all actions and data types
+defined in files with a
+.B \&.dt
+suffix located in these directories.
+.P
+The directory search path is based on the value of the
+.I DTDATABASESEARCHPATH
+environment variable and internal defaults.
+.I DTDATABASESEARCHPATH
+contains a comma-separated list of directories
+in \f3[\f2host\f3:]/\f2path\f1 format.
+The application must call
+.Fn DtDbLoad
+before calling
+any of the routines that query either the action or data type databases.
+If called multiple times, the old databases are freed before the new
+ones are created.
+.cdee
+.SH "RETURN VALUE"
+The
+.Fn DtDbLoad
+function returns no value.
+.SH "APPLICATION USAGE"
+If this function is used in a long-lived application, the application
+must dynamically reload the databases when they are modified.
+To do this, the client must register to receive notification whenever the
+actions and data types database needs to be modified.
+It is up to the application to recall
+.Fn DtDbLoad
+after receiving notification.
+This is done with a call to
+.Fn DtDbReloadNotify 3.
+.P
+If errors are encountered when reading the database files, error messages are
+written to the user's errorlog file (\f3$HOME/.dt/errorlog\fP).
+Records containing errors are not incorporated into the internal database.
+.ig zz
+There are no error returns available to the application
+because, while errors may occur loading some of those
+files, this does not necessarily mean that the application should fail.
+Errors typically affect only a single record in the database.
+The application can continue processing and
+error messages will be emitted when the data in the database is
+actually used.
+.br
+.zz
+.SH "SEE ALSO"
+.Hd Dt/Action.h 5,
+.Fn DtDbReloadNotify 3,
+.cde .BR dtdtfile (4).
+.xo .cX dtdtfile .

@@ -1,0 +1,182 @@
+.TH csa_read_calendar_attributes 3 "14 Oct 94"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.\" (c) Copyright 1994 X.400 API Association
+.SH NAME
+csa_read_calendar_attributes \- read and return the calendar attributes values for a calendar
+.SH SYNOPSIS
+.yS
+#include <csa.h>
+.sp 0.5v
+.ta \w'CSA_return_code csa_read_calendar_attributes('u
+CSA_return_code csa_read_calendar_attributes(CSA_session_handle \f2session\fP,
+	CSA_uint32 \f2number_names\fP,
+	CSA_attribute_reference *\f2attribute_names\fP,
+	CSA_uint32 *\f2number_attributes\fP,
+	CSA_attribute **\f2calendar_attributes\fP
+	CSA_extension *\f2read_calendar_attributes_extensions\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn csa_read_calendar_attributes
+function returns an array of attributes structures
+containing the values of the calendar attributes of the
+specified calendar.
+The function will return all of the
+attributes if
+.IR number_names
+argument is zero and
+.IR attribute_names
+argument is
+.Cn NULL .
+Only the owner of the calendar, users with
+.Cn CSA_OWNER_RIGHTS,
+or users with
+.Cn CSA_VIEW_CALENDAR_ATTRIBUTES
+access rights can read the calendar atttributes.
+.SH ARGUMENTS
+.HU "Session (Session Handle)"
+Opaque session handle that represents a session with the
+calendaring service.
+.P
+Session handles are created by a logon function call and
+invalidated with a logoff function call.
+If the session
+handle is invalid, then the error
+.Cn CSA_E_INVALID_SESSION_HANDLE
+is returned.
+.HU "Number Names (Uint32)"
+The number of calendar attribute names in
+.IR attribute_names.
+If zero, then all of the attributes will be returned.
+If
+the
+.IR attribute_names
+argument is
+.Cn NULL ,
+then this must be zero.
+.HU "Attribute Names (Attribute Names)"
+A pointer to an array of attribute names that are to be
+read.
+If
+.Cn NULL ,
+then all of the attributes will be returned.
+If the
+.IR number_names
+argument is zero, then this must be
+.Cn NULL .
+.HU "Read Calendar Attributes Extensions (Extension)"
+A pointer to an array of
+.B CSA_extension
+structures for this function.
+The array may contain both
+input extensions for providing additional information to
+the function and output extensions for receiving
+information from the function.
+A value of
+.Cn NULL
+indicates that the caller is not using any extensions.
+See the extensions structure for more information.
+.SH "RETURN VALUE"
+.HU "Number Attributes (Uint32)"
+A pointer to the number of attributes returned in
+calendar_attributes.
+The error
+.Cn CSA_E_INSUFFICIENT_MEMORY
+is returned if there is the service has insufficient memory
+to store the complete set of requested information.
+.HU "Calendar Attributes (Attribute)"
+A pointer to an array of attribute structures containing
+the values for the calendar attributes for the specified
+calendar.
+This array is allocated by the service, and
+should be freed with a single call to
+.Fn csa_free 3.
+.HU "Read Calendar Attributes Extensions (Extension)"
+If output extensions were passed to the function in the
+extensions list, the results from the service will be
+available in the extension.
+See the extensions structure for more information.
+Whether the function succeeded or
+not, and, if not, why.
+It may be success or one of the
+values listed under ERRORS below.
+.SH ERRORS
+The
+.Fn csa_read_calendar_attributes
+function returns the following error values:
+.VL 6
+.Lc CSA_E_FAILURE
+.br
+There was a general failure that does not
+fit the description of any other error code.
+.Lc CSA_E_INSUFFICIENT_MEMORY
+.br
+Insufficient memory was available to complete the requested operation.
+.Lc CSA_E_INVALID_ATTRIBUTE
+.br
+An attribute was specified that was not defined by this
+specification and the implementation does not support the
+attribute as an application specific attribute.
+.Lc CSA-E_INVALID_FLAG
+.br
+.Lc CSA_E_INVALID_FUNCTION_EXT
+.br
+The function extension requested is invalid.
+.Lc CSA_E_INVALID_PARAMETER
+.br
+A function parameter was invalid.
+.Lc CSA_E_INVALID_SESSION_HANDLE
+.br
+The specified Session Handle is invalid or no longer valid
+(e.g., after logging off).
+.Lc CSA_E_NO_AUTHORITY
+.br
+The user has insufficient authority for this function.
+.Lc CSA_E_NOT_SUPPORTED
+.br
+The operation requested is not supported by this implementation.
+.Lc CSA_E_SERVICE_UNAVAILABLE
+.br
+The requested calendar service is unavailable.
+.Lc CSA_E_UNSUPPORTED_ATTRIBUTE
+.br
+An attribute was encountered that is unsupported by the calendar service.
+.Lc CSA_E_UNSUPPORTED_FLAG
+.br
+The flag requested is not supported.
+.Lc CSA_E_UNSUPPORTED_FUNCTION_EXT
+.br
+The specified function extension is not supported or
+.Cn CSA_EXT_REQUIRED
+is set.
+.LE
+.SH "SEE ALSO"
+.Hd csa.h 5,
+.Fn csa_add_calendar 3,
+.Fn csa_add_entry 3,
+.Fn csa_call_callbacks 3,
+.Fn csa_delete_calendar 3,
+.Fn csa_delete_entry 3,
+.Fn csa_free 3,
+.Fn csa_free_time_search 3,
+.Fn csa_list_calendar_attributes 3,
+.Fn csa_list_calendars 3,
+.Fn csa_list_entries 3,
+.Fn csa_list_entry_attributes 3,
+.Fn csa_list_entry_sequence 3,
+.Fn csa_logoff 3,
+.Fn csa_logon 3,
+.Fn csa_look_up 3,
+.Fn csa_query_configuration 3,
+.Fn csa_read_entry_attributes 3,
+.Fn csa_read_next_reminder 3,
+.Fn csa_register_callback 3,
+.xo .Fn csa_restore 3,
+.xo .Fn csa_save 3,
+.Fn csa_unregister_callback 3,
+.Fn csa_update_calendar_attributes 3,
+.Fn csa_update_entry_attributes 3.

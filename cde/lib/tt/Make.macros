@@ -1,0 +1,37 @@
+#
+# Make.macros 1.2	05/18/93
+#
+# Make.macros - macros needed by every ToolTalk makefile
+#
+# Copyright (c) 1993 by Sun Microsystems, Inc.
+
+TT_VERSION		= 1.1.1_dev
+
+#
+# Saber needs the extra backslashes
+#
+CPPFLAGS_version	= -DTT_VERSION_STRING=\"$(TT_VERSION)\"
+#CPPFLAGS_version	= -DTT_VERSION_STRING=\\\"$(TT_VERSION)\\\"
+CPPFLAGS_isam		= -I$(TT_DIR)/mini_isam
+
+CPPFLAGS		= -I$(TT_DIR)/lib
+SABER_CPPFLAGS		= -I/usr/dist/local/sun4/newlang/SC2.0.1/include/CC_413
+
+CCFLAGS_gnu		= -I/usr/local/lib/g++-include
+CCFLAGS			= $(CCFLAGS_$(Tools))
+
+LD_RUN_PATH		= /usr/openwin/lib
+
+RUN_PATH_glob		=
+RUN_PATH_SunOS5		= -R $(LD_RUN_PATH)
+RUN_PATH_loc		= $(RUN_PATH_$(OS))
+RUN_PATH		= $(RUN_PATH_glob$(RUN_PATH_loc))$(RUN_PATH_loc)
+
+LDFLAGS_gnu		= -L/usr/local/lib/gcc-lib
+LDFLAGS			= $(LDFLAGS_$(Tools))
+
+PROTO_DIR		= $(TT_DIR)/proto
+INSTALL_DIR_default	= $(TT_DIR)/install
+INSTALL_DIR		= $(INSTALL_DIR_default$(DESTDIR))$(DESTDIR)
+
+TTINSTALL		= $(TT_DIR)/ttinstall $(TT_VERSION)

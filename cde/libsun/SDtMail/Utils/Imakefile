@@ -1,0 +1,49 @@
+XCOMM @(#)Imakefile	1.10 97/01/09 SMI
+XCOMM Copyright (c) 1996 Sun Microsystems, Inc.
+
+LIBTOPDIR = ..
+LIBCURDIR = Utils
+
+#include "../ImakeSdm.tmpl"
+#include <Library.tmpl>
+
+HEADERS  = \
+	CclientUtility.hh	\
+	DataTypeUtility.hh	\
+	LockUtility.hh		\
+	MessageUtility.hh	\
+	TnfProbe.hh		\
+	md5.hh			\
+	md5global.hh
+
+SRCS     = \
+	CclientUtility.cc	\
+	DataTypeUtility.cc	\
+	LockUtility.cc		\
+	MessageUtility.cc	\
+	SystemUtility.cc	\
+	Utility.cc		\
+	md5c_opt.cc
+
+OBJS     = \
+	CclientUtility.o	\
+	DataTypeUtility.o	\
+	LockUtility.o		\
+	MessageUtility.o	\
+	SystemUtility.o		\
+	Utility.o		\
+	md5c_opt.o
+
+INCLUDES = $(SDMINCLUDES) $(SDMCCLIENTINCLUDES)
+DEFINES  = $(SDMDEFINES)
+
+LibraryObjectRule()
+
+AllTarget($(OBJS))
+
+SdmObjectListTarget($(LIBCURDIR),$(OBJS))
+
+SdmTestLibraryTarget($(LIBCURDIR),$(OBJS))
+
+DependTarget()
+

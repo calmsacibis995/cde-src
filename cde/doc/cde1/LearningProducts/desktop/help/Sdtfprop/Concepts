@@ -1,0 +1,278 @@
+<chapter id=Concepts> Properties Concepts
+
+<procedure>File and Folder Ownership and Security
+
+<list bullet tight>
+* <xref GenInfo>
+* <xref BasicPerms>
+* <xref BasicUserTypes>
+* <xref ACList>
+* <xref PermMask>
+<\list>
+
+<procedure>Keyboard Navigation 
+<list bullet tight>
+* <xref PropDBox>
+<\list>
+
+
+
+
+<s1 id=GenInfo>General Information
+<idx>files: security<\idx>
+<idx>files: ACL-enabled<\idx>
+<idx>files: ownership<\idx>
+<idx>folders: security<\idx>
+<idx>folders: ownership<\idx>
+<idx>folders: ACL-enabled<\idx>
+<idx>Access Control Lists<\idx>
+<idx>ACLs<\idx>
+
+Traditional UNIX file and folder protection provides read, write, and execute permissions for three user types: owner, group, and other. These
+are called <emph>basic permissions<\emph>.
+
+Access Control Lists (ACLs) can provide greater control over file and folder permissions than do basic permissions. ACLs enable you to define file or folder permissions for the owner, owner's group, others, and specific users and groups, and default permissions for each of these categories. 
+For example, you can use an ACL to grant a friend read permission on your resume, while protecting it from being read by the rest of the world (besides yourself).
+
+<note>
+A file or folder must reside on a Solaris 2.5 or later server or system, and you must be running Solaris 2.5 software or later, to set, modify, and view ACLs on 
+that file or folder. (Such files and folders are called <emph>ACL-enabled<\emph>.)
+To set, modify, and view basic permissions and ACLs using the 
+Properties graphical user interface (GUI), you must be running CDE 1.1 or later.
+<\note>
+
+
+
+<s1 id=BasicPerms>Basic Permissions
+
+<idx>permissions: basic<\idx>
+<idx>permissions: read<\idx>
+<idx>permissions: write<\idx>
+<idx>permissions: execute<\idx>
+<idx>basic permissions<\idx>
+
+The permissions on a file or folder specify how it can be accessed. These permissions apply to the basic user types as well as all of the ACL default types.
+ 
+Only a file or folder owner can change basic permissions and set or modify ACLs.
+
+<lablist nowrap>
+
+\<term nogloss|Read Permission|\ Allows access to retrieve, copy, or view the contents of the object.
+\<term nogloss|Write Permission|\ For a file, allows access to change the contents of the file. For a folder, allows access to create or delete objects from the folder.
+\<term nogloss|Execute Permission|\ For a file, allows access to run the file (for executable files, scripts, and actions). For a folder, allows access to search and list the folder's contents.
+<\lablist>
+
+To make an object that you've created available for everyone to use, but
+protect it so it isn't inadvertently overwritten:
+ 
+<list bullet>
+ 
+* Change the file's properties, giving read and execute permission to
+  owner, group, and other.  Don't give anyone write permission.
+ 
+<\list>
+
+
+<s1 id=BasicUserTypes> Basic User Types
+<idx>permissions: basic user types<\idx>
+<idx>permissions: Owner<\idx>
+<idx>permissions: Group<\idx>
+<idx>permissions: Other<\idx>
+
+
+For <emph>basic permissions<\emph> on a file or folder, the three types of users are:
+<lablist nowrap> 
+\<term nogloss|Owner|\ The user who owns the file or folder. Only a system administrator (root user) can change the owner of a file or folder.
+\<term nogloss|Group|\ Users who have been grouped together by the system administrator. For example, the members of a department might belong to the same group. This group is the owning group and usually includes the file or folder's owner.
+\<term nogloss|Other|\ All other users on the system besides the owner and owning group.
+<\lablist>
+
+<procedure> Examples
+ 
+To make a folder private:
+ 
+<list bullet>
+ 
+* Change the folder's properties, giving yourself (the owner) read,
+  write, and execute permission, but giving no permissions for group and
+  other.  This means that only you and the root user can view the
+  contents of the folder.
+ 
+<\list>
+ 
+
+
+
+<s1 id=ACList> Access Control Lists
+
+
+You can set up only one ACL per file or folder. An ACL
+consists of ACL <emph>entries<\emph>. Each entry has a user type associated with it, much as basic permissions have Owner, Group, or Other associated with them.
+Each entry also has read, write, and execute permissions capabilities that
+you can assign to it. 
+
+ACL entries of type User or Group give specific users or groups of users
+access to files or folders that are not granted to the general user
+population. 
+
+For example, you can use an ACL to grant a friend read permission on your resume, while protecting it from being read by the rest of the world (besides yourself).
+
+
+
+<procedure> Access Control List Default Entries
+
+<idx>Access Control Lists:Default user types<\idx>
+<idx>Default user types<\idx>
+
+
+<location id=DefACLs>&empty;<\location>
+ 
+
+The ACL Default types enable you to create initial basic permissions and
+initial ACLs on files and folders that are created within the folder that has
+the ACL. 
+
+
+When you create a file or folder within a folder, it inherits the basic 
+permissions set by the system administrator. (To determine the current 
+defaults, create a new file or folder and then choose Properties from the Selected menu to view the permissions.) 
+
+You can use an ACL to set default basic permissions yourself for any file or 
+folder that is created within a folder. The ACL for that folder must contain 
+entries for all four of the following <emph>Required Default entry types<\emph>: Default Owning User, Default Owning Group, Default Other, and Default Mask. 
+An ACL can contain only one entry of each required type.
+
+The file or folder inherits the values for Owner, Group, and Other from the 
+person who creates it and inherits the basic permissions from the required ACL 
+Default entry types on the containing folder. ACL entries of these types do not 
+have names associated with them.
+
+You can also set <emph>Optional Default entry types<\emph> for any 
+folder: Default User and Default Group. You can 
+create as many Default User or Default Group ACL entries as you want. You must 
+specify the name of the user or group when you create the ACL entry. Optional 
+Default entry types set ACLs for any file or folder that is created 
+within that folder.
+
+Any ACL in which you want to put a Default User or Default Group entry must also contain one of each required entry type.
+
+<procedure>Example
+Suppose that the values for Owner and Group for a user named Carla are otto 
+and otto_staff, respectively. The value for Other (call it otto_other) 
+is everyone at Carla's company except for Carla and the members of otto_staff. 
+
+Carla creates these Required Default ACL entries on her folder named Project1:
+One of type Default Owning User with permissions rwx (read, write, execute) <newline>
+One of type Default Owning Group with permissions rx (read, execute) <newline>
+One of type Default Other with permissions no-read, no-write, no-execute <newline>
+One of type Default Mask with permissions rw (read, write) <newline>
+
+Any file or folder subsequently placed in the Project1 directory inherits 
+these basic permissions from Project1:
+<list bullet tight>
+* The file or folder Owner value is otto and otto has read, write, and execute permission on that file or folder
+
+ * The file or folder Group value is otto_staff and otto_staff has read and execute permission on that file or folder
+
+ * The file or folder Other value is otto_other and otto_other has no-read, no-write, and no-execute permission on that file or folder
+
+ * The file or folder has a Mask entry in the Access Control List Permissions scrolling list with value rw (read, write).
+<\list> 
+
+If Carla also adds an optional ACL of type Default User (Default Group) on the Project1 folder, then any file or folder subsequently placed in Project1 will inherit an ACL of type User (Group).
+
+
+<!-- The four ACL types Default Owning User, Default Owning Group, 
+Default Other, and Default Mask are called <emph>ACL Required Default  
+Entries<\emph>. To set any of the default ACLs, you <emph>must<\emph> set all
+four required default ACLs. If you set any one of the required default ACLs,
+the other three are automatically created for you. 
+ 
+To set initial basic permissions on all files and folders that are created in
+a particular folder, you must have an ACL defined on the folder that
+contains one each of type Default Owning User, Default
+Owning Group, Default Other, and Default Mask. The permissions for these 
+entries will be used as the initial basic permissions for the file or folder
+owner, group, and other user types, and mask, respectively.
+
+
+The types Default User and
+Default Group are called <emph>ACL Optional Default  Entries<\emph>.
+You can create as many Default User and Default Group entries as you want.
+You must specify the name of the user or group when you create the ACL
+entry. Optional Default entry types set ACLs for any file or folder that
+is created within the folder containing the optional Default ACLs. -->
+ 
+
+
+For information on how to set and delete ACL default entries, see:
+<list bullet tight>
+* <xref ToSetRequiredDefaultACLEntries>
+* <xref ToDeleteRequiredDefaultACLEntries>
+* <xref ToSetOptionalDefaultACLEntries>
+* <xref BasicPerms>
+<\list>
+
+
+<s1 id=PermMask> Permissions Mask
+
+<idx>permissions: mask<\idx>
+<idx>mask<\idx>
+<idx>ACL-enabled<\idx>
+
+An ACL-enabled file or folder has a <emph>mask<\emph> associated with it regardless of whether it has an Access Control List (ACL). The
+Access Control List Permissions scrolling list in the Permissions dialog box
+displays the Mask entry. 
+
+
+
+The mask is the maximum allowable permissions granted to any user on all ACL entries and Group basic permissions. For example, if a file's mask is read-only, then you cannot assign write or execute permission to any user without changing the mask value. 
+
+The mask's default permissions are the Group permissions for 
+the file or folder. It does not restrict Owner or Other basic permissions.
+
+You can change the mask permissions of any file or folder you own. 
+
+Use the mask as a quick way to limit permissions for users and groups.
+
+
+
+
+<s1 id=PropDBox>Navigating through the Properties Dialog Box
+
+<idx>keyboard navigation<\idx>
+<idx>navigation, using keyboard<\idx>
+
+You can use the keyboard to navigate through the Properties dialog box.
+Keyboard navigation follows the standard Motif and CDE user navigation models.
+In particular:
+
+<list bullet>
+
+* Press Tab to navigate through the basic permissions checkboxes. Press the
+spacebar or Return key to select and deselect Read, Write, and Execute 
+check boxes.
+
+* To select either the Permissions or Information radio button, press Tab
+until you reach the Permissions button. Then use the arrow key to reach the
+Information button, and to toggle between the radio buttons. Press the spacebar to select a radio button.
+
+* Press Tab, repeatedly if necessary, to reach the Apply Changes To option
+button. Press the spacebar to display the options. Use the arrow keys to
+navigate through the options. Press the spacebar or the Return key to choose
+an option.
+
+* Use the arrow keys to navigate within the File Selection Box scrolling list.
+
+* Pressing the Tab key takes you "forward" through the interface;
+pressing Shift+Tab takes you "backward" to the previously highlighted position 
+in the interface.
+
+<\list> 
+
+
+
+
+
+
+

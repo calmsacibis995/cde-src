@@ -1,0 +1,73 @@
+.TH DtDtsDataTypeToAttributeList 3 "15 Jun 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.SH NAME
+DtDtsDataTypeToAttributeList \- get a list of attributes for a data type
+.SH SYNOPSIS
+.yS
+#include <Dt/Dts.h>
+.sp 0.5v
+.ta \w'DtDtsAttribute **DtDtsDataTypeToAttributeList('u
+DtDtsAttribute **DtDtsDataTypeToAttributeList(const char *\f2datatype\fP,
+	const char *\f2opt_name\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn DtDtsDataTypeToAttributeList
+function returns a list of attributes for a data type.
+.P
+The
+.I datatype
+argument is a pointer to a data type name string.
+.P
+The
+.I opt_name
+argument can be used to specify a name to be associated with the
+data type.
+If the
+.I opt_name
+argument is not
+.Cn NULL ,
+it is used as a pseudo file name in typing;
+otherwise, certain attributes may be returned as
+.Cn NULL
+because the filename components could not be determined.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn DtDtsDataTypeToAttributeList
+function returns a
+.Cn NULL -terminated
+array of pointers of
+.BR *DtDtsAttribute ,
+or
+.Cn NULL
+if no value could be determined.
+.SH "APPLICATION USAGE"
+The application should use the
+.Fn DtDtsFreeAttributeList 3
+function to release the memory for the returned value.
+.P
+The
+.I opt_name
+argument is useful when the attribute being returned
+contains a modifier string that depends on having
+a file name included.
+For example, if the
+.Cn INSTANCE_ICON
+attribute had the value
+.BR %name%.icon ,
+.I opt_name
+would be used to derive the
+.B %name%
+portion of the attribute value.
+See
+.cde .IR dtdtsfile (4).
+.xo .cX datatypemodifiers .
+.br
+.SH "SEE ALSO"
+.Hd Dt/Dts.h ,
+.Fn DtDtsLoadDataTypes 3,
+.Fn DtDtsFreeAttributeList 3.

@@ -1,0 +1,420 @@
+.de LI
+.\" simulate -mm .LIs by turning them into .TPs
+.TP \\n()Jn
+\\$1
+..
+.de Lc
+.\" version of .LI that emboldens its argument
+.TP \\n()Jn
+\s-1\f3\\$1\f1\s+1
+..
+.TH SdmIntStr 3 "07/03/96"
+.BH "07/03/96"
+.\" @(#)SdmIntStr.3	1.8 96/07/03 SMI
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994, 1995, 1996 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994, 1995, 1996 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994, 1995, 1996 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994, 1995, 1996 Novell, Inc.
+.SH NAME
+SdmIntStr \- Container for an integer string value pair
+.SH SYNOPSIS
+.\"
+.SS Includes
+.ft 3
+.nf
+#include <Sdtmail.hh>
+.\"
+.SS Creation
+.ft 3
+.nf
+.sp 0.5v
+new SdmIntStr();
+.PP
+.ft 3
+.ta \w'new SdmIntStr('u
+new SdmIntStr(int \f2number\fP,
+	const SdmString& \f2string\fP);
+.PP
+.ft 3
+.ta \w'new SdmIntStr('u
+new SdmIntStr(int \f2number\fP,
+	const char* \f2string\fP);
+.PP
+.ft 3
+.ta \w'new SdmIntStr('u
+new SdmIntStr(const SdmIntStr& \f2IntStr\fP);
+.fi
+.ft 1
+.\"
+.SS Operators
+.PP
+.ft 3
+.nf
+.sp 0.5v
+SdmIntStr& operator= (const SdmIntStr& \f2IntStr\fP);
+.PP
+.ft 3
+int operator< (const SdmIntStr& \f2IntStr\fP) const;
+.PP
+.ft 3
+int operator> (const SdmIntStr& \f2IntStr\fP) const;
+.PP
+.ft 3
+int operator== (const SdmIntStr& \f2IntStr\fP) const;
+.PP
+.ft 3
+int operator!= (const SdmIntStr& \f2IntStr\fP) const;
+.fi
+.ft 1
+.\"
+.SS Methods
+.PP
+.ft 3
+.nf
+.sp 0.5v
+.ta \w'void Clear('u
+void Clear()
+.PP
+.ft 3
+.ta \w'int GetNumber('u
+int GetNumber();
+.PP
+.ft 3
+.ta \w'SdmString GetString('u
+SdmString GetString();
+.PP
+.ft 3
+.ta \w'void SetNumber('u
+void SetNumber(int \f2number\fP);
+.PP
+.ft 3
+.ta \w'void SetNumberAndString('u
+void SetNumberAndString(int \f2number\fP,
+	const SdmString& \f2string\fP);
+.PP
+.ft 3
+.ta \w'void SetNumberAndString('u
+void SetNumberAndString(int \f2number\fP,
+	const char* \f2string\fP);
+.PP
+.ft 3
+.ta \w'void SetString('u
+void SetString(const SdmString& \f2string\fP);
+.PP
+.ft 3
+.ta \w'void SetString('u
+void SetString(const char* \f2String\fP);
+.fi
+.ft 1
+.\" end of methods list
+.ta 0.25i 0.50i 0.75i 1.0i 1.25i 1.50i 1.75i 2.0i 2.5i 3.0i
+.SH DESCRIPTION
+The SdmIntStr object implements a container (tuple) that holds two objects: an integer and
+a SdmString, referred to as the 'number' and the 'string'. The number is a simple integer
+data type. The string object is an SdmString object.
+.PP
+This object is useful for holding information that is logically a single datum but that is
+physically represented by two separate values (such as an abstract header, which is
+composed of an integer abstract field bitname and a string field value).
+.PP
+Many methods implemented by libSDtMail return data in the form of SdmIntStr objects; for
+example, message headers and message attributes.
+.\"
+.SH CREATION
+There are a number of ways to create an SdmIntStr object.
+.SS Empty Object
+You can call the SdmIntStr constructor with no arguments:
+.PP
+.nf
+		SdmIntStr* intstr = new SdmIntStr();
+		SdmIntStr intstr();
+.fi
+.PP
+This creates a new SdmIntStr object that has a zero number and a null (empty) string.
+.SS Existing Char*s
+You can call the SdmIntStr constructor with a constant character pointer:
+.PP
+.nf
+		SdmIntStr* intstr = new SdmIntStr(int number, const char* string);
+		SdmIntStr intstr(int number, const char* string);
+
+	For example:
+
+		SdmIntStr* intstr = new SdmIntStr(1, "first");
+		SdmIntStr intstr(2, "second");
+.fi
+.PP
+This creates a new SdmIntStr object that has initial values of the number and
+character string given as the arguments to the constructor; new storage is
+allocated and the given null terminated character string data is copied into the
+new string objects.
+.SS Existing SdmStrings
+You can call the SdmIntStr constructor with an existing SdmString object:
+.PP
+.nf
+		SdmIntStr* intstr = new SdmIntStr(int number, const SdmString& string);
+		SdmIntStr intstr(int number, const SdmString& string);
+.fi
+.PP
+This creates a new SdmIntStr object that has initial values of referenced copies
+of the original SdmString objects; that is, new storage is not allocated, but
+rather another reference to the same data is made.
+.SS Existing SdmIntStr
+You can call the SdmIntStr constructor with an existing SdmIntStr object:
+.PP
+.nf
+		SdmIntStr* intstr = new SdmIntStr(const SdmIntStr& intstr);
+		SdmIntStr intstr(const SdmIntStr& intstr);
+.fi
+.PP
+This creates a new SdmIntStr object that is a copy of the original; while new
+storage is allocated for the SdmIntStr object, the contained string is a
+reference copy to the same underlying data.
+.\"
+.SH DESTRUCTION
+An SdmIntStr object can be destroyed like any other object. The contained
+SdmString object is destroyed. If it is the last reference to the underlying
+data, the data itself is released from storage; otherwise, just the string
+reference object is destroyed.
+.\"
+.SH OPERATORS
+Some standard C operators are overloaded to function with SdmIntStr objects:
+.SS Comparison
+(\f3<  >  ==  !=\fP)
+.PP
+SdmIntStr tuples can be can be compared against each other using some standard C
+comparison operators; comparisons are "case sensitive". The operators are successful only
+if the operation succeeds on both parts of the tuple; for example, for equality, both the
+number and string must match, for inequality, both the number and string must fail to
+match.
+.PP
+.nf
+		SdmIntStr s1, s2;
+
+		s1 == s2
+		s1 < s2
+		s1 > s2
+		s1 != s2
+.fi
+.SS Assignment
+(\f3=\fP)
+.PP
+SdmIntStr tuples can be assigned to each other. The following is valid:
+.PP
+.nf
+		SdmIntStr s1, s2;
+
+		s2 = s1;
+.fi
+.\"
+.SH METHODS
+The following methods are provided to operate on the contents of an SdmIntStr tuple object.
+.\"
+.SS \f3Clear\fP
+()
+
+This method causes both strings to be cleared; that is, the number is reset to zero, and
+the string is reset to the null string.
+.PP
+.nf
+		SdmIntStr s1;
+		SdmIntStr *s2;
+
+		s1.Clear();
+		s2->Clear();
+.fi
+.\"
+.SS \f3GetNumber\fP
+()
+
+Retrieve the number component of this SdmIntStr tuple.
+For example:
+.PP
+.nf
+		SdmIntStr s1(100, "this is the string");
+
+		printf("%d: %s\\n", s1.GetNumber(), (const char *)s1.GetString());
+
+	would print:
+
+		100: this is the string
+.fi
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "none"
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmString)\fP"
+.br
+A SdmString object representing the first string of this SdmIntStr tuple is returned.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetString\fP
+()
+
+Retrieve the string component of this SdmIntStr tuple. See example for GetNumber() above.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "none"
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmString)\fP"
+.br
+A SdmString object representing the second string of this SdmIntStr tuple is returned.
+This is NOT a reference copy of the contained SdmString object, but rather the contained
+SdmString object itself. The object must not be deleted. If a copy that can later be 
+deleted is desired, it can be assigned to another SdmString object.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3SetNumber\fP
+(\f3number\fP)
+
+This method allows the number component of this tuple to be set to the integer value
+supplied as an argument.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3number\fP (\f3int\fP)"
+.br
+The integer value to set the number component of this tuple to.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "none"
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3SetNumberAndString\fP
+(\f3number\fP, \f3string\fP)
+
+This method allows both the number component and the string component of this tuple
+to be set to the values supplied as arguments.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3number\fP (\f3int\fP)"
+.br
+The integer value to set the number component of this tuple to.
+.LI "\f3string\fP (\f3const SdmString&\fP)"
+.br
+The string to set the string component of this tuple to.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "none"
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3SetNumberAndString\fP
+(\f3number\fP, \f3string\fP)
+
+This method allows both the number component and the character string component of this tuple
+to be set to the values supplied as arguments.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3number\fP (\f3int\fP)"
+.br
+The integer value to set the number component of this tuple to.
+.LI "\f3string\fP (\f3const char*\fP)"
+.br
+The character string to set the string component of this tuple to.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "none"
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3SetString\fP
+(\f3string\fP)
+
+This method allows the string component of this tuple to be set to the string value
+supplied as an argument.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3string\fP (\f3const SdmString&\fP)"
+.br
+The string to set the string component of this tuple to.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "none"
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3SetString\fP
+(\f3string\fP)
+
+This method allows the string component of this tuple to be set to the character string
+value supplied as an argument.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3string\fP (\f3const char*\fP)"
+.br
+The character string to set the string component of this tuple to.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "none"
+.PP
+.RE
+.nr )J 0
+.\"
+.PP
+.RE
+.nr )J 0
+.SH "SEE ALSO"
+.na
+.BR SdmIntStrL (3),
+.BR SdmIntStrLL (3)

@@ -1,0 +1,307 @@
+XCOMM @(#)wpx.cf	1.1	@(#)wpx.cf	1.1	93/12/16 19:25:53	
+XCOMM platform: IBM Workplace Unix  wpx.cf
+
+
+/*---------------------------------------------------------------------------*/
+/* WPX - IBM WorkPlace Unix                                                  */
+/*---------------------------------------------------------------------------*/
+#ifndef OSName
+#define OSName			WPX
+#endif
+#ifndef OSMajorVersion
+#define OSMajorVersion		1
+#endif
+#ifndef OSMinorVersion
+#define OSMinorVersion		0
+#endif
+
+XCOMM operating system:		OSName
+
+/*---------------------------------------------------------------------------*/
+/* Compilation-specific definitions.                                         */
+/*---------------------------------------------------------------------------*/
+#define	BootstrapCFlags		-D__WPX__
+#define	StandardDefines		-D__WPX__
+#define	OSDefines		/**/
+#define LintOpts		-D__WPX__
+#ifndef MotifDefines 
+#define MotifDefines		-DNO_REGEX -DNO_REGCOMP
+#endif
+#define SharedLibraryDef	-DSHARED_LIBRARY
+#define LibraryDefines       	OSDefines StandardDefines
+
+/*---------------------------------------------------------------------------*/
+/* System capabilities.                                                      */
+/*---------------------------------------------------------------------------*/
+/* #define SystemV                 NO  the default is also NO   */
+/* #define HasShm	           NO  the default is also NO  */
+#define HasSockets              YES
+#define HasBSD44Sockets         YES
+#define	HasNdbm	                YES
+#define SetTtyGroup             YES
+#define HasBsearch              YES
+#define Malloc0ReturnsNull	YES
+#define ExecableScripts         YES
+#define ExpandManNames          YES
+#define NeedFunctionPrototypes  YES
+#define NeedNestedPrototypes    YES
+#define NeedConstPrototypes     YES
+#define NeedVarargsPrototypes   YES
+#define LdCombineFlags		-r		/* PS/2 doesn't do ld -X */
+#define LintLibFlag             -o
+#define HasVFork		NO
+#define HasPutenv               YES
+#define DirFailPrefix		-
+
+/*---------------------------------------------------------------------------*/
+/* Build directives.                                                         */
+/*---------------------------------------------------------------------------*/
+#define BuildFonts		YES
+#define UseRtxFonts		YES
+#define StripInstalledPrograms	YES
+#define AvoidNullMakeCommand	YES
+#define LinkArchivedXau		NO
+
+/*---------------------------------------------------------------------------*/
+/*  Commands                                                                 */
+/*---------------------------------------------------------------------------*/
+#define	InstallCmd	        installbsd
+#define DoRanlibCmd             YES
+
+/*---------------------------------------------------------------------------*/
+/* Set up Install destination directories.                                   */
+/*---------------------------------------------------------------------------*/
+
+#define	AdmDir                  /tmp/X11/adm
+#define	LibDir  	        $(USRLIBDIR)
+#define	ConfigDir	        /usr/X11/config
+#define	ManSuffix	        1
+#define	ManDirectoryRoot        /usr/X11/man
+#define ProjectRoot             /usr/X11
+
+/*---------------------------------------------------------------------------*/
+/* Processor-specific settings.                                              */
+/*---------------------------------------------------------------------------*/
+
+#ifdef I386Architecture
+#define UnalignedReferencesAllowed	YES
+#endif
+ 
+/*---------------------------------------------------------------------------*/
+/* Building in source tree.                                                  */
+/*---------------------------------------------------------------------------*/
+#ifndef UseInstalled
+XCOMM WPX: If building in source tree, set WPX pseudo-root variables.
+         WPX_ROOT = $(TOP)/../../wpx_root
+         CDE_ROOT = $(TOP)/../../cde_root
+          WPX_GNU = $(WPX_ROOT)/usr/gnu
+          WPX_MCC = $(WPX_ROOT)/usr/hc
+#endif
+
+ 
+/*---------------------------------------------------------------------------*/
+/* For builds within the tree.                                               */
+/*---------------------------------------------------------------------------*/
+
+#if !defined(UseInstalled)
+XCOMM For builds within the tree, use latest build environment.
+#define IHaveLocalTmpl
+XCOMM Use BUILD_INCLUDES to point to WPX_ROOT include directories
+   BUILD_INCLUDES = -I$(WPX_ROOT)/usr/mach3/include -I$(WPX_ROOT)/usr/include \
+		    -I$(WPX_ROOT)/usr/include/X11
+#define LexCmd		$(WPX_ROOT)/bin/lex -S$(WPX_ROOT)/usr/ccs/lib/flex.skel
+#define YaccCmd		$(WPX_ROOT)/bin/yacc
+#if HasGcc
+#define UseCPlusPlus			YES
+#define DefaultCPlusPlusIncludes	-I$(CDE_ROOT)/usr/gnu/lib/g++-include
+#define CcCmd		LPATH=$(WPX_ROOT)/usr/ccs/lib \
+		        $(WPX_GNU)/bin/gcc \
+			-B$(WPX_GNU)/lib/gcc-lib/i386-mach/2.3.3/ \
+			-B$(WPX_GNU)/bin/ \
+			-L$(WPX_GNU)/lib \
+			-L$(WPX_GNU)/lib/gcc-lib/i386-mach/2.3.3 \
+			-L$(WPX_ROOT)/usr/ccs/lib \
+			-nostdinc \
+			-fstrength-reduce -fwritable-strings -DNO_ALLOCA
+#define CPlusPlusCcCmd	LPATH=$(WPX_ROOT)/usr/ccs/lib \
+			$(WPX_GNU)/bin/g++ \
+			-D__OSF1__ \
+			-B$(WPX_GNU)/lib/gcc-lib/i386-mach/2.3.3/ \
+			-B$(WPX_GNU)/bin/ \
+			-L$(WPX_GNU)/lib \
+			-L$(WPX_GNU)/lib/gcc-lib/i386-mach/2.3.3 \
+			-L$(WPX_ROOT)/usr/ccs/lib \
+			-nostdinc \
+			-fstrength-reduce -fwritable-strings -DNO_ALLOCA
+#define RanlibCmd	$(WPX_GNU)/bin/ranlib
+#define CppCmd		$(WPX_GNU)/lib/gcc-lib/i386-mach/2.3.3/cpp
+#define LdCmd		$(WPX_GNU)/bin/ld
+#define AsCmd		$(WPX_GNU)/bin/as
+#define ArCmd		$(WPX_GNU)/bin/ar clq
+#elif HasMcc
+#define UseCPlusPlus			YES
+#define DefaultCPlusPlusIncludes	-I$(WPX_MCC)/incc
+#define CcCmd		HCDIR=$(WPX_MCC) $(WPX_MCC)/bin/hcw386 \
+			-YP,$(WPX_MCC)/lib\:$(WPX_ROOT)/usr/ccs/lib \
+			-YI,$(WPX_ROOT)/usr/include
+#define CPlusPlusCcCmd	HCDIR=$(WPX_MCC) $(WPX_MCC)/bin/hcw386 \
+			-YP,$(WPX_MCC)/lib\:$(WPX_ROOT)/usr/ccs/lib \
+			-YI,$(WPX_ROOT)/usr/include
+#define AsCmd		$(WPX_MCC)/bin/as
+#define ArCmd		$(WPX_MCC)/bin/ar r
+#define LdCmd		$(WPX_MCC)/bin/ld
+#define RanlibCmd	$(WPX_MCC)/bin/ar s
+#endif /* HasGcc/HasMcc */
+#else /* UseInstalled */
+#if HasGcc
+#define UseCPlusPlus	YES
+#define CcCmd		gcc -fstrength-reduce -fwritable-strings 
+#define CPlusPlusCcCmd	g++ -fstrength-reduce -fwritable-strings 
+#elif HasMcc
+#define UseCPlusPlus	YES
+#define ArCmd		ar r
+#define RanlibCmd	ar s
+#endif
+#endif /* !UseInstalled */
+#define PreProcessCmd	CppCmd
+
+
+/*---------------------------------------------------------------------------*/
+/*  Server-specfic settings		                                     */
+/*                                                                           */
+/*  This defines the name of server you want.                                */
+/*  affected: .../X11/server/Makefile                                        */
+/*---------------------------------------------------------------------------*/
+
+#define XibmServer		YES
+
+/*---------------------------------------------------------------------------*/
+/* Directory name under server/ddx/ibm                                       */
+/*---------------------------------------------------------------------------*/
+#define OPERATING_SYSTEM	WPX
+
+/*---------------------------------------------------------------------------*/
+/*  Server/extension build settings                                          */
+/*---------------------------------------------------------------------------*/
+
+/* For now we are not building PEX.  Delete these two lines to build PEX:    */
+#define BuildPex			NO
+/* Build the xinput extensions.              */
+#define BuildXInputLib			YES
+/* define OpenGL extension for building.     */ 
+#define BuildGL				NO
+
+/*---------------------------------------------------------------------------*/
+/*  Servers to build.                                                        */
+/*---------------------------------------------------------------------------*/
+/*
+ * These define the screens the server will allow
+ * affected:  .../server/ddx/ibm/Makefile
+ *            .../server/ddx/ibm/common/Makefile
+ * Also, be sure to remove .../server/ddx/ibm/common/ibmscreen.o
+ * Plus - ../server/ddx/ibm/AIX directory should be remade
+ *
+ */
+
+#define ibmIncludeXGA	             YES
+#define ibmIncludeVGA	             YES 
+#define ibmIncludeIAA	             NO
+#define ibmInclude8514               YES
+#define ibmIncludeATI                YES
+#define ibmIncludeS3VGA8             YES
+
+
+/*---------------------------------------------------------------------------*/
+/*  Compilation-specific Settings                                            */
+/*---------------------------------------------------------------------------*/
+/* define the following line for easily debuggable servers, the */
+/* second line for especially speedy servers.                   */
+/* Build optimized server.                                      */
+
+#define ServerCDebugFlags         -O 
+/* #define ServerCDebugFlags      -g -DDEBUG -DTRACE_X          */
+/* #define      ServerCDebugFlags -O ibmAthenaDefs              */
+
+
+/*---------------------------------------------------------------------------*/
+/*  OpenGL-specific settings                                                 */
+/*---------------------------------------------------------------------------*/
+#if BuildGL
+#define GLDefines                 -DOPENGL
+#else
+#define GLDefines                 /**/
+#endif
+
+
+#define ExtensionDefines          -DSHAPE -DMULTIBUFFER -DMITMISC GLDefines
+#define ServerOSDefines -Dibm -D_BSD -DAIXV386 -DOSF1 -DAIX_PS2_V2 
+#define	ServerDefines   ServerOSDefines StandardDefines ExtensionDefines -DXDMCP
+
+
+/*---------------------------------------------------------------------------*/
+/* Platform-specfic settings                                                 */
+/*---------------------------------------------------------------------------*/
+
+        /*
+         * affected:    .../server/ddx/ibm/common/Makefile
+         *              .../server/os/4.2bsd/Makefile
+         * remove:      .../server/ddx/ibm/common/ibminit.o
+         *              .../server/ddx/ibm/common/ibmio.o
+         *              .../server/ddx/ibm/common/ibmutils.o
+         *              .../server/os/4.2bsd/utils.o
+         */
+
+/* Need This Also For our IBM Imakefiles */
+/* It turns out that we X11R5, malloc performance is better with the mit
+ * Xalloc(), etc. routines.  Therefore, use of the IBM malloc routines
+ * has been turned off.
+ */
+
+#define SpecialMalloc           NO
+#define ibmSpecialMalloc        NO
+
+#define FontOSDefines StandardDefines
+/* define this as you like for server font support */
+#ifdef AIXArchitecture
+#define FontFilters BDFTOSNFFILT SHELLPATH
+#endif
+
+/*---------------------------------------------------------------------------*/
+/* wpxLib.rules - do not include until build with shared lib                 */
+/*---------------------------------------------------------------------------*/
+
+/*  #include <wpxLib.rules>                                                  */
+
+/*---------------------------------------------------------------------------*/
+/* Various CDE settings.                                                     */
+/*---------------------------------------------------------------------------*/
+#ifdef I386Architecture
+VENDOR=wpx
+HARDWARE=intel
+#endif
+
+/* Build with the bms libraries/headers in this tree */
+#ifndef BUILD_BMS
+#define BUILD_BMS               YES
+#endif
+
+/* Build only with cose bits  */
+#ifndef BUILD_UNITY_1_ONLY
+#define BUILD_UNITY_1_ONLY      YES 
+#endif
+
+/* use the mit libraries from /usr/lib and not the build tree */
+#ifndef UseMitLibrariesFromSystemOnly
+#define UseMitLibrariesFromSystemOnly	YES
+#endif
+
+/* we need MessageCatalogTarget() (and possible others) */
+#define DefineOldLibraryRules
+
+/* Do not build with shared libraries in this tree */
+#ifndef HasSharedLibraries    
+#define HasSharedLibraries      NO
+#endif
+
+/*  temp change to test fix  */
+#define GnuMakeCmd	$(TOP)/admin/BuildTools/gnumake/gnumake

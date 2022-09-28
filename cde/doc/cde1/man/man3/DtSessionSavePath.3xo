@@ -1,0 +1,64 @@
+.TH DtSessionSavePath 3 "17 Feb 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.SH NAME
+DtSessionSavePath \- get a pathname for saving application state information
+.SH SYNOPSIS
+.yS
+#include <Dt/Session.h>
+.sp 0.5v
+.ta \w'Boolean DtSessionSavePath('u
+Boolean DtSessionSavePath(Widget \f2widget\fP,
+	char **\f2savePath\fP,
+	char **\f2saveFile\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn DtSessionSavePath
+function returns the pathname to be used by an application for
+saving its state information.
+The information is later used by the
+application to restore its state.
+.P
+The
+.I widget
+argument is
+the application's top level widget.
+The
+.I savePath
+argument is the address of the character string to receive
+the pathname of the state information file to be used by
+the application for storing its state.
+The
+.I saveFile
+argument is the address of the character string to receive
+the filename of the file to be used by the application for
+storing its state.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn DtSessionSavePath
+function returns True;
+otherwise, it returns False.
+.SH "APPLICATION USAGE"
+The application should add
+.B \-session
+.I saveFile
+when it updates its
+.Cn WM_COMMAND
+property.
+.P
+The application must use
+.Fn XtFree 3X
+to free data returned in *\f2savePath\fP and *\f2saveFile\fP.
+.SH "SEE ALSO"
+.Hd Dt/Session.h 5,
+.Fn DtSessionRestorePath 3;
+.cde .Fn XtFree 3X.
+.xos
+.Fn XtFree 3X
+in the \*(Zt;
+\*(Zi.
+.xoe

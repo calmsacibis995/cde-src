@@ -1,0 +1,51 @@
+.TH DtEditorUndoEdit 3 "3 May 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.\" *************************************************************************
+.SH NAME
+DtEditorUndoEdit \- undo the last edit made to the text in a DtEditor widget
+.SH SYNOPSIS
+.yS
+#include <Dt/Editor.h>
+.sp 0.5v
+.ta \w'Boolean DtEditorUndoEdit('u
+Boolean DtEditorUndoEdit(Widget \f2widget\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn DtEditorUndoEdit
+function undoes the last change (deletion or insertion) made
+to the text in a DtEditor widget.
+A change consists of either a set of
+consecutive insertions, or a set of consecutive deletions followed by up
+to one set of consecutive insertions.
+An insertion is consecutive if there have been no intervening deletions,
+and it is continuing forward from the same point.
+A deletion is consecutive if there have been no intervening insertions,
+and its start or end position is coincidental with the last deletion
+(that is, the deletion is continuing from the same point, either forward or
+backward).
+Undoing an edit once restores the original text.
+Undoing an edit twice restores the last change.
+.P
+The
+.I widget
+argument specifies the DtEditor widget ID.
+.cde .P
+.cde For a complete definition of the DtEditor widget
+.cde and its associated resources, see
+.cde .Fn DtEditor 3.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn DtEditorUndoEdit
+function returns
+True;
+otherwise, if there is no pending undo it returns
+False.
+.SH "SEE ALSO"
+.Hd Dt/Editor.h 5,
+.Fn DtEditor 3.

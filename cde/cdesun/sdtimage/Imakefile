@@ -1,0 +1,87 @@
+XCOMM
+XCOMM	@(#)Imakefile	1.5 97/03/17 (c) Copyright 1996 Sun Microsystems, Inc.
+XCOMM
+XCOMM	Imakefile; sdtimage and sdtpagecounter
+XCOMM
+
+#include <sun/DPS.tmpl>
+
+CCOPTIONS	= -Xa
+XILHOME		= /opt/SUNWits/Graphics-sw/xil
+XILINCLUDE	= $(XILHOME)/include
+XILLIB		= -L$(XILHOME)/lib -lxil
+TIFFLIB		= -ltiff
+DGALIB		= -ldga
+DPSLIB		= -ldps
+
+INCLUDES	= -I. -I$(XILINCLUDE)
+
+TARGET_IMAGE	= sdtimage
+
+TARGET_COUNTER	= sdtpagecounter
+
+PROGRAMS	= $(TARGET_IMAGE) $(TARGET_COUNTER)
+
+IMAGE_DEPLIBS 	= $(DEPDTWIDGETLIB) $(DEPDTSVCLIB) $(DEPTTLIB) \
+		  $(DEPXMLIB) $(DEPXTOOLLIB) $(DEPXLIB)
+
+IMAGE_LIBRARIES = $(DTWIDGETLIB) $(DTSVCLIB) $(TTLIB) \
+		  $(XMLIB) $(XTOOLLIB) $(XLIB) \
+		  $(TIFFLIB) $(DGALIB) $(DPSLIB)
+
+$(TARGET_IMAGE)	:= EXTRA_LOAD_FLAGS += -R $(XILHOME)/lib
+
+IMAGE_PSWRAP	= imagetool
+IMAGE_PSW_SRC	= imagetool.psw
+IMAGE_DPS_SRC	= imagetool_dps.c
+IMAGE_DPS_OBJ	= imagetool_dps.o
+
+IMAGE_OBJS	= $(IMAGE_DPS_OBJ) \
+		  ce.o deskset.o display.o dither.o dragdrop.o fileui.o \
+		  gif.o gifcompr.o  gifencod.o help.o image.o imageinfoui.o \
+		  imagetool.o jfif.o menus.o misc.o open.o \
+		  pageviewui.o paletteui.o photocd.o ppm.o popup.o print.o \
+		  print_prev.o printprevui.o printui.o props.o  propsui.o \
+		  ps.o ps_optionsui.o rast.o save.o select.o session.o \
+		  state.o tiff.o tt.o ui_imagetool.o xpm.o xv.o DrawingAVis.o \
+		  snap_dialog.o dtb_utils.o multivis.o sdtimage_snap.o
+
+IMAGE_SRCS	= $(IMAGE_PSW_SRC) \
+		  ce.c deskset.c display.c dither.c dragdrop.c fileui.c \
+		  gif.c gifcompr.c  gifencod.c help.c image.c imageinfoui.c \
+		  imagetool.c jfif.c menus.c misc.c open.c \
+		  pageviewui.c paletteui.c photocd.c ppm.c popup.c print.c \
+		  print_prev.c printprevui.c printui.c props.c  propsui.c \
+		  ps.c ps_optionsui.c rast.c save.c select.c session.c \
+		  state.c tiff.c tt.c ui_imagetool.c xpm.c xv.c DrawingAVis.c \
+		  snap_dialog.c dtb_utils.c multivis.c sdtimage_snap.c
+
+IMAGE_SYSLIBS	= -lm -lnsl -lsocket -ldl
+
+COUNTER_DEPLIBS	= $(DEPXLIB)
+
+COUNTER_LIBRARIES = $(XLIB) $(DPSLIB)
+
+COUNTER_SYSLIBS	= -lm
+
+COUNTER_PSWRAP	= pagecounter
+COUNTER_PSW_SRC	= pagecounter.psw
+COUNTER_DPS_SRC	= pagecounter_dps.c
+COUNTER_DPS_OBJ	= pagecounter_dps.o
+
+COUNTER_OBJS	= $(COUNTER_DPS_OBJ) \
+		  pagecounter.o
+
+COUNTER_SRCS	= $(COUNTER_PSW_SRC) \
+		  pagecounter.c
+
+AllTarget($(PROGRAMS))
+
+DpsFromPsWrapTarget($(IMAGE_PSWRAP))
+NormalProgramTarget($(TARGET_IMAGE),$(IMAGE_OBJS),$(IMAGE_DEPLIBS),$(IMAGE_LIBRARIES),$(IMAGE_SYSLIBS))
+
+DpsFromPsWrapTarget($(COUNTER_PSWRAP))
+NormalProgramTarget($(TARGET_COUNTER),$(COUNTER_OBJS),$(COUNTER_DEPLIBS),$(COUNTER_LIBRARIES),$(COUNTER_SYSLIBS))
+
+DependTarget()
+LintTarget()

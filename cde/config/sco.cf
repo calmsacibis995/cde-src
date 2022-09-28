@@ -1,0 +1,450 @@
+/**/#
+/**/#
+/**/# Copyright (C) 1983-1993 The Santa Cruz Operation, Inc.
+/**/#
+/**/# The information in this file is provided for the exclusive use of the
+/**/# licensees of The Santa Cruz Operation, Inc.  Such users have the right 
+/**/# to use, modify, and incorporate this code into other products for 
+/**/# purposes authorized by the license agreement provided they include this 
+/**/# notice and the associated copyright notice with any such product.  The 
+/**/# information in this file is provided "AS IS" without warranty.
+/**/# 
+/**/#
+/**/# platform:  SCO sco.cf
+
+/* SCO MODIFICATION HISTORY
+ *
+ * S046, 23-Jun-93, toma
+ * 	add -DUSE_INLINE_CODE to #define OptimizedCDebugFlags
+ * S045, 28-May-93, hess
+ * 	add _UseScoMalloc_ controls use of lib/malloc/libmalloc.a
+ * S044, 21-May-93, garyh
+ *	We are shipping libXi.a.  Set BuildXInputLib to YES
+ * S043, 21-May-93, garyh
+ *	Set OptimizedCDebugFlags from -Oetc to -Olegitc to be consistent with
+ *	server group's optimization flag and also to utilize the fixed inline
+ *	__alloca code in the compiler (-Oi).
+ * S042, 21-May-93, garyh
+ *	Removed NO_ALLOCA.  Compiler bug with alloca fixed by SCOCAN.  Remember
+ *	to use correct compiler intrinsics flag to use fixed alloca code.
+ * S041, 20-Dec-92, mikep
+ *	add the intuitive _SpecialFlagsObjectFromSpecialSource_ for some
+ *	problems in mfb.
+ * S040, 18-Dec-92, hiramc
+ *	- Too many -D defines for the compiler now, forget the SlowAbs trick
+ * S039, 18-Dec-92, hiramc
+ *	-Dabs=labs did not work because of defines in stdlib.h
+ *	So, try -Dabs=SlowAbs and use the routine in ./server/os/SlowAbs.asm
+ * S038, 17-Dec-92, hiramc
+ *	took NO_ALLOCA off of LibraryDefines
+ *	set _OptimizedCDebugFlags_ to be  -Olegitc -DUSE_INLINE_CODE -Dabs=labs 
+ *	and _ServerOptimizedCDebugFlags_ -Olegitc -DUSE_INLINE_CODE -Dabs=labs
+ *	Removed the special compiler rule for the libraries.
+ * S037, 16-Dec-92, mikep
+ *	add _SpecialFlagsObjectRule_
+ * S036, 09-Dec-92, mikep
+ *	put back XTESTEXT1 define
+ * S035, 19-Nov-92, mikep
+ * 	add VIDCONFDIR and GRAFDIR
+ *	also change definition of scripts.  This may break the
+ *	_InstallScript_ rule somewhere else.  Call me it it does
+ * S034, 19-Nov-92, hess
+ * 	add XDTACCESSDIR, for deskworks (and others) clients
+ * S033, 11-Nov-92, mikep
+ *	Fix install grafinfo rulle so it copies
+ * S032, 11-Nov-92, mikep
+ *	Add condition defines around the UseSharedLibrary stuff so
+ *	server compenets aren't forced to use them
+ * S031, 05-Nov-92, chrissc
+ *	Put in PSEUDOCONN define for AT&T client support.
+ * S030, 06-Oct-92, mikep
+ *	Put NO_ALLOCA in _LibraryDefines_ so the server can still use it
+ * S029, 28-Sep-92, hess
+ * 	remove XBSDLIB, no longer needed.
+ * S028, 23-Sep-92, hess
+ *	turn on NO_ALLOCA to prevent a serious bug when using cc -O 
+ * S027, 21-Sep-92, hess
+ * 	add rule to install grafinfo files 
+ * 	build libs with a compiler we will provide on our src tape 
+ * 	NOTE: this is a temporary workaround, and will be removed 
+ * 	when our build environment catches up with our tree.
+ * S027, 09-Sep-92, garyh
+ *	Define BuildXimp to build ximp version of Xlib.
+ * S026, 01-Sep-92, hess
+ * 	add rule to build lib objects with no optmization... (read hack :^{ )
+ * S025, 26-Aug-92, mikep
+ *	Add _CppAsmObjectRule_
+ * S024, 19-Aug-92, hess
+ *  	add flag to install fs config file
+ * S023, 16-Aug-92, mikep
+ *	Remove S022, it shouldn't be here.
+ *	Add XBSDLIB to ExtraLibraries instead of changing Project.tmpl
+ * S022, 12-Aug-92, hiramc@sco.COM
+ *	Add -DPSZ StandardDefines and StandardCppDefines
+ *	to take care of cfbmap.h
+ * S021, 12-Aug-92, hess
+ * 	add PORT_NOVFORK to Testdefines, builds motif's qats. 
+ * S020, 04-Aug-92, hess
+ * 	it's time to begin using shared libs in our handoffs
+ * S019, 04-Aug-92, hess
+ * 	use symbolic links, by default SystemV is set to no symbolic links 
+ * S018, 27-Jul-92, hess
+ * 	Using 3.2V4+IR9 compiler (BL0), we should be able to get -O to work.
+ * S017, 21-Jul-92, hess
+ * 	3.2V4+IR9 compiler (BL0) fails with -Otlc, use no optimization for now.
+ * S016, 17-Jul-92, hess
+ * 	turn on buildXtsharedlib, to get Xt shared objects built 
+ * S015, 17-Jul-92, hess
+ * 	3.2V4+IR9 compiler optimization is broken, can't use -Oetlc, go back
+ * 	to -Otlc
+ * S014, 16-Jul-92, hess
+ *	add severoptimizeflags 
+ * S013, 16-Jul-92, hess
+ * 	use compiler optim flags "-Otlce"
+ * S012, 15-Jun-92, hess
+ * 	add alloca.o to libXm.a, not needed on syslibs any longer
+ * S011, 18-Mar-92, hess
+ * 	add buildsharedlibX flag, to build libX11_s, but not require all apps 
+ * 	to link with it. 
+ * S010, 06-Mar-92, hess
+ * 	add define to strip programs when installing them 
+ * S009, 06-Mar-92, hess
+ * 	add namedtargettopsubdirsdest, like the old makeallinstall, but
+ * 	more generic, works from any dir, gives a fullpath to the dest tree.
+ * 	used in sco/Imakefile to make component dist cuts.
+ * 	also added a more generic version of makeallinstall (again)  
+ * 	and a rule to assist in installing demo sources in EXAMPDIR 
+ * S008, 04-Mar-92, hess
+ *	move makeallinstall over to sco/Imakefile, it was dir specific  
+ * S007, 04-Mar-92, hess
+ * 	bindir must not contain DESTDIR, this is added by the install rules
+ * 	in Imake.rules.  If it is included here the files get installed in 
+ *	$DESTDIR/$DESTDIR/usr/bin/X11.   (this has changed since R4 ) 
+ * S006, 27-Feb-92, hess
+ *	don't build Xlibinput 
+ * S005, 27-Feb-92, hess
+ * 	add makeallinstall to allow easy builds of component distributions.
+ * S004, 27-Feb-92, hess
+ * 	use scoinst to install our stuff in a distribution dir, checks 
+ * 	file times before doing a cp/mv 
+ * S003, 11-Feb-92, mikep
+ *	remove ServerDefines from this file.  Use the one in Project.tmpl
+ *	remove UseNFB
+ *	remove XTESTEXT1 define
+ *	add HasSockets
+ *	add HasXdmAuth
+ *	Put all the server info together
+ *	Hold off on building all the clients with shared Xlib
+ * S002, 06-Feb-92, hess
+ * 	add libXneedsMultibyte, to pull ansi functions into libX11.a 
+ * S001, 13-Jan-92, hess
+ *	put ANSICPP into Xos.h so users won't forget to turn it on...
+ * 	add Shared lib info (which libs we don't want shared)
+ */
+
+/* Comments will need to be clean out before we ship */
+
+/*
+ * SET VERSION NUMBERS BEFORE MAKING MAKEFILES; also, you'll need to install
+ * util/scripts/scoinst before doing a "make install"
+ */
+
+#define SystemV			YES
+
+#define BuildXimp		YES				/* S027 */
+
+#define OSName			SCO Unix System V Release 3.2
+#define OSMajorVersion		3
+#define OSMinorVersion		2
+#define OPERATING_SYSTEM	SYSV
+
+#define RemoveTargetProgramByMoving YES
+#define BootstrapCFlags		-Dsco
+#define StandardDefines		-Dsco -DSYSV
+#define LibraryDefines		-Dsco -DSYSV
+#define StandardCppDefines	StandardDefines
+#define	PreProcessCmd		/lib/cpp -P $(ALLDEFINES)
+#define ExecableScripts		NO
+#define Malloc0ReturnsNull      YES
+#define ForceNormalLib          YES
+#define DefaultCCOptions
+#define HasSockets		YES
+
+#define OptimizedCDebugFlags		-Olegitc -DUSE_INLINE_CODE
+#define ServerOptimizedCDebugFlags	-Olegitc -DUSE_INLINE_CODE
+#define DefaultCPlusPlusDebugFlags +i
+#define DefaultCPlusPlusIncludes	-I/nfs/hpcvxc3/usr/include  -I/nfs/hpcvxc3/usr/include/sys  -I/nfs/hpcvxc3/usr/include/X11
+
+/* flags for masm                 */
+#define AsmCmd                masm
+#define AsmDebugFlags         -p -t -w2 -Ml
+#define AsmDefines            -Di386
+
+/* to work across file systems, we use symbolic links */
+#define LnCmd                 ln -s
+
+#define InstallCmd $(SCRIPTSRC)/scoinst
+
+/* This changes the _InstallScript_ rule */
+#define script sh
+
+/*
+ *  Server stuff
+ */
+/* Change this to YES if you are working on the server
+ */
+#define Intel
+#define BuildServer		YES
+#define ServerGcc		NO
+#define XscoServer      	YES
+#define ConnectionFlags 	-DTCPCONN -DSTREAMPIPECONN -DPSEUDOCONN
+#define BuildXInputExt	 	NO
+#define BuildPex	 	NO
+#define ExtensionOSDefines 	-DXMERGE -DXTESTEXT1
+#define ServerOSDefines 	-DNFB -Di386 -D_XOPEN_XPG4
+#define HasXdmAuth		YES
+
+#define InstallFSConfig 	YES 	/* install the fs config file */
+
+#define BuildMotif	YES	/* Cause Motif.rules to be pulled in */
+#define TestDefines -DMOTIF1_2 -DX11R5 -DPORT_NOVFORK
+
+#define BinDir /usr/bin/X11
+
+#define DynaDir $(DESTDIR)/usr/lib/X11/dyddx
+
+#define BandAidCompiler "dummy.bac"
+
+#define ExtraLibraries -lsocket -lmalloc
+
+#define LdCombineFlags -r
+
+#define HasVoidSignalReturn	YES
+
+/* These are YES until we get a libbsd.a from SCO CAN */
+#define NeedBerklibInXlib	YES
+#define NeedBerklib		YES
+
+
+#define MwmDefines -DPORT_NOVFORK -DSHAPE -DOPAQUE
+
+/* For optional linking with SCO shared libs */
+#ifndef UseSharedLibraries
+#define UseSharedLibraries YES
+#endif
+#if UseSharedLibraries
+#define SharedLibX      YES
+#define SharedLibXtXm   YES
+#else
+#define SharedLibX 	NO
+#define SharedLibXtXm 	NO
+#endif /* UseSharedLibraries */
+
+/* specify which libs we don't want shared */
+/* changing these causes the shared lib to attempt to be made, AND all 
+ * apps to link with the resulting shared lib. 
+ * NOTE: most of these libs are not set up for shared builds 
+ * yet (on SCO systems), so far only libX will build shared.
+ */
+#define SharedLibXaw NO
+#define SharedLibXmu NO
+#define SharedLibXext NO
+#define SharedOldLibX NO
+#define SharedLibXt NO
+#define SharedLibXinput NO
+#define SharedLibXTest NO
+
+/* The following causes the shared libX to be built, but does NOT imply 
+ * that all clients will link with it (see above.)
+ */
+#define BuildSharedLibX YES 
+
+/* Xt is linked into Xm to form XtXm_s, and is controled by buildsharedlibXm */
+#define BuildSharedLibXm YES 
+#define BuildSharedLibXt YES
+
+/* cause multibyte.o to be added into libX11.a, else user must link with 
+ * -ansi to get the ANSI C lib that contains this.
+ */
+#define libXneedsMultibyte YES
+
+/* don't build this until we know if it'll work with our server */
+#define BuildXInputLib   YES
+
+/* strip clients when we do 'make install' */
+#define StripInstalledPrograms YES
+
+/* link our clients with lib/malloc/libmalloc.a */ 
+#define UseScoMalloc YES
+
+/* where to install examples */
+#define ExamplesDir $(LIBDIR)/examples
+
+       EXAMPDIR = ExamplesDir
+
+/* directory where deskworks clients/objects are installed */
+#define xdtAccessories $(LIBDIR)/XDesktop3/english.xdt/toolsheds/Accessories
+
+   XDTACCESSDIR = xdtAccessories
+
+   VIDCONFDIR = $(USRLIBDIR)/vidconf
+   GRAFDIR = $(USRLIBDIR)/grafinfo
+
+/* include sco library rules */
+#include <scoLib.rules>
+
+
+/* Custom for SCO
+ * MultiObjectRule - generate rules to work around limited
+ *	 macro expansion buffer in Microsoft built-in C-preprocessor.
+ * M000, 20-Oct-91, hess
+ * 	fix depend rule here, needs to depend on dst.c 
+ */
+#ifndef NormalMultiObjectRule
+#define	NormalMultiObjectRule(dst,src,flag)				@@\
+dst.c:	src.c								@@\
+	$(PREPROCESSCMD) flag src.c dst.c				@@\
+dst.o: dst.c								@@\
+	$(RM) dst.o && \						@@\
+	$(CC) flag $(CFLAGS) -c dst.c					@@\
+depend:: dst.c								@@\
+clean::									@@\
+	$(RM) dst.c
+#endif /* NormalMultiObjectRule */
+
+/* Custom for SCO
+ * BigMacObjectRule - generate rules to work around limited
+ *	 macro expansion buffer in Microsoft built-in C-preprocessor.
+ */
+#ifndef BigMacObjectRule
+#define	BigMacObjectRule(src)						@@\
+src.o: src.c								@@\
+	$(RM) src.o BMTmp.c && \					@@\
+	$(PREPROCESSCMD) src.c BMTmp.c					@@\
+	$(CC) -c $(CFLAGS) BMTmp.c && \					@@\
+	$(MV) BMTmp.o src.o && \					@@\
+	$(RM) BMTmp.c							@@\
+clean::									@@\
+	$(RM) BMTmp.c BMTmp.o
+#endif /* BigMacObjectRule */
+
+/*
+ * InstallFonts - generate rules to install font files
+ */
+#ifndef InstallFonts2
+#define InstallFonts2(dest)						@@\
+InstallMultipleFlags($(OBJS1),dest,$(INSTDATFLAGS))			@@\
+									@@\
+InstallMultipleFlags($(OBJS2),dest,$(INSTDATFLAGS))			@@\
+									@@\
+install::  fonts.dir							@@\
+	$(INSTALL) -c $(INSTDATFLAGS) fonts.dir dest
+#endif /* InstallFonts */
+
+        DYNADIR = DynaDir
+
+/* rule for dynamic DDX layers */
+#ifndef DynamicObjectRule
+#define DynamicObjectRule(layer,libs)					@@\
+all:: XDriver.o								@@\
+XDriver.o: layer/**/Data.o libs						@@\
+	$(LD) -r -e layer/**/ScreenInfo -o XDriver.o layer/**/Data.o libs @@\
+install:: XDriver.o							@@\
+	$(MKDIRHIER) $(DYNADIR)/layer					@@\
+	$(INSTALL) $(INSTALLFLAGS) -c XDriver.o $(DYNADIR)/layer
+#endif /* DynamicObjectRule */
+
+#ifndef NormalAsmObjectRule
+#define	NormalAsmObjectRule()						@@\
+.asm.o:									@@\
+	$(RM) $@ 							@@\
+	$(ASM) $(ASMFLAGS) $*.asm					@@\
+	cvtomf $*.o
+#endif /* NormalAsmObjectRule */
+
+/*
+ * NamedTargetSubdirsDest - recursively make a series of steps, 
+ * and assume we are trying to install something, so provide a destination.
+ * NOTE: this differs from NamedTargetSubdirs it at least two ways:
+ * 1) dirs are relative to $(TOP), ex demos expands to $(TOP)/demos.
+ * 2) passes DESTDIR with a full path, required to get the dest to be 
+ *    anywhere we want on the system.
+ */
+#ifndef NamedTargetSubdirsDest
+#define NamedTargetSubdirsDest(name,dirs,verb,flags,subname,dest)	@@\
+name::									@@\
+	MakeDir(dest)							@@\
+	@case '${MFLAGS}' in *[ik]*) set +e;; esac; \			@@\
+	_PWD_=`pwd` ;\							@@\
+	for i in dirs ;\						@@\
+	do \								@@\
+		(cd $(TOP)/$$i; echo verb "in $(TOP)/$$i..."; \		@@\
+		$(MAKE) $(MFLAGS) DESTDIR=$$_PWD_/dest flags subname); \@@\
+	done
+#endif
+
+/* MakeAllInstall --  
+ * This is a rule to go into a subdir and do a 'make all install'. 
+ * Used to build component distributions for SCO ODT
+ */
+#ifndef MakeAllInstall
+#define MakeAllInstall(step,dest,dirs) 					@@\
+NamedTargetSubdirsDest(step,dirs,"making" all install,,all install,dest)
+#endif /* MakeAllInstall */
+
+
+/* InstallSources -- When the command 'make install.src' is called this 
+ * rule will install ALLSRC in the dest directory using INSTALLFLAGS if set.
+ */
+#ifndef InstallSources
+#define InstallSources(dest)						@@\
+InstallMultipleDest(install.src,$(ALLSRC),dest)
+#endif
+
+#ifndef CppAsmObjectRule
+#define CppAsmObjectRule()						@@\
+.s.o:									@@\
+	$(RM) $@ cppTmp.s						@@\
+	$(CPP) $*.s > cppTmp.s						@@\
+	$(AS) -o $*.o cppTmp.s
+#endif
+
+#ifndef SpecialLibObjectRuleNoOptm
+#define SpecialLibObjectRuleNoOptm(obj)					@@\
+obj :									@@\
+	$(RM) $@ shared/$@						@@\
+	$(CC) -c $(CCOPTIONS) $(ALLDEFINES) $(SHLIBDEF) $(SHAREDCODEDEF) $(PICFLAGS) $*.c @@\
+	$(MV) $@ shared/$@						@@\
+	$(RM) $@							@@\
+	$(CC) -c $(CCOPTIONS) $(ALLDEFINES) $*.c
+#endif
+
+
+#ifndef SpecialFlagsObjectRule
+#define SpecialFlagsObjectRule(basename, options)			@@\
+basename.o: basename.c							@@\
+	$(RM) $@ 							@@\
+	$(CC) -c options $(CCOPTIONS) $(ALLDEFINES) basename.c
+#endif
+
+#ifndef SpecialFlagsObjectFromSpecialSource
+#define SpecialFlagsObjectFromSpecialSource(dst,src,flags)		@@\
+dst.c:  src.c								@@\
+	$(RM) $@							@@\
+	$(LN) $? $@							@@\
+									@@\
+SpecialFlagsObjectRule(dst,flags)					@@\
+									@@\
+depend::  dst.c								@@\
+									@@\
+clean::									@@\
+	$(RM) dst.c
+#endif /* SpecialFlagsObjectFromSpecialSource */
+
+/* Rule to install grafinfo file into the proper destination directory */
+#ifndef InstallGrafFile
+#define InstallGrafFile(srcPath,grafFile,dest)				@@\
+install:: srcPath/grafFile						@@\
+	$(MKDIRHIER) $(DESTDIR)$(GRAFDIR)/dest				@@\
+	$(INSTALL) -c srcPath/grafFile $(DESTDIR)$(GRAFDIR)/dest/grafFile
+#endif /* InstallGrafFile */

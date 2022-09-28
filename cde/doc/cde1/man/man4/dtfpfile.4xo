@@ -1,0 +1,968 @@
+.cdes
+.TH dtfpfile 4 "28 Jun 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.SH NAME
+dtfpfile \- format and locations of front panel configuration files
+.SH SYNOPSIS
+.yS
+set DtDbVersion=\f2version_number\fP
+set \f2VariableName\fP=\f2variable_value\fP
+.sp 0.5v
+\f2RecordType\fP \f2record_name\fP
+{
+	# \f2Comment\fP
+	\f2Keyword\fP \f2Value\fP
+	\f2Keyword\fP \f2Value\fP
+		\&.
+		\&.
+		\&.
+}
+.yE
+.SH DESCRIPTION
+.cdee
+The
+.cde .B dtfpfile
+front panel database provides definitions for the components
+that define the content and functionality of the front panel.
+Files containing front panel definitions must end with the
+.B \&.fp
+suffix.
+Like the action and data type database,
+the front panel database is constructed
+by reading all files ending in the
+.B \&.fp
+suffix found in the search path
+specified by the
+.I DTDATABASESEARCHPATH
+environment variable.
+.P
+See
+.cde .BR dtdtfile (4)
+.xo the \*(Zz
+for a complete description of the
+directory locations where these database files are found and for a description
+of the specific syntax for the database files.
+.cde .HU "File Format"
+.xo .H 3 "File Format"
+The general syntax of the front panel configuration files is as
+.cde described above in the SYNOPSIS section of this man page.
+.xos
+follows:
+.P
+.yS
+set DtDbVersion=\f2version_number\fP
+set \f2VariableName\fP=\f2variable_value\fP
+.sp 0.5v
+\f2RecordType\fP \f2record_name\fP
+{
+	# \f2Comment\fP
+	\f2Keyword\fP \f2Value\fP
+	\f2Keyword\fP \f2Value\fP
+		\&.
+		\&.
+		\&.
+}
+.yE
+.xoe
+.P
+The
+.IR Comments ,
+.I Versions
+and
+.I Variables
+fields are described in
+.cde .BR dtdtfile (4).
+.xo the \*(Zz.
+.P
+The front panel record types each have a set of
+Keyword and Value pairs.
+There are six record types defined:
+.Cn PANEL ,
+.Cn BOX ,
+.Cn SUBPANEL ,
+.Cn SWITCH ,
+.Cn CONTROL
+and
+.Cn ANIMATION .
+Each record type has a set of keywords defined for it.
+Many of the keywords are used for multiple record types.
+.br
+.cde .HU "Record Types"
+.xo .H 3 "Record Types"
+.VL 6
+.LI "\f3PANEL\fP \f2front panel name\fP"
+.br
+The
+.Cn PANEL
+record type defines the outermost container of the front panel.
+It can contain one or more
+.Cn BOX es
+and optionally repositioning
+handles, a menu and a minimize button.
+The keywords defined for
+.Cn PANEL
+are described in the following table.
+.LE
+.P
+.cde .ne 10
+.DS
+.TS
+.xo box expand tab(@);
+.cde center tab(@);
+cf3 ss
+.xo cf3 | cf3 | cf3
+.xo lw(3c) | lw(5c) | lw(3c) .
+.cde cf3 cf3 cf3
+.cde l l l .
+PANEL Record Type Keywords and Values
+_
+Keyword@Value@Default
+_
+CONTROL_BEHAVIOR@(\f3double_click\fP/\f3single_click\fP)@single_click
+DISPLAY_CONTROL_LABELS@(\f3True\fP/\f3False\fP)@False
+DISPLAY_HANDLES@(\f3True\fP/\f3False\fP)@True
+DISPLAY_MENU@(\f3True\fP/\f3False\fP)@True
+DISPLAY_MINIMIZE@(\f3True\fP/\f3False\fP)@True
+HELP_STRING@\f2string\fP@NULL
+HELP_TOPIC@\f2topic name\fP@NULL
+HELP_VOLUME@\f2volume name\fP@FPanel
+LOCKED@(\f3True\fP/\f3False\fP)@False
+PANEL_GEOMETRY@{+\-}\f2xoffset\fP[{+\-}\f2yoffset\fP]@NULL
+RESOLUTION@(\f3high\fP/\f3medium\fP/\f3low\fP/\f3match_display\fP)@match_display
+SUBPANEL_UNPOST@(\f3True\fP/\f3False\fP)@True
+.TE
+.DE
+.sp
+.VL 6
+.LI "\f3BOX\fP \f2box name\fP"
+.br
+The
+.Cn BOX
+record type defines a container within a
+.Cn PANEL
+that can
+hold a row of
+.Cn CONTROLS
+and at most one
+.Cn SWITCH
+container.
+Multiple
+.Cn BOX es
+within a
+.Cn PANEL
+are stacked vertically.
+The keywords defined for
+.Cn BOX
+are described in the following table.
+.LE
+.P
+.cde .ne 10
+.DS
+.TS
+.xo box expand tab(@);
+.cde center tab(@);
+cf3 ss
+.xo cf3 | cf3 | cf3
+.xo lw(3c) | lw(5c) | lw(3c) .
+.cde cf3 cf3 cf3
+.cde l l l .
+BOX Record Type Keywords and Values
+_
+Keyword@Value@Default
+_
+CONTAINER_NAME@front panel name@NULL (required)
+DELETE@(\f3True\fP/\f3False\fP)@False
+HELP_STRING@\f2string\fP@NULL
+HELP_TOPIC@\f2topic name\fP@NULL
+HELP_VOLUME@\f2volume name\fP@FPanel
+LOCKED@(\f3True\fP/\f3False\fP)@False
+POSITION_HINTS@(\f3first\fP/\f3last\fP/\f2integer\fP \(>= 1)@first
+.TE
+.DE
+.sp
+.VL 6
+.LI "\f3SUBPANEL\fP \f2subpanel name\fP"
+.br
+The
+.Cn SUBPANEL
+record type defines a secondary container for
+.Cn CONTROL s
+that slide up from the front panel.
+.Cn SUBPANEL s
+can also contain a
+drop zone where new controls can be dynamically added.
+The keywords defined for
+.Cn SUBPANEL
+are described in the following table.
+.LE
+.P
+.cde .ne 10
+.DS
+.TS
+.xo box expand tab(@);
+.cde center tab(@);
+cf3 ss
+.xo cf3 | cf3 | cf3
+.xo lw(3c) | lw(5c) | lw(3c) .
+.cde cf3 cf3 cf3
+.cde l l l .
+SUBPANEL Record Type Keywords and Values
+_
+Keyword@Value@Default
+_
+CONTAINER_NAME@\f2control name\fP@NULL (required)
+CONTROL_INSTALL@(\f3True\fP/\f3False\fP)@True
+DELETE@(\f3True\fP/\f3False\fP)@False
+HELP_STRING@\f2string\fP@NULL
+HELP_TOPIC@\f2topic name\fP@NULL
+HELP_VOLUME@\f2volume name\fP@FPanel
+LOCKED@(\f3True\fP/\f3False\fP)@False
+TITLE@\f2string\fP@NULL
+.TE
+.DE
+.sp
+.VL 6
+.LI "\f3SWITCH\fP \f2switch name\fP"
+.br
+The
+.Cn SWITCH
+record type defines a container within a
+.Cn BOX
+that
+contains a set of push buttons, each of which give access to a corresponding
+workspace.
+See
+.Cm dtwm 1
+for a description of the multiple workspace
+capabilities.
+Also contained within the
+.Cn SWITCH
+container is an
+optional set of
+.Cn CONTROL s.
+These are presented in a column on each
+side of the push buttons.
+The keywords defined for
+.Cn SWITCH
+are described in the following table.
+.LE
+.P
+.cde .ne 10
+.DS
+.TS
+.xo box expand tab(@);
+.cde center tab(@);
+cf3 ss
+.xo cf3 | cf3 | cf3
+.xo lw(3c) | lw(5c) | lw(3c) .
+.cde cf3 cf3 cf3
+.cde l l l .
+SWITCH Record Type Keywords and Values
+_
+Keyword@Value@Default
+_
+CONTAINER_NAME@\f2box name\fP@NULL (required)
+DELETE@(\f3True\fP/\f3False\fP)@False
+HELP_STRING@\f2string\fP@NULL
+HELP_TOPIC@\f2topic name\fP@NULL
+HELP_VOLUME@\f2volume name\fP@FPanel
+LOCKED@(\f3True\fP/\f3False\fP)@False
+NUMBER_OF_ROWS@\f2integer\fP@2
+POSITION_HINTS@(\f3first\fP/\f3last\fP/\f2integer\fP \(>= 1)@first
+.TE
+.DE
+.sp
+.VL 6
+.LI "\f3CONTROL\fP \f2control name\fP"
+.br
+The
+.Cn CONTROL
+record type defines the main functional component of the
+front panel.
+.Cn CONTROL s
+typically have actions defined for them that
+are invoked on selection or drag and drop or both.
+.Cn CONTROL s
+are displayed
+with icons or labels or both
+and can have iconic animations associated with them.
+The keywords defined for
+.Cn CONTROL
+are described in the following table.
+.LE
+.P
+.cde .ne 10
+.DS
+.TS
+.xo box expand tab(@);
+.cde center tab(@);
+cf3 ss
+.xo cf3 | cf3 | cf3
+.xo lw(3c) | lw(5c) | lw(3c) .
+.cde cf3 cf3 cf3
+.cde l l l .
+CONTROL Record Type Keywords and Values
+_
+Keyword@Value@Default
+_
+ALTERNATE_ICON@\f2image name\fP@NULL
+CLIENT_GEOMETRY@\f2width\fP \f3x\fP \f2height\fP@NULL
+CLIENT_NAME@\f2client name\fP@NULL
+CONTAINER_NAME@(\f2box name\fP/\f2switch name\fP/\f2subpanel name\fP)@NULL (required)
+CONTAINER_TYPE@(\f3BOX\fP/\f3SWITCH\fP/\f3SUBPANEL\fP)@NULL (required)
+DATE_FORMAT@\f2format string\fP@%b%n%e
+DELETE@(\f3True\fP/\f3False\fP)@False
+DROP_ACTION@\f2action_name\fP@NULL
+DROP_ANIMATION@\f2animation name\fP@NULL
+FILE_NAME@\f2pathname\fP@NULL
+HELP_STRING@\f2string\fP@NULL
+HELP_TOPIC@\f2topic name\fP@NULL
+HELP_VOLUME@\f2volume name\fP@FPanel
+ICON@\f2image name\fP@NULL
+LABEL@\f2string\fP@NULL
+LOCKED@(\f3True\fP/\f3False\fP)@False
+MONITOR_TYPE@(\f3none\fP/\f3mail\fP/\f3file\fP)@none
+POSITION_HINTS@(\f3first\fP/\f3last\fP/\f2integer\fP \(>= 1)@first
+PUSH_ACTION@\f2action_name\fP@NULL
+PUSH_ANIMATION@\f2animation name\fP@NULL
+PUSH_RECALL@(\f3True\fP/\f3False\fP)@False
+TYPE@(\f3blank\fP/\f3busy\fP/\f3client\fP/\f3clock\fP/\f3date\fP/\f3file\fP/\f3icon\fP)@icon
+.TE
+.DE
+.sp
+.VL 6
+.LI "\f3ANIMATION\fP \f2animation name\fP"
+.br
+The
+.Cn ANIMATION
+record types are a sequence of image name and time delay
+pairs that are displayed by a
+.Cn CONTROL
+on a
+.Cn PUSH_ACTION
+or
+.Cn DROP_ACTION .
+.LE
+.P
+.cde .ne 7
+.DS
+.TS
+.xo box expand tab(@);
+.cde center tab(@);
+cf3 ss
+.xo cf3 | cf3 | cf3
+.xo lw(3c) | lw(5c) | lw(3c) .
+.cde cf3 cf3 cf3
+.cde l l l .
+ANIMATION Record Type Keywords and Values
+_
+Keyword@Value@Default
+_
+ANIMATION@\f2image name\fP [\f2millisecond delay\fP]@None [200]
+.TE
+.DE
+.cde .HU "Keyword and Value Descriptions"
+.xo .H 3 "Keyword and Value Descriptions"
+The following list contains a description of each of the keywords defined by
+the front panel.
+.VL 6
+.Lc ALTERNATE_ICON
+.br
+Used with record types of:
+.Cn CONTROL .
+.P
+Used with control types of:
+.B busy
+and
+.BR icon .
+.P
+.Cn ALTERNATE_ICON
+defines an image to be used to replace the normal
+image within a control with a mail or file value for the
+.Cn MONITOR_TYPE .
+The image
+is displayed when the file being monitored changes.
+For the
+.B busy
+control,
+.Cn ALTERNATE_ICON
+is cycled with
+.Cn ICON
+to give the blinking effect.
+.Lc ANIMATION
+.P
+Used with record types of:
+.Cn ANIMATION .
+.P
+Used with control keywords of:
+.Cn PUSH_ANIMATION
+and
+.Cn DROP_ANIMATION .
+.P
+.Cn ANIMATION
+defines a sequence of images to be displayed for either a
+.Cn PUSH_ACTION
+or
+.Cn DROP_ACTION .
+Each animation within the list is
+displayed in order with a default time separation of 200 milliseconds.
+For
+a slower or faster sequence, the image name value can be followed by the
+amount of time to display the image.
+If no time value is specified, the previously specified value is used.
+.Lc CLIENT_GEOMETRY
+.br
+Used with record types of:
+.Cn CONTROL .
+.P
+Used with control type of:
+.BR client .
+.P
+Used with control keywords of:
+.Cn CLIENT_NAME .
+.P
+.Cn CLIENT_GEOMETRY
+specifies the size (in pixels) needed for the
+window of a client displayed within the front panel.
+.Lc CLIENT_NAME
+.br
+Used with record types of:
+.Cn CONTROL .
+.P
+Used with control types of:
+.B client
+or
+.BR icon .
+.P
+Used with control keywords of:
+.Cn PUSH_RECALL .
+.P
+.Cn CLIENT_NAME
+specifies a name used to associate a control with an
+executable.
+It is necessary for control types of
+.B client
+(an X client
+running within the front panel) and for
+.B icon
+when the keyword
+.Cn PUSH_RECALL
+is
+True.
+The value
+.I "client name"
+is the name of the
+executable or can be set via a command-line argument for some
+clients (such as
+.Cm xterm
+.B \-name
+.IR panelterm ).
+.cdes
+The
+.I "client name"
+for a running client can
+be found by executing xprop.
+.cdee
+The first string of the
+.Cn WM_CLASS
+property is
+the value used.
+.Lc CONTAINER_NAME
+.br
+Used with record types of:
+.Cn BOX ,
+.Cn SUBPANEL ,
+.Cn SWITCH
+and
+.Cn CONTROL .
+.P
+.Cn CONTAINER_NAME
+associates a component with its parent.
+For example,
+the
+.Cn CONTAINER_NAME
+value for a
+.Cn SWITCH
+tells the front panel into which
+.Cn BOX
+it should be placed.
+Since controls can reside in several different
+component types,
+.Cn CONTAINER_NAME
+is used in conjunction with
+.Cn CONTAINER_TYPE
+to define a control's parent.
+.Lc CONTAINER_TYPE
+.br
+Used with record types of:
+.Cn CONTROL .
+.P
+.Cn CONTAINER_TYPE
+defines a control's parent type.
+This is used to identify a control uniquely
+so that it can be created within the proper parent.
+.Lc CONTROL_BEHAVIOR
+.br
+Used with record types of:
+.Cn PANEL .
+.P
+.Cn CONTROL_BEHAVIOR
+provides the mechanism for setting the user model
+for front panel controls.
+Controls can be set to invoke their
+.Cn PUSH_ACTION
+by either a single or double click.
+.Lc CONTROL_INSTALL
+.P
+Used with record types of:
+.Cn SUBPANEL .
+.P
+.Cn CONTROL_INSTALL
+enables or disables dynamic control installation
+into subpanels.
+A value of
+True
+causes the control installation area
+to be displayed within the subpanel.
+.Lc DATE_FORMAT
+.br
+Used with record types of:
+.Cn CONTROL .
+.P
+Used with control types of:
+.BR date .
+.P
+.Cn DATE_FORMAT
+specifies the layout of the date string for a control of
+type
+.BR date .
+The format is the same used by the
+.cde UNIX
+.xo \*(ZK
+.Fn strftime 3
+function.
+.Lc DELETE
+.br
+Used with record types of:
+.Cn BOX ,
+.Cn SUBPANEL ,
+.Cn SWITCH
+and
+.Cn CONTROL .
+.P
+.Cn DELETE
+is used to override and remove a non-locked component from
+the front panel.
+This is necessary to eliminate system default front
+panel components without replacing the default files.
+To use
+.Cn DELETE ,
+a copy of the component definition with the additional
+.Cn DELETE
+keyword
+is stored in a file with an
+.B \&.fp
+suffix in the user's or application type's
+directory.
+.Lc DISPLAY_CONTROL_LABELS
+.br
+Used with record types of:
+.Cn PANEL .
+.P
+.Cn DISPLAY_CONTROL_LABELS
+specifies whether the controls contained within
+the front panel's boxes have their labels displayed.
+.Lc DISPLAY_HANDLES
+.br
+Used with record types of:
+.Cn PANEL .
+.P
+If
+.Cn DISPLAY_HANDLES
+is set to
+True,
+the move handles are
+displayed along the left and right edges of the front panel.
+.Lc DISPLAY_MENU
+.br
+Used with record types of:
+.Cn PANEL .
+.P
+If
+.Cn DISPLAY_MENU
+is set to
+True,
+and
+.Cn DISPLAY_HANDLES
+is also set to
+True,
+the system menu button is displayed in the upper left
+hand corner of the front panel.
+.Lc DISPLAY_MINIMIZE
+.br
+Used with record types of:
+.Cn PANEL .
+.P
+If
+.Cn DISPLAY_MINIMIZE
+is set to
+True,
+and
+.Cn DISPLAY_HANDLES
+is also set to
+True,
+the minimize button is displayed in the upper right
+hand corner of the front panel.
+.Lc DROP_ACTION
+.br
+Used with record types of:
+.Cn CONTROL .
+.P
+.Cn DROP_ACTION
+specifies the function that is invoked when a drop occurs
+on the control.
+.Lc DROP_ANIMATION
+.br
+Used with record types of:
+.Cn CONTROL .
+.P
+Used with all control types except:
+.BR client .
+.P
+.Cn DROP_ANIMATION
+specifies the name of an animation record to be
+displayed when a drop occurs on the control.
+The control must have a
+.Cn DROP_ACTION
+defined for the animation to be used.
+.Lc FILE_NAME
+.br
+Used with record types of:
+.Cn CONTROL .
+.P
+Used with control types of:
+.B icon
+and
+.BR file .
+.P
+For the control type of
+.BR file ,
+.Cn FILE_NAME
+is the pathname of the file to be used for the control.
+The file's file type, actions and images are extracted
+from the action database for the control.
+.P
+For
+.Cn MONITOR_TYPE
+.B mail
+and
+.BR file ,
+.Cn FILE_NAME
+specifies the pathname of the file the front panel
+monitors for either mail arrival or some other user-defined data.
+.P
+For
+.Cn MONITOR_TYPE
+.BR file ,
+the
+.Cn ALTERNATE_ICON
+image is displayed
+when the monitored file is non-empty.
+The
+.Cn ICON
+image is displayed
+if the file is empty or non-existent.
+.P
+For
+.Cn MONITOR_TYPE
+.BR mail ,
+the
+.Cn ALTERNATE_ICON
+image is displayed when the file increases in size.
+.Lc HELP_STRING
+.br
+Used with record types of:
+.Cn PANEL ,
+.Cn BOX ,
+.Cn SUBPANEL ,
+.Cn SWITCH
+and
+.Cn CONTROL .
+.P
+.Cn HELP_STRING
+specifies an on-line help string to display when
+help is requested over a front panel component.
+Since each component
+type can have a help string associated with it, there is a precedence
+used in deciding which help string to display.
+Control help takes precedence
+over box help, switch help and subpanel help.
+Box help takes precedence over subpanel help.
+The
+.Cn HELP_STRING
+value is used only if no
+.Cn HELP_TOPIC
+value is defined.
+.Lc HELP_TOPIC
+.br
+Used with record types of:
+.Cn PANEL ,
+.Cn BOX ,
+.Cn SUBPANEL ,
+.Cn SWITCH
+and
+.Cn CONTROL .
+.P
+.Cn HELP_TOPIC
+specifies an on-line help topic that is used with
+either the default help volume or a help volume specified by the
+.Cn HELP_VOLUME
+keyword to display help information when requested
+over a front panel component.
+Like the
+.Cn HELP_STRING
+keyword, each
+component type can have a help topic associated with it and the same
+precedence rules are used.
+.Lc HELP_VOLUME
+.br
+Used with record types of:
+.Cn PANEL ,
+.Cn BOX ,
+.Cn SUBPANEL ,
+.Cn SWITCH
+and
+.Cn CONTROL .
+.P
+When
+.Cn HELP_VOLUME
+is used in conjunction with
+.Cn HELP_TOPIC ,
+it defines
+the help information to be displayed for a front panel component.
+.Lc ICON
+.br
+Used with record types of:
+.Cn CONTROL .
+.P
+Used with control types of:
+.BR icon ,
+.B file
+and
+.BR busy .
+.P
+.Cn ICON
+specifies the image to be displayed within a control.
+.Lc LABEL
+.br
+Used with record types of:
+.Cn CONTROL .
+.P
+Used with control types of:
+.BR icon ,
+.BR file ,
+.B clock
+and
+.BR busy .
+.P
+.Cn LABEL
+specifies the string to be displayed when a control is
+in a subpanel.
+.Lc LOCKED
+.br
+Used with record types of:
+.Cn PANEL ,
+.Cn BOX ,
+.Cn SUBPANEL ,
+.Cn SWITCH
+and
+.Cn CONTROL .
+.P
+.Cn LOCKED
+provides the mechanism to prevent a component definition
+of identical type, name and parent from overriding (replacing) this
+definition.
+Since the front panel can be defined within multiple
+configuration files, it provides the flexibility to override components
+found earlier in the search path.
+Like actions and file types, this allows the front panel to be customized at
+several levels.
+.Lc MONITOR_TYPE
+.br
+Used with record types of:
+.Cn CONTROL .
+.P
+Used with control types of:
+.B icon
+and
+.B file
+.P
+.Cn MONITOR_TYPE
+specifies the method of checking the file being monitored,
+specified by the keyword
+.Cn FILE_NAME .
+.br
+.Lc NUMBER_OF_ROWS
+.br
+Used with record types of:
+.Cn SWITCH .
+.P
+.Cn NUMBER_OF_ROWS
+provides control over the layout of the workspace
+switch buttons.
+The switch buttons are arranged in a row and column layout with the
+.Cn NUMBER_OF_ROWS
+keyword defining the number of rows in the layout.
+The number of columns is derived from this value and the
+total number of switch buttons.
+.br
+.Lc PANEL_GEOMETRY
+.br
+Used with record types of:
+.Cn PANEL .
+.P
+.Cn PANEL_GEOMETRY
+specifies a non-default location to position the
+front panel when it is created.
+By default, the front panel is centered
+along the bottom of the display.
+.Lc POSITION_HINTS
+.br
+Used with record types of:
+.Cn BOX ,
+.Cn SWITCH
+and
+.Cn CONTROL .
+.P
+.Cn POSITION_HINTS
+specifies the ordering of boxes in the front panel,
+the switch and controls in boxes, and controls in subpanels.
+When two components have the same value for
+.Cn POSITION_HINTS ,
+the first one
+read from the configuration file is placed first.
+.Lc PUSH_ACTION
+.br
+Used with record types of:
+.Cn CONTROL .
+.P
+.Cn PUSH_ACTION
+specifies the function that is invoked when a selection
+occurs on the control.
+.Lc PUSH_ANIMATION
+.br
+Used with record types of:
+.Cn CONTROL .
+.P
+Used with all control types except:
+.BR client .
+.P
+.Cn PUSH_ANIMATION
+specifies the name of an animation record to be
+displayed when a selection occurs on the control.
+The control must have a
+.Cn PUSH_ACTION
+defined for the animation to be used.
+.Lc PUSH_RECALL
+.br
+Used with record types of:
+.Cn CONTROL .
+.P
+Used with control keywords of:
+.Cn CLIENT_NAME .
+.P
+When
+.Cn PUSH_RECALL
+is set to
+True,
+it specifies that only one process can be
+started by the control.
+If the process is already running, it is
+displayed within the current workspace and shuffled to the top of
+the window stack.
+The value for the
+.Cn CLIENT_NAME
+keyword is used
+to identify the process for push recall behavior.
+.Lc RESOLUTION
+.br
+Used with record types of:
+.Cn PANEL .
+.P
+.Cn RESOLUTION
+allows the icon set for the front panel to be forced
+to a particular set.
+By default, the front panel determines the
+display resolution at runtime and chooses the high resolution icon set if
+the display width is 1024 pixels or wider.
+.Lc SUBPANEL_UNPOST
+.br
+Used with record types of:
+.Cn PANEL .
+.P
+When
+.Cn SUBPANEL_UNPOST
+is set to
+True,
+it causes a subpanel to hide itself
+whenever a
+.Cn PUSH_ACTION
+occurs on one of the subpanel controls.
+If the subpanel has been torn off
+of the front panel, the
+behavior of the subpanel is forced to remain posted on
+.Cn PUSH_ACTION .
+.Lc TITLE
+.br
+Used with record types of:
+.Cn SUBPANEL .
+.P
+.Cn TITLE
+specifies the string to be displayed in the title area of
+the subpanel.
+.Lc TYPE
+.br
+Used with record types of:
+.Cn CONTROL .
+.P
+A number of different control types are defined by the front panel:
+.VL 12
+.LI \f3blank\fP
+Space-holder control
+.LI \f3busy\fP
+Busy light
+.LI \f3client\fP
+A client window
+.LI \f3clock\fP
+Front panel clock
+.LI \f3date\fP
+Front panel date
+.LI \f3file\fP
+References a file on the file system
+and uses that file's actions and image
+.LI \f3icon\fP
+Front panel general control
+.LE
+.LE
+.cdes
+.SH FILES
+The default front panel configuration file is
+.BR /usr/dt/appconfig/types/C/dtwm.fp .
+.P
+Files containing the attributes of dynamically created
+front panel components are in the directory
+.BR $HOME/.dt/types/fp_dynamic .
+.SH "APPLICATION USAGE"
+Errors encountered when loading front panel database files are written to the
+user's
+.B $HOME/.dt/errorlog
+file.
+.SH "SEE ALSO"
+.Cm dtwm 1,
+.Fn strftime 3,
+.BR dtdtfile (4).
+.cdee

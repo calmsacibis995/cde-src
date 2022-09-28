@@ -1,0 +1,136 @@
+.\" *************************************************************************
+.\" **
+.\" ** (c) Copyright 1993,1994 Hewlett-Packard Company 
+.\" **      All Rights Reserved.
+.\" **
+.\" ** (c) Copyright 1993,1994 International Business Machines Corp. 
+.\" **      All Rights Reserved.
+.\" **  
+.\" ** (c) Copyright 1993,1994 Sun Microsystems, Inc.
+.\" **      All Rights Reserved.
+.\" **
+.\" ** (c) Copyright 1993,1994 Unix Systems Labs, Inc., a susidiary of Novell, Inc
+.\" **      All Rights Reserved.
+.\" **
+.\" *************************************************************************
+.\"----------------------------------------------------------------------------
+.\" %\&Z%%\&M% %\&I% %\&E% SMI;
+.TH DtCmOpenCalendar 3X "26 January 1994"
+.BH "26 January -_1994"
+.\"---
+.\"----------------------------------------------------------------------------
+.SH NAME
+DtCmOpenCalendar(3X) \- Create a calendar object and open a connection to the calendar specified.
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- DESCRIPTION 
+.\"--- This section tells concisely what the command (function, device or
+.\"--- file format) does and includes the parameter list. 
+.\"---
+.SH DESCRIPTION
+\&#include <Dt/DtCm.h>
+.sp .5
+DtCmStatus DtCmOpenCalendar (
+.br
+.ta 0.75i 1.75i
+        const char *	\fIname\fP,
+.br
+        const char *	\fIlocation\fP,
+.br
+        boolean_t	\fIcreate_calendar\fP,
+.br
+        DtCmAttributes	\fIattrs\fP,
+.br
+        int		\fInum_attrs\fP,
+.br
+        DtCmCalendar *		\fIcal_r\fP)
+.fi
+\fP
+.SH
+\fBDtCmOpenCalendar\fP creates a calendar object, opens a connection 
+to the specified ca lendar, and returns a handle to the calendar 
+object. If the calendar exists, create_calendar, attrs and num_attrs 
+are ignored. Otherwise if create_calendar is \fBB_TRUE\fP, a new calendar 
+will be created for the user of the calling application and it 
+will be initialized with the attributes specified in attrs. If 
+the calendar does not exist and create_calendar is \fBB_FALSE\fP, an error 
+status is returned and a calendar object is not created.  When 
+the application is through with the calendar, \fBDtCmCloseCalendar\fP 
+should be called to free the calendar object.
+.sp .5
+.IP "\fIname\fP" 1.25i
+Specifies the name of the calendar.
+.IP "\fIlocation\fP" 1.25i
+Specifies the location of the CM server.
+.IP "\fIcreate_calendar\fP" 1.25i
+Specifies whether to create the calendar if it does not exist.
+.IP "\fIattrs\fP" 1.25i
+Specifies the attributes to set on the new calendar.
+.IP "\fInum_attrs\fP" 1.25i
+Specifies the number of elements in \fIattrs\fP.
+.IP "\fIcal_r\fP" 1.25i
+Returns the calendar handle.
+.sp .5
+.PP
+The user needs access permission to open a calendar.
+
+
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- RETURN VALUES
+.\"--- This section appears in pages from Sections 2 and 3 only.
+.\"--- List the _values_ that the function returns and give _explanations_.
+.\"---
+.SH "RETURN VALUES"
+The function returns a status indicating whether the function is completed success fully. If the function is successful, a calendar handle is stored in cal_r.
+
+.\"---
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- ERRORS
+.\"--- This section lists and explains _ERROR-CODES_ that the function may
+.\"--- may generate.  List _ERROR-CODES_ alphabetically.
+.\"---
+.SH ERRORS
+One of the following status values may be returned:
+.SH
+.IP "\fBDT_CM_ERR_AUTH\fP" 2.5i
+No permission to do the operation.
+.IP "\fBDT_CM_ERR_DATA_TYPE\fP" 2.5i
+Invalid data type specified for predefined attributes.
+.IP "\fBDT_CM_ERR_MEMORY\fP" 2.5i
+Not enough memory.
+.IP "\fBDT_CM_ERR_NOT_EXIST\fP" 2.5i
+The calendar does not exist.
+.IP "\fBDT_CM_ERR_PARAMETER\fP" 2.5i
+Invalid parameter.
+.IP "\fBDT_CM_ERR_READONLY\fP" 2.5i
+Read-only attribute specified.
+.IP "\fBDT_CM_ERR_SERVER\fP" 2.5i
+Server problem.
+.IP "\fBDT_CM_ERR_SPACE\fP" 2.5i
+Not space left on device.
+.IP "\fBDT_CM_OK\fP" 2.5i
+The call is completed successfully.
+.PP
+.sp
+.\"---
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- EXAMPLES
+.\"--- This section gives examples of how to use the command (function
+.\"--- or file format).  Always preface an example with an introduction.
+.\"--- If there are multiple examples, use separate subsection headings
+.\"--- for each _example-type_.  Otherwise, omit these headings.
+.\"---
+.SH EXAMPLES
+NEED MARKUP HERE, SIMILAR TO SYNOPSIS
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- SEE ALSO
+.\"--- This section lists references to other man pages, sample files, etc.
+.\"---
+.SH "SEE ALSO"
+.BR DtCmListCalendars (3X),
+.BR DtCmCloseCalendar (3X),
+.BR DtCmRemoveCalendar (3X)

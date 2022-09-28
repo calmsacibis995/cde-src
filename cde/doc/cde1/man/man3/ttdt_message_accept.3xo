@@ -1,0 +1,200 @@
+.TH ttdt_message_accept 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+ttdt_message_accept \- accept a contract to handle a ToolTalk request
+.SH SYNOPSIS
+.yS
+#include <Tt/tttk.h>
+.sp 0.5v
+.ta \w'Tt_pattern *ttdt_message_accept('u
+Tt_pattern *ttdt_message_accept(Tt_message \f2contract\fP,
+	Ttdt_contract_cb \f2cb\fP,
+	void *\f2clientdata\fP,
+	Widget \f2shell\fP,
+	int \f2accept\fP,
+	int \f2sendStatus\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn ttdt_message_accept
+function
+registers in the default session for
+.Cn TT_HANDLER -\c
+addressed requests:
+.P
+.VL 4
+.LI (1)
+.IR Get_Geometry ,
+.IR Set_Geometry ,
+.IR Get_Iconified ,
+.IR Set_Iconified ,
+.IR Get_Mapped ,
+.IR Set_Mapped ,
+.IR Raise ,
+.IR Lower ,
+.IR Get_XInfo ,
+.IR Set_XInfo
+.LI (2)
+.IR Pause ,
+.IR Resume
+.LI (3)
+.IR Quit ,
+.IR Get_Status
+.LE
+.P
+If the
+.I shell
+argument is not
+.Cn NULL ,
+the ToolTalk service
+handles messages in (1) transparently;
+otherwise, it treats them like messages in (3).
+.P
+If
+.I shell
+is non-\c
+.Cn NULL
+and
+.I cb
+is
+.Cn NULL ,
+then
+the ToolTalk service
+handles messages in (2) transparently by passing
+.I shell
+and the appropriate boolean value to
+.Fn XtSetSensitive 3X.
+If
+.I cb
+is
+.Cn NULL ,
+then
+the ToolTalk service
+treats messages in (2) like (3).
+.P
+If
+.I cb
+is not
+.Cn NULL ,
+.Fn ttdt_message_accept
+passes messages in (3) to the
+.I cb
+callback; otherwise it fails with
+.Cn TT_DESKTOP_ENOTSUP .
+.P
+If
+.I accept
+is True,
+.Fn ttdt_message_accept
+calls
+.Fn tt_message_accept 3
+with a
+.I contract
+argument.
+If
+.I contract
+has a returned value from
+.Fn tt_message_status
+of
+.Cn TT_WRN_START_MESSAGE ,
+it is the message that caused the tool to be started.
+The tool should join any scopes it wants to serve before accepting
+.IR contract ,
+so that it will receive any other messages already dispatched to its
+ptype.
+Otherwise, those messages will cause other instances of the
+ptype
+to be started.
+If that is in fact desired (for example,
+because the tool can only service one message at a time), then
+the tool should undeclare its
+ptype
+while it is busy.
+.P
+If
+.I sendStatus
+is True,
+.Fn ttdt_message_accept
+sends a
+.IR Status
+notice to the requester, using the
+arguments (if any) passed to
+.Fn ttdt_open .
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn ttdt_message_accept
+function
+returns a null-terminated array of
+.BR Tt_pattern ,
+and associates this array with
+.IR contract ;
+otherwise, it returns an error pointer.
+The application can use
+.Fn tt_ptr_error 3
+to extract one of the following
+.B Tt_status
+values from the returned handle:
+.VL 8
+.Lc TT_ERR_NOMP
+.br
+The
+.Cm ttsession 1
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_POINTER
+.br
+The pointer passed does not point to an object
+of the correct type for this operation.
+.Lc TT_ERR_UNIMP
+.br
+The
+.Cm ttsession 1
+for the default session is of a version that does not support
+.Fn tt_message_accept .
+If
+.I contract
+is a
+.Cn TT_WRN_START_MESSAGE ,
+messages to the tool's
+ptype
+will remain blocked until
+.I contract
+is rejected, replied to, or failed.
+.LE
+.SH "APPLICATION USAGE"
+The
+.Fn ttdt_message_accept
+function
+is what a tool calls when it wants to accept responsibility for
+handling (that is, failing or rejecting) a request.
+.P
+If
+.I contract
+is destroyed by
+.Fn tttk_message_destroy 3,
+then the patterns will also be destroyed.
+Otherwise, the caller
+is responsible for iterating over the array and destroying each
+pattern.
+.SH EXAMPLES
+See
+.Fn ttdt_session_join 3
+for an example of a
+.B Ttdt_contract_cb
+callback that can be used with
+.Fn ttdt_message_accept .
+.SH "SEE ALSO"
+.Hd Tt/tttk.h 5,
+.Fn ttdt_open 3,
+.Fn ttmedia_ptype_declare 3,
+.Fn tt_ptype_declare 3,
+.Fn ttdt_session_join 3,
+.Fn ttdt_file_join 3,
+.Fn tt_ptype_undeclare 3,
+.cde .Fn XtSetSensitive 3X,
+.xos
+.Fn XtSetSensitive
+in the \*(Zt,
+.xoe

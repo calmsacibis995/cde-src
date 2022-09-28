@@ -1,0 +1,48 @@
+.TH DtDbReloadNotify 3 "17 Jan 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" **  (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.\" *************************************************************************
+.SH NAME
+DtDbReloadNotify \- reload the Dt actions and data typing services database
+.SH SYNOPSIS
+.yS
+#include <Dt/Action.h>
+.sp 0.5v
+.ta \w'void DtDbReloadNotify('u
+void DtDbReloadNotify(DtDbReloadCallbackProc \f2callback_proc\fP,
+	XtPointer \f2client_data\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn DtDbReloadNotify
+function registers an application callback function that is called
+whenever the actions and data types database needs to be reloaded;
+the conditions that trigger this callback are implementation-dependent.
+The
+.I callback_proc
+must flush any actions and data type information that the
+application has cached and then call
+.Fn DtDbLoad 3
+to reload the database.
+The
+.I client_data
+argument passes additional application information
+to the callback routine.
+.SH "RETURN VALUE"
+The
+.Fn DtDbReloadNotify
+function returns no value.
+.P
+If errors are encountered when reading the database files, error messages are
+written to the user's errorlog file (\f3$HOME/.dt/errorlog\fP).
+Records containing errors are not incorporated into the internal database.
+.SH "SEE ALSO"
+.Hd Dt/Action.h 5,
+.Fn DtDbLoad 3,
+.cde .BR dtactionfile (4),
+.cde .BR dtdtfile (4).
+.xo .cX dtactionfile ,
+.xo .cX dtdtfile .

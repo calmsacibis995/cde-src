@@ -1,0 +1,271 @@
+.de LI
+.\" simulate -mm .LIs by turning them into .TPs
+.TP \\n()Jn
+\\$1
+..
+.de Lc
+.\" version of .LI that emboldens its argument
+.TP \\n()Jn
+\s-1\f3\\$1\f1\s+1
+..
+.TH SdmString 3 "10/29/96"
+.BH "10/29/96"
+.\" @(#)SdmMessageUtility.3	1.2 96/10/29 SMI
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994, 1995, 1996 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994, 1995, 1996 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994, 1995, 1996 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994, 1995, 1996 Novell, Inc.
+.SH NAME
+SdmMessageUtility \- general message utility class
+.SH SYNOPSIS
+.\"
+.SS Includes
+.ft 3
+.nf
+#include <SDtMail/MessageUtility.hh>
+.\"
+.SS Creation
+All member methods are static; class cannot be instantiated.
+.\"
+.SS Methods
+.nf
+.sp 0.5v
+.ft 3
+.ta \w'SdmErrorCode Sdm'u
+SdmErrorCode SdmMessageUtility::AddXMailerHeader(
+	SdmError& \f2err\fP, 
+	SdmString \f2mailerPrefix\fP, 
+	SdmDataPort& \f2dataPort\fP, 
+	SdmMessageNumber \f2msgnum\fP, 
+	SdmBoolean \f2replaceExistingHeader\fP = Sdm_True);
+.PP
+.ft 3
+.ta \w'SdmErrorCode Sdm'u
+SdmErrorCode SdmMessageUtility::MakeReplyHeader(
+	SdmError& \f2error\fP, 
+	SdmString& \f2r_headerValue\fP,
+	SdmMessageHeaderAbstractFlags \f2headers\fP, 
+	SdmMessageEnvelope& \f2env\fP, 
+	SdmBoolean \f2replyAll\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode Sdm'u
+SdmErrorCode SdmMessageUtility::ParseRFC822Headers(
+	SdmError& \f2err\fP, 
+	int& \f2r_errorIndex\fP, 
+	const SdmString& \f2srcHeader\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode Sdm'u
+SdmErrorCode SdmMessageUtility::RemoveMessageStoreIfEmpty(
+	SdmError& \f2err\fP, 
+	const SdmString& \f2messageStoreName\fP);
+.\"
+.fi
+.ft 1
+.\" end of methods list
+.ta 0.25i 0.50i 0.75i 1.0i 1.25i 1.50i 1.75i 2.0i 2.5i 3.0i
+.SH DESCRIPTION
+The SdmMessageUtility class provides general methods for manipulating messages and message
+containers.  Most of the methods are meant to be used internally by the library and thus
+are not documented in this manual page. 
+.PP
+USE OF METHODS NOT DOCUMENTED IN THIS MANUAL PAGE BY CLIENTS OF THE LIBRARY IS STRONGLY
+DISCOURAGED.
+.\"
+.SH CREATION
+The SdmMessageUtility class is a container for general methods that deal with messages and
+message containers; as such no SdmMessageUtility object can be created or destroyed.
+.\"
+.SH DESTRUCTION
+The SdmMessageUtility class is a container for general methods that deal with messages and
+message containers; as such no SdmMessageUtility object can be created or destroyed.
+.\"
+.SH METHODS
+The following static methods are provided:
+.\"
+.SS \f3AddXMailerHeader\fP
+(\f3err\fP, \f3mailerPrefix\fP, \f3dataPort\fP, \f3msgnum\fP, \f3replaceExistingheader\fP)
+
+This static method provides a quick interface to add an X-Mailer header to a message. The
+X-Mailer header is used by convention to identify the sending mailer for an e-mail
+message. This method should be called immediately before a message object Submit method is
+invoked.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)\fP"
+.br
+Error container, used to store return result code.
+.LI "\f3mailerPrefix\fP (\f3SdmString\fP)"
+.br
+A prefix that is included in the X-Mailer header. By convention the prefix is a name identifying
+the mailer (e.g. sdtmail, dtmail) and includes some kind of version identification (e.g. CDE 1.1)
+so a complete prefix might be "sdtmail cde 1.1".
+.LI "\f3dataPort\fP (\f3SdmDataPort&\fP)"
+.br
+The data port that contains the existing message to which the X-Mailer header is to be added.
+.LI "\f3msgnum\fP" (\f3SdmMessageNumber\fP)"
+.br
+The message number of the existing message to which the X-Mailer header is to be added.
+.LI "\f3replaceExistingHeader\fP" (\f3SdmBoolean\fP)"
+.br
+A boolean flag: Sdm_True (the default) causes any existing X-Mailer header to be replaced,
+while Sdm_False causes the X-Mailer header to be included only if one does not already
+exist in the message.
+.br
+Any client calling the library should either specify Sdm_True or not include this optional
+parameter; its intent is to allow the library to include a default X-Mailer header if none
+is provided by the calling client prior to a message object Submit method being called.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f2MakeReplyHeader\fP
+(\f3error\fP, \f3r_headerValue\fP, \f3headers\fP, \f3env\fP, \f3replyAll\fP)
+
+This static method extracts e-mail addresses from the headers
+specified by the abstract header flags list from the specified message
+envelope object and returns a string object suitable for a "reply" to
+those e-mail addresses. 
+
+This method is used to process exiting Sender:, To:, Cc: and other
+appropriate headers into corresponding reply headers.
+.PP
+Arguments:
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)\fP"
+.br
+Error container, used to store return result code.
+.LI "\f3r_headerValue\fP (\f3SdmString&\fP)
+.br
+A string containing the processed reply e-mail addresses.
+.LI "\f3headers\fP (\f3SdmMessageHeaderAbstractFlags\fP)
+.br
+A bit mask representing the headers to be retrieved from the message
+envelope; a bit that is on indicates the header should be retrieved
+and processed into a reply header.
+.LI "\f3env\fP" (\f3SdmMessageEnvelope&\fP)
+.br
+A SdmMessageEnvelope object handle; the headers to be processed are
+retrieved from this message envelope.
+.LI "\f3replyAll\fP" (\f3SdmBoolean\fP)
+.br
+Controls the removal of the user doing the reply; this is used to
+differentiate between a "reply" and a "reply all".
+
+If this is Sdm_True, then the user who is running dtmail will be
+removed from the reply addresses if the appropriate dtmail options are
+also set (metoo, allnet, usealternates mailrc variables).
+
+If this is Sdm_False, then the user who is running dtmail will not be removed
+regardless of the mailrc variables set.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3ParseRFC822Headers\fP
+(\f3err\fP, \f3r_errorIndex\fP, \f3srcHeader\fP)
+
+This static method takes a header that contains one or more possible e-mail addresses and
+returns an indication of whether or not the header is RFC822 compliant; that is, whether
+or not the header contains a valid list of one or more e-mail addresses that can be
+successfully given to the Submit method of a message object.
+
+This method can be used to validate a mail alias (either the name or the contents, both
+of which must be RFC822 compliant) or validate a user supplied e-mail address list.
+.PP
+Arguments:
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)\fP"
+.br
+Error container, used to store return result code.
+.LI "\f3r_errorIndex\fP (\f3int&\fP)"
+.br
+If there is an error in parsing the e-mail addresses, this container is set to the byte
+offset of the first byte of the e-mail address being parsed (from \f3srcHeader\fP) that
+contained the error. Can be used to construct a fancy error message that helps pinpoint
+the error to the user.
+.LI "\f3srcHeader\fP (\f3const SdmString&\fP)"
+.br
+A string containing the e-mail address sequence to parse.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3RemoveMessageStoreIfEmpty\fP
+(\f3err\fP, \f3messageStoreName\fP)
+
+This static method is used to cause a message store to be removed if the message store is
+empty (contains zero bytes). This is typically done to implement the .mailrc "keep"
+variable functionality whereby if the variable is not set then a mailbox is deleted
+(removed) when it is closed and contains no messages.
+
+This method uses proper mailbox locking mechanisms to make sure that updates to the
+mailbox are not lost.
+.PP
+Arguments:
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)\fP"
+.br
+Error container, used to store return result code.
+.LI "\f3messageStoreName\fP (\f3const SdmString&\fP)"
+.br
+A string specifying the name of the message store to be removed; it may contain special
+folder characters which are expanded to a full path name before being operated on.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.br
+If the message store is not empty, or the message store is empty and it is removed, this
+method returns Sdm_EC_Success. It only returns a failure is an operation on the message
+store fails.
+.PP
+.RE
+.nr )J 0
+
+.\"
+.RE
+.nr )J 0
+.SH "SEE ALSO"
+.na
+.BR SdmMessage (3)

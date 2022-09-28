@@ -1,0 +1,59 @@
+XCOMM $XConsortium: Imakefile /main/cde1_maint/5 1995/10/20 16:45:56 barstow $
+#define IHaveSubdirs
+#define PassCDebugFlags 'CDEBUGFLAGS=$(CDEBUGFLAGS)'
+
+#ifdef HPArchitecture
+DTTERM = dtterm
+#endif
+#ifdef IBMArchitecture
+DTTERM = dtterm
+#endif
+#ifdef SunArchitecture
+DTTERM = dtterm
+#endif
+#ifdef USLArchitecture
+DTTERM = dtterm
+#endif
+#ifdef UXPArchitecture
+DTTERM = dtterm
+#endif
+#ifdef AlphaArchitecture
+DTTERM = dtterm
+#endif
+
+EXTRADIRS= util types tttypes
+DTLOGINDIRS = dtlogin
+DTGEDIR=
+DTACTION = dtaction
+
+#if UseDtEncap == YES
+DTSPCD = dtspcd
+#endif
+
+/* directories that have build install rules must be also listed in the
+   else of this ifdef. This is to allow minimum builds that will only
+   create a build install package.
+ */
+#ifndef BUILDBINSTALLDIRSONLY /* normal case */
+   SUBDIRS = dthelp dtmail dsdm dtpad dtfile dtwm $(DTLOGINDIRS) \
+	dtsession dthello dtstyle dtexec dtdbcache dticon $(DTTERM)\
+	dtcalc $(DTACTION) $(DTSPCD) \
+	$(EXTRADIRS) $(DTGEDIR) dtscreen dtksh dtcm dtsearchpath dtappgather \
+        dtappbuilder dtappintegrate dtprintegrate dtconfig \
+        dtcreate dtprintinfo fontaliases dtdspmsg ttsnoop
+	
+   LINTSUBDIRS = dthelp dtmail dsdm dtpad dtfile $(DTLOGINDIRS) dtwm \ 
+	dtsession dthello dtstyle dtexec dtdbcache dticon $(DTTERM) \
+	dtcalc $(DTACTION) dtcreate \
+	$(EXTRADIRS) $(DTGEDIR) dtscreen dtksh dtcm dtsearchpath dtappgather \
+        dtappbuilder dtappintegrate dtprintegrate dtprintinfo dtdspmsg
+#else /* Build install only builds */
+   SUBDIRS = dthelp dtsession $(DTTERM) tttypes
+   LINTSUBDIRS = dthelp dtsession $(DTTERM) tttypes
+#endif /* BUILDBINSTALLDIRSONLY */
+
+
+
+MakeSubdirs($(SUBDIRS))
+DependSubdirs($(SUBDIRS))
+LintSubdirs($(LINTSUBDIRS))

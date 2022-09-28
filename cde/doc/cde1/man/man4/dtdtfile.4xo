@@ -1,0 +1,171 @@
+.cdes
+.\" CDE Common Source Format, Version 1.0.0
+.TH dtdtfile 4 "17 May 1994"
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.\" *************************************************************************
+.SH NAME
+dtdtfile \- define the format and location of actions and data type database files
+.SH SYNOPSIS
+See
+.BR dtactionfile (4)
+and
+.BR dtdtsfile (4).
+.SH DESCRIPTION
+.cdee
+.xo .H 3 "Location of Actions and Data Types Database"
+.xo .xR3 dtdtfile
+The actions and data types database provides definitions for the actions
+and data types Cde clients recognize.
+Files containing actions and data type definitions must end
+with the
+.B \&.dt
+suffix.
+The database is constructed by reading
+all files ending in the
+.B \&.dt
+suffix that are found in the search path
+specified by the
+.I DTDATABASESEARCHPATH
+environment variable.
+.cdes
+.P
+The
+.Cm dttypes 1
+utility is the tool that allows users to examine and debug their database.
+.cdee
+.P
+The
+.I DTDATABASESEARCHPATH
+environment variable contains a comma-separated
+list of directories specified in \f3[\fP\f2host\fP\f3:]/\fP\f2path\fP format.
+The
+.IR host :
+portion is optional, but if specified,
+.I /path
+is interpreted relative to
+.IR host .
+In addition,
+.I host
+defines the
+.I DatabaseHost
+for records defined by files in the
+.I /path
+directory.
+Otherwise, the
+.I DatabaseHost
+is the same as the
+.IR LocalHost .
+To allow for localized action definitions, the data base
+search path supports the string
+.B %L
+within the pathname string.
+The logic that parses
+.I DTDATABASESEARCHPATH
+substitutes the
+value of the current locale as stored in the
+.I LANG
+environment variable for the string
+.B %L
+(or no characters if
+.I LANG
+is not set).
+Other uses of % within the
+.I DTDATABASESEARCHPATH
+pathnames produce unspecified results.
+Directories can be set up for various locales.
+Each directory contains localized action definitions for a
+single locale.
+For examples, see the default search path shown below.
+The local system administrator or the user
+(in
+.BR $HOME/.dtprofile )
+can modify the actual value of the search path.
+The default search path includes the following directories,
+searched in the following sequence:
+.VL 6
+.LI \f3$HOME/.dt/types/\fP
+.br
+personal user-defined database files
+.br
+.LI \f3/etc/dt/appconfig/types/%L\fP
+.br
+locally defined language-specific database files
+.LI \f3/etc/dt/appconfig/types/C\fP
+.br
+locally defined default database files
+.br
+.LI \f3/usr/dt/appconfig/types/%L\fP
+.br
+language-specific database files
+.LI \f3/usr/dt/appconfig/types/C\fP
+.br
+implementation-default database files
+.LE
+.P
+.cdes
+.HU "File Format"
+In addition to the version information, comments and variable references
+described under other headings in this document, these files may contain action
+and data type records, as described in
+.BR dtactionfile (4)
+and
+.BR dtdtsfile (4).
+.HU "Comments"
+Any line whose first non-space character is # is treated as a
+comment line, and is ignored during the reading of the database file.
+.HU "Database Version"
+The database loader supports a version number, which indicates
+the version of the database syntax used by a particular database file.
+If a database version number is not specified, then the database
+loader assumes that the file uses the version 1.0 syntax, described here.
+If a database file specifies a version number, then it
+must be the first non-blank, non-comment line in the database file;
+if the version is specified anywhere else in the file, then an error
+message is generated, and the remainder of that database file is ignored.
+The database version number is specified using the following syntax:
+.Cs I
+set DtDbVersion=\f2version_number\fP
+.Ce
+.HU "String Variables"
+Database entries can reference string variables that can be set
+within the database file.
+The scope of a string variable is restricted
+to only those record definitions within the database file defining the
+string variable.
+A string variable is defined using the following syntax:
+.Cs I
+set \f2VariableName\fP=\f2variable_value\fP
+.Ce
+.P
+String variables are referenced using either of the standard shell
+variable referencing syntaxes:
+$\f2variable_name\fP or ${\f2variable_name\fP}.
+A variable name can be made up of any of the alphanumeric characters
+and the underscore.
+.xo (See section 2.6.2 in the \*(ZC.)
+.HU "Environment Variables"
+Database records may refer to environment variables, using either
+of the standard shell variable referencing syntaxes:
+$\f2environment_variable\fP
+or ${\f2environment_variable\fP}.
+If the environment variable name conflicts
+with a string variable name, the string variable takes precedence.
+.HU "Line Continuation"
+Any field within a record can be continued onto another line by
+ending the line with a \e character.
+The \e and any
+.tK blank s 
+following the \e and preceding the newline are discarded;
+leading
+.tK blank s
+on the following line are preserved in the continued field.
+.br 
+.SH "SEE ALSO"
+.BR dtactionfile (4),
+.BR dtdtsfile (4),
+.Cm dttypes 1.
+.cdee

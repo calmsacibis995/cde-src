@@ -1,0 +1,75 @@
+# %%  (c) Copyright 1993, 1994 Hewlett-Packard Company			
+# %%  (c) Copyright 1993, 1994 International Business Machines Corp.	
+# %%  (c) Copyright 1993, 1994 Sun Microsystems, Inc.			
+# %%  (c) Copyright 1993, 1994 Novell, Inc. 				
+# %%  $Revision: $ 			 				
+#
+#
+# @(#)SunMakefile	1.21 31 Jul 1993
+#
+# The ToolTalk shell command (ttmv, etc.) utility makefile
+#
+# Copyright (c) 1992 by Sun Microsystems, Inc.
+#
+
+TT_DIR = ../..
+THIS_DIR = bin/shell
+
+include $(TT_DIR)/SunMakefile-head.mk
+
+all::		Bin-g
+
+COMMANDS = ttmv ttrm ttcp
+ALIASES = ttrmdir
+# ttrcp doesn't work (yet, if ever)
+
+$(BIN_TARGETS)::	$(COMMANDS) $(ALIASES)
+
+INSTALL_COMMANDS = $(COMMANDS:%=$(INSTALL_DIR)/bin/%)
+INSTALL_ALIASES =  $(ALIASES:%=$(INSTALL_DIR)/bin/%)
+
+$(INSTALL_TARGETS)::	$$(INSTALL_COMMANDS) $$(INSTALL_ALIASES)
+
+Clean::
+	$(RM) $(COMMANDS)
+
+$(INSTALL_COMMANDS): $$(@F)
+		$(TTINSTALL) $(INSTALL_DIR)/bin $(@F)
+
+ttmv	:= SHELL_CONTENTS = ttmv.o mover.o
+ttrm	:= SHELL_CONTENTS = ttrm.o remover.o
+ttcp	:= SHELL_CONTENTS = ttcp.o copier.o
+ttrcp	:= SHELL_CONTENTS = ttrcp.o rcopier.o
+
+CPPFLAGS	+=	$(CPPFLAGS-bin)
+CCFLAGS		+=	$(CCFLAGS-bin)
+CFLAGS		+=	$(CFLAGS-bin)
+LDFLAGS		+=	$(LDFLAGS-bin)
+
+MYLDLIBS_SunOS_4=	-lX -lI18N
+LDLIBS		+=	$(MYLDLIBS_$(OS_NAME)_$(OS_VERSION))
+
+%/mover.o \
+%/remover.o \
+%/copier.o \
+%/rcopier.o 	:=	CPPFLAGS +=	$(CPPFLAGS-version)
+     
+
+OBJECTS =	$(SHELL_CONTENTS:%=$(DERIVED)/%)
+
+# We should probably try to generate a standard link for utilities
+# Trailing -Bstatic ensures libC is linked statically -- that could
+# go away in the future when libC is bundled.
+
+$(COMMANDS):	$$(DERIVED) $$(OBJECTS) $$(LIBDEPENDENCY)
+	$(LINK.cc) -o $@ $(OBJECTS) -ltt $(LDLIBS) -Bstatic
+
+# We used to have an elaborate way of setting macros for commands and
+# their aliases, but that seems silly since there is exactly one.
+ttrmdir:	ttrm
+	rm -f ttrmdir;ln ttrm ttrmdir
+
+$(INSTALL_DIR)/bin/ttrmdir:	$(INSTALL_DIR)/bin/ttrm
+	(cd $(INSTALL_DIR)/bin;rm -f ttrmdir;ln ttrm ttrmdir)
+
+include $(TT_DIR)/SunMakefile-tail.mk

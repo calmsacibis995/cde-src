@@ -1,0 +1,96 @@
+.TH Get_XInfo 4 "13 May 1994"
+.SH NAME
+Get_XInfo request \- get a tool's X11 attributes
+.SH SYNOPSIS
+.yS
+.ta \w@Get_XInfo(@u
+Get_XInfo(out string \f2display\fP,
+	out string \f2visual\fP,
+	out integer \f2depth\fP
+	[in messageID \f2commission\fP]);
+.yE
+.SH DESCRIPTION
+The
+.I Get_XInfo
+request
+reports the X11 attributes of the optionally specified
+window, or of the window primarily associated with the recipient
+procid (if no window is specified).
+.P
+The
+.I display
+argument
+is an X11 display.
+.P
+The
+.I visual
+argument
+is an X11 visual class (which determines how a pixel will be
+displayed as a color).
+Valid values are:
+.Cs I
+StaticGray
+GrayScale
+StaticColor
+PseudoColor
+TrueColor
+DirectColor
+.Ce
+.P
+The
+.I depth
+argument
+is the number of bits in a pixel.
+.P
+The
+.I commission
+argument
+is the ID of the ongoing request with respect to which X11 attributes
+are being set or reported.
+.SH "APPLICATION USAGE"
+The
+.Fn ttdt_session_join 3,
+and
+.Fn ttdt_message_accept 3,
+functions can be used by Xt applications to register for,
+and transparently process, the
+.I Get_XInfo
+request.
+Also,
+.I Get_XInfo
+can be sent by
+.Fn ttdt_sender_imprint_on 3.
+.P
+Since the handler may be running on a
+different host, it is almost always better to return
+a
+.I display
+value of
+\f2hostname\f1:\f2n\f1[.\f2n\f1]
+instead of :\f2n\f1[.\f2n\f1].)
+.P
+The
+.I commission
+argument
+is useful to the extent
+that the handler employs different attributes for the
+different operations it may be carrying out.
+.SH EXAMPLES
+The
+.I Get_XInfo
+request can be sent as in the following example:
+.Cs I
+Tt_message msg = tttk_message_create(0, TT_REQUEST, TT_SESSION,
+			the_recipient_procid, TTDT_GET_XINFO,
+			my_callback);
+tt_message_iarg_add(msg, TT_OUT, Tttk_string, 0);
+tt_message_iarg_add(msg, TT_OUT, Tttk_string, 0);
+tt_message_iarg_add(msg, TT_OUT, Tttk_integer, 0);
+tt_message_send(msg);
+.Ce
+.SH "SEE ALSO"
+.Fn tt_message_iarg_add 3,
+.Fn tt_message_send 3,
+.Fn ttdt_message_accept 3,
+.Fn ttdt_sender_imprint_on 3,
+.Fn ttdt_session_join 3.

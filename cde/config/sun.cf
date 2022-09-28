@@ -1,0 +1,335 @@
+XCOMM platform:  $XConsortium: sun.cf /main/cde1_maint/4 1995/11/10 18:08:52 drk $
+VENDOR = sun
+HARDWARE = SPARC
+#define DefineOldLibraryRules
+#ifndef SVR4
+#define SVR4
+#endif
+#ifndef ProjectRoot
+#define ProjectRoot /usr/openwin
+#endif
+#ifndef LinkArchivedBms
+#define LinkArchivedBms YES
+#endif
+#ifndef LinkArchivedSoftLib
+#define LinkArchivedSoftLib     YES
+#endif
+#ifndef LinkArchivedXdmcp
+#define LinkArchivedXdmcp YES
+#endif
+#ifndef BuildPex
+#define BuildPex NO
+#endif
+
+#ifndef UseExportLists
+#define UseExportLists YES
+#endif
+
+#ifndef BInstallCmd
+#define BInstallCmd /usr/sbin/install
+#endif
+
+#ifndef DefaultUserPath			
+#define DefaultUserPath   $(BINDIR):/bin:/usr/bin:/usr/ucb
+#endif
+
+/* adds date to binstall path on system */
+/* Be sure to set BInstallTop in either BuildTree.Name or treedefines
+*/
+#ifndef BInstallDate
+#define BInstallDate `date +/%m_%d`
+#endif
+
+#ifndef UseInstalledBuildInTree
+#define UseInstalledBuildInTree YES
+#endif
+
+
+/* Forces use of library macros from sv4Lib.tmpl. Ignores macros
+ * in Project.tmpl.
+ */
+#ifndef UseVendorLibraryDefinitions
+#define UseVendorLibraryDefinitions YES
+#endif
+
+/* define USE_XT_FROM_SYSTEM_ONLY so we build using system libXt.a */
+#ifndef USE_XT_FROM_SYSTEM_ONLY
+#define USE_XT_FROM_SYSTEM_ONLY YES
+#endif
+
+#ifndef CPlusPlusPositionIndependentCFlags
+#define CPlusPlusPositionIndependentCFlags -xF -PIC
+#endif
+
+/* -xstrconst flag for optimizing shared libraries. */ 
+
+#ifndef PositionIndependentCFlags
+#define PositionIndependentCFlags -xF -K PIC -xstrconst
+#endif
+
+#ifndef SharedClientLoadFlags
+#define SharedClientLoadFlags -R $(DTUSRLIBDIR):/usr/openwin/lib
+#endif
+
+/* For Sun shared libraries, override the definition in sv4Lib.rules */
+
+#ifdef SharedLibraryLoadFlags
+#undef SharedLibraryLoadFlags
+#endif
+
+#ifndef GPROF
+#define SharedLibraryLoadFlags -G -z defs -z text -R $(DTUSRLIBDIR):/usr/openwin/lib
+#else
+#define SharedLibraryLoadFlags -G -z text -R $(DTUSRLIBDIR):/usr/openwin/lib -L/usr/lib -B dynamic -lc
+#endif
+
+#ifdef SVR4
+#define OSName            SunOS 5.0
+XCOMM operating system:  OSName
+#ifndef OSMajorVersion
+#define OSMajorVersion    5
+#endif
+#ifndef OSMinorVersion
+#define OSMinorVersion    3
+#endif
+#ifndef OSTeenyVersion
+#define OSTeenyVersion    0
+#endif
+#ifndef CPlusPlusLibPath
+#define CPlusPlusLibPath -L /opt/SUNWspro/lib
+#endif
+
+#ifndef StandardDefines
+#define StandardDefines OsDefines LargeFiles ArchDefines DebugDefines InternationalDefines 
+#endif
+
+#ifndef OsDefines
+#define OsDefines -DSVR4 -Dsun
+#endif /* OsDefines */
+
+#ifndef LargeFiles
+#define LargeFiles -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
+#endif
+
+/* To disable Large Filesystem compiles, local Imakefiles may add   */
+/* the NoLargeFiles macro to end of their EXTRA_DEFINES definition  */
+ 
+#ifndef NoLargeFiles
+#define NoLargeFiles -U_LARGEFILE64_SOURCE -U_FILE_OFFSET_BITS
+#endif
+
+/* Define some subarchitectures; sparc, i386 and ppc */
+
+#if defined(sparc)
+#define SunSparcArchitecture
+#elif defined(i386)
+#define SunIntelArchitecture
+#elif defined(__ppc)
+#define SunPpcArchitecture
+#endif
+
+#ifndef ArchDefines
+#if defined(SunSparcArchitecture)
+#define ArchDefines -Dsparc -D__sparc
+#elif defined(SunIntelArchitecture)
+#define ArchDefines -Di386 -D__i386
+#elif defined(SunPpcArchitecture)
+#define ArchDefines -Dppc -D__ppc
+#else
+#define ArchDefines
+#endif
+#endif /* ArchDefines */
+
+/* SunPro compiler version; SC4.0 on sparc/ppc, SC3.0.1 on i386 */
+
+#ifndef SunProMajorVersion
+#if defined(SunIntelArchitecture)
+#define SunProMajorVersion 3
+#else
+#define SunProMajorVersion 4
+#endif
+#endif /* SunProMajorVersion */
+
+#ifndef DebugDefines
+#ifndef DEBUGTREE
+#define DebugDefines -DNDEBUG
+#else
+#define DebugDefines
+#endif
+#endif /* DebugDefines */
+
+#ifndef InternationalDefines
+#define InternationalDefines -DMULTIBYTE -DNLS16 -DMESSAGE_CAT -D_XOPEN_VERSION=4 -D_XOPEN_SOURCE -D__EXTENSIONS__
+#endif /* InternationalDefines */
+
+#define NeedFunctionPrototypes  YES
+#define NeedConstPrototypes  YES
+#define NeedVarargsPrototypes  YES
+#define NeedNestedPrototypes  YES
+#define NeedWidePrototypes  YES
+
+#define ExtraLibraries /usr/ccs/lib/values-xpg4.o 
+
+#else
+#define OSName            SunOS 4.1.2
+XCOMM operating system:  OSName
+#define OSMajorVersion    4
+#define OSMinorVersion    1
+#define OSTeenyVersion    2
+#endif
+
+#if OSMajorVersion < 4 || (OSMajorVersion == 4 && OSMinorVersion < 1)
+/* We do not guarantee this will work */
+#define BootstrapCFlags   -DNOSTDHDRS
+#define StandardDefines   -DNOSTDHDRS
+#endif
+
+/* You ALSO need this if you have Sun ld patch 100170-06 or later to 4.1.1 */
+#if OSMajorVersion == 4 && (OSMinorVersion > 1 || (OSMinorVersion == 1 && OSTeenyVersion > 1))
+#define SunPost411FCSLd	  YES
+#endif
+
+#if OSMajorVersion > 4
+#define BootstrapCFlags	  -DSVR4
+#define ArCmdBase	  /usr/ccs/bin/ar
+#define AsCmd		  /usr/ccs/bin/as
+#define CppCmd		  /usr/ccs/lib/cpp
+
+#ifndef GPROF
+#define LdCmd		  /usr/ccs/bin/ld
+#else
+#define LdCmd		  cc -xpg
+#endif
+
+#define LexCmd		  /usr/ccs/bin/lex
+#define YaccCmd		  /usr/ccs/bin/yacc
+#define SystemV4	  YES
+#define HasSockets	  YES
+#define InstKmemFlags	  -g sys -m 2755
+#define CppTextFlags	  -P -C -Xs
+#include <sv4Lib.rules>
+#else
+#define InstKmemFlags	  -g kmem -m 2755
+#include <sunLib.rules>
+#endif
+
+#define HasSaberC	  YES
+#define HasNdbm		  YES
+#define HasShm		  YES
+#define HasSecureRPC	  YES
+#define SetTtyGroup	  YES
+#define HasPutenv	  YES
+#define XsunServer	  YES		/* has color and mono support */
+#define XsunMonoServer	  YES		/* monochrome only */
+
+#if HasGcc
+#if HasGcc2
+#define OptimizedCDebugFlags -O2
+#else
+#define SharedLibraryCcCmd cc
+#define ExtraLoadFlags -B/usr/bin/
+#define AllocateLocalDefines /**/
+#endif
+
+.c.o:
+	$(CC) -c $(CFLAGS) $*.c
+
+#else
+
+#define AllocateLocalDefines -DINCLUDE_ALLOCA_H
+
+/*** Not used 
+#ifdef Sun3Architecture
+#define DefaultCCOptions -f68881 -pipe
+#else
+#if OSMajorVersion < 5
+#define DefaultCCOptions -pipe
+#endif
+#endif
+****/
+
+#ifndef DefaultCCOptions
+#define DefaultCCOptions -Xc
+#endif
+
+#define PexCCOptions DefaultCCOptions
+
+#ifndef DefaultCPlusPlusOptions
+#define DefaultCPlusPlusOptions -noex
+#endif
+
+#ifndef ArchLibraryCCOptions
+#if defined(SunSparcArchitecture) && SunProMajorVersion > 3
+#define ArchLibraryCCOptions -xregs=no%appl
+#else
+#define ArchLibraryCCOptions
+#endif
+#endif /* ArchLibraryCCOptions */
+
+#ifndef LibraryCCOptions
+#define LibraryCCOptions -Xc ArchLibraryCCOptions
+#endif /* LibraryCCOptions */
+
+#endif
+
+#if OSMajorVersion < 5
+#define SharedAllocateLocalDefines -DINCLUDE_ALLOCA_H
+#endif
+
+#ifndef UseSunWindowsInServer
+#define UseSunWindowsInServer	NO	/* link in SunWindows support? */
+#endif
+
+#if UseSunWindowsInServer
+#define SunWindowsDefines -DSUN_WINDOWS
+#else
+#define SunWindowsDefines /* as nothing */
+#endif
+
+#define ServerOSDefines SunWindowsDefines AllocateLocalDefines
+
+
+/*	SunSoft CDE Package Definitions
+ *	By Eric Nielsen
+ */
+
+#ifndef CDE_PACK_VER
+#define CDE_PACK_VER 10
+#endif
+  
+#ifndef CDE_PACK_DATE
+#define CDE_PACK_DATE `date +%y.%m.%d`
+#endif
+
+#ifndef BUILD_TREE
+#define BUILD_TREE $(TOP)
+#endif
+ 
+#ifndef BUILD_ARCH
+#define BUILD_ARCH `uname -p`
+#endif
+
+#ifndef McsMessage
+#define McsMessage "`grep SDtVERSION_STRING $(TOP)/binstall/include/Dt/Dt.h | awk '{print $$3 $$4 $$5 $$6 $$7 $$8}'`:`uname -p`:`date '+%d%b%y-%H:%M:%S'`"
+#endif
+
+
+/*
+ * define sun strip pass
+ */
+
+#ifndef StripCmd
+#define StripCmd strip -x
+#endif
+
+#ifndef StripProgram
+#ifndef DEBUGTREE
+	STRIP = StripCmd
+#define Strip() \
+	mcs -d -a McsMessage $@						@@\
+	$(STRIP) $@
+#else
+#define Strip() \
+	mcs -d -a McsMessage $@
+#endif
+#endif

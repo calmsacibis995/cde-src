@@ -1,0 +1,412 @@
+XCOMM
+XCOMM 	$XConsortium: Imakefile /main/cde1_maint/7 1995/10/23 10:59:32 rcs $
+XCOMM
+XCOMM 	@(#)Imakefile	1.103 27 Mar 1995
+XCOMM
+XCOMM 	RESTRICTED CONFIDENTIAL INFORMATION:
+XCOMM	
+XCOMM	The information in this document is subject to special
+XCOMM	restrictions in a confidential disclosure agreement between
+XCOMM	HP, IBM, Sun, USL, SCO and Univel.  Do not distribute this
+XCOMM	document outside HP, IBM, Sun, USL, SCO, or Univel without
+XCOMM	Sun's specific written approval.  This document and all copies
+XCOMM	and derivative works thereof must be returned or destroyed at
+XCOMM	Sun's request.
+XCOMM
+XCOMM	Copyright 1993 Sun Microsystems, Inc.  All rights reserved.
+XCOMM
+XCOMM
+
+#define IHaveSubdirs
+#define PassCDebugFlags 'CDEBUGFLAGS=$(CDEBUGFLAGS)'
+
+#include "../ab.tmpl"
+#include "../ab.rules"
+
+SUBDIRS = \
+	help
+
+#ifndef USLArchitecture
+     LINKCC = $(PURIFY) cc 
+#endif
+
+    INCLUDES = -I. -I$(ABINCLUDES)
+
+INSTALLFLAGS = $(INSTINCFLAGS)
+
+    LINTLIBS = $(LINTXLIB) $(LINTXTOOL)
+
+     DEFINES = -DPIXMAP_WORKAROUND
+
+#ifdef CCOPTIONS  
+#undef CCOPTIONS
+#endif
+CCOPTIONS = -Xa
+  
+#ifdef EXTRA_CCOPTIONS
+#undef EXTRA_CCOPTIONS
+#endif
+EXTRA_CCOPTIONS = -D_POSIX_SOURCE=1 -Xa -xF
+
+
+#ifndef GeneratedUISource
+#define GeneratedUISource(macro, suffix)	@@\
+macro =					\@@\
+Concat(dtb_utils,suffix)		\@@\
+Concat(appfw_ui,suffix)			\@@\
+Concat(brws_ui,suffix)			\@@\
+Concat(color_chooser_ui,suffix)		\@@\
+Concat(conn_ui,suffix)			\@@\
+Concat(dnd_ed_ui,suffix)		\@@\
+Concat(help_ed_ui,suffix)		\@@\
+Concat(attch_ed_ui,suffix)		\@@\
+Concat(proj_ui,suffix)			\@@\
+Concat(revolv_ui,suffix)		\@@\
+Concat(button_ui,suffix)		\@@\
+Concat(choice_ui,suffix)		\@@\
+Concat(combobox_ui,suffix)		\@@\
+Concat(cpanel_ui,suffix)		\@@\
+Concat(custdlg_ui,suffix)		\@@\
+Concat(drawp_ui,suffix)			\@@\
+Concat(group_ui,suffix)			\@@\
+Concat(label_ui,suffix)			\@@\
+Concat(list_ui,suffix)			\@@\
+Concat(mainwin_ui,suffix)		\@@\
+Concat(menu_ui,suffix)			\@@\
+Concat(menubar_ui,suffix)		\@@\
+Concat(scale_ui,suffix)			\@@\
+Concat(sep_ui,suffix)			\@@\
+Concat(spinbox_ui,suffix)		\@@\
+Concat(termp_ui,suffix)			\@@\
+Concat(textf_ui,suffix)			\@@\
+Concat(textp_ui,suffix)			\@@\
+Concat(cgen_win_ui,suffix)		\@@\
+Concat(cgen_props_ui,suffix)		\@@\
+Concat(cgen_env_ui,suffix)		\@@\
+Concat(fchooser_ui,suffix)		\@@\
+Concat(message_ed_ui,suffix)		\@@\
+Concat(panedwin_ed_ui,suffix)		\@@\
+Concat(palette_ui,suffix)		\@@\
+Concat(about_box_ui,suffix)
+#endif
+GeneratedUISource(TARGETS.h,.h)
+GeneratedUISource(TARGETS.c,.c)
+GeneratedUISource(TARGETS.o,.o)
+
+TARGETS.h.merged = \
+	dtbuilder.h
+
+#ifndef GeneratedStubsSource
+#define GeneratedStubsSource(macro, suffix)	@@\
+macro =						\@@\
+Concat(appfw_stubs,suffix)			\@@\
+Concat(brws_stubs,suffix)			\@@\
+Concat(color_chooser_stubs,suffix)		\@@\
+Concat(conn_stubs,suffix)			\@@\
+Concat(dnd_ed_stubs,suffix)			\@@\
+Concat(help_ed_stubs,suffix)			\@@\
+Concat(attch_ed_stubs,suffix)			\@@\
+Concat(proj_stubs,suffix)			\@@\
+Concat(revolv_stubs,suffix)			\@@\
+Concat(button_stubs,suffix)			\@@\
+Concat(choice_stubs,suffix)			\@@\
+Concat(combobox_stubs,suffix)			\@@\
+Concat(cpanel_stubs,suffix)			\@@\
+Concat(custdlg_stubs,suffix)			\@@\
+Concat(drawp_stubs,suffix)			\@@\
+Concat(group_stubs,suffix)			\@@\
+Concat(label_stubs,suffix)			\@@\
+Concat(list_stubs,suffix)			\@@\
+Concat(mainwin_stubs,suffix)			\@@\
+Concat(menu_stubs,suffix)			\@@\
+Concat(menubar_stubs,suffix)			\@@\
+Concat(scale_stubs,suffix)			\@@\
+Concat(sep_stubs,suffix)			\@@\
+Concat(spinbox_stubs,suffix)			\@@\
+Concat(termp_stubs,suffix)			\@@\
+Concat(textf_stubs,suffix)			\@@\
+Concat(textp_stubs,suffix)			\@@\
+Concat(cgen_win_stubs,suffix)			\@@\
+Concat(cgen_props_stubs,suffix)			\@@\
+Concat(cgen_env_stubs,suffix)			\@@\
+Concat(fchooser_stubs,suffix)			\@@\
+Concat(message_ed_stubs,suffix)			\@@\
+Concat(palette_stubs,suffix)			\@@\
+Concat(about_box_stubs,suffix)
+#endif
+GeneratedStubsSource(TARGETS.c.stubs,.c)
+GeneratedStubsSource(TARGETS.o.stubs,.o)
+
+TARGETS.c.merged = \
+	dtbuilder.c \
+	$(TARGETS.c.stubs)
+
+SOURCES.h = $(TARGETS.h.merged) $(TARGETS.h)
+
+SOURCES.c = $(TARGETS.c.merged) $(TARGETS.c)
+
+
+SOURCES.h.shipped =
+
+SOURCES.h.shared = \
+		$(TARGETS.h)	\
+		ab.h		\
+		ab_resources.h	\
+		ab_utils.h	\
+		abobj.h		\
+		abobj_edit.h	\
+		abobj_list.h	\
+		abobj_set.h	\
+		abobjP.h	\
+		ab_bil.h	\
+		ab_dnd.h	\
+		appfw.h		\
+		attch_ed.h	\
+		brws.h		\
+		brwsP.h		\
+		cgen.h		\
+		color_chooser.h	\
+		conn.h		\
+		connP.h		\
+		dtbuilder.h	\
+		help.h		\
+		message.h	\
+		pal.h		\
+		proj.h		\
+		projP.h		\
+		prop.h		\
+		propP.h		\
+		tmode.h		\
+		tmodeP.h	\
+		ui_util.h	\
+		vwr.h		\
+		x_util.h
+
+SOURCES.h.unshared = \
+		abobjP.h
+
+SOURCES.msg = \
+		dtbuilder.msg 	\
+		../libAButil/libAButil.msg \
+		../libABobjXm/libABobjXm.msg \
+		../libABil/libABil.msg
+
+#ifndef UngeneratedSource
+#define UngeneratedSource(macro, suffix)	@@\
+macro =						\@@\
+Concat(ab_utils,suffix)				\@@\
+Concat(ab_bil,suffix)				\@@\
+Concat(ab_dnd,suffix)				\@@\
+Concat(ab_globals,suffix)			\@@\
+Concat(abobj_align,suffix)			\@@\
+Concat(abobj_edit,suffix)			\@@\
+Concat(abobj_list,suffix)			\@@\
+Concat(abobj_events,suffix)			\@@\
+Concat(abobj_layers,suffix)			\@@\
+Concat(abobj_layout,suffix)			\@@\
+Concat(abobj_menu,suffix)			\@@\
+Concat(abobj_move,suffix)			\@@\
+Concat(abobj_resize,suffix)			\@@\
+Concat(abobj_select,suffix)			\@@\
+Concat(abobj_set,suffix)			\@@\
+Concat(abobj_util,suffix)			\@@\
+Concat(brws,suffix)				\@@\
+Concat(brws_find,suffix)			\@@\
+Concat(brws_mthds,suffix)			\@@\
+Concat(brws_utils,suffix)			\@@\
+Concat(cgen_utils,suffix)			\@@\
+Concat(conn_drag,suffix)			\@@\
+Concat(conn_interpret,suffix)			\@@\
+Concat(conn_obj,suffix)				\@@\
+Concat(dtbuilder,suffix)			\@@\
+Concat(pal,suffix)				\@@\
+Concat(pal_create,suffix)			\@@\
+Concat(pal_button,suffix)			\@@\
+Concat(pal_choice,suffix)			\@@\
+Concat(pal_combobox,suffix)			\@@\
+Concat(pal_cpanel,suffix)			\@@\
+Concat(pal_custdlg,suffix)			\@@\
+Concat(pal_drawp,suffix)			\@@\
+Concat(pal_fchooser,suffix)			\@@\
+Concat(pal_group,suffix)			\@@\
+Concat(pal_label,suffix)			\@@\
+Concat(pal_list,suffix)				\@@\
+Concat(pal_mainwin,suffix)			\@@\
+Concat(pal_menu,suffix)				\@@\
+Concat(pal_menubar,suffix)			\@@\
+Concat(pal_panedwin,suffix)			\@@\
+Concat(pal_scale,suffix)			\@@\
+Concat(pal_sep,suffix)				\@@\
+Concat(pal_spinbox,suffix)			\@@\
+Concat(pal_termp,suffix)			\@@\
+Concat(pal_textf,suffix)			\@@\
+Concat(pal_textp,suffix)			\@@\
+Concat(proj,suffix)				\@@\
+Concat(proj_utils,suffix)			\@@\
+Concat(projP_utils,suffix)			\@@\
+Concat(prop,suffix)				\@@\
+Concat(prop_items,suffix)			\@@\
+Concat(tmode,suffix)				\@@\
+Concat(tmodeP,suffix)				\@@\
+Concat(ui_msg,suffix)				\@@\
+Concat(ui_list,suffix)				\@@\
+Concat(ui_util,suffix)				\@@\
+Concat(vwr,suffix)				\@@\
+Concat(x_util,suffix)
+#endif
+UngeneratedSource(NONTGTS.c,.c)
+UngeneratedSource(NONTGTS.o,.o)
+
+SRCS = \
+		$(TARGETS.c)		\
+		$(TARGETS.c.stubs)	\
+		$(NONTGTS.c)
+OBJS = \
+		$(TARGETS.o)	\
+		$(TARGETS.o.stubs)	\
+		$(NONTGTS.o)
+
+SYS_LIBRARIES = -lm
+
+#ifdef RsArchitecture
+SYS_LIBRARIES = -lm -liconv
+#endif
+
+#ifdef	SunArchitecture
+SYS_LIBRARIES = -lm -ldl $(WIDECHARSYSLIB) -lgen
+WAITTARGET = .WAIT
+#endif	/* SunArchitecture */
+
+       PROGRAMS = dtbuilder
+   INSTALLFLAGS = -m 4755
+       LINTLIBS = $(XINPUTLIB) $(DTHELPLIB) $(DTSVCLIB) $(XMLIB) $(XTOOLLIB) $(XLIB)
+
+/* DEPLIBS contains the list of library depencies for a client.
+ * LOCAL_LIBRARIES contains the list of libraries on the link line.
+ * Generally, the dependency form of a library has DEP as a prefix.
+ * e.g. put $(XLIB) in LOCAL_LIBRARIES and $(DEPXLIB) in DEPLIBS.
+ * NOTE: if DEPLIBS is not set here, it is by default null and there
+ *       are no library dependencies for clients.
+ *       You cannot put -Llibpath into DEPLIBS. You must put actual
+ *       paths to the library.
+ */
+DEPLIBS = ../libABil/libABil.a  ../libABobjXm/libABobjXm.a  \
+	  ../libABobj/libABobj.a ../libAButil/libAButil.a $(DEPDTWIDGETLIB) \
+	  $(DEPDTTERMLIB) $(DEPDTHELPLIB) $(DEPDTSVCLIB) $(DEPTTLIB) $(DEPUILLIB) \
+	  $(DEPMRMLIB) $(DEPXMLIB) $(DEPXTOOLLIB) $(DEPXLIB)
+LOCAL_LIBRARIES = ../libABil/libABil.a  ../libABobjXm/libABobjXm.a  \
+		  ../libABobj/libABobj.a ../libAButil/libAButil.a \
+		  $(DTWIDGETLIB) $(DTTERMLIB) $(DTHELPLIB) $(DTSVCLIB) $(TTLIB) \
+		  $(UILLIB) $(MRMLIB) $(XMLIB) $(XTOOLLIB) $(XLIB)
+
+MakeSubdirs($(SUBDIRS))
+DependSubdirs($(SUBDIRS))
+
+$(OBJS):	$(SOURCES.h)
+/*
+ * Since dtcodegen depends on libXm, libDtWidget, and other libs, 
+ * it will not be built properly during make includes.
+ * So, when 'all' is made in this directory, redo make includes/depend.
+ * An imake hack no doubt, but it is necessary for now.
+ */
+all::
+
+ComplexProgramTarget(dtbuilder)
+
+AbMessageCatalogTarget(dtbuilder)
+
+clean::
+	$(RM) $(TARGETS.h) $(TARGETS.c) .dtcodegen.log *.delta
+
+CppText2Rule(Dtbuilder,Dtbuilder.src,$(LOCAL_CPP_DEFINES),)
+includes::      Dtbuilder
+
+USLCodegenLink
+
+BuildTempLinks(includes, $(TARGETS.c), ../../ab, /tmp)
+BuildTempLinks(includes, $(TARGETS.h), ../../ab, /tmp)
+
+BuildAbIncludes(shared_includes, $(SOURCES.h.shared),../include/ab_private, ../../ab)
+
+includes:: shared_includes
+sdtgilcvt:
+
+#ifdef	SunArchitecture
+dtbuilder.c + dtbuilder.h + dtb_utils.c + dtb_utils.h: dtbuilder.bip
+	$(LOCAL_DTCODEGEN) -changed -merge -p dtbuilder.bip -main
+dtbuilder.o: dtbuilder.c dtbuilder.bip $(TARGETS.h) $(TARGETS.h.merged)
+#else
+dtbuilder.c dtbuilder.h dtb_utils.c dtb_utils.h: dtbuilder.bip
+	$(LOCAL_DTCODEGEN) -changed -merge -p dtbuilder.bip -main
+dtbuilder.o: dtbuilder.c dtbuilder.bip $(TARGETS.h) $(TARGETS.h.merged)
+#endif
+
+BilTarget(appfw, dtbuilder)
+
+BilTarget(brws, dtbuilder)
+
+BilTarget(color_chooser, dtbuilder)
+
+BilTarget(conn, dtbuilder)
+
+BilTarget(dnd_ed, dtbuilder)
+
+BilTarget(help_ed, dtbuilder)
+
+BilTarget(attch_ed, dtbuilder)
+
+BilTarget(proj, dtbuilder)
+
+BilTarget(revolv, dtbuilder)
+
+BilTarget(button, dtbuilder)
+
+BilTarget(choice, dtbuilder)
+
+BilTarget(combobox, dtbuilder)
+
+BilTarget(cpanel, dtbuilder)
+
+BilTarget(custdlg, dtbuilder)
+
+BilTarget(drawp, dtbuilder)
+
+BilTarget(group, dtbuilder)
+
+BilTarget(label, dtbuilder)
+
+BilTarget(list, dtbuilder)
+
+BilTarget(mainwin, dtbuilder)
+
+BilTarget(menu, dtbuilder)
+
+BilTarget(menubar, dtbuilder)
+
+BilTarget(scale, dtbuilder)
+
+BilTarget(sep, dtbuilder)
+
+BilTarget(spinbox, dtbuilder)
+
+BilTarget(termp, dtbuilder)
+
+BilTarget(textf, dtbuilder)
+
+BilTarget(textp, dtbuilder)
+
+BilTarget(cgen_win, dtbuilder)
+
+BilTarget(cgen_props, dtbuilder)
+
+BilTarget(cgen_env, dtbuilder)
+
+BilTarget(fchooser, dtbuilder)
+
+BilTarget(message_ed, dtbuilder)
+
+BilTarget(panedwin_ed, dtbuilder)
+
+BilTarget(palette, dtbuilder)
+
+BilTarget(about_box, dtbuilder)

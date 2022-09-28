@@ -1,0 +1,38 @@
+.TH Signal Desktop "04 Apr 1994" "SunSoft" "ToolTalk Policy"
+.SH NAME
+.PP
+Signal - send a (POSIX-style) signal to a tool
+.SH SYNOPSIS
+.so ../.synopsis
+	Signal(	in	string	\fItheSignal\f(CW );
+.ft
+.fn
+.SH DESCRIPTION
+.PP
+This request asks the handling procid to send itself the
+indicated POSIX signal.
+.SH REQUIRED ARGUMENTS
+.TP
+\f(CWstring\fR \fItheSignal\fR
+The signal to send.
+.SH EXAMPLES
+.PP
+.BR ttdt_session_join ()
+can be used to register for and transparently process this message.
+.PP
+This message can be sent like so:
+.nf
+.ft CW
+.ps -2
+Tt_message msg = tttk_message_create( 0, TT_REQUEST, TT_SESSION,
+			the_recipient_procid, TTDT_SIGNAL,
+			my_callback );
+tt_message_arg_add( msg, TT_IN, Tttk_string, "SIGHUP" );
+tt_message_send( msg );
+.ps
+.ft
+.fi
+.SH WARNINGS
+.PP
+\f(CWSignal()\fR
+.so .edict

@@ -1,0 +1,538 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH XmLabel 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmLabel\fP \- The Label widget class
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/Label.h>
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+Label is an instantiable widget and is also used as a superclass for
+other button widgets, such as PushButton and ToggleButton.  The Label
+widget does not accept any button or key input, and the help
+callback is the only callback defined.  Label also receives enter
+and leave events.
+.PP 
+Label can contain either text or a pixmap.  Label text is a
+compound string.  Refer to the \fBOSF/Motif Programmer's
+Guide\fP for more information on compound strings.
+The text can be multilingual,
+multiline, and/or multifont.  When a Label is insensitive, its text is
+stippled, or the user-supplied insensitive pixmap is displayed.
+.PP 
+Label supports both accelerators and mnemonics primarily for use in
+Label subclass widgets that are contained in menus.
+Mnemonics are available in a menu system when the button is visible.
+Accelerators in a menu system are accessible even when the button is not
+visible.
+The Label widget displays the mnemonic by underlining the first matching
+character in the text string.
+The accelerator is displayed
+as a text string adjacent to the label text or pixmap.
+.PP 
+Label consists of many margin fields surrounding the text or pixmap.
+These margin fields are resources that may
+be set by the user, but Label subclasses and Manager parents also
+modify some of these fields.  They tend to modify the
+\fIXmNmarginLeft\fP, \fIXmNmarginRight\fP, \fIXmNmarginTop\fP, and
+\fIXmNmarginBottom\fP resources and leave the \fIXmNmarginWidth\fP and
+\fIXmNmarginHeight\fP resources as set by the application.
+.PP
+Label takes into account \fIXmNshadowThickness\fP in determining
+its layout but does not draw the shadow.  That is, if \fIXmNshadowThickness\fP
+is greater than 0, Label leaves space for the shadow, but the shadow
+does not appear.
+.PP 
+In a Label \fIXmNtraversalOn\fP and \fIXmNhighlightOnEnter\fP are forced
+to False inside Popup MenuPanes, Pulldown MenuPanes, and OptionMenus.
+Otherwise these resources default to False.
+.SS "Classes"
+Label inherits behavior and resources from
+\fICore\fP and \fIXmPrimitive\fP Classes.
+.PP 
+The class pointer is \fIxmLabelWidgetClass\fP.
+.PP 
+The class name is \fIXmLabel\fP.
+.SS "New Resources"
+The following table defines a set of widget resources used by the programmer
+to specify data.  The programmer can also set the resource values for the
+inherited classes to set attributes for this widget.  To reference a
+resource by name or by class in a .Xdefaults file, remove the \fIXmN\fP or
+\fIXmC\fP prefix and use the remaining letters.  To specify one of the defined
+values for a resource in a .Xdefaults file, remove the \fIXm\fP prefix and use
+the remaining letters (in either lowercase or uppercase, but include any
+underscores between words).
+The codes in the access column indicate if the given resource can be
+set at creation time (C),
+set by using \fIXtSetValues\fP (S),
+retrieved by using \fIXtGetValues\fP (G),
+or is not applicable (N/A).
+.P 
+.wH
+.in 0 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmLabel Resource Set
+Name	Class	Type	Default	Access
+_
+XmNaccelerator	XmCAccelerator	String	NULL	CSG
+XmNacceleratorText	XmCAcceleratorText	XmString	NULL	CSG
+XmNalignment	XmCAlignment	unsigned char	dynamic	CSG
+XmNfontList	XmCFontList	XmFontList	dynamic	CSG
+XmNlabelInsensitivePixmap	XmCLabelInsensitivePixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNlabelPixmap	XmCLabelPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNlabelString	XmCXmString	XmString	dynamic	CSG
+XmNlabelType	XmCLabelType	unsigned char	XmSTRING	CSG
+XmNmarginBottom	XmCMarginBottom	Dimension	0	CSG
+XmNmarginHeight	XmCMarginHeight	Dimension	2	CSG
+XmNmarginLeft	XmCMarginLeft	Dimension	0	CSG
+XmNmarginRight	XmCMarginRight	Dimension	0	CSG
+XmNmarginTop	XmCMarginTop	Dimension	0	CSG
+XmNmarginWidth	XmCMarginWidth	Dimension	2	CSG
+.wH
+.tH
+XmNmnemonic	XmCMnemonic	KeySym	NULL	CSG
+XmNmnemonicCharSet	XmCMnemonicCharSet	String	XmFONTLIST_DEFAULT_TAG	CSG
+XmNrecomputeSize	XmCRecomputeSize	Boolean	True	CSG
+XmNstringDirection	XmCStringDirection	XmStringDirection	dynamic	CSG
+.TE
+.KE
+.in
+.sp 1
+.wH
+.in  
+.IP "\fIXmNaccelerator\fP"
+Sets the accelerator on a button widget in a menu, which
+activates a visible or invisible, but managed, button from the keyboard.
+This resource is a string that describes a set of modifiers
+and the key that may be used to select the button.
+The format of this string
+is identical to that used by the translations manager, with the exception
+that only a single event may be specified and only \fIKeyPress\fP events are
+allowed.
+.PP
+Accelerators for buttons are supported only for
+PushButtons and ToggleButtons in Pulldown and Popup MenuPanes.
+.IP "\fIXmNacceleratorText\fP"
+Specifies the text displayed
+for the accelerator.
+The text is displayed adjacent to the label
+string or pixmap.
+Accelerator text for buttons is displayed only for
+PushButtons and ToggleButtons in Pulldown and Popup Menus.
+.IP "\fIXmNalignment\fP"
+Specifies the label alignment for text or pixmap.
+.wH
+.rS 
+.TP
+\(bu
+\fIXmALIGNMENT_BEGINNING\fP (left alignment) \- causes the left sides of
+the lines of text to be vertically aligned with the
+left edge of the widget window.  For a pixmap, its left side is vertically
+aligned with the left edge of the widget window.
+.TP
+\(bu
+\fIXmALIGNMENT_CENTER\fP (center alignment) \- causes the centers of the lines of text to be vertically aligned
+.ne 5
+in the center of the widget window.  For a pixmap, its center is vertically aligned with the
+center of the widget window.
+.TP
+\(bu
+\fIXmALIGNMENT_END\fP (right alignment) \- causes the right sides of the
+lines of text to be vertically aligned with the
+right edge of the widget window.  For a pixmap, its right side is vertically
+aligned with the right edge of the widget window.
+.wH
+.rE
+.PP
+The above descriptions for text are correct when \fIXmNstringDirection\fP is
+\fIXmSTRING_DIRECTION_L_TO_R\fP.  When that resource is
+\fIXmSTRING_DIRECTION_R_TO_L\fP, the descriptions for
+\fIXmALIGNMENT_BEGINNING\fP and \fIXmALIGNMENT_END\fP are switched.
+.PP
+If the parent is a RowColumn whose \fIXmNisAligned\fP resource is True,
+\fIXmNalignment\fP is forced to the same value as the RowColumn's
+\fIXmNentryAlignment\fP if the RowColumn's \fIXmNrowColumnType\fP is
+\fIXmWORK_AREA\fP or if the widget is a subclass of XmLabel.
+Otherwise, the default is \fIXmALIGNMENT_CENTER\fP.
+.IP "\fIXmNfontList\fP"
+Specifies the font of the text used in the widget.  If this value is
+NULL at initialization, the font  list is initialized by looking up
+the parent hierarchy of the widget for an ancestor that is a subclass
+of the XmBulletinBoard, VendorShell, or XmMenuShell widget class.  If
+such  an ancestor is found, the font list is initialized to the
+\fIXmNbuttonFontList\fP  (for button subclasses) or
+\fIXmNlabelFontList\fP of the ancestor widget.  If no such ancestor
+is found, the default is implementation dependent.  Refer to
+\fIXmFontList(3X)\fP for more information on the creation and
+structure of a font list.
+.IP "\fIXmNlabelInsensitivePixmap\fP"
+Specifies a pixmap used as the button face if \fIXmNlabelType\fP is
+\fIXmPIXMAP\fP and the button is insensitive.
+The default value, \fIXmUNSPECIFIED_PIXMAP\fP, displays an empty label.
+.IP "\fIXmNlabelPixmap\fP"
+Specifies the pixmap when \fIXmNlabelType\fP is
+\fIXmPIXMAP\fP.
+The default value, \fIXmUNSPECIFIED_PIXMAP\fP, displays an empty label.
+.IP "\fIXmNlabelString\fP"
+Specifies the compound string when the \fIXmNlabelType\fP is
+\fIXmSTRING\fP.
+If this value is NULL, it is initialized by converting the name
+of the widget to a compound string.
+Refer to \fIXmString(3X)\fP
+for more information on the
+creation and structure of compound strings.
+.IP "\fIXmNlabelType\fP"
+Specifies the label type.
+.wH
+.rS 
+.TP
+\(bu
+\fIXmSTRING\fP \- displays text using \fIXmNlabelString\fP.
+.TP
+\(bu
+\fIXmPIXMAP\fP \- displays pixmap using \fIXmNlabelPixmap\fP or
+\fIXmNlabelInsensitivePixmap\fP.
+.wH
+.rE
+.IP "\fIXmNmarginBottom\fP"
+Specifies the amount of spacing between the bottom of the label text
+and the top of the bottom margin specified by \fIXmNmarginHeight\fP.
+This may be modified by Label's
+subclasses.  For example, CascadeButton may increase this field to make
+room for the cascade pixmap.
+.IP "\fIXmNmarginHeight\fP"
+Specifies an equal amount of spacing above the margin 
+defined by \fIXmNmarginTop\fP and below the margin defined by
+\fIXmNmarginBottom\fP. \fIXmNmarginHeight\fP specifies the amount
+of spacing between the top edge of the margin set by \fIXmNmarginTop\fP
+and the bottom edge of the top shadow, and the amount of spacing between
+the bottom edge of the margin specified by \fIXmNmarginBottom\fP and the
+top edge of the bottom shadow.
+.IP "\fIXmNmarginLeft\fP"
+Specifies the amount of spacing between the left edge of the label text
+and the right side of the left margin (specified by \fIXmNmarginWidth\fP).
+This may be modified by Label's
+subclasses.  For example, ToggleButton may increase this field to make room
+for the toggle indicator and for spacing between the indicator and label.
+Whether this actually applies to the left or right side of the label may
+depend on the value of \fIXmNstringDirection\fP.
+.IP "\fIXmNmarginRight\fP"
+Specifies the amount of spacing between the right edge of the label text
+and the left side of the right margin (specified by \fIXmNmarginWidth\fP).
+This may be modified by Label's
+subclasses.  For example, CascadeButton may increase this field to make room
+for the cascade pixmap.
+Whether this actually applies to the left or right side of the label may
+depend on the value of \fIXmNstringDirection\fP.
+.nL
+.ne 6
+.IP "\fIXmNmarginTop\fP"
+Specifies the amount of spacing between the top of the label text and
+the bottom of the top margin specified by \fIXmNmarginHeight\fP.
+This may be modified by Label's subclasses.  For example, CascadeButton
+may increase this field to make room for the cascade pixmap.
+.IP "\fIXmNmarginWidth\fP"
+Specifies an equal amount of spacing to the left of the margin defined
+by \fIXmNmarginLeft\fP and to the right of the margin defined by
+\fIXmNmarginRight\fP.  \fIXmNmarginWidth\fP specifies the amount
+of spacing between the left edge of the margin set by \fIXmNmarginLeft\fP
+and the right edge of the left shadow, and the amount of spacing between
+the right edge of the margin specified by \fIXmNmarginRight\fP and the
+left edge of the right shadow.
+.IP "\fIXmNmnemonic\fP"
+Provides the user with an alternate means of activating a button.
+A button in a MenuBar, a Popup MenuPane, or a Pulldown
+MenuPane can have a mnemonic.
+.PP
+This resource contains a keysym as listed in the X11 keysym table.
+The first character in the label string that exactly matches
+the mnemonic in the character set specified in
+\fIXmNmnemonicCharSet\fP
+is underlined when the button is displayed.
+.PP
+When a mnemonic has been specified, the user activates the button by
+pressing the mnemonic key while the button is visible.
+If the button is a CascadeButton in a MenuBar and the MenuBar does not
+have the focus, the user must use the \fIMAlt\fP modifier while
+pressing the mnemonic.
+The user can activate the button by pressing either the shifted or the
+unshifted mnemonic key.
+.IP "\fIXmNmnemonicCharSet\fP"
+Specifies the character set of the mnemonic for the label.
+The default is \fIXmFONTLIST_DEFAULT_TAG\fP.
+.nL
+.ne 15
+.IP "\fIXmNrecomputeSize\fP"
+Specifies a Boolean value that indicates whether the widget 
+shrinks or expands to accommodate its contents (label string or
+pixmap) as a result of an \fIXtSetValues\fP resource value that
+would change the size of the widget.  If True, the widget shrinks
+or expands to exactly fit the label string or pixmap.
+If False, the widget never attempts to change size on its own.
+.IP "\fIXmNstringDirection\fP"
+Specifies the direction in which the string is to be drawn.  The
+following are the values:
+.TP
+\(bu
+\fIXmSTRING_DIRECTION_L_TO_R\fP \- left to right
+.TP
+\(bu
+\fIXmSTRING_DIRECTION_R_TO_L\fP \- right to left
+.PP 
+The default for this resource is determined at creation time.
+If no value is specified for this resource and the widget's parent is a
+manager, the value is inherited from the parent; otherwise, it defaults
+to \fIXmSTRING_DIRECTION_L_TO_R\fP.
+.SS "Inherited Resources"
+Label inherits behavior and resources from the following
+superclasses.  For a complete description of each resource, refer to the
+man page for that superclass.
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmPrimitive Resource Set
+Name	Class	Type	Default	Access
+_
+XmNbottomShadowColor	XmCBottomShadowColor	Pixel	dynamic	CSG
+XmNbottomShadowPixmap	XmCBottomShadowPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNforeground	XmCForeground	Pixel	dynamic	CSG
+XmNhelpCallback	XmCCallback	XtCallbackList	NULL	C
+XmNhighlightColor	XmCHighlightColor	Pixel	dynamic	CSG
+XmNhighlightOnEnter	XmCHighlightOnEnter	Boolean	False	CSG
+XmNhighlightPixmap	XmCHighlightPixmap	Pixmap	dynamic	CSG
+XmNhighlightThickness	XmCHighlightThickness	Dimension	0	CSG
+.wH
+.tH
+XmNnavigationType	XmCNavigationType	XmNavigationType	XmNONE	CSG
+XmNshadowThickness	XmCShadowThickness	Dimension	0	CSG
+XmNtopShadowColor	XmCTopShadowColor	Pixel	dynamic	CSG
+XmNtopShadowPixmap	XmCTopShadowPixmap	Pixmap	dynamic	CSG
+XmNtraversalOn	XmCTraversalOn	Boolean	False	CSG
+XmNunitType	XmCUnitType	unsigned char	dynamic	CSG
+XmNuserData	XmCUserData	XtPointer	NULL	CSG
+.TE
+.KE
+.in
+.sp 1
+.P 
+.wH
+.in 0 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+Core Resource Set
+Name	Class	Type	Default	Access
+_
+XmNaccelerators	XmCAccelerators	XtAccelerators	dynamic	CSG
+XmNancestorSensitive	XmCSensitive	Boolean	dynamic	G
+XmNbackground	XmCBackground	Pixel	dynamic	CSG
+XmNbackgroundPixmap	XmCPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNborderColor	XmCBorderColor	Pixel	XtDefaultForeground	CSG
+XmNborderPixmap	XmCPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNborderWidth	XmCBorderWidth	Dimension	0	CSG
+XmNcolormap	XmCColormap	Colormap	dynamic	CG
+XmNdepth	XmCDepth	int	dynamic	CG
+XmNdestroyCallback	XmCCallback	XtCallbackList	NULL	C
+XmNheight	XmCHeight	Dimension	dynamic	CSG
+XmNinitialResourcesPersistent	XmCInitialResourcesPersistent	Boolean	True	C
+XmNmappedWhenManaged	XmCMappedWhenManaged	Boolean	True	CSG
+XmNscreen	XmCScreen	Screen *	dynamic	CG
+.wH
+.tH
+XmNsensitive	XmCSensitive	Boolean	True	CSG
+XmNtranslations	XmCTranslations	XtTranslations	dynamic	CSG
+XmNwidth	XmCWidth	Dimension	dynamic	CSG
+XmNx	XmCPosition	Position	0	CSG
+XmNy	XmCPosition	Position	0	CSG
+.TE
+.KE
+.in
+.sp 1
+.wH
+.in  
+.SS "Translations"
+.ne 15
+XmLabel includes translations from Primitive.
+The XmLabel translations are listed below.
+These translations may not directly correspond to a
+translation table.
+.iS
+.ta 1.5i
+.nf
+BDrag Press:	ProcessDrag()
+.sp \n(PDu
+KHelp:	Help()
+.wH
+.fi
+.iE
+The translations used by subclasses of XmLabel for menu
+traversal are listed below.
+These translations may not directly correspond to a
+translation table.
+.iS
+.ta 1.5i
+.nf
+KLeft:	MenuTraverseLeft()
+KRight:	MenuTraverseRight()
+KUp:	MenuTraverseUp()
+KDown:	MenuTraverseDown()
+MAny KCancel:	MenuEscape()
+.wH
+.fi
+.iE
+.SS "Action Routines"
+The XmLabel action routines are described below:
+.IP "\fIHelp()\fP:"
+In a Popup or Pulldown MenuPane, unposts all menus in the menu hierarchy
+and, when the shell's keyboard focus policy is \fIXmEXPLICIT\fP,
+restores keyboard focus to the widget that had the focus before the
+menu system was entered.
+Calls the callbacks for \fIXmNhelpCallback\fP if any exist.
+If there are no help
+callbacks for this widget, this action calls the help callbacks
+for the nearest ancestor that has them.
+.IP "\fIMenuEscape()\fP:"
+In a MenuBar, disarms the CascadeButton and the menu and, when the
+shell's keyboard focus policy is \fIXmEXPLICIT\fP, restores keyboard
+focus to the widget that had the focus before the menu was entered.
+.nL
+.ne 15
+.IP
+In a toplevel Pulldown MenuPane from a MenuBar, unposts the menu,
+disarms the MenuBar CascadeButton and the MenuBar, and, when the shell's
+keyboard focus policy is \fIXmEXPLICIT\fP, restores keyboard focus to
+the widget that had the focus before the MenuBar was entered.
+In other Pulldown MenuPanes, unposts the menu and moves the focus
+to its CascadeButton.
+.IP
+In a Popup MenuPane, unposts the menu and, when the shell's keyboard
+focus policy is \fIXmEXPLICIT\fP, restores keyboard focus to the widget
+from which the menu was posted.
+.IP "\fIMenuTraverseDown()\fP:"
+If the current menu item has a submenu and is in a MenuBar, then this
+action posts the submenu, disarms the current menu item, and arms
+the submenu's first traversable menu item.
+.IP
+If the current menu item is in a MenuPane, then this action disarms the
+current menu item and arms the item below it.  This action wraps within the
+MenuPane.  When the current menu item is at the MenuPane's
+bottom edge, then this action wraps to the topmost menu item in the column
+to the right, if one exists.  When the current menu item is at the bottom,
+rightmost corner of the MenuPane, then this action wraps to the tear-off
+control, if present, or to the top, leftmost menu item.
+.IP "\fIMenuTraverseLeft()\fP:"
+When the current menu item is in a MenuBar, then this action disarms the
+current item and arms the MenuBar item to the left.
+This action wraps within the MenuBar. 
+.IP
+In MenuPanes, if the current menu item is not at the left edge of a MenuPane,
+this action disarms the current item and arms the item to its left.
+If the current menu item is at the left edge of a submenu attached to a
+MenuBar item, then this action unposts the submenu and traverses to the
+MenuBar item to the left, wrapping if necessary.  If that MenuBar item
+has a submenu, it posts the submenu and arms the first traversable
+item in the submenu.
+If the current menu item is at the left edge of a submenu not directly
+attached to a MenuBar item, then this action unposts the current submenu only.
+.IP
+In Popup or Torn-off MenuPanes, when the current menu item is at the
+left edge, this  action wraps within the MenuPane.  If the current menu
+item is at the left edge of the MenuPane and not in the top row, this
+action wraps to the rightmost menu item in the row above.  If the current
+menu item is in the upper, leftmost corner, this action wraps
+to the tear-off control, if present, or else it wraps to the bottom,
+rightmost menu item in the MenuPane.
+.nL
+.ne 5
+.IP "\fIMenuTraverseRight()\fP:"
+If the current menu item is in a MenuBar, then this action disarms the
+current item and arms the MenuBar item to the right.
+This action wraps within the MenuBar. 
+.IP
+In MenuPanes, if the current menu item is a CascadeButton, then this
+action posts its associated submenu.
+If the current menu item is not a CascadeButton and is not at the right
+edge of a MenuPane, this action disarms the current item and arms the
+item to its right, wrapping if necessary. 
+If the current menu item is not a CascadeButton and is at the right edge of a
+submenu that is a descendent of a MenuBar, then this action unposts all
+submenus and traverses to the MenuBar item to the right.
+If that MenuBar item has a submenu, it posts the submenu and arms
+the submenu's first traversable item.
+.IP
+In Popup or Torn-off menus, if the current menu item is not a
+CascadeButton and is at the right edge of a row (except the
+bottom row), this action wraps to the leftmost menu item in the
+row below.  If the current menu item is not a CascadeButton and
+is in the bottom, rightmost corner of a Popup or Pulldown MenuPane, this
+action wraps to the tear-off control, if present, or else it wraps to
+the top, leftmost menu item of the MenuPane.
+.IP "\fIMenuTraverseUp()\fP:"
+When the current menu item is in a MenuPane, then
+this action disarms the current menu item and arms the item above it.  This
+action wraps within the MenuPane.  When the current menu item is at the
+MenuPane's top edge, then this action wraps to the bottommost menu item in the
+column to the left, if one exists.  When the current menu item is at the top,
+leftmost corner of the MenuPane, then this action wraps to the tear-off
+control, if present, or to the bottom, rightmost menu item.
+.IP "\fIProcessDrag()\fP:"
+Drags the contents of a Label, identified by pressing \fIBDrag\fP.  This
+action creates a DragContext object whose \fIXmNexportTargets\fP resource is
+set to "COMPOUND_TEXT" for a label type of \fIXmSTRING\fP; otherwise,
+"PIXMAP" if the label type is \fIXmPIXMAP\fP.  This action is undefined for
+Labels used in a menu system.
+.IP
+This action is disabled if the XmDisplay's \fIenableUnselectableDrag\fP
+resource is True.
+.SS "Virtual Bindings"
+The bindings for virtual keys are vendor specific.
+For information about bindings for virtual buttons and keys, see
+\fIVirtualBindings(3X)\fP.
+.SH RELATED INFORMATION
+.na
+\fICore(3X)\fP, \fIXmCreateLabel(3X)\fP,
+\fIXmDisplay(3X)\fP,
+\fIXmFontListAppendEntry(3X)\fP,
+\fIXmStringCreate(3X)\fP,
+\fIXmStringCreateLtoR(3X)\fP,
+and \fIXmPrimitive(3X)\fP.
+.ad

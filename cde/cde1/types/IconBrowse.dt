@@ -1,0 +1,70 @@
+######################################################################
+#
+#     IconBrowse.dt
+#
+#     DataType definitions for instance-based icons.
+#
+#    (c) Copyright 1993 Hewlett-Packard Company
+#    (c) Copyright 1993 International Business Machines Corp. 
+#    (c) Copyright 1993 Sun Microsystems, Inc.   
+#
+#     $Revision: 1.4 $
+#
+######################################################################
+
+######################################################################
+#
+# The two DataTypes in this file (BM and PM) enable "instance-based" icons
+# for bitmap and pixmap files.  That means that each icon file (.bm and .pm
+# extensions) refer to themselves as their own icons.  This is useful for
+# browsing a directory of icons, because you don't have to open each file to
+# see what it looks like -- the icon displays itself.
+# 
+# To enable instance-based icons, copy this file into the .dt/types/
+# subdirectory in your home directory, then reload the action and DataType
+# database.  (You can reload the action and DataType database by logging out
+# and back in, or by executing the ReloadActions action in the System_Admin
+# directory of the General Toolbox.)
+# 
+#   NOTE  Because of the additional work required to read and display custom
+#         icons, File Manager may run slower with these DataTypes enabled.
+# 
+# To return to the default icons for these DataTypes, remove this file from
+# your personal .dt/types/ subdirectory, then reload the action and DataType
+# database.
+#
+######################################################################
+
+DATA_ATTRIBUTES BM
+{
+	SMALL_INSTANCE_ICON		%dir%/%name%
+        ACTIONS         	Open,EditText
+        SMALL_ICON          	bitmap.s
+        LARGE_ICON          	bitmap.l
+	LARGE_INSTANCE_ICON		%dir%/%name%
+        DESCRIPTION     	A BM file contains data in the X11 \
+				bitmap format.
+}
+DATA_CRITERIA BM1
+{
+	DATA_ATTRIBUTES_NAME BM
+        MODE            	!d
+        NAME_PATTERN    	*.bm
+}
+
+DATA_ATTRIBUTES PM
+{
+	SMALL_INSTANCE_ICON		%dir%/%name%
+        ACTIONS         	Open,EditText
+        SMALL_ICON          	pixmap.s
+        LARGE_ICON          	pixmap.l
+	LARGE_INSTANCE_ICON		%dir%/%name%
+        DESCRIPTION     	A PM file is a pixmap file that contains a \
+                        	multicolor image.
+}
+DATA_CRITERIA PM1
+{
+	DATA_ATTRIBUTES_NAME PM
+        MODE            	!d
+        NAME_PATTERN    	*.pm
+}

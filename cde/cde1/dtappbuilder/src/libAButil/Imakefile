@@ -1,0 +1,129 @@
+XCOMM
+XCOMM 	$XConsortium: Imakefile /main/cde1_maint/6 1995/10/12 19:25:58 pascale $
+XCOMM
+XCOMM 	@(#)Imakefile	1.9 08 Feb 1994
+XCOMM
+XCOMM 	RESTRICTED CONFIDENTIAL INFORMATION:
+XCOMM	
+XCOMM	The information in this document is subject to special
+XCOMM	restrictions in a confidential disclosure agreement between
+XCOMM	HP, IBM, Sun, USL, SCO and Univel.  Do not distribute this
+XCOMM	document outside HP, IBM, Sun, USL, SCO, or Univel without
+XCOMM	Sun's specific written approval.  This document and all copies
+XCOMM	and derivative works thereof must be returned or destroyed at
+XCOMM	Sun's request.
+XCOMM
+XCOMM	Copyright 1993 Sun Microsystems, Inc.  All rights reserved.
+XCOMM
+XCOMM
+
+#define PassCDebugFlags 'CDEBUGFLAGS=$(CDEBUGFLAGS)'
+
+#include <Library.tmpl>
+#include "../ab.tmpl"
+#include "../ab.rules"
+
+    INCLUDES = -I. -I$(ABINCLUDES)
+
+INSTALLFLAGS = $(INSTINCFLAGS)
+
+    LINTLIBS = $(LINTXLIB) $(LINTXTOOL)
+
+#if defined(HPArchitecture) || defined(SunArchitecture) || defined(RsArchitecture) || defined(UXPArchitecture) || defined(USLArchitecture) || defined(AlphaArchitecture)
+    DEFINES = 
+#else
+    DEFINES = -D_NO_PROTO
+#endif
+
+
+#ifdef CCOPTIONS  
+#undef CCOPTIONS
+#endif
+CCOPTIONS = -Xa
+ 
+#ifdef EXTRA_CCOPTIONS
+#undef EXTRA_CCOPTIONS
+#endif
+EXTRA_CCOPTIONS = -D_POSIX_SOURCE=1 -Xa -xF
+
+
+SOURCES.h.shipped = \
+	util_types.h
+
+SOURCES.h.shared = \
+	AB.h \
+	abio.h \
+	istr.h \
+	strlist.h \
+	util.h \
+	util_ds.h \
+	util_err.h \
+	XmAll.h \
+	MwmUtil.h
+
+SOURCES.h.unshared = \
+	utilP.h
+
+SRCS = \
+	abio.c		\
+	abio_path.c	\
+	istr.c		\
+	strlist.c	\
+	util.c		\
+	util_convert.c	\
+	util_ds.c	\
+	util_err.c	\
+	util_file.c	\
+	util_string.c
+
+OBJS = \
+	abio.o		\
+	abio_path.o	\
+	istr.o		\
+	strlist.o	\
+	util.o		\
+	util_convert.o	\
+	util_ds.o	\
+	util_err.o	\
+	util_file.o	\
+	util_string.o
+
+  SYS_LIBRARIES = -lm
+
+#ifdef RsArchitecture
+SYS_LIBRARIES = -lm -liconv
+#endif
+
+#ifdef	SunArchitecture
+EXTRA_DEFINES = -DOSMAJORVERSION=$(OSMAJORVERSION) -DOSMINORVERSION=$(OSMINORVERSION)
+SYS_LIBRARIES = -lm -ldl $(WIDECHARSYSLIB) -lgen
+WAITTARGET = .WAIT
+#endif	/* SunArchitecture */
+
+   INSTALLFLAGS = -m 4755
+       LINTLIBS = $(XINPUTLIB) $(DTHELPLIB) $(DTSVCLIB) $(XMLIB) $(XTOOLLIB) $(XLIB)
+LOCAL_LIBRARIES = $(XINPUTLIB) $(DTHELPLIB) $(DTSVCLIB) $(XMLIB) $(XTOOLLIB) $(XLIB)
+
+LibraryObjectRule()
+
+NormalLibraryTarget(AButil,$(OBJS))
+
+util_test: util_test.o libAButil.a
+	$(CC) -o util_test util_test.o libAButil.a
+util_test.o: util_test.c util.h
+	$(CC) $(INCLUDES) $(CFLAGS) -c util_test.c
+
+istr_test: istr_test.o libAButil.a
+	$(CC) $(CFLAGS) -o istr_test istr_test.o libAButil.a
+istr_test.o : istr_test.c istr.h
+	$(CC) $(INCLUDES) $(CFLAGS) -c istr_test
+
+DependTarget()
+
+BuildAbIncludes(shipped_includes, $(SOURCES.h.shipped),../include/ab, ../../libAButil)
+BuildAbIncludes(shared_includes, $(SOURCES.h.shared),../include/ab_private, ../../libAButil)
+
+includes:: shipped_includes shared_includes $(WAITTARGET)
+sdtgilcvt: libAButil.a
+dtcodegen: libAButil.a
+

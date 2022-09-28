@@ -1,0 +1,133 @@
+XCOMM $XConsortium: scoLib.tmpl, sco$
+
+/*
+ *	@(#) scoLib.tmpl 1.15 93/01/15 
+ * SCO shared library template
+ * 
+ * SCO Modification History 
+ * S010, 15-Jan-93, hess
+ *	use mkshlib from /bin 
+ * S009, 11-Nov-92, mikep
+ *	remove SharedLibrary defines from here.  It's too late by the
+ *	time this is included.
+ * M008, 21-Sep-92, hess
+ * 	move mkshlib to top/cc, for now, until our build env catches up with
+ * 	the tree.
+ * M007, 04-Aug-92, hess
+ * 	use sharedlibs 
+ * M006, 02-Jun-92, hess
+ *	add MKSHLIBSRC 
+ * M005, 18-May-92, hess
+ *	 add sharedxtrev 
+ * M004, 18-Mar-92, hess
+ * 	add mcs command 
+ * M003, 17-Mar-92, hess
+ *	set MKSHLIB var to point to our local version 
+ * M002, 10-Feb-92, hess
+ * 	add sharedxlibrev 
+ * M001, 30-Jan-92, hess
+ * 	add MKSHLIB var. 
+ * M000, 10-Jan-92, hess
+ * 	created, Note: not all these libs will exist.  
+ */
+SHLIBLDFLAGS = SharedLibraryLoadFlags
+     MKSHLIB = mkshlib
+         MCS = mcs -d
+      BMSLIB = $(BMSLIBSRC)/libbms.a
+SOFTLIB = $(SOFTLIBSRC)/libsoftlib.a
+
+
+#undef CoeLib
+#define CoeLib
+DEPCOELIB = $(COESRC)/CoeGetMessage.o $(COESRC)/libCoe.a
+COELIB = $(DEPCOELIB)
+
+#undef XvhLib
+#define XvhLib
+DEPXVHLIB = $(XVHSRC)/ilscalesample.o $(XVHSRC)/libXvh.a 
+XVHLIB = $(DEPXVHLIB)
+
+#ifndef SharedXlibRev
+#define SharedXlibRev R5
+#endif
+#ifndef SharedXtRev
+#define SharedXtRev R5
+#endif
+
+/*
+ * and now a little bit of magic for using imake without source tree; if we
+ * are using shared libraries, we really do not need to depend on anything
+ */
+#if SharedLibXext
+  DEPEXTENSIONLIB = /* _UseCat($(USRLIBDIR),$(EXTENSIONSRC)/lib,/libXext.sa.$(SOXEXTREV)) */
+     EXTENSIONLIB = _Use(-lXext,-L$(EXTENSIONSRC)/lib -lXext)
+#endif
+#if SharedLibX
+          DEPXLIB = $(DEPEXTENSIONLIB) _Use(,$(XLIBSRC)/libX11.a)
+             XLIB = $(EXTENSIONLIB) _Use(-lX11,$(XLIBSRC)/libX11.a)
+#endif
+#if SharedLibXmu
+/* SVR4 shared libraries are deficient in link semantics */
+        DEPXMULIB = /* _UseCat($(USRLIBDIR),$(XMUSRC),/libXmu.sa.$(SOXMUREV)) */
+       XMULIBONLY = _Use(-lXmu_s,-L$(XMUSRC) -lXmu_s)
+           XMULIB = $(XMULIBONLY) -z nodefs
+
+#ifndef XawClientLibs
+#define XawClientLibs $(XAWLIB) $(XMULIBONLY) $(XTOOLLIB) $(XLIB)
+#endif
+#endif
+#if SharedOldLibX
+       DEPOLDXLIB = /* _UseCat($(USRLIBDIR),$(OLDXLIBSRC),/liboldX.sa.$(SOOLDXREV)) */
+          OLDXLIB = _Use(-loldX_s,-L$(OLDXLIBSRC) -loldX_s)
+#endif
+#if SharedLibXt
+      DEPXTOOLLIB = /* _UseCat($(USRLIBDIR),$(TOOLKITSRC),/libXt.sa.$(SOXTREV)) */
+         XTOOLLIB = _Use(-lXt_s,-L$(TOOLKITSRC) -lXt_s)
+#endif
+#if SharedLibXaw
+        DEPXAWLIB = /* _UseCat($(USRLIBDIR),$(AWIDGETSRC),/libXaw.sa.$(SOXAWREV)) */
+           XAWLIB = _Use(-lXaw_s,-L$(AWIDGETSRC) -lXaw_s)
+#endif
+#if SharedLibXinput
+        DEPXILIB = /* _UseCat($(USRLIBDIR),$(XILIBSRC),/libXi.sa.$(SOXINPUTREV)) */
+           XILIB = _Use(-lXi_s,-L$(XILIBSRC) -lXi_s)
+#endif
+     XLIBARCHIVE = $(EXTENSIONLIB) _Use(-lX11,$(XLIBSRC)/libX11.a)
+
+/* Commented Hops 27.07.93 for CDE clients since chomps files Help.* 
+#define Help
+#define Help
+*/
+
+/* libraries that deskworks, scoclients and xdt3 would like to share */
+#ifndef DragDropLib
+#define DragDropLib $(LIBSRC)/dragdrop/libdragdrop.a
+#endif
+
+#ifndef ScoHelpLib
+#define ScoHelpLib $(LIBSRC)/bkr_help/libbkr_help.a
+#endif
+
+#ifndef XoLibrary
+#define XoLibrary $(LIBSRC)/Xo/libXo.a
+#endif
+
+#ifndef XpmLibrary
+#define XpmLibrary $(LIBSRC)/Xpm3/libXpm.a
+#endif
+
+      STARTUPDIR = $(LIBDIR)/sco/startup
+          DNDLIB = DragDropLib
+           XBLIB = $(LIBSRC)/Xb/libXb.a
+           XOLIB = XoLibrary
+          XQPLIB = $(LIBSRC)/Xqp/libXqp.a
+         OSALLIB = $(LIBSRC)/osal/libosal.a 
+         HELPLIB = ScoHelpLib
+
+#ifndef IXIClientLibs
+#define IXIClientLibs $(XBLIB) $(DNDLIB) $(XQPLIB) $(OSALLIB)
+#endif
+
+#ifndef SCOClientLibs
+#define SCOClientLibs $(DNDLIB) $(HELPLIB) $(XOLIB) XmClientLibs
+#endif

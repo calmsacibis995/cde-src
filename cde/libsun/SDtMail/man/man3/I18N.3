@@ -1,0 +1,283 @@
+.de LI
+.\" simulate -mm .LIs by turning them into .TPs
+.TP \\n()Jn
+\\$1
+..
+.de Lc
+.\" version of .LI that emboldens its argument
+.TP \\n()Jn
+\s-1\f3\\$1\f1\s+1
+..
+.TH I18N 3 "08/30/96"
+.BH "08/30/96"
+.\" @(#)I18N.3	1.6 96/05/20 SMI
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994, 1995, 1996 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994, 1995, 1996 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994, 1995, 1996 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994, 1995, 1996 Novell, Inc.
+.SH NAME
+I18N \- Internationalization in dtmail.
+.SH SYNOPSIS
+.\"
+.PP
+.ft 3
+The internationalization of dtmail utilizes the lcl library provided
+by the I18N group.  Library calls are made both from the mid-end and
+front-end to decode international email messages.
+.fi
+.ft 1
+.\" 
+.ta 0.25i 0.50i 0.75i 1.0i 1.25i 1.50i 1.75i 2.0i 2.5i 3.0i
+.SH DESCRIPTION
+
+.PP
+I18N in dtmail consists of modifications in both the mid-end and the
+front-end and uses the lcl library.  The I18N group is responsible for
+maintaining the lcl library, their library is located on
+/net/topping/export/sundae12/lcl/ws/pkgs and is copied to 
+/scde/install/cbe/RefLCLib server by Robert Obrien on request. 
+.PP
+The dtmail team is responsible for the modifications to both the front-end
+and the mid-end.  The I18N group did write some of the mid-end functions
+and should be consulted for changes.
+.PP
+The front-end changes consist of gui changes and decoding:
+.nf
+	add menu button to RoamMenuWindow View->Change Char Set
+	add menu button to Compose Window Format->Change Char Set
+	decode headers in MsgScrollingList
+	decode headers message body and headers in dteditor widget
+	decode attachment names and bodies.
+.fi
+
+.PP
+The mid-end changes consist of additional library functions to support
+the front-end changes.
+.nf
+	decode headers function
+	decode body function
+	set user charset
+	encode headers for sending
+	encode bodies for sending
+	list possible charsets for displaying
+	data typing utility enhancements
+.fi
+
+.SS libSDtMail Changes:
+
+.PP
+The following file have been modified in libSDtMail.  You can search
+for the string "I18N" to locate all changes that have been made to enable
+sputnik.
+.nf
+	DataObjs/Message.cc
+	DataObjs/MessageBody.cc
+	DataObjs/MessageEnvelope.cc
+	DataTypes/ContentBuffer.cc
+	Manager/Connection.cc
+	PortObjs/DataChanCclient.cc
+	Utils/CclientUtility.cc
+	Utils/DataTypeUtility.cc
+	include/SDtMail/ContentBuffer.hh
+.fi
+
+.nf
+DataObjs/Message.cc
+    SdmErrorCode
+    SdmMessage::SetCharacterSet(SdmError& err, const SdmString &charset)
+	The user can choose a charset in which to display the message
+	by selecting "Change Charset" option from the View menu.  This
+	choice propagates down from Message to both the MessageEnvelope
+	and the MessageBodies and ContentBuffers.
+
+DataObjs/MessageBody.cc
+    SdmErrorCode
+    SdmMessageBody::SetCharacterSet(SdmError& err, 
+	const SdmString &charset)
+
+    SdmErrorCode
+    SdmMessageBody::GetCharacterSet(SdmError& err,
+	SdmString& r_charSet) const
+
+DataObjs/MessageEnvelope.cc
+    SdmErrorCode
+    SdmMessageEnvelope::DecodeHeader(SdmError &err, SdmStrStrL &r_hdr,
+        const SdmString &hdr, const SdmString &charset)
+	The user must pass in a single header.  A list of I18N decoded
+	segments will be returned.  The reason there are segments is that 
+	you can have multiple charsets in one header.  The SdmStrStrL that 
+	is returned contains (charset, string) pairs.  The strings must
+	be concatenated before they can be displayed.  Charsets can be
+	ignored for now because Motif can't display multiple charsets.
+
+    SdmErrorCode
+    SdmMessageEnvelope::SetCharacterSet(SdmError& err, 
+	const SdmString &charset)
+	
+    SdmErrorCode
+    SdmMessageEnvelope::GetCharacterSet(SdmError& err, 
+	SdmString& r_charSet) const
+
+DataTypes/ContentBuffer.cc
+    SdmErrorCode
+    SdmContentBuffer::SetCharacterSet(SdmError &err, 
+	const SdmString& charSet)
+
+    SdmErrorCode
+    SdmContentBuffer::GetCharacterSet(SdmError &err, 
+	SdmString& r_charSet) const
+
+    SdmErrorCode
+    SdmContentBuffer::GetPossibleCharacterSetList(SdmError &err, 
+        SdmStringL& r_charSetList, const char *inputBp, 
+	SdmBoolean forSend)
+	This function returns the list of possible charsets in which a
+	message body can be displayed.  The user can then choose from these
+	charsets on the "Change Charset" menu item.  This is useful because
+	sometimes body parts are mis-typed.  Allowing the user to re-decode
+	the message in a different charset will fix this.
+
+    SdmErrorCode
+    SdmContentBuffer::DecodeCharset(SdmError &err, char *&r_outputBp,
+        int &r_outputLen, const char * inputBp, 
+	const unsigned long inputLen, SdmString &body_charset)
+	Provide this function the message body and user chosen charset
+	(if it has been set) and this function will return the decoded
+	message for display.  If the user hasn't chosen a charset by
+	using the "Change Charset" menu item, then the default display
+	charset is used to decode the message.
+
+Manager/Connection.cc
+    Startup:  Open the lcl database in StartUp and close it in ShutDown.  
+	There is only one connection so this is a good place to do it.
+
+PortObjs/DataChanCclient.cc
+    GetMessageContents:  get the charset from the charset attribute 
+	of the MIME message.  Set this value on the content buffer by
+	calling the SetCharacterSet member function.
+
+Utils/CclientUtility.cc
+    Decode the messages before they are sent.
+
+    _DoText:  Add a case to _DoText.  If the data is 8-bit, determine
+	if it can be encode.  If it can be encode, the message is sent in 
+	the default display charset or the user chosen charset.  Otherwise,
+	tag the message as binary.
+
+    _ConstructBodyPart:  Get the user chosen charset from the content
+	buffer.
+
+    _AttachmentsToParts:  call the encode_header function to encode
+	the attachment name.
+
+    ConstructMessageEnvelope:  encode the from, to, cc, and bcc headers.
+
+    static void
+    encode_header(char **buf, char *name, SdmBoolean attachment_flag,
+	SdmBoolean sun_v3_mail)
+	encode the given header.  Do not encode headers in sun v3 mail mode.
+
+    static char *
+    convert_body(char *buf, unsigned long buf_len, char **charset, int
+	*encoding, SdmBoolean attachment, SdmString user_charset)
+	convert the body but don't encode it.  Return the encoding so
+	that the c-client can encode the body itself.
+
+Utils/DataTypeUtility.cc
+    DetermineMimeDataTypesForMessage:  If the cde data typing mechanism
+	has determined that the data is binary add a test to determine
+	if the contents can be decoded.  If they can, set the mime type
+	to text/plain, else set it to application/octet-stream.
+
+    static int
+    check_text(char *buf, size_t length, char **charset)
+	make an educated guess as to whether the data is text or not.
+	If it's determined to be text, return > 0 and the charset name
+	otherwise return 0.  
+.fi
+
+
+
+.SS Dtmail Front-end Changes:
+
+.PP
+The following file have been modified in dtmail.  You can search
+for the string "I18N" to locate all changes that have been made to enable
+sputnik.
+.nf
+	AttachArea.C
+	Attachment.C
+	ComposeCmds.C
+	Editor.C
+	MsgScrollingList.C
+	RoamCmds.C
+	RoamMenuWindow.C
+	SendMsgDialog.C
+.fi
+
+.nf
+AttachArea.C
+    Changed the api to SdmContentBuffer::SetContents to take a 
+	content buffer instead of a string.
+
+Attachment.C
+    Constructor:  Decode the attachment name and concatenate the
+	segments that are returned so that they can be displayed.
+
+	setContents:  If the attachment is text, decode it.
+
+ComposeCmds.C
+    ReplyCmd::doit:  Decode the subject, sender, and cc headers
+	during a reply.
+
+Editor.C
+    set_message:  decode the from, subject, to, and cc headers when
+	displaying headers in the dteditor widget.  Then determine if the
+	first body part is text.  If it is, then decode it, else it's
+	binary.  
+
+MsgScrollingList.C
+    formatHeader:  Decode the headers displayed in the MsgScrollingList.
+	Only decode from, from_alt, to, and subject headers.
+
+RoamCmds.C
+    GetPossibleCharsetsCmd::GetPossibleCharsetsCmd(
+                       char *name,
+                       char *label,
+                       int active,
+                       void *window,
+                       SdmBoolean incoming)
+    : Cmd (name, label, active)
+	Add the "Change Charset" command.
+
+    void
+    GetPossibleCharsetsCmd::doit()
+	There are 2 "Change Charset" menu items.  One is in 
+	View->Change Charset on the RoamMenuWindow, and the other is on
+	Format->Change Charset on the Compose window.  A flag is set,
+	_incoming to determine which menu item was selected.  If the
+	"Change Charset" menu item is selected, the user is given a choice
+	of charsets that are displayed in the status area.  Each time the
+	user selected the menu item, a new choice is displayed, cycling
+	through all the possible choices.
+
+RoamMenuWindow.C
+    Instantiate the GetPossibleCharsetsCmd.
+
+SendMsgDialog.C
+    updateMsgHnd, updateMsgHndAtt, and send_message:  Set the user 
+	selected charset on the content buffer after the message is submitted.
+
+	createFormatMenu:  Instantiate the GetPossibleCharsetsCmd
+.fi
+
+.RE
+.nr )J 0
+.\"
+.PP
+.RE
+.nr )J 0
+.SH "SEE ALSO"
+.na
+.BR lcl(3)

@@ -1,0 +1,19 @@
+#define IHaveSubdirs
+#define PassCDebugFlags 'CDEBUGFLAGS=$(CDEBUGFLAGS)'
+
+TT_DIR = ../..
+#include "../../tooltalk.tmpl"
+
+SUBDIRS = c dnd
+
+MakeSubdirs($(SUBDIRS))
+MakeLintLibSubdirs($(LINTLIBSUBDIRS))
+DependSubdirs($(SUBDIRS))
+
+lint::
+	cd $(SUBDIRS) ; make lint
+
+#ifdef SunArchitecture
+.NO_PARALLEL:
+
+#endif

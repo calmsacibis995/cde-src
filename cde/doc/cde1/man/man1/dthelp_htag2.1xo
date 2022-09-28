@@ -1,0 +1,77 @@
+.TH dthelp_htag2 1 "08 August 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994 Novell, Inc.
+.\" *************************************************************************
+.SH NAME
+dthelp_htag2 \- second pass for parse of HelpTag source
+.SH SYNOPSIS
+.yS
+   dthelp_htag2  -[cdhot] file [outfile]
+.yE
+.SH DESCRIPTION
+The
+.Cm dthelp_htag2
+executable
+is invoked by
+.Cm dthelptag 1
+as the second
+pass of translating HelpTag markup into SDL.
+.sp 1
+The
+.Cm dthelp_htag2
+executable accepts the output of the first pass of
+dthelptag (either
+.Cm dthelp_htag1 1
+or
+.Cm dthelp_ctag1 1)
+and computes the byte
+offsets of virtual pages to be used in the runtime display of the SDL
+volume.
+.sp 1
+If only one file is specified on the command line, the output file
+will overwrite the input file.
+If two files are specified, the output
+will be placed in the second.
+.sp 1
+If the input file has no .sdl extension, one will be added.
+If a
+second file name is specified for output, it will be used without
+modification.
+.sp 1
+The options to
+.Cm dthelp_ctag2
+are:
+.VL 15
+.LI \-c:
+compress the SDL document on a per virtual page basis \- if
+the document is already compressed, this command will result
+in no change to the document.
+.LI \-d:
+decompress an SDL document \- if the document is already
+compressed, this command will result in no change to the
+document; however, the byte offsets of virtual pages will be
+recomputed.
+.LI \-h:
+print a help message and exit.
+.LI \-o:
+perform peephole optimization of the SDL document.
+In
+particular, \f3<FORM>\f1 elements containing only a single \f3<BLOCK>\f1 or
+\f3<FORM>\f1 without a user supplied identifier are replaced by that
+single \f3<BLOCK>\f1 or \f3<FORM>\f1 with the identifier of the original
+(outer) \f3<FORM>\f1.
+.LI \-t:
+eliminate any \f3<TOSS>\f1 sub-elements that are not used in this SDL
+document.
+.LE
+.SH "SEE ALSO"
+.Cm dthelptag 1,
+.Cm dthelp_htag1 1,
+.Cm dthelp_ctag1 1,
+.BR dtsdldtd (4).
+
+

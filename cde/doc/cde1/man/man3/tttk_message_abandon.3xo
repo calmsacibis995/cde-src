@@ -1,0 +1,79 @@
+.TH tttk_message_abandon 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+tttk_message_abandon \- finalize a message properly
+.SH SYNOPSIS
+.yS
+#include <Tt/tttk.h>
+.sp 0.5v
+.ta \w'Tt_status tttk_message_abandon('u
+Tt_status tttk_message_abandon(Tt_message \f2msg\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn tttk_message_abandon
+function is used by an application
+when it does not understand a message
+and wants to get rid of it.
+the
+.Fn tttk_message_abandon
+function fails or rejects
+.I msg
+if appropriate, and then destroys it.
+The
+.Fn tttk_message_abandon
+will reject or fail the message only if
+.I msg
+is a
+.Cn TT_REQUEST
+in
+.B Tt_state
+.Cn TT_SENT .
+If it has a
+.B Tt_address
+of
+.Cn TT_HANDLER
+or a
+.Fn tt_message_status
+of
+.Cn TT_WRN_START_MESSAGE ,
+then it fails the message;
+otherwise, it rejects it.
+In either case,
+.Fn tttk_message_abandon
+gives
+.I msg
+a message status (see
+.Fn tt_message_status 3)
+of
+.Cn TT_DESKTOP_ENOTSUP .
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn tttk_message_abandon
+function returns the status of the operation as one of the following
+.B Tt_status
+values:
+.VL 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_NOMP
+.br
+The
+.Cm ttsession 1
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_NOTHANDLER
+.br
+This application is not the handler for this message.
+.Lc TT_ERR_POINTER
+.br
+The pointer passed does not point to an object
+of the correct type for this operation.
+.LE
+.SH "SEE ALSO"
+.Hd Tt/tttk.h 5,
+.Fn tt_message_status 3,
+.Fn tttk_message_fail 3,
+.Fn tttk_message_reject 3.

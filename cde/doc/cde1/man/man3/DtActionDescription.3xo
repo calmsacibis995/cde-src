@@ -1,0 +1,65 @@
+.TH DtActionDescription 3 "17 Jan 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.\" *************************************************************************
+.SH NAME
+DtActionDescription \- obtain the descriptive text for a given action
+.SH SYNOPSIS
+.yS
+#include <Dt/Action.h>
+.sp 0.5v
+.ta \w'void DtActionDescription('u
+char *DtActionDescription(char *\f2actionName\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn DtActionDescription
+function looks up and returns the descriptive text associated
+with the
+.I actionName
+action.
+The
+.I actionName
+argument is the name of the action.
+If there are multiple
+.I actionName
+actions,
+the string returned is the description of the most general.
+The most general action is the one with the lowest precedence,
+as described in
+.cde .BR dtactionfile (4)
+.cde (``Action Selection'').
+.xo .cX actionselection .
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn DtActionDescription
+function returns a newly allocated copy of the description string
+associated with the action; otherwise, it returns
+.Cn NULL .
+.SH "APPLICATION USAGE"
+The
+.Fn DtActionDescription
+function is useful for applications that wish to present information
+to the user about a particular action.
+.P
+The application should use
+.Fn XtFree 3X
+to free the description string returned by
+.Fn DtActionDescription .
+.SH "SEE ALSO"
+.Hd Dt/Action.h 5,
+.cdes
+.Fn XtFree 3X,
+.BR dtactionfile (4),
+.BR dtdtfile (4).
+.cdee
+.xos
+.Fn XtFree 3X
+in the \*(Zt;
+.cX dtactionfile ,
+.cX dtdtfile .
+.xoe

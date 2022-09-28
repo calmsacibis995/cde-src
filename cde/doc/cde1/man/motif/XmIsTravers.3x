@@ -1,0 +1,73 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH XmIsTraversable 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmIsTraversable\fP \- A function that identifies whether a widget can
+be traversed
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/Xm.h>
+.sp \n(PDu
+Boolean XmIsTraversable (\fBwidget\fI)
+.ta .5i 1.5i
+.nf
+	Widget	\fBwidget\fI;
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+\fIXmIsTraversable\fP determines whether the specified widget is
+eligible to receive focus through keyboard traversal.
+In general, a widget is eligible to receive focus when all of the
+following conditions are true:
+.TP
+\(bu
+The widget and its ancestors are not being destroyed, are sensitive, and
+have a value of True for \fIXmNtraversalOn\fP.
+.TP
+\(bu
+The widget and its ancestors are realized, managed, and (except for
+gadgets) mapped.
+.TP
+\(bu
+Some part of the widget's rectangular area is unobscured by the widget's
+ancestors, or some part of the widget's rectangular area is inside the
+work window (but possibly outside the clip window) of a ScrolledWindow
+whose \fIXmNscrollingPolicy\fP is \fIXmAUTOMATIC\fP and whose
+\fIXmNtraverseObscuredCallback\fP is not NULL.
+.PP
+Some widgets may not be eligible to receive focus even if they meet all
+these conditions.
+For example, most managers cannot receive focus through keyboard traversal.
+Some widgets may be eligible to receive focus under particular
+conditions.
+For example, a DrawingArea is eligible to receive focus if it meets the
+conditions above and has no child whose \fIXmNtraversalOn\fP resource is
+True.
+.IP "\fBwidget\fP"
+Specifies the ID of the widget 
+.SH RETURN VALUE
+Returns True if the widget is eligible to receive focus through keyboard
+traversal; otherwise, returns False.
+.SH RELATED INFORMATION
+.na
+\fIXmGetVisibility(3X)\fP and \fIXmProcessTraversal(3X)\fP.
+.ad

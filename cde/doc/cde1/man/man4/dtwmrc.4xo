@@ -1,0 +1,909 @@
+.TH dtwmrc 4 "26 Nov 1996"
+.\" CDE Common Source Format, Version 1.0.0
+.\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994 Novell, Inc.
+...\" **  (c) Copyright 1989,1990,1992,1993 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+.SH NAME
+dtwmrc \- the dtwm Window Manager Resource Description File
+.SH DESCRIPTION
+The
+\f3dtwmrc\f1
+is a supplementary resource file that controls much of the
+behavior of
+the CDE window manager
+.Cm dtwm .
+It contains
+descriptions of resources that cannot easily be written using standard X
+Window System, Version 11 resource syntax. 
+The resource description file contains entries that are 
+referred to by X resources in defaults files (for example,
+\f3/usr/dt/app-defaults/$LANG/Dtwm\f1) or in the
+.I RESOURCE_MANAGER
+property on the root window.
+.sp 1
+For example, the resource description file enables you to specify different
+types of window menus; however, an X resource is used to
+specify which of these window menus the
+.Cm dtwm
+should
+use for a particular window.
+.sp 1
+The specifications of the resource description file supported by the dtwm
+workspace manager are a strict superset of the specifications supported by
+the OSF Motif Window Manager (\f3mwm 1.2.4\f1).
+In other
+words, the \f3system.mwmrc\f1 or \f3$HOME/.mwmrc\f1
+file that you've used for \f3mwm\f1 is easily made
+usable by
+.Cm dtwm .
+.sp 1
+To merge your personal mwm resource specifications into dtwm:
+.VL
+.LI \(bu
+Copy either \f3/etc/dt/config/$LANG/sys.dtwmrc\f1 or 
+\f3/usr/dt/config/$LANG/sys.dtwmrc\f1 to \f3$HOME/.dt/dtwmrc\f1.
+.LI \(bu
+Use a text editor to move menu definitions, key bindings, and button
+bindings from your \f3.mwmrc\f1 file to your
+.B dtwmrc
+file.
+To merge
+your key and button bindings, you'll need to augment the key and button
+bindings that are referenced by
+.Cm dtwm
+by default 
+(refer to \f3buttonBindings\f1 and \f3keyBindings\f1 resources in the 
+.Cm dtwm
+app-defaults file \f3/usr/dt/app-defaults/$LANG/Dtwm\f1).
+To replace the key or 
+button bindings, you'll also need to modify your personal 
+\f3keyBindings\f1 and \f3buttonBindings\f1 resources.
+.LI \(bu
+Restart
+.Cm dtwm .
+.LE
+.HU Location
+The workspace manager searches for one of the following 
+resource description files, where
+.I $LANG
+is the value
+of the language environment on a per-user basis:
+.br
+\f3$HOME/.dt/$LANG/dtwmrc
+.br
+$HOME/.dt/dtwmrc
+.br
+/etc/dt/config/$LANG/sys.dtwmrc
+.br
+/etc/dt/config/sys.dtwmrc
+.br
+/usr/dt/config/$LANG/sys.dtwmrc
+.br
+/usr/dt/config/sys.dtwmrc\f1
+.sp 1
+The first file found is the first used.
+.br
+If no file is found, a set of built-in specifications
+is used.  
+.sp 1
+A particular resource description file
+can be selected using the \f2configFile\f1 resource.
+.sp 1
+The following shows how a different resource description file can
+be specified from the command line:
+.Cs I
+/usr/dt/bin/dtwm -xrm "Dtwm*configFile: mydtwmrc"
+.Ce
+.HU "Resource Types"
+The following types of resources can be described in the dtwm
+resource description file:
+.VL 15
+.LI \f3Buttons\f1
+Workspace manager functions can be bound (associated) with button events.
+.LI \f3Keys\f1
+Workspace manager functions can be bound (associated) with key press events.
+.LI \f3Menus\f1
+Menu panes can be used for the window menu and other menus posted
+with key bindings and button bindings.
+.LE
+.SH "DTWM RESOURCE DESCRIPTION FILE SYNTAX"
+The \f3dtwm\f1 resource description file
+is a standard text file that contains items
+of information separated by blanks, tabs, and new lines characters.
+Blank lines are ignored.
+Items or characters can be quoted to avoid special interpretation
+(for example, the comment character can be quoted to prevent it from being
+interpreted as the comment character).
+A quoted item can be contained in double quotes (\f3" "\f1).
+.sp 1
+Single characters can be quoted by preceding them by the back-slash
+character (\f3\\\f1), except for workspace names, which
+may contain no back-slash characters.
+If a line ends with a back-slash,
+the next line is considered a continuation of that line.
+.sp 1
+All text from an unquoted \f3#\f1 to the end of the line is regarded 
+as a comment and is not interpreted as part of a resource description.
+If \f3!\f1 is the first character in a line, the line is regarded as a comment.
+.HU "Workspace Manager Functions"
+Workspace manager functions can be accessed with button and key bindings, and
+with workspace manager menus.
+Functions are indicated as part of the specifications for button and key
+binding sets, and menu panes.
+The function specification has the following syntax:
+.Cs I
+\f3function\f1 = \f3function_name\f1 [\f3function_args\f1]
+\f3function_name\f1 = \f3workspace manager function\f1
+\f3function_args\f1 = {\f3quoted_item\f1 | \f3unquoted_item\f1}
+.Ce
+.sp 1
+The following functions are supported.
+If a function is specified that isn't one of the supported functions then it
+is interpreted by \f3dtwm\f1 as \f2f.nop\f1.
+.VL 15
+.LI \f2f.action\f1
+This function causes the specified \f3action\f1 to be invoked
+by means of the message server.
+.LI \f3f.beep\f1
+This function causes a beep.
+.LI "\f2f.circle_down\f1 [\f2icon\f1 | \f2window\f1]"
+This function causes the window or icon that is on the top of the window
+stack to be put on the bottom of the window stack (so that it is no
+longer obscuring any other window or icon).
+This function affects only those windows and icons
+that are obscuring other windows and icons,
+or that are obscured by other windows and icons.
+Secondary windows (that is, transient windows) are restacked with their
+associated primary window.
+Secondary windows always stay on top of the associated primary window and
+there can be no other primary windows between the secondary windows and
+their primary window.
+If an \f2icon\f1 function argument is specified, then
+the function applies only to icons.
+If a \f2window\f1 function argument is specified then the function applies
+only to windows.
+.LI "\f2f.circle_up\f1 [\f2icon\f1 | \f2window\f1]"
+This function raises the window or icon on the bottom of the window stack
+(so that it is not obscured by any other windows).
+This function affects only those windows and icons
+that are obscuring other windows and icons,
+or that are obscured by other windows and icons.
+Secondary windows (that is, transient windows) are restacked with their
+associated primary window.
+If an \f2icon\f1 function argument is specified then the
+function applies only to icons.
+If an \f2window\f1 function argument is specified then the function applies
+only to windows.
+.LI "\f2f.create_workspace\f1"
+This function creates a new workspace.
+The new workspace name is
+generated automatically and is of the form \f3ws_\f1\f3n\f1 where
+\f3n\f1 is an integer. 
+.LI "\f2f.delete_workspace\f1"
+This function deletes the current workspace.
+Windows that reside only in
+this workspace will be moved to the next workspace.
+If the last
+workspace is being deleted, then windows will be moved to the first
+workspace.
+.LI "\f2f.exec\f1 \f3command\f1 (or \f2!\f1 \f3command\f1)"
+This function causes \f2command\f1 to be executed (using the
+value of the \f2$MWMSHELL\f1 or \f2$SHELL\f1 environment variable if set;
+otherwise, \f3/usr/bin/sh\f1).
+The \f2!\f1 notation can be used in place of the \f2f.exec\f1 function
+name.
+.LI "\f2f.focus_color\f1"
+This function sets the colormap focus to a client window.
+If this function is done in a root context, then the default colormap
+(setup by the X Window System for the screen where \f3dtwm\f1 is running)
+is installed and there is no specific client window colormap focus.
+This function is treated as \f2f.nop\f1 if \f2colormapFocusPolicy\f1 is not
+explicit.
+.LI "\f2f.focus_key\f1"
+This function sets the keyboard input focus to a client window or icon.
+This function is treated as \f2f.nop\f1 if \f2keyboardFocusPolicy\f1 is not
+explicit or the function is executed in a root context.
+.LI "\f2f.goto_workspace\f1 \f2workspace\f1"
+This function causes the workspace manager to switch to the
+workspace named by \f2workspace\f1.
+If no workspace exists by 
+the specified name, then no action occurs.
+Note that adding and deleting
+workspaces dynamically and affect this function.
+.LI "\f2f.help\f1 [\f2topic\f1 [\f2volume\f1]]"
+This function displays help on the
+specified \f2topic\f1 and \f2volume\f1.
+If no \f2volume\f1 is given,
+then the workspace manager volume is assumed.
+If no \f2topic\f1 
+is given, then help on the front panel is shown.
+.LI "\f2f.help_mode\f1"
+This function causes the workspace manager to enter into help mode. 
+In help mode, the pointer changes shape to indicate that the window
+manager is waiting for you to select a front panel control.
+Any help
+defined for the control is then shown in a help window.
+.LI "\f2f.kill\f1"
+This function is used to close application windows.
+The actual
+processing that occurs depends on the protocols that the application
+observes.
+The application lists the protocols it observes in the
+.I WM_PROTOCOLS
+property on its top level window.
+.sp 1
+If the application observes the
+.I WM_DELETE_WINDOW
+protocol, it is sent
+a message that requests the window be deleted.
+.sp 1
+If the application observes both
+.I WM_DELETE_WINDOW
+and
+.IR WM_SAVE_YOURSELF ,
+it is sent one message requesting the window be
+deleted and another message advising it to save its state.
+.sp 1
+If the application observes only the
+.IR WM_SAVE_YOURSELF protocol ,
+it is sent a message advising it to 
+save its state.
+After a delay
+(specified by the resource \f2quitTimeout\f1),
+the application's connection to the X server is terminated.
+.sp 1
+If the application observes neither of these protocols, its 
+connection to the X server is terminated.
+.in
+.LI "\f2f.lower\f1\ [\f2\-\f1\f3client\f1 | \f2within\f1\ | \f2freeFamily\f1]"
+This function lowers a primary window to the bottom of the global window
+stack (where it obscures no other window) and lowers the secondary window
+(transient window or dialog box) within the client family.
+The
+arguments to this function are mutually exclusive.
+.sp 1
+The \f2client\f1 argument indicates the name or class of a client to
+lower.
+The name or class of a client appears in the
+.I WM_CLASS
+property 
+on the client's top-level window.
+If the \f2client\f1 argument is not specified, the context that the
+function was invoked in indicates the window or icon to lower.
+.sp 1
+Specifying \f2within\f1 lowers the secondary window within the family
+(staying above the parent) but does not lower the client family in the
+global window stack.
+.sp 1
+Specifying \f2freeFamily\f1 lowers the window to the bottom of the
+global windows stack from its local family stack. 
+.LI "\f2f.marquee_selection\f1"
+This function is only useful in conjunction with the CDE file manager
+(see
+.Cm dtfile 1).
+It enables selection of
+file manager objects that have been placed on the root window.
+It
+must be bound to a button when used.
+.LI "\f2f.maximize\f1"
+This function causes a client window to be displayed with its maximum
+size.
+Refer to the \f2maximumClientSize\f1, \f2maximumMaximumSize\f1,
+and \f2limitResize\f1 resources in
+.Cm dtwm 1.
+.LI "\f2f.menu\f1 \f2menu_name\f1"
+This function associates a cascading (pull-right) menu 
+with a menu pane entry or a menu with a button or key binding.
+The \f2menu_name\f1 function argument identifies the menu to be used.
+.LI "\f2f.minimize\f1"
+This function causes a client window to be minimized (iconified).
+When a window is minimized with no icon box in use, and if the
+\f2lowerOnIconify\f1 resource has the value True (the default), the icon is
+placed on the bottom of the window
+stack (such that it obscures no other window).
+If an icon box is used,
+then the client's icon changes to its iconified form inside the icon box.
+Secondary windows (that is, transient windows) are minimized with their
+associated primary window.
+There is only one icon for a primary window and all its secondary windows.
+.LI "\f2f.move\f1"
+This function initiates an interactive move of a client window.
+.LI "\f2f.next_cmap\f1"
+This function installs the next colormap in the list of colormaps for
+the window with the colormap focus.
+.LI "\f2f.next_key\f1 [\f2icon\f1 | \f2window\f1 | \f2transient\f1]"
+This function sets the keyboard input focus to the next window/icon in the set
+of windows/icons managed by the workspace manager 
+(the ordering of this set is based on the stacking of windows on the screen).
+This function is treated as \f2f.nop\f1 if \f3keyboardFocusPolicy\f1 is not
+explicit.
+The keyboard input focus is only moved to windows that do not have an
+associated secondary window that is application modal.
+If the \f2transient\f1 argument is specified, then transient (secondary)
+windows are traversed (otherwise, if only \f2window\f1 is specified,
+traversal is done only to the last focused window in a transient
+group).
+If an \f2icon\f1 function argument is specified, then the
+function applies only to icons.
+If a \f2window\f1 function argument is specified, then the function applies
+only to windows.
+.LI "\f2f.next_workspace\f1"
+This function causes the workspace manager to switch to
+the next workspace.
+If the last workspace is currently active, then this
+function will switch to the first workspace.
+.LI "\f2f.nop\f1"
+This function does nothing.
+.LI "\f2f.normalize\f1"
+This function causes a client window to be displayed with its normal size.
+Secondary windows (that is, transient windows) are placed in their normal state
+along with their associated primary window. 
+.LI "\f2f.normalize_and_raise\f1"
+This function causes a client window to be displayed with its normal size 
+and raised to the top of the window stack.
+Secondary windows (that is, transient windows) are placed in their normal state
+along with their associated primary window. 
+.LI "\f2f.occupy_all\f1"
+This function causes the associated window to be placed in
+all workspaces.
+.LI "\f2f.pack_icons\f1"
+This function is used to relayout icons 
+(based on the layout policy being used)
+on the root window or in the icon box.
+In general this causes icons to be "packed" into the icon grid.
+.LI "\f2f.pass_keys\f1"
+This function is used to enable/disable (toggle) processing of key bindings
+for workspace manager functions.
+When it disables key binding processing all
+keys are passed on to the window with
+the keyboard input focus and no workspace manager functions are invoked.
+If the \f2f.pass_keys\f1 function is invoked with a key binding to
+disable key binding processing the
+same key binding can be used to enable key binding processing. 
+.LI "\f2f.post_wmenu\f1"
+This function is used to post the window menu.
+If a key is used to post
+the window menu and a window menu button is present, the window menu is
+automatically
+placed with its top-left corner at the bottom-left corner of the
+window menu button for the client window.
+If no window menu button is
+present,  the window menu is placed
+at the top-left corner of the client window.
+.LI "\f2f.prev_cmap\f1"
+This function installs the previous colormap in the list of colormaps for
+the window with the colormap focus.
+.LI "\f2f.prev_key\f1 [\f2icon\f1 | \f2window\f1 | \f2transient\f1]"
+This function sets the keyboard input focus to the previous window/icon in
+the set of windows/icons managed by the workspace manager 
+(the ordering of this set is based on the stacking of windows on the screen).
+This function is treated as \f2f.nop\f1 if \f2keyboardFocusPolicy\f1 is not
+explicit.
+The keyboard input focus is only moved to windows that do not have an
+associated secondary window that is application modal.
+If the \f2transient\f1 argument is specified, then transient (secondary)
+windows are traversed (otherwise, if only \f2window\f1 is specified,
+traversal is done only to the last focused window in a transient
+group).
+If an \f2icon\f1 function argument is specified then the
+function applies only to icons.
+If an \f2window\f1 function argument is specified then the function applies
+only to windows.
+.LI "\f2f.prev_workspace\f1"
+This function causes the workspace manager to switch to
+the previous workspace.
+If the first workspace is currently active,
+then this function switches to the last workspace.
+.LI "\f2f.quit_mwm\f1"
+This function terminates dtwm (but NOT the X window system).
+.LI "\f2f.raise\f1\ [\f2\-\f1\f2client\f1 | \f2within\f1 | \f2freeFamily\f1]"
+This function raises a primary window to the top of the global window stack
+(where it is obscured by no other window) and raises the secondary window
+(transient window or dialog box) within the client family.
+The
+arguments to this function are mutually exclusive.
+.sp 1
+The \f2client\f1 argument indicates the name or class of a client to
+lower.
+If the \f2client\f1 is not specified, the context that the
+function was invoked in indicates the window or icon to lower.
+.sp 1
+Specifying \f2within\f1 raises the secondary window within the family
+but does not raise the client family in the
+global window stack.
+.sp 1
+Specifying \f2freeFamily\f1 raises the window to the top of its local
+family stack and raises the family to the top of the global window stack.
+.LI "\f2f.raise_lower\f1\ [\f2within\f1 | \f2freeFamily\f1]"
+This function raises a primary window to the top of the global window
+stack if
+it is partially obscured by another window; otherwise, it lowers the window
+to the bottom of the window stack.
+The arguments to this function
+are mutually exclusive.
+.sp 1
+Specifying \f2within\f1 raises a secondary window within the family
+(staying above the parent window), if it
+is partially obscured by another window in the application's family; 
+otherwise, it lowers the
+window to the bottom of the family stack.
+It has no effect on the global 
+window stacking order.
+.sp 1
+Specifying \f2freeFamily\f1 raises the window to the top of its local family
+stack, if obscured by another window, and raises the family to the top of the 
+global window stack; otherwise, it lowers the window to the bottom of its
+local family stack and lowers the family to the bottom of the global window
+stack.
+.LI "\f2f.refresh\f1"
+This function causes all windows to be redrawn.
+.LI "\f2f.refresh_win\f1"
+This function causes a client window to be redrawn.
+.LI "\f2f.remove\f1"
+This function causes a client window to be removed from the
+current workspace.
+If the client window exists only 
+in this workspace, no action occurs.
+.LI "\f2f.resize\f1"
+This function initiates an interactive resize of a client window.
+.LI "\f2f.restore\f1"
+This function restores the previous state of an icon's associated window.
+If a maximized window is iconified, then
+\f3f.restore\f1 restores it to its maximized state.
+If a normal window is
+iconified, then \f3f.restore\f1 restores it to its normalized state.
+.LI "\f2f.restore_and_raise\f1"
+This function restores the previous state of an icon's associated
+window and raises the window to the top of the window stack.
+If a maximized window is iconified, then
+\f2f.restore_and_raise\f1 restores it to its maximized state and raises it
+to the top of the window stack.
+If a normal window is iconified, then
+\f2f.restore_and_raise\f1 restores it to its normalized state and raises it
+to the top of the window stack.
+.LI "\2f.restart\f1"
+This function causes dtwm to be restarted (effectively terminated
+and re-executed).
+Restart is necessary for \f3dtwm\f1 to incorporate 
+changes in both the \f3dtwmrc\f1 file and X resources.
+.LI "\f2f.screen\f1\ [\f2next\f1 | \f2prev\f1 | \f2back\f1 | \f2screen_number\f1]"
+This function causes the pointer to warp to a specific screen number
+or to the \f2next\f1, \f2previous\f1, or last visited (\f2back\f1) screen.
+The arguments to this function are mutually exclusive.
+.sp 1
+The \f2screen_number\f1 argument indicates the screen number that the
+pointer is to be warped.
+Screens are numbered starting from screen 0.
+.sp 1
+Specifying \f2next\f1 cause the pointer to warp to the next managed
+screen (skipping over any unmanaged screens).
+.sp 1
+Specifying \f2prev\f1 cause the pointer to warp to the previous managed
+screen (skipping over any unmanaged screens).
+.sp 1
+Specifying \f2back\f1 cause the pointer to warp to the last visited
+screen.
+.LI "\f2f.send_msg\f1 \f2message_number\f1"
+This function sends an \f3XClientMessageEvent\f1 of type 
+.I _MOTIF_WM_MESSAGES
+with \f2message_type\f1 set to \f2message_number\f1.
+The client message is sent only if \f2message_number\f1 is included in the
+client's
+.I _MOTIF_WM_MESSAGES
+property.
+A menu item label is grayed out if
+the menu item is used to do \f2f.send_msg\f1 of a message that is not
+included in the client's
+.I _MOTIF_WM_MESSAGES
+property.  
+.LI "\f2f.separator\f1"
+This function causes a menu separator to be put in the menu pane at the
+specified location (the label is ignored).
+.LI "\f2f.set_behavior\f1"
+This function causes the workspace manager to restart with the default 
+behavior (if a custom behavior is configured) or a custom behavior (if a 
+default behavior is configured).
+By default this is bound to \f2Shift\ Ctrl\ Alt\ <Key>!\f1.
+.LI "\f2f.title\f1"
+This function inserts a title in the menu pane at the specified location.
+.LI "\f2f.toggle_frontpanel\f1"
+If the front panel is in the normal state, this function causes it to be
+minimized.
+If the front panel is minimized, this function will change it
+to the normal state.
+.LI "\f2f.version\f1"
+This function causes the workspace manager to display its
+release version in a dialog box.
+.LI "\f2f.workspace_presence\f1"
+This function displays the workspace presence (or "Occupy Workspace")
+dialog box.
+This dialog allows you to view and set the workspace in which 
+a particular window resides.
+The root context is disallowed for this function.
+.LE
+.HU "Function Constraints"
+Each function may be constrained as to which resource types can specify 
+the function (for example, menu pane) and also what context the function can
+be used in (for example, the function is done to the selected client window).
+Function contexts are:
+.VL 15
+.LI \f2root\f1
+No client window or icon has been selected as an object for
+the function.
+.LI \f2window\f1
+A client window has been selected as an object for the function.
+This includes the window's title bar and frame.
+Some functions are applied only when the window is
+in its normalized state (for example, \f2f.maximize\f1) or its maximized state
+(for example, \f2f.normalize\f1).
+.LI \f2icon\f1
+An icon has been selected as an object for the function.
+.LE
+.sp 1
+If a function is specified in a type of resource where it is not supported
+or is invoked in a context that does not apply
+then the function is treated as \f2f.nop\f1.
+The following table indicates the resource types and function contexts in
+which workspace manager functions apply.
+.br
+.ne 6v
+.TS
+tab(@);
+lf1 lf1 lf1
+lf2 lf1 lf1 .
+
+_
+Function@Contexts@Resources
+_
+f.action@root,icon,window@button,key,menu
+f.beep@root,icon,window@button,key,menu
+f.circle_down@root,icon,window@button,key,menu
+f.circle_up@root,icon,window@button,key,menu
+f.create_workspace@root,icon,window@button,key,menu
+f.delete_workspace@root,icon,window@button,key,menu
+f.exec@root,icon,window@button,key,menu
+f.focus_color@root,icon,window@button,key,menu
+f.focus_key@root,icon,window@button,key,menu
+f.goto_workspace@root,icon,window@button,key,menu
+f.help@root,icon,window@button,key,menu
+f.help_mode@root,icon,window@button,key,menu
+f.kill@icon,window@button,key,menu
+f.lower@root,icon,window@button,key,menu
+f.marquee_selection@root@button
+f.maximize@icon,window(normal)@button,key,menu
+f.menu@root,icon,window@button,key,menu
+f.minimize@window@button,key,menu
+f.move@icon,window@button,key,menu
+f.next_cmap@root,icon,window@button,key,menu
+f.next_key@root,icon,window@button,key,menu
+f.next_workspace@root,icon,window@button,key,menu
+f.nop@root,icon,window@button,key,menu
+f.normalize@icon,window(maximized)@button,key,menu
+f.normalize_and_raise@icon,window@button,key,menu
+f.occupy_all@icon,window@button,key,menu
+f.pack_icons@root,icon,window@button,key,menu
+f.pass_keys@root,icon,window@button,key,menu
+f.post_wmenu@root,icon,window@button,key
+f.prev_cmap@root,icon,window@button,key,menu
+f.prev_key@root,icon,window@button,key,menu
+f.prev_workspace@root,icon,window@button,key,menu
+f.quit_dtwm@root@button,key,menu (root only)
+f.raise@root,icon,window@button,key,menu
+f.raise_lower@icon,window@button,key,menu
+f.refresh@root,icon,window@button,key,menu
+f.refresh_win@window@button,key,menu
+f.remove@root,icon,window@button,key,menu
+f.resize@window@button,key,menu
+f.restart@root@button,key,menu (root only)
+f.restore@icon,window@button,key,menu
+f.restore_and_raise@icon,window@button,key,menu
+f.screen@root,icon,window@button,key,menu
+f.send_msg@icon,window@button,key,menu
+f.separator@root,icon,window@menu
+f.set_behavior@root,icon,window@button,key,menu
+f.title@root,icon,window@menu
+f.toggle_frontpanel@root,icon,window@button,key,menu
+f.version@root,icon,window@button,key,menu
+f.workspace_presence@window@button,key,menu
+.TE
+.SH "WORKSPACE MANAGER EVENT SPECIFICATION"
+Events are indicated as part of the specifications for button and key
+binding sets, and menu panes.
+.sp 1
+Button events have the following syntax:
+.Cs I
+\f3button\f1 =~[\f3modifier_list\f1]\f2<\f3button_event_name\f1\f2>\f1
+\f3modifier_list\f1 =~\f3modifier_name\f1 {\f3modifier_name\f1}
+.Ce
+.sp 1
+The following table indicates the values that can be used
+for \f3modifier_name\f1.
+Note that [Alt] and [Meta] can be used
+interchangably on some hardware.
+.br
+.ne 6v
+.TS
+tab(@);
+lf1 lf1
+lf1 lf1 .
+
+_
+Modifier@Description
+_
+Ctrl@Control Key
+Shift@Shift Key
+Alt@Alt Key
+Meta@Meta Key
+Mod1@Modifier1
+Mod2@Modifier2
+Mod3@Modifier3
+Mod4@Modifier4
+Mod5@Modifier5
+.TE
+.sp 1
+Locking modifiers are ignored when processing button and key 
+bindings.
+The following table lists keys that are interpreted as locking
+modifiers.
+The X server may map some of these symbols to the
+Mod1 - Mod5 modifier keys.
+These keys may or may not be available on
+your hardware:
+.br
+Key Symbol
+.br
+Caps Lock
+.br
+Shift Lock
+.br
+Kana Lock
+.br
+Num Lock
+.br
+Scroll Lock
+.sp 1
+The following table indicates the values that can be used for
+\f3button_event_name\f1.
+.br
+.ne 6v
+.TS
+tab(@);
+lf1 lf1
+lf1 lf1 .
+
+_
+Button@Description
+_
+Btn1Down@Button 1 Press
+Btn1Up@Button 1 Release
+Btn1Click@Button 1 Press and Release
+Btn1Click2@Button 1 Double Click
+Btn2Down@Button 2 Press
+Btn2Up@Button 2 Release
+Btn2Click@Button 2 Press and Release
+Btn2Click2@Button 2 Double Click
+Btn3Down@Button 3 Press
+Btn3Up@Button 3 Release
+Btn3Click@Button 3 Press and Release
+Btn3Click2@Button 3 Double Click
+Btn4Down@Button 4 Press
+Btn4Up@Button 4 Release
+Btn4Click@Button 4 Press and Release
+Btn4Click2@Button 4 Double Click
+Btn5Down@Button 5 Press
+Btn5Up@Button 5 Release
+Btn5Click@Button 5 Press and Release
+Btn5Click2@Button 5 Double Click
+.TE
+.sp 1
+Key events that are used by the workspace manager for menu mnemonics
+and for binding to workspace manager functions are single key presses;
+key releases are ignored.
+Key events have the following syntax:
+.Cs I
+\f3key\f1 =~[\f3modifier_list\f1]\f2<Key>\f1\f3key_name\f1
+\f3modifier_list\f1 =~\f3modifier_name\f1 {\f3modifier_name\f1}
+.Ce
+.sp 1
+All modifiers specified are interpreted as being exclusive
+(this means that only the specified modifiers can be present when the
+key event occurs).
+Modifiers for keys are the same as those that apply to buttons.
+The \f3key_name\f1 is an X11 keysym name.
+Keysym names can be found in the \f3keysymdef.h\f1 file
+(remove the \f3XK_\f1 prefix).
+.SH "BUTTON BINDINGS"
+The \f3buttonBindings\f1 resource value is the name of a set of button 
+bindings that are used to configure workspace manager behavior.
+A workspace manager function can be done when a button press  occurs with 
+the pointer over a framed client window,
+an icon or the root window.
+The context for indicating where the button press applies is also the
+context for invoking the workspace manager function when the button press
+is done (significant for functions that are context sensitive).  
+.sp 1
+The button binding syntax is
+.Cs I
+\f2Buttons\f1 \f3bindings_set_name\f1
+\f2{\f1
+    \f3button\f1    \f3context\f1    \f3function\f1
+    \f3button\f1    \f3context\f1    \f3function\f1
+                         .
+                         .
+    \f3button\f1    \f3context\f1    \f3function\f1
+\f2}\f1
+.Ce
+.sp 1
+The syntax for the \f3context\f1 specification is: 
+.br
+\f3context\f1 = \f3object\f1[\f2|\f1\f3context\f1]
+.br
+\f3object\f1 = \f2root\f1 | \f2icon\f1 | \f2window\f1 | \f2title\f1 |
+\f2frame\f1 | \f2border\f1 | \f2app\f1
+.sp 1
+The context specification indicates where the pointer must be for the
+button binding to be effective.
+For example, a context of \f2window\f1 indicates that the pointer must
+be over a client window or
+window management frame for the button binding to be effective.
+The \f2frame\f1 context is for the window management frame around a
+client window
+(including the border and titlebar), the \f2border\f1 context is
+for the border part of the window management frame
+(not including the titlebar), the \f2title\f1
+context is for the title area of the window management frame,
+and the \f2app\f1 context is for the application window
+(not including the window management frame).  
+.sp 1
+If an \f2f.nop\f1 function is specified for a button binding, the button
+binding is not done.
+.SH "KEY BINDINGS"
+The \f3keyBindings\f1 resource value is the name of a set of key 
+bindings that are used to configure workspace manager behavior. 
+A window
+manager function can be done when a particular key is pressed. 
+The context in which the key binding applies is indicated in the key
+binding specification.
+The valid contexts are the same as those that apply to button bindings.
+.sp 1 
+The key binding syntax is:
+.Cs I
+\f2Keys\f1 \f3bindings_set_name\f1
+\f2{\f1
+    \f3key\f1    \f3context\f1    \f3function\f1
+    \f3key\f1    \f3context\f1    \f3function\f1
+                .
+                .
+    \f3key\f1    \f3context\f1    \f3function\f1
+\f2}\f1
+.Ce
+.sp 1
+If an \f2f.nop\f1 function is specified for a key binding, the key
+binding is not done.
+If an \f2f.post_wmenu\f1 or \f2f.menu\f1 function is bound to a 
+key,
+.B dtwm
+automatically uses the same key for removing the menu from
+the screen after it has been popped up.
+.sp 1
+The \f3context\f1 specification syntax is the same as for button bindings
+with one addition.
+The context \f2ifkey\f1 may be specified for binding
+keys that may not be available on all displays.
+If the key is not
+available and if \f2ifkey\f1 is in the context, then reporting of the
+error message to the error log is suppressed.
+This feature is useful
+for networked, heterogeneous environments.
+.sp 1
+For key bindings, the \f2frame\f1, \f2title\f1, \f2border\f1, and \f2app\f1 
+contexts are equivalent to the \f2window\f1 context.
+The context for a key event is the window or icon that has the keyboard
+input focus (\f2root\f1 if no window or icon has the keyboard input focus).
+.SH "MENU PANES"
+Menus can be popped up using the \f2f.post_wmenu\f1 and
+\f2f.menu\f1 workspace manager functions.
+The context for workspace manager functions that are done from 
+a menu is \f2root\f1, \f2icon\f1 or \f2window\f1 depending on how the
+menu was popped up.
+In the case of the \f2window\f1 menu or menus popped up with a key
+binding, the location of the keyboard input
+focus indicates the context.
+For menus popped up using a button binding,
+the context of the button binding is the context of the menu.
+.sp 1  
+The menu pane specification syntax is:
+.Cs I
+\f2Menu\f1 \f3menu_name\f1
+\f2{\f1
+    \f3label\f1  [\f3mnemonic\f1]  [\f3accelerator\f1]   \f3function\f1
+    \f3label\f1  [\f3mnemonic\f1]  [\f3accelerator\f1]   \f3function\f1
+                .
+                .
+    \f3label\f1  [\f3mnemonic\f1]  [\f3accelerator\f1]   \f3function\f1
+\f2}\f1
+.Ce
+.sp 1
+Each line in the \f2Menu\f1 specification identifies the label for a menu
+item and the function to be done if the menu item is selected.
+Optionally a menu button mnemonic and a menu button keyboard accelerator
+may be specified.
+Mnemonics are functional only when the menu is posted
+and keyboard traversal applies.
+.sp 1
+The \f3label\f1 may be a string or a bitmap file.
+The label specification has the following syntax:
+.Cs I
+\f3label\f1 = \f3text\f1 | \f3bitmap_file\f1
+\f3bitmap_file\f1 = \f2@\f1\f3file_name\f1
+\f3text\f1 = \f3quoted_item\f1 | \f3unquoted_item\f1
+.Ce
+.sp 1  
+The string encoding for labels must be compatible with the menu font that 
+is used.
+Labels are greyed out for menu items that do the \f2f.nop\f1 function 
+or an invalid function or a function that doesn't apply in the current
+context.
+.sp 1
+A \f3mnemonic\f1 specification has the following syntax:
+.Cs I
+\f3mnemonic\f1 = \f2_\f1\f3character\f1
+.Ce
+The first matching \f3character\f1 in the label is underlined.
+If there is no matching \f3character\f1 in the label, no 
+mnemonic is registered with the workspace manager for that label.
+Although the \f3character\f1 must exactly match a character in the
+label,
+the mnemonic does not execute if any modifier (such as Shift) is pressed
+with the character key.
+.sp 1
+The \f3accelerator\f1 specification is a key event specification with
+the same syntax as is used for key bindings to workspace manager functions.
+.SH "INCLUDING FILES"
+You may include other files into your dtwmrc file by using the
+\f2include\f1 construct.
+For example,
+.Cs I
+INCLUDE
+{
+    /usr/local/shared/dtwm.menus
+    /home/kmt/personal/my.bindings
+}
+.Ce
+causes the files named to be read in and interpreted in order as an
+additional part of the dtwmrc file. 
+.sp 1
+\f2Include\f1 is a top-level construct.
+It cannot be nested
+inside another construct. 
+.SH WARNINGS
+Errors that occur during the processing of  
+the resource description file are recorded in: \f3$HOME/.dt/errorlog\f1.  
+Be sure to check this file if the appearance or behavior of \f3dtwm\f1 
+is not what you expect.
+.SH FILES
+\f3$HOME/.dt/$LANG/dtwmrc
+.br
+$HOME/.dt/dtwmrc
+.br
+/etc/dt/config/$LANG/sys.dtwmrc
+.br
+/etc/dt/config/sys.dtwmrc
+.br
+/usr/dt/config/$LANG/sys.dtwmrc
+.br
+/usr/dt/config/sys.dtwmrc
+.br
+$HOME/.dt/errorlog\f1
+.SH "RELATED INFORMATION"
+.BR dtwm (1),
+.BR mwm( 1X),
+.BR dtfile (1),
+.BR X (1).

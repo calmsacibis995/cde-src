@@ -1,0 +1,60 @@
+#!/bin/ksh
+
+typeset -r USAGE="$(basename $0) [ -p <pattern> ... ] file ..."
+typeset PATTERN=""
+
+set -- $(getopt p: $* )
+
+while [ $# -gt 0 ]; do
+	case $1 in
+	-p) # interpret as argument flag
+	    shift;
+	    if [ -z "$PATTERN" ]; then
+		PATTERN="$1"
+	    else
+		PATTERN="$PATTERN|$1"
+	    fi
+	    ;;
+	--) # reached end of switches
+	    shift;
+	    break;
+	    ;;
+	-*) # unrecognized argument
+	    echo "Unrecognized flag: $1"
+	    echo $USAGE
+	    exit 1;
+	    ;;
+	*)  break;
+	    ;;
+	esac
+	shift;
+done
+
+#
+# The 7.0 awk (or nawk) does not recognize the "-v" flag.
+#
+AWK=/usr/bin/awk
+[ -x /usr/bin/nawk ] && AWK=/usr/bin/nawk
+ 
+$AWK '
+	BEGIN {
+	Pattern="'$PATTERN'"
+	PrintFlag = 1
+}
+	$1 == "<!--" && $2 == "IFDEF" && $4 == "ONLY" && $5 != "END" { 
+	if (  Pattern  !~ $3 ) {
+		PrintFlag = 0;
+		next;
+	}
+}
+	$1 == "<!--" && $2 == "IFDEF" && $4 == "ONLY" && $5 == "END" &&
+	$6 == "-->" {
+	if ( ! PrintFlag ) {
+		PrintFlag = 1;
+		next;
+	}
+}
+	PrintFlag == 1 {
+	print $0
+}
+' $*

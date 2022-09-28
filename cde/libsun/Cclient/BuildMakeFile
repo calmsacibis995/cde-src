@@ -1,0 +1,37 @@
+.KEEP_STATE:
+.NO_PARALLEL:
+#
+# @(#)BuildMakeFile	1.7 97/05/23
+#
+# Make the IMAP server and client
+
+debug opt all tcov: process
+	cd c-client;$(MAKE) "BLD_FLAGS=$(BLD_FLAGS)" "SHAREDLIB=$(SHLIB)" $@
+
+includes: process
+	cd c-client;$(MAKE) includes
+
+depend:
+
+process: c-client
+	@echo Processing sources for Solaris...
+	(cd c-client ; \
+	       	$(RM) * ; \
+		ln -s ../src/osdep/unix/* . ; \
+		$(RM) SCCS; \
+		ln -s ../src/c-client/*.[ch] . )
+	touch process
+
+c-client:
+	mkdir c-client
+
+imapd:
+	if [ ! -d imapd ]; then \
+		mkdir imapd ; \
+		(cd imapd ; ln -s ../src/imapd/* .) ; \
+	fi
+	cd imapd;$(MAKE) "BLD_FLAGS=$(BLD_FLAGS)"
+
+clean:
+	$(RM) -r c-client imapd process 
+

@@ -1,0 +1,161 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH XmGetPixmap 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmGetPixmap\fP \- A pixmap caching function that generates a pixmap, stores it in a pixmap cache, and returns the pixmap
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/Xm.h>
+.sp \n(PDu
+Pixmap XmGetPixmap (\fBscreen, image_name, foreground, background\fI)
+.ta .5i 1.5i
+.nf
+	Screen	*\fBscreen\fI;
+	char	*\fBimage_name\fI;
+	Pixel	\fBforeground\fI;
+	Pixel	\fBbackground\fI;
+.wH
+.fi
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+\fIXmGetPixmap\fP
+uses the parameter data to perform a lookup in the
+pixmap cache to see if a pixmap has already been generated that
+matches the data.  If one is found, a reference count is incremented
+and the pixmap is returned.  Applications should use \fIXmDestroyPixmap\fP
+when the pixmap is no longer needed.
+.PP 
+If a pixmap is not found, \fBimage_name\fP is used to perform a lookup in
+the image cache.  If an image is found, it is used to generate the pixmap,
+which is then cached and returned.
+.PP
+If an image is not found, the
+\fBimage_name\fP is used as a filename, and a search is made for
+an \fIX10\fP or \fIX11\fP bitmap file.  If it is found, the file is
+read, converted into an image, and cached in the image cache.  The image
+is then used to generate a pixmap, which is cached and returned.
+.PP 
+If \fBimage_name\fP has a leading slash (\fI/\fP), it specifies a full
+pathname, and \fIXmGetPixmap\fP opens the file as specified.
+Otherwise, \fBimage_name\fP specifies a filename.
+In this case \fIXmGetPixmap\fP looks for the file along a search path
+specified by the \fIXBMLANGPATH\fP environment variable or by a default
+search path, which varies depending on whether or not the
+\fIXAPPLRESDIR\fP environment variable is set.
+.PP
+The \fIXBMLANGPATH\fP environment variable specifies a search path
+for X bitmap files.
+It can contain the substitution field %B, where the \fBimage_name\fP
+argument to \fIXmGetPixmap\fP is substituted for %B.
+It can also contain the substitution fields accepted by
+\fIXtResolvePathname\fP.
+The substitution field %T is always mapped to \fIbitmaps\fP, and %S is
+always mapped to NULL.
+.PP
+If \fIXBMLANGPATH\fP is not set but the environment variable
+\fIXAPPLRESDIR\fP is set, the following pathnames are searched:
+.iS
+.ta 1i
+.nf
+	%B
+	$XAPPLRESDIR/%L/bitmaps/%N/%B
+	$XAPPLRESDIR/%l/bitmaps/%N/%B
+	$XAPPLRESDIR/bitmaps/%N/%B
+	$XAPPLRESDIR/%L/bitmaps/%B
+	$XAPPLRESDIR/%l/bitmaps/%B
+	$XAPPLRESDIR/bitmaps/%B
+	$HOME/bitmaps/%B
+	$HOME/%B
+	/usr/lib/X11/%L/bitmaps/%N/%B
+	/usr/lib/X11/%l/bitmaps/%N/%B
+	/usr/lib/X11/bitmaps/%N/%B
+	/usr/lib/X11/%L/bitmaps/%B
+	/usr/lib/X11/%l/bitmaps/%B
+	/usr/lib/X11/bitmaps/%B
+	/usr/include/X11/bitmaps/%B
+.wH
+.fi
+.iE
+.PP 
+If neither \fIXBMLANGPATH\fP nor \fIXAPPLRESDIR\fP is set, the
+following pathnames are searched:
+.iS
+.ta 1i
+.nf
+	%B
+	$HOME/%L/bitmaps/%N/%B
+	$HOME/%l/bitmaps/%N/%B
+	$HOME/bitmaps/%N/%B
+	$HOME/%L/bitmaps/%B
+	$HOME/%l/bitmaps/%B
+	$HOME/bitmaps/%B
+	$HOME/%B
+	/usr/lib/X11/%L/bitmaps/%N/%B
+	/usr/lib/X11/%l/bitmaps/%N/%B
+	/usr/lib/X11/bitmaps/%N/%B
+	/usr/lib/X11/%L/bitmaps/%B
+	/usr/lib/X11/%l/bitmaps/%B
+	/usr/lib/X11/bitmaps/%B
+	/usr/include/X11/bitmaps/%B
+.wH
+.fi
+.iE
+.PP
+These paths are defaults that vendors may change.
+For example, a vendor may use different directories for
+\fI/usr/lib/X11\fP and \fI/usr/include/X11\fP.
+.PP 
+The following substitutions are used in these paths:
+.IP "\fI%B\fP"
+The image name, from the \fBimage_name\fP argument.
+.IP "\fI%N\fP"
+The class name of the application.
+.IP "\fI%L\fP"
+The display's language string.
+.IP "\fI%l\fP"
+The language component of the display's language string.
+.PP 
+Parameter descriptions are listed below:
+.IP "\fBscreen\fP"
+Specifies the display screen on which the pixmap is to
+be drawn.
+The depth of the pixmap is the default depth for this screen.
+.IP "\fBimage_name\fP"
+Specifies the name of the image to be used to
+generate the pixmap
+.IP "\fBforeground\fP"
+Combines the image with the \fBforeground\fP color to create the pixmap
+if the image referenced is a bit-per-pixel image
+.IP "\fBbackground\fP"
+Combines the image with the \fBbackground\fP color to create the pixmap
+if the image referenced is a bit-per-pixel image
+.SH RETURN VALUE
+Returns a pixmap when successful; returns \fIXmUNSPECIFIED_PIXMAP\fP
+if the image corresponding to the \fBimage_name\fP cannot be found.
+.SH RELATED INFORMATION
+.na
+\fIXmDestroyPixmap(3X)\fP,
+\fIXmGetPixmapByDepth(3X)\fP,
+\fIXmInstallImage(3X)\fP, and
+\fIXmUninstallImage(3X)\fP.
+.ad

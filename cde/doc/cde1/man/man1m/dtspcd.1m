@@ -1,0 +1,239 @@
+.\"---  Man page for the "dtspcd" client.
+.\"---
+.\"----------------------------------------------------------------------------
+.\"----------------------------------------------------------------------------
+.TH dtspcd 1M "12 January 1994"
+.BH "12 January -1994"
+.\"---
+.\"----------------------------------------------------------------------------
+.\" *************************************************************************
+.\" ** (c) Copyright 1993,1994 Hewlett-Packard Company
+.\" ** (c) Copyright 1993,1994 International Business Machines Corp.
+.\" ** (c) Copyright 1993,1994 Sun Microsystems, Inc.
+.\" ** (c) Copyright 1993,1994 Novell, Inc
+.\" *************************************************************************
+.SH NAME
+dtspcd \- CDE Subprocess Control Service
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- SYNOPSIS 
+.\"---
+.SH SYNOPSIS
+.B dtspcd
+[
+.B \-debug
+]
+[
+.B \-log
+]
+[
+.B \-auth_dir 
+.I directory
+]
+.if n .ti +7n
+[
+.B \-timeout 
+.I num_minutes
+]
+[
+.B \-mount_point 
+.I mount_point
+]
+.if n .ti +5n
+.LP
+.nf
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- DESCRIPTION 
+.\"---
+.SH DESCRIPTION
+
+dtspcd is a daemon for the 
+CDE (CDE) 
+Subprocess Control service.
+It is not intended to be started directly by the user,  
+rather it should be started automatically by the inetd 
+daemon (see inetd(1M)) in response to a CDE client 
+requesting a process to be started on the daemon's host.
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- OPTIONS
+.\"---
+.SH OPTIONS
+.TP
+.BI \-auth_dir " directory"
+The default authentication directory is the user's
+$HOME directory.  This option allows the system
+administrator to use a different directory.  Note
+"directory" must be exported to hosts wishing
+to use the dtspc service.
+.P
+.RS
+.I "directory "
+\- the name of the directory to use for authentication.
+.RE
+.\"---
+.\"---
+.TP
+.BI \-timeout " minutes"
+By default, the dtspcd process will terminate if it does
+not have any activity (process start or process stop) 
+for 10 minutes and dtspcd
+has no child processes running.  
+To change the timeout, set "minutes" to the 
+desired number of minutes.  
+To force the daemon to not use a timer, 
+set "minutes" to "-1".
+.P
+.RS
+.I "minutes "
+\- the number of minutes for the timer.
+.RE
+.\"---
+.\"---
+.TP
+.BI \-mount_point " mount_point"
+"mount_point" is the name of the file system's
+mount point.  For example, "mount_point" could
+be "/net" or "/nfs".  The daemon sets the
+environment variable "DTMOUNTPOINT" to the
+value of "mount_point".   This value
+of DTMOUNTPOINT will override all other 
+definitions of DTMOUNTPOINT.
+.P
+.RS
+.I "mount_point "
+\- the file system's mount point.
+.RE
+.\"---
+.\"---
+.TP
+.B \-log            
+.if n .ti +0n
+This option turns on logging of status information
+to the file 
+"/var/dt/tmp/DTSPCD.log".  The information logged
+includes the name of the client host, the client's
+username, error messages and the name of the file 
+used for authentication.
+The default is to not do any logging.
+.TP
+.\"---
+.\"---
+.B \-debug
+This option turns on logging of dtspc protocol 
+to the file "/var/dt/tmp/DTSPCD.log".  The
+protocol information logged includes
+the name of the protocol and number of bytes
+in the request.
+The default is to not log the protocol.
+.\"--- 
+.\"--- Authentication
+.\"---
+.SH AUTHENTICATION
+.LP
+When a CDE client attempts to connect to a dtspcd daemon, 
+the client sends the daemon its username.  The
+daemon uses the username to determine the user's
+home directory on the daemon's host.  The home 
+directory is used during authentication and it
+must be readable by the daemon and writable by
+the client.  Therefore, the user's home directory
+on the daemon's host must be mounted to the client 
+host.  If the user's home directory is not readable
+and the "-auth_dir" command line option is not used,
+the directory /var/dt/tmp will be used.
+.P
+To use a directory other than the user's home directory 
+for authentication, use the "-auth_dir" command
+line option.
+.\"---
+.\"--- Configuration
+.\"---
+.SH CONFIGURATION
+.LP
+The dtspcd daemon is an Internet service that must
+be registered in the file /etc/services as follows:
+.P
+.RS 
+dtspc      6112/tcp
+.RE
+.TP
+and in the file /etc/inetd.conf as follows:
+.P
+.RS
+dtspc  stream  tcp  nowait  root  /usr/dt/bin/dtspcd \\
+.RS
+/usr/dt/bin/dtspcd
+.P
+.\"---
+.\"--- Environment management
+.\"---
+.SH "ENVIRONMENT VARIABLE MANAGEMENT"
+.LP
+The CDE Subprocess Control service allows 
+the user and system administrator to
+create files of environment variable
+definitions to be placed in the
+processes environment before a remote
+process is started.  See dtspcdenv(4M)
+for more information.
+.\"---
+.\"--- Operating system dependencies
+.\"---
+.SH "OPERATING SYSTEM DEPENDENCIES"
+.LP
+On HP-UX, the file /usr/adm/inetd.sec may be used to 
+control access to the dtspcd daemon.  See inetd.sec(4)
+for more information.
+.\"---
+.\"--- All files referenced in this man page
+.\"---
+.SH FILES
+.PD 0
+.TP 25
+.B /usr/dt/bin/dtspcd 
+The CDE Subprocess Control daemon
+.PD 0
+.TP 25
+.B /etc/services
+The Internet service name data base
+.PD 0
+.TP 25
+.B /etc/inted.conf
+The inetd configuration file
+.PD 0
+.TP 25
+.B /etc/dt/config/dtspcdenv
+System-wide, locally defined environment variable 
+definitions used when a process is executed
+.PD 0
+.TP 25
+.B /usr/dt/config/dtspcdenv
+System-wide, installed environment variable definitions 
+used when a process is executed
+.PD 0
+.TP 25
+.B $HOME/.dt/dtspcdenv
+User-specific environment variable definitions used 
+when a process is executed
+.PD 0
+.TP 25
+.B /var/dt/tmp/DTSPCD.log
+The dtspcd log file
+.\"---
+.\"--- Related man pages
+.\"---
+.PD
+.SH "SEE ALSO"
+.BR inetd (1M)
+.BR services (4),
+.BR inetd.conf (4),
+.BR dtspcdenv (4M).
+.\"---
+.\"--- Diagnostics
+.\"---
+.SH DIAGNOSTICS
+Use the command line options "-log" and
+"-debug" (describe above) to get diagnostic
+information.

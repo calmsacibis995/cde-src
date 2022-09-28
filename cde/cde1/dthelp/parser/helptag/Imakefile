@@ -1,0 +1,26 @@
+XCOMM $XConsortium: Imakefile /main/cde1_maint/3 1995/10/09 00:06:27 pascale $
+#ifndef ReleaseTree
+    LOCAL_CPP_DEFINES = 
+#else
+    LOCAL_CPP_DEFINES =  -DReleaseTree
+#endif 
+
+
+#ifdef AlphaArchitecture
+    STAT_LOCAL_CPP_DEFINES =  -DPLAT_FIX
+#endif
+
+
+ICONS = cauticon.pm  noteicon.pm  warnicon.pm
+
+CppTextRule(dthelptag,helptag.src,$(LOCAL_CPP_DEFINES),)
+
+lint::
+
+/* For install of developer's build environment */
+LOCAL_BINSTALL_BINDEST = bin
+BuildMultipleInstall(dthelptag,$(LOCAL_BINSTALL_BINDEST))
+
+/* For dthelp tests */
+LOCAL_BINSTALL_ICONDEST = misc/dthelptag/icons
+BuildMultipleInstall($(ICONS),$(LOCAL_BINSTALL_ICONDEST))

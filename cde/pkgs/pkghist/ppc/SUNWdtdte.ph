@@ -1,0 +1,4 @@
+PKG=SUNWdtdte
+ARCH=ppc
+VERSION=1000
+PKGRM=yes

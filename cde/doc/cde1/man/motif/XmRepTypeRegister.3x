@@ -1,0 +1,95 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Novell, Inc
+...\" **
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **
+.TH XmRepTypeRegister 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmRepTypeRegister\fP \- A representation type manager function
+that registers a representation type resource
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/RepType.h>
+.sp \n(PDu
+XmRepTypeId XmRepTypeRegister (\fBrep_type, value_names, values, num_values\fI)
+.ta .5i 1.75i
+.nf
+	String	\fBrep_type\fI;
+	String	*\fBvalue_names\fI;
+	unsigned char	*\fBvalues\fI;
+	unsigned char	\fBnum_values\fI;
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+\fIXmRepTypeRegister\fP registers a representation
+type resource with the representation type manager.  All
+features of the representation type management facility become
+available for the specified representation type.  The function
+installs a forward type converter to convert string values to
+numerical representation type values.
+.PP
+When the \fBvalues\fP argument is NULL, consecutive numerical
+values are assumed.  The order of the strings in the \fBvalue_names\fP
+array determines the numerical values for the resource.  For example,
+the first value name is 0; the second value name is 1; and so on.
+.PP
+If it is non-NULL, the \fBvalues\fP argument can be used to assign values
+to representation types that have nonconsecutive values or have
+duplicate names for the same value.  Representation types registered
+in this manner will consume additional storage and will be slightly
+slower than representation types with consecutive values.
+.PP
+A representation type can only be registered once; if the
+same representation type name is registered more than once, the
+behavior is undefined.
+.PP
+The function \fIXmRepTypeAddReverse\fP installs a reverse converter
+for a registered representation type.  The reverse converter takes
+a representation type numerical value and returns the corresponding
+string value. If the list of numerical values for a representation
+type contains duplicate values, the reverse converter uses the first
+name in the \fBvalue_names\fP list that matches the specified numeric
+value.  For example, if a \fBvalue_names\fP array has \fIcancel\fP,
+\fIproceed\fP, and \fIabort\fP, and the corresponding \fBvalues\fP array
+contains 0, 1, and 0, the reverse converter will return \fIcancel\fP
+instead of \fIabort\fP for an input value of 0.
+.IP "\fBrep_type\fP"
+Specifies the representation type name.
+.IP "\fBvalue_names\fP"
+Specifies a pointer to an array of value names associated with the
+representation type.  A value name is specified in lowercase characters
+without an "Xm" prefix.  Words within a name are separated with
+underscores.
+.IP "\fBvalues\fP"
+Specifies a pointer to an array of values associated with the
+representation type.  A value in this array is associated with
+the value name in the corresponding position of the \fBvalue_names\fP
+array.
+.IP "\fBnum_values\fP"
+Specifies the number of entries in the \fBvalue_names\fP and
+\fBvalues\fP arrays.
+.SH RETURN VALUE
+Returns the identification number for the specified representation
+type.
+.SH RELATED INFORMATION
+.na
+\fIXmRepTypeAddReverse(3X)\fP,
+\fIXmRepTypeGetId(3X)\fP,
+\fIXmRepTypeGetNameList(3X)\fP,
+\fIXmRepTypeGetRecord(3X)\fP,
+\fIXmRepTypeGetRegistered(3X)\fP, and
+\fIXmRepTypeValidValue(3X)\fP.
+.ad

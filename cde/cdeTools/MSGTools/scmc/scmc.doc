@@ -1,0 +1,551 @@
+/*
+ * COMPONENT_NAME: (PIITOOLS) AIX PII Tools
+ *
+ * FUNCTIONS: Documentation file for scmc
+ *
+ * ORIGINS: 27
+ *
+ * IBM CONFIDENTIAL -- (IBM Confidential Restricted when
+ * combined with the aggregated modules for this product)
+ * OBJECT CODE ONLY SOURCE MATERIALS
+ * (C) COPYRIGHT International Business Machines Corp. 1988
+ * All Rights Reserved
+ *
+ * US Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
+ */                                                                   
+scmc
+
+Purpose
+
+	Extracts messages from C source code modules for use with
+	the X-Open Message facility.
+
+Syntax
+
+	scmc [-f<configuration file>] [-l<level number>] [-b] [-q] <source file>
+
+
+Description
+
+The scmc utility is a C source code message converter.  It converts strings
+designed for application users into a form suitable for use with the X-Open
+Message facility.  This facility consists of utilities and functions that 
+enable a programmer to isolate the text of messages from the executable 
+application.  This enables you to modify or translate the text of messages
+without rebuilding the application.  The scmc utility relies on the mkcatdefs
+and gencat utilities, as well as several Natural Language Support (NLS)
+functions that reside in libc.  The scmc utility also provides control 
+over the content of the messages themselves by employing a spelling file.
+
+To understand scmc and this description, you should already be familiar
+with the following:
+
+	-  mkcatdefs
+	-  gencat
+	-  the message file (<file>.msg)
+	-  the relationship between a message file, a message catalogue
+           (<file>.cat), and the include file (<file>_msg.h) generated
+           by the mkcatdefs utility
+
+Once you have converted an application, anyone is able to modify the
+contents of the converted messages.  The scmc utility modifies source
+code statements such as printf to message functions.  The programmer
+must rebuild his application at least once before the conversion is
+complete.  When complete, anyone can edit the message file and generate
+a new message catalogue.  The Extended Description section provides a
+step by step procedure for using scmc.
+
+
+Options
+
+  -f<configuration file> -  This indicates the name of the configuration 
+                            file to be used.  If the -f is not specified, 
+                            /usr/lpp/scmc/cfig is used.
+
+  -l<level number>       -  This indicates the level at which the operator
+                            must confirm the substitutions.  If the 
+                            program is invoked with '-l3', all substitutions 
+                            with a level of 2 or less will be made without 
+                            asking the operator for confirmation.  The 
+                            default level is 0.
+
+  -b                     -  Specifies batch mode.  No substitutions at or
+                            above the specified level occur.  The scmc 
+                            utility writes the list of bad words and where
+                            they are found to stderr.
+
+  -q                     -  Asks the operator to enter the names used for
+                            the messages.  Without this flag, scmc uses
+                            message names of the general form: E_MSG_<number>.
+
+  <source file>          -  This is the name of the source file to be parsed.
+
+
+
+Input files:
+
+ <file>.msg    -  This file (if it exists) is assumed to contain any
+                  existing messages for <source file>.  If this file 
+                  exists, scmc appends additional messages to it.  If it 
+                  doesn't exist, scmc creates it.  Your configuration
+                  file can contain substitution methods that specify
+                  other message files.  The scmc utility appends or
+                  creates these also.
+
+ <file>_msg.h  -  This file is assumed to contain the #define statements
+                  for the message and set names.  If this file does not
+                  exist, any messages that have names in <file>.msg
+  		  are not recognized as messages.  It must reside in the
+                  same directory as <source file> and <file>.msg.
+ 
+ <file>.cat    -  This file is the message catalogue that the converted
+                  application reads to extract messages.  The scmc utility
+                  uses gencat to produce this file based on the contents
+                  of <file>.msg.
+
+ <configuration file>  
+
+The configuration file is a file that contains information describing 
+patterns for use in determining what constitutes a message.  It also 
+contains the information used to determine which message file the 
+message is placed in, a prefix for the message name, the set name 
+for the message, and whether the operator must confirm the substitution.
+
+The configuration file can be specified on the command line ("-f<cfig-name>").
+If no file is specified, /usr/lpp/scmc/cfig is used.
+
+The configuration file contains a list of keywords and associated parameters 
+followed by a blank line and a list of substitution methods.  Colons 
+are used to separate the parameters.  The backslash character (\) can 
+be used to remove any special meaning from a colon or comma.  The general
+format of the configuration file is a follows: 
+
+<keywd>:<lvl>:<pno>:<pst[,pst]...>:<pdl[,pdl]...>:[<m-pfx>]:[<set>]:<subname>
+.
+.
+.
+{A blank line to separate the list of keywords from the list of substitutions.}
+<subname>:<format>:<catd>:[<file-name>]
+.
+.
+.
+
+Definitions (for keyword list):
+
+<keywd>		- A string that occurs before the start of a list of 
+                  parameters.
+<lvl>		- The level of operator intervention necessary to perform
+                  the substitution.  A number from 0 to 64K.
+<pno>		- The number of the parameter to be substituted out, starting
+    		  at zero. 
+<pst[,pst]...>	- A list of possible starting strings for the parameter.  Each
+                  member of the list separated by commas.
+<pdl[,pdl]...>	- A list of possible strings used to separate parameters.
+[<m-pfx>]	- An optional prefix to the message name.
+[<set-name>]	- An optional set name. If no set name is provided, 
+                  MS_<source file> is used.
+<subname>	- The name of the substitution method.
+
+
+Definitions for substitution method list:
+
+<subname>	- The name of the substitution method.
+<format>        - The string used to replace the parameter.  This string may
+		  (and probably should) contain the following special strings.
+                  These strings represent substitutions.
+
+                     %p - The original parameter.
+                     %s - The set name of the message.
+                     %m - The message name of the message.
+                     %c - The <catd> of the message.
+
+<catd>		- What is to be substituted for the %c in the format string.
+<file-name> 	- The name of the file that the file that the message is
+		  to be placed in.
+
+Parsing technique:
+
+The program parses through the file looking for occurrences of one of the
+keywords.  
+  - Keywords occurring inside quotes or comments are not examined or 
+    processed.  
+  - Once a keyword is found, the current position is moved to the end 
+    of the keyword and advanced one character at a time until the string 
+    representing the start of a parameter list is found.  
+  - Everything up until a string matching one of those specified in 
+    the <pdl> list is considered the first parameter <pno = 0>.  Strings 
+    from the <pdl> list that occur inside parenthesis, brackets, or braces
+    ('()', '[]', or ,'{}') are ignored.  
+  - The position is moved to the end of the <pdl> list string, and 
+    everything up until the next valid <pdl> list string is considered the 
+    second parameter.  This continues until the string representing the 
+    end of a parameter list is found (outside of quotes and parenthesis).  
+    The new-line character is ignored during this process.  The 
+    backslash (\) meta character causes the next character to be 
+    ignored when inside quotes.
+
+
+ <bad words file> 
+
+The scmc utility provides control over the text of the messages.
+It compares the text of extracted messages with the file:
+/usr/lpp/scmc/bad_words.  This file contains a list of words that
+you don't want to use and a list of words that you could use instead. 
+The file format is as follows:
+
+<illegal word>:[synonym [,synonym]...];
+.
+.
+.
+
+The illegal word represents the word that you do not want to use.  
+A colon (:) delimits the illegal word from a list of one or more
+synonyms.  When scmc detects an illegal word, it asks the operator
+to choose one of the synonyms to replace the bad word.  A spelling
+file entry is terminated with a semi-colon (;).  The list must be 
+sorted alphabetically by the illegal word.
+
+Each group of alpha characters delimited by non-alpha characters is 
+searched for in the bad word list.  Thus, although 'power up' is in the
+bad word list, it will never be found because the bad word checker will
+search for 'power' and 'up', but never for 'power up'.  The bad word
+checker converts all input words to lower case before looking for them 
+in the bad word list.  Thus,  you should only use lower case in the bad
+word list because any word with an upper case character will never be 
+found.
+
+
+
+Extended Description
+
+The following procedure outlines how to use scmc.
+
+ 1) Install the program.  Create the directory /usr/lpp/scmc if it
+    doesn't already exist.  Then, just copy all of the files in the
+    installation directory to /usr/lpp/scmc.  Link the executable
+    file scmc to /usr/bin/scmc or copy it to any directory in your
+    search path.  The scmc utility consists of three files:
+
+	*  scmc -- the executable
+
+	*  bad_words -- the default list of unacceptable words 
+
+	*  cfig -- the default configuration file 
+
+    The scmc utility requires the NLS message system be installed.
+    If you have the correct version of AIX, it will already be 
+    installed.  If you have an outdated version, scmc will not
+    execute.  It  will complain that some NLS functions do not
+    exist in the libc shared library.  The scmc utility also 
+    requires that the mkcatdefs and gencat utilities are present.
+
+
+ 2) Check the cfig file in /usr/lpp/scmc/cfig.  Later, you will make
+    a copy of this file and customize it to meet your needs.  For
+    now, use the default.
+
+
+ 3) Check the bad word list.  The scmc utility looks for it in   
+    /usr/lpp/scmc/bad_words.  You should temporarily rename this file
+    until you are ready to use this feature.  If scmc cannot open
+    this file,  it issues an informative message and continues.
+    Don't worry about the bad words until you have customized your
+    configuration file to extract all message text from your source. 
+
+
+ 4) Examine your source code.  Code passed to scmc should be free
+    of syntax errors and produce a 'clean' lint output.  If the
+    source file contains syntax errors, scmc will produce undefined
+    results.  You should also begin to make a list of functions that
+    contain messages.
+
+
+ 5) Ensure that any existing message files for the program are located
+    in the same directory as the source code.  Also, ensure that the
+    <file>_msg.h file exists if it is needed.  Before invoking scmc,
+    make copies of the message files because scmc operates directly
+    on the existing message files.
+
+
+ 6) Invoke the program.  Use the -l<level> option in needed.  Initially,
+    use the default leve (0) so that you can see how scmc works. 
+
+
+ 7) The program asks for input, and help is available by pressing 
+    the question mark key (?).  Accept one or two of the substitutions
+    so that you can see how scmc generates new source and message files.
+
+
+ 8) The scmc utility produces the following files:
+ 
+	*  <source file>.n    --  the new (modified) source code
+
+	*  <source file>.new  --  the text for the new messages (any
+                                  name used in a substitution rule)
+
+	the following two files should use mkcatdefs & gencat to generate.
+
+	*  <source file>_msg.h -- an include file for your source that
+                                  contains #define macros to identify
+                                  the messages created in the message
+                                  file 
+
+	*  <source file>.cat   -- the message catalogue created by the 
+                                  gencat utility using <source file>.msg
+                                  as input 
+
+    In addition to these files, scmc creates three message files for
+    every message file specified by a substitution method in your
+    configuration file.  For example, the default configuration 
+    file contains the following substitution method: 
+ 
+       ERRSTR:NLgetamsg(%c, %s , %m, %p):"err.cat":err.msg
+ 
+    If a keyword is found in your source file that uses this substitution
+    method, scmc also creates err.cat, err_msg.h, and err.msg.  Applications
+    residing in the same directory usually share message catalogues.
+ 
+    After executing scmc once, verify that you can rebuild and execute
+    your application.  First verify that scmc created the necessary
+    source and message files.  Next save your original source file
+    if you haven't already done so.  Copy <source file>.scmc to 
+    <source file> (with a .c extension).  Recompile and link your
+    application.  Test the application and try to generate a few
+    messages.  When you are satisfied that it still works, you are
+    ready to proceed.  If for some reason, the application cannot
+    access the message catalogue, the default messages still appear.
+    You may want to alter a message or two in the message file (and
+    rebuild the catalogue) to verify that the application is using
+    the message facility successfully.
+
+
+ 9) To completely isolate all textual messages from your source code,
+    you will probably have to customize the scmc configuration file. 
+    Compare your original source with the new source that scmc created.
+    Restore your original source and re-execute scmc using level twenty
+    or greater so that scmc attempts to convert all key words that
+    it recognizes.  Examine the new source carefully to identify 
+    messages that remain unconverted.  
+
+    The next step is to customize your configuration file to recognize
+    additional keywords that you application uses to write messages.
+    Either save the default configuration (/usr/lpp/scmc/cfig)
+    or use the -f option when invoking scmc.  Select an unidentified
+    function from your source and add it to the keyword list of the
+    configuration file using a higher level.  For instance, if your
+    program has a subroutine used to print out error messages called
+    perr(), add the following entry:
+   
+       perr:30:1:"\,:M_::MSGSTR
+
+    Don't worry about how to convert the functions yet.  Use one 
+    of the existing substitution methods for now (MSGSTR) and just
+    throw away the output until you are satisfied that scmc can find
+    all function calls that write text.  If perr is called with only 
+    a quoted string ( perrr("Fatal error."); ), the MSGSTR substitution
+    method works fine.   
+
+    Re-execute scmc as necessary until you have identified all of the
+    functions requiring conversion.  Then create new substitution
+    methods where necessary.  How do you know when a new substitution
+    method is appropriate?  C compiler diagnostics provide some
+    direction, but you'll have to rebuild and test you application 
+    to discover where new methods are required.  One reason to add
+    another substitution method is to use other message catalogues.
+    Another reason is to use functions other than NLcatgets or 
+    NLgetamsg.
+
+    To create a new substitution method,  first examine the usage of
+    the function.  Use grep to get a complete list of the function
+    usage.  Try to determine the number of parameters and whether
+    there is any order.  Use the existing substitution methods 
+    contained in the default configuration file as examples.  You
+    may not need to create any new substitution methods.  For 
+    instance, notice the difference between the keyword entries
+    for printf and fprintf: 
+
+       printf:0:0:":\,:M_::MSGSTR
+
+       fprintf:5:1:":\,:M_::MSGSTR
+     
+    The only difference between these two keyword entries is the
+    parameter number, which is zero for printf and one for fprintf.
+    For printf, this means that the text of the message is the
+    first parameter (parameter zero).  For fprintf, it specifies
+    the second parameter (parameter one).  The first parameter
+    for fprintf is the file descriptor (parameter zero), which
+    should not be converted.  Both functions use the same 
+    substitution method (MSGSTR):
+
+       MSGSTR:NLcatgets(%c, %s, %m, %p):scmc_catd:
+
+    The keyword list specifies which parameter contains a string
+    of natural language text.  The substitution method specifies
+    what code fragment should replace that parameter.  Consider
+    the following statement:
+
+       fprintf( stderr, "Hello world.\n");
+
+    The scmc utility using the default configuration file 
+    translates this statement to:
+
+       fprintf( stderr, NLcatgets(scmc_catd, MS_HELLO, M_MSG_l,
+                        "Hello world.\n");
+   
+    The keyword list only substitutes one parameter.  If more than
+    one string is passed to a function, only the first string is
+    converted.   
+  
+
+10) When you are satisfied with the translation, check the location
+    and contents of the bad word list.  It should be in the file:
+    /usr/lpp/scmc/bad_words.  Add or delete entries to conform with
+    your style requirements.  Once a function and its messages have
+    been converted, scmc won't check the contents of the message
+    file against the bad word list.  So if you make a serious error
+    in your bad_words entries, throw away the output and start over
+    from backup.
+
+    Though scmc won't examine text that is converted to this message
+    format, you can still use standard AIX utilities such as spell
+    on the message source file (<file>_msg).  The bad word list
+    operates on a match basis rather than an exception basis like
+    spell.  So it's probably a good idea to use spell on your 
+    message files.  It's also much more convenient to run spell on
+    the message file rather than your unconverted source file because
+    most spelling dictionaries don't include your more inventive 
+    function names.
+
+    If you start over completely, just delete all of the message
+    files and restore your source file.  If you only move back one
+    iteration, copy over the saved <file>_msg and <file>_msg.h files.
+    Remember that these files may be shared with other applications.
+ 
+
+11) Finally, when the source is converted, and the content of the 
+    messages has been checked, you'll need to update your makefile.
+    Remember to add dependencies for the <file>_msg and <file>_msg.h
+    files.  Also add dependencies for any other message files that
+    your substitution methods may specify.  You should also add
+    a rule to rebuild message catalogues whenever the source message
+    files change:
+
+       my_prog.h my_prog.cat : my_prog.msg
+                 mkcatdefs my_prog my_prog.msg | gencat my_prog.cat
+
+    This entry also rebuilds the my_prog.h file.  This means that
+    you should add my_prog.msg to the dependency list for my_prog.
+
+       
+ 
+Summary of scmc methodology
+
+    This section explains how scmc works.  You don't have to read this
+    to be able to use scmc.  
+
+    The scmc utility parses the source file looking for occurrences
+    of one of the keywords. 
+
+       *  Keywords occurring inside quotes or comments are not 
+          examined nor processed.
+
+       *  Once a keyword is found, the current position is moved to
+          the end of the keyword and advanced one character at a time
+          until the string representing the start of a parameter list
+          is found.
+
+       *  Everything up until a string matching one of those specified
+          in the <pdl> list is considered the first parameter <pno = 0>.
+          Strings from the <pdl> list that occur inside parenthesis,
+          brackets, or braces are ignored.
+
+       *  The position is moved to the end of the <pdl> list string, 
+          and everything until the next valid <pdl> list string
+          is considered the second parameter.  This continues until
+          the string representing the end of a parameter list is 
+          found (outside of quotes, parenthesis, brackets, and braces).
+          The new line character is ignored during this process.  The
+          backslash (\) meta character causes the next character to
+          be ignored when inside quotes.
+
+
+    The following procedure summarizes how scmc works internally:
+
+       1) Read the configuration file into memory and verify its
+          syntax.
+
+       2) Read the source file into memory.
+
+       3) Begin parsing, looking for keywords outside of quotes 
+          and comments.  When a keyword is found:
+
+             a)  Get the parameters.
+             b)  Check the message parameter for compliance with 
+                 <pst-list> strings.
+             c)  If the keyword level is greater than or equal 
+                 to the level number specified at invocation, get 
+                 operator confirmation.  If the operator doesn't 
+                 confirm, continue parsing.
+             d)  Pass the string, file, message name, and set name to 
+                 the add message procedure.  The add message function
+                 updates the memory image of the message file.
+             e)  Make the substitution to the memory image of the 
+                 source file.
+
+       4) Keep parsing until the end of text.
+
+       5) Write the new modified file to <source file>.scmc.  The
+          scmc utility appends scmc to the file name.  Therefore,
+          the scmc utility won't over write your source file unless
+          it already has a .scmc extension.  This new source file 
+          will also contain a #include directive for each 
+          <source file>.msg.h file that it creates and a file 
+          descriptor for the message catalogue.
+
+       6) Save any message files read in by the add message procedure.
+
+
+Add message procedure:
+
+       a) Check for bad words in the message string.  If bad words 
+          are found, pass the string to the bad word replacement 
+          procedure, and continue with the add procedure.
+
+       b) Check to see if the file has already been read in to memory.
+          If it has not, read it and build a memory table for its 
+          messages.  Use <source file>_msg.h for any set and message 
+          name definitions.
+
+       c) Check for message name duplications.  If a duplicate exists,
+          make a unique message name.
+
+       d) Add the message to the memory table.
+
+
+Bad Word Replacement Procedure:
+
+       a) Pass the list of synonyms and commands to 'select()'.
+       b) Act on command until command is skip (ESC) or 'accept 
+          and edit'.
+       c) Allow the user to edit the message.
+       d) Pass the resulting message back to the Add message procedure.
+
+
+Files
+
+	/usr/lpp/scmc/bad_words
+	/usr/lpp/scmc/cfig
+
+
+Related information
+
+	The following commands: mkcatdefs, gencat, dspcat, dspmsg
+        and runcat.
+
+	The following system functions: catopen, catclose, catgets,
+        NLcatopen, NLcatgets, and NLgetamsg.
+        
+        "Overview of International Character Support" in Managing
+        the AIX Operating System.
+

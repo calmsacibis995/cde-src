@@ -1,0 +1,1937 @@
+.de LI
+.\" simulate -mm .LIs by turning them into .TPs
+.TP \\n()Jn
+\\$1
+..
+.TH tt_c 5 "1 March 1996" "ToolTalk 1.3" "ToolTalk Definitions"
+.BH "1 March 1996"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.IX "TT/tt_c.h" "" "TT/tt_c.h \(em ToolTalk definitions" ""
+.SH "NAME"
+tt_c, Tttt_c \- ToolTalk definitions
+.SH "SYNOPSIS"
+.ft 3
+.nf
+#include <Tt/tt_c.h>
+.PP
+.fi
+.SH "DESCRIPTION"
+The
+.BR <Tt/tt_c.h> 
+header includes
+.BR typedef s
+for the following callback functions:
+.PP
+.ft 3
+.nf
+.ta \w'typedef Tt_filter_action (*Tt_filter_function)('u
+typedef Tt_filter_action (*Tt_filter_function)(const char *\f2nodeid\fP,
+	void *\f2context\fP,
+	void *\f2accumulator\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'typedef Tt_callback_action (*Tt_message_callback)('u
+typedef Tt_callback_action (*Tt_message_callback)(Tt_message \f2m\fP,
+	Tt_pattern \f2p\fP);
+.PP
+.fi
+.PP
+The header defines the
+.BR \s-1TT_VERSION\s+1
+constant with the value 10200,
+indicating the version of the ToolTalk API.
+.PP
+The header defines the
+.B Tt_status
+enumeration data type,
+with the following members and specific values:
+.PP
+.sp -1
+.RS 5
+.ta 4m +4m +4m +4m +4m +4m +4m
+.nf
+.ft 3
+typedef enum tt_status {
+        TT_OK                   = 0,
+        TT_WRN_NOTFOUND         = 1,
+        TT_WRN_STALE_OBJID      = 2,
+        TT_WRN_STOPPED          = 3,
+        TT_WRN_SAME_OBJID       = 4,
+        TT_WRN_START_MESSAGE    = 5,
+        TT_WRN_NOT_ENABLED      = 6,
+        TT_WRN_APPFIRST         = 512,
+        TT_WRN_LAST             = 1024,
+        TT_ERR_CLASS            = 1025,
+        TT_ERR_DBAVAIL          = 1026,
+        TT_ERR_DBEXIST          = 1027,
+        TT_ERR_FILE             = 1028,
+        TT_ERR_INVALID          = 1029,
+        TT_ERR_MODE             = 1031,
+        TT_ERR_ACCESS           = 1032,
+        TT_ERR_NOMP             = 1033,
+        TT_ERR_NOTHANDLER       = 1034,
+        TT_ERR_NUM              = 1035,
+        TT_ERR_OBJID            = 1036,
+        TT_ERR_OP               = 1037,
+        TT_ERR_OTYPE            = 1038,
+        TT_ERR_ADDRESS          = 1039,
+        TT_ERR_PATH             = 1040,
+        TT_ERR_POINTER          = 1041,
+        TT_ERR_PROCID           = 1042,
+        TT_ERR_PROPLEN          = 1043,
+        TT_ERR_PROPNAME         = 1044,
+        TT_ERR_PTYPE            = 1045,
+        TT_ERR_DISPOSITION      = 1046,
+        TT_ERR_SCOPE            = 1047,
+        TT_ERR_SESSION          = 1048,
+        TT_ERR_VTYPE            = 1049,
+        TT_ERR_NO_VALUE         = 1050,
+        TT_ERR_INTERNAL         = 1051,
+        TT_ERR_READONLY         = 1052,
+        TT_ERR_NO_MATCH         = 1053,
+        TT_ERR_UNIMP            = 1054,
+        TT_ERR_OVERFLOW         = 1055,
+        TT_ERR_PTYPE_START      = 1056,
+        TT_ERR_CATEGORY         = 1057,
+        TT_ERR_DBUPDATE         = 1058,
+        TT_ERR_DBFULL           = 1059,
+        TT_ERR_DBCONSIST        = 1060,
+        TT_ERR_STATE            = 1061,
+        TT_ERR_NOMEM            = 1062,
+        TT_ERR_SLOTNAME         = 1063,
+        TT_ERR_XDR              = 1064,
+        TT_ERR_NETFILE          = 1065,
+        TT_ERR_TOOLATE          = 1066,
+        TT_DESKTOP_             = 1100,
+        TT_DESKTOP_EPERM        = 1101,
+        TT_DESKTOP_ENOENT       = 1102,
+        TT_DESKTOP_EINTR        = 1104,
+        TT_DESKTOP_EIO          = 1105,
+        TT_DESKTOP_EAGAIN       = 1111,
+        TT_DESKTOP_ENOMEM       = 1112,
+        TT_DESKTOP_EACCES       = 1113,
+        TT_DESKTOP_EFAULT       = 1114,
+        TT_DESKTOP_EEXIST       = 1117,
+        TT_DESKTOP_ENODEV       = 1119,
+        TT_DESKTOP_ENOTDIR      = 1120,
+        TT_DESKTOP_EISDIR       = 1121,
+        TT_DESKTOP_EINVAL       = 1122,
+        TT_DESKTOP_ENFILE       = 1123,
+        TT_DESKTOP_EMFILE       = 1124,
+        TT_DESKTOP_ETXTBSY      = 1126,
+        TT_DESKTOP_EFBIG        = 1127,
+        TT_DESKTOP_ENOSPC       = 1128,
+        TT_DESKTOP_EROFS        = 1130,
+        TT_DESKTOP_EMLINK       = 1131,
+        TT_DESKTOP_EPIPE        = 1132,
+        TT_DESKTOP_ENOMSG       = 1135,
+        TT_DESKTOP_EDEADLK      = 1145,
+        TT_DESKTOP_ECANCELED    = 1147,
+        TT_DESKTOP_ENOTSUP      = 1148,
+        TT_DESKTOP_ENODATA      = 1161,
+        TT_DESKTOP_EPROTO       = 1171,
+        TT_DESKTOP_ENOTEMPTY    = 1193,
+        TT_DESKTOP_ETIMEDOUT    = 1245,
+        TT_DESKTOP_EALREADY     = 1249,
+        TT_DESKTOP_UNMODIFIED   = 1299,
+        TT_MEDIA_ERR_SIZE       = 1300,
+        TT_MEDIA_ERR_FORMAT     = 1301,
+        TT_ERR_APPFIRST         = 1536,
+        TT_ERR_LAST             = 2047,
+        TT_STATUS_LAST          = 2048
+} Tt_status;
+.PP
+.ft 1
+.fi
+.RE
+.Ns
+Specific values are required because they can be communicated between ToolTalk
+clients on different platforms, usually via
+.BR tt_message_status_set (3)
+and
+.BR tt_message_status (3).
+.Ne
+.PP
+The header defines the following enumeration data types,
+with the following members:
+.PP
+.RS 3
+.nr )J 6
+.na
+.LI \f3Tt_filter_action\fP
+.br
+.BR \s-1TT_FILTER_CONTINUE\s+1 ,
+.BR \s-1TT_FILTER_LAST\s+1 ,
+.BR \s-1TT_FILTER_STOP\s+1
+.LI \f3Tt_callback_action\fP
+.br
+.BR \s-1TT_CALLBACK_CONTINUE\s+1 ,
+.BR \s-1TT_CALLBACK_LAST\s+1 ,
+.BR \s-1TT_CALLBACK_PROCESSED\s+1
+.LI \f3Tt_mode\fP
+.br
+.BR \s-1TT_IN\s+1 ,
+.BR \s-1TT_INOUT\s+1 ,
+.BR \s-1TT_MODE_LAST\s+1 ,
+.BR \s-1TT_MODE_UNDEFINED\s+1 ,
+.BR \s-1TT_OUT\s+1
+.LI \f3Tt_scope\fP
+.br
+.BR \s-1TT_BOTH\s+1 ,
+.BR \s-1TT_FILE\s+1 ,
+.BR \s-1TT_FILE_IN_SESSION\s+1 ,
+.BR \s-1TT_SCOPE_NONE\s+1 ,
+.BR \s-1TT_SESSION\s+1
+.LI \f3Tt_class\fP
+.br
+.BR \s-1TT_CLASS_LAST\s+1 ,
+.BR \s-1TT_CLASS_UNDEFINED\s+1 ,
+.BR \s-1TT_NOTICE\s+1 ,
+.BR \s-1TT_REQUEST\s+1,
+.BR \s-1TT_OFFER\s+1
+.LI \f3Tt_category\fP
+.br
+.BR \s-1TT_CATEGORY_LAST\s+1 ,
+.BR \s-1TT_CATEGORY_UNDEFINED\s+1 ,
+.BR \s-1TT_HANDLE\s+1 ,
+.BR \s-1TT_HANDLE_PUSH\s+1 ,
+.BR \s-1TT_HANDLE_ROTATE\s+1 ,
+.BR \s-1TT_OBSERVE\s+1
+.LI \f3Tt_address\fP
+.br
+.BR \s-1TT_ADDRESS_LAST\s+1 ,
+.BR \s-1TT_HANDLER\s+1 ,
+.BR \s-1TT_OBJECT\s+1 ,
+.BR \s-1TT_OTYPE\s+1 ,
+.BR \s-1TT_PROCEDURE\s+1
+.LI \f3Tt_disposition\fP
+.br
+.BR \s-1TT_DISCARD\s+1 ,
+.BR \s-1TT_QUEUE\s+1 ,
+.BR \s-1TT_START\s+1
+.LI \f3Tt_state\fP
+.br
+.BR \s-1TT_CREATED\s+1 ,
+.BR \s-1TT_FAILED\s+1 ,
+.BR \s-1TT_HANDLED\s+1 ,
+.BR \s-1TT_QUEUED\s+1 ,
+.BR \s-1TT_REJECTED\s+1 ,
+.BR \s-1TT_RETURNED\s+1 ,
+.BR \s-1TT_ACCEPTED\s+1 ,
+.BR \s-1TT_ABSTAINED\s+1 ,
+.BR \s-1TT_SENT\s+1 ,
+.BR \s-1TT_STARTED\s+1 ,
+.BR \s-1TT_STATE_LAST\s+1
+.LI \f3Tt_feature\fP
+.br
+.BR \s-1_TT_FEATURE_MULTITHREADED\s+1 ,
+.BR \s-1_TT_FEATURE_LAST\s+1
+.PP
+.RE
+.nr )J 0
+.ad
+.PP
+The header defines the following as opaque data types:
+.BR Tt_message ,
+.BR Tt_pattern .
+.PP
+The header declares the following as functions:
+.PP
+.ft 3
+.nf
+.ta \w'char *tt_X_session('u
+char *tt_X_session(const char *\f2xdisplaystring\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_bcontext_join('u
+Tt_status tt_bcontext_join(const char *\f2slotname\fP,
+	const unsigned char *\f2value\fP,
+	int \f2length\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_bcontext_quit('u
+Tt_status tt_bcontext_quit(const char *\f2slotname\fP,
+	const unsigned char *\f2value\fP,
+	int \f2length\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_close('u
+Tt_status tt_close(void);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_context_join('u
+Tt_status tt_context_join(const char *\f2slotname\fP,
+	const char *\f2value\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_context_quit('u
+Tt_status tt_context_quit(const char *\f2slotname\fP,
+	const char *\f2value\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'char *tt_default_file('u
+char *tt_default_file(void);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_default_file_set('u
+Tt_status tt_default_file_set(const char *\f2docid\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'char *tt_default_procid('u
+char *tt_default_procid(void);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_default_procid_set('u
+Tt_status tt_default_procid_set(const char *\f2procid\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf 
+.ta \w'char *tt_thread_procid('u
+char * tt_thread_procid(void);
+.PP
+.fi
+.PP
+.ft 3
+.nf 
+.ta \w'Tt_status tt_thread_procid_set('u
+Tt_status tt_thread_procid_set(const char *\f2procid\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'char *tt_procid_session('u
+char *tt_procid_session(const char *\f2procid\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'char *tt_default_ptype('u
+char *tt_default_ptype(void);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_default_ptype_set('u
+Tt_status tt_default_ptype_set(const char *\f2ptid\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'char *tt_default_session('u
+char *tt_default_session(void);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_default_session_set('u
+Tt_status tt_default_session_set(const char *\f2sessid\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'char *tt_thread_session('u
+char * tt_thread_session(void);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_thread_session_set('u
+Tt_status tt_thread_session_set(const char *\f2sessid\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'int tt_error_int('u
+int tt_error_int(Tt_status \f2ttrc\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'void *tt_error_pointer('u
+void *tt_error_pointer(Tt_status \f2ttrc\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'int tt_fd('u
+int tt_fd(void);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_file_copy('u
+Tt_status tt_file_copy(const char *\f2oldfilepath\fP,
+	const char *\f2newfilepath\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_file_destroy('u
+Tt_status tt_file_destroy(const char *\f2filepath\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_file_join('u
+Tt_status tt_file_join(const char *\f2filepath\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_file_move('u
+Tt_status tt_file_move(const char *\f2oldfilepath\fP,
+	const char *\f2newfilepath\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'char *tt_file_netfile('u
+char *tt_file_netfile(const char *\f2filename\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_file_objects_query('u
+Tt_status tt_file_objects_query(const char *\f2filepath\fP,
+	Tt_filter_function \f2filter\fP,
+	void *\f2context\fP,
+	void *\f2accumulator\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_file_quit('u
+Tt_status tt_file_quit(const char *\f2filepath\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'void tt_free('u
+void tt_free(caddr_t \f2p\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'char *tt_host_file_netfile('u
+char *tt_host_file_netfile(const char *\f2host\fP,
+	const char *\f2filename\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'char *tt_host_netfile_file('u
+char *tt_host_netfile_file(const char *\f2host\fP,
+	const char *\f2netfilename\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_icontext_join('u
+Tt_status tt_icontext_join(const char *\f2slotname\fP, int \f2value\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_icontext_quit('u
+Tt_status tt_icontext_quit(const char *\f2slotname\fP, int \f2value\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'char *tt_initial_session('u
+char *tt_initial_session(void);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_int_error('u
+Tt_status tt_int_error(int \f2return_val\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'int tt_is_err('u
+int tt_is_err(Tt_status \f2s\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'caddr_t tt_malloc('u
+caddr_t tt_malloc(size_t \f2s\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'int tt_mark('u
+int tt_mark(void);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_message_accept('u
+Tt_status tt_message_accept(Tt_message \f2m\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_address tt_message_address('u
+Tt_address tt_message_address(Tt_message \f2m\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_message_address_set('u
+Tt_status tt_message_address_set(Tt_message \f2m\fP, Tt_address \f2a\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_message_arg_add('u
+Tt_status tt_message_arg_add(Tt_message \f2m\fP,
+	Tt_mode \f2n\fP,
+	const char *\f2vtype\fP,
+	const char *\f2value\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_message_arg_bval('u
+Tt_status tt_message_arg_bval(Tt_message \f2m\fP,
+	int \f2n\fP,
+	unsigned char **\f2value\fP,
+	int *\f2len\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_message_arg_bval_set('u
+Tt_status tt_message_arg_bval_set(Tt_message \f2m\fP,
+	int \f2n\fP,
+	const unsigned char *\f2value\fP,
+	int \f2len\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_message_arg_ival('u
+Tt_status tt_message_arg_ival(Tt_message \f2m\fP,
+	int \f2n\fP,
+	int *\f2value\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_message_arg_ival_set('u
+Tt_status tt_message_arg_ival_set(Tt_message \f2m\fP,
+	int \f2n\fP,
+	int \f2value\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_mode tt_message_arg_mode('u
+Tt_mode tt_message_arg_mode(Tt_message \f2m\fP,
+	int \f2n\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'char *tt_message_arg_type('u
+char *tt_message_arg_type(Tt_message \f2m\fP,
+	int \f2n\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'char *tt_message_arg_val('u
+char *tt_message_arg_val(Tt_message \f2m\fP,
+	int \f2n\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_message_arg_val_set('u
+Tt_status tt_message_arg_val_set(Tt_message \f2m\fP,
+	int \f2n\fP,
+	const char *\f2value\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_message_arg_xval('u
+Tt_status tt_message_arg_xval(Tt_message \f2m\fP,
+	int \f2n\fP,
+	xdrproc_t \f2xdr_proc\fP,
+	void **\f2value\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_message_arg_xval_set('u
+Tt_status tt_message_arg_xval_set(Tt_message \f2m\fP,
+	int \f2n\fP,
+	xdrproc_t \f2xdr_proc\fP,
+	void *\f2value\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'int tt_message_args_count('u
+int tt_message_args_count(Tt_message \f2m\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_message_barg_add('u
+Tt_status tt_message_barg_add(Tt_message \f2m\fP,
+	Tt_mode \f2n\fP,
+	const char *\f2vtype\fP,
+	const unsigned char *\f2value\fP,
+	int \f2len\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_message_bcontext_set('u
+Tt_status tt_message_bcontext_set(Tt_message \f2m\fP,
+	const char *\f2slotname\fP,
+	const unsigned char *\f2value\fP,
+	int \f2length\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_message_callback_add('u
+Tt_status tt_message_callback_add(Tt_message \f2m\fP,
+	Tt_message_callback \f2f\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_message_class('u
+Tt_class tt_message_class(Tt_message \f2m\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_message_class_set('u
+Tt_status tt_message_class_set(Tt_message \f2m\fP,
+	Tt_class \f2c\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_message_context_bval('u
+Tt_status tt_message_context_bval(Tt_message \f2m\fP,
+	const char *\f2slotname\fP,
+	unsigned char **\f2value\fP,
+	int *\f2len\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_message_context_ival('u
+Tt_status tt_message_context_ival(Tt_message \f2m\fP,
+	const char *\f2slotname\fP,
+	int *\f2value\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_message_context_set('u
+Tt_status tt_message_context_set(Tt_message \f2m\fP,
+	const char *\f2slotname\fP,
+	const char *\f2value\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'char *tt_message_context_slotname('u
+char *tt_message_context_slotname(Tt_message \f2m\fP,
+	int \f2n\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'char *tt_message_context_val('u
+char *tt_message_context_val(Tt_message \f2m\fP,
+	const char *\f2slotname\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_message_context_xval('u
+Tt_status tt_message_context_xval(Tt_message \f2m\fP,
+	const char *\f2slotname\fP,
+	xdrproc_t \f2xdr_proc\fP,
+	void **\f2value\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'int tt_message_contexts_count('u
+int tt_message_contexts_count(Tt_message \f2m\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_message tt_message_create('u
+Tt_message tt_message_create(void);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_message tt_message_create_super('u
+Tt_message tt_message_create_super(Tt_message \f2m\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_message_destroy('u
+Tt_status tt_message_destroy(Tt_message \f2m\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_disposition tt_message_disposition('u
+Tt_disposition tt_message_disposition(Tt_message \f2m\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_message_disposition_set('u
+Tt_status tt_message_disposition_set(Tt_message \f2m\fP,
+	Tt_disposition \f2r\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_message_fail('u
+Tt_status tt_message_fail(Tt_message \f2m\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'char *tt_message_file('u
+char *tt_message_file(Tt_message \f2m\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_message_file_set('u
+Tt_status tt_message_file_set(Tt_message \f2m\fP,
+	const char *\f2file\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'gid_t tt_message_gid('u
+gid_t tt_message_gid(Tt_message \f2m\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'char *tt_message_handler('u
+char *tt_message_handler(Tt_message \f2m\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'char *tt_message_handler_ptype('u
+char *tt_message_handler_ptype(Tt_message \f2m\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_message_handler_ptype_set('u
+Tt_status tt_message_handler_ptype_set(Tt_message \f2m\fP,
+	const char *\f2ptid\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_message_handler_set('u
+Tt_status tt_message_handler_set(Tt_message \f2m\fP,
+	const char *\f2procid\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_message_iarg_add('u
+Tt_status tt_message_iarg_add(Tt_message \f2m\fP,
+	Tt_mode \f2n\fP,
+	const char *\f2vtype\fP,
+	int \f2value\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_message_icontext_set('u
+Tt_status tt_message_icontext_set(Tt_message \f2m\fP,
+	const char *\f2slotname\fP,
+	int \f2value\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'char *tt_message_id('u
+char *tt_message_id(Tt_message \f2m\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'char *tt_message_object('u
+char *tt_message_object(Tt_message \f2m\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_message_object_set('u
+Tt_status tt_message_object_set(Tt_message \f2m\fP,
+	const char *\f2objid\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'char *tt_message_op('u
+char *tt_message_op(Tt_message \f2m\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_message_op_set('u
+Tt_status tt_message_op_set(Tt_message \f2m\fP,
+	const char *\f2opname\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'int tt_message_opnum('u
+int tt_message_opnum(Tt_message \f2m\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'char *tt_message_otype('u
+char *tt_message_otype(Tt_message \f2m\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_message_otype_set('u
+Tt_status tt_message_otype_set(Tt_message \f2m\fP,
+	const char *\f2otype\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_pattern tt_message_pattern('u
+Tt_pattern tt_message_pattern(Tt_message \f2m\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'char *tt_message_print('u
+char *tt_message_print(Tt_message *\f2m\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_message tt_message_receive('u
+Tt_message tt_message_receive(void);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_message_reject('u
+Tt_status tt_message_reject(Tt_message \f2m\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_message_reply('u
+Tt_status tt_message_reply(Tt_message \f2m\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_scope tt_message_scope('u
+Tt_scope tt_message_scope(Tt_message \f2m\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_message_scope_set('u
+Tt_status tt_message_scope_set(Tt_message \f2m\fP,
+	Tt_scope \f2s\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_message_send('u
+Tt_status tt_message_send(Tt_message \f2m\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_message_send_on_exit('u
+Tt_status tt_message_send_on_exit(Tt_message \f2m\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'char *tt_message_sender('u
+char *tt_message_sender(Tt_message \f2m\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'char *tt_message_sender_ptype('u
+char *tt_message_sender_ptype(Tt_message \f2m\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_message_sender_ptype_set('u
+Tt_status tt_message_sender_ptype_set(Tt_message \f2m\fP,
+	const char *\f2ptid\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'char *tt_message_session('u
+char *tt_message_session(Tt_message \f2m\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_message_session_set('u
+Tt_status tt_message_session_set(Tt_message \f2m\fP,
+	const char *\f2sessid\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_state tt_message_state('u
+Tt_state tt_message_state(Tt_message \f2m\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'int tt_message_status('u
+int tt_message_status(Tt_message \f2m\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_message_status_set('u
+Tt_status tt_message_status_set(Tt_message \f2m\fP,
+	int \f2status\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'char *tt_message_status_string('u
+char *tt_message_status_string(Tt_message \f2m\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_message_status_string_set('u
+Tt_status tt_message_status_string_set(Tt_message \f2m\fP,
+	const char *\f2status_str\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'uid_t tt_message_uid('u
+uid_t tt_message_uid(Tt_message \f2m\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'void *tt_message_user('u
+void *tt_message_user(Tt_message \f2m\fP,
+	int \f2key\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_message_user_set('u
+Tt_status tt_message_user_set(Tt_message \f2m\fP,
+	int \f2key\fP,
+	void *\f2v\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_message_xarg_add('u
+Tt_status tt_message_xarg_add(Tt_message \f2m\fP,
+	Tt_mode \f2n\fP,
+	const char *\f2vtype\fP,
+	xdrproc_t \f2xdr_proc\fP,
+	void *\f2value\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_message_xcontext_join('u
+Tt_status tt_message_xcontext_join(const char *\f2slotname\fP,
+	xdrproc_t \f2xdr_proc\fP,
+	void *\f2value\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_message_xcontext_set('u
+Tt_status tt_message_xcontext_set(Tt_message \f2m\fP,
+	const char *\f2slotname\fP,
+	xdrproc_t \f2xdr_proc\fP,
+	void *\f2value\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'char *tt_netfile_file('u
+char *tt_netfile_file(const char *\f2netfilename\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'int tt_objid_equal('u
+int tt_objid_equal(const char *\f2objid1\fP,
+	const char *\f2objid2\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'char *tt_objid_objkey('u
+char *tt_objid_objkey(const char *\f2objid\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_message tt_onotice_create('u
+Tt_message tt_onotice_create(const char *\f2objid\fP,
+	const char *\f2op\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'char *tt_open('u
+char *tt_open(void);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_message tt_orequest_create('u
+Tt_message tt_orequest_create(const char *\f2objid\fP,
+	const char *\f2op\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'char *tt_otype_base('u
+char *tt_otype_base(const char *\f2otype\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'char *tt_otype_derived('u
+char *tt_otype_derived(const char *\f2otype\fP,
+	int \f2i\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'int tt_otype_deriveds_count('u
+int tt_otype_deriveds_count(const char *\f2otype\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_mode tt_otype_hsig_arg_mode('u
+Tt_mode tt_otype_hsig_arg_mode(const char *\f2otype\fP,
+	int \f2sig\fP,
+	int \f2arg\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'char *tt_otype_hsig_arg_type('u
+char *tt_otype_hsig_arg_type(const char *\f2otype\fP,
+	int \f2sig\fP,
+	int \f2arg\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'int tt_otype_hsig_args_count('u
+int tt_otype_hsig_args_count(const char *\f2otype\fP,
+	int \f2sig\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'int tt_otype_hsig_count('u
+int tt_otype_hsig_count(const char *\f2otype\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'char *tt_otype_hsig_op('u
+char *tt_otype_hsig_op(const char *\f2otype\fP,
+	int \f2sig\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'int tt_otype_is_derived('u
+int tt_otype_is_derived(const char *\f2derivedotype\fP,
+	const char *\f2baseotype\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_otype_opnum_callback_add('u
+Tt_status tt_otype_opnum_callback_add(const char *\f2otid\fP,
+	int \f2opnum\fP,
+	Tt_message_callback \f2f\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_mode tt_otype_osig_arg_mode('u
+Tt_mode tt_otype_osig_arg_mode(const char *\f2otype\fP,
+	int \f2sig\fP,
+	int \f2arg\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'char *tt_otype_osig_arg_type('u
+char *tt_otype_osig_arg_type(const char *\f2otype\fP,
+	int \f2sig\fP,
+	int \f2arg\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'int tt_otype_osig_args_count('u
+int tt_otype_osig_args_count(const char *\f2otype\fP,
+	int \f2sig\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'int tt_otype_osig_count('u
+int tt_otype_osig_count(const char*\f2otype\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'char *tt_otype_osig_op('u
+char *tt_otype_osig_op(const char *\f2otype\fP,
+	int \f2sig\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_pattern_address_add('u
+Tt_status tt_pattern_address_add(Tt_pattern \f2p\fP,
+	Tt_address \f2d\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_pattern_arg_add('u
+Tt_status tt_pattern_arg_add(Tt_pattern \f2p\fP,
+	Tt_mode \f2n\fP,
+	const char *\f2vtype\fP,
+	const char *\f2value\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_pattern_barg_add('u
+Tt_status tt_pattern_barg_add(Tt_pattern \f2m\fP,
+	Tt_mode \f2n\fP,
+	const char *\f2vtype\fP,
+	const unsigned char *\f2value\fP,
+	int \f2len\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_pattern_bcontext_add('u
+Tt_status tt_pattern_bcontext_add(Tt_pattern \f2p\fP,
+	const char *\f2slotname\fP,
+	const unsigned char *\f2value\fP,
+	int \f2length\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_pattern_callback_add('u
+Tt_status tt_pattern_callback_add(Tt_pattern \f2m\fP,
+	Tt_message_callback \f2f\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_category tt_pattern_category('u
+Tt_category tt_pattern_category(Tt_pattern \f2p\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_pattern_category_set('u
+Tt_status tt_pattern_category_set(Tt_pattern \f2p\fP,
+	Tt_category \f2c\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_pattern_class_add('u
+Tt_status tt_pattern_class_add(Tt_pattern \f2p\fP,
+	Tt_class \f2c\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_pattern_context_add('u
+Tt_status tt_pattern_context_add(Tt_pattern \f2p\fP,
+	const char *\f2slotname\fP,
+	const char *\f2value\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_pattern tt_pattern_create('u
+Tt_pattern tt_pattern_create(void);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_pattern_destroy('u
+Tt_status tt_pattern_destroy(Tt_pattern \f2p\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_pattern_disposition_add('u
+Tt_status tt_pattern_disposition_add(Tt_pattern \f2p\fP,
+	Tt_disposition \f2r\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_pattern_file_add('u
+Tt_status tt_pattern_file_add(Tt_pattern \f2p\fP,
+	const char *\f2file\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_pattern_iarg_add('u
+Tt_status tt_pattern_iarg_add(Tt_pattern \f2m\fP,
+	Tt_mode \f2n\fP,
+	const char *\f2vtype\fP,
+	int \f2value\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_pattern_icontext_add('u
+Tt_status tt_pattern_icontext_add(Tt_pattern \f2p\fP,
+	const char *\f2slotname\fP,
+	int \f2value\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_pattern_object_add('u
+Tt_status tt_pattern_object_add(Tt_pattern \f2p\fP,
+	const char *\f2objid\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_pattern_op_add('u
+Tt_status tt_pattern_op_add(Tt_pattern \f2p\fP,
+	const char *\f2opname\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_pattern_opnum_add('u
+Tt_status tt_pattern_opnum_add(Tt_pattern \f2p\fP,
+	int \f2opnum\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_pattern_otype_add('u
+Tt_status tt_pattern_otype_add(Tt_pattern \f2p\fP,
+	const char *\f2otype\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'char *tt_pattern_print('u
+char *tt_pattern_print(Tt_pattern *\f2p\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_pattern_register('u
+Tt_status tt_pattern_register(Tt_pattern \f2p\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_pattern_scope_add('u
+Tt_status tt_pattern_scope_add(Tt_pattern \f2p\fP,
+	Tt_scope \f2s\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_pattern_sender_add('u
+Tt_status tt_pattern_sender_add(Tt_pattern \f2p\fP,
+	const char *\f2procid\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_pattern_sender_ptype_add('u
+Tt_status tt_pattern_sender_ptype_add(Tt_pattern \f2p\fP,
+	const char *\f2ptid\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_pattern_session_add('u
+Tt_status tt_pattern_session_add(Tt_pattern \f2p\fP,
+	const char *\f2sessid\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_pattern_state_add('u
+Tt_status tt_pattern_state_add(Tt_pattern \f2p\fP,
+	Tt_state \f2s\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_pattern_unregister('u
+Tt_status tt_pattern_unregister(Tt_pattern \f2p\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'void *tt_pattern_user('u
+void *tt_pattern_user(Tt_pattern \f2p\fP,
+	int \f2key\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_pattern_user_set('u
+Tt_status tt_pattern_user_set(Tt_pattern \f2p\fP,
+	int \f2key\fP,
+	void *\f2v\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_pattern_xarg_add('u
+Tt_status tt_pattern_xarg_add(Tt_pattern \f2m\fP,
+	Tt_mode \f2n\fP,
+	const char *\f2vtype\fP,
+	xdrproc_t \f2xdr_proc\fP,
+	void *\f2value\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_pattern_xcontext_add('u
+Tt_status tt_pattern_xcontext_add(Tt_pattern \f2p\fP,
+	const char *\f2slotname\fP,
+	xdrproc_t \f2xdr_proc\fP,
+	void *\f2value\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_message tt_pnotice_create('u
+Tt_message tt_pnotice_create(Tt_scope \f2scope\fP,
+	const char *\f2op\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_pointer_error('u
+Tt_status tt_pointer_error(void *\f2pointer\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_message tt_prequest_create('u
+Tt_message tt_prequest_create(Tt_scope \f2scope\fP,
+	const char *\f2op\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_ptr_error('u
+Tt_status tt_ptr_error(\f2pointer\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_ptype_declare('u
+Tt_status tt_ptype_declare(const char *\f2ptid\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_ptype_exists('u
+Tt_status tt_ptype_exists(const char *\f2ptid\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_ptype_opnum_callback_add('u
+Tt_status tt_ptype_opnum_callback_add(const char *\f2ptid\fP,
+	int \f2opnum\fP,
+	Tt_message_callback \f2f\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_ptype_undeclare('u
+Tt_status tt_ptype_undeclare(const char *\f2ptid\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'void tt_release('u
+void tt_release(int \f2mark\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_session_bprop('u
+Tt_status tt_session_bprop(const char *\f2sessid\fP,
+	const char *\f2propname\fP,
+	int \f2i\fP,
+	unsigned char **\f2value\fP,
+	int *\f2length\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_session_bprop_add('u
+Tt_status tt_session_bprop_add(const char *\f2sessid\fP,
+	const char *\f2propname\fP,
+	const unsigned char *\f2value\fP,
+	int \f2length\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_session_bprop_set('u
+Tt_status tt_session_bprop_set(const char *\f2sessid\fP,
+	const char *\f2propname\fP,
+	const unsigned char *\f2value\fP,
+	int \f2length\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_session_join('u
+Tt_status tt_session_join(const char *\f2sessid\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'char *tt_session_prop('u
+char *tt_session_prop(const char *\f2sessid\fP,
+	const char *\f2propname\fP,
+	int \f2i\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_session_prop_add('u
+Tt_status tt_session_prop_add(const char *\f2sessid\fP,
+	const char *\f2propname\fP,
+	const char *\f2value\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'int tt_session_prop_count('u
+int tt_session_prop_count(const char *\f2sessid\fP,
+	const char *\f2propname\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_session_prop_set('u
+Tt_status tt_session_prop_set(const char *\f2sessid\fP,
+	const char *\f2propname\fP,
+	const char *\f2value\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'char *tt_session_propname('u
+char *tt_session_propname(const char *\f2sessid\fP,
+	int \f2n\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'int tt_session_propnames_count('u
+int tt_session_propnames_count(const char *\f2sessid\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_session_quit('u
+Tt_status tt_session_quit(const char *\f2sessid\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_session_types_load('u
+Tt_status tt_session_types_load(const char *\f2session\fP,
+	const char *\f2filename\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_spec_bprop('u
+Tt_status tt_spec_bprop(const char *\f2objid\fP,
+	const char *\f2propname\fP,
+	int \f2i\fP,
+	unsigned char **\f2value\fP,
+	int *\f2length\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_spec_bprop_add('u
+Tt_status tt_spec_bprop_add(const char *\f2objid\fP,
+	const char *\f2propname\fP,
+	const unsigned char *\f2value\fP,
+	int \f2length\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_spec_bprop_set('u
+Tt_status tt_spec_bprop_set(const char *\f2objid\fP,
+	const char *\f2propname\fP,
+	const unsigned char *\f2value\fP,
+	int \f2length\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'char *tt_spec_create('u
+char *tt_spec_create(const char *\f2filepath\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_spec_destroy('u
+Tt_status tt_spec_destroy(const char *\f2objid\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'char *tt_spec_file('u
+char *tt_spec_file(const char *\f2objid\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'char *tt_spec_move('u
+char *tt_spec_move(const char *\f2objid\fP,
+	const char *\f2newfilepath\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'char *tt_spec_prop('u
+char *tt_spec_prop(const char *\f2objid\fP,
+	const char *\f2propname\fP,
+	int \f2i\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_spec_prop_add('u
+Tt_status tt_spec_prop_add(const char *\f2objid\fP,
+	const char *\f2propname\fP,
+	const char *\f2value\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'int tt_spec_prop_count('u
+int tt_spec_prop_count(const char *\f2objid\fP,
+	const char *\f2propname\fP);
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_spec_prop_set('u
+Tt_status tt_spec_prop_set(const char *\f2objid\fP,
+	const char *\f2propname\fP,
+	const char *\f2value\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'char *tt_spec_propname('u
+char *tt_spec_propname(const char *\f2objid\fP,
+	int \f2n\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'int tt_spec_propnames_count('u
+int tt_spec_propnames_count(const char *\f2objid\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'char *tt_spec_type('u
+char *tt_spec_type(const char *\f2objid\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_spec_type_set('u
+Tt_status tt_spec_type_set(const char *\f2objid\fP,
+	const char *\f2otid\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_spec_write('u
+Tt_status tt_spec_write(const char *\f2objid\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'char *tt_status_message('u
+char *tt_status_message(Tt_status \f2ttrc\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'int tt_trace_control('u
+int tt_trace_control(int \f2onoff\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_xcontext_quit('u
+Tt_status tt_xcontext_quit(const char *\f2slotname\fP,
+	xdrproc_t \f2xdr_proc\fP,
+	void *\f2value\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_feature_enabled('u
+Tt_status tt_feature_enabled(Tt_feature *\f2f\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'Tt_status tt_feature_required('u
+Tt_status tt_feature_required(Tt_feature *\f2f\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'int tt_message_accepters_count('u
+int tt_message_accepters_count(Tt_message *\f2m\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'char * tt_message_accepter('u
+char * tt_message_accepter(Tt_message *\f2m\fP,
+	int \f2n\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'int tt_message_rejecters_count('u
+int tt_message_rejecters_count(Tt_message *\f2m\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'char * tt_message_rejecter('u
+char * tt_message_rejecter(Tt_message *\f2m\fP,
+	int \f2n\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'int tt_message_abstainers_count('u
+int tt_message_abstainers_count(Tt_message *\f2m\fP);
+.PP
+.fi
+.PP
+.ft 3
+.nf
+.ta \w'char * tt_message_abstainer('u
+char * tt_message_abstainer(Tt_message *\f2m\fP,
+	int \f2n\fP);
+.PP
+.fi

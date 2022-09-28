@@ -1,0 +1,65 @@
+.TH Interpret Media "07 Sep 1993" "SunSoft" "ToolTalk ICCCM"
+.SH NAME
+.PP
+Interpret \- translate a document, and display the translation
+.SH SYNOPSIS
+.so ../.synopsis
+[\fIfile\f(CW]	Interpret(	in	\fImediaType	contents\f(CW,	
+		in	\fImediaType	targetMedium\f(CW,	
+		in	boolean	\fIinquisitive\f(CW,	
+		in	boolean	\fIcovert\f(CW	
+		[in	messageID	\fIcounterfoil\f(CW]	
+		[in	title	\fIdocName\f(CW ] );
+.ft
+.fi
+.SH DESCRIPTION
+.LP
+Translate a document from one media type to another and display
+the translation.  The translation should be the best possible
+representation of the document in the target media type, even if
+the resulting representation cannot be perfectly translated back
+into the original document.
+.LP
+The 
+.BR Interpret ()
+request is equivalent to issuing a
+.BR Translate ()
+followed by a
+.BR Display()
+of the translated document.  Sending
+.BR Interpret ()
+is a useful optimization when the requester has no
+interest in holding on to the translation.
+.SH REQUIRED ARGUMENTS
+.so .contents
+.TP
+.I mediaType targetMedium
+An unset argument whose vtype indicates the mediaType into
+which the document should be translated before displaying.
+.so .inquisitive
+.SH OPTIONAL ARGUMENTS
+.so ../.counterfoil
+.so .title
+.SH EXAMPLES
+.LP
+To provide a text-speaking service, a tool might handle requests
+of the form
+.so ../.synopsis
+	Interpret(	in	ISO_Latin_1	\fIcontents\f(CW,	
+		in	Sun_Audio	\fItargetMedium\f(CW, ... );
+.ft
+.fi
+.SH ERRORS
+.so .errors
+.SH NOTES
+.LP
+It is possible to extract from the ToolTalk types database a list
+of the installed
+.BR Interpret ()
+mediaType-to-mediaType mappings.
+.SH SEE ALSO
+.PP
+.BR Intro (Desktop),
+.BR Status (Desktop),
+.BR Intro (Media),
+.BR Translate (Media)

@@ -1,0 +1,2138 @@
+'\" t
+.de LI
+.\" simulate -mm .LIs by turning them into .TPs
+.TP \\n()Jn
+\\$1
+..
+.TH tt_enumerated_types 1 "1 March 1996" "ToolTalk 1.3" "Enumerated Types" 
+.BH "1 March 1996"
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.SH NAME
+tt_enumerated_types \- Introduction to ToolTalk enumerated types
+.PP
+.SH Tt_address
+.PP
+.IX "enumerated" "Tt_address" "enumerated types" "Tt_address"
+.IX "Tt_address" "" "Tt_address \(em enumerated type" ""
+.TS
+tab (/) ;
+c s
+l lw(4i) .
+Possible Values for Tt_address
+_
+\f3Value/Description\fP
+_
+TT_HANDLER/T{
+.na
+Addressed to a specific handler that 
+can perform this operation with these arguments. 
+Fill in \fIhandler\fP, \fIop\fP, and \fIarg\fP attributes 
+of the message or pattern.
+T}
+.ad
+TT_OBJECT/T{
+.na
+Addressed to a specific object that 
+performs this operation with these arguments. Fill 
+in \fIobject\fP, \fIop\fP, and \fIarg\fP attributes of 
+the message or pattern.
+T}
+.ad
+TT_OTYPE/T{
+.na
+Addressed to the type of object that 
+can perform this operation with these arguments. 
+Fill in \fIotype\fP, \fIop\fP, and \fIarg\fP attributes 
+of the message or pattern.
+T}
+.ad
+TT_PROCEDURE/T{
+.na
+Addressed to any process that 
+can perform this operation with these arguments. 
+Fill in the \fIop\fP and \fIarg\fP attributes of 
+the message or pattern.
+T}
+.ad
+_
+.TE
+.PP
+.PP
+.SH Tt_callback
+.IX "enumerated" "Tt_callback" "enumerated types" "Tt_callback"
+.IX "Tt_callback" "" "Tt_callback \(em enumerated type" ""
+.TS
+tab (/) ;
+c s
+l lw(3.25i) .
+Possible Values for Tt_callback
+_
+\f2Value/Description\fP
+_
+TT_CALLBACK_CONTINUE/T{
+.na
+If the callback returns 
+TT_CALLBACK_CONTINUE, other callbacks will be run.
+T}
+.ad
+TT_CALLBACK_PROCESSED/T{
+.na
+If the callback returns 
+TT_CALLBACK_PROCESSED, no further callbacks will be 
+invoked for this event, and the message will not be 
+returned by tt_message_receive().
+T}
+.ad
+_
+.TE
+.PP
+.PP
+.\" =========================================================================
+.SH Tt_category
+.IX "enumerated" "Tt_category" "enumerated types" "Tt_category"
+.IX "Tt_category" "" "Tt_category \(em enumerated type" ""
+.TS
+tab (/) ;
+c s
+l lw(4.25i) .
+Possible Values for Tt_category
+_
+\f3Value/Description\fP
+_
+TT_OBSERVE/T{
+.na
+Just looking at the message. No feedback will be given to the 
+sender.
+T}
+.ad
+TT_HANDLE_PUSH/T{
+.na
+Like TT_HANDLE, but will pick the most recently registered
+pattern given several equally qualified choices
+T}
+.ad
+TT_HANDLE_ROTATE/T{
+.na
+Like TT_HANDLE, but if there are  no TT_HANDLE_PUSH
+patterns, pick the least recently used TT_HANDLE_ROTATE pattern
+before trying TT_HANDLE patterns.
+T}
+.ad
+TT_HANDLE/T{
+.na
+Will process the message, including filling in return values if 
+any.
+T}
+.ad
+_
+.TE
+.PP
+.PP
+.\" =========================================================================
+.SH Tt_class
+.IX "enumerated" "Tt_class" "enumerated types" "Tt_class"
+.IX "Tt_class" "" "Tt_class \(em enumerated type" ""
+.TS
+tab (/) ;
+c s
+l lw(4.25i) .
+Possible Values for Tt_class
+_
+\f3Value/Description\fP
+_
+TT_NOTICE/T{
+.na
+Notice of an event. Sender does not want feedback on this 
+message.
+T}
+.ad
+TT_OFFER/T{
+.na
+The term "offer" was chosen because the effect is like
+passing a plate of goodies around -- everybody takes one
+if they want; when the plate comes back you know
+everybody's been offered one.
+T}
+.ad
+TT_REQUEST/T{
+.na
+Request for some action to be taken. Sender must be notified of 
+progress, success or failure, and must receive any return 
+values.
+T}
+.ad
+_
+.TE
+.PP
+.PP
+.\" =========================================================================
+.SH Tt_disposition
+.IX "enumerated" "Tt_disposition" "enumerated types" "Tt_disposition"
+.IX "Tt_disposition" "" "Tt_disposition \(em enumerated type" ""
+.TS
+tab (/) ;
+c s
+l lw(4.25i) .
+Possible Values for Tt_disposition
+_
+\f3Value/Description\fP
+_
+TT_DISCARD/T{
+.na
+No receiver for this message. Message is returned to sender 
+with the Tt_status field containing TT_FAILED.
+T}
+.ad
+TT_QUEUE/T{
+.na
+Queue the message until a process of the proper ptype receives 
+the message.
+T}
+.ad
+TT_START/T{
+.na
+Attempt to start a process of the proper ptype if none is 
+running.
+T}
+.ad
+_
+.TE
+.PP
+.PP
+.\" =========================================================================
+.SH Tt_feature
+.IX "enumerated" "Tt_feature" "enumerated types" "Tt_feature"
+.IX "Tt_feature" "" "Tt_feature \(em enumerated type" ""
+.TS
+tab (/) ;
+c s
+l lw(3.0i) .
+Possible Values for Tt_feature
+_
+\f3Value/Description\fP
+_
+TT_FEATURE_MULTITHREADED/T{
+.na
+Indicates that this version of the ToolTalk API can
+support multi threaded  ToolTalk API  calls.
+T}
+.ad
+TT_FEATURE_LAST/T{
+.na
+This code should be unused.
+T}
+.ad
+_
+.TE
+.PP
+.PP
+.\" =========================================================================
+.SH Tt_filter
+.IX "enumerated" "Tt_filter" "enumerated types" "Tt_filter"
+.IX "Tt_filter" "" "Tt_filter \(em enumerated type" ""
+.TS
+tab (/) ;
+c s
+l lw(3.625i) .
+Possible Values for Tt_filter
+_
+\f3Value/Description\fP
+_
+TT_FILTER_CONTINUE/T{
+.na
+Continue the query, feed more values to the callback.
+T}
+.ad
+TT_FILTER_STOP/T{
+.na
+Stop the query, don't look for any more values.
+T}
+.ad
+_
+.TE
+.PP
+.PP
+.\" =========================================================================
+.SH Tt_mode
+.IX "enumerated" "Tt_mode" "enumerated types" "Tt_mode"
+.IX "Tt_mode" "" "Tt_mode \(em enumerated type" ""
+.TS
+tab (/) ;
+c s
+l lw(4.5i) .
+Possible Values for Tt_mode
+_
+\f3Value/Description\fP
+_
+TT_IN/T{
+.na
+The argument is written by the sender and read by the handler 
+and any observers.
+T}
+.ad
+TT_OUT/T{
+.na
+The argument is written by the handler and read by the sender 
+and any reply observers.
+T}
+.ad
+TT_INOUT/T{
+.na
+The argument is written by the sender and the handler and 
+read by all.
+T}
+.ad
+_
+.TE
+.PP
+.PP
+.\" =========================================================================
+.SH Tt_scope
+.IX "enumerated" "Tt_scope" "enumerated types" "Tt_scope"
+.IX "Tt_scope" "" "Tt_scope \(em enumerated type" ""
+.TS
+tab (/) ;
+c s
+l lw(3.75i) .
+Possible Values for Tt_scope
+_
+\f3Value/Description\fP
+_
+TT_SESSION/T{
+.na
+All processes joined to the indicated session are eligible.
+T}
+.ad
+TT_FILE/T{
+.na
+All processes joined to the indicated file are eligible.
+T}
+.ad
+TT_BOTH/T{
+.na
+All processes joined to either the indicated file or the 
+indicated session are eligible.
+T}
+.ad
+TT_FILE_IN_SESSION/T{
+.na
+All processes joined to both the indicated session and the 
+indicated file are eligible.
+T}
+.ad
+_
+.TE
+.\" =========================================================================
+.bp
+.SH Tt_state
+.IX "enumerated" "Tt_state" "enumerated types" "Tt_state"
+.IX "Tt_state" "" "Tt_state \(em enumerated type" ""
+.TS
+tab (/) ;
+c s
+l lw(4.125i) .
+Possible Values for Tt_state
+_
+\f3Value/Description\fP
+_
+TT_ABSTAINED/T{
+.na
+Offers (only) enter this state when a receiving
+procid does the next tt_message_receive without
+accepting or rejecting the offer.  One can think
+of TT_ABSTAINED also being entered when a procid
+destroys an offer without accepting or rejecting
+it, but since the message is destroyed at that time
+the procid will never see the state.  This state is
+seen only by the receiver.
+T}
+.ad
+TT_ACCEPTED/T{
+.na
+Offers (only) enter this state when tt_message_accept
+is done on them by a receiver.   The state is seen
+only by the receiver.
+T}
+.ad
+TT_CREATED/T{
+.na
+Message has been created but not yet sent.
+T}
+.ad
+TT_SENT/T{
+.na
+Message has been sent but not yet handled.
+T}
+.ad
+TT_HANDLED/T{
+.na
+Message has been handled, return values are valid.
+T}
+.ad
+TT_FAILED/T{
+.na
+Message could not be delivered to a handler.
+T}
+.ad
+TT_QUEUED/T{
+.na
+Message has been queued for later delivery.
+T}
+.ad
+TT_RETURNED/T{
+.na
+All observers (and the handler, if there is one) have
+accepted, rejected, or destroyed the TT_OFFER. The
+original sender sees this state, and it can be
+observed.
+.br
+This comes back to the original sender like the reply
+for a request. In particular, any message callbacks
+for the offer are run, and user data attached to the
+message before sending are available.
+T}
+.ad
+TT_STARTED/T{
+.na
+Attempting to start a process to handle the message.
+T}
+.ad
+TT_REJECTED/T{
+.na
+Message has been rejected by a possible handler. This state is 
+seen only by the rejecting process. The ToolTalk service changes 
+the state back to TT_SENT before delivering the message to 
+another possible handler. If all possible handlers have rejected 
+the message, the ToolTalk service changes the state to 
+TT_FAILED before returning the message to the sender. A receiver that
+gets an offer will see this message in the TT_REJECTED state.
+T}
+.ad
+_
+.TE
+.PP
+.PP
+.\" =========================================================================
+.SH Tt_status
+.IX "enumerated" "Tt_status" "enumerated types" "Tt_status"
+.IX "Tt_status" "" "Tt_status \(em enumerated type" ""
+A Tt_status code is returned by all functions, sometimes directly and 
+sometimes encoded in an error return value. See the ToolTalk 1.3 User's Guide 
+for instructions on to determine whether the Tt_status code is a warning or 
+an error and for retrieving the error message string for a Tt_status code.
+.PP
+The following section lists the Tt_status codes.
+.bp
+.\" =========================================================================
+.SH Error Messages
+.\" =========================================================================
+\f3TT_ERR_ACCESS\fP
+.IX "error message" "TT_ERR_ACCESS" "error messages" "TT_ERR_ACCESS"
+.IX "TT_ERR_ACCESS" "" "TT_ERR_ACCESS \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+TT_ERR_ACCESS
+.br
+An attempt was made to 
+access a ToolTalk object in a 
+way forbidden by the 
+protection system.
+.br
+.in
+\f2Description\fP:
+.in 15
+You do not have the 
+necessary access to the 
+object and the 
+application; for 
+example, you do not 
+have permission to 
+destroy an object spec. 
+Therefore, the operation 
+cannot be performed. 
+.br
+.in
+\f2Solution\fP:
+.in 15
+a. Obtain proper access 
+to the object. 
+.br
+b. Retry the operation.
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================
+\f3TT_ERR_ADDRESS\fP 
+.IX "error message" "TT_ERR_ADDRESS" "error messages" "TT_ERR_ADDRESS"
+.IX "TT_ERR_ADDRESS" "" "TT_ERR_ADDRESS \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+TT_ERR_ADDRESS
+.br
+The Tt_address value passed 
+is not valid.
+.br
+.in
+\f2Description\fP:
+.in 15
+The ToolTalk service 
+does not recognize the 
+address value specified.
+.br
+.in
+\f2Solution\fP:
+.in 15
+The Tt_address values 
+are TT_PROCEDURE, 
+TT_OBJECT, 
+TT_HANDLER, and 
+TT_OTYPE. Retry the 
+call with one of these 
+values.
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================
+\f3TT_ERR_APPFIRST\fP 
+.IX "error message" "TT_ERR_APPFIRST" "error messages" "TT_ERR_APPFIRST"
+.IX "TT_ERR_APPFIRST" "" "TT_ERR_APPFIRST \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+TT_ERR_APPFIRST
+.br
+This code should be unused.
+.br
+.in
+\f2Description\fP:
+.in 15
+This code marks the 
+beginning of the 
+messages allocated for 
+ToolTalk application 
+errors.
+.br
+.in
+\f2Solution\fP:
+.in 15
+NA
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================
+\f3TT_ERR_CATEGORY\fP 
+.IX "error message" "TT_ERR_CATEGORY" "error messages" "TT_ERR_CATEGORY"
+.IX "TT_ERR_CATEGORY" "" "TT_ERR_CATEGORY \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+TT_ERR_CATEGORY
+.br
+Pattern object has no 
+category set.
+.br
+.in
+\f2Description\fP:
+.in 15
+The category was not 
+set.
+.br
+.in
+\f2Solution\fP:
+.in 15
+NA
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================
+\f3TT_ERR_CLASS\fP 
+.IX "error message" "TT_ERR_CLASS" "error messages" "TT_ERR_CLASS"
+.IX "TT_ERR_CLASS" "" "TT_ERR_CLASS \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+TT_ERR_CLASS
+.br
+The Tt_class value passed is 
+invalid.
+.br
+.in
+\f2Description\fP:
+.in 15
+The ToolTalk service 
+does not recognize the 
+class value specified.
+.br
+.in
+\f2Solution\fP:
+.in 15
+The Tt_class values are 
+TT_NOTICE and 
+TT_REQUEST. Retry 
+the call with one of 
+these values.
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================
+\f3TT_ERR_DBAVAIL\fP 
+.IX "error message" "TT_ERR_DBAVAIL" "error messages" "TT_ERR_DBAVAIL"
+.IX "TT_ERR_DBAVAIL" "" "TT_ERR_DBAVAIL \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+TT_ERR_DBAVAIL
+.br
+A required database is not 
+available. The condition may 
+be temporary, trying again 
+later may work.
+.br
+.in
+\f2Description\fP:
+.in 15
+The ToolTalk service 
+could not access the 
+ToolTalk database 
+needed for this 
+operation.
+.br
+.in
+\f2Solution\fP:
+.in 15
+a. Check if the file 
+server or workstation 
+that contains the 
+database is available.
+.br
+b. Try the operation 
+again later.
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================
+\f3TT_ERR_DBCONSIST\fP 
+.IX "error message" "TT_ERR_DBCONSIST" "error messages" "TT_ERR_DBCONSIST"
+.IX "TT_ERR_DBCONSIST" "" "TT_ERR_DBCONSIST \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+Database is access 
+information is incomplete or 
+database is corrupt (run 
+ttdbck).
+.br
+.in
+\f2Description\fP:
+.in 15
+The ToolTalk service 
+could not write to the 
+database because it is 
+either corrupt, or the 
+access inform
+.br
+.in
+\f2Solution\fP:
+.in 15
+Run the ttdbck utility to 
+repair the database.
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================
+\f3TT_ERR_DBEXIST\fP 
+.IX "error message" "TT_ERR_DBEXIST" "error messages" "TT_ERR_DBEXIST"
+.IX "TT_ERR_DBEXIST" "" "TT_ERR_DBEXIST \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+TT_ERR_DBEXIST
+.br
+A required database does not 
+exist. The database must be 
+created before this action 
+will work.
+.br
+.in
+\f2Description\fP:
+.in 15
+The ToolTalk service did 
+not find the specified 
+ToolTalk database in the 
+expected place.
+.br
+.in
+\f2Solution\fP:
+.in 15
+Install the 
+rpc.ttdbserved program 
+on the machine that 
+stores the file or object 
+involved in this 
+operation.
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================
+\f3TT_ERR_DBFULL\fP 
+.IX "error message" "TT_ERR_DBFULL" "error messages" "TT_ERR_DBFULL"
+.IX "TT_ERR_DBFULL" "" "TT_ERR_DBFULL \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+ToolTalk database is full.
+.br
+.in
+\f2Description\fP:
+.in 15
+The ToolTalk service 
+could not write to the 
+database because it is 
+full.
+.br
+.in
+\f2Solution\fP:
+.in 15
+Create more space on 
+the file system in which 
+the database is stored.
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================
+\f3TT_ERR_DBUPDATE\fP 
+.IX "error message" "TT_ERR_DBUPDATE" "error messages" "TT_ERR_DBUPDATE"
+.IX "TT_ERR_DBUPDATE" "" "TT_ERR_DBUPDATE \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+TT_ERR_DBUPDATE
+.br
+The database is inconsistent:
+another tt_spec_write 
+updated object first.
+.br
+.in
+\f2Description\fP:
+.in 15
+The ToolTalk service 
+could not update the 
+database because the 
+specified object was 
+already updated by a 
+previous tt_spec_write 
+call.
+.br
+.in
+\f2Solution\fP:
+.in 15
+NA
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================
+\f3TT_ERR_DISPOSITION\fP 
+.IX "error message" "TT_ERR_DISPOSITION" "error messages" "TT_ERR_DISPOSITION"
+.IX "TT_ERR_DISPOSITION" "" "TT_ERR_DISPOSITION \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+TT_ERR_DISPOSITION
+.br
+The Tt_disposition value 
+passed is not valid.
+.br
+.in
+\f2Description\fP:
+.in 15
+The disposition passed 
+is not recognized by the 
+ToolTalk service.
+.br
+.in
+\f2Solution\fP:
+.in 15
+The Tt_disposition 
+values are 
+TT_DISCARD, 
+TT_QUEUE, and 
+TT_START. Retry the 
+call with one of these 
+values.
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================
+\f3TT_ERR_FILE\fP 
+.IX "error message" "TT_ERR_FILE" "error messages" "TT_ERR_FILE"
+.IX "TT_ERR_FILE" "" "TT_ERR_FILE \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+TT_ERR_FILE
+.br
+File object could not be 
+found.
+.br
+.in
+\f2Description\fP:
+.in 15
+The file specified does 
+not exist or is not 
+accessible.
+.br
+.in
+\f2Solution\fP:
+.in 15
+a. Check the file path 
+name and retry the 
+operation. 
+.br
+b. Check if the machine 
+where the file is 
+stored is accessible.
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================
+\f3TT_ERR_INTERNAL\fP 
+.IX "error message" "TT_ERR_INTERNAL" "error messages" "TT_ERR_INTERNAL"
+.IX "TT_ERR_INTERNAL" "" "TT_ERR_INTERNAL \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+TT_ERR_INTERNAL
+.br
+Internal error (bug)
+.br
+.in
+\f2Description\fP:
+.in 15
+The ToolTalk service has 
+suffered an internal 
+error.
+.br
+.in
+\f2Solution\fP:
+.in 15
+a. Restart all 
+applications that are 
+using the ToolTalk 
+service. 
+.br
+b. Report the error to 
+the your system 
+vendor support 
+center.
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================
+\f3TT_ERR_LAST\fP 
+.IX "error message" "TT_ERR_LAST" "error messages" "TT_ERR_LAST"
+.IX "TT_ERR_LAST" "" "TT_ERR_LAST \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+TT_ERR_LAST
+.br
+This code should be unused.
+.br
+.in
+\f2Description\fP:
+.in 15
+This code marks the last 
+of the messages 
+allocated for ToolTalk 
+errors.
+.br
+.in
+\f2Solution\fP:
+.in 15
+NA
+.in
+.PP
+.RE
+.PP
+.\" ========================================================================
+\f3TT_ERR_MODE\fP 
+.IX "error message" "TT_ERR_MODE" "error messages" "TT_ERR_MODE"
+.IX "TT_ERR_MODE" "" "TT_ERR_MODE \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+TT_ERR_MODE
+.br
+The Tt_mode value is not 
+valid.
+.br
+.in
+\f2Description\fP:
+.in 15
+The ToolTalk service 
+does not recognize the 
+specified mode value.
+.br
+.in
+\f2Solution\fP:
+.in 15
+The Tt_mode values are 
+TT_IN, TT_OUT, and 
+TT_INOUT. Retry the 
+call with one of these 
+values.
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================
+\f3TT_ERR_NO_MATCH\fP 
+.IX "error message" "TT_ERR_NO_MATCH" "error messages" "TT_ERR_NO_MATCH"
+.IX "TT_ERR_NO_MATCH" "" "TT_ERR_NO_MATCH \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+TT_ERR_NO_MATCH 
+.br
+No handler could be found 
+for this message, and the 
+disposition was not queue or 
+start.
+.br
+.in
+\f2Description\fP:
+.in 15
+The message the 
+application sent could 
+not be delivered. 
+.br
+No applications that are 
+running have registered 
+interest in this type of 
+message.
+.br
+.in
+\f2Solution\fP:
+.in 15
+Use tt_disposition_set() 
+to change the 
+disposition to 
+TT_QUEUE or 
+TT_START and resend 
+the message.
+.br
+If no recipients are 
+found, no application 
+has registered interest in 
+this type of message.
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================
+\f3TT_ERR_NO_VALUE\fP 
+.IX "error message" "TT_ERR_NO_VALUE" "error messages" "TT_ERR_NO_VALUE"
+.IX "TT_ERR_NO_VALUE" "" "TT_ERR_NO_VALUE \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+TT_ERR_NO_VALUE
+.br
+No property value with the 
+given name and number 
+exists.
+.br
+.in
+\f2Description\fP:
+.in 15
+The ToolTalk service 
+could not locate a value 
+for the property 
+specified in the 
+ToolTalk database.
+.br
+.in
+\f2Solution\fP:
+.in 15
+Retrieve the current list 
+of properties to find the 
+property.
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================
+\f3TT_ERR_NOMEM\fP 
+.IX "error message" "TT_ERR_NOMEM" "error messages" "TT_ERR_NOMEM"
+.IX "TT_ERR_NOMEM" "" "TT_ERR_NOMEM \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+No more memory.
+.br
+.in
+\f2Description\fP:
+.in 15
+There is not enough 
+available memory to 
+perform the operation.
+.br
+.in
+\f2Solution\fP:
+.in 15
+Check the swap space, 
+then retry the operation.
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================
+\f3TT_ERR_NOMP\fP 
+.IX "error message" "TT_ERR_NOMP" "error messages" "TT_ERR_NOMP"
+.IX "TT_ERR_NOMP" "" "TT_ERR_NOMP \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+TT_ERR_NOMP
+.br
+No ttsession process is 
+running, probably because 
+tt_open() has not been called 
+yet. If this code is returned 
+from tt_open() it means 
+ttsession could not be 
+started, which generally 
+means ToolTalk is not 
+installed on this system.
+.br
+.in
+\f2Description\fP:
+.in 15
+The ttsession process is 
+not available. The 
+ToolTalk service tries to 
+restart ttsession if it is 
+not running. This error 
+indicates that the 
+ToolTalk service is either 
+not installed or not 
+installed correctly.
+.br
+.in
+\f2Solution\fP:
+.in 15
+a. Verify that the 
+ToolTalk service is 
+installed.
+.br
+b. Verify that ttsession is 
+installed on the 
+machine in use.
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================
+\f3TT_ERR_NOTHANDLER\fP 
+.IX "error message" "TT_ERR_NOTHANDLER" "error messages" "TT_ERR_NOTHANDLER"
+.IX "TT_ERR_NOTHANDLER" "" "TT_ERR_NOTHANDLER \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+TT_ERR_NOTHANDLE
+.br
+Only the handler of the 
+message can do this.
+.br
+.in
+\f2Description\fP:
+.in 15
+Only the handler of a 
+message can perform 
+this operation. This 
+application is not the 
+handler for this 
+message.
+.br
+.in
+\f2Solution\fP:
+.in 15
+NA
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================
+\f3TT_ERR_NUM\fP 
+.IX "error message" "TT_ERR_NUM" "error messages" "TT_ERR_NUM"
+.IX "TT_ERR_NUM" "" "TT_ERR_NUM \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+TT_ERR_NUM
+.br
+The integer value passed is 
+not valid.
+.br
+.in
+\f2Description\fP:
+.in 15
+An invalid integer value 
+that was out-of-range 
+was passed to the 
+ToolTalk service. 
+.br
+Note: Simple 
+out-of-range conditions, 
+such as requesting the 
+third value of a property 
+that has only two values, 
+return a null value.
+.br
+.in
+\f2Solution\fP:
+.in 15
+Check the integer 
+specified.
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================
+\f3TT_ERR_OBJID\fP 
+.IX "error message" "TT_ERR_OBJID" "error messages" "TT_ERR_OBJID"
+.IX "TT_ERR_OBJID" "" "TT_ERR_OBJID \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+TT_ERR_OBJID
+.br
+The object id passed does not 
+refer to any existing object 
+spec.
+.br
+.in
+\f2Description\fP:
+.in 15
+The objid does not 
+reference an existing 
+object.
+.br
+.in
+\f2Solution\fP:
+.in 15
+Update the spec 
+property that contains 
+the objid specified.
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================
+\f3TT_ERR_OP\fP 
+.IX "error message" "TT_ERR_OP" "error messages" "TT_ERR_OP"
+.IX "TT_ERR_OP" "" "TT_ERR_OP \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+TT_ERR_OP
+.br
+The operation name passed 
+is not syntactically valid.
+.br
+.in
+\f2Description\fP:
+.in 15
+The specified operation 
+name is null or contains 
+non-alphanumeric 
+characters.
+.br
+.in
+\f2Solution\fP:
+.in 15
+a. Remove any 
+non-alphanumeric 
+characters.
+.br
+b. Retry the operation.
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================
+\f3TT_ERR_OTYPE\fP 
+.IX "error message" "TT_ERR_OTYPE" "error messages" "TT_ERR_OTYPE"
+.IX "TT_ERR_OTYPE" "" "TT_ERR_OTYPE \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+TT_ERR_OTYPE
+.br
+The object type passed is not 
+the name of an installed 
+object type.
+.br
+.in
+\f2Description\fP:
+.in 15
+The ToolTalk service 
+could not locate the 
+specified otype.
+.br
+.in
+\f2Solution\fP:
+.in 15
+Check the type of the 
+object with 
+tt_spec_type(). If the 
+application was 
+recently installed and 
+the ToolTalk service has 
+not reread the ToolTalk 
+Types Database:
+.br
+a. Locate the process id 
+for the ttsession.
+.br
+b. Force the reread with 
+the USR-2 signal:
+.br
+% ps -elf | grep ttsession
+.br
+% kill -USR2 <\f2ttsession pid\fP>
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================
+\f3TT_ERR_OVERFLOW\fP 
+.IX "error message" "TT_ERR_OVERFLOW" "error messages" "TT_ERR_OVERFLOW"
+.IX "TT_ERR_OVERFLOW" "" "TT_ERR_OVERFLOW \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+TT_ERR_OVERFLOW
+.br
+Too many active messages 
+(try again later).
+.br
+.in
+\f2Description\fP:
+.in 15
+The ToolTalk service has 
+received the maximum 
+amount of active 
+messages (2000) it can 
+properly handle.
+.br
+.in
+\f2Solution\fP:
+.in 15
+Either:
+.br
+a. Retrieve any 
+messages that the 
+ToolTalk service may 
+be queueing for the 
+application, and send 
+the message again 
+later.
+.br
+b. Start ttsession with 
+the -A option. 
+Specify the 
+maximum number of 
+messages in progress 
+before a 
+TT_ERR_OVERFLOW
+ condition is returned. 
+The default is 2000 
+messages.
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================
+\f3TT_ERR_PATH\fP 
+.IX "error message" "TT_ERR_PATH" "error messages" "TT_ERR_PATH"
+.IX "TT_ERR_PATH" "" "TT_ERR_PATH \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+TT_ERR_PATH
+.br
+One of the directories in the 
+file path passed does not 
+exist or cannot be read.
+.br
+.in
+\f2Description\fP:
+.in 15
+The ToolTalk service 
+was not able to read a 
+directory in the 
+specified file path name.
+.br
+.in
+\f2Solution\fP:
+.in 15
+a. Check the pathname 
+to ensure access to the 
+specified directories. 
+.br
+b. Check the machine 
+where the file resides 
+to make sure it is 
+accessible.
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================
+\f3TT_ERR_POINTER\fP 
+.IX "error message" "TT_ERR_POINTER" "error messages" "TT_ERR_POINTER"
+.IX "TT_ERR_POINTER" "" "TT_ERR_POINTER \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+TT_ERR_POINTER
+.br
+The opaque pointer (handle) 
+passed does not indicate an 
+object of the proper type.
+.br
+.in
+\f2Description\fP:
+.in 15
+The pointer passed 
+does not point at an 
+object of the correct type 
+for this operation. For 
+example, the pointer 
+may point to an integer 
+when a character string 
+is needed.
+.br
+.in
+\f2Solution\fP:
+.in 15
+a. Check the arguments 
+for the ToolTalk 
+function to find what 
+arguments the 
+function expects. 
+.br
+b. Retry the operation 
+with a pointer for a 
+valid object.
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================
+\f3TT_ERR_PROCID\fP 
+.IX "error message" "TT_ERR_PROCID" "error messages" "TT_ERR_PROCID"
+.IX "TT_ERR_PROCID" "" "TT_ERR_PROCID \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+TT_ERR_PROCID
+.br
+The process id passed is not 
+valid.
+.br
+.in
+\f2Description\fP:
+.in 15
+The process identifier 
+specified is out of date 
+or invalid.
+.br
+.in
+\f2Solution\fP:
+.in 15
+Retrieve the default 
+procid with 
+tt_default_procid().
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================
+\f3TT_ERR_PROPLEN\fP 
+.IX "error message" "TT_ERR_PROPLEN" "error messages" "TT_ERR_PROPLEN"
+.IX "TT_ERR_PROPLEN" "" "TT_ERR_PROPLEN \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+TT_ERR_PROPLEN
+.br
+The property value passed is 
+too long.
+.br
+.in
+\f2Description\fP:
+.in 15
+The ToolTalk service 
+accepts property values 
+of up to 64 characters.
+.br
+.in
+\f2Solution\fP:
+.in 15
+Shorten the property 
+value to less than 64 
+characters.
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================
+\f3TT_ERR_PROPNAME\fP 
+.IX "error message" "TT_ERR_PROPNAME" "error messages" "TT_ERR_PROPNAME"
+.IX "TT_ERR_PROPNAME" "" "TT_ERR_PROPNAME \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+TT_ERR_PROPNAME 
+.br
+The property name passed is 
+syntactically invalid.
+.br
+.in
+\f2Description\fP:
+.in 15
+The property name is 
+too long, contains 
+non-alphanumeric 
+.br
+.in
+\f2Solution\fP:
+.in 15
+Check the property 
+name, modify if 
+necessary, and retry the 
+operation.
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================
+\f3TT_ERR_PTYPE\fP 
+.IX "error message" "TT_ERR_PTYPE" "error messages" "TT_ERR_PTYPE"
+.IX "TT_ERR_PTYPE" "" "TT_ERR_PTYPE \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+TT_ERR_PTYPE
+.br
+The process type passed is 
+not the name of an installed 
+process type.
+.br
+.in
+\f2Description\fP:
+.in 15
+The ToolTalk service 
+could not locate the 
+specified ptype.
+.br
+.in
+\f2Solution\fP:
+.in 15
+If the application was 
+recently installed and 
+the ToolTalk service has 
+not reread the ToolTalk 
+Types Database:
+.br
+a. Locate the process id 
+for the ttsession.
+.br
+b. Force the reread with 
+the USR-2 signal:
+.br
+% ps -elf | grep 
+.br
+	ttsession
+.br
+% kill -USR2 
+.br
+	<\f2ttsession pid\fP>
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================
+\f3TT_ERR_PTYPE_START\fP 
+.IX "error message" "TT_ERR_PTYPE_START" "error messages" "TT_ERR_PTYPE_START"
+.IX "TT_ERR_PTYPE_START" "" "TT_ERR_PTYPE_START \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+TT_ERR_PTYPE_START
+.br
+Attempt to launch a client 
+specified in the start attribute 
+of a ptype failed.
+.br
+.in
+\f2Description\fP:
+.in 15
+The ToolTalk service 
+could not start the type 
+of process specified.
+.br
+.in
+\f2Solution\fP:
+.in 15
+Verify that the 
+application that the 
+ptype represents is 
+properly installed and 
+has execute permission.
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================
+\f3TT_ERR_READONLY\fP 
+.IX "error message" "TT_ERR_READONLY" "error messages" "TT_ERR_READONLY"
+.IX "TT_ERR_READONLY" "" "TT_ERR_READONLY \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+TT_ERR_READONLY
+.br
+The attribute cannot be 
+changed.
+.br
+.in
+\f2Description\fP:
+.in 15
+The application does not 
+have ownership or write 
+permissions for the 
+attribute. Therefore, this 
+operation cannot be 
+performed.
+.br
+.in
+\f2Solution\fP:
+.in 15
+NA
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================
+\f3TT_ERR_SCOPE\fP 
+.IX "error message" "TT_ERR_SCOPE" "error messages" "TT_ERR_SCOPE"
+.IX "TT_ERR_SCOPE" "" "TT_ERR_SCOPE \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+TT_ERR_SCOPE 
+.br
+The Tt_scope value passed is 
+not valid.
+.br
+.in
+\f2Description\fP:
+.in 15
+The scope passed is not 
+recognized by the 
+ToolTalk service.
+.br
+.in
+\f2Solution\fP:
+.in 15
+The Tt_scope values are 
+TT_SESSION and 
+TT_FILE. Retry the call 
+with one of these values.
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================
+\f3TT_ERR_SESSION\fP 
+.IX "error message" "TT_ERR_SESSION" "error messages" "TT_ERR_SESSION"
+.IX "TT_ERR_SESSION" "" "TT_ERR_SESSION \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+TT_ERR_SESSION
+.br
+The session id passed is not 
+the name of an active 
+session.
+.br
+.in
+\f2Description\fP:
+.in 15
+An out-of-date or 
+invalid ToolTalk session 
+was specified.
+.br
+.in
+\f2Solution\fP:
+.in 15
+Either:
+.br
+a. obtain the sessid of 
+the current default 
+session using 
+tt_default_session()
+.br
+b. obtain the sessid of 
+the initial session in 
+which the application 
+was started using 
+tt_initial_session()
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================
+\f3TT_ERR_SLOTNAME\fP 
+.IX "error message" "TT_ERR_SLOTNAME" "error messages" "TT_ERR_SLOTNAME"
+.IX "TT_ERR_SLOTNAME" "" "TT_ERR_SLOTNAME \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+The slot name is syntactically 
+invalid.
+.br
+.in
+\f2Description\fP:
+.in 15
+The syntax for the slot 
+name is not valid.
+.br
+.in
+\f2Solution\fP:
+.in 15
+Correct the syntax for 
+the slot name.
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================
+\f3TT_ERR_STATE\fP 
+.IX "error message" "TT_ERR_STATE" "error messages" "TT_ERR_STATE"
+.IX "TT_ERR_STATE" "" "TT_ERR_STATE \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+The Tt_message is in a state 
+that is not valid for the 
+attempted operation.
+.br
+.in
+\f2Description\fP:
+.in 15
+The state of the message 
+is invalid for the type of 
+operation being 
+requested.
+.br
+.in
+\f2Solution\fP:
+.in 15
+NA
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================
+\f3TT_ERR_TOOLATE\fP 
+.IX "error message" "TT_ERR_TOOLATE" "error messages" "TT_ERR_TOOLATE"
+.IX "TT_ERR_TOOLATE" "" "TT_ERR_TOOLATE \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+This must be the first call made into the ToolTalk API and 
+can therefore no longer be performed.
+.br
+.in
+\f2Description\fP:
+.in 15
+This error will be returned from ToolTalk API calls
+which require that a specific call be  made into the API
+before any other call is made (such as is the  case with
+use of the ToolTalk multi-thread API calls).
+.br
+.in
+\f2Solution\fP:
+.in 15
+NA
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================
+\f3TT_ERR_UNIMP\fP 
+.IX "error message" "TT_ERR_UNIMP" "error messages" "TT_ERR_UNIMP"
+.IX "TT_ERR_UNIMP" "" "TT_ERR_UNIMP \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+TT_ERR_UNIMP
+.br
+Function not implemented.
+.br
+.in
+\f2Description\fP:
+.in 15
+The ToolTalk function 
+called is not 
+implemented.
+.br
+.in
+\f2Solution\fP:
+.in 15
+NA
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================
+\f3TT_ERR_VTYPE\fP 
+.IX "error message" "TT_ERR_VTYPE" "error messages" "TT_ERR_VTYPE"
+.IX "TT_ERR_VTYPE" "" "TT_ERR_VTYPE \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+TT_ERR_VTYPE
+.br
+The value type name passed 
+is not valid.
+.br
+.in
+\f2Description\fP:
+.in 15
+The specified property 
+exists in the ToolTalk 
+database but the type of 
+value does not match 
+the specified type; or the 
+value type is not one 
+that the ToolTalk 
+service recognizes. The 
+ToolTalk service 
+supports types of int 
+and string.
+.br
+.in
+\f2Solution\fP:
+.in 15
+a. Change the type of 
+the value to either int 
+or string.
+.br
+b. Retry the operation.
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================
+\f3TT_ERR_XDR\fP 
+.IX "error message" "TT_ERR_XDR" "error messages" "TT_ERR_XDR"
+.IX "TT_ERR_XDR" "" "TT_ERR_XDR \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+The XDR procedure failed on 
+the given data, or evaluated 
+to a 0 length structure.
+.br
+.in
+\f2Description\fP:
+.in 15
+The XDR procedure 
+failed on the given data, 
+or evaluated to a 0 
+length structure.
+.br
+.in
+\f2Solution\fP:
+.in 15
+NA
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================
+\f3TT_OK\fP 
+.IX "error message" "TT_OK" "error messages" "TT_OK"
+.IX "TT_OK" "" "TT_OK \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+TT_OK
+.br
+Request successful.
+.br
+.in
+\f2Description\fP:
+.in 15
+The call was completed 
+successfully.
+.br
+.in
+\f2Solution\fP:
+.in 15
+NA
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================
+\f3TT_STATUS_LAST\fP 
+.IX "error message" "TT_STATUS_LAST" "error messages" "TT_STATUS_LAST"
+.IX "TT_STATUS_LAST" "" "TT_STATUS_LAST \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+TT_STATUS_LAST
+.br
+This code should be unused.
+.br
+.in
+\f2Description\fP:
+.in 15
+This code marks the last 
+of the messages 
+allocated for ToolTalk 
+status.
+.br
+.in
+\f2Solution\fP:
+.in 15
+NA
+.in
+.PP
+.RE
+.PP
+.\" ========================================================================
+\f3TT_WRN_APPFIRST\fP 
+.IX "error message" "TT_WRN_APPFIRST" "error messages" "TT_WRN_APPFIRST"
+.IX "TT_WRN_APPFIRST" "" "TT_WRN_APPFIRST \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+TT_WRN_APPFIRST
+.br
+This code should be unused.
+.br
+.in
+\f2Description\fP:
+.in 15
+This code marks the 
+beginning of the 
+messages allocated for 
+ToolTalk application 
+warnings.
+.br
+.in
+\f2Solution\fP:
+.in 15
+NA
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================
+\f3TT_WRN_LAST\fP 
+.IX "error message" "TT_WRN_LAST" "error messages" "TT_WRN_LAST"
+.IX "TT_WRN_LAST" "" "TT_WRN_LAST \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+TT_WRN_LAST
+.br
+This code should be unused.
+.br
+.in
+\f2Description\fP:
+.in 15
+This code marks the last 
+of the messages 
+allocated for ToolTalk 
+warnings.
+.br
+.in
+\f2Solution\fP:
+.in 15
+NA
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================
+\f3TT_WRN_NOT_ENABLED\fP 
+.IX "error message" "TT_WRN_NOT_ENABLED" "error messages" "TT_WRN_NOT_ENABLED"
+.IX "TT_WRN_NOT_ENABLED" "" "TT_WRN_NOT_ENABLED \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+TT_WRN_NOT_ENABLED
+.br
+The ToolTalk feature has not been enabled yet in this process.
+.br
+.in
+\f2Description\fP:
+.in 15
+This warning can be returned from certain ToolTalk API calls if
+a particular optional  feature of the ToolTalk  API (such
+as multi-threading) has not yet been enabled.
+.br
+.in
+\f2Solution\fP:
+.in 15
+NA
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================
+\f3TT_WRN_NOTFOUND\fP 
+.IX "error message" "TT_WRN_NOTFOUND" "error messages" "TT_WRN_NOTFOUND"
+.IX "TT_WRN_NOTFOUND" "" "TT_WRN_NOTFOUND \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+TT_WRN_NOTFOUND
+.br
+The object was not removed 
+because it was not found.
+.br
+.in
+\f2Description\fP:
+.in 15
+The ToolTalk service 
+could not find the 
+specified object in the 
+ToolTalk database. The 
+destroy operation did 
+not succeed.
+.br
+.in
+\f2Solution\fP:
+.in 15
+NA
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================
+\f3TT_WRN_SAME_OBJID\fP 
+.IX "error message" "TT_WRN_SAME_OBJID" "error messages" "TT_WRN_SAME_OBJID"
+.IX "TT_WRN_SAME_OBJID" "" "TT_WRN_SAME_OBJID \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+TT_WRN_SAME_OBJID
+.br
+The moved object retains the 
+same objid.
+.br
+.in
+\f2Description\fP:
+.in 15
+The object moved 
+stayed within the same 
+file system. The ToolTalk 
+service will retain the 
+same objid and update 
+the location.
+.br
+.in
+\f2Solution\fP:
+.in 15
+NA
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================
+\f3TT_WRN_STALE_OBJID\fP 
+.IX "error message" "TT_WRN_STALE_OBJID" "error messages" "TT_WRN_STALE_OBJID"
+.IX "TT_WRN_STALE_OBJID" "" "TT_WRN_STALE_OBJID \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+TT_WRN_STALE_OBJID
+.br
+The object attribute in the 
+message has been replaced 
+with a newer one. Update 
+the place from which the 
+object id was obtained.
+.br
+.in
+\f2Description\fP:
+.in 15
+When the ToolTalk 
+service looked up the 
+specified object in the 
+ToolTalk database, it 
+found a forwarding 
+pointer to the object. 
+.br
+.in
+\f2Solution\fP:
+.in 15
+The ToolTalk service 
+automatically puts the 
+new objid in the 
+message. 
+.br
+a. Use tt_message_object() 
+to retrieve the new objid. 
+.br
+b. Update any internal application 
+references to the new objid.
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================
+\f3TT_WRN_START_MESSAGE\fP 
+.IX "error message" "TT_WRN_START_MESSAGE" "error messages" "TT_WRN_START_MESSAGE"
+.IX "TT_WRN_START_MESSAGE" "" "TT_WRN_START_MESSAGE \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+TT_WRN_START_MESSAGE
+.br
+This message caused this 
+process to be started. This 
+message should be replied to 
+even if it is a notice.
+.br
+.in
+\f2Description\fP:
+.in 15
+When the ToolTalk 
+service starts an 
+application to deliver a 
+message to it, a reply to 
+that message must be 
+sent even if the message 
+which ToolTalk is 
+attempting to deliver is 
+a notice.
+.br
+.in
+\f2Solution\fP:
+.in 15
+Use 
+tt_message_accept() or 
+tt_message_reply() to 
+reply to, fail, or reject 
+the message after the 
+process is started by the 
+ToolTalk service.
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================
+\f3TT_WRN_STOPPED\fP 
+.IX "error message" "TT_WRN_STOPPED" "error messages" "TT_WRN_STOPPED"
+.IX "TT_WRN_STOPPED" "" "TT_WRN_STOPPED \(em error message" ""
+.PP
+.RS 3
+\f2Error Message String\fP:
+.in 15
+TT_WRN_STOPPED
+.br
+The query was halted by the 
+filter procedure.
+.br
+.in
+\f2Description\fP:
+.in 15
+The query operation 
+being performed was 
+halted by the 
+Tt_filter_function.
+.br
+.in
+\f2Solution\fP:
+.in 15
+NA
+.in
+.PP
+.RE
+.PP
+.\" =========================================================================

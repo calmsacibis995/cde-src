@@ -1,0 +1,88 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH MrmFetchBitmapLiteral 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIMrmFetchBitmapLiteral\fP \- Fetches a bitmap literal from a hierarchy
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Mrm/MrmPublic.h>
+.sp \n(PDu
+Cardinal MrmFetchBitmapLiteral(\fBhierarchy_id, index, screen, display, pixmap_return, width, height\fI)
+.ta .5i 1.5i
+.nf
+	MrmHierarchy	\fBhierarchy_id\fI;
+	String	\fBindex\fI;
+	Screen	*\fBscreen\fI;
+	Display	*\fBdisplay\fI;
+	Pixmap	*\fBpixmap_return\fI;
+	Dimension	*\fBwidth\fI;
+	Dimension	*\fBheight\fI;
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+The \fIMrmFetchBitmapLiteral\fP function fetches a bitmap literal
+from an MRM hierarchy, and converts the bitmap literal to an X pixmap
+of depth 1.  The function returns this pixmap and its width and height.
+.IP "\fBhierarchy_id\fP"
+Specifies the ID of the UID hierarchy that contains the
+specified icon literal.  The \fBhierarchy_id\fP was returned in
+a previous call to \fIMrmOpenHierarchyPerDisplay\fP.
+.IP "\fBindex\fP"
+Specifies the UIL name of the bitmap literal to fetch.
+.IP "\fBscreen\fP"
+Specifies the screen used for the pixmap.
+The \fBscreen\fP argument specifies a pointer to the
+Xlib structure \fIScreen\fP which contains the information about that
+screen and is linked to the \fIDisplay\fP structure.
+For more information on the \fIDisplay\fP and \fIScreen\fPstructures,
+see the Xlib function \fIXOpenDisplay\fP and the associated screen
+information macros.
+.IP "\fBdisplay\fP"
+Specifies the display used for the pixmap.
+The \fBdisplay\fP argument specifies the connection to the X server.
+For more information on the \fIDisplay\fP structure, see the Xlib function
+\fIXOpenDisplay\fP.
+.IP "\fBpixmap_return\fP"
+Returns the resulting X pixmap value.
+.IP "\fBwidth\fP"
+Specifies a pointer to the width of the pixmap.
+.IP "\fBheight\fP"
+Specifies a pointer to the height of the pixmap.
+.SH RETURN VALUE
+This function returns one of these status return constants:
+.IP "\fIMrmSUCCESS\fP"
+The function executed successfully.
+.IP "\fIMrmBAD_HIERARCHY\fP"
+The hierarchy ID was invalid.
+.IP "\fIMrmNOT_FOUND\fP"
+The bitmap literal was not found in the hierarchy.
+.IP "\fIMrmWRONG_TYPE\fP"
+The caller tried to fetch a literal of a type not supported by this
+function.
+.IP "\fIMrmFAILURE\fP"
+The function failed.
+.SH RELATED INFORMATION
+.na
+\fIMrmFetchIconLiteral(3X)\fP,
+\fIMrmFetchLiteral(3X)\fP, and
+\fIXOpenDisplay(3X)\fP.
+.ad

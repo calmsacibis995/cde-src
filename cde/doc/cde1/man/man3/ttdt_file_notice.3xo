@@ -1,0 +1,136 @@
+.TH ttdt_file_notice 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+ttdt_file_notice \- create and send a standard ToolTalk notice about a file
+.SH SYNOPSIS
+.yS
+#include <Tt/tttk.h>
+.sp 0.5v
+.ta \w'Tt_message ttdt_file_notice('u
+Tt_message ttdt_file_notice(Tt_message \f2context\fP,
+	Tttk_op \f2op\fP,
+	Tt_scope \f2scope\fP,
+	const char *\f2pathname\fP,
+	int \f2send_and_destroy\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn ttdt_file_notice
+function
+is used to create (and optionally send) any of the standard file notices:
+.IR Created ,
+.IR Deleted ,
+.IR Moved ,
+.IR Reverted ,
+.IR Saved ,
+and
+.IR Modified .
+.P
+The
+.Fn ttdt_file_notice
+function
+creates a notice with the specified
+.I op
+and
+.IR scope ,
+and sets its file attribute to
+.IR pathname .
+The function adds an unset argument of
+.B Tt_mode
+.Cn TT_IN
+and
+vtype
+.IR File
+to the notice, per the Desktop messaging conventions.
+If
+.I send_and_destroy
+is True,
+.Fn ttdt_file_notice
+sends the message and then destroys it;
+otherwise, it only creates the message.
+.P
+The
+.I context
+argument describes the environment to use.
+If
+.I context
+is not zero, messages created by
+.Fn ttdt_file_notice
+inherit from
+.I context
+all contexts whose slotname begins with the characters
+.Cn ENV_ .
+.SH "RETURN VALUE"
+If
+.I send_and_destroy
+is False, the
+.Fn ttdt_file_notice
+function returns the created
+.BR Tt_message .
+If
+.I send_and_destroy
+is True, it returns zero;
+otherwise, it returns an error pointer.
+The application can use
+.Fn tt_ptr_error 3
+to extract one of the following
+.B Tt_status
+values from the returned handle:
+.VL 8
+.Lc TT_DESKTOP_EINVAL
+.br
+The
+.I op
+argument was
+.Cn TTDT_MOVED
+and
+.I send_and_destroy
+was True.
+.Lc TT_ERR_DBAVAIL
+.br
+The ToolTalk service could not access the ToolTalk database
+needed for this operation.
+.Lc TT_ERR_DBEXIST
+.br
+The ToolTalk service could not access the specified ToolTalk database
+in the expected place.
+.Lc TT_ERR_NOMEM
+.br
+There is insufficient memory available to perform the function.
+.Lc TT_ERR_NOMP
+.br
+The
+.Cm ttsession 1
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_OVERFLOW
+.br
+The ToolTalk service has more active messages than it can handle.
+(The maximum number of active messages is
+.ne 2
+implementation specific, but is at least 2000.)
+.Lc TT_ERR_POINTER
+.br
+The
+.I pathname
+argument was
+.Cn NULL
+or was a ToolTalk error pointer.
+.Lc TT_ERR_PROCID
+.br
+The specified process identifier is out of date or invalid.
+.LE
+.SH "APPLICATION USAGE"
+The
+.Fn ttdt_file_event
+function
+is a higher-level interface than
+.Fn ttdt_file_notice ,
+and is the preferred way to send all but the
+.IR Moved
+notice.
+.SH "SEE ALSO"
+.Hd Tt/tttk.h 5,
+.Fn ttdt_file_event 3.

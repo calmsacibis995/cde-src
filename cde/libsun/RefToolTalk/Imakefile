@@ -1,0 +1,39 @@
+XCOMM RefToolTalk @(#)Imakefile	1.4 96/05/28 SMI
+XCOMM Copyright (c) 1996 Sun Microsystems, Inc.
+
+/*
+ * Imakefile for creating binstall links to a reference ToolTalk install
+ */
+
+#ifndef UseReferenceToolTalk
+#define UseReferenceToolTalk	YES
+#endif
+
+REFERENCE_PKGNAME	= RefToolTalk
+REFERENCE_PKGBASE	= /usr
+REFERENCE_PKGDIR	= dt
+
+#include <sun/Reference.tmpl>
+
+TT_PUBLIC_INCDIR	= Tt
+TT_PUBLIC_HEADERS	= tt_c.h tttk.h
+
+TT_LIBRARY		= libtt
+TT_LIBRARY_VERSION	= 2
+
+TT_BINARIES		= tt_type_comp
+
+all::
+
+#if UseReferenceToolTalk
+
+ReferencePublicHeadersList($(TT_PUBLIC_HEADERS),$(TT_PUBLIC_INCDIR))
+
+ReferenceSharedLibrary($(TT_LIBRARY),$(TT_LIBRARY_VERSION))
+
+ReferenceBinariesList($(TT_BINARIES))
+
+#endif /* UseReferenceToolTalk */
+
+depend::
+

@@ -1,0 +1,73 @@
+XCOMM $XConsortium: Imakefile /main/cde1_maint/2 1995/10/04 13:24:57 gtsang $
+/* The default for the defines NormalLibtt and SharedLibtt are set in
+ * config/Project.tmpl.
+ * If NormalLibtt and ! SharedLibtt, only non-pic code is built in
+ *    current directory.
+ * If NormalLibtt and SharedLibtt, non-pic code is built in the current
+ *    directory and pic code is built in the shared subdirectory.
+ * If !NormalLibtt and SharedLibtt, only pic code is built in the 
+ *    current directory.
+ * The default defines for NormalLibtt and SharedLittt can be overwritten 
+ *    in many places. See the file config/ExtensionsToImake for 
+ *    information.
+ */
+#ifndef DoNormalLib
+#define DoNormalLib NormalLibtt
+#endif
+#ifndef DoSharedLib
+#define DoSharedLib SharedLibtt
+#endif
+
+#include <Library.tmpl>
+
+TT_DIR = ../../..
+#include "../../../tooltalk.tmpl"
+
+DEFINES = 
+INCLUDES = -I../..
+
+/* put EXTRA_DEFINES and EXTRA_INCLUDES and anything else below */
+#ifdef HPArchitecture
+EXTRA_CCOPTIONS = $(ESLIT_OPTION)
+#endif
+
+#ifdef SunArchitecture
+EXTRA_DEFINES = -D_TS_ERRNO -D_REENTRANT
+#endif
+
+#ifdef RsArchitecture
+#endif
+
+#ifdef USLArchitecture
+#endif
+
+#ifdef UXPArchitecture
+#endif
+
+
+
+
+/*** NOTE!
+ *** Every time a .o is added below it needs to be added to
+ *** the lib/tt/lib Imakefile in OBJS and SHARED_OBJS
+ ***/
+
+
+/* SRCS and OBJS need to be conglomerated for make depend and library build */
+SRCS = 	ttdnd.c
+
+/* lib is not built here */       
+OBJS = ttdnd.o
+
+
+
+/* Build the .o's */
+LibraryObjectRule()
+
+all:: $(OBJS)
+
+LintLibraryTarget(tt,$(SRCS))
+
+DependTarget()
+
+includes::

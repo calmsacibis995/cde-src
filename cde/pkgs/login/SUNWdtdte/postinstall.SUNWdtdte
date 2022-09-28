@@ -1,0 +1,22 @@
+#!/bin/sh
+ 
+#
+# Update system printer actions
+#
+# PKG_INSTALL_ROOT intentionally left off the check below.
+# dtprintinfo does not know how to populate actions
+# correctly in alternate root ( /a ) environments.
+#
+
+if [ -x /usr/dt/bin/dtprintinfo ]
+then
+	/usr/dt/bin/dtprintinfo -populate
+fi
+
+#
+#  To remove obselete /usr/$CDEBOOKMARKS area incorrectly installed under /usr
+#  during Solaris 2.6 early access release.
+#
+
+/usr/bin/rm -rf $BASEDIR/?CDEBOOKMARKS  2>&1 >/dev/null
+

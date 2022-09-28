@@ -1,0 +1,83 @@
+.TH Set_Geometry Desktop "05 Apr 1994" "SunSoft" "ToolTalk Policy"
+.SH NAME
+.PP
+Set_Geometry, Get_Geometry - set/get a tool's on-screen geometry
+.SH SYNOPSIS
+.so ../.synopsis
+	Set_Geometry(	inout	width	\fIw\f(CW	
+		inout	height	\fIh\f(CW	
+		inout	xOffset	\fIx\f(CW	
+		inout	yOffset	\fIy\f(CW	
+		[in	messageID	\fIcommission\f(CW] );	
+.\"		|in	viewID	\fIview2Set\f(CW
+	Get_Geometry(	out	width	\fIw\f(CW	
+		out	height	\fIh\f(CW	
+		out	xOffset	\fIx\f(CW	
+		out	yOffset	\fIy\f(CW	
+		[in	messageID	\fIcommission\f(CW] );	
+.\"		|in	viewID	\fIview2Get\f(CW
+.ft
+.fi
+.SH DESCRIPTION
+.PP
+Set or report the on-screen geometry of the optionally specified
+window, or of the window primarily associated with the recipient
+procid (if no window is specified).
+.SH REQUIRED ARGUMENTS
+.PP
+.HP 8
+.PD 0
+\f(CWwidth\fR \fIw\fR
+.HP 8
+\f(CWheight\fR \fIh\fR
+.HP 8
+\f(CWxOffset\fR \fIx\fR
+.TP
+\f(CWyOffset\fR \fIy\fR
+.PD
+Integer geometry values, in pixels.  Negative offset values
+are interpreted according to the
+.BR X11 (7)
+man page.
+.IP
+For
+.BR Set_Geometry (),
+if any of these arguments are unset, that part of the geometry need
+not be changed.  For
+.BR Set_Geometry (),
+the return values are the actual
+new values, in case they differ from the requested new values.
+.SH OPTIONAL ARGUMENTS
+.TP
+\f(CWmessageID\fR \fIcommission\fR
+The ID of the ongoing request, if any, that resulted in the creation
+of the window in question.
+.\".TP
+.\"\f(CWviewID\fR \fIbuf2{GS}et\fR
+.\"The ID of the view, if any, associated with the window in question.
+.SH EXAMPLES
+.PP
+.BR ttdt_session_join ()
+and
+.BR ttdt_message_accept ()
+can be used by Xt applications to register for and
+transparently process these messages.
+.PP
+These messages can be sent like so:
+.nf
+.ft CW
+.ps -2
+Tt_message msg = tttk_message_create( 0, TT_REQUEST, TT_SESSION,
+			the_recipient_procid, TTDT_SET_GEOMETRY,
+			my_callback );
+tt_message_iarg_add( msg, TT_INOUT, Tttk_width, 500 );
+tt_message_iarg_add( msg, TT_INOUT, Tttk_height, 500 );
+tt_message_arg_add( msg, TT_INOUT, Tttk_xoffset, 0 ); // no value
+tt_message_arg_add( msg, TT_INOUT, Tttk_yoffset, 0 ); // no value
+tt_message_send( msg );
+.ps
+.ft
+.fi
+.PP
+Also, \f(CWGet_Geometry\fR can be sent by
+.BR ttdt_sender_imprint_on ().

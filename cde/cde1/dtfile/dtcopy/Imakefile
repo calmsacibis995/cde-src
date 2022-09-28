@@ -1,0 +1,108 @@
+XCOMM $XConsortium: Imakefile /main/cde1_maint/4 1995/10/09 14:53:03 pascale $
+/************************************<+>*************************************
+ ****************************************************************************
+ **
+ **   File:        Imakefile
+ **
+ **   Project:     dtcopy - Handles move/copy/link operations for 'dtfile'
+ **
+ **   Description: This Imakefile is used to create Makefile to build the
+ **                File Manager 'dtfile_copy' source files.
+ **
+ **  (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+ **  (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+ **  (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+ **  (c) Copyright 1993, 1994, 1995 Novell, Inc.
+ **
+ ****************************************************************************
+ ************************************<+>*************************************/
+
+DESKTOP_VERSION_STRING = DesktopVersionString
+
+/* General case INCLUDES DEFINES LOCAL_LIBRARIES
+ * Each individual architecture may have more or less of the above.
+ * USE_libraryname in LOCAL_LIBRARIES is by default empty.
+ * It should be set when necessary to the real library macro name.
+ */
+        DEFINES = -DXK_MISCELLANY -DSHAPE
+       INCLUDES = -I. -I$(BMSLIBSRC)
+
+/* DEPLIBS contains the list of library depencies for a client.
+ * LOCAL_LIBRARIES contains the list of libraries on the link line.
+ * Generally, the dependency form of a library has DEP as a prefix.
+ * e.g. put $(XLIB) in LOCAL_LIBRARIES and $(DEPXLIB) in DEPLIBS.
+ * NOTE: if DEPLIBS is not set here, it is by default null and there
+ *       are no library dependencies for clients.
+ *       You cannot put -Llibpath into DEPLIBS. You must put actual
+ *       paths to the library.
+ */
+#if defined (SunArchitecture)
+DEPLIBS = $(DEPDTSVCLIB) $(DEPDTWIDGETLIB) $(DEPXMLIB)  $(DEPXTOOLLIB) $(DEPXLIB)
+LOCAL_LIBRARIES = $(DTSVCLIB) $(DTWIDGETLIB) $(XMLIB)  $(XTOOLLIB) $(XLIB)
+#else
+DEPLIBS = $(DEPDTHELPLIB) $(DEPDTSVCLIB) $(DEPDTWIDGETLIB) $(DEPXMLIB)  $(DEPXTOOLLIB) $(DEPXLIB)
+LOCAL_LIBRARIES = $(DTHELPLIB) $(DTSVCLIB) $(DTWIDGETLIB) $(XMLIB)  $(XTOOLLIB) $(XLIB)
+#endif /* SunArchitecture */
+SYS_LIBRARIES	= -lm
+
+
+#ifdef AlphaArchitecture
+EXTRA_DEFINES = -DMESSAGE_CAT
+# EXTRA_DEFINES =
+#endif
+
+#ifdef HPArchitecture
+EXTRA_DEFINES = -DMESSAGE_CAT
+#endif
+
+#ifdef RsArchitecture
+SYS_LIBRARIES = -lm -liconv
+#endif
+
+ 
+#if defined (SunArchitecture)
+
+#ifdef REORDER_PROFILED
+SYS_LIBRARIES = -lm -ldl $(WIDECHARSYSLIB)
+CC = CcCmd -xpg $(BBAFLAGS)
+LOCAL_LDFLAGS = -L/usr/dt/lib -lmcount
+#else
+SYS_LIBRARIES = -lm -ldl $(WIDECHARSYSLIB)
+EXTRA_CCOPTIONS = -xF -xstrconst -dalign
+#endif
+
+#endif
+ 
+
+
+ 
+
+
+#if defined (USLArchitecture)
+SYS_LIBRARIES = -lm -ldl $(WIDECHARSYSLIB) -lgen
+#endif
+
+#if defined (UXPArchitecture)
+SYS_LIBRARIES = -lm -ldl $(WIDECHARSYSLIB) -lgen
+#endif
+
+#if defined(HPOSFArchitecture)
+#endif
+
+
+PROGRAMS=dtfile_copy 
+
+OBJS =  main_dtcopy.o	copydialog.o	overwrtdialog.o	dosync.o\
+	fsrtns.o 	utils.o		errordialog.o   sharedFuncs.o
+
+SRCS =  main_dtcopy.c 	copydialog.c	overwrtdialog.c dosync.c\
+	fsrtns.c 	utils.c 	errordialog.c   sharedFuncs.c
+
+# make off_t a long long instead of a struct
+sharedFuncs.o dosync.o := CCOPTIONS = -Xa
+
+all::
+NormalLibraryObjectRule()
+
+
+ComplexProgramTarget($(PROGRAMS))

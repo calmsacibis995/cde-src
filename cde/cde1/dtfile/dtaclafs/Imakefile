@@ -1,0 +1,89 @@
+/************************************<+>*************************************
+ ****************************************************************************
+ *
+ *   FILE:           Imakefile
+ *
+ *   COMPONENT_NAME: dtaclafs - File awareness dialog for 'afs'
+ *
+ *   DESCRIPTION:    Creates Makefile to build the source code.
+ *
+ *   (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+ *   (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+ *   (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+ *   (c) Copyright 1993, 1994, 1995 Novell, Inc.
+ *
+ ****************************************************************************
+ ************************************<+>*************************************/
+
+DESKTOP_VERSION_STRING = DesktopVersionString
+
+/* General case INCLUDES DEFINES LOCAL_LIBRARIES
+ * Each individual architecture may have more or less of the above.
+ * USE_libraryname in LOCAL_LIBRARIES is by default empty.
+ * It should be set when necessary to the real library macro name.
+ */
+        DEFINES = -DXK_MISCELLANY -DSHAPE \
+                  -DCDE_INSTALLATION_TOP=\"$(CDE_INSTALLATION_TOP)\"
+       INCLUDES = -I. -I$(BMSLIBSRC)
+
+/*
+ *   definitions needed for AFS headers and libraries
+ *   no dependency libraries are defined
+ */
+
+       EXTRA_INCLUDES = -I/usr/afsws/include        /* AFS header files */
+
+       EDITRESLIB = $(XMULIB)                       /* for editres debugging tool */
+       DEPEDITRESLIB = $(DEPXMULIB)
+
+       AFS_LIBDIR = /usr/afsws/lib                  /* AFS libraries */
+       AFS_LIBAFSDIR = /usr/afsws/lib/afs
+       AFS_LIBPATH = -L$(AFS_LIBDIR) -L$(AFS_LIBAFSDIR)
+
+       AFS_LIBRARIES = $(AFS_LIBPATH) -lsys -lrx -llwp
+
+/* DEPLIBS contains the list of library depencies for a client.
+ * LOCAL_LIBRARIES contains the list of libraries on the link line.
+ * Generally, the dependency form of a library has DEP as a prefix.
+ * e.g. put $(XLIB) in LOCAL_LIBRARIES and $(DEPXLIB) in DEPLIBS.
+ * NOTE: if DEPLIBS is not set here, it is by default null and there
+ *       are no library dependencies for clients.
+ *       You cannot put -Llibpath into DEPLIBS. You must put actual
+ *       paths to the library.
+ */
+DEPLIBS = $(DEPDTSVCLIB) $(DEPXMLIB)  $(DEPXTOOLLIB) $(DEPXLIB) $(DEPEDITRESLIB)
+LOCAL_LIBRARIES = $(DTSVCLIB) $(XMLIB)  $(XTOOLLIB) $(XLIB) $(EDITRESLIB)
+SYS_LIBRARIES	= -lm $(AFS_LIBRARIES)
+
+
+#ifdef HPArchitecture
+EXTRA_DEFINES = -DMESSAGE_CAT
+#endif
+
+#ifdef RsArchitecture
+#endif
+
+#if defined (SunArchitecture)
+LOCAL_LIBRARIES = $(DTSVCLIB) $(XPMLIB) $(XMLIB) $(XTOOLLIB) $(XLIB)
+SYS_LIBRARIES = -lm -ldl -lw
+#endif
+
+#if defined (USLArchitecture)
+SYS_LIBRARIES = -lm -ldl -lw -lgen
+#endif
+
+#if defined(HPOSFArchitecture)
+#endif
+
+
+PROGRAMS=dtaclafs
+
+OBJS =  dtaclafs.o callbacks.o create.o toggleGroup.o xacl.o setval.o
+
+SRCS =  dtaclafs.c callbacks.c create.c toggleGroup.c xacl.c setval.c
+
+all::
+NormalLibraryObjectRule()
+
+
+ComplexProgramTarget($(PROGRAMS))

@@ -1,0 +1,146 @@
+XCOMM
+XCOMM	RESTRICTED CONFIDENTIAL INFORMATION:
+XCOMM	
+XCOMM	The information in this document is subject to special
+XCOMM	restrictions in a confidential disclosure agreement between
+XCOMM	HP, IBM, Sun, USL, SCO and Univel.  Do not distribute this
+XCOMM	document outside HP, IBM, Sun, USL, SCO, or Univel without
+XCOMM	Sun's specific written approval.  This document and all copies
+XCOMM	and derivative works thereof must be returned or destroyed at
+XCOMM	Sun's request.
+XCOMM
+XCOMM	Copyright 1994, 1995 Sun Microsystems, Inc.  All rights reserved.
+XCOMM
+XCOMM	@(#)Imakefile	1.16 04/01/97
+XCOMM
+
+/*
+ * I turned this off so that it would stop trying to rebuild imake.
+ * Imake is another component, let them build it.
+ */
+#undef  ImakeDependency
+#define ImakeDependency()	/**/
+
+PROGRAMS	=	dtmailpr
+SYS_LIBRARIES	=	
+
+DEPLIBS		=	$(DEPTTLIB) $(DEPDTSVCLIB) $(DEPTTLIB)
+
+INSTALLFLAGS	=	$(INSTINCFLAGS)
+
+INCLUDES	=	-I. -I../include \
+			-I../../../binstall/include \
+			-I../../../. \
+			-I$(DTINCLUDESRC)
+
+
+#ifdef RsArchitecture
+#undef DTMAILLIB
+DTMAILLIB	=	../libDtMail/libDtMail.a
+#else
+#undef DTMAILLIB
+SDTMAILLIB	=	-L/usr/dt/lib -lSDtMail
+
+#if OSMajorVersion > 5 || (OSMajorVersion == 5 && OSMinorVersion > 5)
+CCLIENTLIB	=	-L../../../binstall/lib -lc-client -lnsl -lsocket
+#else
+CCLIENTLIB	=	-L../../../binstall/lib -lc-client -lnsl -lsocket -lintl
+#endif
+
+LCLLIB		=	-llcl
+#endif
+
+LOCAL_LIBRARIES =	$(SDTMAILLIB) $(CCLIENTLIB) $(LCLLIB) \
+			$(DTSVCLIB) $(TTLIB)
+
+#ifdef RsArchitecture
+EXTRA_DEFINES = -DIBM_MOTIF -DBIG_ENDIAN -DAIX -DI_HAVE_NO_BOOL \
+		-DSTRCASECMP_NOT_DEFINED
+NONSHAREDLIBCOBJ = nonsharelibC.o
+#endif
+
+#ifdef HPArchitecture
+EXTRA_DEFINES	=	-DHPUX -DBIG_ENDIAN -DI_HAVE_NO_IDENT \
+			-DI_HAVE_NO_BOOL -DNEED_MMAP_WRAPPER
+#endif
+
+#ifdef SunArchitecture
+
+#if !defined(i386) && !defined(__ppc)
+ENDIAN		=	-DBIG_ENDIAN
+#endif
+
+#ifndef SUNPRODIR
+SUNPRO_DIR	=	/opt/SUNWspro
+#else
+SUNPRO_DIR	=	SUNPRODIR
+#endif
+
+C++LIBPATH	=	-L$(SUNPRO_DIR)/lib
+
+EXTRA_CCOPTIONS =	-xstrconst -Xc -v
+#ifdef USE_SPRO_V3
+SPRO_V3_OPTIONS =      -noex -USPRO_V2
+#ifdef DEBUGTREE
+SPRO_V3_OPTIONS +=	-xsb
+#endif	/* DEBUGTREE */
+#else
+EXTRA_CCOPTIONS	+=	-DSPRO_V2
+#endif  /* USE_SPRO_V3 */
+
+
+#if REORDER_PROFILED
+EXTRA_C++OPTIONS =	-xF +w $(SPRO_V3_OPTIONS)
+EXTRA_CCOPTIONS =	-xF -xstrconst -Xa -v
+LOCAL_LDFLAGS   =	-L/usr/dt/lib -lmcount
+CC		=	cc -xpg $(BBAFLAGS)
+C++		=	CC -pg $(BBAFLAGS)
+#else
+EXTRA_C++OPTIONS =	-xF +w $(SPRO_V3_OPTIONS)
+EXTRA_CCOPTIONS =	-xF -xstrconst -Xa -v
+
+#if OSMajorVersion > 5 || (OSMajorVersion == 5 && OSMinorVersion > 5)
+LOCAL_LDFLAGS	=	-mt
+#else
+LOCAL_LDFLAGS	=	
+#endif
+
+#endif
+
+#ifndef NoLargeFiles
+#define NoLargeFiles
+#endif
+
+#if OSMajorVersion > 5 || (OSMajorVersion == 5 && OSMinorVersion > 5)
+EXTRA_DEFINES	=	$(ENDIAN) -DSunOS=$(OSMAJORVERSION)$(OSMINORVERSION) -D_REENTRANT NoLargeFiles
+#else
+EXTRA_DEFINES	=	$(ENDIAN) -DSunOS=$(OSMAJORVERSION)$(OSMINORVERSION) 
+#endif
+
+#EXTRA_C++OPTIONS =	+p +w $(SPRO_V3_OPTIONS)
+EXTRA_C++OPTIONS =	+w $(SPRO_V3_OPTIONS)
+MT_LIBS		=	-i $(C++_LIB)
+
+SYS_LIBRARIES	=	$(MT_LIBS) -lC
+
+.KEEP_STATE:
+.PARALLEL:
+#endif
+
+#ifdef USLArchitecture
+SYS_LIBRARIES	=	-lgen -lresolv -lintl -lnsl
+#endif
+
+#ifdef AlphaArchitecture
+EXTRA_DEFINES	=	-DI_HAVE_NO_IDENT -DNEED_MMAP_WRAPPER
+SYS_LIBRARIES	=	-ltt -lm -lcxx -lc
+#endif /* AlphaArchitecture */
+
+SRCS 		=	main.C
+
+OBJS 		=	$(NONSHAREDLIBCOBJ) \
+			main.o
+
+NormalLibraryObjectRule()
+
+ComplexProgramTarget(dtmailpr)

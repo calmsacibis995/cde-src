@@ -1,0 +1,88 @@
+.TH DtCMGetBodyPartContents 3 "17 January 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH "NAME"
+DtCMGetBodyPartContents \- get the contents of a body part
+.SH "SYNOPSIS"
+.yS
+#include <Bento/DtCM.h>
+.sp 0.5v
+.ta \w'void DtCMGetBodyPartContents('u
+void DtCMGetBodyPartContents(DtCMBodyPart *\f2body_part\fP,
+	CMEnv *\f2error\fP,
+	CMGlobalName *\f2type_name\fP,
+	CMPtr *\f2data\fP,
+	CMSize *\f2data_size\fP);
+.yE
+.SH "DESCRIPTION"
+The
+.Fn DtCMGetBodyPartContents
+function returns all or part of the content information for a
+body part.
+This function does not retrieve pointers for information buffers that are
+.Cn NULL .
+.P
+The
+.I body_part
+argument is a body-part structure returned by any of the
+.Fn DtCMGetBodyPart 3,
+.Fn DtCMGetNextBodyPart 3,
+or
+.Fn DtCMNewBodyPart 3
+functions.
+The
+.I error
+argument is a pointer to an error return structure.
+.P
+The
+.I type_name
+argument is a pointer to a
+.BR CMGlobalName
+that stores the content type name.
+The type must be one of the names listed in
+.cX datafmtnaming .
+.P
+The
+.I data
+argument is the content stream for the body part.
+If this pointer is not
+.Cn NULL ,
+then the
+.I data_size
+argument must not be
+.Cn NULL .
+The
+.I data_size
+argument is the size of the contents in bytes.
+.SH "RETURN VALUE"
+The
+.Fn DtCMGetBodyPartContents
+function returns no value.
+If an error occurs,
+.Fn DtCMGetBodyPartContents
+sets the major code in the
+.I error
+structure to
+.Cn USER_EXCEPTION ,
+and the application can use the
+.Fn CMRexception_number
+function to determine the minor code.
+See the Error API Appendix in the \*(ZB.
+.SH "APPLICATION USAGE"
+The application should release the memory pointed to by the returned
+information using the
+.Fn free 3C
+function.
+.SH "SEE ALSO"
+.Fn DtCMGetBodyPart 3,
+.Fn DtCMGetNextBodyPart 3,
+.Fn DtCMNewBodyPart 3,
+.Fn DtCMSetBodyPartContents 3,
+.Hd Bento/DtCM.h 5;
+.Fn CMRexception_number
+in the \*(ZB;
+.cde .Fn free 3C.
+.xo .Fn free
+.xo in the \*(ZK.

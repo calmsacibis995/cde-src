@@ -1,0 +1,229 @@
+:bil-version	1 0
+:module AutoFiling
+(
+
+:element dialog
+(
+	:type			:dialog
+	:bg-color		"white"
+	:label			"Mailer - Auto-filing Mailboxes"
+	:resizable		:true
+	:visible		:false
+	:children		(
+		controlpane
+		dialog_button_panel
+	)
+)
+:element controlpane
+(
+	:type			:container
+	:container-type		:relative
+	:visible		:true
+	:active			:true
+	:border-frame		:none
+	:north-attachment	(:point 0 0)
+	:south-attachment	(:obj dialog -1)
+	:east-attachment	(:obj dialog -1)
+	:west-attachment	(:point 0 0)
+	:children		(
+		sep3
+		af_group
+	)
+)
+:element sep3
+(
+	:type			:separator
+	:line-style		:etched-in
+	:orientation		:horizontal
+	:x			-2
+	:y			377
+	:height			11
+	:visible		:true
+	:north-attachment	(:obj af_group 20)
+	:east-attachment	(:point 0 0)
+	:west-attachment	(:point 0 0)
+)
+:element af_group
+(
+	:type			:container
+	:container-type		:group
+	:active			:true
+	:visible		:true
+	:x			22
+	:y			22
+	:group-type		:column
+	:column-alignment	:left
+	:voffset		10
+	:vattach_type		:obj
+	:border-frame		:none
+	:north-attachment	(:point 0 22)
+	:east-attachment	(:point 0 42)
+	:west-attachment	(:point 0 22)
+	:children		(
+		af_lb
+		mailbox_list
+	)
+)
+:element af_lb
+(
+	:type			:label
+	:label-type		:string
+	:label			"Mailboxes with asterisk (*) contain new mail"
+	:label-alignment	:center
+	:active			:true
+	:visible		:true
+)
+:element mailbox_list
+(
+	:type			:list
+	:width			630
+	:selection-mode		:multiple
+	:selection-required	:false
+	:num-rows		15
+	:active			:true
+	:visible		:true
+)
+:element dialog_button_panel
+(
+	:type			:container
+	:container-type		:button-panel
+	:height			48
+	:visible		:true
+	:active			:true
+	:border-frame		:none
+	:children		(
+		check_button
+		open_button
+		filing_button
+		cancel_button
+		help_button
+	)
+)
+:element check_button
+(
+	:type			:button
+	:button-type		:push-button
+	:x			601
+	:y			457
+	:width			118
+	:height			23
+	:label-type		:string
+	:label-alignment	:center
+	:label			"Check Selected"
+	:active			:true
+	:visible		:true
+	:north-attachment	(:point 0 5)
+	:east-attachment	(:grid-line 19 0)
+	:west-attachment	(:grid-line 2 0)
+)
+:element open_button
+(
+	:type			:button
+	:button-type		:push-button
+	:x			701
+	:y			457
+	:width			126
+	:height			23
+	:label-type		:string
+	:label-alignment	:center
+	:label			"Open"
+	:active			:true
+	:visible		:true
+	:north-attachment	(:point 0 5)
+	:east-attachment	(:grid-line 39 0)
+	:west-attachment	(:grid-line 21 0)
+)
+:element filing_button
+(
+	:type			:button
+	:button-type		:push-button
+	:x			801
+	:y			457
+	:width			125
+	:height			23
+	:label-type		:string
+	:label-alignment	:center
+	:label			"Filing Rules..."
+	:active			:true
+	:visible		:true
+	:north-attachment	(:point 0 5)
+	:east-attachment	(:grid-line 59 0)
+	:west-attachment	(:grid-line 41 0)
+)
+:element cancel_button
+(
+	:type			:button
+	:button-type		:push-button
+	:x			901
+	:y			457
+	:width			126
+	:height			23
+	:label-type		:string
+	:label-alignment	:center
+	:label			"Cancel"
+	:active			:true
+	:visible		:true
+	:north-attachment	(:point 0 5)
+	:east-attachment	(:grid-line 79 0)
+	:west-attachment	(:grid-line 61 0)
+)
+:element help_button
+(
+	:type			:button
+	:button-type		:push-button
+	:x			1001
+	:y			457
+	:width			118
+	:height			23
+	:label-type		:string
+	:label-alignment	:center
+	:label			"Help"
+	:active			:true
+	:visible		:true
+	:north-attachment	(:point 0 5)
+	:east-attachment	(:grid-line 98 0)
+	:west-attachment	(:grid-line 81 0)
+)
+:connection
+(
+	:from			open_button
+	:when			:activate
+	:action-type		:call-function
+	:action			AFOpen_CB
+)
+:connection
+(
+	:from			filing_button
+	:when			:activate
+	:action-type		:call-function
+	:action			AFFiling_CB
+)
+:connection
+(
+	:from			check_button
+	:when			:activate
+	:action-type		:call-function
+	:action			AFCheck_CB
+)
+:connection
+(
+	:from			help_button
+	:when			:activate
+	:action-type		:call-function
+	:action			AFHelp_CB
+)
+:connection
+(
+	:from			cancel_button
+	:when			:activate
+	:action-type		:call-function
+	:action			AFCancel_CB
+)
+:connection
+(
+	:from			mailbox_list
+	:when			:double-click
+	:action-type		:call-function
+	:action			doubleClickCB
+)
+)

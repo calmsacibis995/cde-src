@@ -1,0 +1,69 @@
+.\" **
+.\" ** (c) Copyright 1994 Hewlett-Packard Company
+.\" ** (c) Copyright 1994 International Business Machines Corp.
+.\" ** (c) Copyright 1994 Novell, Inc.
+.\" ** (c) Copyright 1994 Sun Microsystems, Inc.
+.\" **
+.TH DtEditorGetSizeHints 3 ""
+.BH "3 May - 1994"
+.SH NAME
+\fBDtEditorGetSizeHints(3) \- Retrieve sizing information from an Editor 
+widget.\fP
+.iX "DtEditorGetSizeHints"
+.iX "DtEditor functions" "DtEditorGetSizeHints"
+.sp .5
+.SH SYNOPSIS
+\fB
+\&#include <Dt/Editor.h>
+.sp .5
+void DtEditorGetSizeHints (
+.br
+.ta	0.75i 1.75i
+	Widget	\fIwidget\fP,
+.br
+	XSizeHints	*\fIpHints\fP,)
+.fi
+\fP
+.SH DESCRIPTION
+\fBDtEditorGetSizeHints\fP retrieves the current sizing information from
+an \fIwidget\fP, allowing the application to compute appropriate size hints 
+for the window manager.
+.sp .5
+.IP "\fIwidget\fP" 1.00i
+Specifies the editor widget ID.
+.IP "\fIpHints\fP" 1.00i
+Pointer to an XSizeHints structure into which the current sizing 
+information is placed.
+.PP
+.sp .5
+.SH RETURN VALUE
+\fBDtEditorGetSizeHints\fP will fill in the following fields of the
+XSizeHints structure: minimum width and height, width and height increment, 
+base width and height.  The flags field will be set to: \fIPMinSize | 
+PResizeInc | PBaseSize | PSize | PPosition\fP.
+.sp .5
+.SH EXAMPLES
+.P
+The following code segment sets the resize increment and minimum window 
+size properties for the application.
+.nf
+.ta .25i 1.1i 
+	Widget		editor,
+			application_shell;
+	Display		display;
+	XSizeHints	size_hints;
+	long		supplied_return;
+
+	XGetWMSizeHints( display, XtWindow(application_shell), 
+			 &size_hints, &supplied_return, XA_WM_NORMAL_HINTS );
+
+	DtEditorGetResizeHints( editor, &size_hints );
+
+	XSetWMSizeHints( display, XtWindow(application_shell), 
+			 &size_hints, XA_WM_NORMAL_HINTS);
+
+.fi
+.SH RELATED INFORMATION
+\fBDtEditor(3)\fP. 
+.sp .5
+

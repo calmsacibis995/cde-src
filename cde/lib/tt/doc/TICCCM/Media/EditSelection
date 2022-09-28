@@ -1,0 +1,79 @@
+.TH EditSelection Media "07 Sep 1993" "SunSoft" "ToolTalk ICCCM"
+.SH NAME
+.PP
+Display, Edit - load an X11 selection for displaying or editing
+.SH SYNOPSIS
+.so ../.synopsis
+	Display(	in	selection	\fIselname\f(CW,	
+		in	integer	\fIitem\f(CW,	
+		in	string	\fItarget\f(CW,	
+		in	boolean	\fIaskMe\f(CW,	
+		[in	messageID	\fIcounterfoil\f(CW] );	
+	Edit(	in	\fIselection	selname\f(CW,	
+		in	integer	\fIitem\f(CW,	
+		in	string	\fItarget\f(CW,	
+		in	boolean	\fIaskMe\f(CW,	
+		[in	messageID	\fIcounterfoil\f(CW] );
+.ft
+.fi
+.SH DESCRIPTION
+.PP
+Instruct a selection owner to display or edit its selected data,
+optionally by having the requester perform the displaying or editing.
+.PP
+This request is used most often by editors into which a selection has
+been
+.IR drag-loaded .
+.SH REQUIRED ARGUMENTS
+.TP
+\f(CWselection\fR \fIselname\fR
+The selection to be displayed or edited.
+.TP
+\f(CWinteger\fR \fIitem\fR
+The part of the disjoint selection to be displayed or edited.  Items
+are numbered from 0.  -1 means all the items in the selection.
+.TP
+\f(CWstring\fR \fItarget\fR
+The target to which the selection should be converted before
+it gets displayed or edited.
+.TP
+\f(CWboolean\fR \fIaskMe\fR
+If true, the handler (i.e., selection owner) should send a
+.BR Display ()
+or
+.BR Edit ()
+request \f(CWTT_HANDLER\fR-addressed directly back to the requester.
+If false, the handler should somehow display or edit the selection,
+usually by sending an anonymous (i.e., \f(CWTT_PROCEDURE\fR-addressed)
+.BR Display ()
+or
+.BR Edit ()
+request.
+.SH OPTIONAL ARGUMENTS
+.so ../.counterfoil
+.SH ERRORS
+.TP
+\f(BITT_DESKTOP_EINVAL\fR
+The specified
+.IR selname ,
+.IR item ,
+or
+.I target
+is is invalid.
+.PP
+If
+.I askMe
+is true and the consequent
+.BR Display ()
+or
+.BR Edit ()
+request fails, the
+.BR ReEdit ()
+request if failed with the status code of the failed request:
+.so .errors
+.SH SEE ALSO
+.PP
+.BR Intro (Desktop),
+.BR Intro (Media),
+.BR Display (Media),
+.BR Edit (Media)

@@ -1,0 +1,104 @@
+#############################################################################
+###
+###   .dtprofile
+###
+###   user personal environment variables
+###
+###   Common Desktop Environment (CDE)
+###
+###   (c) Copyright 1993 Hewlett-Packard Company
+###   (c) Copyright 1993 International Business Machines Corp.
+###   (c) Copyright 1993 Sun Microsystems, Inc.
+###
+###   $Revision: 1.5 $
+###
+#############################################################################
+
+
+#############################################################################
+###
+###   DT pre-sets the following environment variables for each user.
+###   
+###	DISPLAY	  set to the value of the first field in the Xservers file
+###	EDITOR	  set to the CDE DT default editor
+###     ENV	  set to "$HOME/.kshrc"
+###	HOME	  set to the user's home directory (from /etc/passwd)
+###	KBD_LANG  set to the value of $LANG for some languages (see Xsession)
+###	LANG	  set to the display's current NLS language (if any)
+###	LC_ALL, LC_MESSAGES
+###		  set to the value of $LANG
+###	LOGNAME	  set to the user name
+###	MAIL	  set to "/usr/mail/$USER"
+###	PATH	  set to the value of the Dtlogin "userPath" resource
+###	USER	  set to the user name
+###	SHELL	  set to the user's default shell (from /etc/passwd)
+###     TERM	  set to xterm
+###	TZ	  set to the value of the Dtlogin "timeZone" resource
+###
+###   Three methods are available to modify or add to this list depending 
+###   on the desired scope of the resulting environment variable. 
+###   
+###	1. X server and/or all users on a display	(Xconfig file)
+###	2. all users on a display			(Xsession file)
+###	3. individual users				(.dtprofile file)
+###	
+###   See DT on-line help, the DT Users Guide, or the Dtlogin(1X) man
+###   page for details on setting environment variables.
+###
+###
+###   Personal environment variables can be set in the script file
+###   "$HOME/.dtprofile".  The files /etc/profile and $HOME/.profile are
+###   not read by DT as they may contain terminal I/O based commands
+###   inappropriate for a graphical interface.  Users should set up
+###   ".dtprofile" with personal environment variables for their DT
+###   session.
+###
+###   DT will accept either sh, ksh, or csh syntax for the commands in this
+###   file.  The commands should only be those that set environment
+###   variables, not any that perform terminal I/O, ex.  "tset" or "stty".
+###   If the first line of ".dtprofile" is #!/bin/sh, #!/bin/ksh, or
+###   #!/bin/csh, DT will use the appropriate shell to parse the commands.
+###   Otherwise the user's default shell ($SHELL) will be used.
+###
+###
+###
+###   With minor editing, it is possible to adapt $HOME/.profile (.login)
+###   for use both with and without CDE DT.  Group the statements not
+###   allowed for DT into one section and enclose them with an "if"
+###   statement that checks for the setting of the "DT" environment
+###   variable.  Then set the "DT" environment variable at the bottom of
+###   this script (.dtprofile) and log in again.  From then on changes
+###   need only be made to $HOME/.profile (.login).
+###   
+###   
+###   example for sh/ksh
+###   
+###     #
+###     #  commands and environment variables used when logging in without DT
+###     #
+###     if [ ! "$DT" ]; then
+###         stty ...
+###	    tset ...
+###	    DISPLAY=mydisplay:0
+###	    MAIL=/usr/mail/$USER
+###	    EDITOR=/bin/vi
+###	        ...
+###     fi	    
+###
+###     #
+###     # environment variables common to both DT and non-DT
+###     #
+###     PATH=$HOME/bin:$PATH
+###          ...
+###	  
+###   Errors in .dtprofile or .profile (.login) may prevent a successful
+###   login. If so, log in via the Fail-safe session and correct the error.
+###
+##############################################################################
+
+#
+#  if $HOME/.profile (.login) has been edited as described above, uncomment
+#  one of the two following lines, depending on your default shell.
+#
+# DT=true; export DT; . $HOME/.profile; unset DT	# sh, ksh
+# setenv DT true; source $HOME/.login	; unsetenv DT	# csh

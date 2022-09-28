@@ -1,0 +1,188 @@
+.TH csa_unregister_callback 3 "14 Oct 94"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.\" (c) Copyright 1994 X.400 API Association
+.SH NAME
+csa_unregister_callback \- unregister the specified callback functions
+.SH SYNOPSIS
+.yS
+#include <csa.h>
+.sp 0.5v
+.ta \w'CSA_return_code csa_unregister_callback('u
+CSA_return_code csa_unregister_callback(CSA_session_handle \f2session\fP,
+	CSA_flags \f2reason\fP,
+	CSA_callback \f2callback\fP,
+	CSA_buffer \f2client_data\fP,
+	CSA_extension *\f2unregister_callback_extensions\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn csa_unregister_callback
+function removes the specified callback procedure to the
+specified callback list.
+Both the procedure and the client
+data must match for this function to remove the procedure.
+Specifying a value of
+.Cn NULL
+for both callback and client data will cause all callbacks
+on the specified callback list(s) to be removed.
+.HU "Session (Session Handle)"
+Opaque session handle that represents a session with the
+calendaring service.
+.P
+Session handles are created by a logon function call and
+invalidated with a logoff function call.
+If the session
+handle is invalid, then the error
+.Cn CSA_E_INVALID_SESSION_HANDLE
+is returned.
+.HU "Reason (Flags)"
+A bitmask of flags.
+Unspecified flags should always be
+passed as 0.
+Undocumented flags are reserved.
+Each flag
+corresponds to a callback list.
+Flag settings include:
+.VL 6
+.Lc CSA_CB_CALENDAR_LOGON
+.br
+If set, the new callback will be invoked when a the
+calendar is accessed by a user.
+.Lc CSA_CB_CALENDAR_DELETED
+.br
+If set, the new callback will be invoked when a user
+requests that the calendar be deleted.
+.Lc CSA_CB_CALENDAR_ATTRIBUTE_UPDATED
+.br
+If set, the new callback will be invoked whenever a
+calendar attribute is updated.
+.Lc CSA_CB_ENTRY_ADDED
+.br
+If set, the new callback will be invoked whenever an entry
+is added to the calendar.
+.Lc CSA_CB_ENTRY_DELETED
+.br
+If set, the new callback will be invoked whenever an entry
+is deleted from the calendar.
+.Lc CSA_CB_ENTRY_UPDATED
+.br
+If set, the new callback will be invoked whenever an entry
+is updated on the calendar.
+It is implementation specific
+if the callback function is invoked before or after the
+specified update type occurs.
+.LE
+.HU "Callback (Callback)"
+Specifies the client procedure that should be removed from
+the specified callback list(s).
+.HU "Client Data (Opaque Data)"
+A pointer to an application specific data structure that
+was specified when the callback procedure was registered.
+This must match for the function to succeed.
+This
+constraint allows the application to register the same
+function on more than one callback list with different
+client_data.
+The instances of the callback function on the
+different callback lists will be treated independently by
+the calendar service.
+.HU "Unregister Callback Extensions (Extension)"
+A pointer to an array of
+.B CSA_extension
+structures for this function.
+The array may contain both
+input extensions for providing additional information to
+the function and output extensions for receiving
+information from the function.
+A value of
+.Cn NULL
+indicates that the caller is not using any extensions.
+See the extensions structure for more information.
+.SH "RETURN VALUE"
+.HU "Unregister Callback Extensions (Extension)"
+If output extensions were passed to the function in the
+extensions list, the results from the service will be
+available in the extension.
+See the extensions structure for more information.
+Whether the function succeeded or
+not, and, if not, why.
+It may be success or one of the
+values listed under ERRORS below.
+.SH ERRORS
+The
+.Fn csa_unregister_callback
+function returns the following error values:
+.VL 6
+.Lc CSA_E_CALLBACK_NOT_REGISTERED
+.br
+The specified callback function was not registered.
+.Lc CSA_E_FAILURE
+.br
+There was a general failure that does not
+fit the description of any other error code.
+.Lc CSA_E_INSUFFICIENT_MEMORY
+.br
+Insufficient memory was available to complete the requested operation.
+.Lc CSA_E_INVALID_FLAG
+.br
+A flag value in the
+.I flags
+argument was invalid.
+.Lc CSA_E_INVALID_FUNCTION_EXT
+.br
+The function extension requested is invalid.
+.Lc CSA_E_INVALID_PARAMETER
+.br
+A function parameter was invalid.
+.Lc CSA_E_INVALID_SESSION_HANDLE
+.br
+The specified Session Handle is invalid or no longer valid
+(e.g., after logging off).
+.Lc CSA_E_NO_AUTHORITY
+.br
+The user has insufficient authority for this function.
+.Lc CSA_E_NOT_SUPPORTED
+.br
+The operation requested is not supported by this implementation.
+.Lc CSA_E_SERVICE_UNAVAILABLE
+.br
+The requested calendar service is unavailable.
+.Lc CSA_E_UNSUPPORTED_FLAG
+.br
+The flag requested is not supported.
+.Lc CSA_E_UNSUPPORTED_FUNCTION_EXT
+.br
+The specified function extension is not supported or
+.Cn CSA_EXT_REQUIRED
+is set.
+.LE
+.SH "SEE ALSO"
+.Hd csa.h 5,
+.Fn csa_add_calendar 3,
+.Fn csa_add_entry 3,
+.Fn csa_call_callbacks 3,
+.Fn csa_delete_calendar 3,
+.Fn csa_delete_entry 3,
+.Fn csa_free 3,
+.Fn csa_free_time_search 3,
+.Fn csa_list_calendar_attributes 3,
+.Fn csa_list_calendars 3,
+.Fn csa_list_entries 3,
+.Fn csa_list_entry_attributes 3,
+.Fn csa_list_entry_sequence 3,
+.Fn csa_logoff 3,
+.Fn csa_logon 3,
+.Fn csa_look_up 3,
+.Fn csa_query_configuration 3,
+.Fn csa_read_calendar_attributes 3,
+.Fn csa_read_entry_attributes 3,
+.Fn csa_read_next_reminder 3,
+.Fn csa_register_callback 3,
+.xo .Fn csa_restore 3,
+.xo .Fn csa_save 3,
+.Fn csa_update_calendar_attributes 3,
+.Fn csa_update_entry_attributes 3.

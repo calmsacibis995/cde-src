@@ -1,0 +1,117 @@
+.TH DtDtsDataTypeToAttributeValue 3 "15 Jun 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.SH NAME
+DtDtsDataTypeToAttributeValue \- get an attribute value for a specified data type
+.SH SYNOPSIS
+.yS
+#include <Dt/Dts.h>
+.sp 0.5v
+.ta \w'char *DtDtsDataTypeToAttributeValue('u
+char *DtDtsDataTypeToAttributeValue(const char *\f2datatype\fP,
+	const char *\f2attr_name\fP,
+	const char *\f2opt_name\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn DtDtsDataTypeToAttributeValue
+returns an attribute value for the specified data type name.
+.P
+The
+.I datatype
+argument is a pointer to a data type name string.
+.P
+The
+.I attr_name
+argument is a name of the attribute.
+.P
+The
+.I opt_name
+argument can be used to specify a name to be associated with the
+data type.
+If the
+.I opt_name
+argument is not
+.Cn NULL ,
+it is used as a pseudo file name in typing;
+otherwise, certain attributes may be returned as
+.Cn NULL
+because the filename components could not be determined.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn DtDtsDataTypeToAttributeValue
+function returns a pointer to a data attribute value string, or
+.Cn NULL
+if no value could be determined.
+.SH "APPLICATION USAGE"
+The application should use the
+.Fn DtDtsFreeAttributeValue 3
+function to release the memory for the returned value.
+.P
+The
+.I opt_name
+argument is useful when the attribute being returned
+contains a modifier string that depends on having
+a file name included.
+For example, if the
+.Cn INSTANCE_ICON
+attribute had the value
+.BR %name%.icon ,
+.I opt_name
+would be used to derive the
+.B %name%
+portion of the attribute value.
+See
+.cde .IR dtdtsfile (4).
+.xo .cX datatypemodifiers .
+.br
+.SH EXAMPLES
+The following takes a list of files as arguments
+and determines the description and actions for each file:
+.Cs
+#include <Dt/Dts.h>
+.sp 0.5v
+#define	ATTRIBUTE1	"DESCRIPTION"
+#define	ATTRIBUTE2	"ACTIONS"
+.sp 0.5v
+main (int argc, char **argv)
+{
+	char	*attribute;
+	char	*datatype;
+.sp 0.5v
+	/* load data types database */
+	DtDtsLoadDataTypes();
+.sp 0.5v
+	argv++;
+	while (*argv) {
+		/* get data type file file */
+		datatype = DtDtsFileToDataType(*argv);
+.sp 0.5v
+		/* get first attribute for datatype */
+		attribute = DtDtsDataTypeToAttributeValue(datatype,
+					ATTRIBUTE1, *argv);
+		if (attribute)
+			printf("%s for file %s is %s\en",
+				ATTRIBUTE1, *argv, attribute);
+.sp 0.5v
+		/* get second attribute for datatype */
+		attribute = DtDtsDataTypeToAttributeValue(datatype,
+					ATTRIBUTE2, NULL);
+		if (attribute)
+			printf("%s for file %s is %s\en",
+				ATTRIBUTE2, *argv, attribute);
+		argv++;
+	}
+	DtDtsRelease();
+	exit(0);
+}
+.Ce
+.SH "SEE ALSO"
+.Hd Dt/Dts.h ,
+.Fn DtDtsFileToDataType 3,
+.Fn DtDtsLoadDataTypes 3,
+.Fn DtDtsRelease 3,
+.Fn DtDtsFreeAttributeValue 3.

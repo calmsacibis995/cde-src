@@ -1,0 +1,1967 @@
+:bil-version	1 0
+:module sdtfprop
+(
+
+:element moddialog
+(
+	:type			:dialog
+	:label			"Properties"
+	:resizable		:false
+	:visible		:false
+	:default-button		mod_okButton
+	:children		(
+		controlpane
+		modDialogBpanel
+		modDialogFooter
+	)
+)
+:element controlpane
+(
+	:type			:container
+	:container-type		:relative
+	:x			0
+	:y			0
+	:visible		:true
+	:active			:true
+	:border-frame		:none
+	:north-attachment	(:point 0 0)
+	:south-attachment	(:point 0 0)
+	:east-attachment	(:point 0 0)
+	:west-attachment	(:point 0 0)
+	:children		(
+		mod_permissionGroup
+		mod_effectiveGroup
+		mod_classGroup
+		mod_nameGroup
+	)
+)
+:element mod_permissionGroup
+(
+	:type			:container
+	:container-type		:group
+	:active			:true
+	:visible		:true
+	:x			378
+	:y			10
+	:group-type		:ignore
+	:border-frame		:none
+	:north-attachment	(:point 0 10)
+	:east-attachment	(:obj mod_effectiveGroup 10)
+	:children		(
+		mod_permCbox
+		mod_permLabel
+	)
+)
+:element mod_permCbox
+(
+	:type			:choice
+	:choice-type		:nonexclusive
+	:x			0
+	:y			22
+	:num-columns		1
+	:orientation		:horizontal
+	:selection-required	:false
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj mod_permLabel 0)
+	:west-attachment	(:point 0 0)
+	:children		(
+		mod_permCbox_r_item
+		mod_permCbox_w_item
+		mod_permCbox_x_item
+	)
+)
+:element mod_permCbox_r_item
+(
+	:type			:item
+	:item-type		:item-for-choice
+	:label-type		:string
+	:label			"r"
+	:active			:true
+	:selected		:false
+)
+:element mod_permCbox_w_item
+(
+	:type			:item
+	:item-type		:item-for-choice
+	:label-type		:string
+	:label			"w"
+	:active			:true
+	:selected		:false
+)
+:element mod_permCbox_x_item
+(
+	:type			:item
+	:item-type		:item-for-choice
+	:label-type		:string
+	:label			"x"
+	:active			:true
+	:selected		:false
+)
+:element mod_permLabel
+(
+	:type			:label
+	:x			5
+	:y			-5
+	:label-type		:string
+	:label			"Permission"
+	:label-alignment	:center
+	:active			:true
+	:visible		:true
+	:north-attachment	(:point 0 0)
+	:west-attachment	(:point 0 19)
+)
+:element mod_effectiveGroup
+(
+	:type			:container
+	:container-type		:group
+	:active			:true
+	:visible		:true
+	:x			520
+	:y			10
+	:group-type		:ignore
+	:border-frame		:none
+	:north-attachment	(:point 0 10)
+	:east-attachment	(:point 0 10)
+	:children		(
+		mod_effLabel
+		mod_effPermLabel
+	)
+)
+:element mod_effLabel
+(
+	:type			:label
+	:x			0
+	:y			-2
+	:label-type		:string
+	:label			"Effective"
+	:label-alignment	:center
+	:active			:true
+	:visible		:true
+	:north-attachment	(:point 0 0)
+	:west-attachment	(:point 0 0)
+)
+:element mod_effPermLabel
+(
+	:type			:label
+	:x			4
+	:y			26
+	:label-type		:string
+	:label			"---"
+	:label-alignment	:center
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj mod_effLabel 5)
+	:west-attachment	(:point 0 13)
+)
+:element mod_classGroup
+(
+	:type			:container
+	:container-type		:group
+	:active			:true
+	:visible		:true
+	:x			5
+	:y			10
+	:group-type		:ignore
+	:border-frame		:none
+	:north-attachment	(:point 0 10)
+	:south-attachment	(:point 0 5)
+	:east-attachment	(:obj mod_nameGroup 10)
+	:west-attachment	(:point 0 5)
+	:children		(
+		mod_classOmenu
+		mod_classOmenuLabel
+		mod_classLabel
+	)
+)
+:element mod_classOmenu
+(
+	:type			:choice
+	:choice-type		:option-menu
+	:x			0
+	:y			28
+	:num-columns		1
+	:orientation		:vertical
+	:selection-required	:false
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj mod_classOmenuLabel 4)
+	:west-attachment	(:point 0 0)
+	:children		(
+		mod_classOmenu_User_item
+		mod_classOmenu_Group_item
+		mod_classOmenu_Default_User_item
+		mod_classOmenu_Default_Group_item
+		mod_classOmenu_Default_Owning_User_item
+		mod_classOmenu_Default_Owning_Group_item
+		mod_classOmenu_Default_Other_item
+		mod_classOmenu_Default_Mask_item
+	)
+)
+:element mod_classOmenu_User_item
+(
+	:type			:item
+	:item-type		:item-for-choice
+	:label-type		:string
+	:label			"User"
+	:active			:true
+	:selected		:true
+)
+:element mod_classOmenu_Group_item
+(
+	:type			:item
+	:item-type		:item-for-choice
+	:label-type		:string
+	:label			"Group"
+	:active			:true
+	:selected		:false
+)
+:element mod_classOmenu_Default_User_item
+(
+	:type			:item
+	:item-type		:item-for-choice
+	:label-type		:string
+	:label			"Default User"
+	:active			:false
+	:selected		:false
+)
+:element mod_classOmenu_Default_Group_item
+(
+	:type			:item
+	:item-type		:item-for-choice
+	:label-type		:string
+	:label			"Default Group"
+	:active			:false
+	:selected		:false
+)
+:element mod_classOmenu_Default_Owning_User_item
+(
+	:type			:item
+	:item-type		:item-for-choice
+	:label-type		:string
+	:label			"Default Owning User"
+	:active			:false
+	:selected		:false
+)
+:element mod_classOmenu_Default_Owning_Group_item
+(
+	:type			:item
+	:item-type		:item-for-choice
+	:label-type		:string
+	:label			"Default Owning Group"
+	:active			:false
+	:selected		:false
+)
+:element mod_classOmenu_Default_Other_item
+(
+	:type			:item
+	:item-type		:item-for-choice
+	:label-type		:string
+	:label			"Default Other"
+	:active			:false
+	:selected		:false
+)
+:element mod_classOmenu_Default_Mask_item
+(
+	:type			:item
+	:item-type		:item-for-choice
+	:label-type		:string
+	:label			"Default Mask"
+	:active			:false
+	:selected		:false
+)
+:element mod_classOmenuLabel
+(
+	:type			:label
+	:x			10
+	:y			0
+	:label-type		:string
+	:label			"Type:"
+	:label-alignment	:left
+	:active			:true
+	:visible		:true
+	:north-attachment	(:point 0 0)
+	:west-attachment	(:point 0 10)
+)
+:element mod_classLabel
+(
+	:type			:label
+	:x			107
+	:y			0
+	:label-type		:string
+	:label			"Mask"
+	:label-alignment	:left
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj mod_classOmenuLabel 9)
+	:east-attachment	(:point 0 0)
+	:west-attachment	(:point 0 10)
+)
+:element mod_nameGroup
+(
+	:type			:container
+	:container-type		:group
+	:active			:true
+	:visible		:true
+	:x			246
+	:y			10
+	:group-type		:ignore
+	:border-frame		:none
+	:north-attachment	(:point 0 10)
+	:east-attachment	(:obj mod_permissionGroup 10)
+	:children		(
+		mod_nameTfield
+		mod_nameLabel
+	)
+)
+:element mod_nameTfield
+(
+	:type			:text-field
+	:text-type		:alphanumeric
+	:x			0
+	:y			32
+	:num-columns		15
+	:max-length		80
+	:read-only		:false
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj mod_nameLabel 6)
+	:east-attachment	(:point 0 0)
+	:west-attachment	(:point 0 0)
+)
+:element mod_nameLabel
+(
+	:type			:label
+	:x			0
+	:y			0
+	:label-type		:string
+	:label			"Name:"
+	:label-alignment	:left
+	:active			:true
+	:visible		:true
+	:north-attachment	(:point 0 0)
+	:west-attachment	(:point 0 0)
+)
+:element modDialogBpanel
+(
+	:type			:container
+	:container-type		:button-panel
+	:height			65
+	:visible		:true
+	:active			:true
+	:border-frame		:none
+	:children		(
+		mod_separator
+		mod_okButton
+		mod_cancelButton
+		mod_helpButton
+	)
+)
+:element mod_separator
+(
+	:type			:separator
+	:line-style		:etched-in
+	:orientation		:horizontal
+	:x			0
+	:y			0
+	:height			10
+	:visible		:true
+	:north-attachment	(:point 0 0)
+	:east-attachment	(:grid-line 100 0)
+	:west-attachment	(:grid-line 0 0)
+)
+:element mod_okButton
+(
+	:type			:button
+	:button-type		:push-button
+	:x			63
+	:y			5
+	:label-type		:string
+	:label-alignment	:center
+	:label			"OK"
+	:active			:true
+	:visible		:true
+	:north-attachment	(:center-grid-line 55 0)
+	:east-attachment	(:grid-line 22 0)
+	:west-attachment	(:grid-line 2 0)
+)
+:element mod_cancelButton
+(
+	:type			:button
+	:button-type		:push-button
+	:x			252
+	:y			5
+	:label-type		:string
+	:label-alignment	:center
+	:label			"Cancel"
+	:active			:true
+	:visible		:true
+	:north-attachment	(:center-grid-line 55 0)
+	:east-attachment	(:grid-line 60 0)
+	:west-attachment	(:grid-line 40 0)
+)
+:element mod_helpButton
+(
+	:type			:button
+	:button-type		:push-button
+	:x			440
+	:y			5
+	:label-type		:string
+	:label-alignment	:center
+	:label			"Help"
+	:active			:true
+	:visible		:true
+	:north-attachment	(:center-grid-line 55 0)
+	:east-attachment	(:grid-line 98 0)
+	:west-attachment	(:grid-line 78 0)
+)
+:element modDialogFooter
+(
+	:type			:container
+	:container-type		:footer
+	:height			24
+	:visible		:true
+	:active			:true
+	:border-frame		:none
+	:children		(
+		mod_footerLabel
+	)
+)
+:element mod_footerLabel
+(
+	:type			:label
+	:x			1
+	:y			1
+	:label-type		:string
+	:label			" "
+	:label-alignment	:left
+	:active			:true
+	:visible		:true
+	:north-attachment	(:point 0 0)
+	:west-attachment	(:point 0 1)
+)
+:element propdialog
+(
+	:type			:base-window
+	:label			"Properties - (None)"
+	:resizable		:false
+	:visible		:true
+	:iconic			:false
+	:children		(
+		categoryCpane
+		objectNameCpane
+		propLayers
+		propDialogBpanel
+	)
+	:win-children		(
+		moddialog
+	)
+)
+:element categoryCpane
+(
+	:type			:container
+	:container-type		:relative
+	:x			0
+	:y			0
+	:visible		:true
+	:active			:true
+	:border-frame		:shadow-out
+	:north-attachment	(:point 0 0)
+	:east-attachment	(:point 0 0)
+	:west-attachment	(:point 0 0)
+	:children		(
+		categoryRbox
+	)
+)
+:element categoryRbox
+(
+	:type			:choice
+	:choice-type		:exclusive
+	:x			5
+	:y			3
+	:label-type		:string
+	:label			"Category:"
+	:label-position		:west
+	:num-columns		1
+	:orientation		:horizontal
+	:selection-required	:false
+	:active			:true
+	:visible		:true
+	:north-attachment	(:point 0 1)
+	:south-attachment	(:point 0 1)
+	:west-attachment	(:point 0 5)
+	:children		(
+		categoryRbox_Information_item
+		categoryRbox_Permissions_item
+	)
+)
+:element categoryRbox_Information_item
+(
+	:type			:item
+	:item-type		:item-for-choice
+	:label-type		:string
+	:label			"Information"
+	:active			:true
+	:selected		:false
+)
+:element categoryRbox_Permissions_item
+(
+	:type			:item
+	:item-type		:item-for-choice
+	:label-type		:string
+	:label			"Permissions"
+	:active			:true
+	:selected		:false
+)
+:element objectNameCpane
+(
+	:type			:container
+	:container-type		:relative
+	:x			0
+	:y			0
+	:visible		:true
+	:active			:true
+	:border-frame		:none
+	:north-attachment	(:obj categoryCpane 0)
+	:east-attachment	(:point 0 0)
+	:west-attachment	(:point 0 0)
+	:children		(
+		fileNameGroup
+		linkNameGroup
+		separator
+	)
+)
+:element fileNameGroup
+(
+	:type			:container
+	:container-type		:group
+	:active			:true
+	:visible		:true
+	:x			5
+	:y			10
+	:group-type		:ignore
+	:border-frame		:none
+	:north-attachment	(:point 0 10)
+	:east-attachment	(:point 0 5)
+	:west-attachment	(:point 0 5)
+	:children		(
+		nameLabel
+		fileNameTfield
+		browseButton
+	)
+)
+:element nameLabel
+(
+	:type			:label
+	:x			0
+	:y			3
+	:label-type		:string
+	:label			"File Name:"
+	:label-alignment	:left
+	:active			:true
+	:visible		:true
+	:north-attachment	(:point 0 3)
+	:west-attachment	(:point 0 0)
+)
+:element fileNameTfield
+(
+	:type			:text-field
+	:text-type		:alphanumeric
+	:x			61
+	:y			0
+	:num-columns		35
+	:max-length		1024
+	:read-only		:false
+	:active			:true
+	:visible		:true
+	:north-attachment	(:point 0 0)
+	:east-attachment	(:obj browseButton 5)
+	:west-attachment	(:obj nameLabel 5)
+)
+:element browseButton
+(
+	:type			:button
+	:button-type		:push-button
+	:x			450
+	:y			7
+	:label-type		:string
+	:label-alignment	:center
+	:label			"Browse..."
+	:active			:true
+	:visible		:true
+	:north-attachment	(:center-grid-line 50 0)
+	:east-attachment	(:point 0 0)
+)
+:element linkNameGroup
+(
+	:type			:container
+	:container-type		:group
+	:active			:true
+	:visible		:true
+	:x			6
+	:y			41
+	:group-type		:ignore
+	:border-frame		:none
+	:north-attachment	(:obj fileNameGroup 3)
+	:east-attachment	(:point 0 5)
+	:west-attachment	(:point 0 5)
+	:children		(
+		linkLabel
+		linkNameTfield
+	)
+)
+:element linkLabel
+(
+	:type			:label
+	:x			0
+	:y			0
+	:label-type		:string
+	:label			"Linked To:"
+	:label-alignment	:left
+	:active			:true
+	:visible		:true
+	:north-attachment	(:point 0 3)
+	:west-attachment	(:point 0 0)
+)
+:element linkNameTfield
+(
+	:type			:text-field
+	:text-type		:alphanumeric
+	:x			114
+	:y			4
+	:num-columns		35
+	:max-length		1024
+	:read-only		:false
+	:active			:true
+	:visible		:true
+	:north-attachment	(:point 0 0)
+	:east-attachment	(:point 0 0)
+	:west-attachment	(:obj linkLabel 5)
+)
+:element separator
+(
+	:type			:separator
+	:line-style		:etched-in
+	:orientation		:horizontal
+	:x			4
+	:y			76
+	:height			10
+	:visible		:true
+	:north-attachment	(:obj linkNameGroup 5)
+	:east-attachment	(:grid-line 100 0)
+	:west-attachment	(:grid-line 0 0)
+)
+:element propLayers
+(
+	:type			:layers
+	:x			0
+	:y			200
+	:north-attachment	(:obj objectNameCpane 0)
+	:east-attachment	(:point 0 0)
+	:west-attachment	(:point 0 0)
+	:children		(
+		infoCpane
+		permCpane
+	)
+)
+:element infoCpane
+(
+	:type			:container
+	:container-type		:relative
+	:x			0
+	:y			100
+	:visible		:false
+	:active			:true
+	:border-frame		:none
+	:north-attachment	(:point 0 0)
+	:south-attachment	(:point 0 0)
+	:east-attachment	(:point 0 0)
+	:west-attachment	(:point 0 0)
+	:children		(
+		infoOwnerLabel
+		infoOwnerName
+		infoGroupLabel
+		infoGroupName
+		infoSizeLabel
+		infoSize
+		infoAccessLabel
+		infoAccessTime
+		infoModifyLabel
+		infoModifyTime
+	)
+)
+:element infoOwnerLabel
+(
+	:type			:label
+	:x			212
+	:y			8
+	:label-type		:string
+	:label			"Owner Name:"
+	:label-alignment	:center
+	:active			:true
+	:visible		:true
+	:north-attachment	(:point 0 10)
+	:east-attachment	(:grid-line 30 0)
+)
+:element infoOwnerName
+(
+	:type			:label
+	:x			278
+	:y			8
+	:label-type		:string
+	:label			"N/A"
+	:label-alignment	:center
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj-edge infoOwnerLabel 0)
+	:west-attachment	(:obj infoOwnerLabel 5)
+)
+:element infoGroupLabel
+(
+	:type			:label
+	:x			339
+	:y			8
+	:label-type		:string
+	:label			"Group Name:"
+	:label-alignment	:center
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj infoOwnerLabel 15)
+	:east-attachment	(:grid-line 30 0)
+)
+:element infoGroupName
+(
+	:type			:label
+	:x			271
+	:y			39
+	:label-type		:string
+	:label			"N/A"
+	:label-alignment	:center
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj-edge infoGroupLabel 0)
+	:west-attachment	(:obj infoGroupLabel 5)
+)
+:element infoSizeLabel
+(
+	:type			:label
+	:x			340
+	:y			32
+	:label-type		:string
+	:label			"Size:"
+	:label-alignment	:center
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj infoGroupLabel 15)
+	:east-attachment	(:grid-line 30 0)
+)
+:element infoSize
+(
+	:type			:label
+	:x			276
+	:y			78
+	:label-type		:string
+	:label			"N/A"
+	:label-alignment	:center
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj-edge infoSizeLabel 0)
+	:west-attachment	(:obj infoSizeLabel 5)
+)
+:element infoAccessLabel
+(
+	:type			:label
+	:x			392
+	:y			56
+	:label-type		:string
+	:label			"Last Accessed:"
+	:label-alignment	:center
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj infoSizeLabel 15)
+	:east-attachment	(:grid-line 30 0)
+)
+:element infoAccessTime
+(
+	:type			:label
+	:x			457
+	:y			53
+	:label-type		:string
+	:label			"N/A"
+	:label-alignment	:center
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj-edge infoAccessLabel 0)
+	:west-attachment	(:obj infoAccessLabel 5)
+)
+:element infoModifyLabel
+(
+	:type			:label
+	:x			356
+	:y			62
+	:label-type		:string
+	:label			"Last Modified:"
+	:label-alignment	:center
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj infoAccessLabel 15)
+	:south-attachment	(:point 0 10)
+	:east-attachment	(:grid-line 30 0)
+)
+:element infoModifyTime
+(
+	:type			:label
+	:x			436
+	:y			66
+	:label-type		:string
+	:label			"N/A"
+	:label-alignment	:center
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj-edge infoModifyLabel 0)
+	:west-attachment	(:obj infoModifyLabel 5)
+)
+:element permCpane
+(
+	:type			:container
+	:container-type		:relative
+	:x			0
+	:y			100
+	:visible		:false
+	:active			:true
+	:border-frame		:none
+	:north-attachment	(:point 0 0)
+	:south-attachment	(:point 0 0)
+	:east-attachment	(:point 0 0)
+	:west-attachment	(:point 0 0)
+	:children		(
+		basicPermCpane
+		aclPermCpane
+		applyCpane
+	)
+)
+:element basicPermCpane
+(
+	:type			:container
+	:container-type		:relative
+	:x			0
+	:y			40
+	:visible		:true
+	:active			:true
+	:border-frame		:none
+	:north-attachment	(:point 0 0)
+	:east-attachment	(:point 0 0)
+	:west-attachment	(:point 0 0)
+	:children		(
+		readLabel
+		writeLabel
+		executeLabel
+		ownerLabel
+		groupLabel
+		otherLabel
+		ownerRead
+		ownerWrite
+		ownerExecute
+		groupRead
+		groupWrite
+		groupExecute
+		otherRead
+		otherWrite
+		otherExecute
+		ownerNameTfield
+		groupNameTfield
+		ownerName
+		groupName
+		basicPermLabel
+		effectLabel
+		ownerEffectLabel
+		groupEffectLabel
+		otherEffectLabel
+		separator2
+		aclLabel
+		aclButton
+	)
+)
+:element readLabel
+(
+	:type			:label
+	:x			284
+	:y			91
+	:label-type		:string
+	:label			"Read"
+	:label-alignment	:center
+	:active			:true
+	:visible		:true
+	:north-attachment	(:point 0 5)
+	:west-attachment	(:grid-line 45 0)
+)
+:element writeLabel
+(
+	:type			:label
+	:x			404
+	:y			76
+	:label-type		:string
+	:label			"Write"
+	:label-alignment	:center
+	:active			:true
+	:visible		:true
+	:north-attachment	(:point 0 5)
+	:west-attachment	(:obj readLabel 15)
+)
+:element executeLabel
+(
+	:type			:label
+	:x			360
+	:y			5
+	:label-type		:string
+	:label			"Execute"
+	:label-alignment	:center
+	:active			:true
+	:visible		:true
+	:north-attachment	(:point 0 5)
+	:west-attachment	(:obj writeLabel 15)
+)
+:element ownerLabel
+(
+	:type			:label
+	:x			98
+	:y			120
+	:label-type		:string
+	:label			"Owner:"
+	:label-alignment	:right
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj-edge ownerRead 5)
+	:east-attachment	(:grid-line 20 0)
+)
+:element groupLabel
+(
+	:type			:label
+	:x			5
+	:y			143
+	:label-type		:string
+	:label			"Group:"
+	:label-alignment	:right
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj-edge groupRead 5)
+	:east-attachment	(:grid-line 20 0)
+)
+:element otherLabel
+(
+	:type			:label
+	:x			5
+	:y			181
+	:label-type		:string
+	:label			"Other:"
+	:label-alignment	:right
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj-edge otherRead 5)
+	:east-attachment	(:grid-line 20 0)
+)
+:element ownerRead
+(
+	:type			:choice
+	:choice-type		:nonexclusive
+	:x			326
+	:y			100
+	:num-columns		1
+	:orientation		:vertical
+	:selection-required	:false
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj readLabel 0)
+	:west-attachment	(:obj-edge readLabel 0)
+	:children		(
+		ownerRead_nolabel_item
+	)
+)
+:element ownerRead_nolabel_item
+(
+	:type			:item
+	:item-type		:item-for-choice
+	:label-type		:string
+	:label			" "
+	:active			:false
+	:selected		:false
+)
+:element ownerWrite
+(
+	:type			:choice
+	:choice-type		:nonexclusive
+	:x			406
+	:y			100
+	:num-columns		1
+	:orientation		:vertical
+	:selection-required	:false
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj writeLabel 0)
+	:west-attachment	(:obj-edge writeLabel 0)
+	:children		(
+		ownerWrite_nolabel_item
+	)
+)
+:element ownerWrite_nolabel_item
+(
+	:type			:item
+	:item-type		:item-for-choice
+	:label-type		:string
+	:label			" "
+	:active			:false
+	:selected		:false
+)
+:element ownerExecute
+(
+	:type			:choice
+	:choice-type		:nonexclusive
+	:x			486
+	:y			100
+	:num-columns		1
+	:orientation		:vertical
+	:selection-required	:false
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj executeLabel 0)
+	:west-attachment	(:obj-edge executeLabel 0)
+	:children		(
+		ownerExecute_nolabel_item
+	)
+)
+:element ownerExecute_nolabel_item
+(
+	:type			:item
+	:item-type		:item-for-choice
+	:label-type		:string
+	:label			" "
+	:active			:false
+	:selected		:false
+)
+:element groupRead
+(
+	:type			:choice
+	:choice-type		:nonexclusive
+	:x			256
+	:y			150
+	:num-columns		1
+	:orientation		:vertical
+	:selection-required	:false
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj ownerRead -3)
+	:west-attachment	(:obj-edge readLabel 0)
+	:children		(
+		groupRead_nolabel_item
+	)
+)
+:element groupRead_nolabel_item
+(
+	:type			:item
+	:item-type		:item-for-choice
+	:label-type		:string
+	:label			" "
+	:active			:false
+	:selected		:false
+)
+:element groupWrite
+(
+	:type			:choice
+	:choice-type		:nonexclusive
+	:x			406
+	:y			138
+	:num-columns		1
+	:orientation		:vertical
+	:selection-required	:false
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj ownerWrite -3)
+	:west-attachment	(:obj-edge writeLabel 0)
+	:children		(
+		groupWrite_nolabel_item
+	)
+)
+:element groupWrite_nolabel_item
+(
+	:type			:item
+	:item-type		:item-for-choice
+	:label-type		:string
+	:label			" "
+	:active			:false
+	:selected		:false
+)
+:element groupExecute
+(
+	:type			:choice
+	:choice-type		:nonexclusive
+	:x			486
+	:y			138
+	:num-columns		1
+	:orientation		:vertical
+	:selection-required	:false
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj ownerExecute -3)
+	:west-attachment	(:obj-edge executeLabel 0)
+	:children		(
+		groupExecute_nolabel_item
+	)
+)
+:element groupExecute_nolabel_item
+(
+	:type			:item
+	:item-type		:item-for-choice
+	:label-type		:string
+	:label			" "
+	:active			:false
+	:selected		:false
+)
+:element otherRead
+(
+	:type			:choice
+	:choice-type		:nonexclusive
+	:x			266
+	:y			188
+	:num-columns		1
+	:orientation		:vertical
+	:selection-required	:false
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj groupRead -3)
+	:west-attachment	(:obj-edge readLabel 0)
+	:children		(
+		otherRead_nolabel_item
+	)
+)
+:element otherRead_nolabel_item
+(
+	:type			:item
+	:item-type		:item-for-choice
+	:label-type		:string
+	:label			" "
+	:active			:false
+	:selected		:false
+)
+:element otherWrite
+(
+	:type			:choice
+	:choice-type		:nonexclusive
+	:x			406
+	:y			176
+	:num-columns		1
+	:orientation		:vertical
+	:selection-required	:false
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj groupWrite -3)
+	:west-attachment	(:obj-edge writeLabel 0)
+	:children		(
+		otherWrite_nolabel_item
+	)
+)
+:element otherWrite_nolabel_item
+(
+	:type			:item
+	:item-type		:item-for-choice
+	:label-type		:string
+	:label			" "
+	:active			:false
+	:selected		:false
+)
+:element otherExecute
+(
+	:type			:choice
+	:choice-type		:nonexclusive
+	:x			376
+	:y			97
+	:num-columns		1
+	:orientation		:vertical
+	:selection-required	:false
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj groupExecute -3)
+	:west-attachment	(:obj-edge executeLabel 0)
+	:children		(
+		otherExecute_nolabel_item
+	)
+)
+:element otherExecute_nolabel_item
+(
+	:type			:item
+	:item-type		:item-for-choice
+	:label-type		:string
+	:label			" "
+	:active			:false
+	:selected		:false
+)
+:element ownerNameTfield
+(
+	:type			:text-field
+	:text-type		:alphanumeric
+	:x			165
+	:y			116
+	:num-columns		10
+	:max-length		80
+	:read-only		:false
+	:active			:true
+	:visible		:false
+	:north-attachment	(:obj-edge ownerRead 5)
+	:west-attachment	(:obj ownerLabel 5)
+)
+:element groupNameTfield
+(
+	:type			:text-field
+	:text-type		:alphanumeric
+	:x			165
+	:y			152
+	:num-columns		10
+	:max-length		80
+	:read-only		:false
+	:active			:true
+	:visible		:false
+	:north-attachment	(:obj-edge groupRead 5)
+	:west-attachment	(:obj groupLabel 5)
+)
+:element ownerName
+(
+	:type			:label
+	:x			165
+	:y			105
+	:label-type		:string
+	:label			"Unknown"
+	:label-alignment	:left
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj-edge ownerRead 5)
+	:west-attachment	(:obj ownerLabel 5)
+)
+:element groupName
+(
+	:type			:label
+	:x			124
+	:y			143
+	:label-type		:string
+	:label			"Unknown"
+	:label-alignment	:left
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj-edge groupRead 5)
+	:west-attachment	(:obj groupLabel 5)
+)
+:element basicPermLabel
+(
+	:type			:label
+	:x			5
+	:y			5
+	:label-type		:string
+	:label			"Basic Permissions:"
+	:label-alignment	:center
+	:active			:true
+	:visible		:true
+	:north-attachment	(:point 0 5)
+	:west-attachment	(:point 0 5)
+)
+:element effectLabel
+(
+	:type			:label
+	:x			488
+	:y			90
+	:label-type		:string
+	:label			"Effective"
+	:label-alignment	:center
+	:active			:true
+	:visible		:true
+	:north-attachment	(:point 0 5)
+	:west-attachment	(:obj executeLabel 35)
+)
+:element ownerEffectLabel
+(
+	:type			:label
+	:x			494
+	:y			119
+	:label-type		:string
+	:label			"---"
+	:label-alignment	:center
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj-edge ownerExecute 5)
+	:west-attachment	(:obj-edge effectLabel 0)
+)
+:element groupEffectLabel
+(
+	:type			:label
+	:x			488
+	:y			155
+	:label-type		:string
+	:label			"---"
+	:label-alignment	:center
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj-edge groupExecute 5)
+	:west-attachment	(:obj-edge effectLabel 0)
+)
+:element otherEffectLabel
+(
+	:type			:label
+	:x			485
+	:y			195
+	:label-type		:string
+	:label			"---"
+	:label-alignment	:center
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj-edge otherExecute 5)
+	:west-attachment	(:obj-edge effectLabel 0)
+)
+:element separator2
+(
+	:type			:separator
+	:line-style		:etched-in
+	:orientation		:horizontal
+	:x			0
+	:y			223
+	:height			10
+	:visible		:true
+	:north-attachment	(:obj otherRead 0)
+	:east-attachment	(:grid-line 100 0)
+	:west-attachment	(:grid-line 0 0)
+)
+:element aclLabel
+(
+	:type			:label
+	:x			5
+	:y			238
+	:label-type		:string
+	:label			"Access Control List Permissions:"
+	:label-alignment	:center
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj separator2 5)
+	:west-attachment	(:point 0 5)
+)
+:element aclButton
+(
+	:type			:button
+	:button-type		:push-button
+	:x			410
+	:y			235
+	:label-type		:string
+	:label-alignment	:center
+	:label			"Hide Access List"
+	:active			:false
+	:visible		:true
+	:north-attachment	(:obj separator2 0)
+	:east-attachment	(:point 0 5)
+)
+:element aclPermCpane
+(
+	:type			:container
+	:container-type		:relative
+	:x			0
+	:y			176
+	:visible		:false
+	:active			:true
+	:border-frame		:none
+	:north-attachment	(:obj basicPermCpane 0)
+	:east-attachment	(:point 0 0)
+	:west-attachment	(:point 0 0)
+	:children		(
+		accessList
+		addButton
+		deleteButton
+		changeButton
+		classListLabel
+		nameListLabel
+		permListLabel
+		effectListLabel
+	)
+)
+:element accessList
+(
+	:type			:list
+	:x			10
+	:y			24
+	:selection-mode		:browse
+	:selection-required	:false
+	:num-rows		5
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj classListLabel 0)
+	:east-attachment	(:obj changeButton 15)
+	:west-attachment	(:point 0 5)
+)
+:element addButton
+(
+	:type			:button
+	:button-type		:push-button
+	:x			453
+	:y			24
+	:label-type		:string
+	:label-alignment	:center
+	:label			"Add..."
+	:active			:false
+	:visible		:true
+	:north-attachment	(:obj classListLabel 0)
+	:east-attachment	(:point 0 5)
+)
+:element deleteButton
+(
+	:type			:button
+	:button-type		:push-button
+	:x			453
+	:y			55
+	:label-type		:string
+	:label-alignment	:center
+	:label			"Delete"
+	:active			:false
+	:visible		:true
+	:north-attachment	(:obj addButton 3)
+	:east-attachment	(:point 0 5)
+)
+:element changeButton
+(
+	:type			:button
+	:button-type		:push-button
+	:x			453
+	:y			86
+	:label-type		:string
+	:label-alignment	:center
+	:label			"Change..."
+	:active			:false
+	:visible		:true
+	:north-attachment	(:obj deleteButton 3)
+	:east-attachment	(:point 0 5)
+)
+:element classListLabel
+(
+	:type			:label
+	:x			10
+	:y			0
+	:label-type		:string
+	:label			"Type"
+	:label-alignment	:center
+	:active			:true
+	:visible		:true
+	:north-attachment	(:point 0 0)
+	:west-attachment	(:point 0 5)
+)
+:element nameListLabel
+(
+	:type			:label
+	:x			100
+	:y			0
+	:label-type		:string
+	:label			"Name"
+	:label-alignment	:center
+	:active			:true
+	:visible		:true
+	:north-attachment	(:point 0 0)
+	:west-attachment	(:point 0 100)
+)
+:element permListLabel
+(
+	:type			:label
+	:x			200
+	:y			0
+	:label-type		:string
+	:label			"Requested"
+	:label-alignment	:center
+	:active			:true
+	:visible		:true
+	:north-attachment	(:point 0 0)
+	:west-attachment	(:point 0 200)
+)
+:element effectListLabel
+(
+	:type			:label
+	:x			350
+	:y			0
+	:label-type		:string
+	:label			"Effective"
+	:label-alignment	:center
+	:active			:true
+	:visible		:true
+	:north-attachment	(:point 0 0)
+	:west-attachment	(:point 0 350)
+)
+:element applyCpane
+(
+	:type			:container
+	:container-type		:relative
+	:x			0
+	:y			442
+	:visible		:true
+	:active			:true
+	:border-frame		:none
+	:north-attachment	(:obj aclPermCpane 0)
+	:east-attachment	(:point 0 0)
+	:west-attachment	(:point 0 0)
+	:children		(
+		separator3
+		applyFileOmenu
+		applyToLabel
+		applyFolderOmenu
+	)
+)
+:element separator3
+(
+	:type			:separator
+	:line-style		:etched-in
+	:orientation		:horizontal
+	:x			0
+	:y			0
+	:height			10
+	:visible		:true
+	:north-attachment	(:point 0 0)
+	:east-attachment	(:grid-line 100 0)
+	:west-attachment	(:grid-line 0 0)
+)
+:element applyFileOmenu
+(
+	:type			:choice
+	:choice-type		:option-menu
+	:x			88
+	:y			10
+	:num-columns		1
+	:orientation		:vertical
+	:selection-required	:false
+	:active			:false
+	:visible		:true
+	:north-attachment	(:obj separator3 5)
+	:south-attachment	(:point 0 5)
+	:west-attachment	(:obj applyToLabel 0)
+	:children		(
+		applyFileOmenu_This_File_Only_item
+		applyFileOmenu_All_Files_in_Parent_Folder_item
+		applyFileOmenu_All_Files_in_Parent_Folder_and_its_Subfolders_item
+	)
+)
+:element applyFileOmenu_This_File_Only_item
+(
+	:type			:item
+	:item-type		:item-for-choice
+	:label-type		:string
+	:label			"This File Only"
+	:active			:true
+	:selected		:true
+)
+:element applyFileOmenu_All_Files_in_Parent_Folder_item
+(
+	:type			:item
+	:item-type		:item-for-choice
+	:label-type		:string
+	:label			"All Files in Parent Folder"
+	:active			:true
+	:selected		:false
+)
+:element applyFileOmenu_All_Files_in_Parent_Folder_and_its_Subfolders_item
+(
+	:type			:item
+	:item-type		:item-for-choice
+	:label-type		:string
+	:label			"All Files in Parent Folder and its Subfolders"
+	:active			:true
+	:selected		:false
+)
+:element applyToLabel
+(
+	:type			:label
+	:x			5
+	:y			15
+	:label-type		:string
+	:label			"Apply Changes To:"
+	:label-alignment	:center
+	:active			:false
+	:visible		:true
+	:north-attachment	(:obj separator3 10)
+	:west-attachment	(:point 0 5)
+)
+:element applyFolderOmenu
+(
+	:type			:choice
+	:choice-type		:option-menu
+	:x			92
+	:y			18
+	:num-columns		1
+	:orientation		:vertical
+	:selection-required	:false
+	:active			:false
+	:visible		:true
+	:north-attachment	(:obj separator3 5)
+	:west-attachment	(:obj applyToLabel 0)
+	:children		(
+		applyFolderOmenu_This_Folder_Only_item
+		applyFolderOmenu_This_Folder_and_its_Subfolders_item
+	)
+)
+:element applyFolderOmenu_This_Folder_Only_item
+(
+	:type			:item
+	:item-type		:item-for-choice
+	:label-type		:string
+	:label			"This Folder Only"
+	:active			:true
+	:selected		:true
+)
+:element applyFolderOmenu_This_Folder_and_its_Subfolders_item
+(
+	:type			:item
+	:item-type		:item-for-choice
+	:label-type		:string
+	:label			"This Folder and its Subfolders"
+	:active			:true
+	:selected		:false
+)
+:element propDialogBpanel
+(
+	:type			:container
+	:container-type		:button-panel
+	:height			65
+	:visible		:true
+	:active			:true
+	:border-frame		:none
+	:children		(
+		separator1
+		okButton
+		applyButton
+		resetButton
+		cancelButton
+		helpButton
+	)
+)
+:element separator1
+(
+	:type			:separator
+	:line-style		:etched-in
+	:orientation		:horizontal
+	:x			0
+	:y			0
+	:height			10
+	:visible		:true
+	:north-attachment	(:point 0 0)
+	:east-attachment	(:grid-line 100 0)
+	:west-attachment	(:grid-line 0 0)
+)
+:element okButton
+(
+	:type			:button
+	:button-type		:push-button
+	:x			27
+	:y			15
+	:label-type		:string
+	:label-alignment	:center
+	:label			"OK"
+	:active			:false
+	:visible		:true
+	:north-attachment	(:center-grid-line 55 0)
+	:east-attachment	(:grid-line 18 0)
+	:west-attachment	(:grid-line 2 0)
+)
+:element applyButton
+(
+	:type			:button
+	:button-type		:push-button
+	:x			113
+	:y			5
+	:label-type		:string
+	:label-alignment	:center
+	:label			"Apply"
+	:active			:false
+	:visible		:true
+	:north-attachment	(:center-grid-line 55 0)
+	:east-attachment	(:grid-line 38 0)
+	:west-attachment	(:grid-line 22 0)
+)
+:element resetButton
+(
+	:type			:button
+	:button-type		:push-button
+	:x			109
+	:y			6
+	:label-type		:string
+	:label-alignment	:center
+	:label			"Reset"
+	:active			:false
+	:visible		:true
+	:north-attachment	(:center-grid-line 55 0)
+	:east-attachment	(:grid-line 58 0)
+	:west-attachment	(:grid-line 42 0)
+)
+:element cancelButton
+(
+	:type			:button
+	:button-type		:push-button
+	:x			421
+	:y			17
+	:label-type		:string
+	:label-alignment	:center
+	:label			"Cancel"
+	:active			:true
+	:visible		:true
+	:north-attachment	(:center-grid-line 55 0)
+	:east-attachment	(:grid-line 78 0)
+	:west-attachment	(:grid-line 62 0)
+)
+:element helpButton
+(
+	:type			:button
+	:button-type		:push-button
+	:x			378
+	:y			6
+	:label-type		:string
+	:label-alignment	:center
+	:label			"Help"
+	:active			:true
+	:visible		:true
+	:north-attachment	(:center-grid-line 55 0)
+	:east-attachment	(:grid-line 98 0)
+	:west-attachment	(:grid-line 82 0)
+)
+:connection
+(
+	:from			okButton
+	:when			:activate
+	:action-type		:call-function
+	:action			PropDialogOK_CB
+)
+:connection
+(
+	:from			applyButton
+	:when			:activate
+	:action-type		:call-function
+	:action			PropDialogApply_CB
+)
+:connection
+(
+	:from			resetButton
+	:when			:activate
+	:action-type		:call-function
+	:action			PropDialogReset_CB
+)
+:connection
+(
+	:from			cancelButton
+	:when			:activate
+	:action-type		:call-function
+	:action			PropDialogCancel_CB
+)
+:connection
+(
+	:from			helpButton
+	:when			:activate
+	:action-type		:call-function
+	:action			PropDialogHelp_CB
+)
+:connection
+(
+	:from			deleteButton
+	:when			:activate
+	:action-type		:call-function
+	:action			PropDialogDelete_CB
+)
+:connection
+(
+	:from			aclButton
+	:when			:activate
+	:action-type		:call-function
+	:action			PropDialogACL_CB
+)
+:connection
+(
+	:from			mod_cancelButton
+	:to			moddialog
+	:when			:activate
+	:action-type		:builtin
+	:action			:hide
+	:arg-type		:void
+)
+:connection
+(
+	:from			changeButton
+	:when			:activate
+	:action-type		:call-function
+	:action			PropDialogChange_CB
+)
+:connection
+(
+	:from			addButton
+	:when			:activate
+	:action-type		:call-function
+	:action			PropDialogAdd_CB
+)
+:connection
+(
+	:from			accessList
+	:when			:item-selected
+	:action-type		:call-function
+	:action			PropDialogItemSelect_CB
+)
+:connection
+(
+	:from			mod_permCbox_r_item
+	:when			:toggle
+	:action-type		:call-function
+	:action			ModDialogPermChange_CB
+)
+:connection
+(
+	:from			mod_permCbox_w_item
+	:when			:toggle
+	:action-type		:call-function
+	:action			ModDialogPermChange_CB
+)
+:connection
+(
+	:from			mod_permCbox_x_item
+	:when			:toggle
+	:action-type		:call-function
+	:action			ModDialogPermChange_CB
+)
+:connection
+(
+	:from			moddialog
+	:when			:after-create
+	:action-type		:call-function
+	:action			ModDialogPostCreateProc_CB
+)
+:connection
+(
+	:from			mod_classOmenu_User_item
+	:when			:activate
+	:action-type		:call-function
+	:action			ModDialogClassTypeChange_CB
+)
+:connection
+(
+	:from			browseButton
+	:when			:activate
+	:action-type		:call-function
+	:action			PropDialogBrowse_CB
+)
+:connection
+(
+	:from			ownerRead_nolabel_item
+	:when			:toggle
+	:action-type		:call-function
+	:action			UpdateOwnerEffectPerm_CB
+)
+:connection
+(
+	:from			ownerWrite_nolabel_item
+	:when			:toggle
+	:action-type		:call-function
+	:action			UpdateOwnerEffectPerm_CB
+)
+:connection
+(
+	:from			ownerExecute_nolabel_item
+	:when			:toggle
+	:action-type		:call-function
+	:action			UpdateOwnerEffectPerm_CB
+)
+:connection
+(
+	:from			groupRead_nolabel_item
+	:when			:toggle
+	:action-type		:call-function
+	:action			UpdateGroupEffectPerm_CB
+)
+:connection
+(
+	:from			groupWrite_nolabel_item
+	:when			:toggle
+	:action-type		:call-function
+	:action			UpdateGroupEffectPerm_CB
+)
+:connection
+(
+	:from			groupExecute_nolabel_item
+	:when			:toggle
+	:action-type		:call-function
+	:action			UpdateGroupEffectPerm_CB
+)
+:connection
+(
+	:from			otherRead_nolabel_item
+	:when			:toggle
+	:action-type		:call-function
+	:action			UpdateOtherEffectPerm_CB
+)
+:connection
+(
+	:from			otherWrite_nolabel_item
+	:when			:toggle
+	:action-type		:call-function
+	:action			UpdateOtherEffectPerm_CB
+)
+:connection
+(
+	:from			otherExecute_nolabel_item
+	:when			:toggle
+	:action-type		:call-function
+	:action			UpdateOtherEffectPerm_CB
+)
+:connection
+(
+	:from			categoryRbox_Information_item
+	:when			:toggle
+	:action-type		:call-function
+	:action			ShowInfoPane_CB
+)
+:connection
+(
+	:from			categoryRbox_Permissions_item
+	:when			:toggle
+	:action-type		:call-function
+	:action			ShowPermPane_CB
+)
+:connection
+(
+	:from			mod_classOmenu_Group_item
+	:when			:activate
+	:action-type		:call-function
+	:action			ModDialogClassTypeChange_CB
+)
+:connection
+(
+	:from			mod_classOmenu_Default_User_item
+	:when			:activate
+	:action-type		:call-function
+	:action			ModDialogClassTypeChange_CB
+)
+:connection
+(
+	:from			mod_classOmenu_Default_Group_item
+	:when			:activate
+	:action-type		:call-function
+	:action			ModDialogClassTypeChange_CB
+)
+:connection
+(
+	:from			mod_classOmenu_Default_Owning_User_item
+	:when			:activate
+	:action-type		:call-function
+	:action			ModDialogClassTypeChange_CB
+)
+:connection
+(
+	:from			mod_classOmenu_Default_Owning_Group_item
+	:when			:activate
+	:action-type		:call-function
+	:action			ModDialogClassTypeChange_CB
+)
+:connection
+(
+	:from			mod_classOmenu_Default_Other_item
+	:when			:activate
+	:action-type		:call-function
+	:action			ModDialogClassTypeChange_CB
+)
+:connection
+(
+	:from			mod_classOmenu_Default_Mask_item
+	:when			:activate
+	:action-type		:call-function
+	:action			ModDialogClassTypeChange_CB
+)
+)

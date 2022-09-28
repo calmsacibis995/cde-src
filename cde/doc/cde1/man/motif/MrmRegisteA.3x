@@ -1,0 +1,85 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH MrmRegisterClass 3X
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIMrmRegisterClass\fP \- Saves the information needed for MRM to access the widget creation function for user-defined widgets
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Mrm/MrmPublic.h>
+.sp \n(PDu
+Cardinal MrmRegisterClass(\fBclass_code, class_name, create_name, create_proc, class_record\fI)
+.ta .5i 1.5i
+.nf
+	MrmType	\fBclass_code\fI;
+	String	\fBclass_name\fI;
+	String	\fBcreate_name\fI;
+	Widget	(*\fBcreate_proc\fI) ();
+	WidgetClass	\fBclass_record\fI;
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+The
+\fIMrmRegisterClass\fP
+function
+allows MRM to access user-defined widget classes.
+This function registers the necessary information for
+MRM to create widgets of this class.
+You must call
+\fIMrmRegisterClass\fP
+prior to fetching any user-defined class widget.
+.PP 
+\fIMrmRegisterClass\fP
+saves the information needed to access the widget creation
+function and to do type conversion of argument lists by using the
+information in MRM databases.
+.IP "\fBclass_code\fP"
+This argument is ignored; it is present for compatibility with previous
+releases.
+.IP "\fBclass_name\fP"
+This argument is ignored; it is present for compatibility with previous
+releases.
+.IP "\fBcreate_name\fP"
+Specifies the case-sensitive name of the low-level widget creation
+function for the class.
+An example from the Motif Toolkit is
+\fIXmCreateLabel\fP.
+Arguments are
+\fBparent_widget\fP,
+\fBname\fP,
+\fBoverride_arglist\fP,
+and
+\fBoverride_argcount\fP.
+.PP
+For user-defined widgets,
+\fBcreate_name\fP
+is the creation procedure in the UIL that defines this widget.
+.IP "\fBcreate_proc\fP"
+Specifies the address of the creation function that you named in
+\fBcreate_name\fP.
+.IP "\fBclass_record\fP"
+Specifies a pointer to the class record.
+.SH RETURN VALUE
+This function returns one of these status return constants:
+.IP "\fIMrmSUCCESS\fP"
+The function executed successfully.
+.IP "\fIMrmFAILURE\fP"
+The function failed.

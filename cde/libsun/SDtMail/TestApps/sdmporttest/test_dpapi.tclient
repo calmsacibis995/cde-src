@@ -1,0 +1,487 @@
+##
+## This tests the tclient through the data port api interface
+##
+
+# create the token that names a test message store object
+
+token create token1
+token set token1 servicetype test
+token set token1 serviceoption messagestorename test.mbx
+# token set token1 serviceoption readonly
+
+# create the token that names the smtp transport service
+
+token create token2
+token set token2 servicetype smtp
+token set token2 serviceclass messagetransport
+
+# create and open a data port on that object
+
+port create port1
+port startup port1
+port open port1 token1
+
+# this attach should fail with an 'already open' error
+
+port attach port1 token1
+
+# perform operations
+
+port getstatus port1
+port checkfornewmessages port1
+
+# test getflags
+
+port getflags port1 *
+port getflags port1 2:3
+port getflags port1 1
+port getflags port1 4,2
+port getflags port1 4,3,2,1
+
+# test setflags
+
+port setflags port1 1 answered
+port getflags port1 1
+port clearflags port1 1 answered
+port getflags port1 1
+port setflags port1 * answered
+port getflags port1 *
+port clearflags port1 * answered
+port getflags port1 *
+port setflags port1 2,4 answered
+port getflags port1 *
+port clearflags port1 2,4 answered
+port getflags port1 *
+
+# test getheaders
+
+port getheaders port1
+port getheaders port1 * to
+port getheaders port1 * from message-id
+port getheaders port1 2:3 subject
+port getheaders port1 1:2 to subject
+port getheaders port1 1 to
+port getheaders port1 1 from date
+port getheaders port1 1,2 to
+port getheaders port1 3,4 from date nosuch-header
+port getheaders port1 3,2
+
+# these tests should fail as they lookup non-existent headers
+
+port getheaders port1 * bookem-dano
+port getheaders port1 1 nosuch-header
+port getheaders port1 2:3 probably-not there-too
+port getheaders port1 1,4 bad-header-list
+
+# test getheaders with abstract header names
+# "Real" headers: RBCC RCC RDate RFrom RSubject RTo 
+# "Pseudo" headers: PBcc PCc PMessageId PReceivedDate PCc PTo PSender PSentDate PSubject PTo
+
+port getheaders port1 * -a
+port getheaders port1 * -a rdate
+port getheaders port1 * -a rdate rsubject
+port getheaders port1 * -a rbcc rcc rdate rfrom rsubject rto
+port getheaders port1 1 -a rfrom
+port getheaders port1 1 -a rfrom rto rsubject
+port getheaders port1 1:2 -a rfrom
+port getheaders port1 2:3 -a rfrom rto rsubject
+port getheaders port1 1,2 -a rfrom
+port getheaders port1 3,4 -a rfrom rto rsubject
+
+port getheaders port1 * -a
+port getheaders port1 * -a psentdate
+port getheaders port1 * -a psentdate psubject
+port getheaders port1 * -a pbcc pcc pmessageid preceiveddate pcc pto psender psentdate psubject pto
+port getheaders port1 1 -a psender
+port getheaders port1 1 -a psender pto psubject
+port getheaders port1 1:2 -a psender
+port getheaders port1 2:3 -a psender pto psubject
+port getheaders port1 1,2 -a psender
+port getheaders port1 3,4 -a psender pto psubject
+
+# test getheaders with abstract header names returning abstract header values
+
+port getheaders port1 * -A
+port getheaders port1 * -A rdate
+port getheaders port1 * -A rdate rsubject
+port getheaders port1 * -A rbcc rcc rdate rfrom rsubject rto
+port getheaders port1 1 -A rfrom
+port getheaders port1 1 -A rfrom rto rsubject
+port getheaders port1 1:2 -A rfrom
+port getheaders port1 2:3 -A rfrom rto rsubject
+port getheaders port1 1,2 -A rfrom
+port getheaders port1 3,4 -A rfrom rto rsubject
+
+port getheaders port1 * -A
+port getheaders port1 * -A psentdate
+port getheaders port1 * -A psentdate psubject
+port getheaders port1 * -A pbcc pcc pmessageid preceiveddate pcc pto psender psentdate psubject pto
+port getheaders port1 1 -A psender
+port getheaders port1 1 -A psender pto psubject
+port getheaders port1 1:2 -A psender
+port getheaders port1 2:3 -A psender pto psubject
+port getheaders port1 1,2 -A psender
+port getheaders port1 3,4 -A psender pto psubject
+
+# test getstructure
+
+port getstructure port1 *
+port getstructure port1 1
+port getstructure port1 2,3
+port getstructure port1 4,1,3,2
+
+# test getattributes
+
+port getattributes port1 1 0.1
+port getattributes port1 2 0.1
+port getattributes port1 3 0.1
+port getattributes port1 4 0.1
+port getattributes port1 4 0.1.1
+port getattributes port1 4 0.1.2
+port getattributes port1 4 0.1.3
+port getattributes port1 4 0.1 boundary
+port getattributes port1 4 0.1 test boundary this
+port getattributes port1 4 0.1 test
+
+# test getattributes with abstract attribute names
+
+port getattributes port1 3 0.1 -a
+port getattributes port1 3 0.1 -a charset
+port getattributes port1 4 0.1 -a
+port getattributes port1 4 0.1 -a charset
+
+# test getcontents
+
+port getcontents port1 1
+port getcontents port1 1 -f
+port getcontents port1 1 -h
+port getcontents port1 1 -b
+
+port getcontents port1 2
+port getcontents port1 2 -f
+port getcontents port1 2 -h
+port getcontents port1 2 -b
+
+port getcontents port1 3
+port getcontents port1 3 -f
+port getcontents port1 3 -h
+port getcontents port1 3 -b
+
+port getcontents port1 4
+port getcontents port1 4 -f
+port getcontents port1 4 -h
+port getcontents port1 4 -b
+
+port getcontents port1 1 0.1
+port getcontents port1 1 -f 0.1
+port getcontents port1 1 -h 0.1
+port getcontents port1 1 -b 0.1
+
+port getstructure port1 4
+
+port getcontents port1 4 0.1
+port getcontents port1 4 -f 0.1
+port getcontents port1 4 -h 0.1
+port getcontents port1 4 -b 0.1
+
+port getcontents port1 4 0.1.1
+port getcontents port1 4 -f 0.1.1
+port getcontents port1 4 -h 0.1.1
+port getcontents port1 4 -b 0.1.1
+
+port getcontents port1 4 0.1.2
+port getcontents port1 4 -f 0.1.2
+port getcontents port1 4 -h 0.1.2
+port getcontents port1 4 -b 0.1.2
+
+port getcontents port1 4 0.1.3
+port getcontents port1 4 -f 0.1.3
+port getcontents port1 4 -h 0.1.3
+port getcontents port1 4 -b 0.1.3
+
+# test scannamespace
+
+port scannamespace port1 . %
+port scannamespace port1 . SCCS/%
+port scannamespace port1 /etc auto%
+port scannamespace port1 .. sdm%
+port scannamespace port1 .. sdm%/%.cc
+port scannamespace port1 /foo %/bar
+port scannamespace port1 . %/bar/hum
+
+# test scansubscribednamespace
+
+port addtosubscribednamespace port1 /test/space1/alpha
+port addtosubscribednamespace port1 /test/space1/alpha/name2
+port addtosubscribednamespace port1 /test/space1/alpha/name3
+port addtosubscribednamespace port1 /test/space1/beta
+port addtosubscribednamespace port1 /test/space1/beta/name4
+port addtosubscribednamespace port1 /test/space1/beta/name5
+port addtosubscribednamespace port1 /test/space1/beta/name6
+port scansubscribednamespace port1 /test *
+port scansubscribednamespace port1 /test %
+port scansubscribednamespace port1 /test %/*
+port scansubscribednamespace port1 /test %/%
+port scansubscribednamespace port1 /test %/%/*
+port scansubscribednamespace port1 /test %/%/%
+port scansubscribednamespace port1 /test %/%/%/*
+port scansubscribednamespace port1 /test %/%/%/%
+port scansubscribednamespace port1 /test/space1 %
+port scansubscribednamespace port1 /test/space1 %/%
+port scansubscribednamespace port1 /test/space1 %/%/%
+port scansubscribednamespace port1 /test/space1/alpha %
+port scansubscribednamespace port1 /test/space1/alpha %/%
+port scansubscribednamespace port1 /test/space1/alpha %/%/%
+
+port scansubs port1 /test/space1 %/name%
+
+port removefromsubscribednamespace port1 /test/space1/alpha/name2
+port removefromsubscribednamespace port1 /test/space1/beta/name6
+port scansubscribednamespace port1 /test *
+port removefromsubscribednamespace port1 /test/space1/alpha
+port removefromsubscribednamespace port1 /test/space1/alpha/name3
+port removefromsubscribednamespace port1 /test/space1/beta
+port removefromsubscribednamespace port1 /test/space1/beta/name4
+port removefromsubscribednamespace port1 /test/space1/beta/name5
+port scansubscribednamespace port1 /test *
+
+# test deleting messages
+
+port clearflags port1 * deleted
+port expungedeleted port1
+port getstatus port1
+port getstructure port1 *
+port setflags port1 2 deleted
+port expungedeleted port1
+port getstatus port1
+port getstructure port1 *
+port setflags port1 2,3 deleted
+port expungedeleted port1
+port getstatus port1
+port getstructure port1 *
+port setflags port1 * deleted
+port expungedeleted port1
+port getstatus port1
+port getstructure port1 *
+
+# close the port
+
+port close port1
+port shutdown port1
+port delete port1
+
+##
+## Test attach
+##
+
+port create port1
+port startup port1
+port attach port1 token1
+
+# test scannamespace
+
+port scannamespace port1 . %
+port scannamespace port1 . SCCS/%
+port scannamespace port1 /etc auto%
+port scannamespace port1 .. sdm%
+port scannamespace port1 .. sdm%/%.cc
+port scannamespace port1 /foo %/bar
+port scannamespace port1 . %/bar/hum
+
+# close the port
+
+port close port1
+port shutdown port1
+port delete port1
+
+##
+## test setting attributes
+##
+
+port create port1
+port startup port1
+port open port1 token1
+
+# return the current status and structure of the messages in the message store
+
+port getstatus port1
+port getstructure port1 *
+
+port getattributes port1 1 0.1
+port getattributes port1 2 0.1
+port getattributes port1 3 0.1
+port getattributes port1 4 0.1
+port getattributes port1 4 0.1.1
+port getattributes port1 4 0.1.2
+port getattributes port1 4 0.1.3
+
+port setattributes port1 1 0.1 testattr testvalue
+port getattributes port1 1 0.1
+port getstructure port1 1
+port getstructure port1 2
+port getstructure port1 3
+port getstructure port1 4
+port setattributes port1 4 0.1 test2attr test2value
+port getattributes port1 4 0.1
+port setattributes port1 4 0.1 test2attr test2avalue
+port getattributes port1 4 0.1
+port setattributes port1 4 0.1 test2attr
+port getattributes port1 4 0.1
+port getstructure port1 1
+port getstructure port1 2
+port getstructure port1 3
+port getstructure port1 4
+port setattributes port1 4 0.1.2 test3attr test3value
+port setattributes port1 4 0.1.2 test3battr test3bvalue
+port getattributes port1 1 0.1
+port getattributes port1 2 0.1
+port getattributes port1 3 0.1
+port getattributes port1 4 0.1
+port getattributes port1 4 0.1.1
+port getattributes port1 4 0.1.2
+port getattributes port1 4 0.1.3
+port getstructure port1 1
+port getstructure port1 2
+port getstructure port1 3
+port getstructure port1 4
+
+port getheaders port1 1
+port addheader port1 1 To special@address
+port getheaders port1 1
+port addheader port1 1 Reply-To reply@address
+port getheaders port1 1
+port addheader port1 1 Last-Header nonsense-text
+port getheaders port1 1
+port replaceheader port1 1 To only-sender@address
+port getheaders port1 1
+port replaceheader port1 1 Sender the.sender@address
+port getheaders port1 1
+port removeheader port1 1 bcc
+port getheaders port1 1
+port removeheader port1 1 bad-header
+port getheaders port1 1
+
+# close the port
+
+port close port1
+port shutdown port1
+port delete port1
+
+##
+## test adding/deleting message bodies
+##
+
+port create port1
+port startup port1
+port open port1 token1
+
+port getstructure port1 1
+port addmessagebodytomessage port1 1 text
+port getstructure port1 1
+port addmessagebodytomessage port1 1 multipart
+port getstructure port1 1
+port addmessagebodytomessage port1 1 text 0.3
+port getstructure port1 1
+port setcontents port1 1 0.3 this is a test of adding text
+port getcontents port1 1 0.3
+port setcontents port1 1 0.1 this is another test of adding contents
+port getcontents port1 1 0.1
+port getstructure port1 1
+
+port messagebodydelete port1 1 0.3 yes
+port getstructure port1 1
+port messagebodydelete port1 1 0.3 yes
+port getstructure port1 1
+
+port getstructure port1 4
+port messagebodydelete port1 4 0.1.2 yes
+port getstructure port1 4
+port messagebodydelete port1 4 0.1.2 yes
+port discardpendingmessagechanges port1 4
+port commitpendingmessagechanges port1 4
+
+# close the port
+
+port close port1
+port shutdown port1
+port delete port1
+
+##
+## test creating
+##
+
+port create port1
+port startup port1
+port open port1 token1
+
+port getstructure port1 1
+port setcontents port1 1 0.1 testing contents changes
+port getstructure port1 1
+port derivedmessagecreate port1 1
+port getstructure port1 -1
+port setcontents port1 -1 0.1 different contents
+port getcontents port1 1 0.1
+port getcontents port1 -1 0.1
+
+port derivedmessagecreate port1 3
+port getstructure port1 -2
+
+port newmessagecreate port1
+port getstructure port1 -3
+port addmessagebodytomessage port1 -3 multipart
+port getstructure port1 -3
+port addmessagebodytomessage port1 -3 text 0.1
+port getstructure port1 -3
+port setcontents port1 -3 0.1.1 this is a test of this great system
+port getcontents port1 -3 0.1.1
+port getstructure port1 -3
+
+port discardpendingmessagechanges port1 -1
+port discardpendingmessagechanges port1 -2
+port commitpendingmessagechanges port1 -3
+
+# close the port
+
+port close port1
+port shutdown port1
+port delete port1
+
+##
+## test creating
+##
+
+port create port1
+port startup port1
+port open port1 token1
+
+port create port2
+port startup port2
+port open port2 token2
+
+# create a message and resolve addresses
+
+port newmessagecreate port1
+port getstructure port1 -1
+port addmessagebodytomessage port1 -1 multipart
+port getstructure port1 -1
+port addmessagebodytomessage port1 -1 text 0.1
+port getstructure port1 -1
+port setcontents port1 -1 0.1.1 this is a test of this great system
+port getcontents port1 -1 0.1.1
+port getstructure port1 -1
+port addheader port1 -1 To test-user@host
+port addheader port1 -1 Cc cc1, cc2
+port addheader port1 -1 Bcc +message-log-file
+port getheaders port1 -1
+port resolveandextractaddresses port2 port1 -1
+port commitpendingmessagechanges port1 -1
+
+# close the port
+
+port close port1
+port shutdown port1
+port delete port1
+
+quit
+
+

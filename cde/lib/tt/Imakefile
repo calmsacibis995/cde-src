@@ -1,0 +1,20 @@
+#define IHaveSubdirs
+#define PassCDebugFlags 'CDEBUGFLAGS=$(CDEBUGFLAGS)'
+#define TT_NO_KEEP_STATE
+
+TT_DIR = .
+#include "tooltalk.tmpl"
+
+SUBDIRS=mini_isam lib slib bin man
+
+MakeSubdirs($(SUBDIRS))
+MakeLintLibSubdirs($(LINTLIBSUBDIRS))
+DependSubdirs($(SUBDIRS))
+
+lint::
+	cd $(SUBDIRS) ; make lint
+
+#ifdef SunArchitecture
+.NO_PARALLEL:
+
+#endif

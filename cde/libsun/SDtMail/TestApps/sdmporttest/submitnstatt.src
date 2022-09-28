@@ -1,0 +1,82 @@
+/* @(#)submitnstatt.src	1.2 97/04/29 SMI */
+
+token create token1
+#include "setup.src"
+token set token1 serviceoption messagestorename /tmp/test.mbx
+
+! /usr/bin/rm -f /tmp/test.mbx /tmp/.test.mbx_* /tmp/.test.mbx_dt_index
+! /usr/bin/rm -f /tmp/mail.out
+! /usr/bin/rm -f /tmp/monkey.au
+! /usr/bin/cp test1.mbx /tmp/test.mbx
+! /usr/bin/chmod 660 /tmp/test.mbx
+
+/**/# create the token that names the smtp transport service
+token create token2
+token set token2 servicetype smtp
+token set token2 serviceclass messagetransport
+
+/**/# Create, startup and open the 2 data ports
+port create port1
+port startup port1
+port open port1 token1
+
+port create port2
+port startup port2
+port open port2 token2
+
+port newmessage port1 
+port addheader port1 -1 To LOGNAME, /tmp/mail.out
+port addheader port1 -1 Subject test
+port addmessagebodytomessage port1 -1 multipart mixed
+port addmessagebodytomessage port1 -1 text plain 0.1
+port addmessagebodytomessage port1 -1 text plain 0.1
+port addmessagebodytomessage port1 -1 multipart mixed 0.1
+port addmessagebodytomessage port1 -1 text plain 0.1
+port addmessagebodytomessage port1 -1 audio au 0.1
+
+port addmessagebodytomessage port1 -1 text plain 0.1.3
+port addmessagebodytomessage port1 -1 multipart mixed 0.1.3
+port addmessagebodytomessage port1 -1 text plain 0.1.3
+port addmessagebodytomessage port1 -1 text plain 0.1.3
+
+port addmessagebodytomessage port1 -1 text plain 0.1.3.2
+port addmessagebodytomessage port1 -1 text plain 0.1.3.2
+port addmessagebodytomessage port1 -1 multipart mixed 0.1.3.2
+
+port addmessagebodytomessage port1 -1 text plain 0.1.3.2.3
+port addmessagebodytomessage port1 -1 text plain 0.1.3.2.3
+
+port setcontents port1 -1 0.1.1 This is the contents of the message 0.1.1
+port setcontents port1 -1 0.1.2 This is the contents of the message 0.1.2
+/**/# nested multipart ;-)
+port setcontents port1 -1 0.1.4 This is the £ contents of the message 0.1.4
+port setcontents port1 -1 0.1.5 -f monkey.au
+
+
+port setcontents port1 -1 0.1.3.1 This is the contents of the message 0.1.3.1
+/**/# nested multipart ;-)
+port setcontents port1 -1 0.1.3.3 This is the contents of the message 0.1.3.3
+port setcontents port1 -1 0.1.3.4 This is the contents of the message 0.1.3.4
+
+
+port setcontents port1 -1 0.1.3.2.1 This is the contents of the message 0.1.3.2.1
+port setcontents port1 -1 0.1.3.2.2 This is the contents of the message 0.1.3.2.2
+
+port setcontents port1 -1 0.1.3.2.3.1 This is the contents of the message 0.1.3.2.3.1
+port setcontents port1 -1 0.1.3.2.3.2 This is the contents of the message 0.1.3.2.3.2
+
+port getstructure port1 -1 
+port resolve port2 port1 -1 -f
+port submit port2 port1 -1 mime
+
+/**/# close the dataports
+
+port close port1
+port shutdown port1
+port delete port1
+
+port close port2
+port shutdown port2
+port delete port2
+
+quit

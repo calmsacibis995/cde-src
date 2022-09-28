@@ -1,0 +1,209 @@
+.\"---  Man page for the "dtspcdenv" file.
+.\"---
+.\"----------------------------------------------------------------------------
+.\"----------------------------------------------------------------------------
+.TH dtspcdenv 4M "12 January 1994"
+.BH "12 January -1994"
+.\"---
+.\"----------------------------------------------------------------------------
+.\" *************************************************************************
+.\" **  (c) Copyright 1994 Hewlett-Packard Company
+.\" **  (c) Copyright 1994 International Business Machines Corp.
+.\" **  (c) Copyright 1994 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1994 Novell, Inc.
+.\" *************************************************************************
+.SH NAME
+dtspcdenv \- Environment Variable File for the CDE Subprocess Control Service
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- DESCRIPTION 
+.\"---
+.SH DESCRIPTION
+The CDE Subprocess Control service provides the
+ability for a process running on one system to
+invoke another process on a different system.
+By default, the environment variables of the
+parent process are passed unmodified to the
+child process (on the remote host), 
+however there are some environment
+variables that are given special handling.  In
+addition, the user or system administrator can
+specify environment variables that should be
+modified when they are passed to the child process.
+.P
+The system-wide environment files are: 
+.P
+.RS 
+/etc/dt/config/dtspcdenv
+.P
+/usr/dt/config/dtspcdenv
+.RE
+.TP
+and the user-specific environment file is:
+.P
+.RS
+$HOME/.dt/dtspcdenv
+.RE
+.P
+The file /usr/dt/config/dtspcdenv is created
+when CDE is installed.  This file may be overwritten
+by subsequent CDE installations.  Consequently, local
+variable definitions should be placed in the file
+/etc/dt/config/dtspcdenv because this file is not
+overwritten during installation.
+.P
+The environment variable files are evaluated in the following order:
+.P
+.RS
+1. local host:  /usr/dt/config/dtspcdenv
+.P
+2. local host:  /etc/dt/config/dtspcdenv
+.P
+3. local host:  $HOME/.dt/dtspcdenv
+.P
+4. remote host: /usr/dt/config/dtspcdenv
+.P
+5. remote host: /etc/dt/config/dtspcdenv
+.P
+6. remote host: $HOME/.dt/dtspcdenv
+.RE
+.P
+The precedence occurs in the reverse order of
+evaluation.  Thus, variables in the remote
+host's $HOME/.dt/dtspcdenv file have the highest
+precedence and variables in the local host's
+/etc/dt/config/dtspcdenv file have the lowest
+precedence.
+In this context, the local host is the
+host where a CDE client is running and
+the remote host is the host where a remote
+process will be started (on behalf of
+the local client).
+.P
+Lines beginning with a "#" are considered 
+comments and are not processed.
+.P
+The syntax for a non-commented line is:
+.P
+.RS 
+VAR_NAME=some_value
+.RE
+.P
+where "VAR_NAME" is the name of an 
+environment variable and "some_value"
+is the value assigned to the variable.
+.P
+If "some_value" contains a variable reference,
+the reference will be replaced by the variable's
+value.  For example, if a CDE client has the
+following definition in its environment:
+.P
+.RS
+PATH=/bin:/sbin:/usr/local/bin
+.RE
+.P
+and the following definition occurs in one of the
+environment files:
+.P
+.RS
+PATH=/opt/foo/bin:$PATH
+.RE
+.P
+then before the remote process is executed, "PATH"
+will be expanded to:
+.P
+.RS
+PATH=/opt/foo/bin:/bin:/sbin:/usr/local/bin
+.RE
+.P
+The environment variable names may consist of
+letters, digits or underscores and may be
+enclosed in curly braces.
+.P
+The environment variable files may contain
+"unset <variable_name>" commands to prevent 
+an environment variable from being propagated 
+to the remote process.
+For example, the following line would 
+prevent the variable "LIB_PATH" from being
+propagated to the remote process:
+.P
+.RS 
+unset LIB_PATH
+.RE
+.P
+.\"---
+.\"--- Environment variables
+.\"---
+.SH ENVIRONMENT VARIABLES
+Dtspcd treats the following variables specially: 
+.P
+.PD 0
+.TP 25
+.B DISPLAY
+If DISPLAY is set to "unix:<n>", "local:<n>" or ":<n>"
+(where <n> is the screen number), then before the
+remote process is executed, 
+DISPLAY is changed to the name of the local host and
+the screen number is preserved.
+.P
+.PD 0
+.TP 25
+.B HOME
+Before the remote process is executed, HOME is set 
+to the value of the user's home directory in
+the password file on the remote host.
+.P
+.PD 0
+.TP 25
+.B SHELL
+If SHELL is not in the parent processes environment,
+SHELL is set to the value of the user's shell in
+the password file on the remote host.
+.P
+.PD 0
+.TP 25
+.B PWD
+The variable PWD is not propagated to
+the remote host.
+.PD
+.P
+Note that the above variables will be
+overridden by their corresponding definitions 
+in an environment file.
+.\"---
+.\"--- Examples
+.\"---
+.SH "EXAMPLES"
+The following definition sets the variable
+"FOO_BIN_PATH" to the value "/var/foo/bin":
+.P
+.RS 
+FOO_BIN_PATH=/var/foo/bin
+.RE
+.P
+.\"---
+.\"--- Related files
+.\"---
+.SH FILES
+.PD 0
+.TP 25
+.B /usr/dt/config/dtspcdenv
+System-wide, installed environment variable definitions 
+used when a process is executed
+.PD 0
+.TP 25
+.B /etc/dt/config/dtspcdenv
+System-wide, locally defined environment variable definitions 
+used when a process is executed
+.PD 0
+.TP 25
+.B $HOME/.dt/dtspcdenv
+User-specific environment variable definitions used 
+when a process is executed
+.\"---
+.\"--- Related man pages
+.\"---
+.PD
+.SH "SEE ALSO"
+.BR dtspcd (1).

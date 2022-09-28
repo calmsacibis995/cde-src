@@ -1,0 +1,129 @@
+/* This file is imbedded near the top of  every ToolTalk Imakefile. */
+/* It contains definitions and redefinitions that are common to all */
+/* of ToolTalk but which aren't referred to anywhere else in the    */
+/* build. */
+
+/* TT_VERSION defines the version string which is imbedded in all the */
+/* binaries and shipped libraries. */
+
+TT_VERSION = 1.3
+
+/* TTLIB_AND_MAYBE_XLIB is overridden on architectures where libtt does *.
+/* not need XLIB (because it's dlopen'ed.) */
+
+TTLIB_AND_MAYBE_XLIB = $(TTLIB) $(XLIB)
+/* The depency version for use in DEPLIBS */
+DEPTTLIB_AND_MAYBE_XLIB = $(DEPTTLIB) $(DEPXLIB)
+
+#ifdef SunArchitecture
+/* It would be nice if we could simply override the SPECIAL_...OPTIONS */
+/* with environment variables, but shells tend to complain about the ++ */
+/* in SPECIAL_C++OPTIONS. So we introduce TTCCOPTS and TTCOPTS to set. */
+/* Using this, to do just source browser scanning, use  */
+/* TTCCOPTS=-sbfast TTCOPTS=-xsbfast make -k    */
+/* To do a normal compile and source browser scan, use
+/* TTCCOPTS=-sb TTCOPTS=-xsb make -k    */
+
+SPECIAL_C++OPTIONS=$(TTCCOPTS)
+SPECIAL_CC_OPTIONS=$(TTCOPTS)
+TTLIB_AND_MAYBE_XLIB = $(TTLIB)
+DEPTTLIB_AND_MAYBE_XLIB = $(DEPTTLIB)
+#endif
+
+#ifdef USLArchitecture
+TTLIB_AND_MAYBE_XLIB = $(TTLIB) $(XTOOLLIB) $(XLIB)
+DEPTTLIB_AND_MAYBE_XLIB = $(DEPTTLIB) $(DEPXLIB)
+#endif
+
+#ifdef UXPArchitecture
+TTLIB_AND_MAYBE_XLIB = $(TTLIB) $(XTOOLLIB) $(XLIB)
+DEPTTLIB_AND_MAYBE_XLIB = $(DEPTTLIB) $(DEPXLIB)
+#endif
+/** Set the -L path to find libtt locally **
+ ** This also involves setting LOCAL_TTLIB_DIR to the tt/lib directory
+ ** in each individual bin Imakefile that nees libtt.
+ ** On RsArchitecture don't set any -L. This gets imbedded in their
+ ** clients which use shared libraries.
+ **/
+#ifdef RsArchitecture
+EXTRA_LIBPATH=
+#else
+#ifdef  SunArchitecture
+EXTRA_LIBPATH=-L$(LOCAL_TTLIB_DIR) -L /opt/SUNWspro/lib
+#else
+EXTRA_LIBPATH=-L$(LOCAL_TTLIB_DIR)
+#endif
+#endif
+
+#ifdef AlphaArchitecture
+EXTRA_LIBPATH=-L$(LOCAL_TTLIB_DIR)
+#endif
+
+/* put EXTRA_DEFINES and EXTRA_INCLUDES below */
+#ifdef HPArchitecture
+# if OSMajorVersion >= 10
+EXTRA_DEFINES=-DOSMAJORVERSION=$(OSMAJORVERSION) -DhpV4
+# else
+EXTRA_DEFINES=-DOSMAJORVERSION=$(OSMAJORVERSION)
+# endif
+C++INCLUDES=
+#endif
+
+#ifdef SunArchitecture
+
+/*
+ * Set REORDER_PROFILED if one wishes to profile the code, for the purpose
+ * of building a reordering mapfile.
+ */
+#ifdef REORDER_PROFILED
+C++ = CC -pg $(BBAFLAGS)
+CC = cc -xpg $(BBAFLAGS)
+#endif
+
+C++INCLUDES=
+LAST_LOAD_FLAGS = -Bstatic -lC -Bdynamic -lm -lc -Bstatic
+#endif
+
+#ifdef RsArchitecture
+EXTRA_DEFINES=-D_ALL_SOURCE
+/* NONSHAREDLIBCOBJ = nonsharelibC.o */
+#endif
+
+#ifdef USLArchitecture
+C++INCLUDES=
+STD_DEFINES= -DUSL -DSVR4 -DOSMAJORVERSION=$(OSMAJORVERSION)
+#endif
+
+#ifdef UXPArchitecture
+C++INCLUDES=
+STD_DEFINES= -DSVR4 -DOSMAJORVERSION=$(OSMAJORVERSION) 
+#endif
+
+#ifdef SunArchitecture
+/* Do not turn on dependency tracking in certain directories.  There  */
+/* are no targets there that need it, and sometimes it causes make to */
+/* needlessly try to re-make targets already made in other directores */
+/* this is turned on in lib/tt and lib/tt/lib.                        */
+
+#ifndef TT_NO_KEEP_STATE
+.KEEP_STATE:
+#endif
+
+/* Only need to rebuild message catalog source on one platform. */
+all::
+
+%.msg:	%
+	ttgenmsg -d $@ $(TT_DIR)/SUNW_TOOLTALK.sets $<
+
+%/msgs:	always_rebuild
+	(cd $*; make $(@F))
+
+msgs:	$$(SRCS:%=%.msg) $$(SUBDIRS:%=%/msgs)
+	$(RM) $@
+	touch $@
+	for file in $(SRCS:%=%.msg) $(SUBDIRS:%=%/msgs) /dev/null; do \
+		if grep set $$file > /dev/null; then cat $$file >> $@; fi; \
+	done
+
+always_rebuild:
+#endif

@@ -1,0 +1,108 @@
+.TH Copy Editor "07 Sep 1993" "SunSoft" "ToolTalk ICCCM"
+.SH NAME
+.PP
+Copy, Cut, Paste - retrieve, delete, or insert some buffer contents
+.SH SYNOPSIS
+.so ../.synopsis
+[\fIfile\fR]	Copy(	in	bufferID	\fIdocBuf\f(CW	
+		[out	\fImediaType	data\f(CW]	
+		[in	locator	\fIstart\f(CW,	
+		in	locator	\fIend\f(CW] );	
+[\fIfile\fR]	Cut(	in	bufferID	\fIdocBuf\f(CW	
+		[out	\fImediaType	data\f(CW]	
+		[in	locator	\fIstart\f(CW,	
+		in	locator	\fIend\f(CW] );	
+[\fIfile\fR]	Paste(	in	bufferID	\fIdocBuf\f(CW	
+		[in	\fImediaType	data\f(CW]	
+		[in	locator	\fIstart\f(CW,	
+		in	locator	\fIend\f(CW] );
+.ft
+.fi
+.SH DESCRIPTION
+.PP
+Retrieve, delete, or insert some data from or into a buffer.
+.PP
+This request should be given a \f(CWTt_address\fR of
+\f(BITT_PROCEDURE\fR, so that it will match the pattern registered by
+the owner of
+.IR docBuf .
+.SH REQUIRED ARGUMENTS
+.TP
+\f(CWbufferID\fR \fIdocBuf\fR
+The ID of the buffer.
+.SH OPTIONAL ARGUMENTS
+.TP
+.I mediaType data
+The data being retrieved or to be inserted.  If this argument is
+omitted, the data should be retrieved from or inserted into the window
+system's clipboard.  In
+.BR X11 (7),
+this is the \f(CWCLIPBOARD\fR selection.
+.IP
+If this argument is unset (i.e., has a
+value of \f(CW(char *)0\fR), then the data are in
+the file named in the message's file attribute.  The data type of the
+.I data
+argument shall be string, unless nulls are legal in the given media
+type, in which case case the data type shall be bytes.
+.HP 8
+.PD 0
+\f(CWlocator\fR \fIstart\fR
+.TP
+\f(CWlocator\fR \fIend\fR
+.PD
+The region of the document from which to retrieve, or into which to
+insert.  If this pair of arguments is omitted, the current selection
+or insertion point is used.
+.SH ERRORS
+.TP
+\f(BITT_ERR_NOMATCH\fR
+No editor has a pattern handling the
+.BR Seek ()
+request for
+.IR docBuf ,
+and so it may not be a valid \f(CWbufferID\fR.
+.TP
+\f(BITT_DESKTOP_EINVAL\fR
+.I start
+or
+.I end
+is not a legal \f(CWlocator\fR for the media type of the document in
+.RI docBuf .
+.TP
+\f(BITT_DESKTOP_EFAULT\fR
+.I start
+or
+.I end
+is not a valid \f(CWlocator\fR for the document in
+.IR docBuf .
+.TP
+\f(BITT_DESKTOP_EFAULT\fR
+.I start
+and
+.I end
+were omitted, and there is no selection or insertion point currently
+defined in
+.RI docBuf .
+.TP
+\f(BITT_DESKTOP_EACCES\fR
+The document is read-only.
+.TP
+\f(BITT_DESKTOP_ENODATA\fR
+The \fIdata\fR argument is being returned with no value
+(and the file attribute of the reply is not set) because the
+specified portion of the document in
+.I docBuf
+was empty.  When this condition occurs, the handler should not
+fail the
+.BR Copy ()
+or
+.BR Cut ()
+request.
+.SH SEE ALSO
+.PP
+.BR Intro (TICCCM),
+.BR Intro (Desktop),
+.BR Intro (Media),
+.BR Intro (Editor),
+.BR Open (Editor)

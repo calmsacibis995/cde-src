@@ -1,0 +1,528 @@
+<!-- Help volume: Loginmgr -->
+<1-- File name:   Environ  -->
+
+<chapter id=EnvironmentVariablesCI>Environment Variables in &ProductName;
+
+
+        <idx|environment variables|
+        <idx|variables, environment|
+
+<note>
+When a user logs in to &ProductName;;, the shell environment file (``.profile'' or
+``.login'') is not automatically read.
+Since the &ProductName; runs the X server before the user has logged in, the
+functionality provided by ``bin/login'' and ``.profile'' or
+``.login'' must be provided instead by Login Manager.
+<\note>
+
+&ProductName;; acquires environment variables from several sources.
+<list bullet>
+* Certain default variables are built into Login Manager.
+* System-wide environment variables can be set in Login Manager
+configuration files.
+* Special resouces exist for setting time zone (TZ) and language (LANG).
+* Personal environment variables are set in the the user's ``.dtprofile''
+file.
+* The ``.dtprofile'' file can source in the user's
+shell environment file.  There are special requirements for doing this
+(see <xref ToUseAShellFileTA>).
+<\list>
+
+
+<procedure>Precedence of Variable Definitions
+Since environment variables can be defined in a number of files, it is
+necessary to understand which definition takes precedence.
+A later definition overrides a previous one.
+For example, a definition in ``.dtprofile'' overrides a setting in
+``/etc/opt/dt/Xsession''.
+
+
+<s1 id=DefaultEnvironmentVariablesSI>Default Environment Variables
+        <idx|default: environment variables|
+
+
+Default environment variables are either:
+<list bullet>
+* Built into Login Manager.
+* Set in the script ``/etc/opt/dt/Xsession''.
+<\list>
+
+
+<s2 id=VariablesBuiltIntoLoginManagerTO>Variables built into Login Manager
+
+        <idx|environment variables: built into ``dtlogin''|
+        <idx|``dtlogin'': environment variables built in|
+        <idx|DISPLAY environment variable|
+        <idx|USER environment variable|
+        <idx|HOME environment variable|
+        <idx|PATH environment variable|
+        <idx|SHELL environment variable|
+        <idx|LANG environment variable|
+        <idx|XAUTHORITY environment variable|
+        <idx|environment variable: DISPLAY|
+        <idx|environment variable: USER|
+        <idx|environment variable: HOME|
+        <idx|environment variable: PATH|
+        <idx|environment variable: SHELL|
+        <idx|environment variable: LANG|
+        <idx|environment variable: XAUTHORITY|
+        <idx|variables: built into Login Manager|
+        <idx|Login Manager: built-in variables|
+
+These
+variables are set
+separately for each display after the user login and password have been
+validated.
+
+<lablist>
+<labheads>\Variable\ Default Value
+
+\DISPLAY\ The first field in the ``Xservers'' file.
+
+\USER\ User name.
+
+\HOME\ Home directory specified in ``/etc/passwd''.
+
+\PATH\ Value of the resource ``userPath'' in the
+       ``/etc/opt/dt/Xconfig'' file.
+
+\SHELL\ The shell specified in ``/etc/passwd''.
+
+\LANG\ The display's current NLS language, if any.
+
+\LC_MESSAGES\ Set to the value of LANG.
+
+\LOGNAME\ User name.
+
+\TZ\ Value of the ``timeZone'' resource in ``Xconfig'' (or in the
+       operating system file that sets the time zone).
+
+\XAUTHORITY\ May be set to an authority file.
+<\lablist>
+
+
+
+
+<s2 id=VariablesSetByXsessionTO>Variables set by `Xsession'
+
+        <idx|variables: set by ``Xsession''|
+        <idx|``Xsession'': variables set by|
+
+The script ``/etc/opt/dt/Xsession'' is run by Login Manager after
+the X server has been started.  Therefore, these variables are !!not!!
+available to the X server.
+
+<lablist>
+<labheads>\Variable\ Default Value
+
+\EDITOR\ ``/usr/dt/bin/dtpad''
+\KBD_LANG\ Set to the value of LANG for appropriate languages.
+\TERM\ ``xterm''
+\MAIL\ ``/usr/mail/''$USER
+<\lablist>
+
+
+<s1 id=SettingSystemWideEnvironmentVariablesSI>Setting System-Wide Environment Variables
+
+
+        <idx|setting: system-wide environment variables|
+        <idx|environment variables: setting system-wide|
+        <idx|variables, environment: setting system-wide|
+
+System-wide variables are available to all users on a system.  Variables
+can be set so that they are:
+
+<list bullet>
+* Available both to the &ProductName; session and to the X server.
+* Available only to the &ProductName; session.
+<\list>
+
+In addition, in multi-display systems, the scope of the variable can be set
+so that it is available to:
+
+<list bullet>
+* All displays in a system.
+* A particular display.
+<\list>
+
+
+<s2 id=ToSetServerSessionVariablesTA>To Set system-wide Variables for X server and Session
+
+        <idx|setting: X server variables|
+        <idx|X server: setting system-wide variables|
+        <idx|variables: setting X server|
+        <idx|session: setting variables for current|
+
+
+<list bullet>
+* Set the ``environment'' resource in ``/etc/opt/dt/Xconfig'':
+<ex>
+Dtlogin*environment: %%variable%%=%%value%% %%&ellipsis;%%
+<\ex>
+<\list>
+
+
+Separate variable assignments with a space or tab.
+
+Do !!not!! use the ``environment'' resource to set TZ and LANG.
+
+If the X server does not use the variable, it will be applied only to the
+&ProductName; session.
+
+There is no shell processing within ``Xconfig''.  Thus, you cannot use
+shell programming constructs such as variable assignments
+(for example, ``%%VARIABLE%%=%%value%%'') and conditional expressions (for
+example, ``if''&ellipsis;``fi'').
+
+
+<procedure>Multiple-display systems with different environments
+
+For multiple-display systems, where different environments are needed for
+the displays, use this syntax for the ``environment'' resource in
+``/etc/opt/dt/Xconfig''
+
+<ex>
+Dtlogin*%%display%%*environment: %%variable%%=%%value%% %%&ellipsis;%%
+<\ex>
+
+If %%display%% includes a colon (``:''), replace it with an
+underscore character&emdash;for example,
+``hpcvhere_0''.
+
+
+<procedure>Example
+The following line in ``Xconfig'' sets the EDITOR variable for all displays.
+
+<ex smaller>
+Dtlogin*environment: EDITOR=vi
+<\ex>
+
+<procedure>Example
+The following line in ``Xconfig'' sets the SB_DISPLAY_ADDR variable for
+display ``hpcvxhere:1''.
+
+<ex smaller>
+Dtlogin*hpcvhere_1*environment: EDITOR=vi \
+                                 SB_DISPLAY_ADDR=0xB00000
+<\ex>
+
+
+
+<!-- IFDEF ONLINE ONLY -->
+<procedure>See Also
+<list bullet tight>
+* <xref ToSetSessionVariablesTA>
+<\list>
+<!-- IFDEF ONLINE ONLY END -->
+
+
+
+<s2 id=ToExportSessionVar>To Export System-Wide Variables to the Session Only
+
+This is useful for exporting operating system variables that
+would otherwise be discarded.
+
+<list bullet>
+* In ``/etc/opt/dt/Xconfig'', use the ``exportList'' resource to specify
+the variables to be exported:
+
+<ex>
+Dtlogin[*%%display%%]*exportList: %%variable%% %%variable%% ...
+<\ex>
+
+If %%display%% includes a colon (``:''), replace it with an
+underscore character&emdash;for example,
+``syshere_0''.
+<\list>
+
+<need 4in>
+<s2 id=ToSetSessionVariablesTA>To Set System-wide Variables for the Session Only
+
+        <idx|session: setting variables for current|
+        <idx|variables: setting for current session|
+
+<procedure>Single-display systems
+
+<list bullet>
+
+* Edit ``/etc/opt/dt/Xsession'' to include variable definitions using
+the syntax:
+
+<ex>
+%%variable%%=%%value%%
+&vellipsis;
+export %%variable%% [%%variable%% &ellipsis;]
+
+<\ex>
+
+<\list>
+
+``Xsession'' is a shell (ksh) script, so shell processing is
+available.
+
+<procedure>Multiple-Display Systems
+
+If the system has multiple displays, and different session variables are
+needed for the displays, use the ``session'' resource in
+``/etc/opt/dt/Xconfig'' to specify a different "Xsession" file for
+each display:
+
+<ex>
+Dtlogin*%%display%%*session: /%%path%%/%%filename%%
+<\ex>
+
+
+If %%display%% includes a colon (``:''), replace it with an
+underscore character&emdash;for example,
+``syshere_0''.
+
+<list>
+* Create the specified files.
+* Edit the files to include the variable definitions.
+<\list>
+
+
+<procedure>Example
+
+The following lines in ``Xsession'' set values for the MAIL and TERM
+variables and then export the variables.
+
+<ex smaller>
+MAIL=/usr/mail/$USER
+TERM=xterm
+export MAIL TERM
+<\ex>
+
+<procedure>Example
+The following line in ``Xconfig'' specifies the Xsession file for display
+``syshere:1'':
+
+<ex smaller>
+Dtlogin*syshere_1.session: /usr/lib/X11/dt/Dtlogin/Xsession.syshere
+<\ex>
+
+<need 3in>
+<s2 id=ToSetTZVariable>To Set a System-Wide Timezone (TZ)
+
+        <idx|timezone, setting|
+        <idx|TZ (timezone) setting|
+
+<list bullet>
+* Set the ``timeZone'' resource in ``/etc/opt/dt/Xconfig'':
+<ex>
+Dtlogin[*%%display%%]*timeZone: %%value%%
+<\ex>
+If %%display%% includes a colon (``:''), replace it with an
+underscore character&emdash;for example,
+``syshere_0''.
+<\list>
+
+The time zone will apply to all users logging in using &ProductName;, and will
+override any time zone value set by the operating system.
+
+<procedure>Example
+The following line in ``Xconfig'' sets the time zone for all displays:
+
+<ex smaller>
+Dtlogin*timeZone: PST8PDT
+<\ex>
+
+
+You can set a personal value for TZ in ``.dtprofile''.
+
+
+
+<need begin>
+<s2 id=ToSetLANGVar>To Set a System-Wide Language (LANG)
+
+        <idx|setting: system-wide language|
+        <idx|LANG (language) setting|
+        <idx|language: setting system-wide|
+
+<list bullet>
+* Set the ``language'' resource in ``/etc/opt/dt/Xconfig'':
+<ex>
+Dtlogin[*%%display%%]*language: %%value%%
+<\ex>
+If %%display%% includes a colon (``:''), replace it with an
+underscore character&emdash;for example,
+``syshere_0''.
+
+<\list>
+
+<procedure>Example
+The following line in ``Xconfig'' sets the value of LANG to swedish for
+display sysxpae:0:
+
+<ex smaller>
+Dtlogin*sysxpae_0*language: swedish
+<\ex>
+<need end>
+
+<need 3in>
+<s2 id=DisplayEnvironmentVariableTO>The DISPLAY Environment Variable
+
+        <idx|``dtlogin'': default DISPLAY value|
+        <idx|environment variable: DISPLAY|
+<idx|DISPLAY environment variable|
+
+The DISPLAY environment variable sets the host, display number, and
+screen number to which a system sends bitmapped output for clients.
+
+<procedure>Default value for DISPLAY
+The default value of ``DISPLAY'' is set automatically by ``dtlogin'' to
+%%hostname%%``:0'', which is display 0, screen 0 of the local display.  If
+you must change it, edit the first field of the appropriate entry in the
+``Xservers'' file.
+
+<procedure>System-wide value for DISPLAY
+When specifying a display in ``/etc/opt/dt/Xconfig'', replace the colon
+(``:'') with an underscore character&emdash;for example, ``syshere_0''.
+
+
+<procedure>Personal value for DISPLAY
+DISPLAY can be set in ``.dtprofile''.
+
+
+
+<s1 id=SettingPersonalVariablesSI>Setting Personal Environment Variables
+
+        <idx|setting: personal environment variables|
+        <idx|personal environment variables, setting|
+        <idx|environment variables: setting personal|
+        <idx|variables, environment: setting personal|
+
+User-specific environment variables are set in
+``/%%HomeDirectory%%/.dtprofile''.
+
+<note>
+When a user logs in to &ProductName;, the ``.profile'' or ``.login'' file is not
+automatically read.  Instead, ``.dtprofile'' is read.
+<\note>
+
+<s2 id=ToSetPersonalVariablesTA>To Set Personal Environment Variables
+
+        <idx|setting: personal environment variables|
+        <idx|personal environment variables, setting|
+        <idx|environment variables: setting personal|
+        <idx|variables, environment: setting personal|
+
+<list bullet>
+* Copy the template
+``/etc/opt/dt/sys.dtprofile'' to ``$HOME/.dtprofile''.  Give the new
+file write permission.
+<\list>
+
+The ``.dtprofile'' file should contain only variable settings;  it should
+!!not!! contain shell commands that require terminal I/O or commands that
+run in the foreground.
+
+If you want the file interpreted according to a shell other than the
+default shell, specify the shell for the
+file by placing ``#!/bin/sh'', ``#!/bin/csh'', or ``#!/bin/ksh'' at the top
+of the file.  (&ProductName; supports these three shells; it does not support other
+shells.)
+
+<note>
+Set !!only!! environment variables in ``.dtprofile''.  Commands like those
+for terminal input or output will corrupt your session environment.
+<\note>
+
+<procedure>Example
+The following line in ``.dtprofile'' sets the value for the MAILPATH
+environment variable:
+<ex smaller>
+MAILPATH="${MAIL}?You have new mail."
+<\ex>
+
+<s2 id=ToUseAShellFileTA>To Use a Shell Environment File with `.dtprofile'
+
+        <idx|using: shell environment file with ``.dtprofile''|
+        <idx|shell environment file, using with ``.dtprofile''|
+        <idx|environment file, shell, using with ``.dtprofile''|
+
+<list order>
+
+* Place variables and shell commands in ``.dtprofile'' that apply only to
+  &ProductName;.
+
+* Add lines to the end of ``.dtprofile'' to source in the shell
+  environment file.
+
+* Edit the shell environment file to provide two sections:
+
+<list bullet>
+   * One section contains commands that do not apply to &ProductName; (for
+     example, commands that require terminal I/O, or variables for which
+     you want to replicate the &ProductName; default values).
+
+   * The other section contains variables that apply, whether or not &ProductName;
+     is run&emdash;for example, when logging into the system from a remote
+     system.
+
+<\list>
+
+<\list>
+
+If you have an existing shell environment file (``.profile'' or ``.login''),
+this procedure lets you continue to use that file.  This avoids duplicate
+variable assigments between ``.dtprofile'' and the shell environment file.
+
+
+If a terminal emulator is started with the ``-ls'' option, ``.login'' or
+``.profile'' will be read automatically.
+
+<need begin>
+<procedure>Example (ksh)
+The following lines at the end of ``.dtprofile'' sources in ``.profile'':
+
+<ex smaller>
+Dt=true; export Dt
+. $HOME/.profile
+unset Dt
+<\ex>
+
+The following sample ``.profile'' shows how to separate it into a non-&ProductName;
+section and a section for variables that apply both to &ProductName; and non-HP
+Dt environments.
+
+<ex smaller>
+if [ ! "$Dt" ]; then
+     stty %%options%%
+     tset %%options%%
+     DISPLAY=%%value%%
+     MAIL=%%value%%
+     export DISPLAY MAIL
+     %%Additional shell commands that do not apply to &ProductName;%%
+     %%Additional variable assignments that do not apply to &ProductName;%%
+fi
+PATH=%%value%%
+%%Assignments for common variables%%
+<\ex>
+<need end>
+
+<procedure>Example (csh)
+The following line at the end of ``.dtprofile'' sources in ``.login'':
+<ex smaller>
+setenv Dt true
+source $HOME/.login
+<\ex>
+
+The following sample ``.login'' shows how to separate it into a non-&ProductName;
+section and a
+section for variables that apply both to &ProductName; and non-&ProductName; environments.
+<ex smaller>
+
+if ( ! "$Dt" ) then
+     stty %%options%%
+     tset %%options%%
+     setenv DISPLAY %%value%%
+     set mail = %%value%%
+     %%Additional shell commands that do not apply to &ProductName;%%
+     %%Additional variable assignments that do not apply to &ProductName;%%
+endif
+setenv PATH %%value%%
+%%Assignments for common variables%%
+<\ex>
+
+<!-- EOF: Environ -->

@@ -1,0 +1,130 @@
+XCOMM
+XCOMM 	$XConsortium: Imakefile /main/cde1_maint/2 1995/09/06 08:04:23 lehors $
+XCOMM
+XCOMM 	@(#)Imakefile	1.8 08 Feb 1994
+XCOMM
+XCOMM 	RESTRICTED CONFIDENTIAL INFORMATION:
+XCOMM	
+XCOMM	The information in this document is subject to special
+XCOMM	restrictions in a confidential disclosure agreement between
+XCOMM	HP, IBM, Sun, USL, SCO and Univel.  Do not distribute this
+XCOMM	document outside HP, IBM, Sun, USL, SCO, or Univel without
+XCOMM	Sun's specific written approval.  This document and all copies
+XCOMM	and derivative works thereof must be returned or destroyed at
+XCOMM	Sun's request.
+XCOMM
+XCOMM	Copyright 1993 Sun Microsystems, Inc.  All rights reserved.
+XCOMM
+XCOMM
+
+#define PassCDebugFlags 'CDEBUGFLAGS=$(CDEBUGFLAGS)'
+
+#include <Library.tmpl>
+#include "../ab.tmpl"
+#include "../ab.rules"
+
+    INCLUDES = -I. -I$(ABINCLUDES)
+
+INSTALLFLAGS = $(INSTINCFLAGS)
+
+    LINTLIBS = $(LINTXLIB) $(LINTXTOOL)
+
+     DEFINES =
+
+SOURCES.h.shipped =
+
+SOURCES.h.shared =\
+	obj.h \
+	obj_list.h \
+	obj_lists.h \
+	obj_notify.h \
+	trav.h
+
+SOURCES.h.unshared = \
+	objP.h \
+	obj_names_listP.h \
+	obj_notifyP.h \
+	obj_utils.h \
+	travP.h
+
+SRCS = \
+	obj.c \
+	obj_action.c \
+	obj_alloc.c \
+	obj_fields.c \
+	obj_geometry.c \
+	obj_init.c \
+	obj_isa.c \
+	obj_names_list.c \
+	obj_list.c \
+	obj_lists.c \
+	obj_notify.c \
+	obj_release.c \
+	obj_scoped.c \
+	obj_select.c \
+	obj_tree.c \
+	obj_utils.c \
+	trav.c \
+	travP.c \
+	trav_public.c \
+	trav_safe.c
+
+OBJS = \
+	obj.o \
+	obj_action.o \
+	obj_alloc.o \
+	obj_fields.o \
+	obj_geometry.o \
+	obj_init.o \
+	obj_isa.o \
+	obj_list.o \
+	obj_lists.o \
+	obj_names_list.o \
+	obj_notify.o \
+	obj_release.o \
+	obj_scoped.o \
+	obj_select.o \
+	obj_tree.o \
+	obj_utils.o \
+	trav.o \
+	travP.o \
+	trav_public.o \
+	trav_safe.o
+
+  SYS_LIBRARIES = -lm
+
+#ifdef RsArchitecture
+SYS_LIBRARIES = -lm -liconv
+#endif
+
+#ifdef	SunArchitecture
+SYS_LIBRARIES = -lm -ldl $(WIDECHARSYSLIB) -lgen 
+WAITTARGET = .WAIT
+#endif	/* SunArchitecture */
+
+   INSTALLFLAGS = -m 4755
+       LINTLIBS = $(XINPUTLIB) $(DTHELPLIB) $(DTSVCLIB) $(XMLIB) $(XTOOLLIB) $(XLIB)
+LOCAL_LIBRARIES = $(XINPUTLIB) $(DTHELPLIB) $(DTSVCLIB) $(XMLIB) $(XTOOLLIB) $(XLIB)
+
+LibraryObjectRule()
+
+NormalLibraryTarget(ABobj,$(OBJS))
+
+test: test.o libABobj.a
+	cc $(CFLAGS) -o test test.o ../libAButil/libAButil.a libABobj.a $(SYS_LIBRARIES)
+test.o: test.c obj.h obj_notify.h
+	cc $(CFLAGS) $(INCLUDES) -c test.c
+
+test_notify: test_notify.o libABobj.a
+	cc -o test_notify test_notify.o ../libAButil/libAButil.a libABobj.a $(SYS_LIBRARIES)
+test_notify.o: test_notify.c obj.h obj_notify.h
+	cc $(CFLAGS) $(INCLUDES) -c test_notify.c
+
+DependTarget()
+
+BuildAbIncludes(shared_includes, $(SOURCES.h.shared),../include/ab_private, ../../libABobj)
+
+includes:: shared_includes $(WAITTARGET)
+sdtgilcvt: libABobj.a
+dtcodegen: libABobj.a
+

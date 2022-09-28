@@ -1,0 +1,10968 @@
+%!PS-Adobe-1.0
+%%Creator: poobah:hlj (Hal Jespersen)
+%%Title: stdin (ditroff)
+%%CreationDate: Mon Nov 21 15:37:52 1994
+%%EndComments
+% Start of psdit.pro -- prolog for ditroff translator
+% Copyright (c) 1985,1987 Adobe Systems Incorporated. All Rights Reserved. 
+% GOVERNMENT END USERS: See Notice file in TranScript library directory
+% -- probably /usr/lib/ps/Notice
+% RCS: $Header: xcdi.front.ps,v 1.4 94/11/22 08:38:14 hlj_sun Exp $
+/$DITroff 140 dict def $DITroff begin
+/fontnum 1 def /fontsize 10 def /fontheight 10 def /fontslant 0 def
+/xi {0 72 11 mul translate 72 resolution div dup neg scale 0 0 moveto
+  /fontnum 1 def /fontsize 10 def /fontheight 10 def /fontslant 0 def F
+  /pagesave save def}def
+/PB{save /psv exch def currentpoint translate
+  resolution 72 div dup neg scale 0 0 moveto}def
+/PE{psv restore}def
+/m1 matrix def /m2 matrix def /m3 matrix def /oldmat matrix def
+/tan{dup sin exch cos div}bind def
+/point{resolution 72 div mul}bind def
+/dround	{transform round exch round exch itransform}bind def
+/xT{/devname exch def}def
+/xr{/mh exch def /my exch def /resolution exch def}def
+/xp{}def
+/xs{docsave restore end}def
+/xt{}def
+/xf{/fontname exch def /slotno exch def fontnames slotno get fontname eq not
+ {fonts slotno fontname findfont put fontnames slotno fontname put}if}def
+/xH{/fontheight exch def F}bind def
+/xS{/fontslant exch def F}bind def
+/s{/fontsize exch def /fontheight fontsize def F}bind def
+/f{/fontnum exch def F}bind def
+/F{fontheight 0 le {/fontheight fontsize def}if
+   fonts fontnum get fontsize point 0 0 fontheight point neg 0 0 m1 astore
+   fontslant 0 ne{1 0 fontslant tan 1 0 0 m2 astore m3 concatmatrix}if
+   makefont setfont .04 fontsize point mul 0 dround pop setlinewidth}bind def
+/X{exch currentpoint exch pop moveto show}bind def
+/N{3 1 roll moveto show}bind def
+/Y{exch currentpoint pop exch moveto show}bind def
+/S /show load def
+/ditpush{}def/ditpop{}def
+/AX{3 -1 roll currentpoint exch pop moveto 0 exch ashow}bind def
+/AN{4 2 roll moveto 0 exch ashow}bind def
+/AY{3 -1 roll currentpoint pop exch moveto 0 exch ashow}bind def
+/AS{0 exch ashow}bind def
+/MX{currentpoint exch pop moveto}bind def
+/MY{currentpoint pop exch moveto}bind def
+/MXY /moveto load def
+/cb{pop}def	% action on unknown char -- nothing for now
+/n{}def/w{}def
+/p{pop showpage pagesave restore /pagesave save def}def
+/abspoint{currentpoint exch pop add exch currentpoint pop add exch}def
+/dstroke{currentpoint stroke moveto}bind def
+/Dl{2 copy gsave rlineto stroke grestore rmoveto}bind def
+/arcellipse{oldmat currentmatrix pop
+ currentpoint translate 1 diamv diamh div scale /rad diamh 2 div def
+ rad 0 rad -180 180 arc oldmat setmatrix}def
+/Dc{gsave dup /diamv exch def /diamh exch def arcellipse dstroke 
+    grestore diamh 0 rmoveto}def
+/De{gsave /diamv exch def /diamh exch def arcellipse dstroke
+    grestore diamh 0 rmoveto}def
+/Da{currentpoint /by exch def /bx exch def /fy exch def /fx exch def
+   /cy exch def /cx exch def /rad cx cx mul cy cy mul add sqrt def
+   /ang1 cy neg cx neg atan def /ang2 fy fx atan def cx bx add cy by add
+   2 copy rad ang1 ang2 arcn stroke exch fx add exch fy add moveto}def
+/Barray 200 array def % 200 values in a wiggle
+/D~{mark}def
+/D~~{counttomark Barray exch 0 exch getinterval astore /Bcontrol exch def pop
+ /Blen Bcontrol length def Blen 4 ge Blen 2 mod 0 eq and
+ {Bcontrol 0 get Bcontrol 1 get abspoint /Ycont exch def /Xcont exch def
+  Bcontrol 0 2 copy get 2 mul put Bcontrol 1 2 copy get 2 mul put
+  Bcontrol Blen 2 sub 2 copy get 2 mul put
+  Bcontrol Blen 1 sub 2 copy get 2 mul put
+  /Ybi /Xbi currentpoint 3 1 roll def def 0 2 Blen 4 sub
+  {/i exch def
+   Bcontrol i get 3 div Bcontrol i 1 add get 3 div
+   Bcontrol i get 3 mul Bcontrol i 2 add get add 6 div
+   Bcontrol i 1 add get 3 mul Bcontrol i 3 add get add 6 div
+   /Xbi Xcont Bcontrol i 2 add get 2 div add def
+   /Ybi Ycont Bcontrol i 3 add get 2 div add def
+   /Xcont Xcont Bcontrol i 2 add get add def
+   /Ycont Ycont Bcontrol i 3 add get add def
+   Xbi currentpoint pop sub Ybi currentpoint exch pop sub rcurveto
+  }for dstroke}if}def
+end
+/ditstart{$DITroff begin
+ /nfonts 60 def			% NFONTS makedev/ditroff dependent!
+ /fonts[nfonts{0}repeat]def
+ /fontnames[nfonts{()}repeat]def
+/docsave save def
+}def
+
+% character outcalls
+/oc {/pswid exch def /cc exch def /name exch def
+   /ditwid pswid fontsize mul resolution mul 72000 div def
+   /ditsiz fontsize resolution mul 72 div def
+   ocprocs name known{ocprocs name get exec}{name cb}
+   ifelse}def
+/fractm [.65 0 0 .6 0 0] def
+/fraction
+ {/fden exch def /fnum exch def gsave /cf currentfont def
+  cf fractm makefont setfont 0 .3 dm 2 copy neg rmoveto
+  fnum show rmoveto currentfont cf setfont(\244)show setfont fden show 
+  grestore ditwid 0 rmoveto} def
+/oce {grestore ditwid 0 rmoveto}def
+/dm {ditsiz mul}def
+/ocprocs 50 dict def ocprocs begin
+(14){(1)(4)fraction}def
+(12){(1)(2)fraction}def
+(34){(3)(4)fraction}def
+(13){(1)(3)fraction}def
+(23){(2)(3)fraction}def
+(18){(1)(8)fraction}def
+(38){(3)(8)fraction}def
+(58){(5)(8)fraction}def
+(78){(7)(8)fraction}def
+(sr){gsave .05 dm .16 dm rmoveto(\326)show oce}def
+(is){gsave 0 .15 dm rmoveto(\362)show oce}def
+(->){gsave 0 .02 dm rmoveto(\256)show oce}def
+(<-){gsave 0 .02 dm rmoveto(\254)show oce}def
+(==){gsave 0 .05 dm rmoveto(\272)show oce}def
+end
+% DIThacks fonts for some special chars
+50 dict dup begin
+/FontType 3 def
+/FontName /DIThacks def
+/FontMatrix [.001 0.0 0.0 .001 0.0 0.0] def
+/FontBBox [-220 -280 900 900] def% a lie but ...
+/Encoding 256 array def
+0 1 255{Encoding exch /.notdef put}for
+Encoding
+ dup 8#040/space put %space
+ dup 8#110/rc put %right ceil
+ dup 8#111/lt put %left  top curl
+ dup 8#112/bv put %bold vert
+ dup 8#113/lk put %left  mid curl
+ dup 8#114/lb put %left  bot curl
+ dup 8#115/rt put %right top curl
+ dup 8#116/rk put %right mid curl
+ dup 8#117/rb put %right bot curl
+ dup 8#120/rf put %right floor
+ dup 8#121/lf put %left  floor
+ dup 8#122/lc put %left  ceil
+ dup 8#140/sq put %square
+ dup 8#141/bx put %box
+ dup 8#142/ci put %circle
+ dup 8#143/br put %box rule
+ dup 8#144/rn put %root extender
+ dup 8#145/vr put %vertical rule
+ dup 8#146/ob put %outline bullet
+ dup 8#147/bu put %bullet
+ dup 8#150/ru put %rule
+ dup 8#151/ul put %underline
+ pop
+/DITfd 100 dict def
+/BuildChar{0 begin
+ /cc exch def /fd exch def
+ /charname fd /Encoding get cc get def
+ /charwid fd /Metrics get charname get def
+ /charproc fd /CharProcs get charname get def
+ charwid 0 fd /FontBBox get aload pop setcachedevice
+ 40 setlinewidth
+ newpath 0 0 moveto gsave charproc grestore
+ end}def
+/BuildChar load 0 DITfd put
+%/UniqueID 5 def
+/CharProcs 50 dict def
+CharProcs begin
+/space{}def
+/.notdef{}def
+/ru{500 0 rls}def
+/rn{0 750 moveto 500 0 rls}def
+/vr{20 800 moveto 0 -770 rls}def
+/bv{20 800 moveto 0 -1000 rls}def
+/br{20 770 moveto 0 -1040 rls}def
+/ul{0 -250 moveto 500 0 rls}def
+/ob{200 250 rmoveto currentpoint newpath 200 0 360 arc closepath stroke}def
+/bu{200 250 rmoveto currentpoint newpath 200 0 360 arc closepath fill}def
+/sq{80 0 rmoveto currentpoint dround newpath moveto
+    640 0 rlineto 0 640 rlineto -640 0 rlineto closepath stroke}def
+/bx{80 0 rmoveto currentpoint dround newpath moveto
+    640 0 rlineto 0 640 rlineto -640 0 rlineto closepath fill}def
+/ci{355 333 rmoveto currentpoint newpath 333 0 360 arc
+    50 setlinewidth stroke}def
+
+/lt{20 -200 moveto 0 550 rlineto currx 800 2cx s4 add exch s4 a4p stroke}def
+/lb{20 800 moveto 0 -550 rlineto currx -200 2cx s4 add exch s4 a4p stroke}def
+/rt{20 -200 moveto 0 550 rlineto currx 800 2cx s4 sub exch s4 a4p stroke}def
+/rb{20 800 moveto 0 -500 rlineto currx -200 2cx s4 sub exch s4 a4p stroke}def
+/lk{20 800 moveto 20 300 -280 300 s4 arcto pop pop 1000 sub
+    currentpoint stroke moveto
+    20 300 4 2 roll s4 a4p 20 -200 lineto stroke}def
+/rk{20 800 moveto 20 300 320 300 s4 arcto pop pop 1000 sub
+    currentpoint stroke moveto
+    20 300 4 2 roll s4 a4p 20 -200 lineto stroke}def
+/lf{20 800 moveto 0 -1000 rlineto s4 0 rls}def
+/rf{20 800 moveto 0 -1000 rlineto s4 neg 0 rls}def
+/lc{20 -200 moveto 0 1000 rlineto s4 0 rls}def
+/rc{20 -200 moveto 0 1000 rlineto s4 neg 0 rls}def
+end
+
+/Metrics 50 dict def Metrics begin
+/.notdef 0 def
+/space 500 def
+/ru 500 def
+/br 0 def
+/lt 250 def
+/lb 250 def
+/rt 250 def
+/rb 250 def
+/lk 250 def
+/rk 250 def
+/rc 250 def
+/lc 250 def
+/rf 250 def
+/lf 250 def
+/bv 250 def
+/ob 350 def
+/bu 350 def
+/ci 750 def
+/bx 750 def
+/sq 750 def
+/rn 500 def
+/ul 500 def
+/vr 0 def
+end
+
+DITfd begin
+/s2 500 def /s4 250 def /s3 333 def
+/a4p{arcto pop pop pop pop}def
+/2cx{2 copy exch}def
+/rls{rlineto stroke}def
+/currx{currentpoint pop}def
+/dround{transform round exch round exch itransform} def
+end
+end
+/DIThacks exch definefont pop
+
+ditstart
+(psc)xT
+576 1 1 xr
+1(Times-Roman)xf 1 f
+2(Times-Italic)xf 2 f
+3(Times-Bold)xf 3 f
+4(Times-BoldItalic)xf 4 f
+5(Helvetica)xf 5 f
+6(Helvetica-Bold)xf 6 f
+7(Courier)xf 7 f
+8(Courier-Bold)xf 8 f
+9(Symbol)xf 9 f
+10(DIThacks)xf 10 f
+10 s
+1 f
+xi
+%%EndProlog
+1(Palatino-Roman)xf 1 f
+2(Palatino-Italic)xf 2 f
+1 f
+3(Palatino-Bold)xf 3 f
+1 f
+4(Palatino-BoldItalic)xf 4 f
+1 f
+5(Courier)xf 5 f
+1 f
+6(Courier-Oblique)xf 6 f
+1 f
+7(Courier-Bold)xf 7 f
+1 f
+8(Times-Roman)xf 8 f
+1 f
+
+%%Page: 2 1
+1(Palatino-Roman)xf 1 f
+2(Palatino-Italic)xf 2 f
+3(Palatino-Bold)xf 3 f
+4(Palatino-BoldItalic)xf 4 f
+5(Courier)xf 5 f
+6(Courier-Oblique)xf 6 f
+7(Courier-Bold)xf 7 f
+8(Times-Roman)xf 8 f
+9 s 0 xH 0 xS 8 f
+10 s
+1 f
+4397 MX
+
+% included PostScript
+
+%%HLJ_Lineno_Off
+1002 754 MXY
+96 -432 Dl
+1006 754 MXY
+96 -432 Dl
+1010 754 MXY
+96 -432 Dl
+1014 754 MXY
+96 -432 Dl
+1018 754 MXY
+96 -432 Dl
+1022 754 MXY
+96 -432 Dl
+1026 754 MXY
+96 -432 Dl
+1030 754 MXY
+96 -432 Dl
+1034 754 MXY
+96 -432 Dl
+1037 754 MXY
+96 -432 Dl
+1041 754 MXY
+96 -432 Dl
+2 f
+18 s
+1122 706(X)N
+1226(/O)X
+1380(pen)X
+1624(CA)X
+(E)S
+1948(Specification)X
+2724(D)X
+2836(raft)X
+2996 MX
+
+% included PostScript
+
+%%HLJ_Lineno_On
+3 f
+13 s
+1 f
+8 s
+1090 MY
+420(1)X
+3 f
+13 s
+1002 1090(X/Open)N
+1393(Common)X
+1859(Desktop)X
+2289(Environment)X
+2939(\320)X
+3069(Definitions)X
+3645(and)X
+1 f
+8 s
+1210 MY
+420(2)X
+3 f
+13 s
+1002 1210(Infrastructure)N
+1 f
+8 s
+1398 MY
+420(3)X
+3 f
+13 s
+1002 1398(Company)N
+1490(Review)X
+1875(Draft)X
+2 f
+10 s
+1 f
+8 s
+1992 MY
+420(4)X
+2 f
+10 s
+1002 1992(X/Open)N
+1281(Company)X
+1612(Ltd.)X
+
+2 p
+%%Page: 2 2
+1(Palatino-Roman)xf 1 f
+2(Palatino-Italic)xf 2 f
+3(Palatino-Bold)xf 3 f
+4(Palatino-BoldItalic)xf 4 f
+5(Courier)xf 5 f
+6(Courier-Oblique)xf 6 f
+7(Courier-Bold)xf 7 f
+8(Times-Roman)xf 8 f
+10 s 0 xH 0 xS 8 f
+1 f
+1723 MX
+
+% included PostScript
+
+%%HLJ_Lineno_Off
+1002 754 MXY
+96 -432 Dl
+1006 754 MXY
+96 -432 Dl
+1010 754 MXY
+96 -432 Dl
+1014 754 MXY
+96 -432 Dl
+1018 754 MXY
+96 -432 Dl
+1022 754 MXY
+96 -432 Dl
+1026 754 MXY
+96 -432 Dl
+1030 754 MXY
+96 -432 Dl
+1034 754 MXY
+96 -432 Dl
+1037 754 MXY
+96 -432 Dl
+1041 754 MXY
+96 -432 Dl
+2 f
+9 f
+1002 1114(\323)N
+2 f
+1085(1994,)X
+1285(X/Open)X
+1564(Company)X
+1895(Limited)X
+9 f
+1002 1210(\323)N
+2 f
+1085(1994,)X
+1285(Hewlett-Packard)X
+1850(Company)X
+9 f
+1002 1306(\323)N
+2 f
+1085(1994,)X
+1285(Interleaf,)X
+1596(Inc.)X
+9 f
+1002 1402(\323)N
+2 f
+1085(1994,)X
+1285(International)X
+1732(Business)X
+2035(Machines)X
+2367(Corp.)X
+9 f
+1002 1498(\323)N
+2 f
+1085(1994,)X
+1285(Novell,)X
+1538(Inc.)X
+9 f
+1002 1594(\323)N
+2 f
+1085(1994,)X
+1285(Sun)X
+1437(Microsystems,)X
+1927(Inc.)X
+1 f
+1002 1738(All)N
+1132(rights)X
+1359(reserved.)X
+1727(No)X
+1859(part)X
+2027(of)X
+2120(this)X
+2271(publication)X
+2694(may)X
+2871(be)X
+2976(reproduced,)X
+3433(stored)X
+3679(in)X
+3771(a)X
+3834(retrieval)X
+4154(system,)X
+1002 1834(or)N
+1100(transmitted,)X
+1553(in)X
+1644(any)X
+1796(form)X
+1992(or)X
+2090(by)X
+2200(any)X
+2352(means,)X
+2623(electronic,)X
+3006(mechanical,)X
+3446(photocopying,)X
+3980(recording)X
+4345(or)X
+1002 1930(otherwise,)N
+1390(without)X
+1690(the)X
+1820(prior)X
+2019(permission)X
+2432(of)X
+2523(the)X
+2653(copyright)X
+3016(owners.)X
+1002 2933(X/Open)N
+1318(CAE)X
+1506(Specification)X
+1978(Draft)X
+1002 3077(X/Open)N
+1332(Common)X
+1700(Desktop)X
+2031(Environment)X
+2532(\320)X
+2647(Definitions)X
+3074(and)X
+3244(Infrastructure)X
+3771(Company)X
+4156(Review)X
+1002 3173(Draft)N
+1002 3317(X/Open)N
+1318(Document)X
+1709(Number:)X
+2048(<doc_no>)X
+1002 3866(Published)N
+1375(by)X
+1483(X/Open)X
+1799(Company)X
+2169(Ltd.,)X
+2353(U.K.)X
+1002 4188(Any)N
+1174(comments)X
+1560(relating)X
+1852(to)X
+1942(the)X
+2073(material)X
+2387(contained)X
+2756(in)X
+2846(this)X
+2996(document)X
+3375(may)X
+3551(be)X
+3654(submitted)X
+4034(to)X
+4125(X/Open)X
+1002 4284(at:)N
+1122 4428(X/Open)N
+1438(Company)X
+1808(Limited)X
+1122 4524(Apex)N
+1331(Plaza)X
+1122 4620(Forbury)N
+1430(Road)X
+1122 4716(Reading)N
+1122 4812(Berkshire,)N
+1498(RG1)X
+1673(1AX)X
+1122 4908(United)N
+1386(Kingdom)X
+1002 5052(or)N
+1098(by)X
+1206(Electronic)X
+1579(Mail)X
+1761(to:)X
+1122 5196(XoSpecs@xopen.co.uk)N
+11 s
+680 5854(ii)N
+9 s
+2300(X/Open)X
+2587(CAE)X
+2756(Specification)X
+3181(Draft)X
+3366(\(1994\))X
+3576(\(Draft)X
+3785(November)X
+4145(21,)X
+4253(1994\))X
+
+3 p
+%%Page: 3 3
+1(Palatino-Roman)xf 1 f
+2(Palatino-Italic)xf 2 f
+3(Palatino-Bold)xf 3 f
+4(Palatino-BoldItalic)xf 4 f
+5(Courier)xf 5 f
+6(Courier-Oblique)xf 6 f
+7(Courier-Bold)xf 7 f
+8(Times-Roman)xf 8 f
+9 s 0 xH 0 xS 8 f
+10 s
+1 f
+4397 MX
+
+% included PostScript
+
+%%HLJ_Lineno_Off
+1002 754 MXY
+96 -432 Dl
+1006 754 MXY
+96 -432 Dl
+1010 754 MXY
+96 -432 Dl
+1014 754 MXY
+96 -432 Dl
+1018 754 MXY
+96 -432 Dl
+1022 754 MXY
+96 -432 Dl
+1026 754 MXY
+96 -432 Dl
+1030 754 MXY
+96 -432 Dl
+1034 754 MXY
+96 -432 Dl
+1037 754 MXY
+96 -432 Dl
+1041 754 MXY
+96 -432 Dl
+2 f
+18 s
+1122 706(Contents)N
+1594 MX
+
+% included PostScript
+
+%%HLJ_Lineno_On
+3 f
+12 s
+1 f
+8 s
+1258 MY
+420(5)X
+3 f
+12 s
+1002 1258(Chapter)N
+1495(1)X
+1875(Introduction)X
+10 s
+2436(...........................................................................................)X
+4392(1)X
+1 f
+8 s
+1354 MY
+420(6)X
+10 s
+1495 1354(1.1)N
+1935(Overview)X
+2296(..................................................................................................)X
+4392(1)X
+8 s
+1450 MY
+420(7)X
+10 s
+1495 1450(1.2)N
+1935(Conformance............................................................................................)X
+4392(2)X
+8 s
+1546 MY
+420(8)X
+10 s
+1495 1546(1.3)N
+1935(Terminology.............................................................................................)X
+4392(3)X
+8 s
+1642 MY
+420(9)X
+10 s
+1495 1642(1.4)N
+1935(Format)X
+2212(of)X
+2303(Entries)X
+2556(.....................................................................................)X
+4392(4)X
+8 s
+1738 MY
+420(10)X
+10 s
+1495 1738(1.4.1)N
+1995(C-Language)X
+2448(Functions)X
+2815(and)X
+2970(Headers)X
+3276(.................................................)X
+4392(4)X
+8 s
+1834 MY
+420(11)X
+10 s
+1495 1834(1.4.2)N
+1995(Messages................................................................................................)X
+4392(5)X
+8 s
+1930 MY
+420(12)X
+10 s
+1495 1930(1.4.3)N
+1995(Service)X
+2269 0.0343(Interfaces..................................................................................)AX
+4392(5)X
+8 s
+2026 MY
+420(13)X
+10 s
+1495 2026(1.5)N
+1935(Rationale)X
+2276(...................................................................................................)X
+4352(10)X
+8 s
+2122 MY
+420(14)X
+10 s
+1495 2122(1.5.1)N
+1995(Components)X
+2469(Not)X
+2625(Standardised..........................................................)X
+4352(10)X
+3 f
+12 s
+1 f
+8 s
+2314 MY
+420(15)X
+3 f
+12 s
+1002 2314(Chapter)N
+1495(2)X
+1875(Glossary)X
+10 s
+2276(...................................................................................................)X
+4352(11)X
+1 f
+8 s
+2410 MY
+420(16)X
+10 s
+1495 2410(2.1)N
+1935(Terms)X
+2179(Defined)X
+2482(by)X
+9 s
+2590(XCDE)X
+10 s
+2796(.........................................................................)X
+4352(11)X
+8 s
+2506 MY
+420(17)X
+10 s
+1495 2506(2.2)N
+1935(Terms)X
+2179(From)X
+2390(Other)X
+2615 0.0425(Standards................................................................)AX
+4352(21)X
+3 f
+12 s
+1 f
+8 s
+2698 MY
+420(18)X
+3 f
+12 s
+1002 2698(Chapter)N
+1495(3)X
+1875(General)X
+2251(Definitions)X
+2782(and)X
+2972(Requirements)X
+10 s
+3596(.................................)X
+4352(25)X
+1 f
+8 s
+2794 MY
+420(19)X
+10 s
+1495 2794(3.1)N
+9 s
+1935(XCDE)X
+10 s
+2154(Data)X
+2342(Format)X
+2619(Naming)X
+2916(...................................................................)X
+4352(25)X
+3 f
+12 s
+1 f
+8 s
+2986 MY
+420(20)X
+3 f
+12 s
+1002 2986(Chapter)N
+1495(4)X
+1875(X)X
+1963(Windows)X
+2409(and)X
+2599(Motif)X
+10 s
+2856(......................................................................)X
+4352(27)X
+1 f
+8 s
+3082 MY
+420(21)X
+10 s
+1495 3082(4.1)N
+1935(X)X
+2008(Protocol)X
+2316(.................................................................................................)X
+4352(27)X
+8 s
+3178 MY
+420(22)X
+10 s
+1495 3178(4.2)N
+1935(Xlib)X
+2098(Library)X
+2376(..............................................................................................)X
+4352(27)X
+8 s
+3274 MY
+420(23)X
+10 s
+1495 3274(4.3)N
+1935(Xt)X
+2034(Intrinsics)X
+2376(..............................................................................................)X
+4352(27)X
+8 s
+3370 MY
+420(24)X
+10 s
+1495 3370(4.4)N
+1935(ICCCM,)X
+2249(CT,)X
+2395(XLFD,)X
+2643(BDF)X
+2816(........................................................................)X
+4352(28)X
+8 s
+3466 MY
+420(25)X
+10 s
+1495 3466(4.5)N
+1935(Motif)X
+2151(Libraries)X
+2476(.........................................................................................)X
+4352(28)X
+8 s
+3562 MY
+420(26)X
+10 s
+1495 3562(4.6)N
+1935(X)X
+2008(Windows)X
+2371(and)X
+2526(Motif)X
+2742(Data)X
+2930(Types)X
+3156(.......................................................)X
+4352(28)X
+8 s
+3658 MY
+420(27)X
+10 s
+1495 3658(4.7)N
+9 s
+1935(XCDE)X
+10 s
+2154(Widgets)X
+2456(..........................................................................................)X
+4352(28)X
+2 f
+1 f
+8 s
+3754 MY
+420(28)X
+2 f
+10 s
+1875 3754(DtComboBox)N
+1 f
+2319(\()X
+2359(\))X
+2396(.............................................................................................)X
+4352(29)X
+2 f
+1 f
+8 s
+3850 MY
+420(29)X
+2 f
+10 s
+1875 3850(DtMenuButton)N
+1 f
+2392(\()X
+2432(\))X
+2476(.........................................................................................)X
+4352(33)X
+2 f
+1 f
+8 s
+3946 MY
+420(30)X
+2 f
+10 s
+1875 3946(DtSpinBox)N
+1 f
+2245(\()X
+2285 0.0451(\).................................................................................................)AX
+4352(37)X
+8 s
+4042 MY
+420(31)X
+10 s
+1495 4042(4.8)N
+9 s
+1935(XCDE)X
+10 s
+2154(Widget)X
+2434(Convenience)X
+2911(Functions)X
+3276(.................................................)X
+4352(43)X
+2 f
+1 f
+8 s
+4138 MY
+420(32)X
+2 f
+10 s
+1875 4138(DtComboBoxAddItem)N
+1 f
+2604(\()X
+2644(\))X
+2676(...............................................................................)X
+4352(44)X
+2 f
+1 f
+8 s
+4234 MY
+420(33)X
+2 f
+10 s
+1875 4234(DtComboBoxDeletePos)N
+1 f
+2639(\()X
+2679(\))X
+2716(.............................................................................)X
+4352(45)X
+2 f
+1 f
+8 s
+4330 MY
+420(34)X
+2 f
+10 s
+1875 4330(DtComboBoxSelectItem)N
+1 f
+2653(\()X
+2693(\))X
+2736(............................................................................)X
+4352(46)X
+2 f
+1 f
+8 s
+4426 MY
+420(35)X
+2 f
+10 s
+1875 4426(DtComboBoxSetItem)N
+1 f
+2568(\()X
+2608(\).................................................................................)X
+4352(47)X
+2 f
+1 f
+8 s
+4522 MY
+420(36)X
+2 f
+10 s
+1875 4522(DtCreateComboBox)N
+1 f
+2528(\()X
+2568(\)...................................................................................)X
+4352(48)X
+2 f
+1 f
+8 s
+4618 MY
+420(37)X
+2 f
+10 s
+1875 4618(DtCreateMenuButton)N
+1 f
+2601(\()X
+2641(\))X
+2676(...............................................................................)X
+4352(49)X
+2 f
+1 f
+8 s
+4714 MY
+420(38)X
+2 f
+10 s
+1875 4714(DtCreateSpinBox)N
+1 f
+2454(\()X
+2494(\))X
+2536(......................................................................................)X
+4352(50)X
+2 f
+1 f
+8 s
+4810 MY
+420(39)X
+2 f
+10 s
+1875 4810(DtSpinBoxAddItem)N
+1 f
+2530(\()X
+2570(\))X
+2616(..................................................................................)X
+4352(51)X
+2 f
+1 f
+8 s
+4906 MY
+420(40)X
+2 f
+10 s
+1875 4906(DtSpinBoxDeletePos)N
+1 f
+2565(\()X
+2605 0.0540(\).................................................................................)AX
+4352(52)X
+2 f
+1 f
+8 s
+5002 MY
+420(41)X
+2 f
+10 s
+1875 5002(DtSpinBoxSetItem)N
+1 f
+2494(\()X
+2534(\))X
+2576(....................................................................................)X
+4352(53)X
+8 s
+5098 MY
+420(42)X
+10 s
+1495 5098(4.9)N
+9 s
+1935(XCDE)X
+10 s
+2154(Widget)X
+2434(Headers)X
+2736(............................................................................)X
+4352(54)X
+3 f
+1 f
+8 s
+5194 MY
+420(43)X
+3 f
+10 s
+1875 5194(<Dt/ComboBox.h>)N
+1 f
+2576(....................................................................................)X
+4352(55)X
+9 s
+680 5854(X/Open)N
+967(Common)X
+1284(Desktop)X
+1569(Environment)X
+2008(\320)X
+2098(Definitions)X
+2471(and)X
+2611(Infrastructure)X
+3071(Company)X
+3404(Review)X
+3662(Draft)X
+11 s
+4343(iii)X
+
+4 p
+%%Page: 4 4
+1(Palatino-Roman)xf 1 f
+2(Palatino-Italic)xf 2 f
+3(Palatino-Bold)xf 3 f
+4(Palatino-BoldItalic)xf 4 f
+5(Courier)xf 5 f
+6(Courier-Oblique)xf 6 f
+7(Courier-Bold)xf 7 f
+8(Times-Roman)xf 8 f
+11 s 0 xH 0 xS 8 f
+10 s
+1 f
+2 f
+12 s
+4070 322(Contents)N
+1 f
+10 s
+3 f
+1 f
+8 s
+658 MY
+420(44)X
+3 f
+10 s
+1875 658(<Dt/MenuButton.h>)N
+1 f
+2636(.................................................................................)X
+4352(56)X
+3 f
+1 f
+8 s
+754 MY
+420(45)X
+3 f
+10 s
+1875 754(<Dt/SpinBox.h>)N
+1 f
+2476(.........................................................................................)X
+4352(57)X
+8 s
+850 MY
+420(46)X
+10 s
+1495 850(4.10)N
+1935(Rationale)X
+2289(and)X
+2444(Open)X
+2659(Issues.....................................................................)X
+4352(58)X
+3 f
+12 s
+1 f
+8 s
+1042 MY
+420(47)X
+3 f
+12 s
+1002 1042(Chapter)N
+1495(5)X
+1875(Miscellaneous)X
+2535(Desktop)X
+2933(Services)X
+10 s
+3296(................................................)X
+4352(59)X
+1 f
+8 s
+1138 MY
+420(48)X
+10 s
+1495 1138(5.1)N
+1935(Introduction)X
+2396(.............................................................................................)X
+4352(59)X
+8 s
+1234 MY
+420(49)X
+10 s
+1495 1234(5.2)N
+1935(Functions)X
+2296(..................................................................................................)X
+4352(59)X
+2 f
+1 f
+8 s
+1330 MY
+420(50)X
+2 f
+10 s
+1875 1330(DtInitialize)N
+1 f
+2259(\()X
+2299(\))X
+2336(................................................................................................)X
+4352(60)X
+8 s
+1426 MY
+420(51)X
+10 s
+1495 1426(5.3)N
+1935 0.0315(Headers.....................................................................................................)AX
+4352(61)X
+3 f
+1 f
+8 s
+1522 MY
+420(52)X
+3 f
+10 s
+1875 1522(<Dt/Dt.h>)N
+1 f
+2256(....................................................................................................)X
+4352(62)X
+3 f
+12 s
+1 f
+8 s
+1714 MY
+420(53)X
+3 f
+12 s
+1002 1714(Chapter)N
+1495(6)X
+1875(Message)X
+2278(Services)X
+10 s
+2656(................................................................................)X
+4352(65)X
+1 f
+8 s
+1810 MY
+420(54)X
+10 s
+1495 1810(6.1)N
+1935(Introduction)X
+2396(.............................................................................................)X
+4352(65)X
+8 s
+1906 MY
+420(55)X
+10 s
+1495 1906(6.2)N
+1935(Functions)X
+2296(..................................................................................................)X
+4352(65)X
+2 f
+1 f
+8 s
+2002 MY
+420(56)X
+2 f
+10 s
+1875 2002(tt_X_session)N
+1 f
+2299(\()X
+2339(\))X
+2376(..............................................................................................)X
+4352(66)X
+2 f
+1 f
+8 s
+2098 MY
+420(57)X
+2 f
+10 s
+1875 2098(tt_bcontext_join)N
+1 f
+2413(\()X
+2453(\))X
+2496(........................................................................................)X
+4352(67)X
+2 f
+1 f
+8 s
+2194 MY
+420(58)X
+2 f
+10 s
+1875 2194(tt_bcontext_quit)N
+1 f
+2419(\()X
+2459(\))X
+2496(........................................................................................)X
+4352(68)X
+2 f
+1 f
+8 s
+2290 MY
+420(59)X
+2 f
+10 s
+1875 2290(tt_close)N
+1 f
+2127(\()X
+2167(\).......................................................................................................)X
+4352(69)X
+2 f
+1 f
+8 s
+2386 MY
+420(60)X
+2 f
+10 s
+1875 2386(tt_context_join)N
+1 f
+2376(\()X
+2416(\))X
+2456(..........................................................................................)X
+4352(70)X
+2 f
+1 f
+8 s
+2482 MY
+420(61)X
+2 f
+10 s
+1875 2482(tt_context_quit)N
+1 f
+2382(\()X
+2422(\))X
+2456(..........................................................................................)X
+4352(71)X
+2 f
+1 f
+8 s
+2578 MY
+420(62)X
+2 f
+10 s
+1875 2578(tt_default_file)N
+1 f
+2334(\()X
+2374(\))X
+2416(............................................................................................)X
+4352(72)X
+2 f
+1 f
+8 s
+2674 MY
+420(63)X
+2 f
+10 s
+1875 2674(tt_default_file_set)N
+1 f
+2463(\()X
+2503(\))X
+2536(......................................................................................)X
+4352(73)X
+2 f
+1 f
+8 s
+2770 MY
+420(64)X
+2 f
+10 s
+1875 2770(tt_default_procid)N
+1 f
+2438(\()X
+2478(\))X
+2516(.......................................................................................)X
+4352(74)X
+2 f
+1 f
+8 s
+2866 MY
+420(65)X
+2 f
+10 s
+1875 2866(tt_default_procid_set)N
+1 f
+2567(\()X
+2607(\).................................................................................)X
+4352(75)X
+2 f
+1 f
+8 s
+2962 MY
+420(66)X
+2 f
+10 s
+1875 2962(tt_default_ptype)N
+1 f
+2415(\()X
+2455(\))X
+2496(........................................................................................)X
+4352(76)X
+2 f
+1 f
+8 s
+3058 MY
+420(67)X
+2 f
+10 s
+1875 3058(tt_default_ptype_set)N
+1 f
+2544(\()X
+2584(\))X
+2616(..................................................................................)X
+4352(77)X
+2 f
+1 f
+8 s
+3154 MY
+420(68)X
+2 f
+10 s
+1875 3154(tt_default_session)N
+1 f
+2463(\()X
+2503(\))X
+2536(......................................................................................)X
+4352(78)X
+2 f
+1 f
+8 s
+3250 MY
+420(69)X
+2 f
+10 s
+1875 3250(tt_default_session_set)N
+1 f
+2592(\()X
+2632(\))X
+2676(...............................................................................)X
+4352(79)X
+2 f
+1 f
+8 s
+3346 MY
+420(70)X
+2 f
+10 s
+1875 3346(tt_error_int)N
+1 f
+2268(\()X
+2308(\)................................................................................................)X
+4352(81)X
+2 f
+1 f
+8 s
+3442 MY
+420(71)X
+2 f
+10 s
+1875 3442(tt_error_pointer)N
+1 f
+2406(\()X
+2446 0.0379(\).........................................................................................)AX
+4352(82)X
+2 f
+1 f
+8 s
+3538 MY
+420(72)X
+2 f
+10 s
+1875 3538(tt_fd)N
+1 f
+2037(\()X
+2077(\))X
+2116(...........................................................................................................)X
+4352(83)X
+2 f
+1 f
+8 s
+3634 MY
+420(73)X
+2 f
+10 s
+1875 3634(tt_file_copy)N
+1 f
+2260(\()X
+2300(\))X
+2336(................................................................................................)X
+4352(84)X
+2 f
+1 f
+8 s
+3730 MY
+420(74)X
+2 f
+10 s
+1875 3730(tt_file_destroy)N
+1 f
+2348(\()X
+2388(\)............................................................................................)X
+4352(85)X
+2 f
+1 f
+8 s
+3826 MY
+420(75)X
+2 f
+10 s
+1875 3826(tt_file_join)N
+1 f
+2236(\()X
+2276(\))X
+2316(.................................................................................................)X
+4352(86)X
+2 f
+1 f
+8 s
+3922 MY
+420(76)X
+2 f
+10 s
+1875 3922(tt_file_move)N
+1 f
+2281(\()X
+2321(\))X
+2356(...............................................................................................)X
+4352(87)X
+2 f
+1 f
+8 s
+4018 MY
+420(77)X
+2 f
+10 s
+1875 4018(tt_file_netfile)N
+1 f
+2311(\()X
+2351(\))X
+2396(.............................................................................................)X
+4352(89)X
+2 f
+1 f
+8 s
+4114 MY
+420(78)X
+2 f
+10 s
+1875 4114(tt_file_objects_query)N
+1 f
+2551(\()X
+2591(\))X
+2636(.................................................................................)X
+4352(90)X
+2 f
+1 f
+8 s
+4210 MY
+420(79)X
+2 f
+10 s
+1875 4210(tt_file_quit)N
+1 f
+2242(\()X
+2282(\))X
+2316(.................................................................................................)X
+4352(92)X
+2 f
+1 f
+8 s
+4306 MY
+420(80)X
+2 f
+10 s
+1875 4306(tt_free)N
+1 f
+2090(\()X
+2130(\))X
+2176(........................................................................................................)X
+4352(93)X
+2 f
+1 f
+8 s
+4402 MY
+420(81)X
+2 f
+10 s
+1875 4402(tt_host_file_netfile)N
+1 f
+2485(\()X
+2525 0.0515(\).....................................................................................)AX
+4352(94)X
+2 f
+1 f
+8 s
+4498 MY
+420(82)X
+2 f
+10 s
+1875 4498(tt_host_netfile_file)N
+1 f
+2485(\()X
+2525 0.0515(\).....................................................................................)AX
+4352(95)X
+2 f
+1 f
+8 s
+4594 MY
+420(83)X
+2 f
+10 s
+1875 4594(tt_icontext_join)N
+1 f
+2398(\()X
+2438(\))X
+2476(.........................................................................................)X
+4352(96)X
+2 f
+1 f
+8 s
+4690 MY
+420(84)X
+2 f
+10 s
+1875 4690(tt_icontext_quit)N
+1 f
+2404(\()X
+2444(\))X
+2476(.........................................................................................)X
+4352(97)X
+2 f
+1 f
+8 s
+4786 MY
+420(85)X
+2 f
+10 s
+1875 4786(tt_initial_session)N
+1 f
+2436(\()X
+2476(\))X
+2516(.......................................................................................)X
+4352(98)X
+2 f
+1 f
+8 s
+4882 MY
+420(86)X
+2 f
+10 s
+1875 4882(tt_int_error)N
+1 f
+2268(\()X
+2308(\)................................................................................................)X
+4352(99)X
+2 f
+1 f
+8 s
+4978 MY
+420(87)X
+2 f
+10 s
+1875 4978(tt_is_err)N
+1 f
+2161(\()X
+2201(\))X
+2236(.....................................................................................................)X
+4312(100)X
+2 f
+1 f
+8 s
+5074 MY
+420(88)X
+2 f
+10 s
+1875 5074(tt_malloc)N
+1 f
+2185(\()X
+2225 0.0437(\)....................................................................................................)AX
+4312(101)X
+2 f
+1 f
+8 s
+5170 MY
+420(89)X
+2 f
+10 s
+1875 5170(tt_mark)N
+1 f
+2140(\()X
+2180(\))X
+2216(......................................................................................................)X
+4312(102)X
+11 s
+680 5854(iv)N
+9 s
+2300(X/Open)X
+2587(CAE)X
+2756(Specification)X
+3181(Draft)X
+3366(\(1994\))X
+3576(\(Draft)X
+3785(November)X
+4145(21,)X
+4253(1994\))X
+
+5 p
+%%Page: 5 5
+1(Palatino-Roman)xf 1 f
+2(Palatino-Italic)xf 2 f
+3(Palatino-Bold)xf 3 f
+4(Palatino-BoldItalic)xf 4 f
+5(Courier)xf 5 f
+6(Courier-Oblique)xf 6 f
+7(Courier-Bold)xf 7 f
+8(Times-Roman)xf 8 f
+9 s 0 xH 0 xS 8 f
+10 s
+1 f
+2 f
+12 s
+680 322(Contents)N
+1 f
+10 s
+2 f
+1 f
+8 s
+658 MY
+420(90)X
+2 f
+10 s
+1875 658(tt_message_accept)N
+1 f
+2475(\()X
+2515(\))X
+2556(.....................................................................................)X
+4312(103)X
+2 f
+1 f
+8 s
+754 MY
+420(91)X
+2 f
+10 s
+1875 754(tt_message_address)N
+1 f
+2517(\()X
+2557(\))X
+2596(...................................................................................)X
+4312(104)X
+2 f
+1 f
+8 s
+850 MY
+420(92)X
+2 f
+10 s
+1875 850(tt_message_address_set)N
+1 f
+2646(\()X
+2686 0.0438(\).............................................................................)AX
+4312(105)X
+2 f
+1 f
+8 s
+946 MY
+420(93)X
+2 f
+10 s
+1875 946(tt_message_arg_add)N
+1 f
+2540(\()X
+2580(\))X
+2616(..................................................................................)X
+4312(106)X
+2 f
+1 f
+8 s
+1042 MY
+420(94)X
+2 f
+10 s
+1875 1042(tt_message_arg_bval)N
+1 f
+2559(\()X
+2599(\))X
+2636(.................................................................................)X
+4312(108)X
+2 f
+1 f
+8 s
+1138 MY
+420(95)X
+2 f
+10 s
+1875 1138(tt_message_arg_bval_set)N
+1 f
+2688(\()X
+2728(\)...........................................................................)X
+4312(109)X
+2 f
+1 f
+8 s
+1234 MY
+420(96)X
+2 f
+10 s
+1875 1234(tt_message_arg_ival)N
+1 f
+2544(\()X
+2584(\))X
+2616(..................................................................................)X
+4312(110)X
+2 f
+1 f
+8 s
+1330 MY
+420(97)X
+2 f
+10 s
+1875 1330(tt_message_arg_ival_set)N
+1 f
+2673(\()X
+2713(\))X
+2756(...........................................................................)X
+4312(111)X
+2 f
+1 f
+8 s
+1426 MY
+420(98)X
+2 f
+10 s
+1875 1426(tt_message_arg_mode)N
+1 f
+2593(\()X
+2633(\))X
+2676(...............................................................................)X
+4312(112)X
+2 f
+1 f
+8 s
+1522 MY
+420(99)X
+2 f
+10 s
+1875 1522(tt_message_arg_type)N
+1 f
+2562(\()X
+2602(\))X
+2636(.................................................................................)X
+4312(113)X
+2 f
+1 f
+8 s
+1618 MY
+420(100)X
+2 f
+10 s
+1875 1618(tt_message_arg_val)N
+1 f
+2522(\()X
+2562(\))X
+2596(...................................................................................)X
+4312(114)X
+2 f
+1 f
+8 s
+1714 MY
+420(101)X
+2 f
+10 s
+1875 1714(tt_message_arg_val_set)N
+1 f
+2651(\()X
+2691(\))X
+2736(............................................................................)X
+4312(115)X
+2 f
+1 f
+8 s
+1810 MY
+420(102)X
+2 f
+10 s
+1875 1810(tt_message_arg_xval)N
+1 f
+2562(\()X
+2602(\))X
+2636(.................................................................................)X
+4312(116)X
+2 f
+1 f
+8 s
+1906 MY
+420(103)X
+2 f
+10 s
+1875 1906(tt_message_arg_xval_set)N
+1 f
+2691(\()X
+2731(\))X
+2776(..........................................................................)X
+4312(117)X
+2 f
+1 f
+8 s
+2002 MY
+420(104)X
+2 f
+10 s
+1875 2002(tt_message_args_count)N
+1 f
+2638(\()X
+2678(\))X
+2716(.............................................................................)X
+4312(118)X
+2 f
+1 f
+8 s
+2098 MY
+420(105)X
+2 f
+10 s
+1875 2098(tt_message_barg_add)N
+1 f
+2577(\()X
+2617(\))X
+2656(................................................................................)X
+4312(119)X
+2 f
+1 f
+8 s
+2194 MY
+420(106)X
+2 f
+10 s
+1875 2194(tt_message_bcontext_set)N
+1 f
+2680(\()X
+2720(\))X
+2756(...........................................................................)X
+4312(121)X
+2 f
+1 f
+8 s
+2290 MY
+420(107)X
+2 f
+10 s
+1875 2290(tt_message_callback_add)N
+1 f
+2686(\()X
+2726 0.0450(\)...........................................................................)AX
+4312(122)X
+2 f
+1 f
+8 s
+2386 MY
+420(108)X
+2 f
+10 s
+1875 2386(tt_message_class)N
+1 f
+2429(\()X
+2469(\)........................................................................................)X
+4312(123)X
+2 f
+1 f
+8 s
+2482 MY
+420(109)X
+2 f
+10 s
+1875 2482(tt_message_class_set)N
+1 f
+2558(\()X
+2598(\))X
+2636(.................................................................................)X
+4312(124)X
+2 f
+1 f
+8 s
+2578 MY
+420(110)X
+2 f
+10 s
+1875 2578(tt_message_context_bval)N
+1 f
+2689(\()X
+2729(\)...........................................................................)X
+4312(125)X
+2 f
+1 f
+8 s
+2674 MY
+420(111)X
+2 f
+10 s
+1875 2674(tt_message_context_ival)N
+1 f
+2674(\()X
+2714(\))X
+2756(...........................................................................)X
+4312(126)X
+2 f
+1 f
+8 s
+2770 MY
+420(112)X
+2 f
+10 s
+1875 2770(tt_message_context_set)N
+1 f
+2643(\()X
+2683(\))X
+2716(.............................................................................)X
+4312(127)X
+2 f
+1 f
+8 s
+2866 MY
+420(113)X
+2 f
+10 s
+1875 2866(tt_message_context_slotname)N
+1 f
+2843(\()X
+2883(\))X
+2916(...................................................................)X
+4312(128)X
+2 f
+1 f
+8 s
+2962 MY
+420(114)X
+2 f
+10 s
+1875 2962(tt_message_context_val)N
+1 f
+2652(\()X
+2692(\))X
+2736(............................................................................)X
+4312(129)X
+2 f
+1 f
+8 s
+3058 MY
+420(115)X
+2 f
+10 s
+1875 3058(tt_message_context_xval)N
+1 f
+2692(\()X
+2732(\))X
+2776(..........................................................................)X
+4312(130)X
+2 f
+1 f
+8 s
+3154 MY
+420(116)X
+2 f
+10 s
+1875 3154(tt_message_contexts_count)N
+1 f
+2768(\()X
+2808(\).......................................................................)X
+4312(131)X
+2 f
+1 f
+8 s
+3250 MY
+420(117)X
+2 f
+10 s
+1875 3250(tt_message_create)N
+1 f
+2465(\()X
+2505 0.0509(\)......................................................................................)AX
+4312(132)X
+2 f
+1 f
+8 s
+3346 MY
+420(118)X
+2 f
+10 s
+1875 3346(tt_message_create_super)N
+1 f
+2682(\()X
+2722(\))X
+2756(...........................................................................)X
+4312(133)X
+2 f
+1 f
+8 s
+3442 MY
+420(119)X
+2 f
+10 s
+1875 3442(tt_message_destroy)N
+1 f
+2513(\()X
+2553(\))X
+2596(...................................................................................)X
+4312(134)X
+2 f
+1 f
+8 s
+3538 MY
+420(120)X
+2 f
+10 s
+1875 3538(tt_message_disposition)N
+1 f
+2628(\()X
+2668(\)..............................................................................)X
+4312(135)X
+2 f
+1 f
+8 s
+3634 MY
+420(121)X
+2 f
+10 s
+1875 3634(tt_message_disposition_set)N
+1 f
+2757(\()X
+2797(\))X
+2836(.......................................................................)X
+4312(136)X
+2 f
+1 f
+8 s
+3730 MY
+420(122)X
+2 f
+10 s
+1875 3730(tt_message_fail)N
+1 f
+2379(\()X
+2419(\))X
+2456(..........................................................................................)X
+4312(137)X
+2 f
+1 f
+8 s
+3826 MY
+420(123)X
+2 f
+10 s
+1875 3826(tt_message_file)N
+1 f
+2374(\()X
+2414(\))X
+2456(..........................................................................................)X
+4312(138)X
+2 f
+1 f
+8 s
+3922 MY
+420(124)X
+2 f
+10 s
+1875 3922(tt_message_file_set)N
+1 f
+2503(\()X
+2543(\))X
+2576(....................................................................................)X
+4312(139)X
+2 f
+1 f
+8 s
+4018 MY
+420(125)X
+2 f
+10 s
+1875 4018(tt_message_gid)N
+1 f
+2379(\()X
+2419(\))X
+2456(..........................................................................................)X
+4312(140)X
+2 f
+1 f
+8 s
+4114 MY
+420(126)X
+2 f
+10 s
+1875 4114(tt_message_handler)N
+1 f
+2521(\()X
+2561(\))X
+2596(...................................................................................)X
+4312(141)X
+2 f
+1 f
+8 s
+4210 MY
+420(127)X
+2 f
+10 s
+1875 4210(tt_message_handler_ptype)N
+1 f
+2739(\()X
+2779(\))X
+2816(........................................................................)X
+4312(142)X
+2 f
+1 f
+8 s
+4306 MY
+420(128)X
+2 f
+10 s
+1875 4306(tt_message_handler_ptype_set)N
+1 f
+2868(\()X
+2908(\)..................................................................)X
+4312(143)X
+2 f
+1 f
+8 s
+4402 MY
+420(129)X
+2 f
+10 s
+1875 4402(tt_message_handler_set)N
+1 f
+2650(\()X
+2690(\))X
+2736(............................................................................)X
+4312(144)X
+2 f
+1 f
+8 s
+4498 MY
+420(130)X
+2 f
+10 s
+1875 4498(tt_message_iarg_add)N
+1 f
+2562(\()X
+2602(\))X
+2636(.................................................................................)X
+4312(145)X
+2 f
+1 f
+8 s
+4594 MY
+420(131)X
+2 f
+10 s
+1875 4594(tt_message_icontext_set)N
+1 f
+2665(\()X
+2705 0.0576(\)............................................................................)AX
+4312(146)X
+2 f
+1 f
+8 s
+4690 MY
+420(132)X
+2 f
+10 s
+1875 4690(tt_message_id)N
+1 f
+2339(\()X
+2379(\))X
+2416(............................................................................................)X
+4312(147)X
+2 f
+1 f
+8 s
+4786 MY
+420(133)X
+2 f
+10 s
+1875 4786(tt_message_object)N
+1 f
+2462(\()X
+2502(\))X
+2536(......................................................................................)X
+4312(148)X
+2 f
+1 f
+8 s
+4882 MY
+420(134)X
+2 f
+10 s
+1875 4882(tt_message_object_set)N
+1 f
+2591(\()X
+2631(\))X
+2676(...............................................................................)X
+4312(149)X
+2 f
+1 f
+8 s
+4978 MY
+420(135)X
+2 f
+10 s
+1875 4978(tt_message_op)N
+1 f
+2353(\()X
+2393(\))X
+2436(...........................................................................................)X
+4312(150)X
+2 f
+1 f
+8 s
+5074 MY
+420(136)X
+2 f
+10 s
+1875 5074(tt_message_op_set)N
+1 f
+2482(\()X
+2522(\))X
+2556(.....................................................................................)X
+4312(151)X
+2 f
+1 f
+8 s
+5170 MY
+420(137)X
+2 f
+10 s
+1875 5170(tt_message_opnum)N
+1 f
+2503(\()X
+2543(\))X
+2576(....................................................................................)X
+4312(152)X
+9 s
+680 5854(X/Open)N
+967(Common)X
+1284(Desktop)X
+1569(Environment)X
+2008(\320)X
+2098(Definitions)X
+2471(and)X
+2611(Infrastructure)X
+3071(Company)X
+3404(Review)X
+3662(Draft)X
+11 s
+4371(v)X
+
+6 p
+%%Page: 6 6
+1(Palatino-Roman)xf 1 f
+2(Palatino-Italic)xf 2 f
+3(Palatino-Bold)xf 3 f
+4(Palatino-BoldItalic)xf 4 f
+5(Courier)xf 5 f
+6(Courier-Oblique)xf 6 f
+7(Courier-Bold)xf 7 f
+8(Times-Roman)xf 8 f
+11 s 0 xH 0 xS 8 f
+10 s
+1 f
+2 f
+12 s
+4070 322(Contents)N
+1 f
+10 s
+2 f
+1 f
+8 s
+658 MY
+420(138)X
+2 f
+10 s
+1875 658(tt_message_otype)N
+1 f
+2451(\()X
+2491(\))X
+2536(......................................................................................)X
+4312(153)X
+2 f
+1 f
+8 s
+754 MY
+420(139)X
+2 f
+10 s
+1875 754(tt_message_otype_set)N
+1 f
+2580(\()X
+2620(\))X
+2656(................................................................................)X
+4312(154)X
+2 f
+1 f
+8 s
+850 MY
+420(140)X
+2 f
+10 s
+1875 850(tt_message_pattern)N
+1 f
+2513(\()X
+2553(\))X
+2596(...................................................................................)X
+4312(155)X
+2 f
+1 f
+8 s
+946 MY
+420(141)X
+2 f
+10 s
+1875 946(tt_message_print)N
+1 f
+2441(\()X
+2481(\))X
+2516(.......................................................................................)X
+4312(156)X
+2 f
+1 f
+8 s
+1042 MY
+420(142)X
+2 f
+10 s
+1875 1042(tt_message_receive)N
+1 f
+2495(\()X
+2535(\))X
+2576(....................................................................................)X
+4312(157)X
+2 f
+1 f
+8 s
+1138 MY
+420(143)X
+2 f
+10 s
+1875 1138(tt_message_reject)N
+1 f
+2451(\()X
+2491(\))X
+2536(......................................................................................)X
+4312(158)X
+2 f
+1 f
+8 s
+1234 MY
+420(144)X
+2 f
+10 s
+1875 1234(tt_message_reply)N
+1 f
+2441(\()X
+2481(\))X
+2516(.......................................................................................)X
+4312(159)X
+2 f
+1 f
+8 s
+1330 MY
+420(145)X
+2 f
+10 s
+1875 1330(tt_message_scope)N
+1 f
+2447(\()X
+2487(\).......................................................................................)X
+4312(160)X
+2 f
+1 f
+8 s
+1426 MY
+420(146)X
+2 f
+10 s
+1875 1426(tt_message_scope_set)N
+1 f
+2576(\()X
+2616(\))X
+2656(................................................................................)X
+4312(161)X
+2 f
+1 f
+8 s
+1522 MY
+420(147)X
+2 f
+10 s
+1875 1522(tt_message_send)N
+1 f
+2423(\()X
+2463(\))X
+2496(........................................................................................)X
+4312(162)X
+2 f
+1 f
+8 s
+1618 MY
+420(148)X
+2 f
+10 s
+1875 1618(tt_message_send_on_exit)N
+1 f
+2703(\()X
+2743(\))X
+2776(..........................................................................)X
+4312(164)X
+2 f
+1 f
+8 s
+1714 MY
+420(149)X
+2 f
+10 s
+1875 1714(tt_message_sender)N
+1 f
+2485(\()X
+2525 0.0515(\).....................................................................................)AX
+4312(165)X
+2 f
+1 f
+8 s
+1810 MY
+420(150)X
+2 f
+10 s
+1875 1810(tt_message_sender_ptype)N
+1 f
+2703(\()X
+2743(\))X
+2776(..........................................................................)X
+4312(166)X
+2 f
+1 f
+8 s
+1906 MY
+420(151)X
+2 f
+10 s
+1875 1906(tt_message_sender_ptype_set)N
+1 f
+2832(\()X
+2872(\))X
+2916(...................................................................)X
+4312(167)X
+2 f
+1 f
+8 s
+2002 MY
+420(152)X
+2 f
+10 s
+1875 2002(tt_message_session)N
+1 f
+2503(\()X
+2543(\))X
+2576(....................................................................................)X
+4312(168)X
+2 f
+1 f
+8 s
+2098 MY
+420(153)X
+2 f
+10 s
+1875 2098(tt_message_session_set)N
+1 f
+2632(\()X
+2672(\))X
+2716(.............................................................................)X
+4312(169)X
+2 f
+1 f
+8 s
+2194 MY
+420(154)X
+2 f
+10 s
+1875 2194(tt_message_state)N
+1 f
+2429(\()X
+2469(\)........................................................................................)X
+4312(170)X
+2 f
+1 f
+8 s
+2290 MY
+420(155)X
+2 f
+10 s
+1875 2290(tt_message_status)N
+1 f
+2473(\()X
+2513(\))X
+2556(.....................................................................................)X
+4312(171)X
+2 f
+1 f
+8 s
+2386 MY
+420(156)X
+2 f
+10 s
+1875 2386(tt_message_status_set)N
+1 f
+2602(\()X
+2642(\))X
+2676(...............................................................................)X
+4312(172)X
+2 f
+1 f
+8 s
+2482 MY
+420(157)X
+2 f
+10 s
+1875 2482(tt_message_status_string)N
+1 f
+2708(\()X
+2748(\)..........................................................................)X
+4312(173)X
+2 f
+1 f
+8 s
+2578 MY
+420(158)X
+2 f
+10 s
+1875 2578(tt_message_status_string_set)N
+1 f
+2837(\()X
+2877(\))X
+2916(...................................................................)X
+4312(174)X
+2 f
+1 f
+8 s
+2674 MY
+420(159)X
+2 f
+10 s
+1875 2674(tt_message_uid)N
+1 f
+2383(\()X
+2423(\))X
+2456(..........................................................................................)X
+4312(175)X
+2 f
+1 f
+8 s
+2770 MY
+420(160)X
+2 f
+10 s
+1875 2770(tt_message_user)N
+1 f
+2414(\()X
+2454(\))X
+2496(........................................................................................)X
+4312(176)X
+2 f
+1 f
+8 s
+2866 MY
+420(161)X
+2 f
+10 s
+1875 2866(tt_message_user_set)N
+1 f
+2543(\()X
+2583(\))X
+2616(..................................................................................)X
+4312(177)X
+2 f
+1 f
+8 s
+2962 MY
+420(162)X
+2 f
+10 s
+1875 2962(tt_message_xarg_add)N
+1 f
+2580(\()X
+2620(\))X
+2656(................................................................................)X
+4312(178)X
+2 f
+1 f
+8 s
+3058 MY
+420(163)X
+2 f
+10 s
+1875 3058(tt_message_xcontext_join)N
+1 f
+2718(\()X
+2758(\))X
+2796(.........................................................................)X
+4312(180)X
+2 f
+1 f
+8 s
+3154 MY
+420(164)X
+2 f
+10 s
+1875 3154(tt_message_xcontext_set)N
+1 f
+2683(\()X
+2723(\))X
+2756(...........................................................................)X
+4312(181)X
+2 f
+1 f
+8 s
+3250 MY
+420(165)X
+2 f
+10 s
+1875 3250(tt_netfile_file)N
+1 f
+2311(\()X
+2351(\))X
+2396(.............................................................................................)X
+4312(182)X
+2 f
+1 f
+8 s
+3346 MY
+420(166)X
+2 f
+10 s
+1875 3346(tt_objid_equal)N
+1 f
+2342(\()X
+2382(\))X
+2416(............................................................................................)X
+4312(183)X
+2 f
+1 f
+8 s
+3442 MY
+420(167)X
+2 f
+10 s
+1875 3442(tt_objid_objkey)N
+1 f
+2374(\()X
+2414(\))X
+2456(..........................................................................................)X
+4312(184)X
+2 f
+1 f
+8 s
+3538 MY
+420(168)X
+2 f
+10 s
+1875 3538(tt_onotice_create)N
+1 f
+2431(\()X
+2471(\))X
+2516(.......................................................................................)X
+4312(185)X
+2 f
+1 f
+8 s
+3634 MY
+420(169)X
+2 f
+10 s
+1875 3634(tt_open)N
+1 f
+2126(\()X
+2166 0.0328(\).......................................................................................................)AX
+4312(186)X
+2 f
+1 f
+8 s
+3730 MY
+420(170)X
+2 f
+10 s
+1875 3730(tt_orequest_create)N
+1 f
+2471(\()X
+2511(\))X
+2556(.....................................................................................)X
+4312(187)X
+2 f
+1 f
+8 s
+3826 MY
+420(171)X
+2 f
+10 s
+1875 3826(tt_otype_base)N
+1 f
+2324(\()X
+2364(\))X
+2396(.............................................................................................)X
+4312(188)X
+2 f
+1 f
+8 s
+3922 MY
+420(172)X
+2 f
+10 s
+1875 3922(tt_otype_derived)N
+1 f
+2424(\()X
+2464(\))X
+2496(........................................................................................)X
+4312(189)X
+2 f
+1 f
+8 s
+4018 MY
+420(173)X
+2 f
+10 s
+1875 4018(tt_otype_deriveds_count)N
+1 f
+2678(\()X
+2718(\))X
+2756(...........................................................................)X
+4312(190)X
+2 f
+1 f
+8 s
+4114 MY
+420(174)X
+2 f
+10 s
+1875 4114(tt_otype_hsig_arg_mode)N
+1 f
+2678(\()X
+2718(\))X
+2756(...........................................................................)X
+4312(191)X
+2 f
+1 f
+8 s
+4210 MY
+420(175)X
+2 f
+10 s
+1875 4210(tt_otype_hsig_arg_type)N
+1 f
+2647(\()X
+2687(\).............................................................................)X
+4312(192)X
+2 f
+1 f
+8 s
+4306 MY
+420(176)X
+2 f
+10 s
+1875 4306(tt_otype_hsig_args_count)N
+1 f
+2723(\()X
+2763(\))X
+2796(.........................................................................)X
+4312(193)X
+2 f
+1 f
+8 s
+4402 MY
+420(177)X
+2 f
+10 s
+1875 4402(tt_otype_hsig_count)N
+1 f
+2545(\()X
+2585 0.0534(\)..................................................................................)AX
+4312(194)X
+2 f
+1 f
+8 s
+4498 MY
+420(178)X
+2 f
+10 s
+1875 4498(tt_otype_hsig_op)N
+1 f
+2438(\()X
+2478(\))X
+2516(.......................................................................................)X
+4312(195)X
+2 f
+1 f
+8 s
+4594 MY
+420(179)X
+2 f
+10 s
+1875 4594(tt_otype_is_derived)N
+1 f
+2517(\()X
+2557(\))X
+2596(...................................................................................)X
+4312(196)X
+2 f
+1 f
+8 s
+4690 MY
+420(180)X
+2 f
+10 s
+1875 4690(tt_otype_opnum_callback_add)N
+1 f
+2864(\()X
+2904(\))X
+2936(..................................................................)X
+4312(197)X
+2 f
+1 f
+8 s
+4786 MY
+420(181)X
+2 f
+10 s
+1875 4786(tt_otype_osig_arg_mode)N
+1 f
+2674(\()X
+2714(\))X
+2756(...........................................................................)X
+4312(198)X
+2 f
+1 f
+8 s
+4882 MY
+420(182)X
+2 f
+10 s
+1875 4882(tt_otype_osig_arg_type)N
+1 f
+2643(\()X
+2683(\))X
+2716(.............................................................................)X
+4312(199)X
+2 f
+1 f
+8 s
+4978 MY
+420(183)X
+2 f
+10 s
+1875 4978(tt_otype_osig_args_count)N
+1 f
+2719(\()X
+2759(\))X
+2796(.........................................................................)X
+4312(200)X
+2 f
+1 f
+8 s
+5074 MY
+420(184)X
+2 f
+10 s
+1875 5074(tt_otype_osig_count)N
+1 f
+2541(\()X
+2581(\))X
+2616(..................................................................................)X
+4312(201)X
+2 f
+1 f
+8 s
+5170 MY
+420(185)X
+2 f
+10 s
+1875 5170(tt_otype_osig_op)N
+1 f
+2434(\()X
+2474(\))X
+2516(.......................................................................................)X
+4312(202)X
+11 s
+680 5854(vi)N
+9 s
+2300(X/Open)X
+2587(CAE)X
+2756(Specification)X
+3181(Draft)X
+3366(\(1994\))X
+3576(\(Draft)X
+3785(November)X
+4145(21,)X
+4253(1994\))X
+
+7 p
+%%Page: 7 7
+1(Palatino-Roman)xf 1 f
+2(Palatino-Italic)xf 2 f
+3(Palatino-Bold)xf 3 f
+4(Palatino-BoldItalic)xf 4 f
+5(Courier)xf 5 f
+6(Courier-Oblique)xf 6 f
+7(Courier-Bold)xf 7 f
+8(Times-Roman)xf 8 f
+9 s 0 xH 0 xS 8 f
+10 s
+1 f
+2 f
+12 s
+680 322(Contents)N
+1 f
+10 s
+2 f
+1 f
+8 s
+658 MY
+420(186)X
+2 f
+10 s
+1875 658(tt_pattern_address_add)N
+1 f
+2647(\()X
+2687(\).............................................................................)X
+4312(203)X
+2 f
+1 f
+8 s
+754 MY
+420(187)X
+2 f
+10 s
+1875 754(tt_pattern_arg_add)N
+1 f
+2514(\()X
+2554(\))X
+2596(...................................................................................)X
+4312(204)X
+2 f
+1 f
+8 s
+850 MY
+420(188)X
+2 f
+10 s
+1875 850(tt_pattern_barg_add)N
+1 f
+2551(\()X
+2591(\))X
+2636(.................................................................................)X
+4312(205)X
+2 f
+1 f
+8 s
+946 MY
+420(189)X
+2 f
+10 s
+1875 946(tt_pattern_bcontext_add)N
+1 f
+2681(\()X
+2721(\))X
+2756(...........................................................................)X
+4312(206)X
+2 f
+1 f
+8 s
+1042 MY
+420(190)X
+2 f
+10 s
+1875 1042(tt_pattern_callback_add)N
+1 f
+2660(\()X
+2700(\))X
+2736(............................................................................)X
+4312(207)X
+2 f
+1 f
+8 s
+1138 MY
+420(191)X
+2 f
+10 s
+1875 1138(tt_pattern_category)N
+1 f
+2524(\()X
+2564(\))X
+2596(...................................................................................)X
+4312(208)X
+2 f
+1 f
+8 s
+1234 MY
+420(192)X
+2 f
+10 s
+1875 1234(tt_pattern_category_set)N
+1 f
+2653(\()X
+2693(\))X
+2736(............................................................................)X
+4312(209)X
+2 f
+1 f
+8 s
+1330 MY
+420(193)X
+2 f
+10 s
+1875 1330(tt_pattern_class_add)N
+1 f
+2559(\()X
+2599(\))X
+2636(.................................................................................)X
+4312(210)X
+2 f
+1 f
+8 s
+1426 MY
+420(194)X
+2 f
+10 s
+1875 1426(tt_pattern_context_add)N
+1 f
+2644(\()X
+2684(\))X
+2716(.............................................................................)X
+4312(211)X
+2 f
+1 f
+8 s
+1522 MY
+420(195)X
+2 f
+10 s
+1875 1522(tt_pattern_create)N
+1 f
+2439(\()X
+2479(\))X
+2516(.......................................................................................)X
+4312(212)X
+2 f
+1 f
+8 s
+1618 MY
+420(196)X
+2 f
+10 s
+1875 1618(tt_pattern_destroy)N
+1 f
+2487(\()X
+2527(\).....................................................................................)X
+4312(213)X
+2 f
+1 f
+8 s
+1714 MY
+420(197)X
+2 f
+10 s
+1875 1714(tt_pattern_disposition_add)N
+1 f
+2758(\()X
+2798(\))X
+2836(.......................................................................)X
+4312(214)X
+2 f
+1 f
+8 s
+1810 MY
+420(198)X
+2 f
+10 s
+1875 1810(tt_pattern_file_add)N
+1 f
+2504(\()X
+2544(\))X
+2576(....................................................................................)X
+4312(215)X
+2 f
+1 f
+8 s
+1906 MY
+420(199)X
+2 f
+10 s
+1875 1906(tt_pattern_iarg_add)N
+1 f
+2536(\()X
+2576(\))X
+2616(..................................................................................)X
+4312(216)X
+2 f
+1 f
+8 s
+2002 MY
+420(200)X
+2 f
+10 s
+1875 2002(tt_pattern_icontext_add)N
+1 f
+2666(\()X
+2706 0.0444(\)............................................................................)AX
+4312(217)X
+2 f
+1 f
+8 s
+2098 MY
+420(201)X
+2 f
+10 s
+1875 2098(tt_pattern_object_add)N
+1 f
+2592(\()X
+2632(\))X
+2676(...............................................................................)X
+4312(218)X
+2 f
+1 f
+8 s
+2194 MY
+420(202)X
+2 f
+10 s
+1875 2194(tt_pattern_op_add)N
+1 f
+2483(\()X
+2523(\))X
+2556(.....................................................................................)X
+4312(219)X
+2 f
+1 f
+8 s
+2290 MY
+420(203)X
+2 f
+10 s
+1875 2290(tt_pattern_opnum_add)N
+1 f
+2633(\()X
+2673(\))X
+2716(.............................................................................)X
+4312(220)X
+2 f
+1 f
+8 s
+2386 MY
+420(204)X
+2 f
+10 s
+1875 2386(tt_pattern_otype_add)N
+1 f
+2581(\()X
+2621(\))X
+2656(................................................................................)X
+4312(221)X
+2 f
+1 f
+8 s
+2482 MY
+420(205)X
+2 f
+10 s
+1875 2482(tt_pattern_print)N
+1 f
+2415(\()X
+2455(\))X
+2496(........................................................................................)X
+4312(222)X
+2 f
+1 f
+8 s
+2578 MY
+420(206)X
+2 f
+10 s
+1875 2578(tt_pattern_register)N
+1 f
+2495(\()X
+2535(\))X
+2576(....................................................................................)X
+4312(223)X
+2 f
+1 f
+8 s
+2674 MY
+420(207)X
+2 f
+10 s
+1875 2674(tt_pattern_scope_add)N
+1 f
+2577(\()X
+2617(\))X
+2656(................................................................................)X
+4312(224)X
+2 f
+1 f
+8 s
+2770 MY
+420(208)X
+2 f
+10 s
+1875 2770(tt_pattern_sender_add)N
+1 f
+2615(\()X
+2655(\))X
+2696(..............................................................................)X
+4312(225)X
+2 f
+1 f
+8 s
+2866 MY
+420(209)X
+2 f
+10 s
+1875 2866(tt_pattern_sender_ptype_add)N
+1 f
+2833(\()X
+2873(\))X
+2916(...................................................................)X
+4312(226)X
+2 f
+1 f
+8 s
+2962 MY
+420(210)X
+2 f
+10 s
+1875 2962(tt_pattern_session_add)N
+1 f
+2633(\()X
+2673(\))X
+2716(.............................................................................)X
+4312(227)X
+2 f
+1 f
+8 s
+3058 MY
+420(211)X
+2 f
+10 s
+1875 3058(tt_pattern_state_add)N
+1 f
+2559(\()X
+2599(\))X
+2636(.................................................................................)X
+4312(228)X
+2 f
+1 f
+8 s
+3154 MY
+420(212)X
+2 f
+10 s
+1875 3154(tt_pattern_unregister)N
+1 f
+2583(\()X
+2623(\))X
+2656(................................................................................)X
+4312(229)X
+2 f
+1 f
+8 s
+3250 MY
+420(213)X
+2 f
+10 s
+1875 3250(tt_pattern_user)N
+1 f
+2388(\()X
+2428(\)..........................................................................................)X
+4312(230)X
+2 f
+1 f
+8 s
+3346 MY
+420(214)X
+2 f
+10 s
+1875 3346(tt_pattern_user_set)N
+1 f
+2517(\()X
+2557(\))X
+2596(...................................................................................)X
+4312(231)X
+2 f
+1 f
+8 s
+3442 MY
+420(215)X
+2 f
+10 s
+1875 3442(tt_pattern_xarg_add)N
+1 f
+2554(\()X
+2594(\))X
+2636(.................................................................................)X
+4312(232)X
+2 f
+1 f
+8 s
+3538 MY
+420(216)X
+2 f
+10 s
+1875 3538(tt_pattern_xcontext_add)N
+1 f
+2684(\()X
+2724(\))X
+2756(...........................................................................)X
+4312(233)X
+2 f
+1 f
+8 s
+3634 MY
+420(217)X
+2 f
+10 s
+1875 3634(tt_pnotice_create)N
+1 f
+2435(\()X
+2475(\))X
+2516(.......................................................................................)X
+4312(234)X
+2 f
+1 f
+8 s
+3730 MY
+420(218)X
+2 f
+10 s
+1875 3730(tt_pointer_error)N
+1 f
+2406(\()X
+2446 0.0379(\).........................................................................................)AX
+4312(236)X
+2 f
+1 f
+8 s
+3826 MY
+420(219)X
+2 f
+10 s
+1875 3826(tt_prequest_create)N
+1 f
+2475(\()X
+2515(\))X
+2556(.....................................................................................)X
+4312(237)X
+2 f
+1 f
+8 s
+3922 MY
+420(220)X
+2 f
+10 s
+1875 3922(tt_ptr_error)N
+1 f
+2273(\()X
+2313(\))X
+2356(...............................................................................................)X
+4312(239)X
+2 f
+1 f
+8 s
+4018 MY
+420(221)X
+2 f
+10 s
+1875 4018(tt_ptype_declare)N
+1 f
+2416(\()X
+2456(\))X
+2496(........................................................................................)X
+4312(240)X
+2 f
+1 f
+8 s
+4114 MY
+420(222)X
+2 f
+10 s
+1875 4114(tt_ptype_exists)N
+1 f
+2375(\()X
+2415(\))X
+2456(..........................................................................................)X
+4312(241)X
+2 f
+1 f
+8 s
+4210 MY
+420(223)X
+2 f
+10 s
+1875 4210(tt_ptype_opnum_callback_add)N
+1 f
+2868(\()X
+2908(\)..................................................................)X
+4312(242)X
+2 f
+1 f
+8 s
+4306 MY
+420(224)X
+2 f
+10 s
+1875 4306(tt_ptype_undeclare)N
+1 f
+2504(\()X
+2544(\))X
+2576(....................................................................................)X
+4312(243)X
+2 f
+1 f
+8 s
+4402 MY
+420(225)X
+2 f
+10 s
+1875 4402(tt_release)N
+1 f
+2188(\()X
+2228(\)....................................................................................................)X
+4312(244)X
+2 f
+1 f
+8 s
+4498 MY
+420(226)X
+2 f
+10 s
+1875 4498(tt_session_bprop)N
+1 f
+2425(\()X
+2465 0.0497(\)........................................................................................)AX
+4312(245)X
+2 f
+1 f
+8 s
+4594 MY
+420(227)X
+2 f
+10 s
+1875 4594(tt_session_bprop_add)N
+1 f
+2581(\()X
+2621(\))X
+2656(................................................................................)X
+4312(246)X
+2 f
+1 f
+8 s
+4690 MY
+420(228)X
+2 f
+10 s
+1875 4690(tt_session_bprop_set)N
+1 f
+2554(\()X
+2594(\))X
+2636(.................................................................................)X
+4312(247)X
+2 f
+1 f
+8 s
+4786 MY
+420(229)X
+2 f
+10 s
+1875 4786(tt_session_join)N
+1 f
+2365(\()X
+2405 0.0481(\)...........................................................................................)AX
+4312(248)X
+2 f
+1 f
+8 s
+4882 MY
+420(230)X
+2 f
+10 s
+1875 4882(tt_session_prop)N
+1 f
+2388(\()X
+2428(\)..........................................................................................)X
+4312(249)X
+2 f
+1 f
+8 s
+4978 MY
+420(231)X
+2 f
+10 s
+1875 4978(tt_session_prop_add)N
+1 f
+2544(\()X
+2584(\))X
+2616(..................................................................................)X
+4312(250)X
+2 f
+1 f
+8 s
+5074 MY
+420(232)X
+2 f
+10 s
+1875 5074(tt_session_prop_count)N
+1 f
+2611(\()X
+2651(\))X
+2696(..............................................................................)X
+4312(251)X
+2 f
+1 f
+8 s
+5170 MY
+420(233)X
+2 f
+10 s
+1875 5170(tt_session_prop_set)N
+1 f
+2517(\()X
+2557(\))X
+2596(...................................................................................)X
+4312(252)X
+9 s
+680 5854(X/Open)N
+967(Common)X
+1284(Desktop)X
+1569(Environment)X
+2008(\320)X
+2098(Definitions)X
+2471(and)X
+2611(Infrastructure)X
+3071(Company)X
+3404(Review)X
+3662(Draft)X
+11 s
+4319(vii)X
+
+8 p
+%%Page: 8 8
+1(Palatino-Roman)xf 1 f
+2(Palatino-Italic)xf 2 f
+3(Palatino-Bold)xf 3 f
+4(Palatino-BoldItalic)xf 4 f
+5(Courier)xf 5 f
+6(Courier-Oblique)xf 6 f
+7(Courier-Bold)xf 7 f
+8(Times-Roman)xf 8 f
+11 s 0 xH 0 xS 8 f
+10 s
+1 f
+2 f
+12 s
+4070 322(Contents)N
+1 f
+10 s
+2 f
+1 f
+8 s
+658 MY
+420(234)X
+2 f
+10 s
+1875 658(tt_session_propname)N
+1 f
+2561(\()X
+2601(\))X
+2636(.................................................................................)X
+4312(253)X
+2 f
+1 f
+8 s
+754 MY
+420(235)X
+2 f
+10 s
+1875 754(tt_session_propnames_count)N
+1 f
+2815(\()X
+2855(\))X
+2896(....................................................................)X
+4312(254)X
+2 f
+1 f
+8 s
+850 MY
+420(236)X
+2 f
+10 s
+1875 850(tt_session_quit)N
+1 f
+2371(\()X
+2411(\))X
+2456(..........................................................................................)X
+4312(255)X
+2 f
+1 f
+8 s
+946 MY
+420(237)X
+2 f
+10 s
+1875 946(tt_session_types_load)N
+1 f
+2584(\()X
+2624(\))X
+2656(................................................................................)X
+4312(256)X
+2 f
+1 f
+8 s
+1042 MY
+420(238)X
+2 f
+10 s
+1875 1042(tt_spec_bprop)N
+1 f
+2333(\()X
+2373(\))X
+2416(............................................................................................)X
+4312(257)X
+2 f
+1 f
+8 s
+1138 MY
+420(239)X
+2 f
+10 s
+1875 1138(tt_spec_bprop_add)N
+1 f
+2489(\()X
+2529(\).....................................................................................)X
+4312(258)X
+2 f
+1 f
+8 s
+1234 MY
+420(240)X
+2 f
+10 s
+1875 1234(tt_spec_bprop_set)N
+1 f
+2462(\()X
+2502(\))X
+2536(......................................................................................)X
+4312(259)X
+2 f
+1 f
+8 s
+1330 MY
+420(241)X
+2 f
+10 s
+1875 1330(tt_spec_create)N
+1 f
+2337(\()X
+2377(\))X
+2416(............................................................................................)X
+4312(260)X
+2 f
+1 f
+8 s
+1426 MY
+420(242)X
+2 f
+10 s
+1875 1426(tt_spec_destroy)N
+1 f
+2385(\()X
+2425 0.0486(\)..........................................................................................)AX
+4312(261)X
+2 f
+1 f
+8 s
+1522 MY
+420(243)X
+2 f
+10 s
+1875 1522(tt_spec_file)N
+1 f
+2246(\()X
+2286 0.0348(\).................................................................................................)AX
+4312(262)X
+2 f
+1 f
+8 s
+1618 MY
+420(244)X
+2 f
+10 s
+1875 1618(tt_spec_move)N
+1 f
+2318(\()X
+2358(\))X
+2396(.............................................................................................)X
+4312(263)X
+2 f
+1 f
+8 s
+1714 MY
+420(245)X
+2 f
+10 s
+1875 1714(tt_spec_prop)N
+1 f
+2296(\()X
+2336(\))X
+2376(..............................................................................................)X
+4312(265)X
+2 f
+1 f
+8 s
+1810 MY
+420(246)X
+2 f
+10 s
+1875 1810(tt_spec_prop_add)N
+1 f
+2452(\()X
+2492(\))X
+2536(......................................................................................)X
+4312(266)X
+2 f
+1 f
+8 s
+1906 MY
+420(247)X
+2 f
+10 s
+1875 1906(tt_spec_prop_count)N
+1 f
+2519(\()X
+2559(\))X
+2596(...................................................................................)X
+4312(267)X
+2 f
+1 f
+8 s
+2002 MY
+420(248)X
+2 f
+10 s
+1875 2002(tt_spec_prop_set)N
+1 f
+2425(\()X
+2465 0.0497(\)........................................................................................)AX
+4312(268)X
+2 f
+1 f
+8 s
+2098 MY
+420(249)X
+2 f
+10 s
+1875 2098(tt_spec_propname)N
+1 f
+2469(\()X
+2509(\)......................................................................................)X
+4312(269)X
+2 f
+1 f
+8 s
+2194 MY
+420(250)X
+2 f
+10 s
+1875 2194(tt_spec_propnames_count)N
+1 f
+2723(\()X
+2763(\))X
+2796(.........................................................................)X
+4312(270)X
+2 f
+1 f
+8 s
+2290 MY
+420(251)X
+2 f
+10 s
+1875 2290(tt_spec_type)N
+1 f
+2287(\()X
+2327(\)...............................................................................................)X
+4312(271)X
+2 f
+1 f
+8 s
+2386 MY
+420(252)X
+2 f
+10 s
+1875 2386(tt_spec_type_set)N
+1 f
+2416(\()X
+2456(\))X
+2496(........................................................................................)X
+4312(272)X
+2 f
+1 f
+8 s
+2482 MY
+420(253)X
+2 f
+10 s
+1875 2482(tt_spec_write)N
+1 f
+2318(\()X
+2358(\))X
+2396(.............................................................................................)X
+4312(273)X
+2 f
+1 f
+8 s
+2578 MY
+420(254)X
+2 f
+10 s
+1875 2578(tt_status_message)N
+1 f
+2473(\()X
+2513(\))X
+2556(.....................................................................................)X
+4312(274)X
+2 f
+1 f
+8 s
+2674 MY
+420(255)X
+2 f
+10 s
+1875 2674(tt_trace_control)N
+1 f
+2400(\()X
+2440(\))X
+2476(.........................................................................................)X
+4312(275)X
+2 f
+1 f
+8 s
+2770 MY
+420(256)X
+2 f
+10 s
+1875 2770(tt_xcontext_quit)N
+1 f
+2422(\()X
+2462(\))X
+2496(........................................................................................)X
+4312(276)X
+2 f
+1 f
+8 s
+2866 MY
+420(257)X
+2 f
+10 s
+1875 2866(ttdt_Get_Modified)N
+1 f
+2487(\()X
+2527(\).....................................................................................)X
+4312(277)X
+2 f
+1 f
+8 s
+2962 MY
+420(258)X
+2 f
+10 s
+1875 2962(ttdt_Revert)N
+1 f
+2255(\()X
+2295(\))X
+2336(................................................................................................)X
+4312(278)X
+2 f
+1 f
+8 s
+3058 MY
+420(259)X
+2 f
+10 s
+1875 3058(ttdt_Save)N
+1 f
+2193(\()X
+2233(\))X
+2276(...................................................................................................)X
+4312(280)X
+2 f
+1 f
+8 s
+3154 MY
+420(260)X
+2 f
+10 s
+1875 3154(ttdt_close)N
+1 f
+2194(\()X
+2234(\))X
+2276(...................................................................................................)X
+4312(282)X
+2 f
+1 f
+8 s
+3250 MY
+420(261)X
+2 f
+10 s
+1875 3250(ttdt_file_event)N
+1 f
+2352(\()X
+2392(\))X
+2436(...........................................................................................)X
+4312(283)X
+2 f
+1 f
+8 s
+3346 MY
+420(262)X
+2 f
+10 s
+1875 3346(ttdt_file_join)N
+1 f
+2303(\()X
+2343(\))X
+2376(..............................................................................................)X
+4312(284)X
+2 f
+1 f
+8 s
+3442 MY
+420(263)X
+2 f
+10 s
+1875 3442(ttdt_file_notice)N
+1 f
+2371(\()X
+2411(\))X
+2456(..........................................................................................)X
+4312(287)X
+2 f
+1 f
+8 s
+3538 MY
+420(264)X
+2 f
+10 s
+1875 3538(ttdt_file_quit)N
+1 f
+2309(\()X
+2349(\)..............................................................................................)X
+4312(289)X
+2 f
+1 f
+8 s
+3634 MY
+420(265)X
+2 f
+10 s
+1875 3634(ttdt_file_request)N
+1 f
+2411(\()X
+2451(\))X
+2496(........................................................................................)X
+4312(290)X
+2 f
+1 f
+8 s
+3730 MY
+420(266)X
+2 f
+10 s
+1875 3730(ttdt_message_accept)N
+1 f
+2542(\()X
+2582(\))X
+2616(..................................................................................)X
+4312(292)X
+2 f
+1 f
+8 s
+3826 MY
+420(267)X
+2 f
+10 s
+1875 3826(ttdt_open)N
+1 f
+2193(\()X
+2233(\))X
+2276(...................................................................................................)X
+4312(294)X
+2 f
+1 f
+8 s
+3922 MY
+420(268)X
+2 f
+10 s
+1875 3922(ttdt_sender_imprint_on)N
+1 f
+2658(\()X
+2698(\))X
+2736(............................................................................)X
+4312(295)X
+2 f
+1 f
+8 s
+4018 MY
+420(269)X
+2 f
+10 s
+1875 4018(ttdt_session_join)N
+1 f
+2432(\()X
+2472(\))X
+2516(.......................................................................................)X
+4312(297)X
+2 f
+1 f
+8 s
+4114 MY
+420(270)X
+2 f
+10 s
+1875 4114(ttdt_session_quit)N
+1 f
+2438(\()X
+2478(\))X
+2516(.......................................................................................)X
+4312(301)X
+2 f
+1 f
+8 s
+4210 MY
+420(271)X
+2 f
+10 s
+1875 4210(ttdt_subcontract_manage)N
+1 f
+2708(\()X
+2748(\)..........................................................................)X
+4312(302)X
+2 f
+1 f
+8 s
+4306 MY
+420(272)X
+2 f
+10 s
+1875 4306(ttmedia_Deposit)N
+1 f
+2415(\()X
+2455(\))X
+2496(........................................................................................)X
+4312(303)X
+2 f
+1 f
+8 s
+4402 MY
+420(273)X
+2 f
+10 s
+1875 4402(ttmedia_load)N
+1 f
+2300(\()X
+2340(\))X
+2376(..............................................................................................)X
+4312(305)X
+2 f
+1 f
+8 s
+4498 MY
+420(274)X
+2 f
+10 s
+1875 4498(ttmedia_load_reply)N
+1 f
+2504(\()X
+2544(\))X
+2576(....................................................................................)X
+4312(308)X
+2 f
+1 f
+8 s
+4594 MY
+420(275)X
+2 f
+10 s
+1875 4594(ttmedia_ptype_declare)N
+1 f
+2607(\()X
+2647(\)...............................................................................)X
+4312(309)X
+2 f
+1 f
+8 s
+4690 MY
+420(276)X
+2 f
+10 s
+1875 4690(tttk_Xt_input_handler)N
+1 f
+2624(\()X
+2664(\))X
+2696(..............................................................................)X
+4312(314)X
+2 f
+1 f
+8 s
+4786 MY
+420(277)X
+2 f
+10 s
+1875 4786(tttk_block_while)N
+1 f
+2414(\()X
+2454(\))X
+2496(........................................................................................)X
+4312(315)X
+2 f
+1 f
+8 s
+4882 MY
+420(278)X
+2 f
+10 s
+1875 4882(tttk_message_abandon)N
+1 f
+2613(\()X
+2653(\))X
+2696(..............................................................................)X
+4312(317)X
+2 f
+1 f
+8 s
+4978 MY
+420(279)X
+2 f
+10 s
+1875 4978(tttk_message_create)N
+1 f
+2528(\()X
+2568(\)...................................................................................)X
+4312(318)X
+2 f
+1 f
+8 s
+5074 MY
+420(280)X
+2 f
+10 s
+1875 5074(tttk_message_destroy)N
+1 f
+2576(\()X
+2616(\))X
+2656(................................................................................)X
+4312(319)X
+2 f
+1 f
+8 s
+5170 MY
+420(281)X
+2 f
+10 s
+1875 5170(tttk_message_fail)N
+1 f
+2442(\()X
+2482(\))X
+2516(.......................................................................................)X
+4312(320)X
+11 s
+680 5854(viii)N
+9 s
+2300(X/Open)X
+2587(CAE)X
+2756(Specification)X
+3181(Draft)X
+3366(\(1994\))X
+3576(\(Draft)X
+3785(November)X
+4145(21,)X
+4253(1994\))X
+
+9 p
+%%Page: 9 9
+1(Palatino-Roman)xf 1 f
+2(Palatino-Italic)xf 2 f
+3(Palatino-Bold)xf 3 f
+4(Palatino-BoldItalic)xf 4 f
+5(Courier)xf 5 f
+6(Courier-Oblique)xf 6 f
+7(Courier-Bold)xf 7 f
+8(Times-Roman)xf 8 f
+9 s 0 xH 0 xS 8 f
+10 s
+1 f
+2 f
+12 s
+680 322(Contents)N
+1 f
+10 s
+2 f
+1 f
+8 s
+658 MY
+420(282)X
+2 f
+10 s
+1875 658(tttk_message_reject)N
+1 f
+2514(\()X
+2554(\))X
+2596(...................................................................................)X
+4312(321)X
+2 f
+1 f
+8 s
+754 MY
+420(283)X
+2 f
+10 s
+1875 754(tttk_op_string)N
+1 f
+2349(\()X
+2389(\)............................................................................................)X
+4312(322)X
+2 f
+1 f
+8 s
+850 MY
+420(284)X
+2 f
+10 s
+1875 850(tttk_string_op)N
+1 f
+2349(\()X
+2389(\)............................................................................................)X
+4312(323)X
+8 s
+946 MY
+420(285)X
+10 s
+1495 946(6.3)N
+1935 0.0315(Headers.....................................................................................................)AX
+4312(324)X
+3 f
+1 f
+8 s
+1042 MY
+420(286)X
+3 f
+10 s
+1875 1042(<Tt/tt_c.h>)N
+1 f
+2276(...................................................................................................)X
+4312(325)X
+3 f
+1 f
+8 s
+1138 MY
+420(287)X
+3 f
+10 s
+1875 1138(<Tt/tttk.h>)N
+1 f
+2276(...................................................................................................)X
+4312(338)X
+8 s
+1234 MY
+420(288)X
+10 s
+1495 1234(6.4)N
+1935(Command-Line)X
+2516(Interfaces)X
+2876(.....................................................................)X
+4312(342)X
+2 f
+1 f
+8 s
+1330 MY
+420(289)X
+2 f
+10 s
+1875 1330(tt_type_comp)N
+1 f
+2336(................................................................................................)X
+4312(343)X
+2 f
+1 f
+8 s
+1426 MY
+420(290)X
+2 f
+10 s
+1875 1426(ttcp)N
+1 f
+2016(................................................................................................................)X
+4312(346)X
+2 f
+1 f
+8 s
+1522 MY
+420(291)X
+2 f
+10 s
+1875 1522(ttmv)N
+1 f
+2056(..............................................................................................................)X
+4312(349)X
+2 f
+1 f
+8 s
+1618 MY
+420(292)X
+2 f
+10 s
+1875 1618(ttrm)N
+1 f
+2036(...............................................................................................................)X
+4312(351)X
+2 f
+1 f
+8 s
+1714 MY
+420(293)X
+2 f
+10 s
+1875 1714(ttrmdir)N
+1 f
+2136(..........................................................................................................)X
+4312(353)X
+2 f
+1 f
+8 s
+1810 MY
+420(294)X
+2 f
+10 s
+1875 1810(ttsession)N
+1 f
+2176(........................................................................................................)X
+4312(355)X
+2 f
+1 f
+8 s
+1906 MY
+420(295)X
+2 f
+10 s
+1875 1906(tttar)N
+1 f
+2036(...............................................................................................................)X
+4312(359)X
+8 s
+2002 MY
+420(296)X
+10 s
+1495 2002(6.5)N
+1935(Data)X
+2123(Formats............................................................................................)X
+4312(364)X
+8 s
+2098 MY
+420(297)X
+10 s
+1495 2098(6.5.1)N
+1995(Defining)X
+2324(Process)X
+2610(Types)X
+2836(.......................................................................)X
+4312(364)X
+8 s
+2194 MY
+420(298)X
+10 s
+1495 2194(6.5.2)N
+1995(Defining)X
+2324(Object)X
+2570(Types)X
+2796(.........................................................................)X
+4312(366)X
+8 s
+2290 MY
+420(299)X
+10 s
+1495 2290(6.6)N
+1935(Protocol)X
+2252(Message)X
+2576(Sets.............................................................................)X
+4312(369)X
+8 s
+2386 MY
+420(300)X
+10 s
+1495 2386(6.6.1)N
+1995(Desktop)X
+2311(Message)X
+2635(Set)X
+2756(...........................................................................)X
+4312(370)X
+2 f
+1 f
+8 s
+2482 MY
+420(301)X
+2 f
+10 s
+1875 2482(Get_Environment)N
+1 f
+2476(.........................................................................................)X
+4312(371)X
+2 f
+1 f
+8 s
+2578 MY
+420(302)X
+2 f
+10 s
+1875 2578(Get_Geometry)N
+1 f
+2356(...............................................................................................)X
+4312(372)X
+2 f
+1 f
+8 s
+2674 MY
+420(303)X
+2 f
+10 s
+1875 2674(Get_Iconified)N
+1 f
+2316(.................................................................................................)X
+4312(373)X
+2 f
+1 f
+8 s
+2770 MY
+420(304)X
+2 f
+10 s
+1875 2770(Get_Locale)N
+1 f
+2256(....................................................................................................)X
+4312(374)X
+2 f
+1 f
+8 s
+2866 MY
+420(305)X
+2 f
+10 s
+1875 2866(Get_Mapped)N
+1 f
+2316(.................................................................................................)X
+4312(375)X
+2 f
+1 f
+8 s
+2962 MY
+420(306)X
+2 f
+10 s
+1875 2962(Get_Modified)N
+1 f
+2336(................................................................................................)X
+4312(376)X
+2 f
+1 f
+8 s
+3058 MY
+420(307)X
+2 f
+10 s
+1875 3058(Get_Situation)N
+1 f
+2356(...............................................................................................)X
+4312(377)X
+2 f
+1 f
+8 s
+3154 MY
+420(308)X
+2 f
+10 s
+1875 3154(Get_Status)N
+1 f
+2256(....................................................................................................)X
+4312(378)X
+2 f
+1 f
+8 s
+3250 MY
+420(309)X
+2 f
+10 s
+1875 3250(Get_Sysinfo)N
+1 f
+2276(...................................................................................................)X
+4312(379)X
+2 f
+1 f
+8 s
+3346 MY
+420(310)X
+2 f
+10 s
+1875 3346(Get_XInfo)N
+1 f
+2236(.....................................................................................................)X
+4312(380)X
+2 f
+1 f
+8 s
+3442 MY
+420(311)X
+2 f
+10 s
+1875 3442(Lower)N
+1 f
+2096(............................................................................................................)X
+4312(382)X
+2 f
+1 f
+8 s
+3538 MY
+420(312)X
+2 f
+10 s
+1875 3538(Modified)N
+1 f
+2176(........................................................................................................)X
+4312(383)X
+2 f
+1 f
+8 s
+3634 MY
+420(313)X
+2 f
+10 s
+1875 3634(Pause)N
+1 f
+2076(.............................................................................................................)X
+4312(384)X
+2 f
+1 f
+8 s
+3730 MY
+420(314)X
+2 f
+10 s
+1875 3730(Quit)N
+1 f
+2036(...............................................................................................................)X
+4312(385)X
+2 f
+1 f
+8 s
+3826 MY
+420(315)X
+2 f
+10 s
+1875 3826(Raise)N
+1 f
+2056(..............................................................................................................)X
+4312(387)X
+2 f
+1 f
+8 s
+3922 MY
+420(316)X
+2 f
+10 s
+1875 3922(Resume)N
+1 f
+2136(..........................................................................................................)X
+4312(388)X
+2 f
+1 f
+8 s
+4018 MY
+420(317)X
+2 f
+10 s
+1875 4018(Revert)N
+1 f
+2096(............................................................................................................)X
+4312(389)X
+2 f
+1 f
+8 s
+4114 MY
+420(318)X
+2 f
+10 s
+1875 4114(Reverted)N
+1 f
+2176(........................................................................................................)X
+4312(390)X
+2 f
+1 f
+8 s
+4210 MY
+420(319)X
+2 f
+10 s
+1875 4210(Save)N
+1 f
+2036(...............................................................................................................)X
+4312(391)X
+2 f
+1 f
+8 s
+4306 MY
+420(320)X
+2 f
+10 s
+1875 4306(Saved)N
+1 f
+2076(.............................................................................................................)X
+4312(392)X
+2 f
+1 f
+8 s
+4402 MY
+420(321)X
+2 f
+10 s
+1875 4402(Set_Environment)N
+1 f
+2456(..........................................................................................)X
+4312(393)X
+2 f
+1 f
+8 s
+4498 MY
+420(322)X
+2 f
+10 s
+1875 4498(Set_Geometry)N
+1 f
+2356(...............................................................................................)X
+4312(394)X
+2 f
+1 f
+8 s
+4594 MY
+420(323)X
+2 f
+10 s
+1875 4594(Set_Iconified)N
+1 f
+2316(.................................................................................................)X
+4312(395)X
+2 f
+1 f
+8 s
+4690 MY
+420(324)X
+2 f
+10 s
+1875 4690(Set_Locale)N
+1 f
+2236(.....................................................................................................)X
+4312(396)X
+2 f
+1 f
+8 s
+4786 MY
+420(325)X
+2 f
+10 s
+1875 4786(Set_Mapped)N
+1 f
+2296(..................................................................................................)X
+4312(397)X
+2 f
+1 f
+8 s
+4882 MY
+420(326)X
+2 f
+10 s
+1875 4882(Set_Situation)N
+1 f
+2336(................................................................................................)X
+4312(398)X
+2 f
+1 f
+8 s
+4978 MY
+420(327)X
+2 f
+10 s
+1875 4978(Signal)N
+1 f
+2096(............................................................................................................)X
+4312(399)X
+2 f
+1 f
+8 s
+5074 MY
+420(328)X
+2 f
+10 s
+1875 5074(Started)N
+1 f
+2136(..........................................................................................................)X
+4312(400)X
+2 f
+1 f
+8 s
+5170 MY
+420(329)X
+2 f
+10 s
+1875 5170(Status)N
+1 f
+2096(............................................................................................................)X
+4312(401)X
+9 s
+680 5854(X/Open)N
+967(Common)X
+1284(Desktop)X
+1569(Environment)X
+2008(\320)X
+2098(Definitions)X
+2471(and)X
+2611(Infrastructure)X
+3071(Company)X
+3404(Review)X
+3662(Draft)X
+11 s
+4350(ix)X
+
+10 p
+%%Page: 10 10
+1(Palatino-Roman)xf 1 f
+2(Palatino-Italic)xf 2 f
+3(Palatino-Bold)xf 3 f
+4(Palatino-BoldItalic)xf 4 f
+5(Courier)xf 5 f
+6(Courier-Oblique)xf 6 f
+7(Courier-Bold)xf 7 f
+8(Times-Roman)xf 8 f
+11 s 0 xH 0 xS 8 f
+10 s
+1 f
+2 f
+12 s
+4070 322(Contents)N
+1 f
+10 s
+2 f
+1 f
+8 s
+658 MY
+420(330)X
+2 f
+10 s
+1875 658(Stopped)N
+1 f
+2156(.........................................................................................................)X
+4312(402)X
+8 s
+754 MY
+420(331)X
+10 s
+1495 754(6.6.2)N
+1995(Media)X
+2241(Exchange)X
+2601(Message)X
+2925(Set)X
+3036(.............................................................)X
+4312(403)X
+2 f
+1 f
+8 s
+850 MY
+420(332)X
+2 f
+10 s
+1875 850(Deposit)N
+1 f
+2136(..........................................................................................................)X
+4312(404)X
+2 f
+1 f
+8 s
+946 MY
+420(333)X
+2 f
+10 s
+1875 946(Display)N
+1 f
+2136(..........................................................................................................)X
+4312(405)X
+2 f
+1 f
+8 s
+1042 MY
+420(334)X
+2 f
+10 s
+1875 1042(Edit)N
+1 f
+2036(...............................................................................................................)X
+4312(407)X
+2 f
+1 f
+8 s
+1138 MY
+420(335)X
+2 f
+10 s
+1875 1138(Mail)N
+1 f
+2056(..............................................................................................................)X
+4312(409)X
+2 f
+1 f
+8 s
+1234 MY
+420(336)X
+2 f
+10 s
+1875 1234(Print)N
+1 f
+2056(..............................................................................................................)X
+4312(410)X
+2 f
+1 f
+8 s
+1330 MY
+420(337)X
+2 f
+10 s
+1875 1330(Translate)N
+1 f
+2196(.......................................................................................................)X
+4312(412)X
+8 s
+1426 MY
+420(338)X
+10 s
+1495 1426(6.7)N
+1935(Rationale)X
+2289(and)X
+2444(Open)X
+2659(Issues.....................................................................)X
+4312(414)X
+3 f
+12 s
+1 f
+8 s
+1618 MY
+420(339)X
+3 f
+12 s
+1002 1618(Chapter)N
+1495(7)X
+1875(Drag)X
+2117(and)X
+2307(Drop)X
+10 s
+2536(......................................................................................)X
+4312(417)X
+1 f
+8 s
+1714 MY
+420(340)X
+10 s
+1495 1714(7.1)N
+1935(Introduction)X
+2396(.............................................................................................)X
+4312(417)X
+8 s
+1810 MY
+420(341)X
+10 s
+1495 1810(7.2)N
+1935(Functions)X
+2296(..................................................................................................)X
+4312(417)X
+2 f
+1 f
+8 s
+1906 MY
+420(342)X
+2 f
+10 s
+1875 1906(DtDndCreateSourceIcon)N
+1 f
+2682(\()X
+2722(\))X
+2756(...........................................................................)X
+4312(418)X
+2 f
+1 f
+8 s
+2002 MY
+420(343)X
+2 f
+10 s
+1875 2002(DtDndDragStart)N
+1 f
+2450(\()X
+2490(\))X
+2536(......................................................................................)X
+4312(419)X
+2 f
+1 f
+8 s
+2098 MY
+420(344)X
+2 f
+10 s
+1875 2098(DtDndDropRegister)N
+1 f
+2551(\()X
+2591(\))X
+2636(.................................................................................)X
+4312(424)X
+8 s
+2194 MY
+420(345)X
+10 s
+1495 2194(7.3)N
+1935 0.0315(Headers.....................................................................................................)AX
+4312(429)X
+3 f
+1 f
+8 s
+2290 MY
+420(346)X
+3 f
+10 s
+1875 2290(<Dt/Dnd.h>)N
+1 f
+2336(................................................................................................)X
+4312(430)X
+8 s
+2386 MY
+420(347)X
+10 s
+1495 2386(7.4)N
+1935(Protocols)X
+2276(...................................................................................................)X
+4312(433)X
+8 s
+2482 MY
+420(348)X
+10 s
+1495 2482(7.4.1)N
+1995(Protocol)X
+2312(Overview)X
+2676(...............................................................................)X
+4312(433)X
+8 s
+2578 MY
+420(349)X
+10 s
+1495 2578(7.4.1.1)N
+2055(Drag)X
+2253(and)X
+2408(Drop)X
+2614(API)X
+2771(Protocol)X
+3076(...........................................................)X
+4312(433)X
+8 s
+2674 MY
+420(350)X
+10 s
+1495 2674(7.4.1.2)N
+2055(Export/Import)X
+2611(Targets.....................................................................)X
+4312(433)X
+8 s
+2770 MY
+420(351)X
+10 s
+1495 2770(7.4.1.3)N
+2055(Data)X
+2243(Transfer)X
+2561(Protocol)X
+2876(.....................................................................)X
+4312(433)X
+8 s
+2866 MY
+420(352)X
+10 s
+1495 2866(7.4.1.4)N
+2055(Move)X
+2278(Completion)X
+2716(.............................................................................)X
+4312(433)X
+8 s
+2962 MY
+420(353)X
+10 s
+1495 2962(7.4.2)N
+1995(Text)X
+2169(Transfer)X
+2487(Protocol)X
+2796(.........................................................................)X
+4312(434)X
+8 s
+3058 MY
+420(354)X
+10 s
+1495 3058(7.4.2.1)N
+2055(Drag)X
+2253(and)X
+2408(Drop)X
+2614(API)X
+2756(...........................................................................)X
+4312(434)X
+8 s
+3154 MY
+420(355)X
+10 s
+1495 3154(7.4.2.2)N
+2055(Export/Import)X
+2611(Targets.....................................................................)X
+4312(434)X
+8 s
+3250 MY
+420(356)X
+10 s
+1495 3250(7.4.2.3)N
+2055(Data)X
+2243(Transfer)X
+2561(Protocol)X
+2876(.....................................................................)X
+4312(434)X
+8 s
+3346 MY
+420(357)X
+10 s
+1495 3346(7.4.2.4)N
+2055(Move)X
+2278(Completion)X
+2716(.............................................................................)X
+4312(434)X
+8 s
+3442 MY
+420(358)X
+10 s
+1495 3442(7.4.3)N
+1995(File)X
+2143(Name)X
+2378(Transfer)X
+2696 0.0598(Protocol...............................................................)AX
+4312(434)X
+8 s
+3538 MY
+420(359)X
+10 s
+1495 3538(7.4.3.1)N
+2055(Drag)X
+2253(and)X
+2408(Drop)X
+2614(API)X
+2756(...........................................................................)X
+4312(434)X
+8 s
+3634 MY
+420(360)X
+10 s
+1495 3634(7.4.3.2)N
+2055(Export/Import)X
+2611(Targets.....................................................................)X
+4312(434)X
+8 s
+3730 MY
+420(361)X
+10 s
+1495 3730(7.4.3.3)N
+2055(Data)X
+2243(Transfer)X
+2561(Protocol)X
+2876(.....................................................................)X
+4312(434)X
+8 s
+3826 MY
+420(362)X
+10 s
+1495 3826(7.4.3.4)N
+2055(Move)X
+2278(Completion)X
+2716(.............................................................................)X
+4312(435)X
+8 s
+3922 MY
+420(363)X
+10 s
+1495 3922(7.4.4)N
+1995(Buffer)X
+2236(Transfer)X
+2554(Protocol)X
+2856(......................................................................)X
+4312(435)X
+8 s
+4018 MY
+420(364)X
+10 s
+1495 4018(7.4.4.1)N
+2055(Drag)X
+2253(and)X
+2408(Drop)X
+2614(API)X
+2756(...........................................................................)X
+4312(435)X
+8 s
+4114 MY
+420(365)X
+10 s
+1495 4114(7.4.4.2)N
+2055(Export/Import)X
+2611(Targets.....................................................................)X
+4312(435)X
+8 s
+4210 MY
+420(366)X
+10 s
+1495 4210(7.4.4.3)N
+2055(Data)X
+2243(Transfer)X
+2561(Protocol)X
+2876(.....................................................................)X
+4312(435)X
+8 s
+4306 MY
+420(367)X
+10 s
+1495 4306(7.4.4.4)N
+2055(Move)X
+2278(Completion)X
+2716(.............................................................................)X
+4312(435)X
+8 s
+4402 MY
+420(368)X
+10 s
+1495 4402(7.4.5)N
+1995(Selection)X
+2331(Targets...................................................................................)X
+4312(435)X
+8 s
+4498 MY
+420(369)X
+10 s
+1495 4498(7.5)N
+1935(Rationale)X
+2289(and)X
+2444(Open)X
+2659(Issues.....................................................................)X
+4312(436)X
+3 f
+12 s
+1 f
+8 s
+4690 MY
+420(370)X
+3 f
+12 s
+1002 4690(Chapter)N
+1495(8)X
+1875(Data)X
+2107(Typing)X
+10 s
+2436(...........................................................................................)X
+4312(439)X
+1 f
+8 s
+4786 MY
+420(371)X
+10 s
+1495 4786(8.1)N
+1935(Introduction)X
+2396(.............................................................................................)X
+4312(439)X
+8 s
+4882 MY
+420(372)X
+10 s
+1495 4882(8.2)N
+1935(Functions)X
+2296(..................................................................................................)X
+4312(439)X
+2 f
+1 f
+8 s
+4978 MY
+420(373)X
+2 f
+10 s
+1875 4978(DtDtsBufferToAttributeList)N
+1 f
+2802(\()X
+2842(\))X
+2876(.....................................................................)X
+4312(440)X
+2 f
+1 f
+8 s
+5074 MY
+420(374)X
+2 f
+10 s
+1875 5074(DtDtsBufferToAttributeValue)N
+1 f
+2869(\()X
+2909(\)..................................................................)X
+4312(441)X
+2 f
+1 f
+8 s
+5170 MY
+420(375)X
+2 f
+10 s
+1875 5170(DtDtsBufferToDataType)N
+1 f
+2695(\()X
+2735(\))X
+2776(..........................................................................)X
+4312(442)X
+11 s
+680 5854(x)N
+9 s
+2300(X/Open)X
+2587(CAE)X
+2756(Specification)X
+3181(Draft)X
+3366(\(1994\))X
+3576(\(Draft)X
+3785(November)X
+4145(21,)X
+4253(1994\))X
+
+11 p
+%%Page: 11 11
+1(Palatino-Roman)xf 1 f
+2(Palatino-Italic)xf 2 f
+3(Palatino-Bold)xf 3 f
+4(Palatino-BoldItalic)xf 4 f
+5(Courier)xf 5 f
+6(Courier-Oblique)xf 6 f
+7(Courier-Bold)xf 7 f
+8(Times-Roman)xf 8 f
+9 s 0 xH 0 xS 8 f
+10 s
+1 f
+2 f
+12 s
+680 322(Contents)N
+1 f
+10 s
+2 f
+1 f
+8 s
+658 MY
+420(376)X
+2 f
+10 s
+1875 658(DtDtsDataToDataType)N
+1 f
+2657(\()X
+2697(\))X
+2736(............................................................................)X
+4312(443)X
+2 f
+1 f
+8 s
+754 MY
+420(377)X
+2 f
+10 s
+1875 754(DtDtsDataTypeIsAction)N
+1 f
+2688(\()X
+2728(\)...........................................................................)X
+4312(445)X
+2 f
+1 f
+8 s
+850 MY
+420(378)X
+2 f
+10 s
+1875 850(DtDtsDataTypeNames)N
+1 f
+2633(\()X
+2673(\))X
+2716(.............................................................................)X
+4312(446)X
+2 f
+1 f
+8 s
+946 MY
+420(379)X
+2 f
+10 s
+1875 946(DtDtsDataTypeToAttributeList)N
+1 f
+2924(\()X
+2964(\))X
+2996(...............................................................)X
+4312(447)X
+2 f
+1 f
+8 s
+1042 MY
+420(380)X
+2 f
+10 s
+1875 1042(DtDtsDataTypeToAttributeValue)N
+1 f
+2991(\()X
+3031(\))X
+3076(...........................................................)X
+4312(448)X
+2 f
+1 f
+8 s
+1138 MY
+420(381)X
+2 f
+10 s
+1875 1138(DtDtsFileToAttributeList)N
+1 f
+2722(\()X
+2762(\))X
+2796(.........................................................................)X
+4312(450)X
+2 f
+1 f
+8 s
+1234 MY
+420(382)X
+2 f
+10 s
+1875 1234(DtDtsFileToAttributeValue)N
+1 f
+2789(\()X
+2829(\)......................................................................)X
+4312(451)X
+2 f
+1 f
+8 s
+1330 MY
+420(383)X
+2 f
+10 s
+1875 1330(DtDtsFileToDataType)N
+1 f
+2615(\()X
+2655(\))X
+2696(..............................................................................)X
+4312(452)X
+2 f
+1 f
+8 s
+1426 MY
+420(384)X
+2 f
+10 s
+1875 1426(DtDtsFindAttribute)N
+1 f
+2544(\()X
+2584(\))X
+2616(..................................................................................)X
+4312(453)X
+2 f
+1 f
+8 s
+1522 MY
+420(385)X
+2 f
+10 s
+1875 1522(DtDtsFreeAttributeList)N
+1 f
+2655(\()X
+2695(\))X
+2736(............................................................................)X
+4312(454)X
+2 f
+1 f
+8 s
+1618 MY
+420(386)X
+2 f
+10 s
+1875 1618(DtDtsFreeAttributeValue)N
+1 f
+2722(\()X
+2762(\))X
+2796(.........................................................................)X
+4312(455)X
+2 f
+1 f
+8 s
+1714 MY
+420(387)X
+2 f
+10 s
+1875 1714(DtDtsFreeDataType)N
+1 f
+2548(\()X
+2588(\)..................................................................................)X
+4312(456)X
+2 f
+1 f
+8 s
+1810 MY
+420(388)X
+2 f
+10 s
+1875 1810(DtDtsFreeDataTypeNames)N
+1 f
+2770(\()X
+2810(\))X
+2856(......................................................................)X
+4312(457)X
+2 f
+1 f
+8 s
+1906 MY
+420(389)X
+2 f
+10 s
+1875 1906(DtDtsIsTrue)N
+1 f
+2303(\()X
+2343(\))X
+2376(..............................................................................................)X
+4312(458)X
+2 f
+1 f
+8 s
+2002 MY
+420(390)X
+2 f
+10 s
+1875 2002(DtDtsLoadDataTypes)N
+1 f
+2598(\()X
+2638(\))X
+2676(...............................................................................)X
+4312(459)X
+2 f
+1 f
+8 s
+2098 MY
+420(391)X
+2 f
+10 s
+1875 2098(DtDtsRelease)N
+1 f
+2325(\()X
+2365 0.0470(\).............................................................................................)AX
+4312(460)X
+2 f
+1 f
+8 s
+2194 MY
+420(392)X
+2 f
+10 s
+1875 2194(DtDtsSetDataType)N
+1 f
+2513(\()X
+2553(\))X
+2596(...................................................................................)X
+4312(461)X
+8 s
+2290 MY
+420(393)X
+10 s
+1495 2290(8.3)N
+1935 0.0315(Headers.....................................................................................................)AX
+4312(462)X
+3 f
+1 f
+8 s
+2386 MY
+420(394)X
+3 f
+10 s
+1875 2386(<Dt/Dts.h>)N
+1 f
+2296(..................................................................................................)X
+4312(463)X
+8 s
+2482 MY
+420(395)X
+10 s
+1495 2482(8.4)N
+1935(Data)X
+2123(Formats............................................................................................)X
+4312(465)X
+8 s
+2578 MY
+420(396)X
+10 s
+1495 2578(8.4.1)N
+1995(Location)X
+2323(of)X
+2414(Actions)X
+2705(and)X
+2860(Data)X
+3048(Types)X
+3281(Database)X
+3616(................................)X
+4312(465)X
+8 s
+2674 MY
+420(397)X
+10 s
+1495 2674(8.4.2)N
+1995(Data)X
+2183(Types)X
+2416(and)X
+2571(Actions)X
+2862(Database)X
+3206(Syntax)X
+3456(........................................)X
+4312(465)X
+8 s
+2770 MY
+420(398)X
+10 s
+1495 2770(8.4.2.1)N
+2055(Comments)X
+2456(..........................................................................................)X
+4312(466)X
+8 s
+2866 MY
+420(399)X
+10 s
+1495 2866(8.4.2.2)N
+2055(Database)X
+2399(Version...............................................................................)X
+4312(466)X
+8 s
+2962 MY
+420(400)X
+10 s
+1495 2962(8.4.2.3)N
+2055(String)X
+2288(Variables)X
+2636(.................................................................................)X
+4312(466)X
+8 s
+3058 MY
+420(401)X
+10 s
+1495 3058(8.4.2.4)N
+2055(Environment)X
+2541(Variables.....................................................................)X
+4312(466)X
+8 s
+3154 MY
+420(402)X
+10 s
+1495 3154(8.4.2.5)N
+2055(Line)X
+2231(Continuation)X
+2716(.............................................................................)X
+4312(466)X
+8 s
+3250 MY
+420(403)X
+10 s
+1495 3250(8.4.2.6)N
+2055(Record)X
+2328(Name)X
+2556(.....................................................................................)X
+4312(466)X
+8 s
+3346 MY
+420(404)X
+10 s
+1495 3346(8.4.2.7)N
+2055(Record)X
+2328(Delimiters)X
+2716(.............................................................................)X
+4312(467)X
+8 s
+3442 MY
+420(405)X
+10 s
+1495 3442(8.4.2.8)N
+2055(Fields)X
+2276(...................................................................................................)X
+4312(467)X
+8 s
+3538 MY
+420(406)X
+10 s
+1495 3538(8.4.2.9)N
+2055(Record)X
+2328(Types)X
+2556(.....................................................................................)X
+4312(467)X
+8 s
+3634 MY
+420(407)X
+10 s
+1495 3634(8.4.3)N
+1995(Data)X
+2183(Criteria)X
+2474(Records)X
+2776(..........................................................................)X
+4312(467)X
+8 s
+3730 MY
+420(408)X
+10 s
+1495 3730(8.4.3.1)N
+2055(NAME_PATTERN)X
+2745(Field)X
+2936(..................................................................)X
+4312(467)X
+8 s
+3826 MY
+420(409)X
+10 s
+1495 3826(8.4.3.2)N
+2055(PATH_PATTERN)X
+2717(Field....................................................................)X
+4312(467)X
+8 s
+3922 MY
+420(410)X
+10 s
+1495 3922(8.4.3.3)N
+2055(CONTENT)X
+2474(Field)X
+2656(................................................................................)X
+4312(468)X
+8 s
+4018 MY
+420(411)X
+10 s
+1495 4018(8.4.3.4)N
+2055(MODE)X
+2325(Field)X
+2516(.......................................................................................)X
+4312(468)X
+8 s
+4114 MY
+420(412)X
+10 s
+1495 4114(8.4.3.5)N
+2055(LINK_NAME)X
+2568(Field)X
+2756(...........................................................................)X
+4312(469)X
+8 s
+4210 MY
+420(413)X
+10 s
+1495 4210(8.4.3.6)N
+2055(LINK_PATH)X
+2540(Field)X
+2736(............................................................................)X
+4312(469)X
+8 s
+4306 MY
+420(414)X
+10 s
+1495 4306(8.4.3.7)N
+2055(DATA_ATTRIBUTES_NAME)X
+3135(Field...............................................)X
+4312(469)X
+8 s
+4402 MY
+420(415)X
+10 s
+1495 4402(8.4.3.8)N
+2055(Logical)X
+2334(Expressions)X
+2776(..........................................................................)X
+4312(469)X
+8 s
+4498 MY
+420(416)X
+10 s
+1495 4498(8.4.3.9)N
+2055(White)X
+2288 0.0448(Space........................................................................................)AX
+4312(470)X
+8 s
+4594 MY
+420(417)X
+10 s
+1495 4594(8.4.3.10)N
+2055(Escape)X
+2320(Character)X
+2676(...............................................................................)X
+4312(470)X
+8 s
+4690 MY
+420(418)X
+10 s
+1495 4690(8.4.3.11)N
+2055(Data)X
+2243(Criteria)X
+2534(Format)X
+2796(.........................................................................)X
+4312(470)X
+8 s
+4786 MY
+420(419)X
+10 s
+1495 4786(8.4.3.12)N
+2055(Data)X
+2243(Criteria)X
+2534(Sorting)X
+2796(.........................................................................)X
+4312(471)X
+8 s
+4882 MY
+420(420)X
+10 s
+1495 4882(8.4.4)N
+1995(Data)X
+2183(Attribute)X
+2528(Records........................................................................)X
+4312(472)X
+8 s
+4978 MY
+420(421)X
+10 s
+1495 4978(8.4.4.1)N
+2055(DESCRIPTION)X
+2619(Field.........................................................................)X
+4312(472)X
+8 s
+5074 MY
+420(422)X
+10 s
+1495 5074(8.4.4.2)N
+2055(ICON)X
+2288(Field)X
+2476(.........................................................................................)X
+4312(472)X
+8 s
+5170 MY
+420(423)X
+10 s
+1495 5170(8.4.4.3)N
+2055(INSTANCE_ICON)X
+2746(Field)X
+2936(..................................................................)X
+4312(473)X
+9 s
+680 5854(X/Open)N
+967(Common)X
+1284(Desktop)X
+1569(Environment)X
+2008(\320)X
+2098(Definitions)X
+2471(and)X
+2611(Infrastructure)X
+3071(Company)X
+3404(Review)X
+3662(Draft)X
+11 s
+4350(xi)X
+
+12 p
+%%Page: 12 12
+1(Palatino-Roman)xf 1 f
+2(Palatino-Italic)xf 2 f
+3(Palatino-Bold)xf 3 f
+4(Palatino-BoldItalic)xf 4 f
+5(Courier)xf 5 f
+6(Courier-Oblique)xf 6 f
+7(Courier-Bold)xf 7 f
+8(Times-Roman)xf 8 f
+11 s 0 xH 0 xS 8 f
+10 s
+1 f
+2 f
+12 s
+4070 322(Contents)N
+1 f
+10 s
+8 s
+658 MY
+420(424)X
+10 s
+1495 658(8.4.4.4)N
+2055(PROPERTIES)X
+2558(Field............................................................................)X
+4312(473)X
+8 s
+754 MY
+420(425)X
+10 s
+1495 754(8.4.4.5)N
+2055(ACTIONS)X
+2441(Field)X
+2636(.................................................................................)X
+4312(473)X
+8 s
+850 MY
+420(426)X
+10 s
+1495 850(8.4.4.6)N
+2055(NAME_TEMPLATE)X
+2799(Field................................................................)X
+4312(473)X
+8 s
+946 MY
+420(427)X
+10 s
+1495 946(8.4.4.7)N
+2055(IS_EXECUTABLE)X
+2712(Field)X
+2896(....................................................................)X
+4312(473)X
+8 s
+1042 MY
+420(428)X
+10 s
+1495 1042(8.4.4.8)N
+2055(MOVE_TO_ACTION)X
+2837(Field..............................................................)X
+4312(473)X
+8 s
+1138 MY
+420(429)X
+10 s
+1495 1138(8.4.4.9)N
+2055(COPY_TO_ACTION)X
+2812(Field)X
+2996(...............................................................)X
+4312(474)X
+8 s
+1234 MY
+420(430)X
+10 s
+1495 1234(8.4.4.10)N
+2055(LINK_TO_ACTION)X
+2791(Field)X
+2976(................................................................)X
+4312(474)X
+8 s
+1330 MY
+420(431)X
+10 s
+1495 1330(8.4.4.11)N
+2055(IS_TEXT)X
+2384(Field)X
+2576(....................................................................................)X
+4312(474)X
+8 s
+1426 MY
+420(432)X
+10 s
+1495 1426(8.4.4.12)N
+2055(MEDIA)X
+2351(Field)X
+2536(......................................................................................)X
+4312(475)X
+8 s
+1522 MY
+420(433)X
+10 s
+1495 1522(8.4.4.13)N
+2055(MIME_TYPE)X
+2542(Field)X
+2736(............................................................................)X
+4312(476)X
+8 s
+1618 MY
+420(434)X
+10 s
+1495 1618(8.4.4.14)N
+2055(X400_TYPE)X
+2487(Field)X
+2676(...............................................................................)X
+4312(476)X
+8 s
+1714 MY
+420(435)X
+10 s
+1495 1714(8.4.4.15)N
+2055(DATA_HOST)X
+2570(Attribute....................................................................)X
+4312(476)X
+8 s
+1810 MY
+420(436)X
+10 s
+1495 1810(8.4.4.16)N
+2055(Modifiers)X
+2416(............................................................................................)X
+4312(476)X
+8 s
+1906 MY
+420(437)X
+10 s
+1495 1906(8.4.4.17)N
+2055(Data)X
+2243(Attributes)X
+2622(Format)X
+2896(....................................................................)X
+4312(476)X
+8 s
+2002 MY
+420(438)X
+10 s
+1495 2002(8.4.4.18)N
+2055(Examples)X
+2416(............................................................................................)X
+4312(477)X
+3 f
+12 s
+1 f
+8 s
+2194 MY
+420(439)X
+3 f
+12 s
+1002 2194(Chapter)N
+1495(9)X
+1875(Execution)X
+2332(Management)X
+10 s
+2916(...................................................................)X
+4312(479)X
+1 f
+8 s
+2290 MY
+420(440)X
+10 s
+1495 2290(9.1)N
+1935(Introduction)X
+2396(.............................................................................................)X
+4312(479)X
+8 s
+2386 MY
+420(441)X
+10 s
+1495 2386(9.1.1)N
+1995(Scope)X
+2216(......................................................................................................)X
+4312(479)X
+8 s
+2482 MY
+420(442)X
+10 s
+1495 2482(9.1.2)N
+1995(Components)X
+2456(..........................................................................................)X
+4312(479)X
+8 s
+2578 MY
+420(443)X
+10 s
+1495 2578(9.1.3)N
+1995(Action)X
+2252(Database)X
+2596(Entries)X
+2856(......................................................................)X
+4312(479)X
+8 s
+2674 MY
+420(444)X
+10 s
+1495 2674(9.1.4)N
+1995(Command-Line)X
+2576(Actions)X
+2856(......................................................................)X
+4312(480)X
+8 s
+2770 MY
+420(445)X
+10 s
+1495 2770(9.2)N
+1935(Functions)X
+2296(..................................................................................................)X
+4312(480)X
+2 f
+1 f
+8 s
+2866 MY
+420(446)X
+2 f
+10 s
+1875 2866(DtActionCallbackProc)N
+1 f
+2611(\()X
+2651(\))X
+2696(..............................................................................)X
+4312(481)X
+2 f
+1 f
+8 s
+2962 MY
+420(447)X
+2 f
+10 s
+1875 2962(DtActionDescription)N
+1 f
+2567(\()X
+2607(\).................................................................................)X
+4312(484)X
+2 f
+1 f
+8 s
+3058 MY
+420(448)X
+2 f
+10 s
+1875 3058(DtActionExists)N
+1 f
+2389(\()X
+2429(\)..........................................................................................)X
+4312(485)X
+2 f
+1 f
+8 s
+3154 MY
+420(449)X
+2 f
+10 s
+1875 3154(DtActionIcon)N
+1 f
+2328(\()X
+2368(\).............................................................................................)X
+4312(486)X
+2 f
+1 f
+8 s
+3250 MY
+420(450)X
+2 f
+10 s
+1875 3250(DtActionInvoke)N
+1 f
+2403(\()X
+2443(\))X
+2476(.........................................................................................)X
+4312(487)X
+2 f
+1 f
+8 s
+3346 MY
+420(451)X
+2 f
+10 s
+1875 3346(DtActionLabel)N
+1 f
+2359(\()X
+2399(\))X
+2436(...........................................................................................)X
+4312(493)X
+2 f
+1 f
+8 s
+3442 MY
+420(452)X
+2 f
+10 s
+1875 3442(DtDbLoad)N
+1 f
+2225(\()X
+2265 0.0446(\)..................................................................................................)AX
+4312(494)X
+2 f
+1 f
+8 s
+3538 MY
+420(453)X
+2 f
+10 s
+1875 3538(DtDbReloadNotify)N
+1 f
+2496(\()X
+2536(\))X
+2576(....................................................................................)X
+4312(495)X
+8 s
+3634 MY
+420(454)X
+10 s
+1495 3634(9.3)N
+1935 0.0315(Headers.....................................................................................................)AX
+4312(496)X
+3 f
+1 f
+8 s
+3730 MY
+420(455)X
+3 f
+10 s
+1875 3730(<Dt/Action.h>)N
+1 f
+2416(............................................................................................)X
+4312(497)X
+8 s
+3826 MY
+420(456)X
+10 s
+1495 3826(9.4)N
+1935(Command-Line)X
+2516(Interfaces)X
+2876(.....................................................................)X
+4312(499)X
+2 f
+1 f
+8 s
+3922 MY
+420(457)X
+2 f
+10 s
+1875 3922(dtaction)N
+1 f
+2156(.........................................................................................................)X
+4312(500)X
+8 s
+4018 MY
+420(458)X
+10 s
+1495 4018(9.5)N
+1935(Data)X
+2123(Formats............................................................................................)X
+4312(503)X
+8 s
+4114 MY
+420(459)X
+10 s
+1495 4114(9.5.1)N
+1995(Action)X
+2252(File)X
+2400(Syntax)X
+2656(................................................................................)X
+4312(503)X
+8 s
+4210 MY
+420(460)X
+10 s
+1495 4210(9.5.2)N
+1995(Classes)X
+2275(of)X
+2366(Actions)X
+2656(................................................................................)X
+4312(503)X
+8 s
+4306 MY
+420(461)X
+10 s
+1495 4306(9.5.2.1)N
+2055(Command)X
+2453(Actions)X
+2736(............................................................................)X
+4312(503)X
+8 s
+4402 MY
+420(462)X
+10 s
+1495 4402(9.5.2.2)N
+2055(ToolTalk)X
+2391(Message)X
+2715(Actions)X
+2996(...............................................................)X
+4312(503)X
+8 s
+4498 MY
+420(463)X
+10 s
+1495 4498(9.5.2.3)N
+2055(Map)X
+2239(Actions)X
+2516(.......................................................................................)X
+4312(503)X
+8 s
+4594 MY
+420(464)X
+10 s
+1495 4594(9.5.2.4)N
+2055(Common)X
+2408(Fields)X
+2636(.................................................................................)X
+4312(504)X
+8 s
+4690 MY
+420(465)X
+10 s
+1495 4690(9.5.2.5)N
+2055(Keywords)X
+2436(...........................................................................................)X
+4312(504)X
+8 s
+4786 MY
+420(466)X
+10 s
+1495 4786(9.5.2.6)N
+2055(Argument)X
+2442(References)X
+2836(.......................................................................)X
+4312(504)X
+8 s
+4882 MY
+420(467)X
+10 s
+1495 4882(9.5.2.7)N
+2055(Action)X
+2312(Selection)X
+2636(.................................................................................)X
+4312(505)X
+8 s
+4978 MY
+420(468)X
+10 s
+1495 4978(9.5.2.8)N
+2055(ARG_CLASS)X
+2544(Field)X
+2736(............................................................................)X
+4312(505)X
+8 s
+5074 MY
+420(469)X
+10 s
+1495 5074(9.5.2.9)N
+2055(ARG_COUNT)X
+2589(Field)X
+2796(.........................................................................)X
+4312(506)X
+8 s
+5170 MY
+420(470)X
+10 s
+1495 5170(9.5.2.10)N
+2055(ARG_MODE)X
+2542(Field)X
+2736(............................................................................)X
+4312(506)X
+11 s
+680 5854(xii)N
+9 s
+2300(X/Open)X
+2587(CAE)X
+2756(Specification)X
+3181(Draft)X
+3366(\(1994\))X
+3576(\(Draft)X
+3785(November)X
+4145(21,)X
+4253(1994\))X
+
+13 p
+%%Page: 13 13
+1(Palatino-Roman)xf 1 f
+2(Palatino-Italic)xf 2 f
+3(Palatino-Bold)xf 3 f
+4(Palatino-BoldItalic)xf 4 f
+5(Courier)xf 5 f
+6(Courier-Oblique)xf 6 f
+7(Courier-Bold)xf 7 f
+8(Times-Roman)xf 8 f
+9 s 0 xH 0 xS 8 f
+10 s
+1 f
+2 f
+12 s
+680 322(Contents)N
+1 f
+10 s
+8 s
+658 MY
+420(471)X
+10 s
+1495 658(9.5.2.11)N
+2055(ARG_TYPE)X
+2491(Field)X
+2676(...............................................................................)X
+4312(506)X
+8 s
+754 MY
+420(472)X
+10 s
+1495 754(9.5.2.12)N
+2055(CWD)X
+2274(Field)X
+2456(..........................................................................................)X
+4312(507)X
+8 s
+850 MY
+420(473)X
+10 s
+1495 850(9.5.2.13)N
+2055(DESCRIPTION)X
+2619(Field.........................................................................)X
+4312(507)X
+8 s
+946 MY
+420(474)X
+10 s
+1495 946(9.5.2.14)N
+2055(EXEC_HOST)X
+2543(Field)X
+2736(............................................................................)X
+4312(507)X
+8 s
+1042 MY
+420(475)X
+10 s
+1495 1042(9.5.2.15)N
+2055(EXEC_STRING)X
+2622(Field)X
+2816(........................................................................)X
+4312(507)X
+8 s
+1138 MY
+420(476)X
+10 s
+1495 1138(9.5.2.16)N
+2055(ICON)X
+2288(Field)X
+2476(.........................................................................................)X
+4312(508)X
+8 s
+1234 MY
+420(477)X
+10 s
+1495 1234(9.5.2.17)N
+2055(LABEL)X
+2333(Field)X
+2516(.......................................................................................)X
+4312(508)X
+8 s
+1330 MY
+420(478)X
+10 s
+1495 1330(9.5.2.18)N
+2055(MAP_ACTION)X
+2625(Field)X
+2816(........................................................................)X
+4312(508)X
+8 s
+1426 MY
+420(479)X
+10 s
+1495 1426(9.5.2.19)N
+2055(TERM_OPTS)X
+2545(Field)X
+2736(............................................................................)X
+4312(508)X
+8 s
+1522 MY
+420(480)X
+10 s
+1495 1522(9.5.2.20)N
+2055(TT_ARGn_MODE)X
+2726(Field)X
+2916(...................................................................)X
+4312(509)X
+8 s
+1618 MY
+420(481)X
+10 s
+1495 1618(9.5.2.21)N
+2055(TT_ARGn_REP_TYPE)X
+2866(Field)X
+3056(............................................................)X
+4312(509)X
+8 s
+1714 MY
+420(482)X
+10 s
+1495 1714(9.5.2.22)N
+2055(TT_ARGn_VALUE)X
+2756(Field..................................................................)X
+4312(509)X
+8 s
+1810 MY
+420(483)X
+10 s
+1495 1810(9.5.2.23)N
+2055(TT_ARGn_VTYPE)X
+2733(Field)X
+2916(...................................................................)X
+4312(509)X
+8 s
+1906 MY
+420(484)X
+10 s
+1495 1906(9.5.2.24)N
+2055(TT_CLASS)X
+2465(Field)X
+2656(................................................................................)X
+4312(510)X
+8 s
+2002 MY
+420(485)X
+10 s
+1495 2002(9.5.2.25)N
+2055(TT_FILE)X
+2382(Field)X
+2576(....................................................................................)X
+4312(510)X
+8 s
+2098 MY
+420(486)X
+10 s
+1495 2098(9.5.2.26)N
+2055(TT_OPERATION)X
+2694(Field)X
+2876(.....................................................................)X
+4312(510)X
+8 s
+2194 MY
+420(487)X
+10 s
+1495 2194(9.5.2.27)N
+2055(TT_SCOPE)X
+2472(Field)X
+2656(................................................................................)X
+4312(510)X
+8 s
+2290 MY
+420(488)X
+10 s
+1495 2290(9.5.2.28)N
+2055(TYPE)X
+2274(Field)X
+2456(..........................................................................................)X
+4312(510)X
+8 s
+2386 MY
+420(489)X
+10 s
+1495 2386(9.5.2.29)N
+2055(WINDOW_TYPE)X
+2692(Field)X
+2876(.....................................................................)X
+4312(511)X
+8 s
+2482 MY
+420(490)X
+10 s
+1495 2482(9.5.3)N
+1995 0.0388(Resources...............................................................................................)AX
+4312(511)X
+8 s
+2578 MY
+420(491)X
+10 s
+1495 2578(9.5.4)N
+1995(Examples)X
+2356(...............................................................................................)X
+4312(513)X
+8 s
+2674 MY
+420(492)X
+10 s
+1495 2674(9.5.5)N
+1995(Application)X
+2434(Usage................................................................................)X
+4312(513)X
+8 s
+2770 MY
+420(493)X
+10 s
+1495 2770(9.6)N
+1935(Rationale)X
+2289(and)X
+2444(Open)X
+2659(Issues.....................................................................)X
+4312(514)X
+3 f
+12 s
+1 f
+8 s
+2962 MY
+420(494)X
+3 f
+12 s
+1875 2962(Index)N
+10 s
+2136(..........................................................................................................)X
+4312(515)X
+1 f
+9 s
+680 5854(X/Open)N
+967(Common)X
+1284(Desktop)X
+1569(Environment)X
+2008(\320)X
+2098(Definitions)X
+2471(and)X
+2611(Infrastructure)X
+3071(Company)X
+3404(Review)X
+3662(Draft)X
+11 s
+4298(xiii)X
+
+14 p
+%%Page: 14 14
+1(Palatino-Roman)xf 1 f
+2(Palatino-Italic)xf 2 f
+3(Palatino-Bold)xf 3 f
+4(Palatino-BoldItalic)xf 4 f
+5(Courier)xf 5 f
+6(Courier-Oblique)xf 6 f
+7(Courier-Bold)xf 7 f
+8(Times-Roman)xf 8 f
+11 s 0 xH 0 xS 8 f
+10 s
+1 f
+2 f
+12 s
+4070 322(Contents)N
+1 f
+11 s
+680 5854(xiv)N
+9 s
+2300(X/Open)X
+2587(CAE)X
+2756(Specification)X
+3181(Draft)X
+3366(\(1994\))X
+3576(\(Draft)X
+3785(November)X
+4145(21,)X
+4253(1994\))X
+
+15 p
+%%Page: 15 15
+1(Palatino-Roman)xf 1 f
+2(Palatino-Italic)xf 2 f
+3(Palatino-Bold)xf 3 f
+4(Palatino-BoldItalic)xf 4 f
+5(Courier)xf 5 f
+6(Courier-Oblique)xf 6 f
+7(Courier-Bold)xf 7 f
+8(Times-Roman)xf 8 f
+9 s 0 xH 0 xS 8 f
+10 s
+1 f
+4397 MX
+
+% included PostScript
+
+%%HLJ_Lineno_Off
+1002 754 MXY
+96 -432 Dl
+1006 754 MXY
+96 -432 Dl
+1010 754 MXY
+96 -432 Dl
+1014 754 MXY
+96 -432 Dl
+1018 754 MXY
+96 -432 Dl
+1022 754 MXY
+96 -432 Dl
+1026 754 MXY
+96 -432 Dl
+1030 754 MXY
+96 -432 Dl
+1034 754 MXY
+96 -432 Dl
+1037 754 MXY
+96 -432 Dl
+1041 754 MXY
+96 -432 Dl
+2 f
+18 s
+1122 706(Editorial)N
+1670(N)X
+1782(otes)X
+1950 MX
+
+% included PostScript
+
+%%HLJ_Lineno_On
+10 s
+1 f
+8 s
+1210 MY
+420(495)X
+2 f
+10 s
+1002 1210(This)N
+1172(section)X
+1423(will)X
+1575(not)X
+1710(appear)X
+1952(in)X
+2046(the)X
+2172(final)X
+2346(standard.)X
+2699(It)X
+2781(is)X
+2862(used)X
+3036(to)X
+3127(describe)X
+3410(editorial)X
+3705(issues)X
+3923(associated)X
+4274(with)X
+1 f
+6 s
+7 s
+4500(2)X
+6 s
+2 f
+10 s
+1 f
+8 s
+1306 MY
+420(496)X
+2 f
+10 s
+1002 1306(this)N
+1142(draft.)X
+1 f
+6 s
+7 s
+4500(2)X
+6 s
+10 s
+8 s
+1450 MY
+420(497)X
+10 s
+1002 1450(This)N
+1184(is)X
+1271(the)X
+1412(fast-track)X
+1775(review)X
+2049(draft)X
+2254(for)X
+2388(the)X
+2529(X/Open)X
+2856(Common)X
+3220(Desktop)X
+3547(Environment.)X
+4084(Technical)X
+6 s
+7 s
+4500(6)X
+6 s
+10 s
+8 s
+1546 MY
+420(498)X
+10 s
+1002 1546(changes)N
+1310(from)X
+1508(previous)X
+1844(drafts)X
+2076(are)X
+2210(diff-marked)X
+2661(with)X
+2847(small)X
+3062(numbers)X
+3399(in)X
+3492(the)X
+3626(right)X
+3821(margin,)X
+4121(like)X
+4272(this.)X
+6 s
+7 s
+4500(1)X
+6 s
+10 s
+8 s
+1642 MY
+420(499)X
+10 s
+1002 1642(These)N
+1227(are)X
+1357(logical)X
+1610(diff-marks,)X
+2024(used)X
+2213(only)X
+2390(for)X
+2513(technical)X
+2847(changes,)X
+3171(not)X
+3307(for)X
+3430(editorial)X
+3748(changes.)X
+6 s
+7 s
+4500(1)X
+6 s
+10 s
+8 s
+1786 MY
+420(500)X
+10 s
+1002 1786(The)N
+1155(following)X
+1516(schedule)X
+1848(addresses)X
+2216(recent)X
+2452(and)X
+2607(future)X
+2846(events.)X
+6 s
+7 s
+4500(6)X
+6 s
+10 s
+8 s
+1930 MY
+420(501)X
+10 s
+1002 1930(Oct)N
+1147(10)X
+9 f
+1247(-)X
+1 f
+1311(Nov)X
+1486(4)X
+1642(WG)X
+1803(and)X
+1958(Technical)X
+2315(Managers)X
+2685(Review)X
+2970(Draft)X
+3177(5)X
+6 s
+7 s
+4500(4)X
+6 s
+10 s
+8 s
+2074 MY
+420(502)X
+10 s
+1002 2074(Nov)N
+1177(21)X
+1642(CDE)X
+1830(Sponsors)X
+2174(deliver)X
+2442(Draft)X
+2649(6)X
+2709(to)X
+2799(X/Open)X
+3115(for)X
+3238(formal)X
+3495(review)X
+6 s
+7 s
+4500(5)X
+6 s
+10 s
+8 s
+2218 MY
+420(503)X
+10 s
+1002 2218(Nov)N
+1177(21)X
+1642(X/Open)X
+1958(announces)X
+2356(formal)X
+2613(review)X
+8 s
+2362 MY
+420(504)X
+10 s
+1002 2362(Nov)N
+1177(28)X
+9 f
+1277(-)X
+1 f
+1341(Jan)X
+1474(13)X
+1642(Technical)X
+1999(Managers)X
+2369(conduct)X
+2674(formal)X
+2931(review)X
+3194(of)X
+3285(Draft)X
+3492(6)X
+6 s
+7 s
+4500(5)X
+6 s
+10 s
+8 s
+2506 MY
+420(505)X
+10 s
+1002 2506(Jan)N
+1135(22)X
+9 f
+1235(-)X
+1 f
+1299(Feb)X
+1445(10)X
+1642(CDE)X
+1830(Sponsors)X
+2174(resolve)X
+2448(issues)X
+2679(from)X
+2873(formal)X
+3130(review)X
+8 s
+2650 MY
+420(506)X
+10 s
+1002 2650(Feb)N
+1148(28)X
+1642(CDE)X
+1853(Sponsors)X
+2220(turn)X
+2415(over)X
+2618(revised)X
+2921(materials)X
+3292(\(troff)X
+3519(source)X
+3795(files\))X
+4011(to)X
+4125(X/Open)X
+8 s
+2746 MY
+420(507)X
+10 s
+1642 2746(editors)N
+8 s
+2890 MY
+420(508)X
+10 s
+1002 2890(Mar)N
+1170(1)X
+9 f
+1230(-)X
+1 f
+1294(Apr)X
+1456(3)X
+1642(X/Open)X
+1958(typesets)X
+2266(and)X
+2421(prints)X
+2650(standard)X
+9 s
+680 5854(X/Open)N
+967(Common)X
+1284(Desktop)X
+1569(Environment)X
+2008(\320)X
+2098(Definitions)X
+2471(and)X
+2611(Infrastructure)X
+3071(Company)X
+3404(Review)X
+3662(Draft)X
+11 s
+4326(xv)X
+
+16 p
+%%Page: 16 16
+1(Palatino-Roman)xf 1 f
+2(Palatino-Italic)xf 2 f
+3(Palatino-Bold)xf 3 f
+4(Palatino-BoldItalic)xf 4 f
+5(Courier)xf 5 f
+6(Courier-Oblique)xf 6 f
+7(Courier-Bold)xf 7 f
+8(Times-Roman)xf 8 f
+11 s 0 xH 0 xS 8 f
+10 s
+1 f
+11 s
+680 5854(xvi)N
+9 s
+2300(X/Open)X
+2587(CAE)X
+2756(Specification)X
+3181(Draft)X
+3366(\(1994\))X
+3576(\(Draft)X
+3785(November)X
+4145(21,)X
+4253(1994\))X
+
+17 p
+%%Page: 17 17
+1(Palatino-Roman)xf 1 f
+2(Palatino-Italic)xf 2 f
+3(Palatino-Bold)xf 3 f
+4(Palatino-BoldItalic)xf 4 f
+5(Courier)xf 5 f
+6(Courier-Oblique)xf 6 f
+7(Courier-Bold)xf 7 f
+8(Times-Roman)xf 8 f
+9 s 0 xH 0 xS 8 f
+10 s
+1 f
+4397 MX
+
+% included PostScript
+
+%%HLJ_Lineno_Off
+1002 754 MXY
+96 -432 Dl
+1006 754 MXY
+96 -432 Dl
+1010 754 MXY
+96 -432 Dl
+1014 754 MXY
+96 -432 Dl
+1018 754 MXY
+96 -432 Dl
+1022 754 MXY
+96 -432 Dl
+1026 754 MXY
+96 -432 Dl
+1030 754 MXY
+96 -432 Dl
+1034 754 MXY
+96 -432 Dl
+1037 754 MXY
+96 -432 Dl
+1041 754 MXY
+96 -432 Dl
+2 f
+18 s
+1122 706(Preface)N
+1484 MX
+
+% included PostScript
+
+%%HLJ_Lineno_On
+3 f
+10 s
+1 f
+8 s
+1210 MY
+420(509)X
+3 f
+10 s
+1002 1210(X/Open)N
+1 f
+8 s
+1354 MY
+420(510)X
+10 s
+1002 1354(X/Open)N
+1330(is)X
+1419(an)X
+1537(independent,)X
+2036(worldwide,)X
+2480(open)X
+2689(systems)X
+3003(organisation)X
+3478(supported)X
+3878(by)X
+3999(most)X
+4207(of)X
+4311(the)X
+8 s
+1450 MY
+420(511)X
+10 s
+1002 1450(world's)N
+1302(largest)X
+1568(information)X
+2018(systems)X
+2327(suppliers,)X
+2703(user)X
+2883(organisations)X
+3387(and)X
+3550(software)X
+3886(companies.)X
+4334(Its)X
+8 s
+1546 MY
+420(512)X
+10 s
+1002 1546(mission)N
+1298(is)X
+1377(to)X
+1469(bring)X
+1680(to)X
+1772(users)X
+1980(greater)X
+2252(value)X
+2468(from)X
+2664(computing,)X
+3092(through)X
+3400(the)X
+3532(practical)X
+3858(implementation)X
+8 s
+1642 MY
+420(513)X
+10 s
+1002 1642(of)N
+1093(open)X
+1289(systems.)X
+8 s
+1786 MY
+420(514)X
+10 s
+1002 1786(X/Open's)N
+1379(strategy)X
+1688(for)X
+1816(achieving)X
+2182(this)X
+2336(goal)X
+2512(is)X
+2594(to)X
+2689(combine)X
+3016(existing)X
+3317(and)X
+3478(emerging)X
+3840(standards)X
+4216(into)X
+4381(a)X
+8 s
+1882 MY
+420(515)X
+10 s
+1002 1882(comprehensive,)N
+1602(integrated,)X
+2025(high-value)X
+2445(and)X
+2620(usable)X
+2887(system)X
+3174(environment,)X
+3689(called)X
+3938(the)X
+4088(Common)X
+8 s
+1978 MY
+420(516)X
+10 s
+1002 1978(Applications)N
+1480(Environment)X
+1971(\(CAE\).)X
+2258(This)X
+2436(environment)X
+2917(covers)X
+3172(the)X
+3308(standards,)X
+3704(above)X
+3941(the)X
+4077(hardware)X
+8 s
+2074 MY
+420(517)X
+10 s
+1002 2074(level,)N
+1211(that)X
+1371(are)X
+1503(needed)X
+1783(to)X
+1875(support)X
+2177(open)X
+2375(systems.)X
+2697(It)X
+2771(provides)X
+3105(for)X
+3229(portability)X
+3623(and)X
+3779(interoperability)X
+4350(of)X
+8 s
+2170 MY
+420(518)X
+10 s
+1002 2170(applications,)N
+1473(and)X
+1628(allows)X
+1879(users)X
+2085(to)X
+2175(move)X
+2393(between)X
+2710(systems)X
+3011(with)X
+3193(a)X
+3253(minimum)X
+3626(of)X
+3717(retraining.)X
+8 s
+2314 MY
+420(519)X
+10 s
+1002 2314(The)N
+1181(components)X
+1660(of)X
+1777(the)X
+1933(Common)X
+2312(Applications)X
+2811(Environment)X
+3323(are)X
+3479(defined)X
+3795(in)X
+3910(X/Open)X
+4253(CAE)X
+8 s
+2410 MY
+420(520)X
+10 s
+1002 2410(Specifications.)N
+1552(These)X
+1781(contain,)X
+2086(among)X
+2355(other)X
+2565(things,)X
+2828(an)X
+2938(evolving)X
+3269(portfolio)X
+3603(of)X
+3697(practical)X
+4024(application)X
+8 s
+2506 MY
+420(521)X
+10 s
+1002 2506(programming)N
+1520(interfaces)X
+1883(\(APIs\),)X
+2151(which)X
+2392(significantly)X
+2850(enhance)X
+3163(portability)X
+3560(of)X
+3655(application)X
+4076(programs)X
+8 s
+2602 MY
+420(522)X
+10 s
+1002 2602(at)N
+1098(the)X
+1238(source)X
+1500(code)X
+1697(level,)X
+1914(and)X
+2079(definitions)X
+2488(of,)X
+2609(and)X
+2774(references)X
+3163(to,)X
+3282(protocols)X
+3642(and)X
+3806(protocol)X
+4132(profiles,)X
+8 s
+2698 MY
+420(523)X
+10 s
+1002 2698(which)N
+1240(significantly)X
+1695(enhance)X
+2005(the)X
+2135(interoperability)X
+2705(of)X
+2796(applications.)X
+8 s
+2842 MY
+420(524)X
+10 s
+1002 2842(The)N
+1163(X/Open)X
+1487(CAE)X
+1683(Specifications)X
+2197(are)X
+2335(supported)X
+2730(by)X
+2846(an)X
+2960(extensive)X
+3317(set)X
+3443(of)X
+3542(conformance)X
+4030(tests)X
+4217(and)X
+4381(a)X
+8 s
+2938 MY
+420(525)X
+10 s
+1002 2938(distinct)N
+1295(X/Open)X
+1621(trademark\320the)X
+2213(XPG)X
+2405(brand\320that)X
+2864(is)X
+2951(licensed)X
+3268(by)X
+3386(X/Open)X
+3712(and)X
+3876(may)X
+4060(be)X
+4171(carried)X
+8 s
+3034 MY
+420(526)X
+10 s
+1002 3034(only)N
+1179(on)X
+1289(products)X
+1626(that)X
+1784(comply)X
+2070(with)X
+2252(the)X
+2382(X/Open)X
+2698(CAE)X
+2886(Specifications.)X
+8 s
+3178 MY
+420(527)X
+10 s
+1002 3178(The)N
+1192(XPG)X
+1411(brand,)X
+1699(when)X
+1953(associated)X
+2374(with)X
+2594(a)X
+2692(vendor's)X
+3060(product,)X
+3421(communicates)X
+3992(clearly)X
+4286(and)X
+8 s
+3274 MY
+420(528)X
+10 s
+1002 3274(unambiguously)N
+1598(to)X
+1707(a)X
+1786(procurer)X
+2134(that)X
+2310(the)X
+2458(software)X
+2804(bearing)X
+3109(the)X
+3257(brand)X
+3506(correctly)X
+3855(implements)X
+4311(the)X
+8 s
+3370 MY
+420(529)X
+10 s
+1002 3370(corresponding)N
+1576(X/Open)X
+1930(CAE)X
+2156(Specifications.)X
+2740(Users)X
+2998(specifying)X
+3420(XPG-conformance)X
+4128(in)X
+4256(their)X
+8 s
+3466 MY
+420(530)X
+10 s
+1002 3466(procurements)N
+1530(are)X
+1675(therefore)X
+2031(certain)X
+2307(that)X
+2480(the)X
+2625(branded)X
+2958(products)X
+3310(they)X
+3499(buy)X
+3670(conform)X
+4005(to)X
+4109(the)X
+4253(CAE)X
+8 s
+3562 MY
+420(531)X
+10 s
+1002 3562(Specifications.)N
+8 s
+3706 MY
+420(532)X
+10 s
+1002 3706(X/Open)N
+1325(is)X
+1410(primarily)X
+1774(concerned)X
+2167(with)X
+2357(the)X
+2495(selection)X
+2831(and)X
+2994(adoption)X
+3342(of)X
+3441(standards.)X
+3859(The)X
+4020(policy)X
+4266(is)X
+4351(to)X
+8 s
+3802 MY
+420(533)X
+10 s
+1002 3802(use)N
+1145(formal)X
+1405(approved)X
+2 f
+1772(de)X
+1866(jure)X
+1 f
+2017(standards,)X
+2410(where)X
+2654(they)X
+2831(exist,)X
+3036(and)X
+3194(to)X
+3287(adopt)X
+3517(widely)X
+3784(supported)X
+2 f
+4174(de)X
+4268(facto)X
+1 f
+8 s
+3898 MY
+420(534)X
+10 s
+1002 3898(standards)N
+1372(in)X
+1461(other)X
+1667(cases.)X
+8 s
+4042 MY
+420(535)X
+10 s
+1002 4042(Where)N
+1277(formal)X
+1555(standards)X
+1946(do)X
+2080(not)X
+2237(exist,)X
+2460(it)X
+2550(is)X
+2648(X/Open)X
+2985(policy)X
+3244(to)X
+3355(work)X
+3583(closely)X
+3867(with)X
+4071(standards)X
+8 s
+4138 MY
+420(536)X
+10 s
+1002 4138(development)N
+1503(organisations)X
+2014(to)X
+2119(assist)X
+2345(in)X
+2449(the)X
+2594(creation)X
+2914(of)X
+3020(formal)X
+3292(standards)X
+3677(covering)X
+4019(the)X
+4163(needed)X
+8 s
+4234 MY
+420(537)X
+10 s
+1002 4234(functions,)N
+1395(and)X
+1573(to)X
+1686(make)X
+1922(its)X
+2049(own)X
+2250(work)X
+2481(freely)X
+2727(available)X
+3087(to)X
+3201(such)X
+3409(organisations.)X
+3949(Additionally,)X
+8 s
+4330 MY
+420(538)X
+10 s
+1002 4330(X/Open)N
+1318(has)X
+1458(a)X
+1518(commitment)X
+1990(to)X
+2080(align)X
+2276(its)X
+2379(definitions)X
+2778(with)X
+2960(formal)X
+3217(approved)X
+3581(standards.)X
+9 s
+680 5854(X/Open)N
+967(Common)X
+1284(Desktop)X
+1569(Environment)X
+2008(\320)X
+2098(Definitions)X
+2471(and)X
+2611(Infrastructure)X
+3071(Company)X
+3404(Review)X
+3662(Draft)X
+11 s
+4274(xvii)X
+
+18 p
+%%Page: 18 18
+1(Palatino-Roman)xf 1 f
+2(Palatino-Italic)xf 2 f
+3(Palatino-Bold)xf 3 f
+4(Palatino-BoldItalic)xf 4 f
+5(Courier)xf 5 f
+6(Courier-Oblique)xf 6 f
+7(Courier-Bold)xf 7 f
+8(Times-Roman)xf 8 f
+11 s 0 xH 0 xS 8 f
+10 s
+1 f
+2 f
+12 s
+4142 322(Preface)N
+3 f
+10 s
+1 f
+8 s
+658 MY
+420(539)X
+3 f
+10 s
+1002 658(X/Open)N
+1304(Specifications)X
+1 f
+8 s
+802 MY
+420(540)X
+10 s
+1002 802(There)N
+1225(are)X
+1355(two)X
+1512(types)X
+1722(of)X
+1813(X/Open)X
+2129(specification:)X
+8 s
+10 f
+1 f
+8 s
+946 MY
+420(541)X
+10 f
+8 s
+1060 946(g)N
+2 f
+10 s
+1122(CAE)X
+1302(Specifications)X
+1 f
+8 s
+1090 MY
+420(542)X
+10 s
+1122 1090(CAE)N
+1313(\(Common)X
+1696(Applications)X
+2172(Environment\))X
+2688(Specifications)X
+3197(are)X
+3330(the)X
+3463(long-life)X
+3781(specifications)X
+4283(that)X
+8 s
+1186 MY
+420(543)X
+10 s
+1122 1186(form)N
+1322(the)X
+1458(basis)X
+1658(for)X
+1786(conformant)X
+2223(and)X
+2383(branded)X
+2706(X/Open)X
+3027(systems.)X
+3373(They)X
+3575(are)X
+3710(intended)X
+4050(to)X
+4145(be)X
+4252(used)X
+8 s
+1282 MY
+420(544)X
+10 s
+1122 1282(widely)N
+1386(within)X
+1637(the)X
+1767(industry)X
+2089(for)X
+2212(product)X
+2515(development)X
+3001(and)X
+3156(procurement)X
+3635(purposes.)X
+8 s
+1426 MY
+420(545)X
+10 s
+1122 1426(Developers)N
+1552(who)X
+1737(base)X
+1921(their)X
+2114(products)X
+2459(on)X
+2577(a)X
+2645(current)X
+2931(CAE)X
+3127(Specification)X
+3608(can)X
+3759(be)X
+3870(sure)X
+4051(that)X
+4218(either)X
+8 s
+1522 MY
+420(546)X
+10 s
+1122 1522(the)N
+1270(current)X
+1566(specification)X
+2048(or)X
+2162(an)X
+2285(upwards-compatible)X
+3060(version)X
+3359(of)X
+3467(it)X
+3553(will)X
+3726(be)X
+3845(referenced)X
+4256(by)X
+4381(a)X
+8 s
+1618 MY
+420(547)X
+10 s
+1122 1618(future)N
+1363(XPG)X
+1547(brand)X
+1780(\(if)X
+1879(not)X
+2018(referenced)X
+2415(already\),)X
+2751(and)X
+2909(that)X
+3070(a)X
+3133(variety)X
+3404(of)X
+3498(compatible,)X
+3934(XPG-branded)X
+8 s
+1714 MY
+420(548)X
+10 s
+1122 1714(systems)N
+1426(capable)X
+1718(of)X
+1812(hosting)X
+2098(their)X
+2286(products)X
+2626(will)X
+2785(be)X
+2890(available,)X
+3249(either)X
+3475(immediately)X
+3944(or)X
+4042(in)X
+4133(the)X
+4265(near)X
+8 s
+1810 MY
+420(549)X
+10 s
+1122 1810(future.)N
+8 s
+1954 MY
+420(550)X
+10 s
+1122 1954(CAE)N
+1314(Specifications)X
+1824(are)X
+1958(not)X
+2098(published)X
+2475(to)X
+2569(coincide)X
+2888(with)X
+3074(the)X
+3208(launch)X
+3471(of)X
+3566(a)X
+3630(particular)X
+4003(XPG)X
+4190(brand,)X
+8 s
+2050 MY
+420(551)X
+10 s
+1122 2050(but)N
+1265(are)X
+1399(published)X
+1776(as)X
+1874(soon)X
+2066(as)X
+2164(they)X
+2342(are)X
+2476(developed.)X
+2912(By)X
+3029(providing)X
+3407(access)X
+3649(to)X
+3743(its)X
+3850(specifications)X
+4352(in)X
+8 s
+2146 MY
+420(552)X
+10 s
+1122 2146(this)N
+1281(way,)X
+1482(X/Open)X
+1808(makes)X
+2065(it)X
+2144(possible)X
+2462(for)X
+2595(products)X
+2942(that)X
+3111(conform)X
+3442(to)X
+3543(the)X
+3684(CAE)X
+3883(\(and)X
+4076(hence)X
+4311(are)X
+8 s
+2242 MY
+420(553)X
+10 s
+1122 2242(eligible)N
+1403(for)X
+1531(a)X
+1596(future)X
+1840(XPG)X
+2027(brand\))X
+2290(to)X
+2384(be)X
+2490(developed)X
+2886(as)X
+2984(soon)X
+3176(as)X
+3274(practicable,)X
+3704(enhancing)X
+4093(the)X
+4227(value)X
+8 s
+2338 MY
+420(554)X
+10 s
+1122 2338(of)N
+1213(the)X
+1343(XPG)X
+1525(brand)X
+1756(as)X
+1850(a)X
+1910(procurement)X
+2389(aid)X
+2521(to)X
+2611(users.)X
+8 s
+10 f
+1 f
+8 s
+2482 MY
+420(555)X
+10 f
+8 s
+1060 2482(g)N
+2 f
+10 s
+1122(Preliminary)X
+1532(Specifications)X
+1 f
+8 s
+2626 MY
+420(556)X
+10 s
+1122 2626(These)N
+1391(are)X
+1565(specifications,)X
+2128(usually)X
+2453(addressing)X
+2907(an)X
+3058(emerging)X
+3459(area)X
+3674(of)X
+3810(technology,)X
+4286(and)X
+8 s
+2722 MY
+420(557)X
+10 s
+1122 2722(consequently)N
+1618(not)X
+1761(yet)X
+1896(supported)X
+2290(by)X
+2405(a)X
+2472(base)X
+2655(of)X
+2753(conformant)X
+3192(product)X
+3502(implementations,)X
+4146(that)X
+4311(are)X
+8 s
+2818 MY
+420(558)X
+10 s
+1122 2818(released)N
+1481(in)X
+1617(a)X
+1724(controlled)X
+2152(manner)X
+2492(for)X
+2662(the)X
+2839(purpose)X
+3198(of)X
+3336(validation)X
+3763(through)X
+4117(practical)X
+8 s
+2914 MY
+420(559)X
+10 s
+1122 2914(implementation)N
+1718(or)X
+1827(prototyping.)X
+2324(A)X
+2418(Preliminary)X
+2870(Specification)X
+3354(is)X
+3443(not)X
+3591(a)X
+3663(``draft'')X
+3957(specification.)X
+8 s
+3010 MY
+420(560)X
+10 s
+1122 3010(Indeed,)N
+1412(it)X
+1484(is)X
+1564(as)X
+1661(stable)X
+1889(as)X
+1986(X/Open)X
+2305(can)X
+2450(make)X
+2666(it,)X
+2758(and)X
+2916(on)X
+3029(publication)X
+3454(has)X
+3598(gone)X
+3794(through)X
+4104(the)X
+4238(same)X
+8 s
+3106 MY
+420(561)X
+10 s
+1122 3106(rigorous)N
+1443(X/Open)X
+1759(development)X
+2245(and)X
+2400(review)X
+2663(procedures)X
+3082(as)X
+3176(a)X
+3236(CAE)X
+3424(Specification.)X
+8 s
+3250 MY
+420(562)X
+10 s
+1122 3250(Preliminary)N
+1578(Specifications)X
+2100(are)X
+2247(analogous)X
+2647(with)X
+2846(the)X
+2993(``trial-use'')X
+3409(standards)X
+3796(issued)X
+4059(by)X
+4184(formal)X
+8 s
+3346 MY
+420(563)X
+10 s
+1122 3346(standards)N
+1499(organisations,)X
+2022(and)X
+2184(product)X
+2493(development)X
+2985(teams)X
+3220(are)X
+3356(intended)X
+3697(to)X
+3793(develop)X
+4104(products)X
+8 s
+3442 MY
+420(564)X
+10 s
+1122 3442(on)N
+1240(the)X
+1378(basis)X
+1581(of)X
+1680(them.)X
+1929(However,)X
+2307(because)X
+2613(of)X
+2712(the)X
+2850(nature)X
+3108(of)X
+3207(the)X
+3345(technology)X
+3765(that)X
+3932(a)X
+4001(Preliminary)X
+8 s
+3538 MY
+420(565)X
+10 s
+1122 3538(Specification)N
+1604(is)X
+1691(addressing,)X
+2130(it)X
+2209(is)X
+2296(untried)X
+2588(in)X
+2687(practice)X
+2996(and)X
+3161(may)X
+3345(therefore)X
+3695(change)X
+3974(before)X
+4226(being)X
+8 s
+3634 MY
+420(566)X
+10 s
+1122 3634(published)N
+1510(as)X
+1619(a)X
+1694(CAE)X
+1897(Specification.)X
+2424(In)X
+2532(such)X
+2731(a)X
+2806(case)X
+2989(the)X
+3134(CAE)X
+3337(Specification)X
+3824(will)X
+3995(be)X
+4113(made)X
+4347(as)X
+8 s
+3730 MY
+420(567)X
+10 s
+1122 3730(upwards-compatible)N
+1911(as)X
+2035(possible)X
+2373(with)X
+2585(the)X
+2745(corresponding)X
+3311(Preliminary)X
+3781(Specification,)X
+4303(but)X
+8 s
+3826 MY
+420(568)X
+10 s
+1122 3826(complete)N
+1466(upwards-compatibility)X
+2302(in)X
+2391(all)X
+2497(cases)X
+2699(is)X
+2776(not)X
+2912(guaranteed.)X
+8 s
+3970 MY
+420(569)X
+10 s
+1002 3970(In)N
+1095(addition,)X
+1435(X/Open)X
+1751(periodically)X
+2194(publishes:)X
+8 s
+10 f
+1 f
+8 s
+4114 MY
+420(570)X
+10 f
+8 s
+1060 4114(g)N
+2 f
+10 s
+1122(Snapshots)X
+1 f
+8 s
+4258 MY
+420(571)X
+10 s
+1122 4258(Snapshots)N
+1511(are)X
+1650(``draft'')X
+1941(documents,)X
+2382(which)X
+2629(provide)X
+2937(a)X
+3006(mechanism)X
+3440(for)X
+3573(X/Open)X
+3899(to)X
+3999(disseminate)X
+8 s
+4354 MY
+420(572)X
+10 s
+1122 4354(information)N
+1577(on)X
+1700(its)X
+1815(current)X
+2105(direction)X
+2454(and)X
+2621 -0.4643(thinking)AX
+2951(to)X
+3053(an)X
+3171(interested)X
+3553(audience,)X
+3923(in)X
+4024(advance)X
+4350(of)X
+8 s
+4450 MY
+420(573)X
+10 s
+1122 4450(formal)N
+1379(publication,)X
+1820(with)X
+2002(a)X
+2062(view)X
+2255(to)X
+2345(soliciting)X
+2687(feedback)X
+3023(and)X
+3178(comment.)X
+8 s
+4594 MY
+420(574)X
+10 s
+1122 4594(A)N
+1211(Snapshot)X
+1564(represents)X
+1957(the)X
+2094(interim)X
+2380(results)X
+2642(of)X
+2740(an)X
+2853(X/Open)X
+3177(technical)X
+3519(activity.)X
+3850(Although)X
+4217(at)X
+4311(the)X
+8 s
+4690 MY
+420(575)X
+10 s
+1122 4690(time)N
+1323(of)X
+1437(publication)X
+1881(X/Open)X
+2220(intends)X
+2525(to)X
+2638(progress)X
+2987(the)X
+3140(activity)X
+3445(towards)X
+3779(publication)X
+4222(of)X
+4335(an)X
+8 s
+4786 MY
+420(576)X
+10 s
+1122 4786(X/Open)N
+1444(Preliminary)X
+1890(or)X
+1992(CAE)X
+2186(Specification,)X
+2684(X/Open)X
+3006(is)X
+3089(a)X
+3156(consensus)X
+3543(organisation,)X
+4032(and)X
+4194(makes)X
+8 s
+4882 MY
+420(577)X
+10 s
+1122 4882(no)N
+1232(commitment)X
+1704(regarding)X
+2072(publication.)X
+8 s
+5026 MY
+420(578)X
+10 s
+1122 5026(Similarly,)N
+1488(a)X
+1553(Snapshot)X
+1904(does)X
+2094(not)X
+2235(represent)X
+2592(any)X
+2747(commitment)X
+3224(by)X
+3337(any)X
+3492(X/Open)X
+3813(member)X
+4132(to)X
+4228(make)X
+8 s
+5122 MY
+420(579)X
+10 s
+1122 5122(any)N
+1272(specific)X
+1557(products)X
+1894(available.)X
+11 s
+680 5854(xviii)N
+9 s
+2300(X/Open)X
+2587(CAE)X
+2756(Specification)X
+3181(Draft)X
+3366(\(1994\))X
+3576(\(Draft)X
+3785(November)X
+4145(21,)X
+4253(1994\))X
+
+19 p
+%%Page: 19 19
+1(Palatino-Roman)xf 1 f
+2(Palatino-Italic)xf 2 f
+3(Palatino-Bold)xf 3 f
+4(Palatino-BoldItalic)xf 4 f
+5(Courier)xf 5 f
+6(Courier-Oblique)xf 6 f
+7(Courier-Bold)xf 7 f
+8(Times-Roman)xf 8 f
+9 s 0 xH 0 xS 8 f
+10 s
+1 f
+2 f
+12 s
+680 322(Preface)N
+3 f
+10 s
+1 f
+8 s
+658 MY
+420(580)X
+3 f
+10 s
+1002 658(X/Open)N
+1304(Guides)X
+1 f
+8 s
+802 MY
+420(581)X
+10 s
+1002 802(X/Open)N
+1353(Guides)X
+1661(provide)X
+1995(information)X
+2472(that)X
+2665(X/Open)X
+3016(believes)X
+3354(is)X
+3466(useful)X
+3739(in)X
+3863(the)X
+4028(evaluation,)X
+8 s
+898 MY
+420(582)X
+10 s
+1002 898(procurement,)N
+1535(development)X
+2055(or)X
+2185(management)X
+2699(of)X
+2824(open)X
+3054(systems,)X
+3409(particularly)X
+3878(those)X
+4120(that)X
+4311(are)X
+8 s
+994 MY
+420(583)X
+10 s
+1002 994(X/Open-compliant.)N
+8 s
+1138 MY
+420(584)X
+10 s
+1002 1138(X/Open)N
+1324(Guides)X
+1603(are)X
+1739(not)X
+1881(normative,)X
+2292(and)X
+2453(should)X
+2723(not)X
+2865(be)X
+2973(referenced)X
+3374(for)X
+3504(purposes)X
+3857(of)X
+3955(specifying)X
+4345(or)X
+8 s
+1234 MY
+420(585)X
+10 s
+1002 1234(claiming)N
+1328(X/Open-conformance.)X
+3 f
+1 f
+8 s
+1426 MY
+420(586)X
+3 f
+10 s
+1002 1426(This)N
+1187(Document)X
+1 f
+8 s
+1570 MY
+420(587)X
+10 s
+1002 1570(This)N
+1176(specification)X
+1642(is)X
+1721(one)X
+1871(of)X
+1964(a)X
+2026(set)X
+2146(of)X
+2239(X/Open)X
+2557(CAE)X
+2747(Specifications)X
+3255(\(see)X
+3414(above\))X
+3674(defining)X
+3992(the)X
+4125(X/Open)X
+8 s
+1666 MY
+420(588)X
+10 s
+1002 1666(Common)N
+1355(Desktop)X
+1671(Environment)X
+2157(\()X
+9 s
+2184(XCDE)X
+10 s
+2383(\))X
+7 s
+2410 1634(1)N
+10 s
+2458 1666(requirements:)N
+8 s
+10 f
+1 f
+8 s
+1810 MY
+420(589)X
+10 f
+8 s
+1060 1810(g)N
+10 s
+1 f
+1122(X/Open)X
+1438(Common)X
+1791(Desktop)X
+2107(Environment)X
+2593(\320)X
+2693(Definitions)X
+3105(and)X
+3260(Infrastructure)X
+3772(\(this)X
+3948(document\))X
+8 s
+10 f
+1 f
+8 s
+1954 MY
+420(590)X
+10 f
+8 s
+1060 1954(g)N
+10 s
+1 f
+1122(X/Open)X
+1438(Common)X
+1791(Desktop)X
+2107(Environment)X
+2593(\320)X
+2693(Services)X
+3001(and)X
+3156(Applications)X
+8 s
+2098 MY
+420(591)X
+10 s
+1002 2098(The)N
+1180(X/Open)X
+1521(CAE)X
+1734(Specification,)X
+3 f
+9 s
+2249(XCDE)X
+10 s
+2498(Definitions)X
+2967(and)X
+3150(Infrastructure)X
+1 f
+3704(document)X
+4108(provides)X
+6 s
+7 s
+4500(2)X
+6 s
+10 s
+8 s
+2194 MY
+420(592)X
+10 s
+1002 2194(common)N
+1345(definitions)X
+1755(for)X
+1889(the)X
+2030(X/Open)X
+2357(CAE)X
+2556(Specification,)X
+3 f
+9 s
+3057(XCDE)X
+10 s
+3291(Definitions)X
+3745(and)X
+3913(Infrastructure)X
+1 f
+6 s
+7 s
+4500(2)X
+6 s
+10 s
+8 s
+2290 MY
+420(593)X
+10 s
+1002 2290(and)N
+1160(the)X
+1293(X/Open)X
+1612(CAE)X
+1803(Specification,)X
+3 f
+9 s
+2296(XCDE)X
+10 s
+2523(Services)X
+2849(and)X
+3010(Applications)X
+1 f
+3483(;)X
+3526(therefore,)X
+3890(readers)X
+4177(should)X
+6 s
+7 s
+4500(2)X
+6 s
+10 s
+8 s
+2386 MY
+420(594)X
+10 s
+1002 2386(be)N
+1117(familiar)X
+1429(with)X
+1624(the)X
+1766(X/Open)X
+2094(CAE)X
+2294(Specification,)X
+3 f
+9 s
+2796(XCDE)X
+10 s
+3032(Definitions)X
+3488(and)X
+3658(Infrastructure)X
+1 f
+4198(before)X
+6 s
+7 s
+4500(2)X
+6 s
+10 s
+8 s
+2482 MY
+420(595)X
+10 s
+1002 2482(using)N
+1238(the)X
+1389(X/Open)X
+1726(CAE)X
+1936(Specification,)X
+3 f
+9 s
+2448(XCDE)X
+10 s
+2694(Services)X
+3039(and)X
+3219(Applications)X
+1 f
+3692(.)X
+3774(\(Readers)X
+4128(are)X
+4280(also)X
+6 s
+7 s
+4500(2)X
+6 s
+10 s
+8 s
+2578 MY
+420(596)X
+10 s
+1002 2578(expected)N
+1356(to)X
+1465(be)X
+1586(familiar)X
+1904(with)X
+2105(the)X
+2254(X/Open)X
+2589(CAE)X
+2796(Specification,)X
+3 f
+3307(System)X
+3613(Interface)X
+3977(Definitions)X
+1 f
+4401(,)X
+3 f
+1 f
+8 s
+2674 MY
+420(597)X
+3 f
+10 s
+1002 2674(Issue)N
+1229(4,)X
+1324(Version)X
+1648(2)X
+1 f
+(,)S
+1743(which)X
+1996(contains)X
+2326(a)X
+2401(number)X
+2715(of)X
+2821(applicable)X
+3219(definitions.\))X
+3700(This)X
+3887(document)X
+4280(also)X
+8 s
+2770 MY
+420(598)X
+10 s
+1002 2770(describes)N
+1377(interfaces)X
+1764(available)X
+2127(to)X
+2244(both)X
+2451(the)X
+2608(application)X
+3052(program)X
+3409(and)X
+3590(the)X
+3746(X/Open)X
+4088(Common)X
+8 s
+2866 MY
+420(599)X
+10 s
+1002 2866(Desktop)N
+1318(Environment)X
+1804(Services)X
+2112(and)X
+2267(Applications.)X
+2780(This)X
+2952(specification)X
+3416(is)X
+3493(structured)X
+3882(as)X
+3976(follows:)X
+8 s
+10 f
+1 f
+8 s
+3010 MY
+420(600)X
+10 f
+8 s
+1060 3010(g)N
+10 s
+1 f
+1122(Chapter)X
+1483(1)X
+1597(explains)X
+1964(the)X
+2148(targets)X
+2462(for)X
+2639(standardisation,)X
+3285(requirements)X
+3830(for)X
+4008(conforming)X
+8 s
+3106 MY
+420(601)X
+10 s
+1122 3106(implementations,)N
+1759(and)X
+1914(general)X
+2195(standards)X
+2565(terminology.)X
+8 s
+10 f
+1 f
+8 s
+3250 MY
+420(602)X
+10 f
+8 s
+1060 3250(g)N
+10 s
+1 f
+1122(Chapter)X
+1429(2)X
+1489(is)X
+1566(a)X
+1626(glossary)X
+1941(of)X
+2032(terms.)X
+8 s
+10 f
+1 f
+8 s
+3394 MY
+420(603)X
+10 f
+8 s
+1060 3394(g)N
+10 s
+1 f
+1122(Chapter)X
+1429(3)X
+1489(describes)X
+1837(general)X
+2118(definitions)X
+2517(and)X
+2672(requirements)X
+3163(for)X
+9 s
+3284(XCDE)X
+10 s
+3483(.)X
+8 s
+10 f
+1 f
+8 s
+3538 MY
+420(604)X
+10 f
+8 s
+1060 3538(g)N
+10 s
+1 f
+1122(Chapter)X
+1438(4)X
+1508(describes)X
+1866(requirements)X
+2367(for)X
+2500(the)X
+2640(underlying)X
+3063(window)X
+3389(system)X
+3666(and)X
+3831(additional)X
+9 s
+4222(XCDE)X
+10 s
+8 s
+3634 MY
+420(605)X
+10 s
+1122 3634(interfaces)N
+1482(\(widgets\).)X
+8 s
+10 f
+1 f
+8 s
+3778 MY
+420(606)X
+10 f
+8 s
+1060 3778(g)N
+10 s
+1 f
+1122(Chapter)X
+1429(5)X
+1489(describes)X
+1837(miscellaneous)X
+9 s
+2353(XCDE)X
+10 s
+2572(desktop)X
+2875(services)X
+3175(interfaces.)X
+8 s
+10 f
+1 f
+8 s
+3922 MY
+420(607)X
+10 f
+8 s
+1060 3922(g)N
+10 s
+1 f
+1122(Chapter)X
+1429(6)X
+1489(describes)X
+1837(the)X
+9 s
+1965(XCDE)X
+10 s
+2184(message)X
+2503(services)X
+2803(interfaces)X
+3163(\(ToolTalk\).)X
+8 s
+10 f
+1 f
+8 s
+4066 MY
+420(608)X
+10 f
+8 s
+1060 4066(g)N
+10 s
+1 f
+1122(Chapter)X
+1429(7)X
+1489(describes)X
+1837(the)X
+9 s
+1965(XCDE)X
+10 s
+2184(drag)X
+2369(and)X
+2524(drop)X
+2717(interfaces.)X
+6 s
+7 s
+4500(5)X
+6 s
+8 s
+10 f
+1 f
+8 s
+4210 MY
+420(609)X
+10 f
+8 s
+1060 4210(g)N
+10 s
+1 f
+1122(Chapter)X
+1429(8)X
+1489(describes)X
+1837(the)X
+9 s
+1965(XCDE)X
+10 s
+2184(data)X
+2359(typing)X
+2610(interfaces.)X
+8 s
+10 f
+1 f
+8 s
+4354 MY
+420(610)X
+10 f
+8 s
+1060 4354(g)N
+10 s
+1 f
+1122(Chapter)X
+1429(9)X
+1489(describes)X
+1837(the)X
+9 s
+1965(XCDE)X
+10 s
+2184(execution)X
+2544(management)X
+3024(interfaces.)X
+8 s
+4498 MY
+420(611)X
+10 s
+1002 4498(Comprehensive)N
+1582(references)X
+1961(are)X
+2091(available)X
+2427(in)X
+2516(the)X
+2646(index.)X
+8 s
+10 f
+680 5049(hhhhhhhhhhhhhhhhhh)N
+1 f
+8 s
+5145 MY
+420(612)X
+8 s
+680 5145(1.)N
+776(These)X
+975(names)X
+1193(are)X
+1315(tentative.)X
+1630(X/Open)X
+1902(and)X
+2044(the)X
+2167(CDE)X
+2335(sponsors)X
+2619(will)X
+2762(select)X
+2952(a)X
+3017(unique)X
+3251(name)X
+3441(for)X
+3555(this)X
+3692(specification)X
+4080(that)X
+4224(can)X
+4354(be)X
+8 s
+5217 MY
+420(613)X
+8 s
+776 5217(trademark-protected)N
+1380(for)X
+1477(branding)X
+1754(purposes.)X
+9 s
+680 5854(X/Open)N
+967(Common)X
+1284(Desktop)X
+1569(Environment)X
+2008(\320)X
+2098(Definitions)X
+2471(and)X
+2611(Infrastructure)X
+3071(Company)X
+3404(Review)X
+3662(Draft)X
+11 s
+4305(xix)X
+
+20 p
+%%Page: 20 20
+1(Palatino-Roman)xf 1 f
+2(Palatino-Italic)xf 2 f
+3(Palatino-Bold)xf 3 f
+4(Palatino-BoldItalic)xf 4 f
+5(Courier)xf 5 f
+6(Courier-Oblique)xf 6 f
+7(Courier-Bold)xf 7 f
+8(Times-Roman)xf 8 f
+11 s 0 xH 0 xS 8 f
+10 s
+1 f
+2 f
+12 s
+4142 322(Preface)N
+3 f
+10 s
+1 f
+8 s
+658 MY
+420(614)X
+3 f
+10 s
+1002 658(Typographical)N
+1555(Conventions)X
+1 f
+8 s
+802 MY
+420(615)X
+10 s
+1002 802(The)N
+1155(following)X
+1516(typographical)X
+2030(conventions)X
+2478(are)X
+2608(used)X
+2797(throughout)X
+3221(this)X
+3370(document:)X
+8 s
+10 f
+1 f
+8 s
+946 MY
+420(616)X
+10 f
+8 s
+1060 946(g)N
+3 f
+10 s
+1122(Bold)X
+1 f
+1315(font)X
+1478(is)X
+1555(used)X
+1744(in)X
+1833(text)X
+1984(for)X
+2107(options)X
+2392(to)X
+2482(commands,)X
+2913(filenames,)X
+3294(keywords)X
+3667(and)X
+3823(type)X
+4000(names.)X
+4290(It)X
+4364(is)X
+8 s
+1042 MY
+420(617)X
+10 s
+1122 1042(also)N
+1283(used)X
+1472(to)X
+1562(identify)X
+1858(brackets)X
+2172(that)X
+2330(surround)X
+2683(optional)X
+2997(items)X
+3209(in)X
+3298(syntax,)X
+3 f
+3569([)X
+3609(])X
+1 f
+3636(.)X
+8 s
+10 f
+1 f
+8 s
+1186 MY
+420(618)X
+10 f
+8 s
+1060 1186(g)N
+2 f
+10 s
+1122(Italic)X
+1 f
+1326(strings)X
+1603(are)X
+1751(used)X
+1958(for)X
+2100(emphasis)X
+2473(or)X
+2588(to)X
+2697(identify)X
+3012(the)X
+3161(first)X
+3342(instance)X
+3670(of)X
+3780(a)X
+3859(word)X
+4090(requiring)X
+8 s
+1282 MY
+420(619)X
+10 s
+1122 1282(definition.)N
+1527(Italics)X
+1756(in)X
+1845(text)X
+1996(also)X
+2157(denote:)X
+8 s
+1426 MY
+420(620)X
+10 s
+1122 1426(\320)N
+1242(variable)X
+1547(names,)X
+1816(for)X
+1939(example,)X
+2278(substitutable)X
+2752(argument)X
+3117(prototypes)X
+8 s
+1570 MY
+420(621)X
+10 s
+1122 1570(\320)N
+1242(environment)X
+1717(variables,)X
+2076(which)X
+2314(are)X
+2444(also)X
+2605(shown)X
+2862(in)X
+2951(capitals)X
+8 s
+1714 MY
+420(622)X
+10 s
+1122 1714(\320)N
+1242(commands)X
+1653(or)X
+1749(utilities)X
+8 s
+1858 MY
+420(623)X
+10 s
+1122 1858(\320)N
+1242(external)X
+1546(variables,)X
+1905(such)X
+2089(as)X
+2 f
+2183(errno)X
+1 f
+8 s
+2002 MY
+420(624)X
+10 s
+1122 2002(\320)N
+1242(X)X
+1315(Window)X
+1644(System)X
+1919(widgets)X
+8 s
+2146 MY
+420(625)X
+10 s
+1122 2146(\320)N
+1242(functions;)X
+1631(these)X
+1852(are)X
+2001(shown)X
+2277(as)X
+2391(follows:)X
+2 f
+2713(name)X
+1 f
+2892(\()X
+2932(\);)X
+3019(names)X
+3288(without)X
+3608(parentheses)X
+4068(are)X
+4218(either)X
+8 s
+2242 MY
+420(626)X
+10 s
+1242 2242(external)N
+1546(variables)X
+1885(or)X
+1981(function)X
+2297(family)X
+2545(names)X
+8 s
+10 f
+1 f
+8 s
+2386 MY
+420(627)X
+10 f
+8 s
+1060 2386(g)N
+10 s
+1 f
+1122(Normal)X
+1418(font)X
+1581(is)X
+1658(used)X
+1847(for)X
+1970(the)X
+2100(names)X
+2349(of)X
+2440(constants)X
+2792(and)X
+2947(literals.)X
+8 s
+10 f
+1 f
+8 s
+2530 MY
+420(628)X
+10 f
+8 s
+1060 2530(g)N
+10 s
+1 f
+1122(The)X
+1275(notation)X
+3 f
+1590(<file.h>)X
+1 f
+1900(indicates)X
+2235(a)X
+2295(header)X
+2558(file.)X
+8 s
+10 f
+1 f
+8 s
+2674 MY
+420(629)X
+10 f
+8 s
+1060 2674(g)N
+10 s
+1 f
+1122(Names)X
+1417(surrounded)X
+1883(by)X
+2017(braces,)X
+2308(for)X
+2458(example,)X
+2824({ARG_MAX},)X
+3353(represent)X
+3732(symbolic)X
+4098(limits)X
+4345(or)X
+8 s
+2770 MY
+420(630)X
+10 s
+1122 2770(configuration)N
+1641(values)X
+1909(which)X
+2167(may)X
+2362(be)X
+2484(declared)X
+2828(in)X
+2936(appropriate)X
+3394(headers)X
+3710(by)X
+3837(means)X
+4105(of)X
+4215(the)X
+4364(C)X
+3 f
+1 f
+8 s
+2866 MY
+420(631)X
+3 f
+10 s
+1122 2866(#define)N
+1 f
+1418(construct.)X
+8 s
+10 f
+1 f
+8 s
+3010 MY
+420(632)X
+10 f
+8 s
+1060 3010(g)N
+10 s
+1 f
+1122(Ellipses,)X
+1434(.)X
+1467(.)X
+1500(.,)X
+1560(are)X
+1690(used)X
+1879(to)X
+1969(show)X
+2180(that)X
+2338(additional)X
+2721(arguments)X
+3120(are)X
+3250(optional.)X
+8 s
+10 f
+1 f
+8 s
+3154 MY
+420(633)X
+10 f
+8 s
+1060 3154(g)N
+10 s
+1 f
+1122(Syntax)X
+1385(and)X
+1544(code)X
+1735(examples)X
+2092(are)X
+2226(shown)X
+2487(in)X
+5 f
+2608(fixed)X
+2900(width)X
+3192(font)X
+1 f
+(.)S
+3428(Brackets)X
+3751(shown)X
+4012(in)X
+4105(this)X
+4258(font,)X
+5 f
+1 f
+8 s
+3250 MY
+420(634)X
+5 f
+10 s
+1122 3250([)N
+1183(])X
+1 f
+(,)S
+1271(are)X
+1401(part)X
+1567(of)X
+1658(the)X
+1788(syntax)X
+2039(and)X
+2194(do)X
+2 f
+2307(not)X
+1 f
+2434(indicate)X
+2735(optional)X
+3049(items.)X
+8 s
+10 f
+1 f
+8 s
+3394 MY
+420(635)X
+10 f
+8 s
+1060 3394(g)N
+10 s
+1 f
+1122(Variables)X
+1474(within)X
+1725(syntax)X
+1976(statements)X
+2375(are)X
+2505(shown)X
+2762(in)X
+6 f
+2879(italic)X
+3215(fixed)X
+3503(width)X
+3791(font)X
+1 f
+(.)S
+8 s
+10 f
+1 f
+8 s
+3538 MY
+420(636)X
+10 f
+8 s
+1060 3538(g)N
+10 s
+1 f
+1122(The)X
+1284(names)X
+1542(of)X
+1643(virtual)X
+1910(keys,)X
+2120(such)X
+2314(as)X
+2 f
+2418(<Help>)X
+1 f
+2699(or)X
+2 f
+2805(<Insert>)X
+1 f
+3122(are)X
+3262(used)X
+3461(as)X
+3565(described)X
+3938(by)X
+4056(the)X
+4196(model)X
+6 s
+7 s
+4500(6)X
+6 s
+10 s
+8 s
+3634 MY
+420(637)X
+10 s
+1122 3634(keyboard)N
+1477(section)X
+1744(of)X
+1835(the)X
+3 f
+1965(OSF/Motif)X
+2378(Style)X
+2585(Guide)X
+1 f
+2817(.)X
+6 s
+7 s
+4500(6)X
+6 s
+11 s
+680 5854(xx)N
+9 s
+2300(X/Open)X
+2587(CAE)X
+2756(Specification)X
+3181(Draft)X
+3366(\(1994\))X
+3576(\(Draft)X
+3785(November)X
+4145(21,)X
+4253(1994\))X
+
+21 p
+%%Page: 21 21
+1(Palatino-Roman)xf 1 f
+2(Palatino-Italic)xf 2 f
+3(Palatino-Bold)xf 3 f
+4(Palatino-BoldItalic)xf 4 f
+5(Courier)xf 5 f
+6(Courier-Oblique)xf 6 f
+7(Courier-Bold)xf 7 f
+8(Times-Roman)xf 8 f
+9 s 0 xH 0 xS 8 f
+10 s
+1 f
+4397 MX
+
+% included PostScript
+
+%%HLJ_Lineno_Off
+1002 754 MXY
+96 -432 Dl
+1006 754 MXY
+96 -432 Dl
+1010 754 MXY
+96 -432 Dl
+1014 754 MXY
+96 -432 Dl
+1018 754 MXY
+96 -432 Dl
+1022 754 MXY
+96 -432 Dl
+1026 754 MXY
+96 -432 Dl
+1030 754 MXY
+96 -432 Dl
+1034 754 MXY
+96 -432 Dl
+1037 754 MXY
+96 -432 Dl
+1041 754 MXY
+96 -432 Dl
+2 f
+18 s
+1122 706(Trade)N
+1494(M)X
+1630(arks)X
+1814 MX
+
+% included PostScript
+
+%%HLJ_Lineno_On
+1 f
+10 s
+8 s
+1066 MY
+420(638)X
+10 s
+1002 1066(DEC)N
+9 f
+1170 1026(\322)N
+1 f
+1253 1066(is)N
+1330(a)X
+1390(registered)X
+1764(trade)X
+1969(mark)X
+2176(of)X
+2267(Digital)X
+2528(Equipment)X
+2942(Corporation.)X
+6 s
+7 s
+4500(3)X
+6 s
+10 s
+8 s
+1210 MY
+420(639)X
+10 s
+1002 1210(Helvetica)N
+9 f
+1337 1170(\322)N
+1 f
+1420 1210(is)N
+1497(a)X
+1557(registered)X
+1931(trade)X
+2136(mark)X
+2343(of)X
+2434(Linotype)X
+2772(AG)X
+2915(and/or)X
+3194(its)X
+3297(subsidiaries.)X
+6 s
+7 s
+4500(3)X
+6 s
+10 s
+8 s
+1354 MY
+420(640)X
+10 s
+1002 1354(IBM)N
+9 f
+1154 1314(\322)N
+1 f
+1237 1354(is)N
+1314(a)X
+1374(registered)X
+1748(trade)X
+1953(mark)X
+2160(of)X
+2251(International)X
+2728(Business)X
+3054(Machines)X
+3413(Corporation.)X
+6 s
+7 s
+4500(3)X
+6 s
+10 s
+8 s
+1498 MY
+420(641)X
+10 s
+1002 1498(Motif)N
+6 s
+1198 1458(TM)N
+10 s
+1293 1498(is)N
+1370(a)X
+1430(trade)X
+1635(mark)X
+1842(of)X
+1933(Open)X
+2148(Software)X
+2484(Foundation,)X
+2934(Inc.)X
+6 s
+7 s
+4500(3)X
+6 s
+10 s
+8 s
+1642 MY
+420(642)X
+10 s
+1002 1642(OPEN)N
+1248(LOOK)X
+9 f
+1481 1602(\322)N
+1 f
+1564 1642(is)N
+1641(a)X
+1701(registered)X
+2075(trademark)X
+2467(of)X
+2558(Novell,)X
+2837(Inc.)X
+6 s
+7 s
+4500(3)X
+6 s
+10 s
+8 s
+1786 MY
+420(643)X
+10 s
+1002 1786(Postscript)N
+9 f
+1353 1746(\322)N
+1 f
+1436 1786(is)N
+1513(a)X
+1573(registered)X
+1947(trade)X
+2152(mark)X
+2359(of)X
+2450(Adobe)X
+2707(Systems)X
+3016(Incorporated.)X
+6 s
+7 s
+4500(3)X
+6 s
+10 s
+8 s
+1930 MY
+420(644)X
+10 s
+1002 1930(ToolTalk)N
+6 s
+1318 1890(TM)N
+10 s
+1413 1930(is)N
+1490(a)X
+1550(trade)X
+1755(mark)X
+1962(of)X
+2053(Sun)X
+2209(Microsystems,)X
+2741(Inc.)X
+6 s
+7 s
+4500(3)X
+6 s
+10 s
+8 s
+2074 MY
+420(645)X
+10 s
+1002 2074(UNIX)N
+9 f
+1210 2034(\322)N
+1 f
+1297 2074(is)N
+1378(a)X
+1443(registered)X
+1822(trade)X
+2032(mark)X
+2244(in)X
+2338(the)X
+2473(United)X
+2742(States)X
+2973(and)X
+3133(other)X
+3344(countries,)X
+3716(licensed)X
+4028(exclusively)X
+6 s
+7 s
+4500(3)X
+6 s
+10 s
+8 s
+2170 MY
+420(646)X
+10 s
+1002 2170(through)N
+1308(X/Open)X
+1624(Company)X
+1994(Limited.)X
+6 s
+7 s
+4500(3)X
+6 s
+10 s
+8 s
+2314 MY
+420(647)X
+10 s
+1002 2314(X/Open)N
+6 s
+1298 2274(TM)N
+10 s
+1396 2314(and)N
+1554(the)X
+1687(``X'')X
+1851(device)X
+2103(are)X
+2236(trade)X
+2444(marks)X
+2688(of)X
+2783(X/Open)X
+3103(Company)X
+3477(Ltd.)X
+3665(in)X
+3758(the)X
+3892(U.K.)X
+4076(and)X
+4235(other)X
+6 s
+7 s
+4500(3)X
+6 s
+10 s
+8 s
+2410 MY
+420(648)X
+10 s
+1002 2410(countries.)N
+6 s
+7 s
+4500(3)X
+6 s
+10 s
+8 s
+2554 MY
+420(649)X
+10 s
+1002 2554(X)N
+1075(Window)X
+1404(System)X
+6 s
+1659 2514(TM)N
+10 s
+1754 2554(is)N
+1831(a)X
+1891(trade)X
+2096(mark)X
+2303(of)X
+2394(the)X
+2524(Massachusetts)X
+3056(Institute)X
+3370(of)X
+3461(Technology.)X
+6 s
+7 s
+4500(3)X
+6 s
+2 f
+10 s
+1 f
+8 s
+2698 MY
+420(650)X
+2 f
+10 s
+1002 2698(<Others)N
+1292(to)X
+1375(be)X
+1463(provided;)X
+1783(reviewer)X
+2078(suggestions)X
+2475(are)X
+2593(solicited>)X
+1 f
+6 s
+7 s
+4500(3)X
+6 s
+9 s
+680 5854(X/Open)N
+967(Common)X
+1284(Desktop)X
+1569(Environment)X
+2008(\320)X
+2098(Definitions)X
+2471(and)X
+2611(Infrastructure)X
+3071(Company)X
+3404(Review)X
+3662(Draft)X
+11 s
+4305(xxi)X
+
+22 p
+%%Page: 22 22
+1(Palatino-Roman)xf 1 f
+2(Palatino-Italic)xf 2 f
+3(Palatino-Bold)xf 3 f
+4(Palatino-BoldItalic)xf 4 f
+5(Courier)xf 5 f
+6(Courier-Oblique)xf 6 f
+7(Courier-Bold)xf 7 f
+8(Times-Roman)xf 8 f
+11 s 0 xH 0 xS 8 f
+10 s
+1 f
+4395 MX
+
+% included PostScript
+
+%%HLJ_Lineno_Off
+1002 754 MXY
+96 -432 Dl
+1006 754 MXY
+96 -432 Dl
+1010 754 MXY
+96 -432 Dl
+1014 754 MXY
+96 -432 Dl
+1018 754 MXY
+96 -432 Dl
+1022 754 MXY
+96 -432 Dl
+1026 754 MXY
+96 -432 Dl
+1030 754 MXY
+96 -432 Dl
+1034 754 MXY
+96 -432 Dl
+1037 754 MXY
+96 -432 Dl
+1041 754 MXY
+96 -432 Dl
+2 f
+18 s
+1122 706(A)N
+1226(cknow)X
+1596(ledgem)X
+2004(ents)X
+2188 MX
+
+% included PostScript
+
+%%HLJ_Lineno_On
+1 f
+10 s
+8 s
+1066 MY
+420(651)X
+10 s
+1002 1066(X/Open)N
+1319(gratefully)X
+1685(acknowledges)X
+2209(the)X
+2340(CDE)X
+2529(sponsoring)X
+2945(companies)X
+3346(who)X
+3524(donated)X
+3837(the)X
+3969(materials)X
+4318(for)X
+8 s
+1162 MY
+420(652)X
+10 s
+1002 1162(this)N
+1151(specification:)X
+10 f
+1 f
+8 s
+1306 MY
+420(653)X
+10 f
+10 s
+1002 1306(g)N
+1 f
+1122(Hewlett-Packard)X
+1742(Company)X
+10 f
+1 f
+8 s
+1450 MY
+420(654)X
+10 f
+10 s
+1002 1450(g)N
+1 f
+1122(International)X
+1599(Business)X
+1925(Machines)X
+2284(Corporation)X
+10 f
+1 f
+8 s
+1594 MY
+420(655)X
+10 f
+10 s
+1002 1594(g)N
+1 f
+1122(Novell,)X
+1401(Incorporated.)X
+10 f
+1 f
+8 s
+1738 MY
+420(656)X
+10 f
+10 s
+1002 1738(g)N
+1 f
+1122(Sun)X
+1278(Microsystems,)X
+1810(Incorporated)X
+11 s
+680 5854(xxii)N
+9 s
+2300(X/Open)X
+2587(CAE)X
+2756(Specification)X
+3181(Draft)X
+3366(\(1994\))X
+3576(\(Draft)X
+3785(November)X
+4145(21,)X
+4253(1994\))X
+
+23 p
+%%Page: 23 23
+1(Palatino-Roman)xf 1 f
+2(Palatino-Italic)xf 2 f
+3(Palatino-Bold)xf 3 f
+4(Palatino-BoldItalic)xf 4 f
+5(Courier)xf 5 f
+6(Courier-Oblique)xf 6 f
+7(Courier-Bold)xf 7 f
+8(Times-Roman)xf 8 f
+9 s 0 xH 0 xS 8 f
+10 s
+1 f
+4397 MX
+
+% included PostScript
+
+%%HLJ_Lineno_Off
+1002 754 MXY
+96 -432 Dl
+1006 754 MXY
+96 -432 Dl
+1010 754 MXY
+96 -432 Dl
+1014 754 MXY
+96 -432 Dl
+1018 754 MXY
+96 -432 Dl
+1022 754 MXY
+96 -432 Dl
+1026 754 MXY
+96 -432 Dl
+1030 754 MXY
+96 -432 Dl
+1034 754 MXY
+96 -432 Dl
+1037 754 MXY
+96 -432 Dl
+1041 754 MXY
+96 -432 Dl
+2 f
+18 s
+1122 706(Referenced)N
+1784(D)X
+1896(ocum)X
+2210(ents)X
+2394 MX
+
+% included PostScript
+
+%%HLJ_Lineno_On
+1 f
+10 s
+8 s
+1066 MY
+420(657)X
+10 s
+1002 1066(The)N
+1155(following)X
+1516(documents)X
+1928(are)X
+2058(referenced)X
+2452(in)X
+2541(this)X
+2690(specification:)X
+8 s
+1210 MY
+420(658)X
+10 s
+1002 1210(ISO)N
+1154(C)X
+8 s
+1306 MY
+420(659)X
+10 s
+1162 1306(ISO/IEC)N
+1495(9899:)X
+1688(1990,)X
+1888(Information)X
+2334(technology)X
+2745(\320)X
+2845(Programming)X
+3360(Languages)X
+3763(\320)X
+3863(C.)X
+8 s
+1450 MY
+420(660)X
+10 s
+1002 1450(ISO/IEC)N
+1335(6429:)X
+1528(1992)X
+6 s
+7 s
+4500(4)X
+6 s
+10 s
+8 s
+1546 MY
+420(661)X
+10 s
+1162 1546(Information)N
+1613(processing)X
+2017(\320)X
+2122(ISO)X
+2274(7-bit)X
+2459(and)X
+2620(8-bit)X
+2806(coded)X
+3048(character)X
+3400(sets)X
+3558(\320)X
+3664(Control)X
+3962(functions)X
+4318(for)X
+6 s
+7 s
+4500(4)X
+6 s
+10 s
+8 s
+1642 MY
+420(662)X
+10 s
+1162 1642(coded)N
+1398(character)X
+1744(sets)X
+6 s
+7 s
+4500(4)X
+6 s
+10 s
+8 s
+1786 MY
+420(663)X
+10 s
+1002 1786(ISO)N
+1154(8859-1:)X
+1414(1987)X
+6 s
+7 s
+4500(4)X
+6 s
+10 s
+8 s
+1882 MY
+420(664)X
+10 s
+1162 1882(Information)N
+1623(processing)X
+2037(\320)X
+2153(8-bit)X
+2349(single-byte)X
+2772(coded)X
+3024(graphic)X
+3329(character)X
+3691(sets)X
+3859(\320)X
+3975(Part)X
+4141(1:)X
+4237(Latin)X
+6 s
+7 s
+4500(4)X
+6 s
+10 s
+8 s
+1978 MY
+420(665)X
+10 s
+1162 1978(alphabet)N
+1487(No.)X
+1637(1)X
+6 s
+7 s
+4500(4)X
+6 s
+10 s
+8 s
+2122 MY
+420(666)X
+10 s
+1002 2122(ISO)N
+1154(8879:)X
+1347(1986)X
+6 s
+7 s
+4500(4)X
+6 s
+10 s
+8 s
+2218 MY
+420(667)X
+10 s
+1162 2218(Information)N
+1637(processing)X
+2065(\320)X
+2194(Text)X
+2397(and)X
+2581(office)X
+2826(systems)X
+3157(\320)X
+3287(Standard)X
+3661(Generalised)X
+4133(Markup)X
+6 s
+7 s
+4500(4)X
+6 s
+10 s
+8 s
+2314 MY
+420(668)X
+10 s
+1162 2314(Language)N
+1531(\(SGML\))X
+6 s
+7 s
+4500(4)X
+6 s
+10 s
+8 s
+2458 MY
+420(669)X
+10 s
+1002 2458(ISO/IEC)N
+1335(9070:)X
+1528(1991)X
+8 s
+2554 MY
+420(670)X
+10 s
+1162 2554(Information)N
+1620(technology)X
+2043(\320)X
+2155(SGML)X
+2416(support)X
+2729(facilities)X
+3055(\320)X
+3168(Registration)X
+3631(procedures)X
+4063(for)X
+4199(public)X
+8 s
+2650 MY
+420(671)X
+10 s
+1162 2650(text)N
+1313(owner)X
+1560(identifiers)X
+8 s
+2794 MY
+420(672)X
+10 s
+1002 2794(ANSI)N
+1219(X3.64-1979)X
+6 s
+7 s
+4500(3)X
+6 s
+10 s
+8 s
+2890 MY
+420(673)X
+10 s
+1162 2890(Additional)N
+1579(Controls)X
+1918(for)X
+2054(Use)X
+2221(with)X
+2416(the)X
+2559(American)X
+2940(National)X
+3281(Standard)X
+3638(Code)X
+3859(for)X
+3995(Information)X
+6 s
+7 s
+4500(3)X
+6 s
+10 s
+8 s
+2986 MY
+420(674)X
+10 s
+1162 2986(Interchange)N
+6 s
+7 s
+4500(3)X
+6 s
+10 s
+8 s
+3130 MY
+420(675)X
+10 s
+1002 3130(RFC-822)N
+6 s
+7 s
+4500(5)X
+6 s
+10 s
+8 s
+3226 MY
+420(676)X
+10 s
+1162 3226(Internet)N
+1461(RFC)X
+1636(822,)X
+1796(Crocker,)X
+2119(D.)X
+2241(Standard)X
+2585(for)X
+2708(the)X
+2838(format)X
+3098(of)X
+3189(ARPA)X
+3435(Internet)X
+3734(text)X
+3885(messages.)X
+6 s
+7 s
+4500(5)X
+6 s
+10 s
+8 s
+3370 MY
+420(677)X
+10 s
+1002 3370(XDR)N
+6 s
+7 s
+4500(5)X
+6 s
+10 s
+8 s
+3466 MY
+420(678)X
+10 s
+1162 3466(Internet)N
+1461(RFC)X
+1636(1014,)X
+1836(Sun)X
+1992(Microsystems.)X
+2544(XDR:)X
+2753(External)X
+3068(Data)X
+3256(Representation)X
+3809(standard.)X
+6 s
+7 s
+4500(5)X
+6 s
+10 s
+8 s
+3610 MY
+420(679)X
+10 s
+1002 3610(MIME)N
+1250(RFCs)X
+6 s
+7 s
+4500(6)X
+6 s
+10 s
+8 s
+3706 MY
+420(680)X
+10 s
+1162 3706(Internet)N
+1465(RFC)X
+1644(1521,)X
+1848(N.)X
+1958(Borenstein,)X
+2378(N.)X
+2488(Freed,)X
+2733(MIME)X
+2985(\(Multipurpose)X
+3524(Internet)X
+3827(Mail)X
+4013(Extensions\))X
+6 s
+7 s
+4500(6)X
+6 s
+10 s
+8 s
+3802 MY
+420(681)X
+10 s
+1162 3802(Part)N
+1353(One:)X
+1565(Mechanisms)X
+2054(for)X
+2202(Specifying)X
+2618(and)X
+2798(Describing)X
+3224(the)X
+3378(Format)X
+3679(of)X
+3794(Internet)X
+4117(Message)X
+6 s
+7 s
+4500(6)X
+6 s
+10 s
+8 s
+3898 MY
+420(682)X
+10 s
+1162 3898(Bodies.)N
+6 s
+7 s
+4500(6)X
+6 s
+10 s
+8 s
+4042 MY
+420(683)X
+10 s
+1162 4042(Internet)N
+1476(RFC)X
+1667(1522,)X
+1883(K.)X
+1997(Moore,)X
+2287(MIME)X
+2551(\(Multipurpose)X
+3102(Internet)X
+3417(Mail)X
+3615(Extensions\))X
+4059(Part)X
+4241(Two:)X
+6 s
+7 s
+4500(6)X
+6 s
+10 s
+8 s
+4138 MY
+420(684)X
+10 s
+1162 4138(Message)N
+1486(Header)X
+1769(Extensions)X
+2170(for)X
+2293(Non-ASCII)X
+2711(Text.)X
+6 s
+7 s
+4500(6)X
+6 s
+10 s
+8 s
+4282 MY
+420(685)X
+10 s
+1162 4282(Internet)N
+1461(RFC)X
+1636(1590,)X
+1836(J.)X
+1903(Postel,)X
+2156(Media)X
+2402(Type)X
+2601(Registration)X
+3051(Procedure.)X
+6 s
+7 s
+4500(6)X
+6 s
+10 s
+8 s
+4426 MY
+420(686)X
+10 s
+1002 4426(Motif)N
+1218(Style)X
+1411(Guide)X
+6 s
+7 s
+4500(6)X
+6 s
+10 s
+8 s
+4522 MY
+420(687)X
+10 s
+1162 4522(Open)N
+1377(Software)X
+1713(Foundation,)X
+3 f
+2163(OSF/Motif)X
+2576(Style)X
+2783(Guide,)X
+3055(Revision)X
+3400(1.2.)X
+1 f
+3560(\(ISBN:)X
+3811(0-13-643123-2\).)X
+6 s
+7 s
+4500(6)X
+6 s
+4499 MX
+
+% included PostScript
+
+%%HLJ_Rat_Start@4570@
+4 f
+12 s
+1 f
+8 s
+4762 MY
+420(688)X
+4 f
+12 s
+680 4762(Notes)N
+955(to)X
+1069(Reviewers)X
+1 f
+6 s
+7 s
+4500(6)X
+6 s
+2 f
+10 s
+1 f
+8 s
+4858 MY
+420(689)X
+2 f
+10 s
+1162 4858(This)N
+1324(section)X
+1567(with)X
+1734(side)X
+1878(shading)X
+2151(will)X
+2295(not)X
+2422(appear)X
+2656(in)X
+2742(the)X
+2860(final)X
+3026(copy.)X
+3214(-)X
+3261(Ed.)X
+1 f
+6 s
+7 s
+4500(6)X
+6 s
+10 s
+8 s
+5002 MY
+420(690)X
+10 s
+1162 5002(The)N
+1316(X/Open)X
+1634(Desktop+)X
+2000(Steering)X
+2311(Group)X
+2566(decided)X
+2870(in)X
+2961(its)X
+3066(Grenoble)X
+3414(meeting)X
+3722(to)X
+3814(defer)X
+4020(submission)X
+6 s
+7 s
+4500(6)X
+6 s
+10 s
+8 s
+5098 MY
+420(691)X
+10 s
+1162 5098(of)N
+1275(the)X
+1427(full)X
+1590(OSF/Motif)X
+2024(Style)X
+2238(Guide)X
+2498(as)X
+2613(an)X
+2740(X/Open)X
+3077(publication)X
+3519(and)X
+3695(has)X
+3856(asked)X
+4102(the)X
+4253(CDE)X
+6 s
+7 s
+4500(6)X
+6 s
+10 s
+8 s
+5194 MY
+420(692)X
+10 s
+1162 5194(sponsoring)N
+1584(companies)X
+1991(and)X
+2154(OSF)X
+2331(to)X
+2429(submit)X
+2703(a)X
+2771(converged)X
+3171(style)X
+3364(guide)X
+3594(at)X
+3688(a)X
+3756(future)X
+4003(date.)X
+4224(Thus,)X
+6 s
+7 s
+4500(6)X
+6 s
+10 s
+8 s
+5290 MY
+420(693)X
+10 s
+1162 5290(this)N
+1311(reference)X
+1656(list)X
+1782(still)X
+1931(refers)X
+2152(to)X
+2242(the)X
+2372(OSF)X
+2541(version.)X
+6 s
+7 s
+4500(6)X
+6 s
+4499 MX
+
+% included PostScript
+
+/HLJ save def
+200 MX
+4570 MY
+200 setlinewidth
+.90 setgray
+0 720 Dl
+4650 MX
+4570 MY
+0 720 Dl
+HLJ restore
+%%HLJ_Rat_End@5290@
+9 s
+680 5854(X/Open)N
+967(Common)X
+1284(Desktop)X
+1569(Environment)X
+2008(\320)X
+2098(Definitions)X
+2471(and)X
+2611(Infrastructure)X
+3071(Company)X
+3404(Review)X
+3662(Draft)X
+11 s
+4253(xxiii)X
+
+24 p
+%%Page: 24 24
+1(Palatino-Roman)xf 1 f
+2(Palatino-Italic)xf 2 f
+3(Palatino-Bold)xf 3 f
+4(Palatino-BoldItalic)xf 4 f
+5(Courier)xf 5 f
+6(Courier-Oblique)xf 6 f
+7(Courier-Bold)xf 7 f
+8(Times-Roman)xf 8 f
+11 s 0 xH 0 xS 8 f
+10 s
+1 f
+2 f
+12 s
+3537 322(Referenced)N
+3977(Documents)X
+1 f
+10 s
+8 s
+658 MY
+420(694)X
+10 s
+1002 658(The)N
+1155(following)X
+1516(X/Open)X
+1832(documents)X
+2244(are)X
+2374(referenced)X
+2768(in)X
+2857(this)X
+3006(specification.)X
+8 s
+802 MY
+420(695)X
+10 s
+1002 802(XBD)N
+8 s
+898 MY
+420(696)X
+10 s
+1162 898(X/Open)N
+1511(CAE)X
+1732(Specification,)X
+2257(September)X
+2687(1994,)X
+3 f
+2920(System)X
+3240(Interface)X
+3618(Definitions)X
+1 f
+4042(,)X
+3 f
+4115(Issue)X
+4361(4,)X
+1 f
+6 s
+7 s
+4500(6)X
+6 s
+3 f
+10 s
+1 f
+8 s
+994 MY
+420(697)X
+3 f
+10 s
+1162 994(Version)N
+1471(2)X
+1 f
+1531(\(ISBN:)X
+1782(1-859120-36-9,)X
+2303(C434\).)X
+6 s
+7 s
+4500(6)X
+6 s
+10 s
+8 s
+1138 MY
+420(698)X
+10 s
+1002 1138(XSH)N
+6 s
+7 s
+4500(6)X
+6 s
+10 s
+8 s
+1234 MY
+420(699)X
+10 s
+1162 1234(X/Open)N
+1500(CAE)X
+1710(Specification,)X
+2224(September)X
+2643(1994,)X
+3 f
+2865(System)X
+3175(Interfaces)X
+3579(and)X
+3760(Headers)X
+1 f
+4063(,)X
+3 f
+4126(Issue)X
+4361(4,)X
+1 f
+6 s
+7 s
+4500(6)X
+6 s
+3 f
+10 s
+1 f
+8 s
+1330 MY
+420(700)X
+3 f
+10 s
+1162 1330(Version)N
+1471(2)X
+1 f
+1531(\(ISBN:)X
+1782(1-859120-37-7,)X
+2303(C435\).)X
+6 s
+7 s
+4500(6)X
+6 s
+10 s
+8 s
+1474 MY
+420(701)X
+10 s
+1002 1474(XCU)N
+6 s
+7 s
+4500(6)X
+6 s
+10 s
+8 s
+1570 MY
+420(702)X
+10 s
+1162 1570(X/Open)N
+1486(CAE)X
+1682(Specification,)X
+2182(September)X
+2587(1994,)X
+3 f
+2795(Commands)X
+3241(and)X
+3407(Utilities)X
+1 f
+3707(,)X
+3 f
+3755(Issue)X
+3975(4,)X
+4063(Version)X
+4381(2)X
+1 f
+6 s
+7 s
+4500(6)X
+6 s
+10 s
+8 s
+1666 MY
+420(703)X
+10 s
+1162 1666(\(ISBN:)N
+1413(1-859120-34-2,)X
+1934(C436\).)X
+6 s
+7 s
+4500(6)X
+6 s
+10 s
+8 s
+1810 MY
+420(704)X
+10 s
+1002 1810(XIG)N
+8 s
+1906 MY
+420(705)X
+10 s
+1162 1906(X/Open)N
+1542(Guide,)X
+1865(February)X
+2271(1992,)X
+3 f
+2536(Internationalisation)X
+3352(Guide)X
+1 f
+3669(\(ISBN:)X
+3920(1-872630-20-0,)X
+8 s
+2002 MY
+420(706)X
+10 s
+1162 2002(XO/GUIDE/91/030\).)N
+8 s
+2146 MY
+420(707)X
+10 s
+1002 2146(XPG4)N
+8 s
+2242 MY
+420(708)X
+10 s
+1162 2242(X/Open)N
+1505(Single)X
+1768(UNIX)X
+2023(Specification)X
+2522(\(Spec.)X
+2781(1170\),)X
+3036(September)X
+3461(1994)X
+3669(\(ISBN:)X
+3920(1-859120-54-7,)X
+6 s
+7 s
+4500(6)X
+6 s
+10 s
+8 s
+2338 MY
+420(709)X
+10 s
+1162 2338(T405\).)N
+6 s
+7 s
+4500(6)X
+6 s
+10 s
+8 s
+2482 MY
+420(710)X
+10 s
+1002 2482(X)N
+1075(Protocol)X
+6 s
+7 s
+4500(6)X
+6 s
+10 s
+8 s
+2578 MY
+420(711)X
+10 s
+1162 2578(X/Open)N
+1489(CAE)X
+1689(Specification,)X
+3 f
+2193(X/Open)X
+2507(Window)X
+2855(Management:)X
+3387(X)X
+3472(Window)X
+3820(System)X
+4119(Protocol)X
+1 f
+6 s
+7 s
+4500(6)X
+6 s
+10 s
+8 s
+2674 MY
+420(712)X
+10 s
+1162 2674(<X11R5-updated)N
+1782(version\320details)X
+2377(to)X
+2467(be)X
+2569(provided>)X
+6 s
+7 s
+4500(6)X
+6 s
+10 s
+8 s
+2818 MY
+420(713)X
+10 s
+1002 2818(Xlib)N
+6 s
+7 s
+4500(6)X
+6 s
+10 s
+8 s
+2914 MY
+420(714)X
+10 s
+1162 2914(X/Open)N
+1497(CAE)X
+1704(Specification,)X
+3 f
+2216(X/Open)X
+2538(Window)X
+2894(Management:)X
+3434(Xlib)X
+3630(C)X
+3728(Language)X
+4123(Binding)X
+1 f
+6 s
+7 s
+4500(6)X
+6 s
+10 s
+8 s
+3010 MY
+420(715)X
+10 s
+1162 3010(<X11R5-updated)N
+1782(version\320details)X
+2377(to)X
+2467(be)X
+2569(provided>)X
+6 s
+7 s
+4500(6)X
+6 s
+10 s
+8 s
+3154 MY
+420(716)X
+10 s
+1002 3154(Xt)N
+1162(X/Open)X
+1485(CAE)X
+1680(Specification,)X
+3 f
+2180(X/Open)X
+2490(Window)X
+2834(Management:)X
+3362(X)X
+3443(Toolkit)X
+3742(Intrinsics)X
+1 f
+4119(<X11R5-)X
+6 s
+7 s
+4500(6)X
+6 s
+10 s
+8 s
+3250 MY
+420(717)X
+10 s
+1162 3250(updated)N
+1480(version\320details)X
+2075(to)X
+2165(be)X
+2267(provided>)X
+6 s
+7 s
+4500(6)X
+6 s
+10 s
+8 s
+3394 MY
+420(718)X
+10 s
+1002 3394(ICCCM)N
+6 s
+7 s
+4500(6)X
+6 s
+10 s
+8 s
+3490 MY
+420(719)X
+10 s
+1162 3490(X/Open)N
+1508(CAE)X
+1726(Specification,)X
+3 f
+2248(X/Open)X
+2580(Window)X
+2946(Management:)X
+3496(X)X
+3599(Window)X
+3965(System)X
+4283(File)X
+1 f
+6 s
+7 s
+4500(6)X
+6 s
+3 f
+10 s
+1 f
+8 s
+3586 MY
+420(720)X
+3 f
+10 s
+1162 3586(Formats)N
+1475(and)X
+1633(Application)X
+2090(Conventions)X
+1 f
+2577(<X11R5-updated)X
+3197(version\320details)X
+3792(to)X
+3882(be)X
+3984(provided>)X
+6 s
+7 s
+4500(6)X
+6 s
+10 s
+8 s
+3730 MY
+420(721)X
+10 s
+1002 3730(Motif)N
+6 s
+7 s
+4500(6)X
+6 s
+10 s
+8 s
+3826 MY
+420(722)X
+10 s
+1162 3826(X/Open)N
+1505(CAE)X
+1720(Specification,)X
+3 f
+2239(X/Open)X
+2568(Motif)X
+2825(Toolkit)X
+3144(API)X
+1 f
+3334(<CAE)X
+3598(version\320details)X
+4221(to)X
+4339(be)X
+6 s
+7 s
+4500(6)X
+6 s
+10 s
+8 s
+3922 MY
+420(723)X
+10 s
+1162 3922(provided>)N
+6 s
+7 s
+4500(6)X
+6 s
+10 s
+8 s
+4066 MY
+420(724)X
+10 s
+1002 4066(XAPIA)N
+1274(Calendar)X
+6 s
+7 s
+4500(4)X
+6 s
+10 s
+8 s
+4162 MY
+420(725)X
+10 s
+1162 4162(X/Open)N
+1478(CAE)X
+1666(Specification,)X
+3 f
+2158(X/Open)X
+2460(XAPIA)X
+2737(Calendar)X
+3091(API)X
+1 f
+3253(<details)X
+3554(to)X
+3644(be)X
+3746(provided>)X
+6 s
+7 s
+4500(4)X
+6 s
+10 s
+8 s
+4306 MY
+420(726)X
+10 s
+1002 4306(XCSA)N
+6 s
+7 s
+4500(4)X
+6 s
+10 s
+8 s
+4402 MY
+420(727)X
+10 s
+1162 4402(X/Open)N
+1478(CAE)X
+1666(Specification)X
+2138(Draft,)X
+3 f
+9 s
+2363(XCDE)X
+10 s
+2587(Services)X
+2910(and)X
+3068(Applications)X
+1 f
+6 s
+7 s
+4500(4)X
+6 s
+4498 MY
+4402 MY
+11 s
+680 5854(xxiv)N
+9 s
+2300(X/Open)X
+2587(CAE)X
+2756(Specification)X
+3181(Draft)X
+3366(\(1994\))X
+3576(\(Draft)X
+3785(November)X
+4145(21,)X
+4253(1994\))X
+
+26 p
+%%Trailer
+xt
+
+xs

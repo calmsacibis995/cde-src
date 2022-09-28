@@ -1,0 +1,31 @@
+XCOMM
+XCOMM	@(#)Imakefile	1.3 96/08/14 (c) Copyright 1996 Sun Microsystems, Inc.
+XCOMM
+XCOMM	Imakefile; sdtactrl
+XCOMM
+
+DEFINES		=
+
+INCLUDES	= -I. -I../sdtaudio
+
+DEPLIBS		= $(DEPDTSVCLIB) $(DEPDTWIDGETLIB) $(DEPTTLIB) \
+		  $(DEPXMLIB) $(DEPXTOOLLIB) $(DEPXLIB)
+
+LOCAL_LIBRARIES	= $(DTSVCLIB) $(DTWIDGETLIB) $(DTHELPLIB) $(TTLIB) \
+		  $(XMLIB) $(XTOOLLIB) $(XLIB)
+
+SYS_LIBRARIES	= -lgen -ldl -lm -mt -lposix4
+
+PROGRAMS	= sdtactrl
+
+OBJS		= dtb_utils.o sdtactrl.o audio_control_ui.o \
+		  audio_control_stubs.o audio_util.o ../sdtaudio/sa.o ../sdtaudio/g711.o
+
+SRCS		= dtb_utils.c sdtactrl.c audio_control_ui.c \
+		  audio_control_stubs.c audio_util.c
+
+ComplexProgramTarget($(PROGRAMS))
+
+#ifdef SunArchitecture
+.KEEP_STATE:
+#endif /* SunArchitecture */

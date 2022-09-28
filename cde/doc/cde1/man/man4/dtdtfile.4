@@ -1,0 +1,82 @@
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994 Novell, Inc.
+.\" *************************************************************************
+.TH dtdtfile 4
+.SH NAME
+dtdtfile \- format and location of desktop data type and action files
+.SH SYNOPSIS
+See
+.BR dtactionfile(4)
+and
+.BR dtdtsfile(4).
+.SH DESCRIPTION
+.PP
+The \fIAction/Data Type\fP database provides definitions for the data types
+and actions recognized by clients participating in the Common Desktop 
+Environment (CDE).  Files containing Action/Data Type definitions must end
+with the \fI.dt\fP suffix.  The data base is constructed by reading
+all files, ending in the \fI.dt\fP suffix, found in the search path
+specified by the \fBDTDATABASESEARCHPATH\fP environment variable.  
+.PP
+This database has similarities with other configuration
+databases used by CDE (e.g. font panel configuration).  such as:
+.TP
+\(bu
+The database can be spread across multiple files in multiple directories on
+multiple systems.
+.TP
+\(bu
+Database files are identified by unique filename suffixes (i.e. \fI.dt\fP).
+.TP
+\(bu
+Database records consist of a series of field name/value pairs.
+.TP
+\(bu
+Multiple record types may appear in the same database file.
+.TP
+\(bu
+Database entries can reference string variables which may be set either within
+the database file or via environment variables.
+.PP
+The \fBDTDATABASESEARCHPATH\fP environment variable contains a comma-separated
+list of directories specified in \fI[host:]/path\fP format. The \fIhost:\fP
+portion is optional but, if specified,  \fIhost\fP defines the 
+\fIDatabaseHost\fP for records defined by files in the \fI/path\fP directory.
+Otherwise, the \fIDatabaseHost\fP is the same as the \fILocalHost\fP. 
+The search path should generally be set by the normal CDE session startup
+procedures;  the actual value of the search path my be modified by the local
+system administrator or the user (in \fI$HOME/.dtprofile\fP).  The default
+search path includes the following directories:
+.TP
+\(bu
+$HOME/.dt/types/$(LANG) \(em personal user-defined localized database files
+.TP
+\(bu
+$HOME/.dt/types/ \(em personal user-defined database files
+.TP
+\(bu
+/etc/dt/appconfig/types/$(LANG) \(em locally defined language-specific database files.
+.TP
+\(bu
+/etc/dt/appconfig/types/C \(em locally defined default database files
+.TP
+\(bu
+/usr/dt/appconfig/types/$(LANG) \(em language-specific database files
+.TP
+\(bu
+/usr/dt/appconfig/types/C \(em factory supplied default database files
+.SH FILE FORMAT
+See
+.BR dtactionfile(4),
+and
+.BR dtdtsfile(4).
+.PP
+.SH "SEE ALSO"
+.BR  dtactionfile(4),
+.BR  dtdtsfile(4),
+.BR  dttypes(1).
+./" tooltalk man page should  be referenced.
+./" should dtaction or dtfile be referenced?

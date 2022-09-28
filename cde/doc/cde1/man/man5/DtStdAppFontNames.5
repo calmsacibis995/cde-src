@@ -1,0 +1,354 @@
+.\" (c) Copyright 1994 Hewlett-Packard Company
+.\" (c) Copyright 1994 International Business Machines Corp.
+.\" (c) Copyright 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1994 Unix System Labs, Inc., a subsidiary of Novell, Inc.
+.\" TDG version 1.3
+.TH DtStdAppFontNames 5
+.SH NAME
+StdAppFontNames \- CDE Standard Application Font Names:
+a set of 13 platform-independent font names in several designs and styles
+.PP
+.SH SYNOPSIS
+The CDE Standard Application Font Names are a set of generic X Window System font names, usable by application developers as the default fonts for their applications, for the most common categories of type designs and styles.
+These names, for at least 6 sizes of 13 typefaces, must exist on all CDE platforms, and they should be provided in any X server product on which CDE applications are expected to run.
+They are typically mapped to
+existing fonts on the platform using the font alias mechanism, 
+although this method is not required.
+.PP
+.SH DESCRIPTION
+CDE 1.0 does not come with a common set of fonts on all vendors'
+platforms, and both CDE itself and CDE applications must be able to run on X\ servers and X terminals from non-CDE
+vendors if those vendors so desire.
+Therefore, there are a standard set of ``generic'' font names
+and sizes that each CDE vendor makes available on their CDE systems and
+that X\ server vendors may make available on their X\ servers and terminals.
+The names map to existing fonts on each vendor's platform, which may vary from vendor to vendor.
+.PP
+The CDE Standard Application Font Names described here allow CDE applications to use a single set of default font specifications in their \f3app-defaults\fP files,
+without concern for the CDE platform or X\ server on which CDE is running.
+These \f3app-defaults\fP application defaults are given as XLFD font name patterns that will match the standard CDE font names on all CDE platforms.
+This allows application developers to both 
+reduce their concern with selecting their default fonts from a varying set of fonts on different CDE 
+platforms and to easily make use of the vendor's choice for default fonts on its hardware platform. 
+.PP
+.SS Background
+Application fonts are the fonts used within an application, where a wide variety of text designs, styles, weights, and point sizes are useful.
+These variations are used for emphasis, cross-references, section headers, etc.
+There are 1000's of fonts available in the market for use in applications, and different CDE platforms will have different fonts.
+The standard names attempt to provide the minimum variety in generic designs, styles, and sizes that an application might want to use as defaults.
+(The CDE Standard Interface Font Names, described in
+.BR DtStdInterfaceFontNames (5),
+provide a similar mechanism for the elements of the CDE desktop itself.)
+.PP
+Common application font names are required to prevent application developers from needing different 
+.ft 3
+app-defaults
+.R
+files for their application on each CDE platform.
+Since CDE vendors
+do not ship the same set of fonts on their platforms, the Standard Application Font Names allow 
+application developers to use a single 
+.ft 3
+app-defaults
+.R
+file across all CDE platforms.
+In addition, any X\ server or X terminal
+vendor may ensure that CDE applications can run on their X\ server by
+mapping these standard application names to fonts of the corresponding style on
+their individual X platforms.
+.PP
+.SS Rationale
+Two of the most common design variations in fonts used to display text are the presence or absence of 
+serifs and the choice between proportional or regularly spaced (mono-spaced) characters. Combining 
+these two design variations yields four ``generic'' font designs, or families:
+.nf
+	serif proportionally-spaced
+	sans serif proportionally-spaced
+	serif mono-spaced
+	sans serif mono-spaced
+.PP
+Common examples of these four designs are
+	Times Roman
+	Helvetica
+	Courier
+	Lucida Typewriter
+.PP
+.fi
+Each of these designs typically come, for text fonts, in four styles (combinations of weight and slant):
+.nf
+	plain
+	bold
+	italic
+	bold-italic
+.PP
+.fi
+The four styles of each of the four design variations yield 16 generic font variations. These 16 generic 
+fonts are among the most commonly used in general desktop computing. For example, taking the first 
+3 real examples above (Times Roman, Helvetica, Courier), these 12 fonts, along with the Symbol 
+font, constitute the so-called ``Adobe 13'' that is a de facto minimum set of fonts in the PostScript 
+community in the desktop computer marketplace.
+.PP
+In some cases, applications do not care about the exact font family or name to be used, but do need to 
+use a mono-spaced font, a sans serif font, or a serif font.
+This CDE mechanism allows such applications to be freed from the need to be concerned about the exact font names that may or may not be 
+present on a particular CDE platform.
+.PP
+.SS "The Standard Names, for the ISO8859-1 Character Set"
+The 13 standard application font names are provided on all CDE systems only for the ISO8859-1 character set.
+These represent 12 of the above generic design and style variations (serif 
+and sans serif proportionally-spaced, and a mono-spaced font that is either serif or sans serif), as well 
+as a symbol font. These standard names are provided in addition to the ``real'' names of the fonts that 
+the standard names are mapped to for a particular CDE platform. An additional 4 standard font 
+names, to allow both serif and sans serif designs in a mono-spaced font, may also be provided by a 
+CDE platform vendor, if they choose to do so;
+this would be documented in the vendor's CDE documentation.
+.PP
+.SS "XLFD Field Values for the Standard Application Font Names"
+These standard names are available using the X Window System
+XLFD font naming scheme.
+It is important to understand that there are 3 aspects to the standard names:
+.RS 3
+.PD .1
+.IP \(bu 3
+the
+.I "underlying font"
+on each X\ server platform that a standard name is mapped to:
+.br
+this will probably be different on each platform
+.IP \(bu 3
+the
+.I "standard name"
+itself, a full XLFD name mapped to the underlying font:
+.br
+this will probably be different on each platform
+.IP \(bu 3
+the font resource
+.I "pattern"
+containing the \f3*\fP wildcards, used in \f3app-defaults\fP files, that will match the full XLFD name of the standard name:
+.br
+this is the same across all platforms, for a given use in an \f3app-defaults\fP file
+.PD
+.RE
+.PP
+Each CDE or X\ server vendor implementing this specification must provide full XLFD names for the standard names, mapped to underlying fonts of their choice, so that the XLFD patterns used in CDE application \f3app-defaults\fP files will always match one of the full XLFD names provided.
+.PP
+The Standard Application Font Names are identified by the presence of the
+following XLFD field name values:
+.RS 3
+.PD .1
+.IP \(bu 3
+FOUNDRY is \f3dt\fP
+.IP \(bu 3
+FAMILY_NAME is \f3application\fP
+.IP \(bu 3
+WEIGHT_NAME is \f3medium\fP or \f3bold\fP
+.IP \(bu 3
+SLANT is \f3r\fP or \f3i\fP
+.IP \(bu 3
+SETWIDTH is \f3normal\fP
+.IP \(bu 3
+ADD_STYLE is \f3sans\fP for sans serif, \f3serif\fP for serif
+.IP \(bu 3
+SPACING is \f3p\fP or \f3m\fP
+.IP \(bu 3
+CHARSET_REGISTRY and CHARSET_ENCODING are \f3iso8859\fP and \f31\fP, respectively
+.PD
+.RE
+.PP
+Although \f3sans\fP and \f3serif\fP are not required by the XLFD font convention, they are always part of 
+the standard CDE font names.
+.PP
+.SS "Point sizes"
+The complete set of point size available for each of the standard application font names is determined 
+by the set of fonts shipped with a vendor's CDE platform, whether bitmapped only or both bitmapped 
+and scalable outline. The minimum set of sizes required and available on all CDE platforms corresponds to the standard sizes of bitmapped fonts that make up the default mapping for X11R5: 8, 10, 
+12, 14, 18, and 24.
+.PP
+For example, the entire set of 6 sizes of the plain monospaced font, on any CDE platform, is represented by:
+.EX
+-dt-application-medium-r-normal-*-*-80-*-*-m-*-iso8859-1
+-dt-application-medium-r-normal-*-*-100-*-*-m-*-iso8859-1
+-dt-application-medium-r-normal-*-*-120-*-*-m-*-iso8859-1
+-dt-application-medium-r-normal-*-*-140-*-*-m-*-iso8859-1
+-dt-application-medium-r-normal-*-*-180-*-*-m-*-iso8859-1
+-dt-application-medium-r-normal-*-*-240-*-*-m-*-iso8859-1
+.EE
+These patterns will match the corresponding standard font name on any CDE platform, even though 
+the PIXEL_SIZE and AVERAGE_WIDTH numeric fields may be different on various platforms, and the matched 
+fonts may be either serif or sans serif, depending on how the vendor implemented their set of standard 
+names.
+.PP
+Applications requesting point sizes different from the 6 in the minimum set might obtain either 
+``scaled bitmapped'' fonts of the requested design, or scaled outline versions of the requested design. 
+This will occur if the fonts are requested according to the appropriate X11R5 XLFD font scaling conventions and the platform vendor has shipped a bitmapped font scaler or a scalable outline rasterizer 
+as part of the CDE platform and the standard names are mapped to such font capabilities.
+.PP
+.SS "Example XLFD Patterns for the Standard Names"
+Using the specified field values for these standard names,
+we can represent subsets of the standard names with various XLFD patterns.
+The XLFD pattern
+.EX
+-dt-application-*
+.EE
+matches the full set of CDE Standard Application Font Names. The pattern
+.EX
+-dt-application-bold-*-*-*-*-*-*-*-p-*-*-*-
+.EE
+matches the bold, proportionally-spaced CDE fonts, both serif and sans serif. And the pattern
+.EX
+-dt-application-*-*-*-*-*-*-*-*-m-*-*-*-
+.EE
+matches the monospaced fonts (whether serif or sans serif, or both).
+.PP
+The full set of CDE Standard Application Font Names can be represented with the following patterns:
+.EX
+-dt-application-bold-i-normal-serif-*-*-*-*-p-*-iso8859-1
+-dt-application-bold-r-normal-serif-*-*-*-*-p-*-iso8859-1
+-dt-application-medium-i-normal-serif-*-*-*-*-p-*-iso8859-1
+-dt-application-medium-r-normal-serif-*-*-*-*-p-*-iso8859-1
+-dt-application-bold-i-normal-sans-*-*-*-*-p-*-iso8859-1
+-dt-application-bold-r-normal-sans-*-*-*-*-p-*-iso8859-1
+-dt-application-medium-i-normal-sans-*-*-*-*-p-*-iso8859-1
+-dt-application-medium-r-normal-sans-*-*-*-*-p-*-iso8859-1
+-dt-application-bold-i-normal-*-*-*-*-*-m-*-iso8859-1
+-dt-application-bold-r-normal-*-*-*-*-*-m-*-iso8859-1
+-dt-application-medium-i-normal-*-*-*-*-*-m-*-iso8859-1
+-dt-application-medium-r-normal-*-*-*-*-*-m-*-iso8859-1
+-dt-application-medium-r-normal-*-*-*-*-*-p-*-dtsymbol-1
+.EE
+Remember that each of these 13 standard ``names'' comes in at least 6 point sizes.
+.PP
+.SS "CDE Platform Vendor and X Server Vendor Implementation of These Names"
+Each CDE platform vendor and X\ server vendor provides mappings of their
+own fonts to XLFD names meeting this standard, so that CDE applications will
+work on their platform.
+The actual XLFD names will vary from platform to platform, just as the
+fonts they are mapped to, since they contain some of the same values
+as the XLFD name of the underlying font.
+What does not vary is the behavior: the
+common patterns in which only specified fields are used will match each
+platform's standard names.  
+This is guaranteed by the field specifications given earlier.
+.PP
+The following requirements are placed on each CDE or X\ server vendor's implementation of the Standard Application Font Names:
+.RS 3
+.PD .1
+.IP \(bu 3
+The names must be fully specified XLFD names, without wild cards.
+.IP \(bu 3
+The WEIGHT_NAME, SLANT, SETWIDTH_NAME, SPACING, CHARSET_REGISTRY, and
+CHARSET_ENCODING fields must contain valid values as defined previously and must match those in the underlying font.
+.IP \(bu 3
+The ADD_STYLE_NAME field must contain 
+either the \f3serif\fP or \f3sans\fP designation,
+whichever matches the underlying font.
+.PP
+.SS "Default CDE Mapping of the Standard Application Font Names for ISO8859-1 Locales"
+The default mapping of these standard application font names for ISO8859-1 locales is to the following standard X11R5 bitmapped fonts (the 6 minimum sizes are not shown explicitly in these patterns):
+.EX
+-adobe-times-bold-i-normal--*-*-*-*-p-*-iso8859-1
+-adobe-times-bold-r-normal--*-*-*-*-p-*-iso8859-1
+-adobe-times-medium-i-normal--*-*-*-*-p-*-iso8859-1
+-adobe-times-medium-r-normal--*-*-*-*-p-*-iso8859-1
+-adobe-helvetica-bold-o-normal--*-*-*-*-p-*-iso8859-1
+-adobe-helvetica-bold-r-normal--*-*-*-*-p-*-iso8859-1
+-adobe-helvetica-medium-o-normal--*-*-*-*-p-*-iso8859-1
+-adobe-helvetica-medium-r-normal--*-*-*-*-p-*-iso8859-1
+-adobe-courier-bold-o-normal--*-*-*-*-m-*-iso8859-1
+-adobe-courier-bold-r-normal--*-*-*-*-m-*-iso8859-1
+-adobe-courier-medium-o-normal--*-*-*-*-m-*-iso8859-1
+-adobe-courier-medium-r-normal--*-*-*-*-m-*-iso8859-1
+-adobe-symbol-medium-r-normal--*-*-*-*-p-*-adobe-fontspecific
+.EE
+A vendor of a CDE platform is free, however, to provide a different mapping of these standard names 
+as long as all 13 names map to fonts of the appropriate design and style and the required 6 point sizes 
+are available.
+The vendor's CDE documentation will document the platform-specific default mapping for the standard names.
+.PP
+.SS "Using the Standard Application Font Names in \f3app-defaults\fP files"
+An application developer can code a single \f3app-defaults\fP
+file to specify font resources for their application and use it across all CDE platforms.
+Since most of the fields
+(FOUNDRY,
+FAMILY_NAME,
+WEIGHT_NAME,
+SLANT,
+SETWIDTH_NAME,
+ADD_STYLE_NAME,
+POINT_SIZE,
+SPACING,
+CHARSET_REGISTRY,
+and
+CHARSET_ENCODING)
+of the standard names are the same across different vendors' platforms,
+these values can be used in the resource specification in the \f3app-defaults\fP file.
+However, other fields
+(PIXEL_SIZE, RESOLUTION_X, RESOLUTION_Y, and AVERAGE_WIDTH) may vary across
+platforms, and so must be wild-carded in the resource specification.
+For example:
+.EX
+.SM "appOne*headFont: -dt-application-bold-r-normal-sans-*-140-*-*-p-*-iso8859-1"
+.SM "appOne*linkFont: -dt-application-bold-i-normal-sans-*-100-*-*-p-*-iso8859-1"
+.EE
+might be used to specify some of AppOne's default font resource needs.
+.PP
+.SS "Other Character Sets in the Common Locales"
+The standard application fonts names defined above are for use in locales using the ISO 8859-1 
+character set only.
+For other locales supported by CDE, there are no fonts guaranteed to be part of CDE for each vendor's 
+CDE platform, for CDE 1.0. However, for the following locales, this standard recommends that 
+CDE vendors provide fonts with the following XLFD attribute values, and that they be accessible using 
+these names. For full information on how the vendors, if they ship the recommended fonts, would 
+make such names usable with the appropriate font base name lists required for correct CDE support 
+for internationalization, see the guidelines in the 
+.I "CDE Internationalization Programming Guide"
+document.
+.PP
+.PP
+.I "For locales using ISO8859-2, ISO8859-3, ISO8859-4, ISO8859-5 (Cyrillic), and ISO8859-7 (Greek):"
+.PP
+The same values for FOUNDRY, FAMILY_NAME, WEIGHT_NAME, SLANT, SET_WIDTH, ADD_STYLE, and 
+SPACING as are used in this definition for the ISO8859-1 locale are recommended.
+.PP
+.PP
+.I "For Japanese locales:"
+.PP
+Two values for the FAMILY_NAME attribute (\f3Gothic\fP and \f3Mincho\fP) and two values for the 
+WEIGHT attribute (\f3medium\fP and \f3bold\fP) are recommended.
+.PP
+.PP
+.I "For Chinese (Taiwan) locales:"
+.PP
+Two values for the FAMILY_NAME attribute (\f3Sung\fP and \f3Kai\fP) and two values for the WEIGHT 
+attribute (\f3medium\fP and \f3bold\fP) are recommended.
+.PP
+.PP
+.I "For Chinese (PRC) locales:"
+.PP
+Two values for the FAMILY_NAME attribute (\f3Song\fP and \f3Kai\fP) and two values for the WEIGHT 
+attribute (\f3medium\fP and \f3bold\fP) are recommended.
+.PP
+.PP
+.I "For Korean locales:"
+.PP
+Two values for the FAMILY_NAME attribute (\f3Totum\fP and \f3Pathang\fP) and two values for the 
+WEIGHT attribute (\f3medium\fP and \f3bold\fP) are recommended. Note that these names are unofficial, tentative romanizations of the two common font families in use in Korea; Totum corresponds to 
+fonts typically shipped as Gothic, Kodig, or Dotum, and Pathang corresponds to fonts typically 
+shipped as Myungjo or Myeongjo. The official roman names for these fonts are under review and may 
+be changed in the future by the Korean government, and thus may change for CDE.
+.PP
+.SH "SEE ALSO"
+.BR dtstyle (1),
+.BR dtterm (1),
+.BR DtStdInterfaceFontNames (5)
+.PP
+.SH NOTES
+There is no requirement on a CDE platform vendor to implement these standard names in a particular way.  Several mechanisms are possible:
+duplicate font files with altered naming attributes,
+X11R5 font aliases,
+or vendor-specific mechanisms.
+The only requirement is that an XLFD pattern, written with attributes taken from the set that define the standard names, can be successfully used to open a font with the Xlib function \f3XLoadFont\fP;
+and, specifically, the Xlib function \f3XListFonts\fP need NOT return the same XLFD names for the pattern on different CDE platforms.
+.PP
+CDE applications should, of course, be written to behave in a reasonable manner if these standard font names are not available on a particular X server.
+This is typically done in an X application by defaulting to the \f3fixed\fP and \f3variable\fP fonts.

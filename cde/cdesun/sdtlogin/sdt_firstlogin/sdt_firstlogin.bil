@@ -1,0 +1,190 @@
+:bil-version	1 0
+:module sdt_firstlogin
+(
+
+:element mainwindow
+(
+	:type			:base-window
+	:width			999
+	:height			852
+	:bg-color		"Black"
+	:label			"First Login"
+	:resizable		:true
+	:visible		:true
+	:iconic			:false
+	:children		(
+		controlpane2
+	)
+)
+:element controlpane2
+(
+	:type			:container
+	:container-type		:relative
+	:x			0
+	:y			0
+	:visible		:true
+	:active			:true
+	:border-frame		:none
+	:north-attachment	(:center-grid-line 50 0)
+	:west-attachment	(:center-grid-line 50 0)
+	:children		(
+		separator
+		label2
+		radiobox
+		label3
+		separator2
+		button
+		button2
+	)
+)
+:element separator
+(
+	:type			:separator
+	:line-style		:etched-in
+	:orientation		:horizontal
+	:x			0
+	:y			219
+	:height			8
+	:visible		:true
+	:north-attachment	(:obj radiobox 10)
+	:east-attachment	(:obj controlpane2 -1)
+	:west-attachment	(:point 0 0)
+)
+:element label2
+(
+	:type			:label
+	:x			37
+	:y			20
+	:label-type		:string
+	:label			"Welcome to Solaris.  The following desktops are\navailable.  Which one would you like to use as\nyour default desktop?"
+	:label-alignment	:left
+	:active			:true
+	:visible		:true
+	:north-attachment	(:point 0 20)
+	:east-attachment	(:point 0 37)
+	:west-attachment	(:point 0 37)
+)
+:element radiobox
+(
+	:type			:choice
+	:choice-type		:exclusive
+	:x			38
+	:y			145
+	:label-type		:string
+	:label			"Choose One:"
+	:label-position		:north
+	:num-columns		1
+	:orientation		:vertical
+	:selection-required	:false
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj label3 15)
+	:west-attachment	(:point 0 38)
+	:children		(
+		radiobox_Item1_item
+	)
+)
+:element radiobox_Item1_item
+(
+	:type			:item
+	:item-type		:item-for-choice
+	:label-type		:string
+	:label			"Item1"
+	:active			:true
+	:selected		:true
+)
+:element label3
+(
+	:type			:label
+	:x			37
+	:y			81
+	:label-type		:string
+	:label			"Note: You can change this default at any time by\nusing the Session Menu located on the Desktop\nLogin Screen's Options Menu."
+	:label-alignment	:left
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj label2 12)
+	:east-attachment	(:point 0 37)
+	:west-attachment	(:point 0 37)
+)
+:element separator2
+(
+	:type			:separator
+	:line-style		:etched-in
+	:orientation		:horizontal
+	:x			0
+	:y			280
+	:height			9
+	:visible		:true
+	:north-attachment	(:obj button2 16)
+	:east-attachment	(:obj controlpane2 -2)
+	:west-attachment	(:obj controlpane2 0)
+)
+:element button
+(
+	:type			:button
+	:button-type		:push-button
+	:x			37
+	:y			239
+	:width			125
+	:height			30
+	:label-type		:string
+	:label-alignment	:center
+	:label			"OK"
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj separator 12)
+	:west-attachment	(:point 0 45)
+)
+:element button2
+(
+	:type			:button
+	:button-type		:push-button
+	:x			160
+	:y			239
+	:width			125
+	:height			30
+	:label-type		:string
+	:label-alignment	:center
+	:label			"Cancel"
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj separator 12)
+	:east-attachment	(:point 0 45)
+)
+:connection
+(
+	:from			button
+	:when			:activate
+	:action-type		:call-function
+	:action			FL_Select_OK_Button
+)
+:connection
+(
+	:from			radiobox
+	:when			:after-create
+	:action-type		:call-function
+	:action			FL_Create_Choices
+)
+:connection
+(
+	:from			button2
+	:when			:activate
+	:action-type		:execute-code
+	:action			"	/* Cancel button has been called, return a non-zero exit code */\n\n	exit(2);"
+)
+:connection
+(
+	:from			button
+	:when			:after-create
+	:action-type		:call-function
+	:action			FL_Create_OK_Button
+)
+:connection
+(
+	:from			mainwindow
+	:when			:after-create
+	:action-type		:call-function
+	:action			FL_Main_Window_Created
+)
+)

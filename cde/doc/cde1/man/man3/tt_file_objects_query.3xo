@@ -1,0 +1,96 @@
+.TH tt_file_objects_query 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+tt_file_objects_query \- find all objects in the named file
+.SH SYNOPSIS
+.yS
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'Tt_status tt_file_objects_query('u
+Tt_status tt_file_objects_query(const char *\f2filepath\fP,
+	Tt_filter_function \f2filter\fP,
+	void *\f2context\fP,
+	void *\f2accumulator\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn tt_file_objects_query
+function instructs the ToolTalk service to find all objects in the
+named file and pass the
+objids
+to the filter function.
+The context pointer and accumulator pointer initially specified are also
+passed to the filter function.
+.P
+As the ToolTalk service finds each object,
+it calls the filter function, passing the
+objid
+of the object and the two application-supplied pointers.
+The filter function performs its computation and returns a
+.B Tt_filter_action
+value that tells the query function whether to continue or to stop.
+.B Tt_filter_action
+values are:
+.VL 8
+.Lc TT_FILTER_CONTINUE
+.br
+The query function should continue.
+.Lc TT_FILTER_STOP
+.br
+The query function should stop.
+.LE
+.P
+The
+.I filepath
+argument is the name of the file to be searched for objects.
+The
+.I filter
+argument is the filter function to which the
+objids
+are to be passed.
+The
+.I context
+argument is a pointer to any information the filter needs to execute.
+The ToolTalk service does not interpret this argument,
+but passes it directly to the filter function.
+The
+.I accumulator
+argument is a pointer to where the filter is to store the results
+of the query and filter operations.
+The ToolTalk service does not interpret this argument, but passes
+it directly to the filter function.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn tt_file_objects_query
+function returns the status of the operation as one of the following
+.B Tt_status
+values:
+.VL 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_DBAVAIL
+.br
+The ToolTalk service could not access the
+ToolTalk database needed for this operation.
+.Lc TT_ERR_DBEXIST
+.br
+The ToolTalk service could not access the
+specified ToolTalk database in the expected place.
+.Lc TT_ERR_NOMP
+.br
+The
+.Cm ttsession 1
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_PATH
+.br
+The specified pathname included an unsearchable directory.
+.Lc TT_WRN_STOPPED
+.br
+The query operation being performed was halted by
+.BR Tt_filter_function .
+.LE
+.SH "SEE ALSO"
+.Hd Tt/tt_c.h 5.

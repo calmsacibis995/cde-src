@@ -1,0 +1,80 @@
+.TH tt_orequest_create 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+tt_orequest_create \- create a request message
+.SH SYNOPSIS
+.yS
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'Tt_message tt_orequest_create('u
+Tt_message tt_orequest_create(const char *\f2objid\fP,
+	const char *\f2op\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn tt_orequest_create
+function
+creates a message.
+The created message contains the following:
+.P
+.in +6
+.B Tt_address
+=
+.Cn TT_OBJECT
+.br
+.B Tt_class
+=
+.Cn TT_REQUEST
+.P
+.xo .in -6
+The application can use the returned handle to add
+arguments and other attributes, and to send the message.
+.P
+The
+.I objid
+argument is the identifier of the specified object.
+The
+.I op
+argument is the operation to be performed by the receiving process.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn tt_orequest_create
+function returns the unique handle that identifies the message.
+The application can use
+.Fn tt_ptr_error 3
+to extract one of the following
+.B Tt_status
+values from the returned handle:
+.VL 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_NOMP
+.br
+The
+.Cm ttsession 1
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_PROCID
+.br
+The specified process identifier is out of date or invalid.
+.LE
+.SH "APPLICATION USAGE"
+The application should use
+.Fn tt_free 3
+to free any data stored in the address returned by the
+ToolTalk API.
+.SH "SEE ALSO"
+.Hd Tt/tt_c.h 5,
+.Fn tt_ptr_error 3,
+.Fn tt_free 3.
+.iN
+A reviewer commented that
+``TT_ERR_OBJID error code should be returned if the passed-in
+objid is not valid.''
+This was not added because that return value is applicable to
+.Fn tt_message_send
+or
+.Fn tt_pattern_register ,
+.sA

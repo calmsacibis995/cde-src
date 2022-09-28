@@ -1,0 +1,208 @@
+XCOMM $XConsortium: sv4Lib.rules /main/cde1_maint/5 1995/11/06 16:29:02 drk $
+
+
+/*
+ * SVR4 shared library rules
+ */
+
+#ifndef HasSharedLibraries
+#define HasSharedLibraries YES
+#endif
+#ifndef SharedDataSeparation
+#define SharedDataSeparation NO
+#endif
+#ifndef SharedCodeDef
+#define SharedCodeDef /**/
+#endif
+#ifndef SharedLibraryDef
+#define SharedLibraryDef /**/
+#endif
+#ifndef ShLibIncludeFile
+#define ShLibIncludeFile <sv4Lib.tmpl>
+#endif
+#ifndef SharedLibraryLoadFlags
+#define SharedLibraryLoadFlags -G -z text
+#endif
+#ifndef PositionIndependentCFlags
+#if HasGcc2
+#define PositionIndependentCFlags -fpic
+#endif
+#endif
+#ifndef HasLdRunPath
+#define HasLdRunPath YES
+#endif
+
+/*
+ *  USL and others will need to place an ifdef TARGET and place their rule for 
+ *  LinkScopeAndReorder() in this section..
+ *                      ifdef usl
+ *                      define LinkScopeAndReorder(....)..
+ *                      endif
+ *
+ *  In the future we might want to break these rules out into a sunLib.rules
+ *  or place them in sun.cf.
+ */
+
+
+#ifndef LinkScopeAndReorder
+
+#ifndef MAPFILE_SCOPE
+#define MAPFILE_SCOPE	-M mapfile.scope
+#endif
+
+#ifndef MAPFILE_REORDER
+#define MAPFILE_REORDER	-M mapfile.reorder
+#endif
+
+#ifdef NO_REORDER
+#undef  MAPFILE_REORDER
+#define MAPFILE_REORDER
+#endif
+
+#ifdef NO_LIBSCOPE
+#undef  MAPFILE_SCOPE
+#define MAPFILE_SCOPE
+#endif
+
+#ifdef SunArchitecture
+#if UseExportLists
+#define LinkScopeAndReorder(down,up,lib,libver, exportlist, solist) \
+	@if [ -f down/exportlist ]; then \				@@\
+	    $(RM) down/mapfile.scope down/$@.list; \			@@\
+	    (set -x; cd down; $(LD) -o up/lib $(SHLIBLDFLAGS) -h libver solist $(REQUIREDLIBS)); \	@@\
+	    $(CPP) exportlist >$@.list; \				@@\
+	    $(EXPORTLISTGEN) lib $@.list libver > down/mapfile.scope; \	@@\
+        fi; 								@@\
+	@if [ -f down/mapfile.reorder ] && [ -f down/mapfile.scope ]; then \ @@\
+	    (set -x; cd down; $(LD) -o up/lib $(SHLIBLDFLAGS) MAPFILE_SCOPE MAPFILE_REORDER -h libver solist $(REQUIREDLIBS)); \ @@\
+	elif [ -f down/mapfile.scope ]; then \				@@\
+	    (set -x; cd down; $(LD) -o up/lib $(SHLIBLDFLAGS) MAPFILE_SCOPE -h libver solist $(REQUIREDLIBS)); \ @@\
+	elif [ -f down/mapfile.reorder ]; then \			@@\
+	    (set -x; cd down; $(LD) -o up/lib $(SHLIBLDFLAGS) MAPFILE_REORDER -h libver solist $(REQUIREDLIBS)); \ @@\
+	else \								@@\
+	    (set -x; cd down; $(LD) -o up/lib $(SHLIBLDFLAGS) -h libver solist $(REQUIREDLIBS)); \ @@\
+	fi;								@@\
+	@if [ -f down/exportlist ]; then \				@@\
+	    $(RM) down/mapfile.scope down/$@.list; \			@@\
+	fi
+
+#else /* UseExportLists */
+
+#define LinkScopeAndReorder(down,up,lib,libver, exportlist, solist) \
+	@if [ -f down/mapfile.reorder ]; then \				@@\
+        (set -x; cd down; $(LD) -o up/lib $(SHLIBLDFLAGS) MAPFILE_REORDER -h libver solist $(REQUIREDLIBS)); else \				@@\
+        (set -x; cd down; $(LD) -o up/lib $(SHLIBLDFLAGS) -h libver solist $(REQUIREDLIBS)); fi; 
+
+#endif /* UseExportLists */
+
+#else  /* SunArchitecture */
+
+#define LinkScopeAndReorder(down,up,lib,libver, exportlist, solist) \
+        (set -x; cd down; $(LD) -o up/lib $(SHLIBLDFLAGS) -h libver solist $(REQUIREDLIBS));
+
+#endif /* SunArchitecture */
+#endif /* LinkScopeAndReorder */
+
+/*
+ * InstallSharedLibrary - generate rules to install the shared library.
+ */
+#ifndef InstallSharedLibrary
+#define	InstallSharedLibrary(libname,rev,dest)				@@\
+install:: Concat(lib,libname.so.rev) 					@@\
+	MakeDir($(DESTDIR)dest)						@@\
+	$(INSTALL) -c $(INSTLIBFLAGS) Concat(lib,libname.so.rev) $(DESTDIR)dest @@\
+	$(RM) Concat($(DESTDIR)dest/lib,libname.so)			@@\
+	$(LN) Concat(lib,libname.so.rev) Concat($(DESTDIR)dest/lib,libname.so)
+
+#endif /* InstallSharedLibrary */
+
+/*
+ * InstallSharedLibraryData - generate rules to install the shared library data
+ */
+#ifndef InstallSharedLibraryData
+#define	InstallSharedLibraryData(libname,rev,dest)
+#endif /* InstallSharedLibraryData */
+
+
+/*
+ * SharedLibraryTarget - generate rules to create a shared library;
+ * build it into a different name so that we do not hose people by having
+ * the library gone for long periods.
+ */
+#ifndef SharedLibraryTarget
+#define SharedLibraryTarget(libname,rev,solist,down,up)			@@\
+AllTarget(Concat(lib,libname.so.rev))					@@\
+									@@\
+Concat(lib,libname.so.rev):  solist					@@\
+	$(RM) $@~							@@\
+	LinkScopeAndReorder(down,up,$@~,$@,Concat(lib,libname.elist), solist)	@@\
+	$(RM) $@ 							@@\
+	$(MV) $@~ $@							@@\
+	$(RM) Concat(lib,libname.so)					@@\
+	$(LN) $@ Concat(lib,libname.so)					@@\
+	Strip()								@@\
+									@@\
+clean::									@@\
+	$(RM) Concat(lib,libname.so.rev) Concat(lib,libname.so)
+#endif /* SharedLibraryTarget */
+
+
+/*
+ * SharedLibraryTarget3 - generate rules to create a shared library;
+ * build it into a different name so that we do not hose people by having
+ * the library gone for long periods.
+ *
+ * This is similar to SharedLibraryTarget but if the argument list is too
+ * long, it fails on some machines; So, build the shared library incrementally
+ * with objs1, objs2 and objs3
+ */
+#ifndef SharedLibraryTarget3
+#define SharedLibraryTarget3(libname,rev,objs1,objs2,objs3,down,up)	@@\
+AllTarget(Concat(lib,libname.so.rev))					@@\
+									@@\
+Concat(lib,libname.so.rev.r1)::  objs1					@@\
+	$(RM) $@							@@\
+	(cd down; $(LD) -r -o up/$(@) objs1)	 			@@\
+									@@\
+Concat(lib,libname.so.rev.r2)::  objs2					@@\
+	$(RM) $@							@@\
+	(cd down; $(LD) -r -o up/$(@) objs2)	 			@@\
+									@@\
+Concat(lib,libname.so.rev)::  objs3 Concat(lib,libname.so.rev.r1) Concat(lib,libname.so.rev.r2)	@@\
+	$(RM) $@~							@@\
+	(cd down; $(LD) -o up/$@~ $(SHLIBLDFLAGS) -h $(@) up/$(@).r[12] objs3 $(REQUIREDLIBS)) @@\
+	$(RM) $@ 							@@\
+	$(MV) $@~ $@ 							@@\
+	$(RM) Concat(lib,libname.so)					@@\
+	$(LN) $@ Concat(lib,libname.so)					@@\
+									@@\
+clean::									@@\
+	$(RM) Concat(lib,libname.so.rev) Concat(lib,libname.so)		@@\
+	$(RM) Concat(lib,libname.so.rev.r1) Concat(lib,libname.so.rev.r2)
+
+#endif /* SharedLibraryTarget3 */
+
+/*
+ * SharedLibraryDataTarget - generate rules to create shlib data file;
+ */
+#ifndef SharedLibraryDataTarget
+#define SharedLibraryDataTarget(libname,rev,salist)
+#endif /* SharedLibraryTarget */
+
+/* SharedLibraryBuildInstall - install a shared library to a destination.
+ * Remove it first if you can. If not, move them to file~.
+ */
+#ifndef SharedLibraryBuildInstall
+#define SharedLibraryBuildInstall(libname,rev,dest)			@@\
+$(INST_STEP)::								@@\
+	MakeDir($(BINSTALLPATH)/dest)					@@\
+	@if [ -f Concat($(BINSTALLPATH)/dest/lib,libname.so.rev) ];then \	@@\
+	  $(RM) Concat($(BINSTALLPATH)/dest/lib,libname.so); \		@@\
+	  $(RM) Concat($(BINSTALLPATH)/dest/lib,libname.so.rev) || \	@@\
+	  $(MV) Concat($(BINSTALLPATH)/dest/lib,libname.so.rev) Concat(Concat($(BINSTALLPATH)/dest/lib,libname.so.rev),~);fi	@@\
+	$(BINSTALL) -f $(BINSTALLPATH)/dest Concat(lib,libname.so.rev)	@@\
+	@(set -x; cd $(BINSTALLPATH)/dest; \				@@\
+	$(LN) Concat(lib,libname.so.rev) Concat(lib,libname.so))	@@\
+									@@\
+LinkBuildFileList($(BUILDINCTOP),includes,Concat(lib,libname.so.rev) Concat(lib,libname.so) ,$(BINSTALLPATH),dest,$(CURRENT_DIR))
+#endif /* SharedLibraryBuildInstall */

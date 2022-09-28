@@ -1,0 +1,105 @@
+.\"---
+.\"     (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\"     (c) Copyright 1993, 1994 International Business Machines Corp.
+.\"     (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\"     (c) Copyright 1993, 1994 Novell, Inc.
+.\"---
+.TH dtsession_res 1 "05 Dec 1994"
+.BH "05 Dec 1994""
+.SH NAME
+dtsession_res - CDE dtsession resource load utility
+.SH SYNOPSIS
+dtsession_res -load|-merge [-system] [-xdefaults] [-file <name>]
+.P
+NOTE: The Common Desktop Environment (CDE)
+.B dtsession_res
+utility is used by
+.B dtsession
+and the
+.B ReloadResources
+action to load session resources. It is not intended to be run directly
+from the command line.
+.SH DESCRIPTION
+The CDE dtsession_res utility uses
+.B xrdb(1)
+to load the session resources into the 
+RESOURCE_MANAGER property of the root window of the display. The session
+resources are gathered from the following files:
+.RS
+.P
+- /usr/dt/config/$LANG/sys.resources
+.P
+- /etc/dt/config/$LANG/sys.resources
+.P
+- $HOME/.Xdefaults
+.P
+- $HOME/.dt/<session dir>/dt.resources
+.RE
+.P
+Refer to the
+.B
+dtsession(1)
+man page for more information on these files and their content.
+.P
+The
+.B dtsession_res
+utility provides support for display-specific resources by converting 
+the $DISPLAY value into a
+.B cpp(1)
+macro that can be used in a session resource file to limit resource
+definitions to a particular display. It does this by converting all
+\'\.' (dot) and ':' (colon) characters to '_', stripping off any screen
+specification and finally prefixing 'DISPLAY_' to the result. For example,
+a $DISPLAY of ':0' would be 'DISPLAY_0', and a $DISPLAY of 'blanco.gato.com:0.0'
+would be 'DISPLAY_blanco_gato_com_0'. The resulting value can be used
+as part of a
+.B cpp
+test in a session resource file. For example:
+.RS
+.P
+.nf
+Myapp*resource: value
+.P
+#ifdef DISPLAY_blanco_gato_com_0
+Myapp*resource: specialvalue1
+#endif
+.P
+#ifdef DISPLAY_pablo_gato_com_0
+Myapp*resource: specialvalue2
+#endif
+.fi
+.RE
+.P
+.SH OPTIONS
+.SS -load
+Replace the current RESOURCE_MANAGER content with the session resources.
+.SS -merge
+Merge the current RESOURCE_MANAGER content with the session resources.
+.SS -system
+Load or merge the system session resources.
+.SS -xdefaults
+Load or merge the $HOME/.Xdefault file.
+.SS -file <name>
+Load or merge the file specified by <name>.
+.SH EXAMPLES
+The
+.B dtsession_res
+utility is not intended to be run from the command line. Refer to the
+.B ReloadResources
+action for information on how to reload session resources in a
+user's session.
+.P
+.nf
+dtsession_res -load -system -xdefaults \\
+   -file $HOME/.dt/sessions/current/dt.resources
+.fi
+.P
+Replaces the RESOURCE_MANAGER with the content of the following files:
+.P
+- /usr/dt/config/$LANG/sys.resources,
+.P
+- /etc/dt/config/$LANG/sys.resources,
+.P
+- $HOME/.Xdefaults and
+.P
+- $HOME/.dt/sessions/current/dt.resources files.

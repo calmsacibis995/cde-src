@@ -1,0 +1,166 @@
+/* tt/lib/dm/Imakefile */
+/* The default for the defines NormalLibtt and SharedLibtt are set in
+ * config/Project.tmpl.
+ * If NormalLibtt and ! SharedLibtt, only non-pic code is built in
+ *    current directory.
+ * If NormalLibtt and SharedLibtt, non-pic code is built in the current
+ *    directory and pic code is built in the shared subdirectory.
+ * If !NormalLibtt and SharedLibtt, only pic code is built in the 
+ *    current directory.
+ * The default defines for NormalLibtt and SharedLittt can be overwritten 
+ *    in many places. See the file config/ExtensionsToImake for 
+ *    information.
+ */
+#ifndef DoNormalLib
+#define DoNormalLib NormalLibtt
+#endif
+#ifndef DoSharedLib
+#define DoSharedLib SharedLibtt
+#endif
+
+#include <Library.tmpl>
+
+TT_DIR = ../..
+#include "../../tooltalk.tmpl"
+/* We don't need the local CDE includes here (see tooltalk.tmpl) */
+CDEINCLUDES=
+XINCLUDES=
+
+/* General case INCLUDES DEFINES
+ * Each individual architecture may have more or less of the above.
+ * Use EXTRA_DEFINES and EXTRA_INCLUDES to add defines and includes
+ * to an individual architecture.
+ */
+DEFINES = 
+/* Sure wish we could put mini_isam only on the few files that need	*/
+/* it, but SpecialObjectRule doesn't seem to be defined 		*/
+INCLUDES = -I../../lib -I../../mini_isam 
+
+/* put EXTRA_DEFINES and EXTRA_INCLUDES and anything else below */
+#ifdef HPArchitecture
+EXTRA_C++OPTIONS = $(ESLIT++_OPTION)
+#endif
+
+#ifdef SunArchitecture
+EXTRA_DEFINES = -D_TS_ERRNO
+#endif
+
+#ifdef RsArchitecture
+#endif
+
+#ifdef USLArchitecture
+#endif
+
+
+/*** NOTE!
+ *** Every time a .o is added below it needs to be added to
+ *** the lib/tt/lib Imakefile in DM_OBJS and SHARED_DM_OBJS
+ ***/
+
+
+SRCS = \
+dm_path.C \
+dm_oid.C \
+dm_dbref.C \
+dm_db.C \
+dm.C \
+dm_transaction.C \
+dm_mfs.C \
+dm_oid_prop_record.C \
+dm_magic.C \
+dm_key.C \
+dm_docoid_path_record.C \
+dm_dbrefs_table.C \
+dm_dbtables.C \
+dm_db_desc.C \
+dm_dbdescs_table.C \
+dm_redirect.C \
+dm_table_desc.C \
+dm_record.C \
+dm_oid_container_record.C \
+dm_oid_access_record.C \
+dm_msg_queue_record.C \
+dm_access_utils.C \
+dm_dbtables_utils.C \
+dm_container_utils.C \
+dm_db_desc_utils.C \
+dm_db_utils.C \
+dm_dbdescs_utils.C \
+dm_dbref_utils.C \
+dm_dbrefs_utils.C \
+dm_enums.C \
+dm_docoid_utils.C \
+dm_exports.C \
+dm_exports_utils.C \
+dm_key_desc.C \
+dm_key_desc_utils.C \
+dm_key_utils.C \
+dm_oid_prop_utils.C \
+dm_mfs_utils.C \
+dm_msg_utils.C \
+dm_oid_utils.C \
+dm_table_desc_utils.C \
+dm_record_utils.C \
+dm_rpc_mount.C \
+dm_utils.C
+
+
+OBJS = \
+dm_path.o \
+dm_oid.o \
+dm_dbref.o \
+dm_db.o \
+dm.o \
+dm_transaction.o \
+dm_mfs.o \
+dm_oid_prop_record.o \
+dm_magic.o \
+dm_key.o \
+dm_docoid_path_record.o \
+dm_dbrefs_table.o \
+dm_dbtables.o \
+dm_db_desc.o \
+dm_dbdescs_table.o \
+dm_redirect.o \
+dm_table_desc.o \
+dm_record.o \
+dm_oid_container_record.o \
+dm_oid_access_record.o \
+dm_msg_queue_record.o \
+dm_access_utils.o \
+dm_dbtables_utils.o \
+dm_container_utils.o \
+dm_db_desc_utils.o \
+dm_db_utils.o \
+dm_dbdescs_utils.o \
+dm_dbref_utils.o \
+dm_dbrefs_utils.o \
+dm_enums.o \
+dm_docoid_utils.o \
+dm_exports.o \
+dm_exports_utils.o \
+dm_key_desc.o \
+dm_key_desc_utils.o \
+dm_key_utils.o \
+dm_oid_prop_utils.o \
+dm_mfs_utils.o \
+dm_msg_utils.o \
+dm_oid_utils.o \
+dm_table_desc_utils.o \
+dm_record_utils.o \
+dm_rpc_mount.o \
+dm_utils.o
+
+
+
+/* Build the .o's */
+LibraryObjectRule()
+
+all:: $(OBJS)
+
+/* Library built up one level */
+LintLibraryTarget(tt,$(SRCS))
+
+DependTarget()
+
+includes::

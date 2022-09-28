@@ -1,0 +1,139 @@
+.TH Translate 4 "13 May 1994"
+.SH NAME
+Translate request \- translate a document from one media type to another
+.SH SYNOPSIS
+.yS
+.ta \w'[\f2file\fP] Translate('u
+[\f2file\fP] Translate(in \f2mediaType contents\fP,
+	out \f2mediaType output\fP,
+	in boolean \f2inquisitive\fP,
+	in boolean \f2covert\fP
+	[in messageID \f2counterfoil\fP]);
+.yE
+.SH DESCRIPTION
+The
+.I Translate
+request causes the handler to translate a document from one media type
+to another and return the translation.
+The translation must be the best possible representation of the document
+in the target media type,
+even if the resulting representation cannot be exactly translated
+back into the original document.
+.P
+The
+.I contents
+argument
+is the contents of the document.
+If this argument is unset
+(in other words, has a value of
+.BR (char\ *)0 ) ,
+then the contents of the document are in
+the file named in the message's
+.I file
+attribute.
+The data type
+.RI ( mediaType )
+of the
+.I contents
+argument should be
+.BR string ,
+unless nulls are valid in the given media type,
+in which case the data type must be
+.BR bytes .
+.P
+The
+.I output
+argument is the translation of the document.
+.P
+The
+.I inquisitive
+argument is a
+.B boolean
+value
+indicating whether the handler is allowed to block on user input
+while carrying out the request.
+However, even if
+.I inquisitive
+is True, the handler is not required to seek such input.
+.P
+The
+.I covert
+argument is a
+.B boolean
+value indicating whether the handler may make itself apparent to the user
+as it carries out the request.
+If False, the recipient need not make itself apparent.
+.P
+If both the
+.I inquisitive
+argument and the
+.I covert
+argument are True, the recipient should attempt to limit its presence
+to the minimum needed to receive any user input desired;
+for example, through iconification.
+.P
+The
+.I counterfoil
+argument is a unique string created by the message sender
+to give both sender and receiver a way to refer to this request
+in other correspondence.
+Typically this string is created by concatenating a process ID and a counter.
+This argument should be included
+if the sender anticipates a need to communicate with the handler
+about this request before it is completed; for example, to cancel it.
+When this argument is included,
+and the handler determines that an immediate reply is not possible,
+the handler must immediately send at least one
+.I Status
+notice point-to-point back to the requester,
+so as to identify itself to the requester.
+.SH "APPLICATION USAGE"
+To provide a speech-to-text service, a tool can handle requests of the form:
+.Cs I
+.ta \w'Translate('u
+Translate(in Sun_Audio \f2contents\fP,
+	out ISO_Latin_1 \f2output\fP,
+	...);
+.Ce
+.P
+To provide an OCR (optical character recognition) service,
+a tool can handle requests of the form:
+.Cs I
+.ta \w'Translate('u
+Translate(in GIF \f2contents\fP,
+	out ISO_Latin_1 \f2output\fP,
+	...);
+.Ce
+.SH ERRORS
+The ToolTalk service may return one of the following errors
+in processing the
+.I Translate
+request:
+.VL 6
+.Lc TT_DESKTOP_ENOENT
+.br
+The file that was alleged to contain the document does not exist.
+.Lc TT_DESKTOP_ENODATA
+.br
+The in-mode
+.I contents
+argument had no value and the
+.I file
+attribute
+of the message was not set.
+.Lc TT_MEDIA_ERR_FORMAT
+.br
+The document is not a valid instance of the media type.
+.LE
+.SH "SEE ALSO"
+.IR Intro ,
+.IR Abstract ,
+.IR Interpret ,
+.I Status
+requests.
+.iN
+The example code in
+.B "APPLICATION USAGE"
+is subject to change when the data typing name space is
+defined in Draft 3.
+.sA

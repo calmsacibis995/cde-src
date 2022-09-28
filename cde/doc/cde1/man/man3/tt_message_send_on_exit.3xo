@@ -1,0 +1,86 @@
+.TH tt_message_send_on_exit 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+tt_message_send_on_exit \- set up a message to send upon unexpected exit
+.SH SYNOPSIS
+.yS
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'Tt_status tt_message_send_on_exit('u
+Tt_status tt_message_send_on_exit(Tt_message \f2m\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn tt_message_send_on_exit
+function
+requests that the ToolTalk service send this message if
+the process exits unexpectedly.
+The message is sent to the ToolTalk service, which queues the message
+internally until either of two events occur:
+.VL 5
+.LI 1.
+The procid that sent the
+.Fn tt_message_send_on_exit
+message to the ToolTalk service calls
+.Fn tt_close 3.
+In this case, the queued message is deleted.
+.LI 2.
+The connection between the
+.Cm ttsession 1
+server and the process that sent the
+.Fn tt_message_send_on_exit
+message to the ToolTalk service is broken; for
+example, if the application has crashed.
+.LE
+.P
+In this case, the ToolTalk service matches the queued message to its patterns
+and delivers it in the same manner as if the process had sent the message
+normally before exiting.
+.P
+If a process sends a normal termination message but exits without calling
+.Fn tt_close 3,
+both the normal termination message and the on_exit message are
+delivered.
+.P
+The
+.I m
+argument is the opaque handle for the message involved in this operation.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn tt_message_send_on_exit
+function returns the status of the operation as one of the following
+.B Tt_status
+values:
+.VL 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_ADDRESS
+.br
+The specified
+.B Tt_address
+is invalid.
+.Lc TT_ERR_CLASS
+.br
+The specified
+.B Tt_class
+is invalid.
+.Lc TT_ERR_FILE
+.br
+The specified file does not exist or it is inaccessible.
+.Lc TT_ERR_NOMP
+.br
+The
+.Cm ttsession 1
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_OBJID
+.br
+The
+objid
+passed to the ToolTalk service does not reference an existing object spec.
+.LE
+.SH "SEE ALSO"
+.Hd Tt/tt_c.h 5,
+.Fn tt_close 3.

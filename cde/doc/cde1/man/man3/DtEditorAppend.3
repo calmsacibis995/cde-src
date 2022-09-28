@@ -1,0 +1,120 @@
+.\" **
+.\" ** (c) Copyright 1994 Hewlett-Packard Company
+.\" ** (c) Copyright 1994 International Business Machines Corp.
+.\" ** (c) Copyright 1994 Novell, Inc.
+.\" ** (c) Copyright 1994 Sun Microsystems, Inc.
+.\" **
+.TH DtEditorAppend 3 ""
+.BH "3 May - 1994"
+.SH NAME
+\fBDtEditorAppend(3) \- Appends data to an Editor widget.\fP
+.iX "DtEditorAppend"
+.iX "DtEditor functions" "DtEditorAppend"
+.sp .5
+.SH SYNOPSIS
+\fB
+\&#include <Dt/Editor.h>
+.sp .5
+DtEditorErrorCode DtEditorAppend (
+.br
+.ta	0.75i 1.75i
+	Widget \fIwidget\fP,
+.br
+	DtEditorContentRec *\fIdata\fP)
+.fi
+\fP
+.SH DESCRIPTION
+\fBDtEditorAppend\fP inserts data defined by the content record,
+\fIdata\fP at the end of the contents of an Editor widget, \fIwidget\fP.
+.sp .5
+.IP "\fIwidget\fP" 1.00i
+Specifies the editor widget ID.
+.IP "\fIdata\fP" 1.00i
+Pointer to a data structure containing the data to append.
+.sp .5
+.PP
+This function transfers content data between the application and the
+Editor widget using a \fBDtEditorContentRec\fP.  
+This structure indicates the 
+type of data to be transfered along with the actual data.
+.sp .5
+.nf
+.ta .25i 1.1i 1.5i 2.0i
+\fBtypedef struct DtEditorContentRec\fP {
+	\fBDtEditorFormat\fP \fItype\fP;
+	union {
+		\fBchar\fP	*\fIstring\fP;
+		\fBwchar_t\fP	*\fIwchar\fP;
+	} value;
+} \fBDtEditorContentRec\fP\fP;
+.sp .5
+.IP "\fItype\fP"
+Indicates the type of data being passed to the widget.  There are two
+possible types.
+.wH
+.rS
+.TP
+\(bu
+DtEDITOR_TEXT - \fIvalue\fP points to a NULL terminated string of 
+characters (a char *)
+.TP
+\(bu
+DtEDITOR_WCHAR - \fIvalue\fP is a \fBwchar_t*\fP value.
+.fi
+.sp .5
+.IP "\fIvalue\fP"
+The value to be appended to \fIwidget\fP.
+.sp .5
+.PP
+For a complete definition of Editor and its associated resources, see
+\fBDtEditor(3)\fP.
+.sp .5
+.SH RETURN VALUE
+When the data is placed sucessfully into the widget,
+\fBDtEditorAppend\fP returns \fBDtEDITOR_NO_ERRORS\fP.
+If \fItype\fP is unrecognized, \fBDtEDITOR_INVALID_TYPE\fP is returned.
+.sp .5
+.SH EXAMPLES
+.P
+The following code segment sets the contents of an Editor to "The quick
+brown fox".
+.nf
+.ta .25i 1.1i 
+	Widget			editor;
+	DtEditorContentRec	cr;
+	DtEditorErrorCode	status;
+	char * 			sampleString1="The quick",
+				secondString2="brown fox";
+
+	cr.type = DtEDITOR_TEXT;
+	cr.data.string = sampleString1;
+	status = DtEditorSetContents ( editor, &cr );
+	if (status != DtEDITOR_NO_ERRORS)
+	{
+	  printf("Unable to set the contents of the widget\n");
+	}
+	else
+	{
+	  cr.type = DtEDITOR_TEXT;
+	  cr.data.string = sampleString2;
+	  status = DtEditorAppend ( editor, &cr );
+	  if (status != DtEDITOR_NO_ERRORS)
+	  {
+	    printf("Unable to append to the contents of the widget\n");
+	  {
+	}
+.fi
+.SH APPLICATION USAGE
+If the data is in a disk file, rather than in memory, the application should 
+use \fBDtEditorAppendFromFile(3)\fP.
+.SH RELATED INFORMATION
+\fBDtEditor(3)\fP, 
+\fBDtEditorAppendFromFile(3)\fP.
+\fBDtEditorGetContents(3)\fP,
+\fBDtEditorInsert(3)\fP.
+\fBDtEditorInsertFromFile(3)\fP.
+\fBDtEditorSaveContentsToFile(3)\fP,
+\fBDtEditorSetContents(3)\fP,
+\fBDtEditorSetContentsFromFile(3)\fP,
+.sp .5
+

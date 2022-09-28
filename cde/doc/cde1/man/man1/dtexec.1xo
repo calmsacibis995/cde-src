@@ -1,0 +1,124 @@
+.TH dtexec 1 "12 Apr 1994"
+.\" *************************************************************************
+.\" ** (c) Copyright 1993,1994 Hewlett-Packard Company 
+.\" ** (c) Copyright 1993,1994 International Business Machines Corp. 
+.\" ** (c) Copyright 1993,1994 Sun Microsystems, Inc.
+.\" ** (c) Copyright 1993,1994 Novell, Inc.
+.\" *************************************************************************
+.SH NAME
+dtexec \- execute command-based action
+.iX "dtexec"
+.SH SYNOPSIS
+.yS
+dtexec [\-open \f2open_option\fP ] [ \-ttprocid \f2procid\fP ] [ \-tmp \f2tmpfile\fP ] \f2cmd\fP [ \f2cmd_arg ...\fP ]
+.yE
+.SH DESCRIPTION
+Cde uses the
+.Cm dtexec 
+utility to execute
+.Cn COMMAND
+actions.
+In normal
+usage, Cde automatically invokes
+.Cm dtexec
+when it is needed.
+Cde users
+and administrators do not need to interact directly with
+.Cm dtexec .
+.P
+The primary argument for
+.Cm dtexec 
+is the name of a command to execute and
+any command-line options or arguments for that command.
+There are 
+several important services that
+.Cm dtexec 
+provides for the commands that it executes.
+These services are controlled via the options specified in the ``OPTIONS''
+section in this document.
+.SH OPTIONS
+The following options are available:
+.VL 15
+.LI "\f3-open\fP \f2open_option\fP"
+The \f3-open\fP option tells
+.Cm dtexec 
+whether it should continue to run or 
+exit after the command terminates.
+.P
+The valid values for 
+\f2open_option\fP are:
+.VL 6
+.LI \f3-1\fP
+(default) continue to execute after \f2cmd\fP terminates.
+.LI \f30\fP
+exit as soon as \f2cmd\fP terminates.
+.LI \f3n\fP
+continue to execute if \f2cmd\fP terminates
+within \f3n\fP seconds of starting.
+.LE
+.P
+The values \f3-1\fP and \f3n\fP are typically used when
+.Cn COMMAND
+actions are executed in a terminal emulator to control
+the lifetime of the terminal window.
+.LI "\f3-ttprocid\fP \f2procid\fP"
+The
+.Cm dtexec 
+command uses the \f3-ttprocid\fP option
+to send ToolTalk messages
+back to the application that invoked the
+.Cn COMMAND
+action.
+These
+messages are used to convey status information (for example, the command
+has terminated).
+.LI "\f3-tmp\fP \f2tmpfile\fP"
+The \f3-tmp\fP option names a temporary file that
+.Cm dtexec 
+removes after \f2cmd\fP terminates if either no \f2-ttprocid\fP option is
+supplied or contact is lost with the specified \f2procid\fP.
+In normal usage, the parent process that starts
+.Cm dtexec ,
+performs this cleanup.
+This option can be issued multiple times, once for each tmp file present.
+Typically, \f2tmpfile\fP also appears as a \f2cmd_arg\fP.
+.LE
+.SH "EXIT STATUS"
+The following exit values are returned:
+.VL 6
+.LI \f30\fP
+Implies all system resources were available to fork and exec the requested
+command, not that the requested command executed successfully.
+.LI \f31\fP
+An error occurred.
+.LE
+.SH "APPLICATION USAGE"
+Normally, application programs do not directly invoke this program.
+Normally, an application program links with the
+action service, which then invokes
+.Cm dtexec 
+as needed.
+Applications should use the
+\f3waitTime\fP resource to configure the value of the
+\f2\-open_option\fP and the \f3DtexecPath\fP resource to configure
+the location of
+.Cm dtexec .
+.P
+If \f2cmd\fP writes to stderr, the error messages are time stamped
+and redirected to the user's errorlog file (\f3$HOME/.dt/errorlog\fP)
+when \f2open_option\fP is \f30\fP.  If \f2open_option\fP is set
+otherwise, the error messages are typically displayed in the
+terminal window.
+.SH "SEE ALSO"
+.Cm dtaction 1,
+\f3dtactionfile\fP(4).
+
+
+
+
+
+
+
+
+
+

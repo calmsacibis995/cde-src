@@ -1,0 +1,57 @@
+.TH DtCMDeleteBodyPart 3 "17 January 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH "NAME"
+DtCMDeleteBodyPart \- delete a body part from a document
+.SH "SYNOPSIS"
+.yS
+#include <Bento/DtCM.h>
+.sp 0.5v
+.ta \w'void DtCMDeleteBodyPart('u
+void DtCMDeleteBodyPart(DtCMDocument \f2document\fP,
+	CMEnv *\f2error\fP,
+	DtCMBodyPart *\f2body_part\fP);
+.yE
+.SH "DESCRIPTION"
+The
+.Fn DtCMDeleteBodyPart
+function deletes a body part from a document.
+.P
+The
+.I document
+argument is a document handle created by the
+.Fn DtCMInitDocument 3
+function.
+The
+.I error
+argument is a pointer to an error return structure.
+The
+.I body_part
+argument is the part being deleted.
+.SH "RETURN VALUE"
+The
+.Fn DtCMDeleteBodyPart
+function returns no value.
+If an error occurs,
+.Fn DtCMDeleteBodyPart
+sets the major code in the
+.I error
+structure to
+.Cn USER_EXCEPTION ,
+and the application can use the
+.Fn CMRexception_number
+function to determine the minor code.
+See the Error API Appendix in the \*(ZB.
+.SH "APPLICATION USAGE"
+After the body part is deleted, the application should not access it again
+and should not attempt to release it using the
+.Fn DtCMReleaseBodyPart 3
+function.
+.SH "SEE ALSO"
+.Fn DtCMInitDocument 3,
+.Fn DtCMNewBodyPart 3,
+.Hd Bento/DtCM.h 5;
+.Fn CMRexception_number
+in the \*(ZB.

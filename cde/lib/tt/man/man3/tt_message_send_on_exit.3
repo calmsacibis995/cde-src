@@ -1,0 +1,110 @@
+.de LI
+.\" simulate -mm .LIs by turning them into .TPs
+.TP \\n()Jn
+\\$1
+..
+.de Lc
+.\" version of .LI that emboldens its argument
+.TP \\n()Jn
+\s-1\f3\\$1\f1\s+1
+..
+.TH tt_message_send_on_exit 3 "1 March 1996" "ToolTalk 1.3" "ToolTalk Functions"
+.BH "1 March 1996"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.IX "tt_message_send_on_exit" "" "tt_message_send_on_exit(3)" ""
+.SH NAME
+tt_message_send_on_exit \- set up a message to send upon unexpected exit
+.SH SYNOPSIS
+.ft 3
+.nf
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'Tt_status tt_message_send_on_exit('u
+Tt_status tt_message_send_on_exit(Tt_message \f2m\fP);
+.PP
+.fi
+.SH DESCRIPTION
+The
+.BR tt_message_send_on_exit (\|)
+function
+requests that the ToolTalk service send this message if
+the process exits unexpectedly.
+The message is sent to the ToolTalk service, which queues the message
+internally until either of two events occur:
+.PP
+.RS 3
+.nr )J 5
+.LI 1.
+The procid that sent the
+.BR tt_message_send_on_exit (\|)
+message to the ToolTalk service calls
+.BR tt_close (3).
+In this case, the queued message is deleted.
+.LI 2.
+The connection between the
+.BR ttsession (1)
+server and the process that sent the
+.BR tt_message_send_on_exit (\|)
+message to the ToolTalk service is broken; for
+example, if the application has crashed.
+.PP
+.RE
+.nr )J 0
+.PP
+In this case, the ToolTalk service matches the queued message to its patterns
+and delivers it in the same manner as if the process had sent the message
+normally before exiting.
+.PP
+If a process sends a normal termination message but exits without calling
+.BR tt_close (3),
+both the normal termination message and the on_exit message are
+delivered.
+.PP
+The
+.I m
+argument is the opaque handle for the message involved in this operation.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.BR tt_message_send_on_exit (\|)
+function returns the status of the operation as one of the following
+.B Tt_status
+values:
+.PP
+.RS 3
+.nr )J 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_ADDRESS
+.br
+The specified
+.B Tt_address
+is invalid.
+.Lc TT_ERR_CLASS
+.br
+The specified
+.B Tt_class
+is invalid.
+.Lc TT_ERR_FILE
+.br
+The specified file does not exist or it is inaccessible.
+.Lc TT_ERR_NOMP
+.br
+The
+.BR ttsession (1)
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_OBJID
+.br
+The
+objid
+passed to the ToolTalk service does not reference an existing object spec.
+.PP
+.RE
+.nr )J 0
+.SH "SEE ALSO"
+.na
+.BR tt_c (5),
+.BR tt_close (3).

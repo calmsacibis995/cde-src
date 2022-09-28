@@ -1,0 +1,84 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH UilDumpSymbolTable 3X
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIUilDumpSymbolTable\fP \- Dumps the contents of a named UIL symbol table to standard output
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <uil/UilDef.h>
+.sp \n(PDu
+void UilDumpSymbolTable (\fBroot_ptr\fI)
+.ta 0.5i 2.5i
+.nf
+	sym_entry_type *\fBroot_ptr\fI;
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+.PP 
+The \fIUilDumpSymbolTable\fP function dumps
+the contents of a
+UIL symbol table pointer to standard output.
+.IP "\fBroot_ptr\fP"
+Specifies a pointer to the the symbol table root entry.
+This value can be taken from the \fIparse_tree_root\fP part of
+the \fIUil_compile_desc_type\fP data structure returned by \fIUil\fP.
+.PP 
+.ne 20
+By following the link from the root entry,
+you can traverse the entire parse tree.
+Symbol table entries are in the following format:
+.PP 
+\fBhex.address\fP
+.nL
+\fBsymbol.type\fP
+.nL
+\fBsymbol.data\fP
+.nL
+ \fBprev.source.position\fP
+.nL
+ \fBsource.position\fP
+.nL
+ \fBmodification.record\fP
+.PP 
+where:
+.IP "\fBhex.address\fP"
+Specifies the hexadecimal address of this entry in the symbol table.
+.IP "\fBsymbol.type\fP"
+Specifies the type of this symbol table entry.  Some possible types
+are \fIroot\fP, \fImodule\fP, \fIvalue\fP, \fIprocedure\fP, and \fIwidget\fP.
+.IP "\fBsymbol.data\fP"
+Specifies data for the symbol table entry.  The data varies with the
+type of the entry.  Often it contains pointers to other symbol table entries,
+or the actual data for the data type.
+.IP "\fBprev.source.position\fP"
+Specifies the end point in the source code for the previous source item.
+.IP "\fBsource.position\fP"
+Specifies the range of positions in the source code for this symbol.
+.PP 
+The exact data structures for each symbol type are defined in the
+include file \fIUilSymDef.h\fP.
+Note that this file is automatically included when
+an application includes the file \fIUilDef.h\fP.
+.SH RELATED INFORMATION
+.na
+\fIUil(3X)\fP
+.ad

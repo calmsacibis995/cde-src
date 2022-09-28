@@ -1,0 +1,136 @@
+\#! CDE_INSTALLATION_TOP/bin/dtksh
+
+\##########################################################################
+\#  (c) Copyright 1993, 1994 Hewlett-Packard Company	
+\#  (c) Copyright 1993, 1994 International Business Machines Corp.
+\#  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+\#  (c) Copyright 1993, 1994 Unix System Labs, Inc., a subsidiary of
+\#      Novell, Inc.
+\##########################################################################
+
+
+\#
+\# This sample shell script demonstrates the steps necessary for tying into
+\# session management.  To run, simply run this script, and then save the
+\# current session.  When the session is restored, this script should again
+\# restore to its previous state.
+\#
+
+
+\# This function is invoked when the user attempts to save the current session.
+\# It will save off its state information (whether it is iconified, and the
+\# list of workspaces it occupies) into a session file, and then tell the
+\# session manager how to reinvoke it when the session is restored.
+SessionCallback()
+{
+\#  Get the name of our session file
+   if DtSessionSavePath $TOPLEVEL PATH SAVEFILE; then
+      exec 9>$PATH
+
+\#     Save our iconification state
+      if DtShellIsIconified $TOPLEVEL ; then
+         print -u9 'Iconified'
+      else
+         print -u9 'Deiconified'
+      fi
+
+\#     Save the list of workspace we occupy
+      if DtWsmGetWorkspacesOccupied $(XtDisplay "-" $TOPLEVEL) \
+                                    $(XtWindow "-" $TOPLEVEL) \
+                                    CURRENT_WS_LIST ;
+      then
+         oldIFS=$IFS
+         IFS=","
+         for item in $CURRENT_WS_LIST; 
+         do
+            XmGetAtomName NAME $(XtDisplay "-" $TOPLEVEL) $item
+            print -u9 $NAME
+         done
+         IFS=$oldIFS
+      fi
+
+      exec 9<&-
+
+\#     Tell the session manager how to restart us
+      DtSetStartupCommand $TOPLEVEL \
+		   "/usr/dt/share/examples/dtksh/SessionTest $SAVEFILE"
+   else
+      echo "DtSessionSavePath FAILED!!"
+      exit -3
+   fi
+}
+
+
+\# This function is invoked when we are restarted at session restore time.
+\# It is passed the name of the session file as $1.  It will extract our
+\# session information from the session file, and will restore our state
+\# accordingly.
+RestoreSession()
+{
+\#  Get the full path of our session file
+   if DtSessionRestorePath $TOPLEVEL PATH $1; then
+      exec 9<$PATH
+      read -u9 ICONIFY
+
+\#     Restore our iconification state
+      case $ICONIFY in
+         Iconified) DtSetIconifyHint $TOPLEVEL True;;
+         *)         DtSetIconifyHint $TOPLEVEL False;;
+      esac
+
+\#     Place us into the indicated set of workspaces
+      WS_LIST=""
+      while read -u9 NAME
+      do
+         XmInternAtom ATOM $(XtDisplay "-" $TOPLEVEL) $NAME False
+         if [ ${#WS_LIST} -gt 0 ]; then
+            WS_LIST=$WS_LIST,$ATOM
+         else
+            WS_LIST=$ATOM
+         fi
+      done
+
+      DtWsmSetWorkspacesOccupied $(XtDisplay "-" $TOPLEVEL) \
+                                 $(XtWindow "-" $TOPLEVEL) \
+                                 $WS_LIST
+
+      exec 9<&-
+   else
+      echo "DtSessionRestorePath FAILED!!"
+      exit -3
+   fi
+}
+
+
+
+\######################### Create the Main UI #################################
+
+XtInitialize TOPLEVEL wmProtTest WmProtTest "$0" "$@"
+
+XtCreateManagedWidget DA da XmDrawingArea $TOPLEVEL
+XtSetValues $DA height:200 width:200
+
+XmInternAtom SAVE_SESSION_ATOM $(XtDisplay "-" $TOPLEVEL) "WM_SAVE_YOURSELF" False
+
+
+\# If we are invoked with any command line parameters, then we will assume
+\# that it is the name of our session file, and will restore to the indicated
+\# state.
+if (( $# > 0))
+then
+   XtSetValues $TOPLEVEL mappedWhenManaged:False
+   XtRealizeWidget $TOPLEVEL
+   XSync $(XtDisplay "-" $TOPLEVEL) False
+   RestoreSession $1
+   XtSetValues $TOPLEVEL mappedWhenManaged:True
+   XtPopup $TOPLEVEL GrabNone
+else
+   XtRealizeWidget $TOPLEVEL
+   XSync $(XtDisplay "-" $TOPLEVEL) False
+fi
+
+\# Register our interest in participating in session management.
+XmAddWMProtocols $TOPLEVEL $SAVE_SESSION_ATOM
+XmAddWMProtocolCallback $TOPLEVEL $SAVE_SESSION_ATOM SessionCallback
+
+XtMainLoop

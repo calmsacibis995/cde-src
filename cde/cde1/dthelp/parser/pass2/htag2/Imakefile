@@ -1,0 +1,101 @@
+XCOMM $XConsortium: Imakefile /main/cde1_maint/2 1995/10/09 00:10:57 pascale $
+/* htag2 Imakefile */
+
+.SUFFIXES : .e .c .h
+
+HTAG2        = ..
+HTAG2SRC     = $(HTAG2)/htag2
+SDLPARSERSRC = $(HTAG2)/parser
+SDLELTDEFSRC = $(HTAG2)/eltdef
+SDLDTDFILE   = $(HTAG2SRC)/sdl.dtd
+SDLUTILSRC   = $(HTAG2)/util
+SDLBUILDSRC  = $(HTAG2)/build
+SDLUTILLIB   = $(HTAG2)/util/libutil.a
+SDLIFFILE    = $(HTAG2SRC)/sdl.if
+
+#ifdef SunArchitecture
+XLATESRC  = $(TOP)/lib1/DtSvc/DtUtil2
+#else
+XLATESRC  = $(TOP)/lib1/DtHelp
+#endif /* SunArchitecture */
+XLATEHDRS = $(XLATESRC)/XlationSvc.h $(XLATESRC)/LocaleXlate.h
+XLATESRCS = LocaleXlate.c XlationSvc.c
+XLATEOBJS = LocaleXlate.o XlationSvc.o
+
+INCLUDES =  -I. -I$(SDLUTILSRC) -I$(SDLPARSERSRC) \
+	    -I$(SDLELTDEFSRC) -I$(XLATESRC)
+DEFINES =   -DOSMAJORVERSION=$(OSMAJORVERSION) \
+	    -DOSMINORVERSION=$(OSMINORVERSION)
+
+ELTHDRS = $(SDLUTILSRC)/entdef.h $(SDLUTILSRC)/entext.h
+
+# PARSEHDRS are header files used by many parser routines
+PARSEHDRS = $(SDLUTILSRC)/basic.h $(SDLUTILSRC)/trie.h \
+        $(SDLUTILSRC)/common.h $(SDLUTILSRC)/dtddef.h \
+        $(SDLUTILSRC)/dtdext.h $(SDLUTILSRC)/sparse.h \
+        parser.h proto.h
+
+APPLHDRS = $(PARSEHDRS) $(ELTHDRS) \
+        $(SDLUTILSRC)/version.h \
+        $(HTAG2SRC)/global.h \
+	$(HTAG2SRC)/fproto.h \
+        ../parser/pval.h ../parser/globdec.h ../parser/signonx.h \
+        ../parser/userinc.h
+
+SRCS =  custom.c sdl.c option.c out.c $(XLATESRCS)
+
+OBJS =  custom.o sdl.o option.o out.o $(XLATEOBJS)
+
+LOCAL_LIBRARIES = $(SDLUTILLIB)
+
+/* Don't use shared libs for hp */
+#ifdef HPArchitecture
+#if OSMajorVersion > 7
+EXTRA_LOAD_FLAGS = -Wl,-a archive
+#endif
+#endif
+
+#if defined (SunArchitecture)
+SYS_LIBRARIES = -lm -ldl $(WIDECHARSYSLIB) -lgen -lC
+#endif /* SunArchitecture */
+
+/*
+ * SC4.0 C compiler at -xO3 optimization produces bad code for sdl.c
+ * Workaround for this compiler bug is to use -O (minimal optimization)
+ */
+#if defined(SunArchitecture) && !defined(DEBUGTREE)
+sdl.o	:= CDEBUGFLAGS = -O
+#endif
+
+all:: $(OBJS)
+
+/* link the locale translation code */
+#ifdef SunArchitecture
+LinkFiles($(XLATESRC),  $(XLATESRCS))
+#else
+LinkFiles($(DTHELPSRC),  $(XLATESRCS))
+#endif
+NormalLibraryObjectRule()
+
+dthelp_htag2:  $(SDLPARSERSRC)/parser
+	$(RM) dthelp_htag2
+	$(CP) (SDLPARSERSRC)/parser dthelp_htag2
+
+clean::
+	$(RM) dthelp_htag2
+	$(RM) $(XLATESRCS)
+
+
+DependTarget()
+
+sdl.o	:= CCOPTIONS = -Xa
+
+tags ::
+	etags -t *.c *.h *.if
+
+etags ::
+	etags -t *.c *.h *.if
+
+/* For install of developer's build environment */
+LOCAL_BINSTALL_BINDEST = bin
+BuildMultipleInstall(dthelp_htag2,$(LOCAL_BINSTALL_BINDEST))

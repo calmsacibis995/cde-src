@@ -1,0 +1,76 @@
+.TH tt_message_disposition_set 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+tt_message_disposition_set \- set the disposition attribute for a message
+.SH SYNOPSIS
+.yS
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'Tt_status tt_message_disposition_set('u
+Tt_status tt_message_disposition_set(Tt_message \f2m\fP,
+	Tt_disposition \f2r\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn tt_message_disposition_set
+function
+sets the disposition attribute for the specified message.
+.P
+The
+.I m
+argument is the opaque handle for the message involved in this operation.
+The
+.I r
+argument indicates whether an instance of the receiving process
+is to be started to receive the message immediately,
+or whether the message is to be queued until the
+receiving process is started at a later time.
+The following values are defined:
+.VL 8
+.Lc TT_DISCARD
+.br
+There is no receiver for this message.
+The message will be returned to the sender with the
+.B Tt_status
+field containing
+.Cn TT_FAILED .
+.Lc TT_QUEUE
+.br
+Queue the message until a process of the proper
+ptype
+receives the message.
+.Lc TT_START
+.br
+Attempt to start a process of the proper
+ptype
+if none is running.
+.Lc TT_QUEUE+TT_START
+.br
+Queue the message and attempt to start a process of the proper
+ptype
+if none is running.
+.LE
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn tt_message_disposition_set
+function returns the status of the operation as one of the following
+.B Tt_status
+values:
+.VL 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_NOMP
+.br
+The
+.Cm ttsession 1
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_POINTER
+.br
+The pointer passed does not point to an object of
+the correct type for this operation.
+.LE
+.SH "SEE ALSO"
+.Hd Tt/tt_c.h 5.

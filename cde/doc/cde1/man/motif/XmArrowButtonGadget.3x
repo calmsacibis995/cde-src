@@ -1,0 +1,278 @@
+'\" t
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Novell, Inc
+...\" **
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH XmArrowButtonGadget 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmArrowButtonGadget\fP \- The ArrowButtonGadget widget class
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/ArrowBG.h>
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+ArrowButtonGadget consists of a directional arrow surrounded by a border shadow.
+When it is selected, the shadow changes to give the appearance that the
+ArrowButtonGadget has been pressed in.  When it is unselected, the
+shadow reverts to give the appearance that the button is released, or out.
+.SS "Classes"
+ArrowButtonGadget inherits behavior and
+resources from \fIObject\fP, \fIRectObj\fP, and \fIXmGadget\fP classes.
+.PP
+The class pointer is \fIxmArrowButtonGadgetClass\fP.
+.PP
+The class name is \fIXmArrowButtonGadget\fP.
+.SS "New Resources"
+The following table defines a set of widget resources used by the programmer
+to specify data.  The programmer can also set the resource values for the
+inherited classes to set attributes for this widget.  To reference a
+resource by name or by class in a .Xdefaults file, remove the \fIXmN\fP or
+\fIXmC\fP prefix and use the remaining letters.  To specify one of the defined
+values for a resource in a .Xdefaults file, remove the \fIXm\fP prefix and use
+the remaining letters (in either lowercase or uppercase, but include any
+underscores between words).
+The codes in the access column indicate if the given resource can be
+set at creation time (C),
+set by using \fIXtSetValues\fP (S),
+retrieved by using \fIXtGetValues\fP (G), or is not applicable (N/A).
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+ArrowButtonGadget Resource Set
+Name	Class	Type	Default	Access
+_
+XmNactivateCallback	XmCCallback	XtCallbackList	NULL	C
+XmNarmCallback	XmCCallback	XtCallbackList	NULL	C
+XmNarrowDirection	XmCArrowDirection	unsigned char	XmARROW_UP	CSG
+XmNdisarmCallback	XmCCallback	XtCallbackList	NULL	C
+XmNmultiClick	XmCMultiClick	unsigned char	dynamic	CSG
+.TE
+.KE
+.in
+.sp 1
+.IP "\fIXmNactivateCallback\fP"
+Specifies a list of callbacks that is called
+when the ArrowButtonGadget is activated.
+To activate the button, press and release
+\fIBSelect\fP while the pointer is inside
+the ArrowButtonGadget.  Activating the ArrowButtonGadget
+also disarms it.
+The reason sent by this callback is \fIXmCR_ACTIVATE\fP.
+.nL
+.ne 5
+.IP "\fIXmNarmCallback\fP"
+Specifies a list of callbacks that is called
+when the ArrowButtonGadget is armed.
+To arm this widget, press \fIBSelect\fP
+while the pointer is inside the ArrowButtonGadget.
+The reason sent by this callback is \fIXmCR_ARM\fP.
+.IP "\fIXmNarrowDirection\fP"
+Sets the arrow direction.
+The values for this resource are:
+.wH
+.rS 
+.TP
+\(bu
+\fIXmARROW_UP\fP.
+.TP
+\(bu
+\fIXmARROW_DOWN\fP.
+.TP
+\(bu
+\fIXmARROW_LEFT\fP.
+.TP
+\(bu
+\fIXmARROW_RIGHT\fP.
+.wH
+.rE
+.IP "\fIXmNdisarmCallback\fP"
+Specifies a list of callbacks that is called
+when the ArrowButtonGadget is disarmed.
+To disarm this widget, press and release \fIBSelect\fP
+while the pointer is inside the ArrowButtonGadget.
+The reason sent by this callback is \fIXmCR_DISARM\fP.
+.IP "\fIXmNmultiClick\fP"
+If a button click is followed by another button click within the time
+span specified by the display's multi-click time, and this resource is
+set to \fIXmMULTICLICK_DISCARD\fP, do not process the second click.
+If this resource is set to \fIXmMULTICLICK_KEEP\fP, process the event
+and increment \fBclick_count\fP in the callback structure.
+When the ArrowButtonGadget is not in a menu, the default value is
+\fIXmMULTICLICK_KEEP\fP.
+.SS "Inherited Resources"
+ArrowButtonGadget inherits behavior and resources from the following
+superclasses.  For a complete description of each resource, refer to the
+man page for that superclass.
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmGadget Resource Set
+Name	Class	Type	Default	Access
+_
+XmNbottomShadowColor	XmCBottomShadowColor	Pixel	dynamic	G
+XmNhelpCallback	XmCCallback	XtCallbackList	NULL	C
+XmNhighlightColor	XmCHighlightColor	Pixel	dynamic	G
+XmNhighlightOnEnter	XmCHighlightOnEnter	Boolean	False	CSG
+XmNhighlightThickness	XmCHighlightThickness	Dimension	2	CSG
+XmNnavigationType	XmCNavigationType	XmNavigationType	XmNONE	CSG
+XmNshadowThickness	XmCShadowThickness	Dimension	2	CSG
+XmNtopShadowColor	XmCTopShadowColor	Pixel	dynamic	G
+XmNtraversalOn	XmCTraversalOn	Boolean	True	CSG
+XmNunitType	XmCUnitType	unsigned char	dynamic	CSG
+XmNuserData	XmCUserData	XtPointer	NULL	CSG
+.TE
+.KE
+.in
+.sp 1
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+RectObj Resource Set
+Name	Class	Type	Default	Access
+_
+XmNancestorSensitive	XmCSensitive	Boolean	dynamic	G
+XmNborderWidth	XmCBorderWidth	Dimension	0	CSG
+XmNheight	XmCHeight	Dimension	dynamic	CSG
+XmNsensitive	XmCSensitive	Boolean	True	CSG
+XmNwidth	XmCWidth	Dimension	dynamic	CSG
+XmNx	XmCPosition	Position	0	CSG
+XmNy	XmCPosition	Position	0	CSG
+.TE
+.KE
+.in
+.sp 1
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+Object Resource Set
+Name	Class	Type	Default	Access
+_
+XmNdestroyCallback	XmCCallback	XtCallbackList	NULL	C
+.TE
+.KE
+.in
+.sp 1
+.SS "Callback Information"
+A pointer to the following structure is passed to each callback:
+.sS
+.iS
+.ta .25i 1.1i
+.nf
+typedef struct
+{
+	int	\fBreason\fI;
+	XEvent	\fB* event\fI;
+	int	\fBclick_count\fI;
+} XmArrowButtonCallbackStruct;
+.iE
+.sE
+.wH
+.fi
+.IP "\fBreason\fP"
+Indicates why the callback was invoked.
+.IP "\fBevent\fP"
+Points to the \fIXEvent\fP that triggered the callback.
+.IP "\fBclick_count\fP"
+This value is valid only when the reason is \fIXmCR_ACTIVATE\fP.
+It contains the number of clicks in the last multiclick sequence
+if the \fIXmNmultiClick\fP resource is set to \fIXmMULTICLICK_KEEP\fP,
+otherwise it contains \fI1\fP.
+The activate callback is invoked for each click if \fIXmNmultiClick\fP
+is set to \fIXmMULTICLICK_KEEP\fP.
+.SS "Behavior"
+XmArrowButtonGadget includes behavior from XmGadget.
+Additional XmArrowButtonGadget behavior is described below:
+.IP "\fIBSelect\ Press\fP:"
+Draws the shadow in the selected state and
+calls the callbacks for \fIXmNarmCallback\fP.
+.IP "\fIBSelect\ Click\ or\ BSelectRelease\fP:"
+Draws the shadow in the unselected state.
+If the pointer is within the ArrowButtonGadget,
+calls the callbacks for \fIXmNactivateCallback\fP.
+Calls the callbacks for \fIXmNdisarmCallback\fP.
+.IP "\fIBSelect\ Press\ 2+\fP:"
+If \fIXmNmultiClick\fP is \fIXmMULTICLICK_DISCARD\fP, this action does
+nothing.
+If \fIXmNmultiClick\fP is \fIXmMULTICLICK_KEEP\fP, this action
+draws the shadow in the selected state and calls the callbacks for
+\fIXmNarmCallback\fP.
+.nL
+.ne 7
+.IP "\fIBSelect\ Release\ 2+\fP:"
+If \fIXmNmultiClick\fP is \fIXmMULTICLICK_DISCARD\fP, this action does
+nothing.
+.P
+If \fIXmNmultiClick\fP is \fIXmMULTICLICK_KEEP\fP, this action does the
+following:
+Increments \fBclick_count\fP in the callback structure.
+Draws the shadow in the unselected state.
+If the pointer is within the ArrowButtonGadget, calls the
+callbacks for \fIXmNactivateCallback\fP.
+Calls the callbacks for \fIXmNdisarmCallback\fP.
+.IP "\fIKSelect\fP:"
+Draws the shadow in the selected state and
+calls the callbacks for \fIXmNarmCallback\fP.
+Arranges for the shadow to be drawn in the unselected state and
+the callbacks for \fIXmNactivateCallback\fP and \fIXmNdisarmCallback\fP
+to be called, either immediately or at a later time.
+.IP "\fIKHelp\fP:"
+Calls the callbacks for \fIXmNhelpCallback\fP if any exist.
+If there are no help callbacks for this widget, this calls the help
+callbacks for the nearest ancestor that has them.
+.IP "\fI<Enter>\fP:"
+Draws the ArrowButtonGadget shadow in its selected state if the
+pointer leaves and re-enters the gadget while BSelect is pressed.
+.IP "\fI<Leave>\fP:"
+Draws the ArrowButtonGadget shadow in its unselected state
+if the pointer leaves the gadget while BSelect is pressed.
+.SS "Virtual Bindings"
+The bindings for virtual keys are vendor specific.
+For information about bindings for virtual buttons and keys, see \fIVirtualBindings(3X)\fP.
+.SH RELATED INFORMATION
+.na
+\fIObject(3X)\fP, \fIRectObj(3X)\fP,
+\fIXmCreateArrowButtonGadget(3X)\fP, and
+\fIXmGadget(3X)\fP.
+.ad

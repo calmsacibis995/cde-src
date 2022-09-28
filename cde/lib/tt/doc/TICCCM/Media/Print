@@ -1,0 +1,72 @@
+.TH Print Media "08 Apr 1994" "SunSoft" "ToolTalk Policy"
+.SH NAME
+.PP
+Print \- print a document
+.SH SYNOPSIS
+.so ../.synopsis
+[\fIfile\f(CW]	Print(	in	\fImediaType	contents\f(CW,	
+		in	boolean	\fIinquisitive\f(CW,	
+		in	boolean	\fIcovert\f(CW	
+.\"		[in	messageID	\fIcounterfoil\f(CW]	
+		[in	title	\fIdocName\f(CW ] );
+.ft
+.fi
+.SH DESCRIPTION
+.LP
+Print a document.  In effect, the handler should pretend that
+the user issued, via the handler's user interface,
+either a "Print One" or "Print..." command (depending on
+the value of
+.IR inquisitive ).
+.LP
+Thus, if
+.I inquisitive
+is false, the handler should print a single copy on the
+system-defined current default printer.  If true, the handler
+should by default do the same thing, but is encouraged (although not
+required) to first query the user for any printing options it sees
+fit.
+.LP
+If present, the handler should use the
+.I docname
+to identify the print job, for example in a print queue or on
+a banner page.
+.SH REQUIRED ARGUMENTS
+.so .contents
+.so .inquisitive
+.SH OPTIONAL ARGUMENTS
+.\".so ../.counterfoil
+.so .title
+.SH EXAMPLES
+.LP
+To print a PostScript document, send a request of the form
+.so ../.synopsis
+	Print(	in	PostScript	\fIcontents\f(CW,	
+		in	boolean	\fIinquisitive\f(CW,	
+		in	boolean	\fIcovert\f(CW );
+.ft
+.fi
+.LP
+with a first argument whose
+value is a a vector of bytes such as "%!^J/inch {72 mul} def...".
+(By "^J" here we mean the newline character, octal 12.)
+.LP
+To print a PostScript document contained in a file, send the same
+form of the
+.BR Print ()
+request, but with the file attribute set to the
+relevant file, and with the value of the first argument not set.
+.PP
+.BR ttmedia_ptype_declare ()
+can be used to register for
+and help process this message.
+.PP
+This message can be sent with
+.BR ttmedia_load ().
+.SH ERRORS
+.so .errors
+.SH SEE ALSO
+.PP
+.BR Intro (Desktop),
+.BR Status (Desktop),
+.BR Intro (Media)

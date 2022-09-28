@@ -1,0 +1,2171 @@
+* TOOLTALK IMPLEMENTATION OVERVIEW
+
+
+This document presents a roadmap to understanding the implementation
+of ToolTalk. It does not aim to describe the details of the algorithms
+used. In order to find these out it is necessary to read the source
+code as well as the comments. This document should give the reader an
+overall picture of how all the various objects that implement
+message-passing fit together as well as familiarity with where to find
+the code that implements a particular feature. Finally some naming
+conventions used throughout the code are given.
+
+
+   * MEMORY MANAGEMENT
+
+The only memory management policy used througout the code is
+reference-counting. This is an automatic sort of memory management
+since objects are "magically" deleted when there are no longer
+references to them. This functionality is implemented by way of
+pointer classes that behave just like normal pointers except that they
+maintain a reference count in the object they point to. It is
+important *not* to mix normal pointers with counted pointers.
+
+These pointers are declared with the declare_pointer_to() macro
+from tt/lib/util/tt_ptr.h. Built on top of the pointer package
+are several generic data structures. These don't use C++ templates
+since the code predates templates appearing in the language; given
+some of the problems with some implementations, it's probably
+just as well.  Check tt_list.h, tt_table.h, and tt_string.h.
+Every fully developed ToolTalk internal class will have four
+source files.  _Tt_samplename would have:
+
+tt_samplename.h -- class declaration
+tt_samplename.C -- method definitions
+tt_samplename_util.h -- pointer, list, and table declarations
+tt_samplename_util.h -- pointer, list, and table definitions
+
+The files tt_list.3 and tt_string.3 in this directory are man pages
+giving descriptions and examples of how to use the tt_list
+and tt_string classes.  There ought to be a tt_table.3 man page
+as well, but it's never been written.
+
+      * MIXING POINTERS
+
+You should never use a C pointer with refcounted objects (i.e., those
+inheriting from _Tt_object (actually, from _Tt_new; I have no idea why
+_Tt_new and _Tt_object are different)).  You should always use
+refcounting pointers ("ptrs") with _Tt_objects.  The danger is as
+follows:
+
+	_Tt_object *evilRef;
+	{
+		evilRef = new _Tt_object;
+		//
+		// refCount is now zero, but evilRef is pointing at our
+		// object!
+		//
+		...
+		_Tt_object_ptr goodRef = evilRef;
+		//
+		// refCount is now 1
+		//
+		...
+		//
+		// goodRef goes out of scope.
+		// goodRef::~_Tt_object_ptr() decrements the refCount
+		// to zero, and deletes our object because the
+		// refCount is now zero.
+		//
+	}
+	int foo = evilRef->dataMember;	// core dump
+
+If you need a static pointer to a _Tt_object, you cannot have a static
+_Tt_object_ptr, because static C++ instances aren't allowed.  But you
+don't want to have a static _Tt_object *, because then you have to
+eternally worry about never showing it to a refcounting pointer (which
+would try to delete it when it was done with it).
+
+The best thing to do is have a static _Tt_object_ptr *:
+
+	static _Tt_object_ptr *ppGlobalObj;
+	ppGlobalObj = new _Tt_object_ptr;
+	*ppGlobalObj = new _Tt_object;
+
+Now you can use *ppGlobalObj wherever you would have used your static
+_Tt_object_ptr.  The _Tt_object you allocated is safely refcounted, so
+you can let refcounting pointers do whatever they want with it.
+When it's time to clean up, you just
+
+	delete ppGlobalObj;
+
+This is a call to ppGlobalObj->~_Tt_object_ptr(), which decrements the
+refcount of your object, and *optionally* deletes it if the refcount
+is zero.  This way, you don't delete your object out from under anyone
+who still has a reference to it.
+
+      * REFCOUNTING INSIDE CONSTRUCTORS
+
+Inside a constructor, never assign the 'this' pointer of a refcounted
+object to an automatic refcounting pointer.  Inside the constructor,
+the refcount is still zero.  Assigning 'this' into a refcounting
+pointer will increment the refcount to 1.  But before the constructor
+returns, the automatic refcounting pointer on the stack will be
+destructed.  The destructor will decrement the object's refcount back
+to zero, and therefore delete the object -- before the constructor
+even returns!
+
+	_Tt_foo::_Tt_foo()
+	{
+		// On entry, _Tt_foo::_refcount_ == 0
+		_Tt_foo_ptr evilRef = this;
+		// Now, _Tt_foo::_refcount_ == 1
+		...
+		// On exit, evilRef->~_Tt_foo_ptr() will be called.
+		// It will decrement the refcount to zero, and
+		// then delete this object under construction!
+	}
+
+Also, be sure not to pass the 'this' pointer to any routine that might
+hold a temporary reference to the object while the routine runs.
+(Here, "hold a temporary reference to" means "increment the refcount
+and then decrement it".)  If you must pass the 'this' pointer anywhere
+from within the constructor, cast it to const first so that the
+compiler will protect you from any routine with an intention of
+modifying its refcount.  If you absolutely must pass the 'this'
+pointer to a routine that might only temporarily reference it, then
+manually increment the refcount before doing so, and then manually
+decrement the refcount before returning from the constructor
+
+      * CYCLICAL REFERENCES
+
+Avoid creating data structures that permit cyclical references.
+A single reference cycle can cause a massive memory leak.
+
+   * COMMENT CONVENTIONS
+
+Throughout the code, any comments preceded by XXX are notes to the
+reader of problems or suggestions for the code they describe. 
+
+
+
+   * DESCRIPTION OF OBJECT CLASSES
+
+This section presents all the object classes used to implement the
+message-passing portion of ToolTalk along with a brief description of
+what each class represents and in which files it can be found. Before
+describing the classes we need to mention some important naming
+conventions as well as some general comments about client/server
+conventions.
+
+Many of the object classes described below have client-side and
+server-side implementations. For example, a client-side version of a
+ToolTalk message has methods to send the message to the server. On the
+server-side there is a corresponding _Tt_message that processes the
+new message. In the 1.0 version of ToolTalk, these methods were
+roughly coded as:
+
+		void _Tt_some_object::
+		sample_method(...)
+		{
+			if (_tt_mp->in_server()) {
+				... do server-specific actions ...
+			} else {
+				... do client-specific actions ...
+			}	
+		}
+
+where the "in_server" method for the _Tt_mp class returns 1 if the
+environment is in server mode (which is true if the method is
+executing on behalf of ttsession). The problem with this scheme is
+that the library was excessively big because the code to implement the
+server, ttsession, was contained in the library even though it wasn't
+needed for the clients.
+
+Because of this, the 1.0.1 version split up this method in one of two
+ways. The first method is to create two subclasses of the object. One
+of the subclasses, named with a "_c_" infix, represents the
+client-side state and methods for the object. The other subclass,
+named with a "_s_" infix, represents the server-side state and methods
+for the object.  Each of these subclasses then contains the
+corresponding method which now doesn't need the conditional test. The
+example above then becomes:
+
+		void _Tt_c_some_object::
+		sample_method(...)
+		{
+			... do client-specific actions ...
+		}
+
+
+		void _Tt_s_some_object::
+		sample_method(...)
+		{
+			... do server-specific actions ...
+		}
+
+The other mechanism is to still have one object class but name the
+object with a "c_" prefix for the client-specific method, and an "s_"
+prefix for the server-specific method.
+
+In the 4/93 version of ToolTalk, more classes were split up so that
+no references to server-only classes would appear in client code.
+As part of this, the client-to-server XDR methods were slightly
+changed.  You will see (in mp_rpc_implement.C) that apparently
+the server uses a XDR function to decode the arguments of some
+RPCs which is different from the encoding XDR function.  This
+seemingly violates the central dogma of XDR, but it really isn't
+as bad as it looks.  What is happpening is that we have class
+hierarchies like:
+
+          _Tt_pattern
+               |
+       ------------------
+       |                |
+  _Tt_s_pattern     _Tt_c_pattern          
+
+Only _Tt_pattern has an XDR method -- that is, the data that appears
+on the wire is only the common data. A client would create a _Tt_c_pattern
+and XDR it out; the server then XDR's it in as a _Tt_s_pattern, but
+the _Tt_pattern::XDR routine does all the work and the only difference
+is the virtual function table (and any private _Tt_s_pattern data,
+which would be initialized by the _Tt_s_pattern constructor.)
+
+
+The following classes are related to the main message-passing
+functionality in ToolTalk. Details on what methods they implement and
+precise algorithms are in the source code along with the comments
+throughout the code.
+
+
+      * Class: _Tt_arg
+File: tt/lib/mp/mp_arg.C (client/server methods)
+      tt/lib/mp/mp_s_arg.C (server-only methods)
+
+This class represents an argument to a message or pattern. Its methods
+implement matching arguments with other arguments and constructing and
+updating arguments.
+
+
+      * Class: _Tt_desktop
+File: tt/lib/mp/mp_desktop.C
+
+This class represents "desktop" sessions. Currently this means X11
+server sessions but the methods reflect an interface that is largely
+independent of X11. As a result, all X11-dependent code is isolated in
+this one module.
+
+
+      * Class:	_Tt_c_message (subclass of _Tt_message)
+File:	tt/lib/mp/mp_c_message.C
+
+This class represents client-only view of ToolTalk messages. It
+contains methods for sending messages to the ttsession server.
+
+
+      * Class:	_Tt_c_procid (subclass of _Tt_procid)
+File:	tt/lib/mp/mp_c_procid.C
+
+This class implements client-only methods needed to reply to messages
+and to retrieve new messages for the ToolTalk client represented by
+this class.
+
+
+      * Class:	_Tt_file
+File:	tt/lib/mp/mp_file.C (server/client methods)
+        tt/lib/mp/mp_s_file.C (server-only methods)
+
+This class represents file objects. The functionality implemented is
+for querying for specs contained in the file, joining and quitting
+file scopes, and queuing and de-queueing messages on file objects.
+
+
+      * Class:	_Tt_message
+File:	tt/lib/mp/mp_message.C
+
+This class represents a ToolTalk message. This class represents
+methods that are common to both clients and ttsession. Its subclasses,
+_Tt_s_message and _Tt_c_message described below implement methods
+specific to client manipulation and server manipulation respectively.
+The code is structured so that _Tt_message objects contain the methods
+to do delivery to other clients.
+
+
+      * Class: _Tt_mp 
+File:  tt/lib/mp/mp_mp.C
+
+This class represents the global state needed by the message-passing
+objects. In particular, this object contains many object caches that
+are needed by the system as well as holds references to some important
+objects such as the default session object.
+
+
+      * Class:	_Tt_node
+File:	tt/lib/mp/mp_node.C
+
+This class represents a ToolTalk spec. Its methods create/destroy
+specs in a database and add properties to an existing spec.
+
+
+      * Class:	_Tt_observer
+File:	tt/lib/mp/mp_observer.C
+
+This class is a very simple class that basically just stores some
+message fields that can change for static observers of a message. It
+is used only by the _Tt_s_message class. This class is mainly used as
+to hold the information necessary to honor static observer "promises"
+for message disposition processing.
+
+
+      * Class:	_Tt_otype
+File:	tt/lib/mp/mp_otype.C
+
+This class implements methods needed to deal with otype definitions.
+In general the operations needed are for setting and returning the
+observer, inherited, and handler signatures for this otype definition
+as well as printing out the otype definition which, in addition to
+debugging, is used to print out the definition for storage under the
+Classing Engine and also for dumping out compiled type databases in
+source format.
+
+
+      * Class:	_Tt_pattern
+File:	tt/lib/mp/mp_pattern.C (server/client methods)
+        tt/lib/mp/mp_s_pattern.C (server-only methods)
+
+This class represents a ToolTalk pattern. Client-side methods
+implement adding/deleting fields to the pattern and
+registering/unregistering the pattern by invoking the proper rpc
+routines on the server. Server-side methods implement the appropiate
+actions for registering/unregistering patterns as well as matching
+patterns to messages.
+
+
+      * Class:	_Tt_procid
+File:	tt/lib/mp/mp_procid.C
+
+This class represents a ToolTalk client. It represents all of the
+methods and data necessary for sending a message to a ToolTalk client.
+Its subclasses, _Tt_s_procid and _Tt_c_procid, implement the needed
+server-only and client-only methods.
+
+
+      * Class:	_Tt_ptype
+File:	tt/lib/mp/mp_ptype.C
+
+This class implements methods needed to deal with ptype definitions
+and with starting new instances of ptypes which is functionality
+needed to implement the start disposition options for ToolTalk
+messages. Also, as with _Tt_otype objects, printing methods are also
+defined that are used for storage in type databases and dumping out
+ptype definitions in source format.
+
+
+      * Class:	_Tt_rpc_client
+File:	tt/lib/mp/mp_rpc_client.C
+
+This class represents a client rpc connection. The methods implemented
+are basically wrappers around the rpc interfaces with the important
+difference that the api to this object is the same regardless of
+whether tli rpc or non-tli rpc is used. The methods for this object
+are ifdefed to use tli rpc or not.
+
+
+      * Class:	_Tt_rpc_server
+File:	tt/lib/mp/mp_rpc_server.C
+
+This class represents an rpc server. The methods implemented are
+wrappers around the rpc server interfaces with the difference that
+both tli and non-tli rpc is supported by ifdefing the implementation
+code for the methods to select which rpc interface to use.
+
+
+      * Class:	_Tt_s_message (subclass of _Tt_message)
+File:	tt/lib/mp/mp_s_message.C
+
+This class represents a ToolTalk message with some specialized methods
+that are specific to server-side manipulation of messages. In
+particular this class implements methods to dispatch a message (ie.
+match the message against static patterns), and deliver the message to
+ToolTalk clients with patterns that match it. There are also methods
+to implement the reliability for messages that don't match any active
+client's patterns.
+
+
+      * Class: _Tt_s_mp
+File:  tt/lib/mp/mp_s_mp.C
+
+This class represents the global server-only state needed by the
+message-passing objects. It contains object caches that are relevant
+to the server module as well as the ptypes and otypes that were read
+in from the type database.
+
+
+      * Class:	_Tt_s_procid (subclass of _Tt_procid)
+File:	tt/lib/mp/mp_s_procid.C
+
+This class implements server-only methods needed to send messages to
+ToolTalk clients and also methods which process replies to previously
+sent messages.
+
+
+      * Class:	_Tt_session
+File:	tt/lib/mp/mp_session.C (server/client methods)
+        tt/lib/mp/mp_s_session.C (server-only methods)
+
+This class represents a ToolTalk session. It has methods that apply in
+client-side and server-side environments. The main functionality
+required is establishing ToolTalk sessions, advertising the addressing
+information to contact the session, and methods for connecting to a
+session given its addressing information and auto-starting a session
+if necessary.
+
+
+      * Class: _Tt_signature
+File: tt/lib/mp/mp_signature.C
+
+This class represents a ToolTalk signature which can be either an
+otype or ptype signature. The main methods for this object allow one
+to create a signature, match the signature against an operation name
+and a list of arguments, and match the signature against relevant
+message fields.
+
+
+      * Class:	_Tt_stream_socket
+File:	tt/lib/mp/mp_stream_socket.C
+
+This class represents a stream connection. Its methods are ifdefed
+depending on whether TCP sockets are to be used or TLI streams.
+
+
+      * Class:	_Tt_typedb
+File:	tt/lib/mp/mp_typedb.C
+
+This class represents the ToolTalk type database. It has methods for
+reading and writing the database in either a native xdr format or to
+the Classing Engine. Important Note: since  the typedb on disk is
+a table_ptr and not just a table, it's possible to have a null
+table and a non-null _ptr, which if xdr-decoded will crash the
+_Tt_object_table xdr method, because the default constructor
+for that class tries to decode a null table.
+
+
+      * Class: _Tt_global
+File:  tt/lib/util/tt_global_env.C
+
+This class is where any global information that is not specific to
+message-passing is kept. In particular any global flags or caches are
+kept in this object. This class also keeps the number representing the
+current xdr version to be used by all xdr methods.
+
+
+      * Class: _Tt_host
+File:  tt/lib/util/tt_host.C
+
+This class packages up methods for mapping host addresses to host
+names and viceversa.
+
+
+      * Class: _Tt_xdr_version
+File: tt/lib/util/tt_xdr_version.C
+
+This class provides a mechanism for temporarily setting the default
+xdr version. It sets the version to a given number in the constructor
+and then resets the default to the previous value in the destructor.
+
+
+      * Class: _Tt_new_ptr
+File: tt/lib/util/tt_new_ptr.C
+
+Generic version of a pointer class. This implements the
+reference-counting machinery. See declare_ptr_to and implement_ptr_to
+in tt/lib/util/tt_ptr.h to see how a specialized pointer class is
+derived from this generic class.
+
+
+      * Class: _Tt_object_list
+File: tt/lib/util/tt_object_list.C
+
+Generic version of a list class. See declare_list_of and
+implement_list_of in tt/lib/util/tt_list.h to see how a specialized
+list class is derived from the generic one.
+
+
+      * Class: _Tt_object_table
+File: tt/lib/util/tt_object_table.C
+
+Generic version of a table class. See declare_table_of and
+implement_table_of in tt/lib/util/tt_table.h to see how a specialized
+list class is derived from the generic one.  Important note: unfortunately
+you can crash this method by trying to de-xdr on online db because
+the default constructor for that class tries to decode a null table.
+
+
+   * FEATURE GAZETTEER
+
+The rich functionality offered by ToolTalk is implemented partly in
+the client library, partly in the server (which itself is implemented
+by objects contained in a server library). Thus it isn't always
+trivial to find which code implements a certain feature. A good
+heuristic to use is to decide whether the particular feature is likely
+to be implemented on the client side or server side. If it is likely a
+client-side feature then it is accessible through one of the tooltalk
+api calls. These are all implemented in the tt/lib/api/c directory
+where the files are named api_<noun> where <noun> is the name of the
+entity being operated on by the api call. For example,
+tt_pattern_create can be found in "api_pattern.C". The api calls that
+don't operate on a particular entity are found in "api_mp.C". For
+example, tt_open and tt_fd can be found there. 
+
+Once the code for the api is located, the way the feature is
+implemented can be traced through the code. Occasionally the api call
+may interact with the server-side code. This is usually in the form of
+an api call such as:
+
+        ...
+	rstatus = call(TT_RPC_JOIN_SESSION,
+		       (xdrproc_t)tt_xdr_procid,
+		       (char *)&procid,
+		       (xdrproc_t)xdr_int,
+		       (char *)&status);
+	...	       
+
+
+This will cause an rpc stub to be invoked which then invokes the
+appropiate methods on the server side. All the rpc stubs are
+implemented in tt/lib/mp/mp_rpc_implement.C. Furthermore, the naming
+scheme for these stubs is to add an underscore to the front of the
+enum used to make the call on the client side and then turn all the
+letters into lower case. In the example above, one would then look for
+the "_tt_rpc_join_session" function in tt/lib/mp/mp_rpc_implement.C. 
+
+The details of how the call is mapped to this rpc stub and what
+processing goes on before the rpc stub is invoked can be found in the
+_tt_service_rpc function which does the actual rpc dispatching.
+
+Since most of the functionality is initiated by an api call (the
+exception being the initializiation of the server itself), this
+strategy usually succeeds in finding the code one is looking for. 
+
+
+We now list some guides into the code implementing some of the major
+features in ToolTalk.  For each piece of functionality some important
+methods and/or files are listed which represent the main code that
+implements the given functionality. Looking at the code for the given
+methods and their associated comments should give a good idea as to
+how the functionality is implemented.
+
+
+      * RPC REQUEST HANDLING 
+
+(client) _Tt_session::call - single method that all other methods use
+when they want to invoke an rpc call.
+
+(server) tt/lib/mp/mp_rpc_implement.C contains all of the rpc stubs
+that get invoked on the server side in response to an rpc request from
+a client. The dispatch function in this file "_tt_service_rpc" does
+the actual dispatching of the rpc request (_tt_service_rpc is actually
+invoked by the rpc function svc_getreqset which is called from
+_Tt_s_mp::main_loop by calling _Tt_rpc_server::run).
+
+Looking at the various rpc stubs in mp_rpc_implement.C is an
+excellent way of navigating the code to find out how each particular
+rpc call is used. In particular, a good strategy for finding out how
+an api call is implemented is by looking at the definition of the api
+call and tracing through the code until _Tt_session::call invocations
+are found. Using the rpc procedure number passed into the
+_Tt_session::call method one can then look in mp_rpc_implement.C to
+see what happens on the server side.
+
+
+      * NULL MESSAGE SENDING/RECEIVING LOOP
+
+This loop consists of a client sending a request message to ttsession
+when no patterns match the message. The message gets failed and
+returned to the sender. Understanding the code involved in this loop
+means that one understands the basic low-level mechanism by which the
+messages sent to and received from ttsession. The major methods
+involved here are:
+
+(client) _Tt_c_message::dispatch - send message to ttsession
+(server) _Tt_s_message::dispatch - match message with static patterns. 
+(server) _Tt_s_message::deliver - match message with dynamic patterns. 
+(server) _Tt_s_procid::add_message - add a message to procid's message
+				     queue. 
+(server) _Tt_s_procid::signal_new_message - signal a procid that it has
+					    a new message.
+(client) _Tt_c_procid::next_message - get next message from ttsession
+(server) _Tt_s_procid::next_message - return next message from ttsession
+
+
+      * DISPATCHING AND DELIVERING A MESSAGE
+
+(server) _Tt_s_message::dispatch
+(server) _Tt_s_message::deliver
+
+
+
+      * STARTING A NEW PTYPE
+
+(server) _Tt_s_message::handle_no_recipients
+(server) _Tt_s_message::change_state
+(server) _Tt_ptype::start
+
+
+      * PROCESSING THE REPLY TO A MESSAGE
+
+(client) _Tt_c_procid::update_msg
+(server) _Tt_s_procid::update_msg
+(server) _Tt_message::update_msg
+(server) _Tt_s_message::change_state
+
+
+      * HONORING START AND QUEUE RELIABILITY OPTIONS
+
+_Tt_s_message::deliver
+_Tt_s_message::handle_no_recipients
+
+For file-scope messages, queueing is actually handled on the client
+side. For more details look in:
+
+_Tt_c_message::c_dispatch
+_Tt_file::q_message
+_Tt_file::dq_message
+_Tt_file::c_join
+
+
+      * READING IN CLASSING ENGINE DATABASES
+
+_Tt_typedb::init_ce
+
+      * ADDING/MERGING NEW TYPES TO A TYPE DATABASE
+
+_Tt_typedb::begin_write
+_Tt_typedb::end_write
+_Tt_typedb::insert_ptype
+_Tt_typedb::insert_otype
+
+
+      * DECLARING A PTYPE
+
+_tt_rpc_declare_ptype
+_Tt_s_procid::declare_ptype
+
+
+      * DETECTING PTYPE LAUNCH FAILURE
+
+sig_handler (in tt/bin/ttsession/mp_server.C)
+notify_launch_failure (in tt/bin/ttsession/mp_server.C)
+_Tt_ptype::launch_failed
+
+
+      * AUTO-STARTING A SESSION 
+
+tt_open (tt/lib/api/c/api_mp.C)
+_Tt_mp::init
+_Tt_session::init
+_Tt_session::c_init
+
+
+      * ESTABLISHING RPC CONNECTION TO THE SERVER
+
+_Tt_session::client_session_init - client-side processing
+_Tt_s_mp::main_loop - unix and network rpc connection
+_Tt_session::u_rpc_init - unix socket rpc connection
+
+
+      * XDR/RPC VERSIONING SCHEME
+
+_tt_service_rpc (tt/lib/mp/mp_rpc_implement.C)
+_Tt_xdr_version (tt/lib/util/tt_xdr_version)
+_Tt_global::set_xdr_version (tt/lib/util/tt_global_env.C)
+_Tt_global::xdr_version (tt/lib/util/tt_global_env.C)
+
+
+   * TRACE/DEBUG/ERROR OUTPUT
+
+For trace output in ttsession and in slib, use the _Tt_trace
+class.
+
+For debug output in the old dm code, do it according to the
+$TT_DM_DEBUG level.  No other module has a similar debug output
+facility.
+
+When an error is detected in the client library and a Tt_status
+other than TT_ERR_INTERNAL is going to be passed up through
+the API to diagnose it, then the client library should not
+emit any message anywhere.  That's the job of the application using
+libtt.
+
+_tt_syslog( 0, LOG_ERR, ) should be used in the client library when:
+  - a TT_ERR_INTERNAL (bug) arises and we want to diagnose what happened;
+  - a partial failure of an API call occurs, but the API call is still
+    considered to have succeeded.  For example, when tt_message_send()
+    for a file-scoped message cannot contact one of the interested
+    sessions.
+
+The daemons (ttsession and dbserver) should pass either 0 or stderr
+to _tt_syslog(), depending on whether they are in daemon mode or not.
+
+In CDE, certain parts (tt_type_comp, ttrm et al.) of ToolTalk are
+likely to be run from tools that have stderr aimed at /dev/null.
+These parts of ToolTalk should never write to stderr directly, nor
+call perror(), nc_perror(), t_error(), etc.  Instead, they should pass
+stderr to _tt_syslog(), and use strerror() (or %m), nc_strerror(),
+t_strerror(), etc.  _tt_syslog() will prefix, route, suppress, and
+multiplex the output appropriately. For example, in CDE we will
+probably multiplex our error output onto ~/.dt/errorlog.  For
+suppression, _tt_syslog() obeys _tt_global->silent.
+
+No output should include un-internationalized English.  The output
+should include only ToolTalk-ese and catgets() strings.  (ToolTalk-ese
+can be C/C++ use of the ToolTalk API, or the ToolTalk types language.)
+All modules that call catgets() should include "util/tt_gettext.h", so
+that they are really calling _tt_catgets() instead of the one in
+/usr/lib.  This lets us map catgets() to something else on platforms
+where it is not supported.
+
+It is OK to write normal output to stdout.
+
+   * ASSIGNING NEW CATGETS MESSAGE IDS
+
+When you code up a new call to catgets(), choose your message set out
+of util/tt_gettext.h, and use -1 as the message id.  Then follow this
+procedure to update the message catalog:
+
+0. Make sure your source file(s) is(are) checked in; ttgenmsg will
+   refuse to work on checked-out files.
+0a. Make sure /home/tooltalk/tools/bin is in your PATH
+1. Check out SUNW_TOOLTALK.msg and SUNW_TOOLTALK.sets
+2. Run "make msgs" from the top of the tree.
+2a. Run msgfix which will sort and clean up "msgs" into "msgs.fixed"
+3. Check in SUNW_TOOLTALK.sets (which now has been updated).
+4. Copy "msgs.fixed" to SUNW_TOOLTALK.msg and check it in.
+5. Check in your updated source files.
+
+Note to source customers: ttgenmsg depends on genmsg, an internal
+SunSoft tool, and so ttgenmsg is not included in the ToolTalk source
+distribution.  If you add any new catgets() messages, you will have to
+manually assign message ids and update the message catalog.
+
+Note to ToolTalk developers: ttgenmsg and genmsg are in
+/home/tooltalk/tools/bin.
+
+
+   * TOOLTALK TROUBLESHOOTING
+
+For each of the sending and receiving clients, you need to know:
+
+0. what version of libtt it's using
+1. what session it's in (and the version of that session)
+2. what host that session (i.e. ttsession) is running on
+3. what file it's scoping to (if any)
+4. what host that file is on (and the version of the dbserver running there)
+5. what host that client is on
+
+Questions 2 and 5 are almost never important.  Question 1 and 3 are always
+the most important; questions 4 and 0 are sometimes important,
+because of the 1.0 bugs that the patch fixes.
+
+In addition:
+- the return status of each TT API call should be checked, via tttrace
+- the session trace output of (each) ttsession should be examined, via tttrace
+
+In desperation, you can even try:
+
+- using trace(1)/truss(1) on the client program to see what libtt is doing
+- running the dbserver in debug mode, by setting $TT_DM_DEBUG to 10
+
+but these aren't as likely to be very helpful.
+
+   * UNDERSTANDING SCOPES
+
+Sessions are not one-to-one with hosts.  There can be many
+sessions based on a given host, and there can be many clients on a
+given host, each joined to a session based elsewhere.
+
+If you have clients (on the same or different hosts -- it matters not
+a bit) that want to communicate, you have to ask: what do they have in
+common?  In our experience, the two most common answers are: an X
+display, or a file.  So we've put code into libtt that can map X
+displays and filenames to session IDs.  If your clients are interested
+in something besides X displays or files, your have to write some code
+that can map that something into session IDs.
+
+You get a session name via something like "ttsession -p", which forks off a
+new session and prints its name to stdout, or with "ttsession -c" which
+sets the environment variable $_SUN_TT_SESSION to the session id.  Use some
+mechanism to put that session name "somewhere", where the other processes
+can find it. (This mechanism is perhaps a shared file, putting it in a
+.plan file and using finger to retrieve it, a mail message, a separate RPC
+call of your own design, NIS, etc.  You might also advertize newly created
+ttsessions by sending messages in the ttsession usually associated with a
+particular X server)
+
+An approach to do this with a well-known file in a NFS-exported file system 
+goes like so:  Start ttsession with
+
+   ttsession -p >/home/foo/sessionaddress
+
+and then ensure the clients use the session address from the file.  One
+easy way to do that would be to wrap the clients in a shell script which
+reads the session address and sets SUN_TT_SESSION:
+
+  #!/bin/csh
+  setenv SUN_TT_SESSION `cat /home/foo/sessionaddress`
+  exec client-program
+
+or have the processes use that session name in tt_default_session_set
+before tt_open, so they connect to that session (warning, there is a bug in
+some versions of ToolTalk that causes tt_open to fail if the default
+session is different from the _SUN_TT_SESSION environment variable.  The
+workaround is to setenv() the environment variable to the same value before
+calling tt_open.)  Note that using session identifiers, you can also have
+processes on ONE machine using different ttsessions.
+
+   * HOW DOES FILE SCOPING WORK?
+
+[NOTE: the bug mentioned in the following was fixed in release 1.1.
+The CDE version of ToolTalk is 1.2.] This section describes the way
+ToolTalk handles file-based scoping mechanisms and when ToolTalk does
+and does not use the ToolTalk database server for handling file-based
+scoping mechanisms.  Specifically, because of a bug in the current
+release, ToolTalk does not use the DB server for any type of scoping
+(other then TT_OBJECT scoping) unless an explicit tt_file_join call is
+made.
+
+The following is an explanation of when the DB server is and is not used
+and how the DB server is used for scoping and how the various file-based
+scoping methods work.
+
+Brief Overview of the TT DB Server Duties:
+
+In the current release of ToolTalk, the DB server is used to store 3 types
+of information:
+
+	1) Storage of ToolTalk objects specs (see the tt_spec_write and
+	   and the other tt_spec_* API calls).
+
+	2) Storage of ToolTalk session IDs of sessions with clients that
+	   have joined a file via the tt_file_join call.
+
+	3) Storage of a file-scoped (NOT file-in-session scoped) message
+	   that is queued because the message disposition is TT_QUEUED
+	   and a handler has not yet been started that can handle the
+	   message.
+
+File-based Scoping in Patterns:
+
+With patterns, there 3 types of scopes that use files:
+
+	TT_FILE, TT_BOTH, TT_FILE_IN_SESSION, TT_SESSION+tt_pattern_file_add()
+
+TT_FILE scopes to just a file.  A session attribute may be set on this type
+of pattern to provide a file-in-session-like scoping, but a tt_session_join
+will NOT update the session attribute of a pattern that is TT_FILE scoped.
+
+TT_BOTH scopes to the union of interest in the file and the session.  A
+pattern with just this scope will match messages that are scoped to either
+the file and/or the session.
+
+TT_FILE_IN_SESSION scopes to the intersection of interest in the file and
+the session.  A pattern with just this scope will only match messages that
+are scoped to both the file and session.
+
+Using the TT_SESSION scope and calling tt_pattern_file_add will match session
+scoped messages that also have the file attribute set to one of the files
+added to the pattern by tt_pattern_file_add.  If a tt_file_join call is made,
+it will add files to TT_FILE, TT_BOTH, and TT_FILE_IN_SESSION scoped
+patterns, but NOT to TT_SESSION scoped patterns.  This is important because
+patterns that were registered via a tt_ptype_declare call can only have files
+added to them via a tt_file_join call.
+
+In the case of the TT_FILE_IN_SESSION scope, all you need to do is create a
+pattern, add the TT_FILE_IN_SESSION scope to the pattern, add a session to
+the pattern (or call tt_session_join after registering the pattern), add a
+file to the pattern, and then register the pattern.  The following 2
+examples register an equivalent pattern (sans error checking):
+
+	Example 1:
+	----------
+	tt_open();
+
+	Tt_pattern pat = tt_create_pattern();
+	tt_pattern_scope_add(pat, TT_FILE_IN_SESSION);
+	tt_pattern_file_add(pat, file);
+	tt_pattern_session_add(pat, tt_default_session());
+	tt_pattern_register(pat);
+
+	Example 2:
+	----------
+	tt_open();
+
+	Tt_pattern pat = tt_create_pattern();
+	tt_pattern_scope_add(pat, TT_FILE_IN_SESSION);
+	tt_pattern_file_add(pat, file);
+	tt_pattern_register(pat);
+	tt_session_join(tt_default_session());
+
+Because TT_FILE_IN_SESSION scope is the intersection of file interest and
+session interest, all the information required to properly match similarly
+scoped messages can be stored in the ToolTalk session and the ToolTalk DB
+server is never contacted.  If TT_FILE scoping had been used, the second
+example would NOT have updated the session attribute in the pattern.
+
+If ToolTalk had no bugs, then setting the scope of a pattern (via
+tt_pattern_scope_add) and setting the session and/or file of a pattern (via
+tt_pattern_session_add and/or tt_pattern_file_add) would be all you needed
+to do and the pattern scopes would match the message scopes as described
+above.  However, because of a bug in ToolTalk, if you do not explicitly
+join a file, the above scopes will only match messages that are scoped to
+both the file and the session of tt_open the pattern was registered under.
+This means that if you do not make an explicit call to tt_file_join,
+TT_FILE and TT_BOTH effectively act like TT_FILE_IN_SESSION.
+
+The reason this occurs is because of how the ToolTalk DB server is used.
+When a message is scoped to TT_FILE or TT_BOTH, the ToolTalk client library
+that is sending the message (this is where the tt_message_send call was
+made) contacts the TT DB server and asks for a list of ToolTalk sessions
+that have registered interest in the file the message is scoped to.  The
+client library can then send the message to each ToolTalk session in the
+list.  When a ToolTalk session receives the message from the sending
+client, it can then match the message to patterns that have been registered
+with the ToolTalk session and send the messages to any clients that have
+patterns that match.  The problem is that the ToolTalk session that a
+pattern is registered on is not stored on the ToolTalk DB server until a
+tt_file_join call is made, not when an actual pattern is registered.
+
+The reason this is a bug is because when a tt_file_join call is made, this
+implicitly does a tt_pattern_file_add to every pattern that has already
+been registered and effectively re-registers the patterns.  This means that
+there is no way to create several different patterns in one ToolTalk proc
+that all scope to different files.  For example, if I make the following
+calls:
+
+	tt_open();
+
+	Tt_pattern pat1 = tt_create_pattern();
+	tt_pattern_scope_add(pat1, TT_FILE);
+	tt_pattern_register(pat1);
+	tt_file_join(file1);
+
+	Tt_pattern pat2 = tt_create_pattern();
+	tt_pattern_scope_add(pat2, TT_FILE);
+	tt_pattern_register(pat2);
+	tt_file_join(file2);
+
+	Tt_pattern pat3 = tt_create_pattern();
+	tt_pattern_scope_add(pat3, TT_FILE);
+	tt_pattern_register(pat3);
+	tt_file_join(file3);
+
+Pattern pat1 will actually be scoped to 3 different files (file1, file2,
+and file3).  Pattern pat2 will be scoped to 2 files (file2 and file3), and
+pattern pat3 will be scoped to just file3.  I can't use just
+tt_pattern_file_add to set individual files on individual patterns, because
+a tt_pattern_file_add doesn't cause the pattern's ToolTalk session to be
+stored in the database.  Only a tt_file_join call will do that.  This bug
+will be fixed in a future release of ToolTalk.
+
+Some may ask, if you fix that bug, how will I scope to the union of
+TT_FILE_IN_SESSION scope and TT_SESSION scope with one pattern?  Currently,
+if I use TT_BOTH on a pattern, register the pattern, and do NOT call
+tt_file_join, it effectively provides that ability.
+
+The answer is, when the bug is fixed you can still scope to the union of
+TT_FILE_IN_SESSION and TT_SESSION by adding both scopes to the same
+pattern:
+
+	tt_open();
+
+	Tt_pattern pat = tt_create_pattern();
+	tt_pattern_scope_add(pat, TT_FILE_IN_SESSION);
+	tt_pattern_scope_add(pat, TT_SESSION);
+	tt_pattern_file_add(pat, file);
+	tt_pattern_session_add(pat, tt_default_session());
+	tt_pattern_register(pat);
+
+This is the way you should implement the union of the scopes.  When the
+file scoping bug is fixed, just adding the scope TT_BOTH will have a
+different behavior than it does right now.  However, adding TT_BOTH and
+then calling tt_file_join after registering the pattern will have exactly
+the same behavior as it does now.
+
+File-based Scoping in Messages:
+
+Messages have the same types of file-based scoping mechanisms as patterns:
+
+	TT_FILE - The message is scoped to all clients that have registered
+		interest in a file.
+
+	TT_BOTH - The message is scoped to all clients that have registered
+		interest in the message's session and/or file.
+
+	TT_FILE_IN_SESSION - The message is scoped to all clients that
+		have registered in interest in both the message's file
+		and session.
+
+	TT_SESSION + tt_message_file_set() - I've listed this as
+		file-based scoping mechanism because of the call to
+		tt_message_file_set.  This will scope the message to
+		every client that has registered interest in the message's
+		session.  When the message is received by a client whose
+		pattern matches, the receiving client can get the file
+		name by calling tt_message_file.
+
+The bugs that applied to file-scoped patterns do NOT apply to messages.
+When a message is TT_FILE or TT_BOTH scoped, the ToolTalk client library
+will check the database server for all sessions that have clients that
+joined the file and send the message to all of the interested ToolTalk
+sessions.  The ToolTalk sessions will then match the messages to the
+appropriate clients.  NO explicit call to tt_file_join is required.
+
+In the case of a TT_FILE_IN_SESSION scoped message or a TT_SESSION scoped
+message that has a file set in it (via tt_message_file_set), the database
+server is not contacted and the message is only sent to clients that are
+scoped to the message's session.
+
+   * WHAT IF TTSESSION GETS KILLED?
+
+For versions 1.1 and beyond (also 1.0 patch level 4): When ttsession is
+killed, the tt_fd will become active, and most TT API calls will return
+TT_ERR_NOMP.  (That's "No Message Passer", Message Passer being another
+name for the ttsession process.)  Most applications just assume that this
+means something bad has happened to ttsession, and stop trying to
+send/receive ToolTalk messages.  If an application wants to recover from
+this situation, it may be possible.  Some of the things it would do
+include:
+
+- Recognize the TT_ERR_NOMP situation
+- do a tt_close() to clean up the connection from its end
+- re do the TT initialization sequence:
+  -- tt_open, tt_default_session_join, tt_fd
+     (Note that what tt_open does varies with the setting of the environment
+      variable _SUN_TT_SESSION, the value of the _SUN_TT_SESSION property of
+      the root X window (if it exists), some clever manipulation of these
+      is likely necessary when restarting a crashed ttsession to take over
+      where the last one left off.  Also, other participants of the crashed
+      session must somehow be made aware of the restarting and the new session
+      id so that they can recover.)
+  -- re-register all patterns and re-declare ptypes.`
+- continue on
+
+The following are lost when ttsession crashes:
+- patterns registered by procids in the crashed session
+- outstanding requests from procids in the crashed session
+- messages bequeathed via tt_message_send_on_exit() by
+  procids in the crashed session.
+- session props
+- session-queued messages
+
+   * WHAT IF RPC.TTDBSERVERD GETS KILLED?
+
+If rpc.ttdbserverd exits unexpectedly, there may be no effect at all, since
+inetd (Suns) will start a new one to replace it.  The worst that is
+supposed to happen is that one or more API calls dealing with specs or
+scoped-to files on that fileserver may return TT_ERR_DBAVAIL.  If the call
+returns TT_OK, the dbserver will update the TT databases appropriately,
+either immediately or when a new dbserver reads the crash recovery log.  If
+the dbserver crashes, data may be temporarily unavailable as zero or more
+API calls will fail with TT_ERR_DBAVAIL, but no data will be lost.
+
+   * TOOLTALK MESSAGING POLICY
+
+     ToolTalk  is  purely  an   inter-application   communication
+     mechanism,  and does not specify communication policy.  This
+     document sets forth messaging conventions that good ToolTalk
+     citizens should adhere to.  The purpose of these conventions
+     is threefold:
+
+     1. Prevent collisions, so that no two  tools  use  the  same
+        ToolTalk syntax for different semantics.
+
+     2. Prevent "passing in the night", so that no two tools fail
+        to  talk  to  each  other just because they use different
+        ToolTalk syntax for identical semantics.
+
+     3. Encourage socialization, as tool authors are  exposed  to
+        message  interfaces  that  they might not have thought to
+        add to their tools.
+
+     Most of these conventions consist of descriptions  of  stan-
+     dard ToolTalk messages.  Conventions not related to any par-
+     ticular standard message are described either below,  or  in
+     the Intro page for the set of messages they apply to.
+
+   * MEDIA EXCHANGE
+
+The Media conventions allow a tool to  be  a  container  for
+arbitrary  media, or to be a media player/editor that can be
+driven from such a container.   These  conventions  allow  a
+container  application  to compose, display, edit, print, or
+transform a document of an  arbitrary  media  type,  without
+understanding  anything about the format of that media type.
+Each data format maps one-to-one to a published document
+specifying the grammar for the format. The grammar must allow a
+vector of bytes (such as the contents of a file) in that format
+to be interpreted unambiguously.  Each data format has a
+canonical string -- called the media type -- that names it.
+That string is used as the vtype of the message argument
+containing the document.
+
+ToolTalk routes container requests to the  user's  preferred
+tool  for the given media type and operation.  This includes
+routing the request to an already-running  instance  of  the
+tool  if  that  instance  is  best-positioned  to handle the
+request.
+
+Media Exchange is just a way to use ToolTalk to map certain
+common operations-on-byte-vectors to the tools that can both
+understand those byte vectors and implement those operations.
+"A1:C3" is a pretty worthless byte vector, but
+"/home/holtz/finance.wks:A1:C3" is potentially useful.  However,
+it requires that some spreadsheet understand such compound
+references.  Such smarts have to come from the application (or a
+fully-blown object model), they can't come from Media Exchange or
+MIME.  Media Exchange is exactly like launching editors by
+double-clicking on typed files in a file manager, except that in
+Media Exchange an already-running process can respond to the
+double-click.
+
+Media Exchange can route on media type, but not on document
+contents.  Why?  Static patterns can't match on arg value at all,
+and dynamic patterns have to match the arg value byte-for-byte,
+making it very hard to register general patterns.
+
+You might want Media Exchange to define a stringified federated
+heirarchical namespace and then register patterns to match for subsets
+of the namespace.  You can't do that, because ToolTalk has no
+substring-matching capabilities, and because designing such a
+namespace right is incredibly hard.  If you're going to have such a
+hierarchy, you shouldn't try to represent things as strings, and you
+should get inheritance out of the bargain.  In other words, you would
+be aspiring to something that only an OMG-style effort can achieve.
+It's very easy to get this kind of thing wrong, as MIME and OLE
+demonstrate.  Bento/OpenDoc are pretty close, though.
+
+The Media Exchange format names predate CDE.  We had hoped that
+CDE would use for its data formats a disciplined namespace such
+as Media Exchange or (better yet) Bento's.  (By disciplined,
+I mean that the namespace is managed for collisions, and
+there is a mapping between each format name and a
+public document that describes how to unambiguously interpret
+a vector of bytes in the named format.)  As used by Media
+Exchange or Bento, format names are used solely to bring
+together byte vectors and the applications that can understand
+them.
+
+By contrast, CDE data types are also used for object-to-icon and
+object-to-action mappings.  This leads to platform-dependent "data
+types" such as OBJECT and CORE, and ambiguous "data types" such as
+AUDIO.   It also leads to downright category mistakes (as "data types"
+per se) such as DOT_DIR, CURRENT_DIRECTORY, and PRINTER_UNKNOWN, none
+of which you would ever meet in a format namespace such as that of
+Media Exchange or Bento.
+
+The data typing API allows its clients to map between
+CDE data types and media types.  Given the object-to-icon and
+object-to-action requirements placed on CDE "data types", this
+object-to-media-type mapping is perhaps all we could hope for.
+
+To really do this area right, we would have to recognize that
+object types and data formats are truly orthogonal.  Extra credit
+if the classing system allowed an object to match multiple types/formats
+at once, and the grand prize goes to expressing inheritance among
+data formats.  (The ToolTalk object system does inheritance, but
+that's another story...)
+
+   * SECTION 4 MESSAGE MAN PAGE LAYOUT
+
+     Each message is described on a separate reference page, con-
+     sisting of:
+
+     Name
+        The name of the message and a one-line description of it.
+
+     Synopsis
+        A representation of the message in a  syntax  similar  to
+        that   understood   by   the   ToolTalk   type   compiler
+        tt_type_comp(1).  The format is essentially
+
+        [fileAttrib] opName( requiredArgs, [optionalArgs] );
+
+        A synopsis entry is given for each interesting variant of
+        the message.
+
+        fileAttrib
+           An indication of whether the  file  attribute  of  the
+           message  can/should be set.  ToolTalk allows each mes-
+           sage to refer to a file, and has a  mechanism  (called
+           file-scoping)  for  delivering messages to clients who
+           are "interested" in the named file.
+
+        opName
+           The name of the operation or event is  called  the  op
+           name  (or  op).   It is important that different tools
+           not use the same  opName  to  mean  different  things.
+           Therefore,  unless  a  message  is a standard one, its
+           opName should be made unique.  A good way to  do  this
+           is   to   prefix   it   with   Company_Product,  e.g.,
+           Acme_HoarkTool_Hoark_My_Frammistat.
+
+        requiredArgs, optionalArgs
+           In the synopsis, arguments are expressed as mode vtype
+           argumentName.  vtype  and  argumentName  are described
+           below.  mode is one of in, out, or  inout,  and  indi-
+           cates the direction(s) in which the data of that argu-
+           ment flow.
+
+     Description
+        An  explanation  of  the  operation  that   the   request
+        entreats, or the event that the notice announces.
+
+     Required Arguments
+        The arguments that must always be in the message.
+
+        vtype argumentName
+           A description of a particular argument.
+
+           A vtype is a programmer-defined string that  describes
+           what  kind of data a message argument contains.  Tool-
+           Talk uses vtypes for the sole purpose of matching sent
+           message instances with registered message patterns.
+
+           Every vtype should by  convention  map  to  a  single,
+           well-known  data  type.   The  data type of a ToolTalk
+           argument is either integer,  string,  or  bytes.   The
+           data  type  of a message or pattern argument is deter-
+           mined by which ToolTalk API function is  used  to  set
+           its value.
+
+           The argument name is merely a comment hinting to human
+           readers  at the semantics of the argument, much like a
+           parameter name in an ANSI C function prototype.
+
+     Optional Arguments
+        The extra arguments that may be included  in  a  message.
+        Any optional arguments in a message must be in the speci-
+        fied order, and must follow the required arguments.
+
+     Errors
+        A list of the error codes that can be set by the  handler
+        of the request (or the sender of the notice).
+
+     Examples
+        Scenarios in which the message can be useful, and  sample
+        ToolTalk code for sending and receiving the message.
+
+  Versioning
+     All messages are individually versioned.   When  no  version
+     information is available, messages may be assumed to be ver-
+     sion 0.  Version information is carried in  a  context  slot
+     with  the  slotname version.  (Contexts are a new feature in
+     ToolTalk 1.1.  In previous releases, arguments can  only  be
+     positional.   That is, they are set and retrieved by ordinal
+     numbers.  Context arguments may be set and retrieved by key-
+     word.   These  ToolTalk  messaging  policies  currently only
+     specify positional arguments for passing data.)
+
+   * DEFINITIONS
+
+  Edict
+     A notice that looks like a request.  If a request returns no
+     data  (or  if  the  sender  doesn't  care about the returned
+     data), it can sometimes be useful to broadcast that  request
+     to  a  set of tools.  Since the message is a notice, no data
+     will be returned, no  replies  will  be  received,  and  the
+     sender is not told whether any tool gets the message.
+
+  Handler
+     The distinguished recipient procid of a request.  This  pro-
+     cid is responsible for carrying out the indicated operation.
+
+  Notice
+     A message announcing an  event.   Zero  or  more  tools  may
+     receive  a given notice.  The sender is not told whether any
+     tools receive its notice.  A notice cannot be replied to.
+
+  Procid
+     A principal that can send and receive ToolTalk messages.   A
+     procid  is  an identity, created and handed over by ToolTalk
+     on demand (via tt_open()), that a  process  must  assume  in
+     order  to  send  and receive messages.  A single process can
+     use multiple procids, and a single procid can be used  by  a
+     group of cooperating processes.
+
+  Request
+     A message that asks an operation to be performed.  A request
+     has  a  distinguished  recipient,  called  a handler, who is
+     responsible  for  performing  the  indicated  operation.   A
+     handler may fail, reject, or reply to a request.  Any number
+     of handlers may reject a request, but ultimately only one of
+     them  can fail it or reply to it.  If no running handler can
+     be found to accept a  request,  ToolTalk  can  automatically
+     start  a handler.  If no willing handler can be found, or if
+     a handler fails the request, then the request is returned to
+     the sender in with a Tt_state of TT_FAILED.
+
+  boolean
+     A vtype for logical values.  The  underlying  data  type  of
+     boolean  is integer; that is, arguments of this vtype should
+     be    manipulated     with     tt_*_arg_ival[_set]()     and
+     tt_*_iarg_add().  Zero means false; non-zero means true.
+
+  messageID
+     A vtype for uniquely identifying messages.   The  underlying
+     data type of messageID is string; that is, arguments of this
+     vtype should be manipulated  with  tt_*_arg_val[_set]()  and
+     tt_*_arg_add().   The  messageID of a Tt_message is returned
+     by tt_message_id().
+
+  type
+     Any of the vtypes that are the name of the kind  of  objects
+     in  a particular system of persistent objects.  For example,
+     the vtype for the kind of objects in  filesystems  is  File.
+     The vtype for ToolTalk objects is ToolTalk_Object.
+
+  vendor
+  toolName
+  toolVersion
+     Names of arguments that appear in several of the messages in
+     the  Desktop  suite  of  messages.   These  strings  are not
+     defined rigorously; they merely should be presentable to the
+     user  as  descriptions  of  these  three  attributes  of the
+     relevant procid.
+
+
+   * ERRORS
+
+     An integer  status  code  can  be  read  from  a  reply  via
+     tt_message_status().   This  status defaults to 0 ( TT_OK ),
+     or can be set by the  handler  via  tt_message_status_set().
+     In  extraordinary circumstances such as no matching handler,
+     ToolTalk itself sets the  message  status,  to  a  Tt_status
+     code.
+
+     In addition to the Tt_status values defined by the  ToolTalk
+     API, the Intro reference page for each set of messages lists
+     the error conditions defined for that set of messages.   For
+     each error condition, the reference page gives
+        o Its integer value
+        o Its name
+        o A string in the "C" locale that explains the error con-
+          dition.
+
+     ToolTalk allows an arbitrary status string to be included in
+     any reply.  Since a standard localized message string can be
+     derived for each status code, the tt_message_status_string()
+     may  be  used as a free-form elucidation of the status.  For
+     example, if a request is failed with TT_DESKTOP_EPROTO, then
+     the  status  string could be set to "The vtype of argument 2
+     was 'string'; expected 'integer'".   Handling  tools  should
+     try  to  compose  the  status  string  in  the locale of the
+     requestor.  See the Get_Locale(Desktop) request.
+
+     1102 ITT_DESKTOP_ENOENT
+          No such file or directory
+
+     1113 TT_DESKTOP_EACCES
+          Permission denied
+
+     1122 TT_DESKTOP_EINVAL
+          Invalid argument
+
+          An  argument's  value  was  not  valid  in  these  cir-
+          cumstances  --  e.g.,  a locale in Set_Locale() that is
+          not   valid   on   the   handler's   host.     However,
+          TT_DESKTOP_EINVAL  should  only  be  used when no more-
+          specific     status      (e.g.       TT_DESKTOP_ENOMSG,
+          TT_DESKTOP_EPROTO ) applies.
+
+     1135 TT_DESKTOP_ENOMSG
+          No message of desired type
+
+          A messageID does not refer  to  any  message  currently
+          known by the handler.
+
+     1171 TT_DESKTOP_EPROTO
+          Protocol error
+
+          A message does could not be understood, because
+             o a required argument was omitted
+             o an argument had the wrong vtype, or  a  vtype  not
+               allowed  in  this  message  --  e.g.,  boolean  in
+               Get_Geometry()
+             o an argument had the wrong Tt_mode
+             o an argument's value was not legal for its vtype --
+               e.g., negative values for width in Set_Geometry()
+             o an argument's value was not legal for this message
+               --    e.g.,    PATH=/foo    as   a   variable   in
+               Get_Environment()
+
+          In general, TT_DESKTOP_EPROTO means that one could  see
+          that  the  request  is malformed simply by comparing it
+          with the reference page for the message.
+
+     1147 TT_DESKTOP_ECANCELED
+          Operation canceled
+
+          The  operation  was  canceled  because  of  direct   or
+          indirect  user  intervention.   An  example of indirect
+          intervention is termination  of  the  handling  process
+          caused  by  the  user,  or receipt of a Quit() request.
+          (All  messages  should  be   taken   as   authentically
+          representing  the wishes of the user whose uid is indi-
+          cated by tt_message_uid().)
+
+     1148 TT_DESKTOP_ENOTSUP
+          Operation not supported
+
+          The  requested  operation  is  not  supported  by  this
+          handler.    Normally,  a  well-formed  request  that  a
+          handler     does     not     support     should      be
+          tt_message_reject()ed,  thus  causing  it  to fail with
+          TT_ERR_NO_MATCH if no supporting handler can  be  found
+          or  started.  But sometimes a handler can safely assume
+          that, if it rejects a request, no other handler will be
+          able  to perform the operation.  Examples: a TT_HANDLER
+          -addressed  request  such  as  Set_Iconified(),  or   a
+          request  referring  to  state  that  is managed by this
+          handler and no other.  In these cases, it is better  to
+          explicitly fail the request with TT_DESKTOP_ENOTSUP, in
+          order to  distinguish  the  case  of  an  incompletely-
+          implemented  handler  from the case of the absence of a
+          handler.
+
+          TT_ERR_UNIMP  should  not   be   used   in   place   of
+          TT_DESKTOP_ENOTSUP,  because  TT_ERR_UNIMP means that a
+          particular feature of ToolTalk  itself  is  not  imple-
+          mented.
+
+     1299 TT_DESKTOP_UNMODIFIED
+          Operation does not apply to unmodified entities
+
+     1300 TT_MEDIA_ERR_SIZE
+          The specified size was too big or too small
+
+     1301 TT_MEDIA_ERR_FORMAT
+          The data do not conform to their alleged format
+
+
+   * TTTK: CDE MESSAGING TOOLKIT
+
+	The messaging toolkit makes it easy to use the standard message
+	interfaces for the following tasks:
+
+	* getting/setting a tool's POSIX-related attributes, such as
+	  locale, environment, current working directory, and host.
+	* getting/setting a tool's X11-related attributes, such as
+	  display, geometry, and iconic state.  (This support is only
+	  provided to Xt-based applications.)
+	* cooperating with other tools on modifying, saving, and
+	  reverting files of shared interest.
+	* composing, editing, and displaying documents of arbitrary
+	  media formats.
+
+	The toolkit consists mainly of two kinds routines:
+
+	* 'macro' routines to help send, receive, and process
+	  individual standard messages, and
+	* higher-level versions of certain ToolTalk API calls, which
+	  call the corresponding ToolTalk function but also carry out
+	  any messaging policy related to that function.
+
+        - Signals issued?  Signals caught? (see "man(5) signal")
+                One of the non-essential message interfaces pending
+                implementation is the Signal request, which instructs
+                a tool to send a signal to itself.  In the usual case,
+                the toolkit would service this request for the
+                application, and call signal().
+
+        - How do you respond to property change notification and ICCCM
+          client messages?  E.g. do you respond to "save workspace"
+
+                The toolkit does not respond to such X messages.              |
+                However, if ttdt_session_join() is used in the default        |
+                way, the toolkit will send WM_DELETE_WINDOW to the            |
+                application if the application receives a Quit request.       |
+
+        - Which window-system toolkit/desktop does it depend on?
+
+                No dependency on any particular UI spec, window
+                manager, session manager, or custom desktop.  Depends
+                on Xlib and Xt to implement GUI-related message
+                interfaces (e.g. Get_Geometry).  This could have been done    |
+                through straight Xlib, but Xt both a) made                    |
+                implementation easier and b) provided better service to       |
+                standards-compliant applications.                             |
+        
+        - Other interfaces
+
+                The toolkit specifies a particular set of opnum
+                offsets to be used in the ptypes of Media Exchange
+                editors.  (Opnums are integers that the programmer
+                associates with on-disk message patterns, so that the
+                application may process matched messages using a case
+                statement.) This allows the toolkit to process
+                standard Media Exchange messages for the application.
+                These offsets are defined in the man page for                 |
+                tt_media_ptype_declare().
+
+                The existing ToolTalk interface allows the programmer
+                to attach client data to ToolTalk data structures by
+                passing a void * and an integer key to
+                tt_message_user_set() and tt_pattern_user_set().  The
+                ToolTalk manuals do not specify how libraries in the
+                same address space should avoid key collisions.  The
+                toolkit adopts the convention of using the address of
+                a private data structure as a key.  This convention
+                will be recommended in the ToolTalk programming guide.
+
+        - Are there any other standards it conforms to (or deviates from)?
+            E.g. Sparc/Intel ABI, OMG/CORBA, POSIX, SVID, XPG (XOPen Portablity
+            Guide), ...
+                The toolkit is coded in C++ on top of the Public
+                ToolTalk API and the Standard Xlib and Xt APIs.
+
+                The toolkit operates only on data structures exposed
+                by the ToolTalk API.  When ToolTalk becomes MT safe,
+                the toolkit will automatically become MT safe.  There
+                is no schedule as yet for making ToolTalk MT safe.
+
+        - Does the application pause for significant amounts of time?           
+          Can the user interact with the application while it is                
+          performing long-duration tasks?                                       
+
+                The toolkit provides a few routines --
+                ttdt_sender_imprint_on(), ttdt_Get_Modified(),
+                ttdt_Save(), and ttdt_Revert() -- that block all but
+                messaging activity while awaiting a reply message.
+                These routines take a timeout parameter to be safe,
+                and in normal operation the delay is well under a
+                second.  These routines also take an                          |
+                XtAppContext and thus also service the GUI while
+                blocking.
+
+
+   * TT_OFFER, TT_HANDLE_PUSH, TT_HANDLE_ROTATE
+
+- Abstract
+
+	Three new extensions to ToolTalk are proposed.
+
+	* The ability to send a message and know when all observers
+	  of the message have had the opportunity to see and act on the
+	  message.
+
+	* The ability to specify that the most recently registered
+	  pattern is used when multiple equally-well-matching
+	  patterns are found.
+
+	* The ability to specify that patterns are used in rotation
+	  when multiple equally-well-matching patterns are found.
+
+	TT_OFFER joins TT_REQUEST and TT_NOTICE as a new Tt_class of
+	ToolTalk message.  A request entreats an operation; a notice
+	announces an event; an offer conducts a poll.  An offer is
+	distributed just like a notice.  Each observer (and the
+	"handler", if any) must either accept, reject, or abstain from
+	the offer.  When all observers have done so, the offer is
+	returned to the sender, and it contains lists of the
+	accepting, rejecting, and abstaining procids (ToolTalk client
+	identifiers).
+
+	TT_HANDLE_PUSH and TT_HANDLE_ROTATE join TT_HANDLE and
+	TT_OBSERVE as new Tt_categories of ToolTalk patterns.  Rotate
+	is like handle, except that ties among equally-well-matching
+	rotate patterns are broken by matching to the least-recently-
+	matched pattern (instead of arbitrarily).  Push is like
+	handle, except that ties among equally-well-matching push
+	patterns are broken by matching to the most-recently-
+	registered pattern.  A rotate pattern trumps any handle
+	pattern, and a push pattern trumps any rotate or handle pattern.
+
+- Notice with receipt
+
+-- General description
+
+   When an offer is sent to the ttsession daemon, pattern matching
+   is applied in the same way as for a notice or request.  All matching
+   observers and one matching handler are determined, and the list of
+   ptypes that need to be started to process the message is created.
+
+   Just as for notices and requests, the message is then queued for delivery
+   to each matching receiver; processes are started as necessary.
+   As each delivery is made, the process delivered to is marked as
+   having an outstanding offer.
+
+   When a ToolTalk procid receives an offer in state TT_SENT, it must
+   eventually do one of five things:
+
+   1. Accept the offer by calling tt_message_accept on the message.
+      tt_message_accept will make an RPC back to the ttsession server;
+      ttsession will add the procid to the list of procids accepting
+      the offer, and mark the procid as not having an outstanding offer.
+
+   2. Reject the offer by calling tt_message_reject on the message.
+      tt_message_reject will make an RPC back to the ttsession server;
+      ttsession will add the procid to the list of procids rejecting
+      the offer, and mark the procid as not having an outstanding offer.
+
+   3. Abstain from the offer by calling tt_message_destroy on the message
+      without accepting or rejecting it first.  tt_message_destroy can
+      detect this because the message state will still be TT_SENT instead of
+      TT_ACCEPTED or TT_REJECTED.  tt_message_destroy will then make
+      an RPC back to the ttsession server; ttsession will add the process
+      to the list of procids abstaining from the offer, and mark the procid as
+      not having an outstanding offer.
+
+      Special case: if the procid is the sender of the message,
+      tt_message_destroy on a message in TT_SENT state has no effect -- this
+      is analogous to the similar special case when a process handles its
+      own request.  Only after the procid accepts or rejects the request
+      will the tt_message_destroy really destroy the message.  This
+      means that procid cannot abstain from their own offers, but
+      that doesn't appear to be a problem.  We could add a new API call
+      "tt_message_abstain", but it hardly seems worth it.
+
+   4. Abstain from the offer by calling tt_message_receive again without
+      accepting or rejecting the offer first.  This means the process must
+      accept or reject an offer before receiving another message.  This
+      restriction may be a problem in a few cases, but without this
+      restriction we would have trouble with the case where a process has
+      more that one pattern which matches the offer.  ToolTalk always
+      delivers a message to a process multiple times if the process has
+      multiple matching patterns; this is essential for processes that are
+      really two independent tools running in the same process, which is an
+      amazingly common case.  If we allowed processes to delay accepting and
+      rejecting the offer, we'd have to allow accepting or rejecting a
+      message which is already in the TT_ACCEPTED, TT_REJECTED, or
+      TT_ABSTAINED state.  Normally this would be an error, and it seems
+      more important to catch this error than to allow the accept/reject
+      to be delayed.
+
+      When tt_message_receive detects the condition, it will make a
+      RPC back to ttsession to process the abstain, just as in the
+      above case.  [Performance note: since tt_message_receive is also
+      going to make an RPC to ttsession to pick up the next message, we
+      should investigate "batching" the two RPC calls.]
+      
+   5. Finally, the procid might disconnect via tt_close, or exit (normally
+      or abnormally) without doing any of the above.  ttsession should, as
+      part of cleaning up after the procid, mark the procid as abstaining
+      from any outstanding offer.
+
+      [Should tt_close return a warning if there are any outstanding offers?
+      No, because we don't warn procids if they close without replying to
+      outstanding requests.]
+
+    When the handler (if any) all observers have accepted, rejected, or
+    abstained from the offer, the offer's state is changed to TT_RETURNED
+    and the offer is delivered back to the original sender, with the lists
+    of accepting, rejecting, and abstaining procids included.  Matching for
+    observers of the returned offer is done, just as for replies to
+    requests.  Everything else in the message will be as it was when the
+    message was sent.  In particular, any updates to arguments are not
+    reflected back to the original sender; this means arguments of mode
+    TT_OUT and TT_INOUT are, while permitted, effectively meaningless for
+    offers, just as they are for notices.
+
+-- New message class.
+
+   We are adding a new message type, called an "offer".  The term "offer"
+   was chosen because the effect is like passing a plate of goodies around --
+   everybody takes one if they want; when the plate comes back you know
+   everybody's been offered one.
+
+   This means there is a new value, TT_OFFER, added to the Tt_class
+   enum.
+
+-- New message states
+
+   In order to track the progress of an offer, three new values
+   (TT_RETURNED, TT_ACCEPTED, and TT_ABSTAINED) are added to the
+   Tt_state enum; one existing value (TT_REJECTED) gets an additional
+   use for offers.
+
+   TT_RETURNED -- all observers (and the handler, if there is one) have
+   accepted, rejected, or destroyed the TT_OFFER. The original sender sees
+   this state, and it can be observed.
+
+   This comes back to the original sender like the reply for a request. In
+   particular, any message callbacks for the offer are run, and user data
+   attached to the message before sending are available.
+
+   TT_ACCEPTED -- offers (only) enter this state when tt_message_accept
+   is done on them by a receiver.   The state is seen only by the receiver.
+
+   TT_REJECTED -- This state already exists; a receiver can
+   tt_message_reject a request that matched a handle pattern, which
+   puts the message into state TT_REJECTED for it.  This will be extended
+   to offers -- a receiver that gets an offer will see this message
+   in the TT_REJECTED state 
+
+   TT_ABSTAINED -- offers (only) enter this state when a receiving
+   procid does the next tt_message_receive without accepting or rejecting
+   the offer.  One can think of TT_ABSTAINED also being entered when
+   a procid destroys an offer without accepting or rejecting it, but
+   since the message is destroyed at that time the procid will never
+   see the state.  This state is seen only by the receiver.
+   
+-- Notes and restrictions
+
+--- No "progress" states for offers
+
+    While offers, like requests and notices, can have dispositions of
+    "start" or "queue", no notification is made back to the sender.
+    This is like notices, but unlike requests, where the sender
+    gets the message back in the TT_STARTED or TT_QUEUED states.
+
+--- Message callbacks run
+
+    Since the returned offer has the same message id as the offer
+    as sent, any message callbacks placed on the offer by the sender
+    will be run when the offer is returned, just as message callbacks
+    placed on a request are run when the reply comes back.
+
+--- Only procedural address mode for offers
+
+    Trying to send a message with address other than TT_PROCEDURE
+    (i.e. TT_OBJECT, TT_OTYPE, or TT_HANDLER) will result in TT_ERR_ADDRESS.
+
+    We don't implement TT_OBJECT and TT_OTYPE for two reasons.  First,
+    we are deemphasizing ToolTalk object oriented messaging in favor
+    of DOE. Second, a few minutes thought didn't turn up any obvious
+    need for it even in programs using object oriented ToolTalk messaging.
+
+    Since TT_HANDLER messages are by definition seen by only one receiver,
+    a request with its single reply can be used whereever a offer might
+    be used.
+
+--- Session scope only in this release
+
+    For the initial implementation, targeted for CDE 1.0, only session
+    scoped offers will be implemented.  If a file-scoped offer is
+    created, tt_message_send will return TT_ERR_UNIMP when an attempt
+    is made to send the offer.
+
+    File scoped offers will be a significant amount of work, since
+    co-ordination between the sessions in the file scope is required.
+    The first session that gets the message will have to distribute
+    the offer to the other sessions and wait for all of them to
+    return it.  This will be similar, but not identical, to the
+    processing required for file scoped requests.
+
+--- libtt.so version number must increment
+
+    If a program that uses offers were to be executed against a sufficiently
+    old libtt.so.1, no errors would be reported (tt_message_class_set did
+    not always check that its arguments were in the expected range, sigh)
+    but the program would not get the expected results.  So we have to
+    increment the version number of libtt to libtt.so.1.  Fortunately libtt
+    will remain completely backward compatible, so we should be able to
+    continue to ship just one libtt, and place a link from libtt.so.1 to
+    libtt.so.2.  [The versioning linker would be an even better solution,
+    of course.]
+
+-- API changes
+
+--- tt_message_accept
+
+    Tt_status tt_message_accept(Tt_message m)
+
+    This API call already exists.  Its only current use is to "unblock" the
+    ptype after receiving the message that started a process, without
+    replying to the message.  If the message did not start the process,
+    tt_message_accept was a no-op.
+
+    For requests and notices, tt_message_accept will continue its existing
+    behavior, thus maintaining compatibility.
+
+    For offers, tt_message_accept will counts this procid as accepting
+    the offer, see above.  
+
+    If the offer happens to be the message that started the process,
+    tt_message_accept will unblock the ptype.
+
+    New Error code:
+
+    TT_ERR_STATE: offer not in state TT_SENT (i.e. already accepted or
+    rejected, or not sent yet.)
+
+--- tt_message_reject
+
+    Tt_status tt_message_reject(Tt_message m)
+
+    This API call already exists.  It is currently a no-op unless the
+    process calling it is the handler for the message, and the message
+    is a request.  In that case, it causes the message to be redispatched
+    to the next eligible handler.  It also unblocks the ptype.
+
+    For offers, tt_message_reject will counts this procid as rejecting the
+    offer.
+
+    If the offer happens to be the message that started the process,
+    tt_message_reject will unblock the ptype.
+
+    New Error code:
+
+    TT_ERR_STATE: not in state TT_SENT (i.e. already accepted or rejected,
+    not sent yet.)
+
+--- tt_message_destroy
+
+    Tt_status tt_message_destroy(Tt_message m)
+
+    This API call already exists.  It maintains its current function, plus
+    if the message is an offer and it hasn't been rejected, accepted, or
+    abstained from yet, count this procid as abstaining from the offer.
+
+--- tt_message_receive
+
+    Tt_message tt_message_receive()
+
+    This API call already exists.  It maintains its current function, plus
+    if the procid has received an offer and hasn't accepted, rejected, or
+    abstained from it yet, count this procid as abstaining from the offer.
+    The state of the offer becomes TT_ABSTAINED in this case.
+
+    New status codes:
+
+--- Retrieval functions for accept/reject/abstain lists
+
+    All of the following functions can be used by the sender of an offer
+    (and any observers seeing the offer in state TT_RETURNED) to examine the
+    lists of procids which accepted, rejected, or abstained from the offer.
+    It's kind of a shame we have to use 6 whole API calls for this, but
+    anything else would be inconsistent with the existing structure of the
+    ToolTalk API.
+
+    We have hypothesized two uses for this information:
+
+    - An offer would be useful for a sort of "multi-phase commit"
+      protocol, such as is implemented in the CoEd concurrent-text
+      editor demo shipped with ToolTalk.  The offer in this case
+      means "does everybody agree that the state of the file is
+      correct and stable?"  If any participant has pending updates,
+      they would reject the offer, and the current controlling process
+      (which sent the offer) would pass the update responsibility
+      to one of the rejecters.
+
+    - In the CAD blackboard scenario, a data producer might
+      check the number of procids observing its offers and adjust
+      its frequency of data generation accordingly; for example,
+      if no one is observing the offers, obviously no one cares
+      and the data generator could increase the time between offers
+      to cut overhead.
+
+--- tt_message_accepters_count
+
+    int tt_message_accepters_count(Tt_message m)
+
+    Returns the number of procids that accepted the offer.
+    
+    Error code			Meaning
+
+    TT_ERR_PROCID		invalid default procid (usually means
+				tt_open not yet called)
+    TT_ERR_POINTER		m is not a valid message handle.
+    TT_ERR_STATE		m is not in state TT_RETURNED
+				(since only offers are ever in the
+				TT_RETURNED state, this code will also
+				be returned if m is a notice or request.)
+
+--- tt_message_accepter
+
+    char -tt_message_accepter(Tt_message m, int n)
+
+    Returns the n'th entry (zero based indexing) in the list of procids that
+    accepted the offer, or NULL if n==tt_message_accepters_count(m).
+
+    Error code			Meaning
+
+    TT_ERR_PROCID		invalid default procid (usually means
+				tt_open not yet called)
+    TT_ERR_POINTER		m is not a valid message handle.
+    TT_ERR_STATE		m is not in state TT_RETURNED
+				(since only offers are ever in the
+				TT_RETURNED state, this code will also
+				be returned if m is a notice or request.)
+    TT_ERR_NUM			n is not in the range
+				0<=n<=tt_message_accepters_count(m)
+
+
+--- tt_message_rejecters_count
+--- tt_message_rejecter
+--- tt_message_abstainers_count
+--- tt_message_abstainer
+
+    All like the accepter calls, making the obvious changes.
+
+-- ptype changes
+
+   The ptype grammar will be updated to add "offer" to the set of
+   message types (currently "request" and "notice.")
+
+-- Compatibility
+
+   We need to once again introduce a new RPC call, to send offers.
+   
+   If a process is using a ttsession that doesn't understand the
+   new send RPC call, tt_message_send will fail with TT_ERR_UNIMP.
+  
+   If a process is of a old version (ttsession already knows the
+   version of all its clients), no offers will be delivered to
+   the process.  The process will be counted as abstaining from
+   the offer.
+
+- most-recently-registered and least-recently-dispatched dispatch
+
+-- General description
+
+   We are adding two new pattern categories: TT_HANDLE_PUSH and
+   TT_HANDLE_ROTATE, in addition to the existing TT_HANDLE and TT_OBSERVE
+   categories.  As the names imply, these are specializations of the
+   existing TT_HANDLE.  A ToolTalk message is delivered to only one handle
+   pattern.  Currently the single handler is determined by matching against
+   all handle patterns in a session and picking the pattern which is the
+   "best match", meaning that it has the most matching attributes in the
+   pattern -- broadly, this means that more specific patterns are preferred
+   to less specific ones.  If more than one pattern match equally well, the
+   current ToolTalk specification is that it is undefined; the current
+   implementation will usually pick the most recently registered pattern,
+   because patterns are pushed onto the front of a list, so the most
+   recently registered one is found first.  (It's possible to construct
+   cases where the most recently registered pattern is not used, because
+   patterns are hashed by opname; patterns with no opname come after
+   patterns with an opname.)  The new pattern categories extend the
+   handler selection according to the following method:
+
+   1. Find the best matching TT_HANDLE_PUSH patterns (not counting those from
+      procids that have already rejected this message.)  If there are any,
+      deliver the message to the most recently registered pattern of the
+      equally-well-matching ones.
+
+   2. If there are no TT_HANDLE_PUSH patterns (or all of them
+      belong to procids that have already rejected the message)
+      find the best matching TT_HANDLE_ROTATE patterns (not counting
+      those from procids that have already rejected this message.)  If
+      there are any, deliver to the pattern that least recently had
+      a message dispatched do it, choosing arbitrarily if there are
+      more than one pattern that have never had a message dispatched
+      to them.
+
+   3. Finally, if there are no TT_HANDLE_PUSH or TT_HANDLE_ROTATE patterns
+      (r all of them belong to procids that have already rejected the
+      message) find the best matching TT_HANDLE patterns (not counting those
+      from procids that have already rejected this message.)  If there are
+      any, deliver to an arbitrary one (the current behavior.)
+
+   Note that this method requires us to store in each TT_HANDLE_PUSH
+   pattern the time at which the pattern was registered, and to store
+   into each TT_HANDLE_ROTATE pattern the time at which a message
+   was dispatched.  This "time" does not have to be clock time, just
+   a relative time; a counter that's incremented on every pattern
+   registration or message delivery would be fine.
+
+   An alternate definition that was considered and rejected was to
+   match against all TT_HANDLE, TT_HANDLE_PUSH, and TT_HANDLE_ROTATE
+   patterns, and apply the above method only among equally well matching
+   patterns.  This would mean a more explicit TT_HANDLE pattern would
+   win over a more general TT_HANDLE_PUSH pattern.  This issue is probably
+   not very important, it's highly likely that messages defined by 
+   applications using the new categories will never use TT_HANDLE.
+   The chosen approach was preferred because it seems that
+   applications using TT_HANDLE_PUSH are asserting "I should be first!"
+   and this should be honored.
+
+
+--- New pattern categories
+
+    New values of Tt_category
+
+    TT_HANDLE_PUSH -- like TT_HANDLE but use the most recently registered
+    pattern of this category (if any) before using any pattern of another
+    HANDLE category.
+
+    TT_HANDLE_ROTATE -- like TT_HANDLE, but if no eligible TT_HANDLE_PUSH
+    patterns are found, ue the TT_HANDLE_ROTATE pattern
+    that was least recently used to deliver a message before using
+    any TT_HANDLE patterns.
+
+-- Restrictions
+
+--- File scope
+
+    For the first implementation, file scoped TT_HANDLE_PUSH and 
+    TT_HANDLE_ROTATE patterns are not allowed.
+
+    Implementing these in the future is somewhat problematical, given the
+    way file scoped messaging is built on top of multiple ttsessions.
+    First of all, it would require coherent "clocks" over all the ttsessions
+    in a file scope; secondly, dispatch would require some form of "two
+    phase commit" -- we'd have to make one pass over all the ttsessions
+    looking at matching TT_HANDLE_PUSH patterns, choose the newest,
+    then notify the ttsession with the winning pattern.
+
+    We had considered allowing file scoped TT_HANDLE_PUSH and
+    TT_HANDLE_ROTATE patterns, with the hoky restriction that
+    the preferences only apply within one session -- this is ugly,
+    but it's the same way the current "best match" semantics work --
+    but it's hard to see how that does anybody any good.  File
+    scoped TT_HANDLE_PUSH patterns do seem to be a useful thing,
+    so we'd be better off not allowing them until we can implement
+    them in a useful way, rather than poisioning the well with
+    a worthless implementation.
+
+-- API changes
+
+   No changes to calls, except new values are available to
+   tt_pattern_category_set.  tt_pattern_register can now fail
+   with TT_ERR_UNIMP for two new reasons:
+
+   1. The ttsession daemon for this session is an old version which
+      does not support TT_HANDLE_PUSH or TT_HANDLE_ROTATE
+
+   2. The pattern is of file scope and the category is TT_HANDLE_PUSH
+      or TT_HANDLE_ROTATE>
+
+-- ptype changes
+
+   "handle_push" and "handle_rotate" are added to the ptype language as
+   new section headers.  If these are used, a new version number should
+   be written in the compiled ptype, so old ttsessions would refuse
+   to start if the new categories are used.
+
+   * TTSNOOP
+
+     This section describes the new dtbuilder ttsnoop, and contrasts
+     it with the existing TeleUse ttsnoop.
+
+     The ttsnoop utility interactively monitors ToolTalk message
+     traffic, ttsession(1) pattern matching, and ToolTalk client
+     function calls.  ttsnoop allows the interactive execution of
+     almost any valid sequence of ToolTalk function calls, while
+     optionally tracing those calls.  ttsnoop can interactively
+     create and send any ToolTalk message, and can automatically
+     create many of the standard ToolTalk messages.  ttsnoop can
+     interactively create and register any ToolTalk pattern.
+     Messages received by virtue of these patterns can be pro-
+     cessed (e.g. replied to) interactively or automatically.
+     For any message encountered, ttsnoop can clone a copy of it
+     or generate a pattern that will match similar messages.  For
+     any message encountered, ttsnoop can generate C source code
+     for recreating it, dtactionfile(4) source for a message
+     action that will send it, or tt_type_comp(1) source for a
+     static pattern that will match it.  ttsnoop can dump the
+     system's installed static patterns and message actions.
+
+     Like tttrace(1), ttsnoop operates in two fundamental modes.
+     ttsnoop either runs command with ToolTalk client tracing
+     turned on, or (if command is omitted) snoops message traffic
+     in the default ToolTalk scope.  For client tracing, ttsnoop
+     simply invokes tttrace and logs the trace output to the
+     ttsnoop terminal pane.  For message snooping, ttsnoop regis-
+     ters a ToolTalk pattern in the default scope and prints each
+     matching message in the terminal pane.  When ttsnoop
+     receives a message, it prints the current time, the address
+     of the internal Tt_message_callback that received the mes-
+     sage, and a description of the message as generated by
+     tt_message_print(3).
+
+     Like any ToolTalk client, ttsnoop can observe multicast mes-
+     sages, but not TT_HANDLER-addressed messages.  Only
+     tttrace(1) can monitor TT_HANDLER-addressed messages.  Run
+     tttrace(1) by choosing "ttsession" from the "Snoop" menu.
+
+     ttsnoop allows a message to be opened as long as it has not
+     been destroyed.  However, ttsnoop exposes certain ToolTalk
+     convenience routines -- ttdt_Get_Modified(3), ttdt_Save(3),
+     and ttdt_Revert(3) -- that send and destroy requests without
+     ever returning them above the API.  When ttsnoop uses these
+     routines to send a request to itself, the message should not
+     be manipulated after the convenience routines have destroyed
+     it.
+
+     * Improvements over the TeleUse ttsnoop:
+
+      * Integrated with CDE
+         * Exposes TT 1.2 features: netfiles, CFI, tttk, tracing
+         * Uses CDE Help
+         * Uses Actions to open man pages and generated buffers
+         * Uses Motif file chooser instead of filename text field
+         * Uses CDE standard colors in icon
+      * Smaller
+         * source:	17Kloc			36Kloc
+         * object:	205K+32K+16K = 250K	370K+26K+33K = 430K
+         * msg dialog:	325Kpixel^2		520Kpixel^2
+         * pat dialog:	230Kpixel^2		455Kpixel^2
+      * No need for localization
+         GUI uses only terms from CDE APIs
+      * GUI layout works across changes in font size and window geometry
+      * tttrace integration
+         * Invoke tttrace's session tracing
+         * Invoke tttrace's client tracing
+      * Messages
+         * Separate properties window per message
+         * Send on exit, Accept, Reject, Reply, Fail, Destroy
+         * Add message callbacks
+         * Messages printed in standard format via tt_message_print()
+         * Generate
+            * new message dialog containing cloned message
+            * C code (including callback for requests and offers)
+            * TT_MSG action
+            * ptype containing matching static pattern
+            * new pattern dialog containing matching dynamic pattern
+            * new message dialog containing Status notice
+      * Patterns
+         * Handler patterns (as well as observer patterns)
+         * Separate properties window per pattern
+         * Unregister, (re)register, destroy
+         * Add pattern callbacks
+      * Files
+         * Join, quit, get/set/unset default
+         * Call ttdt_file_*() APIs
+         * Call netfile APIs
+      * Session: join, quit, set default
+      * Ptype: declare, undeclare, set default, exists
+      * Types: load, reload, enumerate, decompile, dump TT_MSG actions
+      * Procids: open, close, suspend, resume
+      * libc menu: system(), chdir(), pause(), exit()
+      * Help
+         * Menu items open man1/tt* man pages
+         * On-item help opens man3/tt* man pages
+      * Dialogs for choosing sessions, procids, standard ops
+      * Comprehensive command line options
+         * to specify initial pattern
+         * to log snoop output
+
+     * Limitations vs. the TeleUse ttsnoop
+
+       The dtbuilder ttsnoop is more closely tied to the TT API than the
+       TeleUse ttsnoop, and so cannot do a few things that the TeleUse
+       ttsnoop can (because the TT API does not allow them):
+
+      * Cannot change which message attributes get printed;
+        uses tt_message_print()
+      * Cannot name messages
+      * Cannot delete message and pattern arguments after they have
+        been added
+THREADING ISSUES
+
+ - Locking granularity:
+    ToolTalk API calls acquire a global lock which they hold as long
+    as they are doing operations that can't block.  The original
+    intention was to drop the locks around RPC calls and re-acquire
+    them immediately after returning from such calls.  This proved to
+    be unworkable because it resulted in crashes in the RPC library.
+    As of the time of this writing, locks are held around RPC calls,
+    which introduces the danger of a blocking call causing a deadlock
+    in the entire TT library, since only one thread is actually
+    manipulating TT structures at any particular time in a process.
+
+ - ttsession threading
+    Currently ttsession only uses a thread for registering as a client
+    of itself.  This is an atomic operation and its success or failure
+    doesn't have a significant effect on ttsession's ability to serve
+    client processes.  ttsession tracing won't work until the
+    thread completes successfully.
+
+ - ALL thread-specific storage should be from malloc calls, NEVER local
+    storage.  Also, all storage obtained from tt_malloc-type calls is
+    thread-specific.
+
+ - Calling tt_message_receive and receiving the same message simultaneously
+    in different threads causes the message object to be updated from under
+    the calling code.  This happens, for instance, when one thread has a
+    handle pattern registered and another has an observe pattern registered,
+    and they both match the same message.  The biggest danger here is
+    if one thread deletes a message while another thread is accessing
+    data from the message.  It is up to the client program to regulate
+    access to TT message data.

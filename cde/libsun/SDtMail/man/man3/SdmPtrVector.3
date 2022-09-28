@@ -1,0 +1,717 @@
+.de LI
+.\" simulate -mm .LIs by turning them into .TPs
+.TP \\n()Jn
+\\$1
+..
+.de Lc
+.\" version of .LI that emboldens its argument
+.TP \\n()Jn
+\s-1\f3\\$1\f1\s+1
+..
+.TH SdmPtrVector 3 "07/03/96"
+.BH "07/03/96"
+.\" @(#)SdmPtrVector.3	1.6 96/07/03 SMI
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994, 1995, 1996 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994, 1995, 1996 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994, 1995, 1996 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994, 1995, 1996 Novell, Inc.
+.SH NAME
+SdmPtrVector \- Template based class - vector of pointers
+.SH SYNOPSIS
+.\"
+.SS Includes
+.ft 3
+.nf
+#include <Sdtmail.hh>
+#include <PtrVector.hh>
+.\"
+.SS Creation
+.ft 3
+.nf
+.sp 0.5v
+.ta \w'new SdmPtrVector('u
+new SdmPtrVector<dataType>();
+.PP
+.ft 3
+.ta \w'new SdmPtrVector('u
+new SdmPtrVector<dataType> (const int \f2maxElements\fP);
+.PP
+.ft 3
+.ta \w'new SdmPtrVector('u
+new SdmPtrVector<dataType> (const SdmPtrVector<dataType>& \f2vector\fP);
+.fi
+.ft 1
+.\"
+.SS Operators
+.PP
+.ft 3
+.nf
+.sp 0.5v
+dataType& operator[] (const int position) const;
+.PP
+.ft 3
+dataType& operator() (const int position);
+.fi
+.ft 1
+.\"
+.SS Methods
+.PP
+.ft 3
+.nf
+.sp 0.5v
+.ta \w'int AddElementToList('u
+int AddElementToList(const dataType& \f2element\fP);
+.PP
+.ft 3
+.ta \w'int AddElementToVector('u
+int AddElementToVector();
+.PP
+.ft 3
+.ta \w'void ClearAndDestroyAllElements('u
+void ClearAndDestroyAllElements();
+.PP
+.ft 3
+.ta \w'void ClearAllElements('u
+void ClearAllElements();
+.PP
+.ft 3
+.ta \w'void ClearPtrDeleteFlag('u
+void ClearPtrDeleteFlag();
+.PP
+.ft 3
+.ta \w'int ElementCount('u
+int ElementCount() const;
+.PP
+.ft 3
+.ta \w'int FindElement('u
+int FindElement(const dataType& \f2element\fP);
+.PP
+.ft 3
+.ta \w'void InsertElementAfter('u
+void InsertElementAfter(const dataType& \f2element\fP,
+	 const int \f2position\fP);
+.PP
+.ft 3
+.ta \w'void InsertElementBefore('u
+void InsertElementBefore(const dataType& \f2element\fP,
+	 const int \f2position\fP);
+.PP
+.ft 3
+.ta \w'void RemoveElement('u
+void RemoveElement(const int \f2position\fP);
+.PP
+.ft 3
+.ta \w'void SetPtrDeleteFlag('u
+void SetPtrDeleteFlag();
+.PP
+.ft 3
+.ta \w'void SetVectorSize('u
+void SetVectorSize(const int \f2size\fP);
+.fi
+.ft 1
+.\" end of methods list
+.ta 0.25i 0.50i 0.75i 1.0i 1.25i 1.50i 1.75i 2.0i 2.5i 3.0i
+.SH DESCRIPTION
+The SdmPtrVector object is a template based vector class, derived from
+SdmVector, providing the ability to containerize a list of \f3pointers\fP to any
+type of object. This differs from the SdmVector object that containerizes a list
+of the \f3objects\fP themselves. The vector allocates no memory unless a size
+has been specified or until an object is added to the vector. The vector
+allocates chunks of memory and then assigns elements, only allocating more space
+when the vector is full.
+.SS Vector Contents
+This is a pointer (as opposed to an object) vector; only pointers to the actual
+objects are stored in such a vector; therefore, any such object need not have
+copy constructor and assignment operators.
+.PP
+Since the SdmPtrVector container stores pointers to objects as opposed to copies
+of actual objects themselves, care must be taken when assigning and copying
+pointers into and out of the vector.
+.PP
+In general, pointer based vectors are useful for holding data that does not have
+a fixed size (and therefore may not be placed in an object vector), or objects
+that do not have complete copy constructors, or objects that are expensive to
+copy.
+.PP
+For example, you cannot have an object vector containing object vectors:
+.PP
+.nf
+	SdmVector<SdmVector<SdmString>>
+.fi
+.PP
+This is not permitted because the inner vector does not have a fixed size and so
+therefore cannot be represented inside of an object vector. This must instead
+be represented as a vector of pointers to vectors of SdmString objects:
+.PP
+.nf
+	SdmPtrVector<SdmVector<SdmString>>
+.fi
+.SS Origin
+This vector implements 0-origin indexing. For example, given a vector named X
+with 100 pointers in it, the first pointer in the vector is referred to as X[0],
+and the last pointer as X[99].
+.PP
+You must be careful when using indexing to assign values into the vector rather
+than using methods that append values to the end of the vector. You must assure
+that the vector was either assigned a size at creation, or that SetVectorSize()
+was called.
+.\"
+.SH CREATION
+There are a number of ways to create a pointer vector.
+.SS Empty Vector
+You can call the vector constructor with no arguments. A vector with no pointers
+is allocated.
+.PP
+.nf
+	SdmPtrVector<dataType>* vector = new SdmPtrVector<dataType>;
+	SdmPtrVector<dataType> vector;
+ 
+For example:
+ 
+	SdmPtrVector<int>* numlist = new SdmPtrVector<int>;
+	SdmPtrVector<int> numlist;
+.fi
+.PP
+This creates a integer pointer vector that contains no elements.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "none."
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmPtrVector<dataType>*)\fP"
+.br
+A pointer to the SdmPtrVector object if successfully created;
+otherwise, the return value is undefined.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS Preallocated Vector
+You can call the vector constructor with an integer argument specifying the
+number of elements to preallocate. A vector with that number of pointers of the
+templated type is created. The pointers are not assigned any default values.
+.PP
+.nf
+        SdmPtrVector<dataType>* v = new SdmPtrVector<dataType>(const int maxElements);
+        SdmPtrVector<dataType> v(const int maxElements);
+ 
+For example:
+ 
+        SdmPtrVector<int> numPtrList(100);
+        for (i=0; i<100; i++)
+            numPtrList[i] = NULL;
+ 
+.fi
+.PP
+This creates an integer pointer vector that contains 100 integer pointers.  
+Note that the pointers are not initialized so it's up to the caller to initialize the
+pointers in this vector after it is created.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3maxElements\fP (\f3const int\fP)"
+.br
+The number of elements to preallocate in the vector.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmPtrVector<dataType>*)\fP"
+.br
+A pointer to the SdmPtrVector object if successfully created;
+otherwise, the return value is undefined.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS From Existing Vector
+You can call the vector constructor with another vector of the same type as
+an argument. A new vector is created with a complete copy of the original vectors
+contents. The pointers are copied - not the objects that are pointed to.
+.PP
+.nf
+  SdmPtrVector<dataType>* vtr = 
+	new SdmPtrVector<dataType>(const SdmPtrVector<vector>& theCopy);
+  SdmPtrVector<dataType>  vtr(const SdmPtrVector<dataType>& theCopy);
+ 
+.fi
+.PP
+This creates a new vector that contains copies of each pointer in theCopy.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3theCopy\fP (\f3SdmPtrVector<dataType>&\fP)"
+.br
+The vector where elements are copied from.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmPtrVector<dataType>*)\fP"
+.br
+A pointer to the SdmPtrVector object if successfully created;
+otherwise, the return value is undefined.
+.PP
+.RE
+.nr )J 0
+.\"
+.SH DESTRUCTION
+A SdmPtrVector object can be destroyed like any other object.  By default, the
+contents of the vector are NOT automatically destroyed when the vector itself is
+destroyed. You must make sure that the objects are destroyed when they are no
+longer needed (to avoid memory leaks), and make sure that the destructor for
+each object is not called more than once.
+.PP
+See the sections on the SetPtrDeleteFlag() and ClearPtrDeleteFlag() methods to
+see how this default behavior can be changed.
+.\"
+.SH OPERATORS
+Two standard C operators are overloaded to function with SdmPtrVector objects: []
+and ().
+.SS []
+Vector indexing via the [] operator operates identically to the standard C
+subscripting mechanisms for arrays of ordinary data types. This operator works
+on const and non-const vectors.
+.SS ()
+Vector indexing via the () operator operates identically to the [] operator
+described above with the following two exceptions:
+.PP
+1) the () operator does not work on const objects.
+.PP
+2) if the index is -1, then a new element is added to the end of the list, and
+that elements index is then used in the operation. This allows for the quick
+addition of elements to the end of the vector. For example:
+.PP
+.nf
+	SdmPtrVector<SdmString*> strL;
+	strL(-1) = new SdmString("a");
+	strL(-1) = new SdmString("b");
+	strL(-1) = new SdmString("c");
+.fi
+.PP
+Creates a vector and assigns three pointers, one to each of the three SdmString
+objects specified in the call. While this may appear slightly "ugly", it is much
+more efficient than:
+.PP
+.nf
+	strL[strL.AddElementToVector()] = new SdmString("a");
+	strL[strL.AddElementToVector()] = new SdmString("b");
+	strL[strL.AddElementToVector()] = new SdmString("c");
+.fi
+.PP
+This also allows object methods to be invoked on the pointers to the objects
+added to the vector as well. For example:
+.PP
+.nf
+	SdmPtrVector<SdmStrStr*> ssL;
+
+	ssL(-1)->SetBothStrings("1", "2");
+	ssL(-1)->SetBothStrings("3", "4");
+.	ssL(-1)->SetBothStrings("5", "6");
+.fi
+.PP
+.\"
+.SH METHODS
+The following methods are provided to operate on the contents of a SdmPtrVector templated object.
+.\"
+.SS \f3AddElementToList\fP
+(\f3element\fP)
+
+This method appends a pointer to an object to the end of the vector, increasing
+the size of the vector by one element, grabbing additional storage as needed to
+grow the vector.  The following example creates a vector of pointers to
+SdmString objects and appends two pointers to SdmString objects onto the end of
+the vector:
+.PP
+.nf
+	SdmString str1("test");
+	SdmString str2("again");
+	SdmPtrVector<SdmString*> strvec;
+
+	strvec.AddElementToList(str1);
+	strvec.AddElementToList(str2);
+.fi
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3element\fP (\f3const dataType&\fP)"
+.br
+An object of the same type as the template data type, a pointer to which is
+appended to the end of the vector. No copy of the object is created.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "(\f3int\fP)"
+.br
+The index into the vector where the pointer to this object is inserted is
+returned. This value can be used to index into the vector to retrieve the
+pointer to the object just added.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3AddElementToVector\fP
+()
+
+This method appends a new pointer to the end of the vector, increasing the size
+of the vector by one element, grabbing additional storage as needed to grow the
+vector. It is similar to AddElementToList() but it adds a new pointer only
+without assigning a value to the pointer. The following example creates a vector
+of pointers to SdmString objects and appends two pointers to SdmString objects
+onto the end of the vector in two different ways using this method:
+.PP
+.nf
+	SdmString str1("test");
+	SdmString str2("again");
+	SdmPtrVector<SdmString*> strvec;
+	int pos;
+
+	pos = strvec.AddElementToVector();
+	strvec[pos] = &str1;
+	strvec[strvec.AddElementToVector()] = &str2;
+.fi
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "none"
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "(\f3int\fP)"
+.br
+The index into the vector where the new pointer is inserted is returned. This
+value can be used to index into the vector to retrieve the pointer just added.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3ClearAndDestroyAllElements\fP
+()
+
+This method causes all elements in the vector to be destroyed, and causes the
+destructor for each object addressed by each pointer to be called, and the size
+of the vector to be set to zero. This method is usually used to clear the vector
+out of pointers and the objects they point to when the objects are no longer
+needed.
+.PP
+This method should be used with caution. If any pointers are copied out of this
+vector in the course of operating on the data, all such pointers become invalid
+when this method is invoked.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "none"
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "none"
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3ClearAllElements\fP
+()
+
+This method causes all elements in the vector to be destroyed, and the size of
+the vector to be set to zero. This method is usually used to clear the vector
+out of old pointers before inserting a new list of objects into the vector.
+.PP
+This differs from ClearAllElements() on SdmVector objects. Since this container
+is a vector of pointers, just the \f3pointers\fP in the vector are destroyed by
+this call. The objects pointed to by the pointers are NOT automatically
+destroyed by this call (see ClearAndDestroyAllElements). The owner must make
+provisions for destroying the objects that are pointed to; otherwise, a memory
+leak will occur.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "none"
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "none"
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3ClearPtrDeleteFlag\fP
+()
+
+This method causes the destructor for the vector to revert to the default
+mode where the objects pointed to are NOT automatically deleted when the
+vector is destroyed.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "none"
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "none"
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3ElementCount\fP
+()
+
+Return the number of elements in the vector. The following example iterates through the list
+of elements in a vector of integers and prints out the contents:
+.PP
+.nf
+	SdmPtrVector<int*> intL;
+
+	<< do something to add elements to the vector >>
+
+	for (int i = 0; i < intL.ElementCount(); i++)
+	  printf("Element %d value %d\n", i, *intL[i]);
+.fi
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "none"
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(int)\fP"
+.br
+The number of elements in the vector is returned.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3FindElement\fP
+(\f2element\fP)
+
+This method is used to locate a particular pointer to an object in the
+vector by comparing pointers to the objects and return the index of
+the element in the vector.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3element\fP (\f3const dataType&\fP)"
+.br
+The object to look for by pointer in the vector. The comparison
+operator of the pointers is used to find a match.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(int)\fP"
+.br
+The index into the vector of where the pointer to the object is found;
+Sdm_Not_Found is returned if the object cannot be found in the vector.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3InsertElementAfter\fP
+(\f3element\fP, \f3position\fP)
+
+This method is similar to AddElementToList, except that it allows an index into
+the vector where the pointer to the object is to be added. All pointers in the
+vector above that position are shifted up in the vector one position, and the a
+pointer to the given object is then inserted after the indicated position.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3element\fP (\f3const dataType&\fP)"
+.br
+An object of the same type as the template data type, a pointer to which is
+inserted after the given index. A copy of the object is not created.
+.LI "\f3position\fP (\f3int\fP)"
+.br
+The index into the vector after which the pointer to the object is to be
+inserted.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "none"
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3InsertElementBefore\fP
+(\f3element\fP, \f3position\fP)
+ 
+This method is similar to AddElementToList, except that it allows an index into the vector
+where the object is to be added. All objects in the vector starting at that position are shifted
+up in the vector one position, and the given object is then added at the
+position.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3element\fP (\f3const dataType&\fP)"
+.br
+An object of the same type as the template data type to be inserted after the given
+index. A copy of the object is created and placed in vector after the given index.
+.LI "\f3position\fP (\f3int\fP)"
+.br
+The index into the vector after which the object is to be inserted.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "none"
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3RemoveElement\fP
+(\f3position\fP)
+
+This method removes a pointer to an object from a position in the vector. The
+pointer to the object is destroyed; the object itself is NOT destroyed.  All
+pointers in the vector above that position are shifted down in the vector one
+position.
+.PP
+This differs from RemoveElement() on SdmVector objects. Since this container is
+a vector of pointers, just the \f3pointer\fP in the vector is destroyed by this
+call. The object pointed to by the pointer is NOT automatically destroyed by
+this call. The owner must make provisions for destroying the object that is
+pointed to; otherwise, a memory leak will occur.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3position\fP (\f3int\fP)"
+.br
+The index into the vector of the position of the pointer to be removed.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "none"
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3SetPtrDeleteFlag\fP
+()
+
+This method causes the destructor for the vector to change from the default
+behavior, and to automatically destroy the objects pointed to by the pointers
+in the vector when the vector is destroyed.
+.PP
+This mode of operation should be used with caution. If any pointers are copied
+out of this vector in the course of operating on the data, all such pointers
+become invalid when this vector is destroyed.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "none"
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "none"
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3SetVectorSize\fP
+(\f3size\fP)
+
+This method allows the size of the vector to be manipulated. If the vector size
+is adjusted up, new empty pointers are appended to the end of the vector. If the
+vector size is adjusted down, the pointers that fall off the end of the vector
+are destroyed.
+.PP
+This differs from SetVectorSize() on SdmVector objects. Since this container is
+a vector of pointers, just the \f3pointers\fP in the vector are destroyed by
+this call if the vector is adjusted down. The objects pointed to by the pointers
+are NOT automatically destroyed by this call. The owner must make provisions for
+destroying the objects that are pointed to; otherwise, a memory leak will occur.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3size\fP (\f3int\fP)"
+.br
+The number of elements to set the vector to.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "none"
+.PP
+.RE
+.nr )J 0
+.\"
+.PP
+.RE
+.nr )J 0
+.SH "SEE ALSO"
+.na
+.BR SdmPtrSortVector (3),
+.BR SdmSortVector (3),
+.BR SdmVector (3)

@@ -1,0 +1,71 @@
+.TH tt_file_destroy 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+tt_file_destroy \- remove objected rooted on a file
+.SH SYNOPSIS
+.yS
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'Tt_status tt_file_destroy('u
+Tt_status tt_file_destroy(const char *\f2filepath\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn tt_file_destroy
+function
+removes all objects that exist on the files and directories rooted at
+.IR filepath .
+The application must call this function when the application
+unlinks a file or removes a directory.
+.P
+The
+.I filepath
+argument is a pointer to the pathname of the file or directory to be removed.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn tt_file_destroy
+function returns the status of the operation as one of the following
+.B Tt_status
+values:
+.VL 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_ACCESS
+.br
+The user does not have the necessary access to the object and/or the process.
+.Lc TT_ERR_DBAVAIL
+.br
+The ToolTalk service could not access the
+ToolTalk database needed for this operation.
+.Lc TT_ERR_DBEXIST
+.br
+The ToolTalk service could not access the
+specified ToolTalk database in the expected place.
+.cde It does not appear to exist; administrative action is required.
+.Lc TT_ERR_FILE
+.br
+The specified file does not exist or it is inaccessible.
+.Lc TT_ERR_NOMP
+.br
+The
+.Cm ttsession 1
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_PATH
+.br
+The specified pathname included an unsearchable directory.
+.Lc TT_ERR_POINTER
+.br
+The pointer passed does not point to an object of
+the correct type for this operation.
+.LE
+.SH "SEE ALSO"
+.Hd Tt/tt_c.h 5,
+.Fn tt_file_copy 3,
+.Fn tt_file_move 3;
+.Cm rmdir 2,
+.cde .Cm unlink 2,
+.xo .Cm unlink 2
+.xo in the \*(ZC.

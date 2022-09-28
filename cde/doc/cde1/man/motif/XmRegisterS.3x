@@ -1,0 +1,67 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH XmRegisterSegmentEncoding 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmRegisterSegmentEncoding\fP \- A compound string function that registers
+a compound text encoding format for a specified font list element tag
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/Xm.h>
+.sp \n(PDu
+char * XmRegisterSegmentEncoding (\fBfontlist_tag, ct_encoding\fI)
+.ta .5i 1.25i
+.nf
+	char	*\fBfontlist_tag\fI;
+	char	*\fBct_encoding\fI;
+.wH
+.fi
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+\fIXmRegisterSegmentEncoding\fP registers a compound text encoding format
+with the specified font list element tag.  The \fIXmCvtXmStringToCT\fP
+function uses this registry to map the font list tags of compound string
+segments to compound text encoding formats.  Registering
+a font list tag that already exists in the registry overwrites the original
+entry.  You can unregister a font list tag by passing a NULL value for the
+\fBct_encoding\fP parameter.
+.IP "\fBfontlist_tag\fP"
+Specifies the font list element tag to be registered.  The
+tag must be a NULL-terminated ISO8859-1 string.
+.IP "\fBct_encoding\fP"
+Specifies the compound text character set to be used for segments
+with the font list tag.  The value must be a NULL-terminated ISO8859-1 string.
+A value of \fIXmFONTLIST_DEFAULT_TAG\fP maps the specified font list tag to
+the code set of the locale.
+.SH RETURN VALUE
+Returns NULL for a new font list tag or the old \fBct_encoding\fP
+value for an already registered font list tag.   The 
+application is responsible for freeing the 
+storage associated with the returned data (if any) by
+calling \fIXtFree\fP. 
+.SH RELATED INFORMATION
+.na
+\fIXmCvtXmStringToCT(3X)\fP,
+\fIXmFontList(3X)\fP,
+\fIXmMapSegmentEncoding(3X)\fP, and
+\fIXmString(3X)\fP.
+.ad

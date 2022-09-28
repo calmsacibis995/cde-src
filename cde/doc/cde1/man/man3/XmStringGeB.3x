@@ -1,0 +1,119 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH XmStringGetNextComponent 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmStringGetNextComponent\fP \- A compound string function that returns the type and value of the next component in a compound string
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/Xm.h>
+.sp \n(PDu
+.ta 1i
+.nf
+XmStringComponentType XmStringGetNextComponent (\fBcontext, text, tag, direction, unknown_tag,
+unknown_length, unknown_value\fI)
+.ta .5i 2.5i
+.nf
+	XmStringContext	\fBcontext\fI;
+	char	**\fBtext\fI;
+	XmStringCharSet	*\fBtag\fI;
+	XmStringDirection	*\fBdirection\fI;
+	XmStringComponentType	*\fBunknown_tag\fI;
+	unsigned short	*\fBunknown_length\fI;
+	unsigned char	**\fBunknown_value\fI;
+.wH
+.fi
+.ne 10
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+\fIXmStringGetNextComponent\fP
+returns the type and value of the next component in
+the compound string identified by \fBcontext\fP.  It is a low-level
+component function.  Components are returned one at a time.  On return, only
+some output parameters will be valid; which ones can be determined by
+examining the return status.  In the case of \fBtext\fP,
+\fBtag\fP, and \fBdirection\fP components, only one
+output parameter is valid.  If the return status indicates an unknown
+component was encountered, the font list element tag, length, and value
+are returned.  This function allocates the space necessary to hold
+returned values; freeing this space is the caller's responsibility.
+.IP "\fBcontext\fP"
+Specifies the string context structure which was allocated by the
+\fIXmStringInitContext\fP function.
+.IP "\fBtext\fP"
+Specifies a pointer to a null terminated string.
+.IP "\fBtag\fP"
+Specifies a pointer to the font list element tag associated with the
+text.  The value \fIXmFONTLIST_DEFAULT_TAG\fP identifies a locale
+text segment.
+.IP "\fBdirection\fP"
+Specifies a pointer to the direction of the text.
+.IP "\fBunknown_tag\fP"
+Specifies a pointer to the tag of an unknown component.
+.IP "\fBunknown_length\fP"
+Specifies a pointer to the length of an unknown component.
+.IP "\fBunknown_value\fP"
+Specifies a pointer to the value of an unknown component.
+.P 
+.ne 25
+.SH RETURN VALUE
+Returns the type of component found.
+Following are the possible values:
+.wH
+.rS 
+.TP
+\(bu
+\fIXmSTRING_COMPONENT_CHARSET\fP
+.PP
+This component is obsolete and remains for
+compatibility with previous releases.  It has been
+replaced by \fIXmSTRING_COMPONENT_FONTLIST_ELEMENT_TAG\fP.
+.TP
+\(bu
+\fIXmSTRING_COMPONENT_FONTLIST_ELEMENT_TAG\fP
+.TP
+\(bu
+\fIXmSTRING_COMPONENT_LOCALE_TEXT\fP
+.TP
+\(bu
+\fIXmSTRING_COMPONENT_TAG\fP
+.TP
+\(bu
+\fIXmSTRING_COMPONENT_TEXT\fP
+.TP
+\(bu
+\fIXmSTRING_COMPONENT_DIRECTION\fP
+.TP
+\(bu
+\fIXmSTRING_COMPONENT_SEPARATOR\fP
+.TP
+\(bu
+\fIXmSTRING_COMPONENT_END\fP
+.TP
+\(bu
+\fIXmSTRING_COMPONENT_UNKNOWN\fP
+.wH
+.rE
+.SH RELATED INFORMATION
+.na
+\fIXmStringCreate(3X)\fP and \fIXmStringInitContext(3X)\fP.
+.ad

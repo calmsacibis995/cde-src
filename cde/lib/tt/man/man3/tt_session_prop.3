@@ -1,0 +1,103 @@
+.de Lc
+.\" version of .LI that emboldens its argument
+.TP \\n()Jn
+\s-1\f3\\$1\f1\s+1
+..
+.TH tt_session_prop 3 "1 March 1996" "ToolTalk 1.3" "ToolTalk Functions"
+.BH "1 March 1996"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.IX "tt_session_prop.3" "" "tt_session_prop.3" "" 
+.SH NAME
+tt_session_prop \- return the ith value of a session property
+.SH SYNOPSIS
+.ft 3
+.nf
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'char *tt_session_prop('u
+char *tt_session_prop(const char *\f2sessid\fP,
+	const char *\f2propname\fP,
+	int \f2i\fP);
+.PP
+.fi
+.SH DESCRIPTION
+The
+.BR tt_session_prop (\|)
+function
+returns the
+.IR i th
+value of the specified session property.
+.PP
+The
+.I sessid
+argument is the name of the session joined.
+The application can use the
+.I sessid
+value returned when
+.BR tt_default_session (\|)
+is called.
+The
+.I propname
+argument is the name of the property from which a value is to be retrieved.
+The name
+must be less than 64 bytes.
+The
+.I i
+argument is the number of the item in the property name list
+for which the value is to be obtained.
+The list numbering begins with zero.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.BR tt_session_prop (\|)
+function returns the value of the requested property.
+If there are
+.I i
+values or fewer, it returns
+.BR \s-1NULL\s+1 .
+The application can use
+.BR tt_ptr_error (3)
+to extract one of the following
+.B Tt_status
+values from the returned pointer:
+.PP
+.RS 3
+.nr )J 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_NOMP
+.br
+The
+.BR ttsession (1)
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_NUM
+.br
+The integer value passed was invalid (out of range).
+.Lc TT_ERR_PROPNAME
+.br
+The specified property name is syntactically invalid.
+.Lc TT_ERR_SESSION
+.br
+The specified ToolTalk session is out of date or invalid.
+.PP
+.RE
+.nr )J 0
+.SH "APPLICATION USAGE"
+The application should use
+.BR tt_free (3)
+to free any data stored in the address returned by the
+ToolTalk API.
+.PP
+If the returned value has embedded nulls, it is
+impossible to determine how long it is.
+The application can use
+.BR tt_session_bprop (3)
+for values with embedded nulls.
+.SH "SEE ALSO"
+.na
+.BR tt_c (5),
+.BR tt_ptr_error (3),
+.BR tt_free (3).

@@ -1,0 +1,175 @@
+.TH Bento/DtCM.h 5 "22 March 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH "NAME"
+Bento/DtCM.h \- Bento definitions
+.SH "SYNOPSIS"
+.yS
+#include <Bento/DtCM.h>
+.yE
+.SH "DESCRIPTION"
+The
+.BR <Bento/DtCM.h>
+header defines the
+.BR DtCMBodyPart
+structure,
+which contains at least the following members:
+.P
+.ne 6v
+.TS
+.xo  lf5 lf5 lw(4i) .
+.cde lf3 lf2 lw(4i) .
+CMObject	object	T{
+.na
+An object that can be used to access the body part until the
+container is closed.
+T}
+CMReference	reference	T{
+.na
+A persistent object reference relative to the container for the body part.
+This value can be saved and used to access the object again using the
+.Fn DtCMGetBodyPart 3
+function.
+T}
+.TE
+.P
+The following format type-name constants are defined:
+.VL 30
+.Lc DtCMTypesDocumentAlternate
+An alternate representation of the same object.
+.Lc DtCMTypesDocumentEmbedded
+A document contained within a document.
+.Lc DtCMTypesDocumentStandard
+A normal Cde container document.
+.Lc DtCMTypesString
+A null-terminated string of characters.
+.LE
+.P
+The following are declared as functions and may also be declared as macros:
+.P
+.yS
+.ta \w'char *DtCMCombineFormatTypeStrings('u
+char *DtCMCombineFormatTypeStrings(const char *\f2type1\fP,
+	const char *\f2type2\fP);
+.ta \w'void DtCMDeleteBodyPart('u
+void DtCMDeleteBodyPart(DtCMDocument \f2document\fP,
+	CMEnv *\f2error\fP,
+	DtCMBodyPart *\f2body_part\fP);
+.ta \w'void DtCMFiniDocument('u
+void DtCMFiniDocument(DtCMDocument \f2document\fP,
+	CMEnv *\f2error\fP);
+.ta \w'void DtCMFreeFormatStrings('u
+void DtCMFreeFormatStrings(char *\f2list\fP);
+.ta \w'DtCMBodyPart *DtCMGetBodyPart('u
+DtCMBodyPart *DtCMGetBodyPart(DtCMDocument \f2document\fP,
+	CMEnv *\f2error\fP,
+	CMReference \f2reference\fP);
+.ta \w'CMContainer DtCMGetBodyPartContainer('u
+CMContainer DtCMGetBodyPartContainer(DtCMBodyPart *\f2body_part\fP,
+	CMEnv *\f2error\fP,
+	CMGlobalName *\f2type_name\fP,
+	CMContainerUseMode \f2use_mode\fP);
+.ta \w'void DtCMGetBodyPartContents('u
+void DtCMGetBodyPartContents(DtCMBodyPart *\f2body_part\fP,
+	CMEnv *\f2error\fP,
+	CMGlobalName *\f2type_name\fP,
+	CMPtr *\f2data\fP,
+	CMSize *\f2data_size\fP);
+.ta \w'CMGlobalName DtCMGetBodyPartFormatType('u
+CMGlobalName DtCMGetBodyPartFormatType(DtCMBodyPart *\f2body_part\fP,
+	CMEnv *\f2error\fP);
+.br
+.ne 6v
+.ta \w'void DtCMGetBodyPartProperty('u
+void DtCMGetBodyPartProperty(DtCMBodyPart *\f2body_part\fP,
+	CMEnv *\f2error\fP,
+	CMGlobalName \f2property\fP,
+	CMGlobalName *\f2type_name\fP,
+	CMPtr *\f2data\fP,
+	CMSize *\f2data_size\fP);
+.br
+.ne 3v
+.ta \w'DtCMBodyPart *DtCMGetNextBodyPart('u
+DtCMBodyPart *DtCMGetNextBodyPart(DtCMDocument \f2document\fP,
+	CMEnv *\f2error\fP,
+	DtCMBodyPart *\f2previous\fP);
+.ta \w'DtCMDocument DtCMInitDocument('u
+DtCMDocument DtCMInitDocument(CMContainer \f2container\fP,
+	CMEnv *\f2error\fP,
+	CMBoolean \f2create\fP);
+.ta \w'void DtCMInsertBodyPart('u
+void DtCMInsertBodyPart(DtCMDocument \f2doc\fP,
+	CMEnv *\f2error\fP,
+	DtCMBodyPart *\f2after_part\fP
+	DtCMBodyPart *\f2new_part\fP);
+.ta \w'CMBoolean DtCMIsBodyPartContainer('u
+CMBoolean DtCMIsBodyPartContainer(DtCMBodyPart *\f2body_part\fP,
+	CMEnv *\f2error\fP);
+.ta \w'CMBoolean DtCMIsDocument('u
+CMBoolean DtCMIsDocument(CMContainer \f2container\fP,
+	CMEnv *\f2error\fP);
+.ta \w'CMContainer DtCMMemoryCreate('u
+CMContainer DtCMMemoryCreate(CMSession \f2session\fP,
+	CMEnv *\f2error\fP,
+	CMPtr \f2buffer\fP,
+	CMSize \f2buffer_size\fP,
+	CMRefCon *\f2ref_con\fP);
+.ta \w'void DtCMMemoryDestroy('u
+void DtCMMemoryDestroy(CMRefCon \f2ref_con\fP,
+	CMEnv *\f2error\fP);
+.ta \w'void DtCMMemoryInfo('u
+void DtCMMemoryInfo(CMRefCon \f2ref_con\fP,
+	CMEnv *\f2error\fP,
+	const CMPtr *\f2buffer\fP,
+	CMSize *\f2buffer_size\fP);
+.ta \w'DtCMBodyPart *DtCMNewBodyPart('u
+DtCMBodyPart *DtCMNewBodyPart(DtCMDocument \f2document\fP,
+	CMEnv *\f2error\fP);
+.ta \w'CMContainer DtCMOpen('u
+CMContainer DtCMOpen(CMSession \f2session\fP,
+	CMEnv *\f2error\fP,
+	const char *\f2path\fP,
+	int \f2open_flag\fP,
+	...
+	mode_t \f2mode\fP,
+	const char *\f2magic_bytes\fP);
+.ta \w'DtCMParseFormatTypeString('u
+char *DtCMParseFormatTypeString(const char *\f2type\fP);
+.ta \w'char *DtCMReadMagicBytes('u
+char *DtCMReadMagicBytes(const char *\f2path\fP,
+	CMEnv *\f2error\fP);
+.ta \w'void DtCMReleaseBodyPart('u
+void DtCMReleaseBodyPart(DtCMBodyPart *\f2body_part\fP,
+	CMEnv *\f2error\fP);
+.ta \w'CMContainer DtCMSetBodyPartContainer('u
+CMContainer DtCMSetBodyPartContainer(DtCMBodyPart *\f2body_part\fP,
+	CMEnv *\f2error\fP,
+	CMGlobalName \f2type_name\fP);
+.ta \w'void DtCMSetBodyPartContents('u
+void DtCMSetBodyPartContents(DtCMBodyPart *\f2body_part\fP,
+	CMEnv *\f2error\fP,
+	CMGlobalName \f2type_name\fP,
+	CMPtr \f2data\fP,
+	CMSize \f2data_size\fP);
+.br
+.ne 5v
+.ta \w'void DtCMSetBodyPartFormatType('u
+void DtCMSetBodyPartFormatType(DtCMBodyPart *\f2body_part\fP,
+	CMEnv *\f2error\fP,
+	CMGlobalName \f2type_name\fP,
+	CMMetaHandler \f2meta_handler\fP,
+	...);
+.ta \w'void DtCMSetBodyPartProperty('u
+void DtCMSetBodyPartProperty(DtCMBodyPart *\f2body_part\fP,
+	CMEnv *\f2error\fP,
+	CMGlobalName \f2property\fP,
+	CMGlobalName \f2type_name\fP,
+	CMPtr \f2data\fP,
+	CMSize \f2data_size\fP);
+.ta \w'CMSession DtCMStartSession('u
+CMSession DtCMStartSession(CMEnv *\f2error\fP);
+.yE
+.SH "SEE ALSO"
+.Fn DtCMGetBodyPart 3.

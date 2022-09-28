@@ -1,0 +1,160 @@
+This file describes the usage of macros in the "common source format"
+that is converted by the dt2man script to man page format, or dt2xo
+to X/Open format.
+
+Functions:
+
+	Italics() in X/Open, Bold with () or (vol) in Man.  Second
+	argument can be omitted; it is used for a volume number and/or
+	punctuation.
+
+		.Fn tt_open ;	(no volume number for same-page usage)
+		.Fn open 2
+		.Fn malloc 3c,
+
+Utilities:
+
+	(Don't call them "commands.")
+	Italics in X/Open, Bold with optional (vol) in Man.  Same
+	second argument as in .Fn.
+
+		.Cm ttsession ;	(no volume number for same-page usage)
+		.Cm stty 1M
+		.Cm grep 1,
+
+Headers:
+
+	<Bold> in X/Open, <bold> with optional (vol) in Man.
+	Same syntax as .Fn.  Do not code the <> brackets.
+
+		.Hd sys/types.h .
+		.Hd Bento/DtBento.h 5.
+
+Constants (all-cap symbols other than environment variables):
+
+	Roman in X/Open, Bold in Man.
+
+		.Cn O_CREAT
+		.Cn SEEK_CUR ),
+		.Lc NULL	[.VL list version]
+
+Environment Variables:
+
+	Italics, all caps in both versions.  Do not prefix with a '$'
+	in regular text (only shell script examples).
+
+		.I SHELL
+		.IR LC_MESSAGES ,
+		.LI \f2LANG\fP	[.VL list version]
+
+X Resources:
+
+	Bold in both versions.
+
+Pathnames:
+
+	Bold in both versions.
+
+		.B /etc/passwd
+		.BR \&.profile ,	[note \& to protect leading dot]
+		.LI \f3/tmp\fP		[.VL list version]
+
+Utility Options in Synopsis:
+
+	Courier in X/Open, bold in Man.  Option-arguments are
+	CourierOblique and italics, respectively.  Use \- for minus.
+	List single letters first in a group.  Code as follows and the
+	conversion scripts do the rest:
+
+		.yS
+		ttsession
+		[\-spStvhN]
+		[\-E|\-X]
+		[\-a\ \f2level\fP]
+		[\-d\ \f2display\fP]
+		[\-c\ [\f2command\fP]]
+		.yE
+
+Utility Options in Text:
+
+	Bold in both versions.  Use \- for minus.
+
+		.B \-x
+		.BR \-y ;
+		.BI \-f " makefile"	[note space]
+		\f3\(mif\ \fP\f2makefile\fP	[version of previous if
+				you're breaking across two lines]
+		.LI \f3\-a\0\f2level\f1	[.VL version; note usage of \0 as
+				an internal space and the return to font 1]
+
+Variable Lists:
+
+	.VL 12
+	.LI foo
+	text text text
+	.LI averylongtagneedsabreak
+	.br
+	text text text
+	.Lc R_OK
+	text text text
+	.LE
+
+Bulleted Lists:
+
+	.VL 3
+	.LI \(bu
+	text text text
+	.LI \(bu
+	text text text
+	.LE
+
+Conditional Text:
+
+	.xos
+	Lines between .xos and .xoe [start/end] will
+	appear only in the X/Open version.
+	.xoe
+
+	.xo This single line [less the ".xo "] will also be only in X/Open.
+
+	.cdes
+	Lines between .cdes and .cdee will
+	appear only in the manpage version.
+	.cdee
+
+	.cde This single line [less the ".cde "] will also be man-only.
+
+	Also available for vendor-specific uses:
+
+		.hps/.hpe, .hp
+		.ibms/.ibme, .ibm
+		.suns/.sune, .sun
+		.usls/.usle, .usl
+
+General Style:
+
+	Always spell out standard input, output, and error.
+
+	Never use "print" unless you are describing literal printing
+	operations; use "write to standard output [error]."
+
+	Be careful not to say "character" when you mean "byte."
+
+	Never change the case of a symbol such as a function name.
+	If it starts lowercase, you cannot start a sentence with it.
+
+	Do not use the second person form of address or imperatives
+	when referring to the reader or application.
+
+	Avoid passive voice.
+
+	Do not use the names "CDE" or "Common Desktop Environment"
+	directly because X/Open may have a different name for it.
+	Use "Cde" (upper/lowercase as shown) and the script will
+	substitute appropriately.
+
+	Do not use Latin abbreviations:
+
+		e.g. --> for example
+		i.e. --> in other words
+		etc. --> and so forth

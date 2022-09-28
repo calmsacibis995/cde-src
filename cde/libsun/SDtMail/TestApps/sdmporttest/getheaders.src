@@ -1,0 +1,47 @@
+/* @(#)getheaders.src	1.2 97/04/29 SMI */
+
+token create token1
+#include "setup.src"
+token set token1 serviceoption messagestorename /tmp/test.mbx
+
+! /usr/bin/rm -f /tmp/test.mbx /tmp/.test.mbx_* /tmp/.test.mbx_dt_index
+! /usr/bin/cp test2.mbx /tmp/test.mbx
+! /usr/bin/chmod 660 /tmp/test.mbx
+
+/**/# Create, startup and open a data port
+port create port1
+port startup port1
+port open port1 token1
+
+
+/**/# These first 3 requests should be satisfied entirely from SHORTINFO
+port getheaders port1 10:12 -A pmessagefrom psenderpersonalinfo pmessagesize pmessagetype psubject preceiveddate
+port getheaders port1 3 -A psubject
+port getheaders port1 5:8 -a preceiveddate psenderpersonalinfo psubject
+
+/**/# Now test the "indirect" headers
+port getheaders port1 100:109 -a psender pto
+port getheaders port1 110:119 -A psender pto
+
+/**/# Test the real (non-pseudo) headers
+port getheaders port1 3
+port getheaders port1 3 Subject To From
+port getheaders port1 3 Bookem-Danno
+port getheaders port1 5 Subject Bookem To From
+port getheaders port1 70,71,72,73,74,75 subject
+
+/**/# Test various combinations
+port getheaders port1 80:84 -a rfrom pto pmessagesize pmessagetype
+port getheaders port1 2:3 -a rfrom rto rsubject
+port getheaders port1 6:8 -A rfrom pto psender rsubject
+port getheaders port1 8 -A rfrom psender rdate
+
+/**/# A sender should be available for every message
+port getheaders port1 * -A psender
+
+/**/# Close the port and exit
+port close port1
+port shutdown port1
+port delete port1
+
+quit

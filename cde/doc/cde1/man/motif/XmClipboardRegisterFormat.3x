@@ -1,0 +1,83 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Novell, Inc
+...\" **
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1988 by Massachusetts Institute of Technology
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH XmClipboardRegisterFormat 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmClipboardRegisterFormat\fP \- A clipboard function that registers a new format
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/Xm.h>
+\&#include <Xm/CutPaste.h>
+.sp \n(PDu
+int \fIXmClipboardRegisterFormat\fI (\fBdisplay, format_name, format_length\fI)
+.ta .5i 1.75i
+.nf
+	Display	\fB* display\fI;
+	char	\fB* format_name\fI;
+	int	\fBformat_length\fI;
+.wH
+.fi
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+\fIXmClipboardRegisterFormat\fP
+registers a new format.  Each format stored on the
+clipboard should have a length associated with it;
+this length must be known to the clipboard
+routines.
+Formats are known as targets in the \fBInter-Client Communication Conventions Manual\fP
+(ICCCM).
+All of the formats specified by the ICCCM conventions are
+preregistered.  Any other format that the application wants to use must
+either be 8-bit
+data or be registered via this routine.  Failure to
+register the length of the data results in incompatible applications across
+platforms having different byte-swapping orders.
+.nL
+.ne 9
+.IP "\fBdisplay\fP"
+Specifies a pointer to the \fIDisplay\fP structure that was returned in a
+previous call to \fIXOpenDisplay\fP or \fIXtDisplay\fP.
+.IP "\fBformat_name\fP"
+Specifies the string name for the new format (target).
+.IP "\fBformat_length\fP"
+Specifies the format length in bits (8, 16, or 32).
+.SH RETURN VALUE
+.IP "\fIClipboardBadFormat\fP"
+The \fBformat_name\fP must not be NULL, and the \fBformat_length\fP
+must be 8, 16, or 32.
+.IP "\fIClipboardSuccess\fP"
+The function is successful.
+.IP "\fIClipboardLocked\fP"
+The function failed because the clipboard was locked by another
+application.  The application can continue to call the function again with
+the same parameters until the lock goes away.  This gives the application
+the opportunity to ask if the user wants to keep trying or to give up
+on the operation.
+.IP "\fIClipboardFail\fP"
+The function failed because the format was already registered with this
+length.
+.SH RELATED INFORMATION
+.na
+\fIXmClipboardStartCopy(3X)\fP.
+.ad

@@ -1,0 +1,85 @@
+.TH Get_Locale 4 "13 May 1994"
+.SH NAME
+Get_Locale request \- get a tool's locale
+.SH SYNOPSIS
+.yS
+.ta \w@Get_Locale(@u
+Get_Locale(in string \f2category\fP,
+	out string \f2locale\fP
+	[...]);
+.yE
+.SH DESCRIPTION
+The
+.I Get_Locale
+request
+reports the
+.xo XPG4
+.cde POSIX
+locale of the indicated locale categories.
+.P
+The
+.I category
+argument
+is the locale category to get.
+A locale category is a
+group of data types whose output formatting varies according to
+locale in a similar way.
+ISO C and \*(XX locale categories are:
+.Cs I
+LC_ALL
+LC_COLLATE
+LC_CTYPE
+LC_MESSAGES
+LC_MONETARY
+LC_NUMERIC
+LC_TIME
+.Ce
+.P
+The
+.I locale
+argument
+is the name of the current locale of the indicated category.
+The value of
+.I locale
+is implementation-defined.
+.suns
+For example, Solaris defines such locales as
+.BR C ,
+.BR de ,
+.BR fr ,
+.BR it ,
+etc.
+.sune
+.SH ERRORS
+The ToolTalk service may return the following error
+in processing the
+.I Get_Locale
+request:
+.VL 6
+.Lc TT_DESKTOP_EINVAL
+.br
+The
+.I locale
+argument is not valid on the handler's host.
+.LE
+.SH "APPLICATION USAGE"
+The
+.Fn ttdt_session_join 3,
+function can be used to register for,
+and transparently process, the
+.I Get_Locale
+request.
+.P
+Also,
+.I Get_Locale
+can be sent by
+.Fn ttdt_sender_imprint_on 3,
+with the reply being handled transparently.
+.SH "SEE ALSO"
+.Fn setlocale 3C
+.xo in the \*(Zk,
+.sun .I Solaris 2.3 Developer's Guide to Internationalization,
+.Fn ttdt_sender_imprint_on 3,
+.Fn ttdt_session_join 3;
+.I Set_Locale
+request.

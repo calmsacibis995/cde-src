@@ -1,0 +1,511 @@
+-*- mode:outline; minor-mode:outl-mouse -*-
+
+Need to figure out the answers to the following questions:
+
+* How and when are mailboxes saved?
+
+The c-client library doesn't provide any kind of "auto-save" facility.
+However, the mail_check function, in addition to checking for new messages,
+will also save to disk any changes in mailbox state.
+
+The following discusses the underlying mail_check implementation in the
+solaris driver:
+
+void solaris_check (MAILSTREAM *stream)
+
+The good news, from a performance standpoint, is that only the first dirty
+message and forward are actually written to disk.
+
+solaris_check calls solaris_parse with the `write_dirty' argument set to
+True.
+
+solaris_parse opens and locks the mailbox, and then checks whether the
+mailbox has changed size since the previous check. 
+
+If any new messages are present or the mailbox is dirty (and the write_dirty
+arg is True), it rewrites the *tail* of the mailbox, updating the flags.
+
+This is done by calling solaris_extend to extend the mailbox size, and then
+solaris_save_msgs to write the messages.
+
+solaris_extend grows the mailbox by allocating a char buffer for the `n'
+additional bytes, filling it with 0's, seeking to the end of the mailbox,
+and writing the buffer to enlarge the file.
+
+solaris_save_msgs starts at the `seek_offset' for the "minimum dirty
+message" and writes all messages from this one to the end.  The individual
+messages are written by a call to solaris_write_message.
+
+[NOTE: The code in solaris_save_msgs looks like it will loop indefinitely on
+a persistent write error (it just continues retrying).  The program will
+hang and the mailbox will be left in an inconsistent state.]
+
+solaris_write_message builds an array of iovec structs which contain the
+headers, status, body and final newline; these data are written using
+writev(2).
+
+When all required messages have been written, the dirty bit for the stream
+is cleared and the min_dirty_msgno is set to nmsgs+1.  Also, the new
+filesize and filetime are recorded in the stream's LOCAL struct.
+
+Next, the main program is notified (by calling its mm_exists function) that
+`n' messages now exist in the mailbox; the new number of messages is
+recorded in the stream and the count of new messages is added to the
+stream's `recent' count.
+
+Finally, solaris_parse returns, and solaris_check unlocks and closes the
+mailbox.
+
+mail_check may write an entire mailbox by calling solaris_save, but I'm not
+sure under what circumstances this occurs.
+
+
+* How is a mailbox read into memory and parsed?
+
+MAILSTREAM *mail_open (MAILSTREAM *stream,char *name,long options)
+
+Calls mail_valid to find a driver that understands the given mailbox name.
+The driver then determines actual validity.  In the case of the solaris
+driver, this is based on the existence of a "From " header on the first line
+of the file.  A pointer to the driver is returned.
+
+Note: When a mailbox is opened, any messages that use Sun V3 format
+(Content-Type: X-sun-attachment) are internally translated to mime.  If the
+mailbox is opened with the flag OP_KEEP_MIME, these messages are written
+back to the mailbox in mime format instead of V3.
+
+Allocates storage for a MAILSTREAM and initializes its fields.
+
+Calls the driver's open method.
+
+For the solaris driver:
+
+solaris_open
+
+Allocates storage for the stream's LOCAL struct and initializes its fields.
+
+Opens a mailbox lock file for writing (eg. /tmp/.0.17128)
+
+The lock filename is comprised of a device id and an inode, to uniquely
+identify the file (I presume this is the one shared exclusively by imapds).
+
+Calls flock(fd, LOCK_EX|LOCK_NB) on this mailbox lock file.
+(NOTE: flock is #define'd to sol_flock which uses lockf - see flock_sv5.c)
+
+If the flock fails, reads the PID of the locking process from the file and
+send it the KOD (Kiss Of Death) == SIGUSR2 and retries.
+
+Next, checks that we have write access to the mailbox itself.  If not, then
+the lock file is removed, and stream->ld is set to 0.
+
+Calls solaris_parse to read and parse the mailbox.  NIL is passed for the
+`write_dirty' argument, to avoid a needless rewrite of the mailbox.
+
+Calls mail_lock, which simply checks that stream->lock is not already set,
+and then sets it to T.  This is to detect recursion.
+
+Next calls solaris_lock with LOCK_SH (shared) as the locking op.
+
+solaris_lock tries to open "mailbox.lock" with O_WRONLY|O_CREAT|O_EXCL.
+This will fail if the file already exists.  In this case, the lock file may
+still be opened (without O_EXCL) if the lock file is "old".
+
+It seems that situations may arise where the lock file cannot be opened, and
+the code just generates a warning and continues.
+	mm_log (tmp,WARN);	/* this is probably not good */
+
+Should this condition cause a more serious error to be raised, instead of
+just continuing?
+
+Next, the mailbox file itself is opened and then locked using lockf (the
+code is written flock, but this is _really_ is defined to be lockf).  The
+entire length of the file is locked.  The file descriptor for the mailbox is
+returned.
+
+To summarize, there are three locks that are checked during a mailbox open:
+
+1. The long-term lock (eg. /tmp/0.1712f) to prevent contention between
+   multiple imapd's is locked using lockf.
+2. The <mailbox>.lock file is opened using O_EXCL.
+3. The <mailbox> file is opened and locked with lockf.
+
+
+Allocates block of size 32K+1 - this seems a little strange.
+Reads file in chunks of 32K, and parses the messages in each chunk by
+calling solaris_eom (18 arguments!).
+
+mallocs FILECACHE space for message (uses linked list of these).  Populates
+FILECACHE with message information and then copies message data into
+internal buffer.
+
+After all messages have been read:
+mallocs a cache of (nmsgs+100) pointers (void*) and assign it to
+stream->cache.c
+Initializes each entry to NULL.
+
+mallocs space for cachesize (nmsgs+100) pointers to FILECACHE and assigns
+them to LOCAL->msgs.
+
+Next parses the headers for all messages.  Looks for a "Status:" header and
+marks the message as read, deleted, etc.
+
+Unlocks flock(lockf) the mailbox.lock file, closes the fd and unlinks the
+file.
+
+Returns the stream.
+
+
+* How is the data returned from the mail_fetch_ functions?
+
+Unix mailboxes contain data with lines terminated by '\n' (ASCII 10 == LF),
+and this data is normally maintained in the c-client as-is.  However, the
+various mail_fetch functions return text in RFC822 format, which specifies
+that textual data is returned with lines terminated by CRLF pairs.
+
+Consequently, in the solaris driver, each of the fetch functions reformats
+text on the fly to contain CRLF pairs.  The data is returned in a
+heap-allocated temporary buffer, the contents of which will change between
+mail_fetch calls.  The onus is on the caller to make copies as required.
+
+Detail: Each of the fetch functions ultimately calls strcrlfcpy (sometimes
+via rfc822_contents, sometimes not) which copies text from a source location
+to a destination (the temp buffer), translating LF to CRLF, and expanding
+the destination storage as necessary (using free and malloc).
+
+
+* What's the difference between mail_fetchbody and mail_fetchbody_full?
+
+#define mail_fetchbody(stream,msgno,section,len) \
+  mail_fetchbody_full (stream,msgno,section,len,NIL)
+
+This final parameter specifies flags.  It appears that FT_UID may be passed
+to specify a UID instead of a message number.  Also, the flags are passed
+down to solaris_fetchheader.
+
+* What *is* the API and how is it used?
+
+A document describing the c-client API is currently under construction by
+Mark Crispin at the University of Washington.  I will therefore not
+duplicate that effort by documenting the whole API myself, but will instead
+concentrate on understanding the salient c-client features outlined in the
+rest of this document.
+
+* Locking
+
+** How does the current locking scheme work?
+
+To summarize, there are three locks that are obtained during a mailbox open:
+
+1. The long-term lock (eg. /tmp/0.1712f) to prevent contention between
+   multiple imapd's is locked using lockf.
+2. The <mailbox>.lock file is opened using the O_EXCL|O_CREAT flags.
+3. The <mailbox> file is opened and locked with lockf.
+
+Lock 1) is a long term lock held the whole time the mailbox is open.  It is
+only relinquished when the mailbox is closed (solaris_abort unlocks the
+file, closes it and unlinks it).
+
+Locks 2) and 3) are short-term locks held only while the mailbox file is
+actually being accessed.  They are only acquired in the following functions,
+by a call to solaris_lock:
+
+solaris_rename
+solaris_append
+solaris_parse
+solaris_copy_messages
+
+Each of the above functions relinquishes the short term locks before
+returning, by a call to solaris_unlock.
+
+Refer to the discussion above on how mailboxes are opened for further
+details on exactly when these locks are obtained during mailbox open.
+
+** How can we modify the existing locking scheme such that we can
+   incorporate network aware tooltalk locking?
+
+[ We need a hook (callback?) at step 1 above, which will allow us to perform
+  our long-term tooltalk locking. ]
+
+Not necessarily - we can simply perform our tooltalk locking prior to
+calling into the c-client to open the mailbox.
+
+* Charset conversion
+
+** How is charset conversion currently done?
+
+None is currently done by either the c-client or by roam.
+
+** How can we modify the existing charset conversion scheme such that we can
+   incorporate iconv conversion?
+
+I would guess we need to fetch the Content-Type header and parse out any
+charset parameter ourself.  Then, we need to call the appropriate iconv
+routines before handing the text over to Motif for display.
+
+Content-Type: text/plain; charset=ISO-8859-1
+
+
+* What is "disconnected operation" and how does it work?
+
+** Overview
+
+Here is a description of how it seems to work in roam 3.0 :
+
+The first time roam is invoked, it prompts the user for a mail server name.
+
+A connection is made to the given server and the user is prompted for
+username and password.
+
+Once the login succeeds, the user is considered "connected", and roam
+fetches (SHORTINFO IMAP request) the last 75 (25 for "slow" net) messages in
+the mailbox and displays some of these in its Motif listbox.
+
+Earlier messages will only be fetched on demand, as the user scrolls back
+through the listbox.
+
+As the user interacts with the mailbox by scrolling to earlier messages and
+viewing messages and attachments, all the retrieved headers and body parts
+are stored in an in-memory cache.  Messages that have been viewed (and are
+thus also in the cache) are displayed in a bolder font.  This allows the
+user to see which messages will be available after disconnection...
+
+At any time the user can select a menu option to "disconnect" from the
+session.  The network connection is severed, and the cache is written out to
+disk.  The user may now unplug the ethernet and take off on flight BA286 to
+London Heathrow. ;)
+
+Once disconnected, the user can view any messages which exist in the cache,
+delete messages based on headers that exist in the cache, and compose
+messages, which are stored in a local "outbox" for later delivery.  Note
+that although a message may be marked as available (bold font), only the
+body parts which are in cache (also previously viewed) will be available.
+
+A separate file is used to maintain the list of deleted messages, etc, so
+that this information can be "played back" once the user reconnects to the
+mail server.
+
+The user may now either reconnect to the mail server to reconcile any
+changes made to the mailbox state, or the user can quit roam, in which case,
+the cache is (by default) saved out to disk.
+
+When roam is next invoked, it notices the existence of a cache, and is able
+to quickly restore the mailbox state from the local cache, i.e. when a cache
+is available, roam starts up in "disconnected" mode.
+
+The user may choose to reconnect at any time, and will be prompted for
+username/password if they haven't already been provided in this session.
+Once the login succeeds, any pending state changes are played back to the
+IMAP server.
+
+However, the local cache still exists, and will gradually grow over time, as
+the user interacts with more of the mailbox.
+
+
+To summarize:
+
+  The cache is constructed while connected to the mail server; it contains
+  all the headers and body parts that the user has "seen".  Only items that
+  exist in the cache will be available once the user disconnects.  The cache
+  is written to disk when the user disconnects, when the user exits roam,
+  and when the user explicitly saves the cache from a menu option.
+
+  When disconnected, the cache essentially becomes the "contents" of the
+  mailbox.  In addition, a separate side file is used to record the user's
+  operations on the mailbox.  This file is used to "play back" these
+  operations when the user eventually reconnects.
+
+
+** How does "disconnected operation" work in the c-client?
+
+mail_disconnect
+
+Calls the driver's disconnect method.  The solaris and bezerk drivers use
+`dummy_disconnect' which just immediately returns.  Disconnect is only
+"functional" when connected to the imap driver.
+
+It first calls imap_checksum which, for IMAP4, calls imap_status to send a
+STATUS request to the server.  This should result in an untagged STATUS
+response, eg.:
+ * STATUS /var/mail/jsc (CHECKSUM 10154913943 UID-VALIDITY 820698472 UID-NEXT 260)
+
+.. which is handled by imap_parse_unsolicited.  Various fields in the stream
+structure are updated accordingly and the mm_status callback is invoked.
+
+The list of UIDs is saved in stream->sync_uidseq - this is later used for
+synchronization.
+
+The LOGOUT request is sent to the server and then the tcp stream is closed.
+
+Some fields in the stream structure are saved, and then the LOCAL struct is
+freed.
+
+mail_enable_recording
+
+Turns off the DR_DISABLE bit for the record driver.
+Stores the provided subdir in the record_subdir (file static) variable -
+this will likely be a threading issue.
+
+NOTE: mail_enable_recording is typically followed by a call to re-open the
+stream in RECORD mode, eg.:
+      mail_open(stream, stream->mailbox, ovflags + OP_RECORDING);
+
+The above call to mail_open will reset the stream->dtb to point to the
+record driver.  It also resets various stream fields and then calls the
+driver's open method.
+
+The record driver's open method generates a temporary file to hold the
+recording information, eg:
+ "/space/jsc/.roam/.imap4_recording.#grimsby#"
+
+.. and allocates a new LOCAL struct, and sets stream->record to T and
+returns stream.
+
+
+mail_disable_recording
+
+Switches off the DR_DISABLE bit for the imap4 driver and switches on the
+DR_DISABLE bit for the record driver.
+
+
+mail_playback
+
+Opens the recording file for reading and verifies the first line is
+IMAP4C-CLIENT:IMAP4RECORD
+
+Reads the checksum and UIDVALIDITY from the record file.
+
+Calls replay_imap4recording.  If the UIDVALIDITY is different, an error is
+returned.  Otherwise the recorded msg numbers are converted to UIDs using
+the current cache and the recorded commands are read from the file and
+stored in a linked list.  Next, if the checksum is different, the cache is
+synchronized from the server.  This uses `UID FETCH <uidsequence> UID' to
+obtain the new list of msgnumbers and reshuffle the current cache to match.
+The flags are refetched for any messages that previously existed in the
+cache.  If the resync succeeds, the recorded commands are played back to the
+server.  (The server ignores commands for UIDs that no longer exist).
+
+
+mail_cache_to_disk
+
+Before operating on the cache, roam seems to always call this:
+mail_parameters(NIL, SET_SAVECACHEPATH, (void *)ROAMSUBDIR);  
+
+savecachepath is file static - this will likely need to be fixed for multi
+threaded support.
+
+When the cache needs to be saved while connected to a mailserver, it appears
+necessary to bracket the call to mail_cache_to_disk with the following:
+
+mail_set_disconnected_state
+mail_cache_to_disk
+mail_clear_disconnected_state
+
+These functions respectively set and clear some state that is normally
+associated with a disconnected session, eg:
+
+    stream->sync_uidseq = mail_seq_to_uidseq(stream, tmp, T);
+    stream->checkpointed = T;
+    stream->cached_nmsgs = stream->nmsgs;
+    stream->imap4_recording_session = mail_imap4support(stream);
+
+mail_restore_cache
+
+int mail_cached_filename(char *name,char *buf)
+
+Supposedly returns T if a cache file name (aka "checkpointed" file name) can
+be constructed from `name' and copied into buf.  In reality, it fails to do
+any checking, would only return NIL if buf is NIL but in this case would
+likely dump core.
+
+
+** Other c-client functions called by roam:
+
+mail_open
+mail_parameters
+mail_imap4support
+mail_check
+mail_set1flag_full
+mail_clear1flag_full
+mail_fetchbody_full
+mail_fetchtext_full
+mail_fetchheader_full
+mail_fetchshort_full
+mail_fetchstructure_full
+mail_fetchsubject
+mail_newenvelope
+mail_debug
+mail_nodebug
+
+
+* How does searching work?
+
+The c-client provides 2 calls for searching :
+
+void mail_simple_search (MAILSTREAM *stream, char *criteria, char *charset,
+			 long flags)
+
+void mail_search_full (MAILSTREAM *stream,char *charset,SEARCHPGM *pgm,
+		       long flags)
+
+The criteria argument to mail_simple_search is a list of attributes to
+include in the search.  For example, the following search may be executed in
+the mtest program with the "0" command:
+
+  FROM jsc SUBJECT compiler UNDELETED SEEN
+
+
+* Miscellaneous
+
+** Is the c-client compatible with RFC1341, RFC1521 or both?
+
+** How will the proposed new flags mechanism for dealing with CRLF work?
+
+** Where is the latest roam source.
+
+/net/roam/ws1/roam.dynamic/roam.dev/src-imap4
+
+** Where is the interpretation of Status and X-Status defined?
+
+Status is used by `mail' and `mailx' - it uses "R" and "O" for "Read" and
+"Old".
+
+X-Status is a c-client addition.
+
+** Why do we keep the V3 => MIME translation, even when not saving MIME?
+
+The IMAP protocol only talks MIME - the MIME translation is kept so we have
+the MIME information available to transmit over the wire.
+
+** What does it mean for a stream to be "silent"?
+
+When a stream is in a "silent" state, it doesn't receive (certain?) replies.
+Such streams are sometimes called "half-open", and are used, for example,
+when listing mailboxes.
+
+** How can I manually send IMAP commands to an IMAP server?
+
+telnet <server> <port>
+
+eg. telnet grimsby 143
+
+1 LOGIN jsc password
+2 SELECT INBOX
+3 FETCH 5 RFC822.HEADER
+4 FETCH 5 RFC822.BODY[1]
+
+
+** Why does FETCH SHORTINFO not include the UID when using telnet?
+
+The imapd only returns the UID with the SHORTINFO if it knows the client is
+the imap4 sun version.  The following command informs the server that this
+client supports the sunversion:
+
+3 IMAP4SUNVERSION
+4 FETCH 4 SHORTINFO
+ * 4 FETCH (SHORTINFO ("28-Nov-1995 11:29:47 -0800" (("Carl S. Gutekunst" NIL "csg" "clavinova.Eng.Sun.COM")) "Re: Eng Domain DNS server upgrades " "MULTIPART" "2209") FLAGS (\Seen \Flagged) UID 15)
+3 OK FETCH completed
+
+Now the returned SHORTINFO includes the UID.
+
+This happens automatically in the mtest program because it calls mail_open,
+and the imap driver sends the imap4sunversion command.

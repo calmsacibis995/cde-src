@@ -1,0 +1,115 @@
+.de LI
+.\" simulate -mm .LIs by turning them into .TPs
+.TP \\n()Jn
+\\$1
+..
+.de Lc
+.\" version of .LI that emboldens its argument
+.TP \\n()Jn
+\s-1\f3\\$1\f1\s+1
+..
+.TH tt_objid_equal 3 "1 March 1996" "ToolTalk 1.3" "ToolTalk Functions"
+.BH "1 March 1996"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.IX "tt_objid_equal" "" "tt_objid_equal(3)" ""
+.SH NAME
+tt_objid_equal \- test whether two objids are equal
+.SH SYNOPSIS
+.ft 3
+.nf
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'int tt_objid_equal('u
+int tt_objid_equal(const char *\f2objid1\fP,
+	const char *\f2objid2\fP);
+.PP
+.fi
+.SH DESCRIPTION
+The
+.BR tt_objid_equal (\|)
+function
+tests whether two
+objids
+are equal.
+.PP
+The
+.BR tt_objid_equal (3)
+function is recommended rather than
+.BR strcmp (3)
+for this purpose because the
+.BR tt_objid_equal (3)
+function returns 1 even in the
+case where one
+objid
+is a forwarding pointer for the other.
+.PP
+The
+.I objid1
+argument is the identifier of the first object involved in this operation.
+The
+.I objid2
+argument is the identifier of the second object involved in this operation.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.BR tt_objid_equal (\|)
+function returns an integer that indicates whether the
+objids
+are equal.
+The application can use
+.BR tt_int_error (3)
+to extract one of the following
+.B Tt_status
+values from the returned integer:
+.PP
+.RS 3
+.nr )J 4
+.LI 0
+The
+.I objid1
+and
+.I objid2
+objects are not equal.
+.LI 1
+The
+.I objid1
+and
+.I objid2
+objects are equal.
+.PP
+.RE
+.nr )J 0
+.PP
+The application can use
+.BR tt_int_error (3)
+to determine if the integer is valid.
+The
+.BR tt_objid_equal (\|)
+function returns one of the following
+.B Tt_status
+values:
+.PP
+.RS 3
+.nr )J 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_NOMP
+.br
+The
+.BR ttsession (1)
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_OBJID
+.br
+The
+objid
+passed to the ToolTalk service does not reference an existing object spec.
+.PP
+.RE
+.nr )J 0
+.SH "SEE ALSO"
+.na
+.BR tt_c (5),
+.BR tt_int_error (3).

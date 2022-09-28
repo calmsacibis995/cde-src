@@ -1,0 +1,65 @@
+.TH tt_message_receive 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+tt_message_receive \- receive a message
+.SH SYNOPSIS
+.yS
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'Tt_message tt_message_receive('u
+Tt_message tt_message_receive(void);
+.yE
+.SH DESCRIPTION
+The
+.Fn tt_message_receive
+function returns a handle for the next message queued to be delivered
+to the process and also runs any message or pattern callbacks
+applicable to the queued message.
+.P
+If the return value of
+.Fn tt_message_status 3
+for this message is
+.Cn TT_WRN_START_MESSAGE ,
+the ToolTalk service started the process to deliver the queued message;
+the process must reply to this message.
+If the return value of
+.Fn tt_message_receive
+is zero, no message is available.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn tt_message_receive
+function returns the handle for the message object.
+The application can use
+.Fn tt_ptr_error 3
+to extract one of the following
+.B Tt_status
+values from the returned handle:
+.VL 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_NOMP
+.br
+The
+.Cm ttsession 1
+process is not running and the ToolTalk service cannot restart it.
+.LE
+.SH "APPLICATION USAGE"
+A zero value can occur if a message or pattern callback processes the message.
+It can also occur if the interval is too long between the time the file
+descriptor became active and the
+.Fn tt_message_receive
+call was made.
+In the latter case, the ToolTalk service will time out and offer the message to
+another process.
+.P
+The application should use
+.Fn tt_free 3
+to free any data stored in the address returned by the
+ToolTalk API.
+.SH "SEE ALSO"
+.Hd Tt/tt_c.h 5,
+.Fn tt_ptr_error 3,
+.Fn tt_free 3.

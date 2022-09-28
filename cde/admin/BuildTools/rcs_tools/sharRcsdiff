@@ -1,0 +1,172 @@
+# old #!/bin/sh
+# V.4 #!/usr/bin/sh
+# Script to make diffs of source against an RCS vault and 
+# package them in a shar file.
+#
+# This script can be used to package fixes to the CDE SI that
+# will be put in CMVC as remarks.
+#
+# $Revision: 1.1 $
+
+usage()
+{
+  echo "usage: $prgname [-cn] [-rrev] fixId file1 [file2 ...]";
+  echo "-c: number of lines of context (default is 8)";
+  echo "-r: revision number (default is latest)";
+  echo "-q: quiet (no messages)";
+  echo "-v: verbose messages";
+  echo "fixId: used in the name of the shar file";
+  echo "       The defect number makes a good fixId.";
+  echo "file: files associated with the fix.  If a file";
+  echo "      has a RCS vault, [Rr]csdiff is used to get a";
+  echo "      context diff.  Other files are included in the";
+  echo "      shar file in entirety.";
+  echo
+  echo "The context diffs of all the files are placed";
+  echo "in a shar(1) file named fix-<fixId>.shar.";
+  echo "When un-shar'd, the files are put in a subdirectory";
+  echo "named fix-<fixId>.dir."
+
+  exit 1;
+}
+
+cleanup()
+{
+  rm -rf $fixdir
+}
+
+#debugging
+#set -x  # turn on for debugging
+
+#init
+copt=-c8       # default num of context lines
+ropt=""        # default revision (latest)
+prgname=$0
+diffpgm="Rcsdiff";       # default to Rcsdiff
+if [ -z `whence $diffpgm` ]
+then
+  diffpgm="rcsdiff";     # use rcsdiff as backup
+  echo "Can't find Rcsdiff, using rcsdiff instead."
+fi
+errout=1
+statpgm="Rcs";       # default to Rcs
+if [ -z `whence $statpgm` ]
+then
+  errout=2
+  statpgm="rcs";     # use rcs as backup
+  echo "Can't find Rcsstat, using rcsstat instead."
+fi
+
+#options
+for arg in $*
+do
+  case "$arg" in
+    -r* )
+      ropt="$ropt $1"
+      ;;
+    -c* )
+      copt="$1"
+      ;;
+    -q* )
+      quiet=t
+      ;;
+    -v* )
+      verbose=t
+      ;;
+    -* )
+      usage
+      ;;
+    * )
+      break
+      ;;
+  esac
+  shift
+done
+
+if [ $# -lt 2 ]
+then
+  usage
+fi
+
+#setup
+typeset -i cnt
+trap cleanup 1 2 3 4 5 6 7 8 10 12 13 14 15 16 17
+
+#special files/directories
+fixdir="fix-$1.dir"
+sharfile="fix-$1.shar"
+shift       # remove the fixId
+
+# avoid overwrite
+if [ -z "$verbose" -a -z "$quiet" ]
+then 
+  echo "$sharfile:"
+elif [ -n "$verbose" -a -z "$quiet" ]
+then
+  echo "#### $prgname: shar archive of [Rr]csdiffs placed in $sharfile ####"
+fi
+if [ -a "$sharfile" ]
+then
+  echo "$sharfile already exists.  Exiting."
+  exit 1
+fi
+
+if [ -n "$verbose" ]
+then 
+   echo "$prgname: diffs stored temporarily in $fixdir"
+fi
+
+if [ -a "$fixdir" ]
+then
+  echo "$fixdir already exists.  Exiting."
+  exit 1
+fi
+
+
+# make a place for the diffs
+mkdir $fixdir
+
+# get the diffs and files
+for i in $*
+do
+   $diffpgm $copt $ropt $i > $fixdir/$i.df;
+   if [ $? -ne 0 ] ;
+   then 
+     # an error occurred
+     rm -f "$fixdir/$i.df" ;
+
+     # maybe because there's no RCS vault; use rcs to check
+     $statpgm $i $errout> /dev/null
+
+     if [ $? -ne 0 ] ;
+     then 
+       # an error occurred; there must be no RCS vault
+       # just take the whole file
+       cp $i "$fixdir/$i.df"
+       if [ -z "$quiet" -a -z "$verbose" ]
+       then
+          echo "	$i"
+       elif [ -n "$verbose" -a -z "$quiet" ]
+       then
+          echo "$i: took complete copy"
+       fi
+     fi ;
+   else
+     if [ -z "$quiet" -a -z "$verbose" ]
+     then
+        echo "	$i"
+     elif [ -n "$verbose" -a -z "$quiet" ]
+     then
+        echo "$i: took $diffpgm"
+     fi
+   fi ;
+done
+
+# package them
+#shar -bce $fixdir/*df > $sharfile
+shar -ce $fixdir > $sharfile
+
+# cleanup
+cleanup
+
+exit 0 ;

@@ -1,0 +1,525 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH VendorShell 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIVendorShell\fP \- The VendorShell widget class
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/Xm.h>
+\&#include <X11/Shell.h>
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+VendorShell is a Motif widget class used as a supporting superclass for
+all shell classes that are visible to the window manager and that are
+not override redirect.
+It contains resources that describe the MWM-specific look and feel.
+It also manages the MWM-specific communication needed by all VendorShell
+subclasses.
+See the \fImwm\fP(1X) man page for more information.
+.P
+If an application uses the \fIXmNmwmDecorations\fP,
+\fIXmNmwmFunctions\fP, or \fIXmNmwmInputMode\fP resource, it should
+include the file \fI<Xm/MwmUtil.h>\fP.
+.PP
+Setting \fIXmNheight\fP, \fIXmNwidth\fP, or \fIXmNborderWidth\fP for
+either a VendorShell or its managed child usually sets that resource to the
+same value in both the parent and the child.  When an off-the-spot input
+method exists, the height and width of the shell may be greater than
+those of the managed child in order to accommodate the input method.
+In this case setting \fIXmNheight\fP or \fIXmNwidth\fP for the 
+shell does not necessarily set that resource to the same value in 
+the managed child, and setting \fIXmNheight\fP or \fIXmNwidth\fP
+for the child does not necessarily set that resource to the same
+value in the shell.
+.PP 
+For the managed child of a VendorShell, regardless of the value
+of the shell's \fIXmNallowShellResize\fP, setting \fIXmNx\fP or
+\fIXmNy\fP sets the corresponding resource of the parent but does
+not change the child's position relative to the parent.
+\fIXtGetValues\fP for the child's \fIXmNx\fP or \fIXmNy\fP yields the
+value of the corresponding resource in the parent.
+The \fBx\fP and \fBy\fP coordinates of the child's upper left outside
+corner relative to the parent's upper left inside corner are both zero
+minus the value of \fIXmNborderWidth\fP.
+.PP 
+Note that the \fBInter-Client Communication Conventions Manual\fP allows
+a window manager to change or control the border width of a reparented
+top-level window.
+.SS "Classes"
+VendorShell inherits behavior and resources from \fICore\fP,
+\fIComposite\fP, \fIShell\fP, and
+\fIWMShell\fP classes.
+.PP
+The class pointer is \fIvendorShellWidgetClass\fP.
+.PP
+The class name is \fIVendorShell\fP.
+.SS "New Resources"
+The following table defines a set of widget resources used by the programmer
+to specify data.  The programmer can also set the resource values for the
+inherited classes to set attributes for this widget.  To reference a
+subresource by name or by class in a .Xdefaults file, remove the \fIXmN\fP or
+\fIXmC\fP prefix and use the remaining letters.  To specify one of the defined
+values for a subresource in a .Xdefaults file, remove the \fIXm\fP prefix and use
+the remaining letters (in either lowercase or uppercase, but include any
+underscores between words).
+The codes in the access column indicate if the given subresource can be
+set at creation time (C),
+set by using \fIXtSetValues\fP (S),
+retrieved by using \fIXtGetValues\fP (G), or is not applicable (N/A).
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+VendorShell Resource Set
+Name	Class	Type	Default	Access
+_
+XmNaudibleWarning	XmCAudibleWarning	unsigned char	XmBELL	CSG
+XmNbuttonFontList	XmCButtonFontList	XmFontList	dynamic	CSG
+XmNdefaultFontList	XmCDefaultFontList	XmFontList	dynamic	CG
+XmNdeleteResponse	XmCDeleteResponse	unsigned char	XmDESTROY	CSG
+XmNinputMethod	XmCInputMethod	String	NULL	CSG
+XmNkeyboardFocusPolicy	XmCKeyboardFocusPolicy	unsigned char	XmEXPLICIT	CSG
+XmNlabelFontList	XmCLabelFontList	XmFontList	dynamic	CSG
+XmNmwmDecorations	XmCMwmDecorations	int	-1	CSG
+XmNmwmFunctions	XmCMwmFunctions	int	-1	CSG
+XmNmwmInputMode	XmCMwmInputMode	int	-1	CSG
+XmNmwmMenu	XmCMwmMenu	String	NULL	CSG
+XmNpreeditType	XmCPreeditType	String	dynamic	CSG
+XmNshellUnitType	XmCShellUnitType	unsigned char	XmPIXELS	CSG
+XmNtextFontList	XmCTextFontList	XmFontList	dynamic	CSG
+XmNuseAsyncGeometry	XmCUseAsyncGeometry	Boolean	False	CSG
+.TE
+.KE
+.in
+.sp 1
+.IP "\fIXmNaudibleWarning\fP"
+Determines whether an action activates its associated audible cue.
+The possible values are: \fIXmBELL\fP and \fIXmNONE\fP.
+.IP "\fIXmNbuttonFontList\fP"
+Specifies the font list used for VendorShell's button descendants.
+If this value is NULL at initialization and if the value of
+\fIXmNdefaultFontList\fP is not NULL, \fIXmNbuttonFontList\fP
+is initialized to the value of \fIXmNdefaultFontList\fP.  If
+the value of \fIXmNdefaultFontList\fP is NULL, \fIXmNbuttonFontList\fP
+is initialized by looking up the parent hierarchy of the widget for 
+an ancestor that is a subclass of the XmBulletinBoard, VendorShell,
+or XmMenuShell widget class.  If such an ancestor is found,
+\fIXmNbuttonFontList\fP is initialized to the \fIXmNbuttonFontList\fP
+of the ancestor  widget.  If no such ancestor is found, the default
+is implementation dependent.
+.IP "\fIXmNdefaultFontList\fP"
+Specifies a default font list for VendorShell's descendants.
+This resource is obsolete and exists for compatibility with 
+earlier releases.  It has been replaced by \fIXmNbuttonFontList\fP,
+\fIXmNlabelFontList\fP, and \fIXmNtextFontList\fP.
+.IP "\fIXmNdeleteResponse\fP"
+Determines what action the shell takes in response to a
+\fIWM_DELETE_WINDOW\fP message.
+The setting can be one of three values: \fIXmDESTROY\fP, \fIXmUNMAP\fP,
+and \fIXmDO_NOTHING\fP.
+The resource is scanned, and the appropriate action is taken, after the
+\fIWM_DELETE_WINDOW\fP callback list (if any) that is registered with
+the Protocol manager has been called.
+.IP "\fIXmNinputMethod\fP"
+Specifies the string that sets the locale modifier for the input
+method.
+.IP "\fIXmNkeyboardFocusPolicy\fP"
+Determines allocation of keyboard focus within the widget hierarchy rooted
+at this shell.  The X keyboard focus must be directed to somewhere in the
+hierarchy for this client-side focus management to take effect.
+Possible values are \fIXmEXPLICIT\fP, specifying a click-to-type policy,
+and \fIXmPOINTER\fP, specifying a pointer-driven policy.
+.IP "\fIXmNlabelFontList\fP"
+Specifies the font list used for VendorShell's label descendants
+(Labels and LabelGadgets).  If this value is NULL at initialization
+and if the value of \fIXmNdefaultFontList\fP is not NULL,
+\fIXmNlabelFontList\fP is initialized to the value of
+\fIXmNdefaultFontList\fP.  If the value of \fIXmNdefaultFontList\fP is
+NULL, \fIXmNlabelFontList\fP is initialized by looking up the parent
+hierarchy of the widget for an ancestor that is a subclass of the
+XmBulletinBoard, VendorShell, or XmMenuShell widget class.  If such
+an ancestor is found, \fIXmNlabelFontList\fP is initialized to the
+\fIXmNlabelFontList\fP of the ancestor widget.  If no such ancestor
+is found, the default is implementation dependent.
+.IP "\fIXmNmwmDecorations\fP"
+Specifies the decoration flags (specific decorations to add or remove
+from the window manager frame) for the \fI_MOTIF_WM_HINTS\fP property.
+If any decoration flags are specified by the \fI_MOTIF_WM_HINTS\fP
+property, only decorations indicated by both that property and the MWM
+\fIclientDecoration\fP and \fItransientDecoration\fP resources are
+displayed.
+If no decoration flags are specified by the \fI_MOTIF_WM_HINTS\fP
+property, decorations indicated by the MWM \fIclientDecoration\fP and
+\fItransientDecoration\fP resources are displayed.
+The default for the \fIXmNmwmDecorations\fP resource is not to specify
+any decoration flags for the \fI_MOTIF_WM_HINTS\fP property.
+.P
+The value of this resource is the bitwise inclusive OR of one or more
+flag bits.
+Following are the possible flag bit constants, defined in the include
+file \fI<Xm/MwmUtil.h>\fP:
+.TP
+\(bu
+\fIMWM_DECOR_ALL\fP \- All decorations \*Eexcept\fP those specified by
+other flag bits that are set
+.TP
+\(bu
+\fIMWM_DECOR_BORDER\fP \- Client window border
+.TP
+\(bu
+\fIMWM_DECOR_RESIZEH\fP \- Resize frame handles
+.TP
+\(bu
+\fIMWM_DECOR_TITLE\fP \- Title bar
+.TP
+\(bu
+\fIMWM_DECOR_MENU\fP \- Window menu button
+.TP
+\(bu
+\fIMWM_DECOR_MINIMIZE\fP \- Minimize window button
+.TP
+\(bu
+\fIMWM_DECOR_MAXIMIZE\fP \- Maximize window button
+.IP "\fIXmNmwmFunctions\fP"
+Specifies the function flags (specific window manager functions to
+apply or not apply to the client window) for the \fI_MOTIF_WM_HINTS\fP
+property.
+If any function flags are specified by the \fI_MOTIF_WM_HINTS\fP
+property, only functions indicated by both that property and the MWM
+\fIclientFunctions\fP and \fItransientFunctions\fP resources are
+applied.
+If no function flags are specified by the \fI_MOTIF_WM_HINTS\fP
+property, functions indicated by the MWM \fIclientFunctions\fP and
+\fItransientFunctions\fP resources are applied.
+The default for the \fIXmNmwmFunctions\fP resource is not to specify any
+function flags for the \fI_MOTIF_WM_HINTS\fP property.
+.P
+The value of this resource is the bitwise inclusive OR of one or more
+flag bits.
+Following are the possible flag bit constants, defined in the include
+file \fI<Xm/MwmUtil.h>\fP:
+.TP
+\(bu
+\fIMWM_FUNC_ALL\fP \- All functions \*Eexcept\fP those specified by
+other flag bits that are set
+.TP
+\(bu
+\fIMWM_FUNC_RESIZE\fP \- \fIf.resize\fP
+.TP
+\(bu
+\fIMWM_FUNC_MOVE\fP \- \fIf.move\fP
+.TP
+\(bu
+\fIMWM_FUNC_MINIMIZE\fP \- \fIf.minimize\fP
+.TP
+\(bu
+\fIMWM_FUNC_MAXIMIZE\fP \- \fIf.maximize\fP
+.TP
+\(bu
+\fIMWM_FUNC_CLOSE\fP \- \fIf.kill\fP
+.IP "\fIXmNmwmInputMode\fP"
+Specifies the input mode flag (application modal or system modal input
+constraints) for the \fI_MOTIF_WM_HINTS\fP property.
+If no input mode flag is specified by the \fI_MOTIF_WM_HINTS\fP
+property, no input constraints are applied, and input goes to any
+window.
+The default for the \fIXmNmwmInputMode\fP resource is not to specify any
+input mode flag for the \fI_MOTIF_WM_HINTS\fP property.
+.P
+An application that sets input constraints on a dialog usually uses the
+BulletinBoard's \fIXmNdialogStyle\fP resource rather than the parent
+DialogShell's \fIXmNmwmInputMode\fP resource.
+.P
+Following are the possible values for this resource, defined in the
+include file \fI<Xm/MwmUtil.h>\fP:
+.TP
+\(bu
+\fIMWM_INPUT_MODELESS\fP \- Input goes to any window
+.TP
+\(bu
+\fIMWM_INPUT_PRIMARY_APPLICATION_MODAL\fP \- Input does not
+go to ancestors of this window
+.TP
+\(bu
+\fIMWM_INPUT_SYSTEM_MODAL\fP \- Input goes only to this window
+.TP
+\(bu
+\fIMWM_INPUT_FULL_APPLICATION_MODAL\fP \- Input does not go to other
+windows in this application
+.IP "\fIXmNmwmMenu\fP"
+Specifies the menu items that the Motif window manager should add to the end
+of the window menu.  The string contains a list of items separated
+by \*C\en\fP with the following format:
+.PP
+\fBlabel [mnemonic] [accelerator] function\fP
+.PP
+If more than one item is specified, the items should be separated by a
+newline character.
+.IP "\fIXmNpreeditType\fP"
+Specifies the input method style or styles available to the input
+manager.
+The syntax, possible values, and default value are implementation
+dependent.
+.cS
+If more than one style is specified, the list is in priority
+order. The input manager uses the first style if it is available; if
+not, it uses the second style, and so on.
+The supported input method styles are:
+.IP "OverTheSpot"
+The pre-edit window is located over the point of insertion.
+.IP "OffTheSpot"
+The pre-edit window is not located over the point of insertion.
+In this case, the pre-edit window is often located at the bottom
+of the application window.
+.IP "Root"
+The pre-edit window is a child of the root window.
+.PP
+If no input method style in this list is available, the input
+manager can support another input style method, but only if it
+does not require geometry management or any additional supporting
+information.
+.PP
+The Xlib XIMStyles data structure stores preedit information that
+describes the requirements for a given input method style.  
+The three styles identified by \fIXmNpreeditType\fP are related to the
+preedit settings in an XIMStyles structure.  The input styles,
+"OverTheSpot", "OffTheSpot" and "Root", correspond
+respectively to the settings XIMPreEditPosition, XIMPreEditArea,
+and XIMPreEditNothing.
+.cE
+.LI "\fIXmNshellUnitType\fP"
+Determines geometric resource interpretation.
+The following values are allowed:
+.wH
+.rS 
+.TP
+\(bu
+\fIXmPIXELS\fP \- all values provided to the widget are treated as normal
+pixel values.
+.TP
+\(bu
+\fIXm100TH_MILLIMETERS\fP \- all values provided to the widget are treated
+as 1/100 millimeter.
+.TP
+\(bu
+\fIXm1000TH_INCHES\fP \- all values provided to the widget are treated as
+1/1000 inch.
+.TP
+\(bu
+\fIXm100TH_POINTS\fP \- all values provided to the widget are treated as
+1/100 point.  A point is a unit used in text processing
+applications and is defined as 1/72 inch.
+.TP
+\(bu
+\fIXm100TH_FONT_UNITS\fP \- all values provided to the widget are
+treated as 1/100 of a font unit.
+A font unit has horizontal and vertical components.
+These are the values of the XmScreen resources \fIXmNhorizontalFontUnit\fP
+and \fIXmNverticalFontUnit\fP.
+.LI "\fIXmNtextFontList\fP"
+Specifies the font list used for VendorShell's Text and List 
+descendants.  If this value is NULL at initialization
+and if the value of \fIXmNdefaultFontList\fP is not NULL,
+\fIXmNtextFontList\fP is initialized to the value of
+\fIXmNdefaultFontList\fP.  If the value of \fIXmNdefaultFontList\fP is
+NULL, \fIXmNtextFontList\fP is initialized by looking up the parent
+hierarchy of the widget for an ancestor that is a subclass of the
+XmBulletinBoard or VendorShell widget class.  If such
+an ancestor is found, \fIXmNtextFontList\fP is initialized to the
+\fIXmNtextFontList\fP of the ancestor widget.  If no such ancestor
+is found, the default is implementation dependent.  
+.LI "\fIXmNuseAsyncGeometry\fP"
+Specifies whether the geometry manager should wait for confirmation of a
+geometry request to the window manager.
+When the value of this resource is True, the geometry manager forces
+\fIXmNwaitForWm\fP to False and \fIXmNwmTimeout\fP to 0, and it relies
+on asynchronous notification.
+When the value of this resource is False, \fIXmNwaitForWm\fP and
+\fIXmNwmTimeout\fP are unaffected.
+The default is False.
+.LE
+.SS "Inherited Resources"
+VendorShell inherits behavior and resources from the following
+superclasses.  For a complete description of each resource, refer to the
+man page for that superclass.
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+WMShell Resource Set
+Name	Class	Type	Default	Access
+_
+XmNbaseHeight	XmCBaseHeight	int	XtUnspecifiedShellInt	CSG
+XmNbaseWidth	XmCBaseWidth	int	XtUnspecifiedShellInt	CSG
+XmNheightInc	XmCHeightInc	int	XtUnspecifiedShellInt	CSG
+XmNiconMask	XmCIconMask	Pixmap	NULL	CSG
+XmNiconPixmap	XmCIconPixmap	Pixmap	NULL	CSG
+XmNiconWindow	XmCIconWindow	Window	NULL	CSG
+XmNiconX	XmCIconX	int	\-1	CSG
+XmNiconY	XmCIconY	int	\-1	CSG
+XmNinitialState	XmCInitialState	int	NormalState	CSG
+XmNinput	XmCInput	Boolean	True	CSG
+XmNmaxAspectX	XmCMaxAspectX	int	XtUnspecifiedShellInt	CSG
+XmNmaxAspectY	XmCMaxAspectY	int	XtUnspecifiedShellInt	CSG
+XmNmaxHeight	XmCMaxHeight	int	XtUnspecifiedShellInt	CSG
+XmNmaxWidth	XmCMaxWidth	int	XtUnspecifiedShellInt	CSG
+.wH
+.tH
+XmNminAspectX	XmCMinAspectX	int	XtUnspecifiedShellInt	CSG
+XmNminAspectY	XmCMinAspectY	int	XtUnspecifiedShellInt	CSG
+XmNminHeight	XmCMinHeight	int	XtUnspecifiedShellInt	CSG
+XmNminWidth	XmCMinWidth	int	XtUnspecifiedShellInt	CSG
+XmNtitle	XmCTitle	String	dynamic	CSG
+XmNtitleEncoding	XmCTitleEncoding	Atom	dynamic	CSG
+XmNtransient	XmCTransient	Boolean	False	CSG
+XmNwaitForWm	XmCWaitForWm	Boolean	True	CSG
+XmNwidthInc	XmCWidthInc	int	XtUnspecifiedShellInt	CSG
+XmNwindowGroup	XmCWindowGroup	Window	dynamic	CSG
+XmNwinGravity	XmCWinGravity	int	dynamic	CSG
+XmNwmTimeout	XmCWmTimeout	int	5000 ms	CSG
+.TE
+.KE
+.in
+.sp 1
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+Shell Resource Set
+Name	Class	Type	Default	Access
+_
+XmNallowShellResize	XmCAllowShellResize	Boolean	False	CG
+XmNcreatePopupChildProc	XmCCreatePopupChildProc	XtCreatePopupChildProc	NULL	CSG
+XmNgeometry	XmCGeometry	String	NULL	CSG
+XmNoverrideRedirect	XmCOverrideRedirect	Boolean	False	CSG
+XmNpopdownCallback	XmCCallback	XtCallbackList	NULL	C
+XmNpopupCallback	XmCCallback	XtCallbackList	NULL	C
+XmNsaveUnder	XmCSaveUnder	Boolean	False	CSG
+XmNvisual	XmCVisual	Visual *	CopyFromParent	CSG
+.TE
+.KE
+.in
+.sp 1
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+Composite Resource Set
+Name	Class	Type	Default	Access
+_
+XmNchildren	XmCReadOnly	WidgetList	NULL	G
+XmNinsertPosition	XmCInsertPosition	XtOrderProc	NULL	CSG
+XmNnumChildren	XmCReadOnly	Cardinal	0	G
+.TE
+.KE
+.in
+.sp 1
+.P 
+.wH
+.in 0 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+Core Resource Set
+Name	Class	Type	Default	Access
+_
+XmNaccelerators	XmCAccelerators	XtAccelerators	dynamic	CSG
+XmNancestorSensitive	XmCSensitive	Boolean	dynamic	G
+XmNbackground	XmCBackground	Pixel	dynamic	CSG
+XmNbackgroundPixmap	XmCPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNborderColor	XmCBorderColor	Pixel	XtDefaultForeground	CSG
+XmNborderPixmap	XmCPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNborderWidth	XmCBorderWidth	Dimension	1	CSG
+XmNcolormap	XmCColormap	Colormap	dynamic	CG
+XmNdepth	XmCDepth	int	dynamic	CG
+XmNdestroyCallback	XmCCallback	XtCallbackList	NULL	C
+XmNheight	XmCHeight	Dimension	dynamic	CSG
+XmNinitialResourcesPersistent	XmCInitialResourcesPersistent	Boolean	True	C
+XmNmappedWhenManaged	XmCMappedWhenManaged	Boolean	True	CSG
+XmNscreen	XmCScreen	Screen *	dynamic	CG
+.wH
+.tH
+XmNsensitive	XmCSensitive	Boolean	True	CSG
+XmNtranslations	XmCTranslations	XtTranslations	dynamic	CSG
+XmNwidth	XmCWidth	Dimension	dynamic	CSG
+XmNx	XmCPosition	Position	0	CSG
+XmNy	XmCPosition	Position	0	CSG
+.TE
+.KE
+.in
+.sp 1
+.wH
+.in  
+.SS "Translations"
+There are no translations for VendorShell.
+.SH RELATED INFORMATION
+.na
+\fIComposite(3X)\fP,
+\fICore(3X)\fP,
+\fImwm(1X)\fP,
+\fIShell(3X)\fP,
+\fIWMShell(3X)\fP,
+\fIXmActivateProtocol(3X)\fP,
+\fIXmActivateWMProtocol(3X)\fP,
+\fIXmAddProtocolCallback(3X)\fP,
+\fIXmAddWMProtocolCallback(3X)\fP,
+\fIXmAddProtocols(3X)\fP,
+\fIXmAddWMProtocols(3X)\fP,
+\fIXmDeactivateProtocol(3X)\fP,
+\fIXmDeactivateWMProtocol(3X)\fP,
+\fIXmGetAtomName(3X)\fP,
+\fIXmInternAtom(3X)\fP,
+\fIXmIsMotifWMRunning(3X)\fP,
+\fIXmRemoveProtocolCallback(3X)\fP,
+\fIXmRemoveWMProtocolCallback(3X)\fP,
+\fIXmRemoveProtocols(3X)\fP,
+\fIXmRemoveWMProtocols(3X)\fP,
+\fIXmScreen(3X)\fP,
+\fIXmSetProtocolHooks(3X)\fP,
+and \fIXmSetWMProtocolHooks(3X)\fP.
+.ad

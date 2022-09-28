@@ -1,0 +1,59 @@
+DESKTOP_VERSION_STRING = DesktopVersionString
+
+LOCAL_CPP_DEFINES = -DCDE_INSTALLATION_TOP=$(CDE_INSTALLATION_TOP) \
+                    -DCDE_CONFIGURATION_TOP=$(CDE_CONFIGURATION_TOP)
+
+INCLUDES = -I. -I..
+
+DEPLIBS = 
+LOCAL_LIBRARIES = 
+
+GEN = lpstat_svc.c lpstat_xdr.c lpstat.h
+RPCCOM = rpcgen
+
+all:: $(GEN)
+
+$(GEN): lpstat.x
+	$(RPCCOM) lpstat.x
+	$(RM) lpstat_clnt.c
+
+/* put EXTRA_DEFINES and EXTRA_INCLUDES and anything else below */
+#ifdef HPArchitecture
+OTHER_OBJ = lpstat_hp.o
+OTHER_SRC = lpstat_hp.c
+#endif
+
+#ifdef SunArchitecture
+SYS_LIBRARIES = -lnsl
+OTHER_OBJ = lpstat_sun.o
+OTHER_SRC = lpstat_sun.c
+#endif
+
+#ifdef RsArchitecture
+OTHER_OBJ = lpstat_aix.o
+OTHER_SRC = lpstat_aix.c
+#endif
+
+#ifdef USLArchitecture
+OTHER_OBJ = lpstat_sun.o
+OTHER_SRC = lpstat_sun.c
+#endif
+
+SRCS1 = lpstat_proc.c $(OTHER_SRC)
+OBJS1 = lpstat_proc.o lpstat_svc.o lpstat_xdr.o $(OTHER_OBJ)
+PROGRAMS = dtlpstatd dtlpstat
+
+NormalLibraryObjectRule()
+
+ComplexProgramTarget_1(dtlpstatd,,)
+
+NormalLibraryObjectRule()
+
+SRCS2 = dtlpstat.c rlpstat.c $(OTHER_SRC)
+OBJS2 = dtlpstat.o lpstat_xdr.o rlpstat.o $(OTHER_OBJ)
+
+ComplexProgramTarget_2(dtlpstat,,)
+
+clean::
+	$(RM) lpstat_svc $(GEN) *.map
+

@@ -1,0 +1,63 @@
+.TH Revert 4 "13 May 1994"
+.SH NAME
+Revert notice \- discard any modifications to an entity
+.SH SYNOPSIS
+.yS
+.ta \w@[\f2file\fP] Revert(@u
+[\f2file\fP] Revert(in \f2type ID\fP);
+.yE
+.SH DESCRIPTION
+The
+.I Revert
+notice
+asks that any pending, unsaved modifications to a
+persistent entity (such as a file) be discarded.
+.P
+The
+.I ID
+argument is the identity of the entity to revert.
+When its
+.I type
+is
+.BR File ,
+then the
+.I ID
+argument is unset (in other words, has a
+value of
+.BR (char\ *)0 ),
+and it refers to the file or directory
+named in the message's file attribute.
+.SH ERRORS
+The ToolTalk service may return one of the following errors
+in processing the
+.I Revert
+notice:
+.VL 6
+.Lc TT_DESKTOP_UNMODIFIED
+.br
+The entity had no pending, unsaved modifications.
+.Lc TT_DESKTOP_ENOENT
+.br
+The file to save/revert does not exist.
+.LE
+.SH "APPLICATION USAGE"
+The
+.Fn ttdt_file_join 3,
+function can be used to register for,
+and help process, the
+.I Revert
+request.
+.P
+The
+.I Revert
+request can be sent with
+.Fn ttdt_file_request 3.
+Also,
+.Fn ttdt_Revert 3,
+can send the relevant message and block on the reply.
+.SH "SEE ALSO"
+.Fn ttdt_Revert 3,
+.Fn ttdt_file_join 3,
+.Fn ttdt_file_request 3;
+.I Save
+notice.

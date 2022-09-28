@@ -1,0 +1,293 @@
+XCOMM
+XCOMM  Imakefile ($TOP/cdesrc/cde1/dtcm/libcsa)
+XCOMM
+XCOMM  @(#)Imakefile 1.20 94/08/12 Copyr 1993 Sun Microsystems, Inc.
+XCOMM
+XCOMM  $XConsortium: Imakefile /main/cde1_maint/3 1995/10/10 13:27:16 pascale $
+XCOMM
+XCOMM  RESTRICTED CONFIDENTIAL INFORMATION:
+XCOMM
+XCOMM  The information in this document is subject to special
+XCOMM  restrictions in a confidential disclosure agreement between
+XCOMM  HP, IBM, Sun, USL, SCO and Univel.  Do not distribute this
+XCOMM  document outside HP, IBM, Sun, USL, SCO, or Univel without
+XCOMM  Sun's specific written approval.  This document and all copies
+XCOMM  and derivative works thereof must be returned or destroyed at
+XCOMM  Sun's request.
+XCOMM
+XCOMM  Copyright 1993 Sun Microsystems, Inc.  All rights reserved.
+XCOMM
+
+#ifdef AlphaArchitecture
+SO_REQLIBS = $(ALL_LIBPATH) $(XMLIB) $(XTOOLLIB) $(XLIB) $(DTSVCLIB) -lm -lc -lcxx
+#endif
+ 
+      SOCSAREV = 0
+
+#ifndef SharedLibcsa
+#ifdef HPArchitecture
+#define SharedLibcsa YES
+#define NormalLibcsa YES
+#else
+#define SharedLibcsa YES
+#define NormalLibcsa NO
+#endif
+#endif
+ 
+#ifndef DoNormalLib
+#define DoNormalLib NormalLibcsa
+#endif
+#ifndef DoSharedLib
+#define DoSharedLib SharedLibcsa
+#endif
+ 
+#include <Library.tmpl>
+ 
+        LIBNAME = csa
+         TARGET = lib$(LIBNAME)
+   INSTALLFLAGS = $(INSTINCFLAGS)
+
+       INCLUDES = -I.
+
+        DEFINES = -DRFC_MIME -DLINE_COUNT -DV2 -DOW_I18N -DSVR4
+
+#ifdef RsArchitecture
+  EXTRA_DEFINES = -DBIG_ENDIAN -DAIX -DI_HAVE_NO_BOOL \
+                  -DSTRCASECMP_NOT_DEFINED -DRS6000 -DCSA_NOT_MT_SAFE
+#if DoSharedLib
+   REQUIREDLIBS = $(XMLIB) $(XTOOLLIB) $(XLIB) $(DTSVCLIB)
+#endif
+#endif
+
+#ifdef HPArchitecture
+  EXTRA_DEFINES = -DBIG_ENDIAN -DHPUX -DS9000 -DI_HAVE_NO_IDENT \
+                  -DI_HAVE_NO_BOOL -DCSA_NOT_MT_SAFE
+#endif
+
+#ifdef SunArchitecture
+STD_CPP_DEFINES=
+  STD_DEFINES = -DSVR4 -D_XOPEN_VERSION=4 -D_XOPEN_SOURCE -D__EXTENSIONS__ \
+		-DSunOS=$(OSMAJORVERSION)$(OSMINORVERSION)
+
+  PROTO_DEFINES =
+  TOP_INCLUDES = -I/usr/openwin/include
+  EXTRA_DEFINES = -Dsparc -D_TS_ERRNO -D_POSIX_C_SOURCE=199506L
+
+  EXTRA_CCOPTIONS = -xstrconst -v -mt
+  REQUIREDLIBS = -ldl -lnsl -lc
+#ifndef GPROF
+  SHLIBLDFLAGS = -R/usr/openwin/lib -G -z text -z defs -i
+#endif
+.KEEP_STATE:
+.PARALLEL:
+#endif
+
+           SRCS = \
+		  agent.c \
+		  agent_xdr.c \
+		  api.c \
+		  appt4.c \
+		  attr.c \
+		  calendar.c \
+		  cmsdata.c \
+		  cm_clnt.c \
+		  cmxdr.c \
+		  cmcbxdr.c \
+		  connection.c \
+		  convert2-4.c \
+		  convert3-4.c \
+		  convert4-2.c \
+		  convert4-3.c \
+		  convert4-5.c \
+		  convert5-4.c \
+		  debug.c \
+		  entry.c \
+		  free.c \
+		  hash.c \
+		  iso8601.c \
+		  laccess.c \
+		  lutil.c \
+		  match.c \
+		  nametbl.c \
+		  refree.c \
+		  reparser.y \
+		  rescan.c \
+		  rpccalls.c \
+		  rtable2_clnt.c \
+		  rtable2_xdr.c \
+		  rtable3_clnt.c \
+		  rtable3_xdr.c \
+		  rtable4_clnt.c \
+		  rtable4_xdr.c \
+		  table.c \
+		  updateattrs.c \
+		  xtclient.c
+
+           OBJS = \
+		  agent.o \
+		  agent_xdr.o \
+		  api.o \
+		  appt4.o \
+		  attr.o \
+		  calendar.o \
+		  cmsdata.o \
+		  cm_clnt.o \
+		  cmxdr.o \
+		  cmcbxdr.o \
+		  connection.o \
+		  convert2-4.o \
+		  convert3-4.o \
+		  convert4-2.o \
+		  convert4-3.o \
+		  convert4-5.o \
+		  convert5-4.o \
+		  debug.o \
+		  entry.o \
+		  free.o \
+		  hash.o \
+		  iso8601.o \
+		  laccess.o \
+		  lutil.o \
+		  match.o \
+		  nametbl.o \
+		  refree.o \
+		  reparser.o \
+		  rescan.o \
+		  rpccalls.o \
+		  rtable2_clnt.o \
+		  rtable2_xdr.o \
+		  rtable3_clnt.o \
+		  rtable3_xdr.o \
+		  rtable4_clnt.o \
+		  rtable4_xdr.o \
+		  table.o \
+		  updateattrs.o \
+		  xtclient.o
+
+        HEADERS = \
+		  csa.h \
+		  agent.h  \
+		  agent.wrapbegin \
+		  agent.wrapend \
+		  agent_p.h \
+		  ansi_c.h \
+		  appt4.h \
+		  attr.h \
+		  calendar.h \
+		  cm.h \
+		  cmcb.h \
+		  cmsdata.h \
+		  cmxdr.h \
+		  connection.h \
+		  convert2-4.h \
+		  convert3-4.h \
+		  convert4-2.h \
+		  convert4-3.h \
+		  convert4-5.h \
+		  convert5-4.h \
+		  debug.h \
+		  entry.h \
+		  free.h \
+		  hash.h \
+		  iso8601.h \
+		  laccess.h \
+		  lutil.h \
+		  match.h \
+                  misc.h \
+		  nametbl.h \
+		  reparser.h \
+		  rerule.h \
+		  rpccalls.h \
+		  rtable2.h \
+		  rtable3.h \
+		  rtable4.h \
+		  table.h \
+		  updateattrs.h \
+		  xtclient.h
+
+	SRCS_GENERATED = \
+		reparser.c \
+		reparser.h \
+		agent.h \
+		agent_xdr.c \
+		cm_clnt.c \
+		rtable2_clnt.c \
+		rtable2_xdr.c \
+		rtable3_clnt.c \
+		rtable3_xdr.c \
+		rtable4_clnt.c \
+		rtable4_xdr.c
+
+
+
+
+LibraryObjectRule()
+ 
+/* For install of developer's build environment */
+LOCAL_BINSTALL_LIBDEST = lib
+LOCAL_BINSTALL_INCLUDEDEST = include/csa
+
+#if DoSharedLib
+#if DoNormalLib
+SharedLibraryTarget($(LIBNAME),$(SOCSAREV),$(OBJS),shared,..)
+#else
+SharedLibraryTarget($(LIBNAME),$(SOCSAREV),$(OBJS),.,.)
+#endif
+SharedLibraryBuildInstall(csa,$(SOCSAREV),$(LOCAL_BINSTALL_LIBDEST))
+InstallSharedLibrary($(LIBNAME),$(SOCSAREV),$(USRLIBDIR))
+#endif
+ 
+#if DoNormalLib
+NormalLibraryTarget($(LIBNAME),$(OBJS))
+NormalLibraryBuildInstall(csa,$(LOCAL_BINSTALL_LIBDEST))
+InstallLibrary($(LIBNAME),$(USRLIBDIR))
+#endif
+
+BuildMultipleInstall(csa.h,$(LOCAL_BINSTALL_INCLUDEDEST))
+
+LintLibraryTarget($(LIBNAME),$(SRCS))
+InstallLintLibrary($(LIBNAME),$(LINTLIBDIR))
+ 
+includes:: $(SRCS_GENERATED)
+
+#ifndef SunArchitecture
+DependTarget()
+#else
+depend:
+#endif
+ 
+NormalLintTarget($(SRCS))
+
+.SUFFIXES: .y
+
+.y.c:
+	$(YACC) -d $(YFLAGS) $<
+	sed -e s/yyparse/_DtCm_rule_parser/g -e s/yy/_DtCm_yy/g y.tab.c > $*.c
+	sed s/yy/_DtCm_yy/g y.tab.h >  $*.h
+	$(RM) y.tab.c  y.tab.h
+
+reparser.o:	reparser.c
+
+rtable2_clnt.c rtable3_clnt.c rtable4_clnt.c cm_clnt.c:
+	$(RM) $@
+	rpcgen -A -l $(@:_clnt.c=.x) | sed -f namechange1.sed | sed -f namechange2.sed > $@
+
+rtable2_xdr.c rtable3_xdr.c rtable4_xdr.c agent_xdr.c:
+	$(RM) $@
+	rpcgen -c $(@:_xdr.c=.x) | sed -f namechange1.sed | sed -f namechange2.sed > $(@:.x=_xdr.c)
+
+rtable4_clnt.c rtable4_xdr.c: rtable4.h rtable4.x namechange1.sed namechange2.sed
+rtable3_clnt.c rtable3_xdr.c: rtable3.h rtable3.x namechange1.sed namechange2.sed
+rtable2_clnt.c rtable2_xdr.c: rtable2.h rtable2.x namechange1.sed namechange2.sed
+agent_xdr.c agent.c: agent.h
+
+agent.h:
+	$(RM) $@
+	cat agent.wrapbegin > agent.h
+	rpcgen -h agent.x | sed -f namechange1.sed | sed -f namechange2.sed >> agent.h
+	cat agent.wrapend >> agent.h
+
+.SUFFIXES: .x
+
+clean::
+	$(RM) $(SRCS_GENERATED)

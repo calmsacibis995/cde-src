@@ -1,0 +1,174 @@
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994 Novell, Inc.
+.\" *************************************************************************
+.TH dtpmfile 4
+.SH NAME
+dtpmfile \- format of X Pixmap (XPM) format desktop icon files
+.SH SYNOPSIS
+
+    /* XPM */
+    static char * \f2icon_name\f1[] = {
+    "\f2width height num_colors chars_per_pixel [x_hot y_hot]\f1",
+    "\f2char {key color}+\f1",
+    ...
+    " \f2pixels\f1 ",
+    ...
+    };
+
+.SH DESCRIPTION
+.PP
+Pixmap icons are multi-color images based on the XPM (X PixMap) format 
+developed by Arnaud Le Hors. A pixmap file is an ascii file which can 
+be read and modified by hand, in addition to the use of color pixmap 
+editors (like the Icon Editor). The XPM format was designed specifically 
+for small "icon" images. XPM files can be included directly in C source 
+code, so the file data is in the form of a pixmap structure variable. 
+A pixmap file can be broken down into three main components: generic 
+pixmap information, pixmap colors, and the actual pixmap data.  
+
+The generic pixmap file contains the following information:
+
+.LI
+\(bu
+pixmap name
+.br
+\(bu
+pixmap width
+.br
+\(bu
+pixmap height
+.br
+\(bu
+number of colors used in pixmap
+.br
+\(bu
+number of characters per pixel
+.br
+\(bu
+x hot-spot and y hot-spot (optional)
+.LE
+
+Each color used in the pixmap is defined by a string containing the 
+following information:
+
+.LI
+\(bu
+character(s) used to represent this color in pixmap data
+.br
+\(bu
+symbolic name for this color
+.br
+\(bu
+mono visual to use for this color (i.e. black/white)
+.br
+\(bu
+color visual by name ("red") or RGB value ("#9696c8c8afaf")
+.br
+\(bu
+gray scale visuals (most CDE icons do not include gray scale data)
+.LE
+
+The data itself is simply strings of symbols representing colors. 
+There is one string per column of the pixmap, and this data will 
+resemble the actual icon.
+
+More detailed information on the XPM library API and file format is
+available with the XPM package from Arnaud Le Hors.
+
+For documentation on the XPM Library, questions, suggestions, etc., you 
+can send electronic mail to lehors@sophia.inria.fr. There is an email 
+group to discuss XPM issues which you can subscribe to by writing to 
+xpm-talk-request@sophia.inria.fr. The latest release, along with an archive 
+of the mailing list, is available by anonymous ftp on avahi.inria.fr 
+(138.96.24.30) or export.lcs.mit.edu (18.30.0.238).
+
+.SH "RETURN VALUE"
+None.
+
+.SH EXAMPLES
+
+The following is a pixmap which could be used to represent an executable 
+file.  The icon has a 3-D border around it and contains a lightning bolt.
+
+.nf
+static char ** execute = {
+"22 22 7 1",
+"R s iconGray1 m white c #e1e1e1e1e1e1",
+"B s iconGray3 m white c #afafafafafaf",
+"~ s iconColor6 m white c yellow",
+"Y s iconColor1 m black c black",
+"X s iconGray2 m white c #c8c8c8c8c8c8",
+"+ s iconGray7 m black c #4b4b4b4b4b4b",
+"@ s iconGray5 m black c #7d7d7d7d7d7d",
+"RRRRRRRRRRRRRRRRRRRBRR",
+"RRRRRRRRRRRRRRRR~~BRRY",
+"RRBBBBBBBBBBBBX~~YBBYY",
+"RRBBBBBBBBBBBB~~YBBBYY",
+"RRBBBBBBBBBB~~~YBBBBYY",
+"RRBBBBBBBBX~~~YBBBBBYY",
+"RRBBBBBBBB~~~YBBBBBBYY",
+"RRBBBBBBX~~~~~~~~XYBYY",
+"RRBBBBX~~~~~~~~XYYBBYY",
+"RRBBBBBYYYY~~~XYBBBBYY",
+"RRBBBBBBX~~~XYYBBBBBYY",
+"RRBBBBBX~~XYYBBBBBBBYY",
+"RRBBBX~~~YYYBBBBBBBBYY",
+"RRBB~~~~~~~~~~~XYBBBYY",
+"RRX~~~~~~~~~~X+YBBBBYY",
+"RRBYYYY~~~~X+YBBBBBBYY",
+"RRBBBBB~~B@YBBBBBBBBYY",
+"RRBBBB~X@YYBBBBBBBBBYY",
+"RRBBB~B+YBBBBBBBBBBBYY",
+"RRBB~+YBBBBBBBBBBBBBYY",
+"RRY~YYYYYYYYYYYYYYYYYY",
+"RYYYYYYYYYYYYYYYYYYYYY"};
+.fi
+
+.bp
+.SH REQUIRED XPM COPYRIGHT 
+
+/*
+ * Copyright 1990-92 GROUPE BULL
+ *
+ * Permission to use, copy, modify, and distribute this software 
+ * and its documentation for any purpose and without fee is hereby 
+ * granted, provided that the above copyright notice appear in all 
+ * copies and that both that copyright notice and this permission 
+ * notice appear in supporting documentation, and that the name of 
+ * GROUPE BULL not be used in advertising or publicity pertaining 
+ * to distribution of the software without specific, written prior 
+ * permission.  GROUPE BULL makes no representations about the
+ * suitability of this software for any purpose.  It is provided 
+ * "as is" without express or implied warranty.
+ *
+ * GROUPE BULL disclaims all warranties with regard to this software,
+ * including all implied warranties of merchantability and fitness,
+ * in no event shall GROUPE BULL be liable for any special,
+ * indirect or consequential damages or any damages
+ * whatsoever resulting from loss of use, data or profits,
+ * whether in an action of contract, negligence or other tortious
+ * action, arising out of or in connection with the use 
+ * or performance of this software.
+ *
+ */
+
+Arnaud LE HORS      BULL Research FRANCE -- Koala Project 
+                    (XPM - X PixMap format version 2 & 3)
+    Internet:       lehors@sophia.inria.fr
+Surface Mail:       Arnaud LE HORS, INRIA - Sophia Antipolis, 
+                    2004, route des Lucioles, 06565 Valbonne Cedex -- FRANCE
+ Voice phone:       (33) 93.65.77.71, Fax: (33) 93 65 77 66, Telex: 97 00 50 F
+
+.SH "APPLICATION USAGE"
+For a description of icon location, usage, design, etc. within the
+common desktop environment, refer to \f3dticonfile(4)\f1.
+
+.SH "SEE ALSO"
+.B X11 Window System documentation,
+.B dticonfile(4),
+.B dticon(1),
+.B dtbmfile(4),
+

@@ -1,0 +1,44 @@
+.TH Save Desktop "05 Apr 1994" "SunSoft" "ToolTalk Policy"
+.SH NAME
+.PP
+Save, Revert - save/discard any modifications to an entity (e.g. a file)
+.SH SYNOPSIS
+.so ../.synopsis
+[\fIfile\f(CW]	Save(	in	\fItype	ID\f(CW );	
+[\fIfile\f(CW]	Revert(	in	\fItype	ID\f(CW );
+.ft
+.fi
+.SH DESCRIPTION
+.PP
+This request asks that any pending, unsaved modifications to a
+persistent entity (such as a file) be saved or discarded.
+.SH REQUIRED ARGUMENTS
+.TP
+.I type ID
+The identity of the entity to save or revert.
+.IP
+When
+.I type
+is \f(CWFile\fR, then this argument is unset (i.e., has a
+value of \f(CW(char *)0\fR), and it refers to the file or directory
+named in the message's file attribute.
+.SH ERRORS
+.TP
+\f(BITT_DESKTOP_UNMODIFIED\fR
+The entity had no pending, unsaved modifications.
+.TP
+\f(BITT_DESKTOP_ENOENT\fR
+The file to save/revert does not exist.
+.SH EXAMPLES
+.PP
+.BR ttdt_file_join ()
+can be used to register for
+and help process these messages.
+.PP
+These messages can be sent with
+.BR ttdt_file_request ().
+Also,
+.BR ttdt_Save ()
+and
+.BR ttdt_Revert ()
+can send the relevant message and block on the reply.

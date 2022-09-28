@@ -1,0 +1,84 @@
+.de Lc
+.\" version of .LI that emboldens its argument
+.TP \\n()Jn
+\s-1\f3\\$1\f1\s+1
+..
+.TH tt_message_scope_set 3 "1 March 1996" "ToolTalk 1.3" "ToolTalk Functions"
+.BH "1 March 1996"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.IX "tt_message_scope_set" "" "tt_message_scope_set(3)" ""
+.SH NAME
+tt_message_scope_set \- set the scope attribute for a message
+.SH SYNOPSIS
+.ft 3
+.nf
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'Tt_status tt_message_scope_set('u
+Tt_status tt_message_scope_set(Tt_message \f2m\fP,
+	Tt_scope \f2s\fP);
+.PP
+.fi
+.SH DESCRIPTION
+The
+.BR tt_message_scope_set (\|)
+function
+sets the scope attribute for the specified message.
+.PP
+The
+.I m
+argument is the opaque handle for the message involved in this operation.
+The
+.I s
+argument identifies the set of processes eligible to receive the message.
+The following values are defined:
+.PP
+.RS 3
+.nr )J 8
+.Lc TT_SESSION
+.br
+All processes joined to the indicated session are eligible.
+.Lc TT_FILE
+.br
+All processes joined to the indicated file are eligible.
+.Lc TT_BOTH
+.br
+All processes joined to either indicated file
+or the indicated session are eligible.
+.Lc TT_FILE_IN_SESSION
+.br
+All processes joined to both the indicated file
+and the indicated session are eligible.
+.PP
+.RE
+.nr )J 0
+.SH "RETURN VALUE"
+Upon successful completion, the
+.BR tt_message_scope_set (\|)
+function returns the status of the operation as one of the following
+.B Tt_status
+values:
+.PP
+.RS 3
+.nr )J 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_NOMP
+.br
+The
+.BR ttsession (1)
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_POINTER
+.br
+The pointer passed does not point to an object of
+the correct type for this operation.
+.PP
+.RE
+.nr )J 0
+.SH "SEE ALSO"
+.na
+.BR tt_c (5).

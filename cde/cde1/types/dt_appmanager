@@ -1,0 +1,205 @@
+#!/bin/sh
+#
+# This script creates localized directories/files for the actions in each
+# toolbox. This should be executed at the installation of localized environment.
+#
+#    Usage: dt-toolbox Build_Top_Dir Install_Top_Dir
+#
+#   (c) Copyright 1993, 1994 Hewlett-Packard Company
+#   (c) Copyright 1993, 1994 International Business Machines Corp.
+#   (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+#   (c) Copyright 1993, 1994 Novell, Inc.
+#
+
+BUILD_TOP=$1
+INSTALL_TOP=$2
+
+if [ x$BUILD_TOP = x ];
+then
+    echo "Usage: dt_appmanager Build_Top_Dir Install_Top_Dir"
+    exit
+fi
+if [ x$INSTALL_TOP = x ];
+then
+    echo "Usage: dt_appmanager Build_Top_Dir Install_Top_Dir"
+    exit
+fi
+
+LANG=%|nls-14-C|
+
+INSTALL_LANG=$LANG
+
+DIR_USR=usr
+DIR_DT=dt
+DIR_APPCONFIG=appconfig
+DIR_APPMANAGER=appmanager
+DIR_ETC=etc
+
+TOOLBOX_TOP=$INSTALL_TOP/$DIR_USR/$DIR_DT/$DIR_APPCONFIG/$DIR_APPMANAGER
+ETC_TOOLBOX_TOP=/$DIR_ETC/$DIR_DT/$DIR_APPCONFIG/$DIR_APPMANAGER
+
+#-----------------------------------------------------------
+# Subdirectories in appmanager
+#-----------------------------------------------------------
+DIRS_APPMAN1="\
+    %|nls-13009-Desktop_Apps| \
+    %|nls-13010-Printers| \
+    %|nls-13011-Information| \
+    %|nls-13012-System_Admin| \
+    %|nls-13013-Desktop_Tools| \
+"
+ETC_DIRS_APPMAN="\
+    %|nls-13010-Printers| \
+"
+
+#-----------------------------------------------------------
+# action name files
+#-----------------------------------------------------------
+FILES_ACTION="\
+    $INSTALL_LANG/%|nls-13009-Desktop_Apps|/Dtappbuild \
+    $INSTALL_LANG/%|nls-13009-Desktop_Apps|/Dtcalc \
+    $INSTALL_LANG/%|nls-13009-Desktop_Apps|/Dtcm \
+    $INSTALL_LANG/%|nls-13009-Desktop_Apps|/Dticon \
+    $INSTALL_LANG/%|nls-13009-Desktop_Apps|/Dtfile \
+    $INSTALL_LANG/%|nls-13009-Desktop_Apps|/Dthelpview \
+    $INSTALL_LANG/%|nls-13009-Desktop_Apps|/Dtmail \
+    $INSTALL_LANG/%|nls-13009-Desktop_Apps|/Dtmanpageview \
+    $INSTALL_LANG/%|nls-13009-Desktop_Apps|/Dtqueueinfo \
+    $INSTALL_LANG/%|nls-13009-Desktop_Apps|/Dtstyle \
+    $INSTALL_LANG/%|nls-13009-Desktop_Apps|/Dtterm \
+    $INSTALL_LANG/%|nls-13009-Desktop_Apps|/Dtpad \
+    $INSTALL_LANG/%|nls-13009-Desktop_Apps|/Dttrash \
+    $INSTALL_LANG/%|nls-13010-Printers|/DtPrint \
+    $INSTALL_LANG/%|nls-13013-Desktop_Tools|/Bitmap \
+    $INSTALL_LANG/%|nls-13013-Desktop_Tools|/Spell \
+    $INSTALL_LANG/%|nls-13013-Desktop_Tools|/Xclipboard \
+    $INSTALL_LANG/%|nls-13013-Desktop_Tools|/Diff \
+    $INSTALL_LANG/%|nls-13013-Desktop_Tools|/Compress \
+    $INSTALL_LANG/%|nls-13013-Desktop_Tools|/XtermConsole \
+    $INSTALL_LANG/%|nls-13013-Desktop_Tools|/Wc \
+    $INSTALL_LANG/%|nls-13013-Desktop_Tools|/Dtcreate \
+    $INSTALL_LANG/%|nls-13013-Desktop_Tools|/XclockDig \
+    $INSTALL_LANG/%|nls-13013-Desktop_Tools|/DuSort \
+    $INSTALL_LANG/%|nls-13013-Desktop_Tools|/Df \
+    $INSTALL_LANG/%|nls-13013-Desktop_Tools|/Xfd \
+    $INSTALL_LANG/%|nls-13013-Desktop_Tools|/Dttypes \
+    $INSTALL_LANG/%|nls-13013-Desktop_Tools|/DtwmrcEdit \
+    $INSTALL_LANG/%|nls-13013-Desktop_Tools|/ExecuteCmd \
+    $INSTALL_LANG/%|nls-13013-Desktop_Tools|/Enc \
+    $INSTALL_LANG/%|nls-13013-Desktop_Tools|/Xlsfonts \
+    $INSTALL_LANG/%|nls-13013-Desktop_Tools|/Nm \
+    $INSTALL_LANG/%|nls-13013-Desktop_Tools|/Xwininfo \
+    $INSTALL_LANG/%|nls-13013-Desktop_Tools|/Xprop \
+    $INSTALL_LANG/%|nls-13013-Desktop_Tools|/Make \
+    $INSTALL_LANG/%|nls-13013-Desktop_Tools|/Xrefresh \
+    $INSTALL_LANG/%|nls-13013-Desktop_Tools|/ReloadApps \
+    $INSTALL_LANG/%|nls-13013-Desktop_Tools|/ReloadActions \
+    $INSTALL_LANG/%|nls-13013-Desktop_Tools|/DttermRlogin \
+    $INSTALL_LANG/%|nls-13013-Desktop_Tools|/DttermSpcd \
+    $INSTALL_LANG/%|nls-13013-Desktop_Tools|/XtermRlogin \
+    $INSTALL_LANG/%|nls-13013-Desktop_Tools|/XtermSpcd \
+    $INSTALL_LANG/%|nls-13013-Desktop_Tools|/RestorePanel \
+    $INSTALL_LANG/%|nls-13013-Desktop_Tools|/Rm \
+    $INSTALL_LANG/%|nls-13013-Desktop_Tools|/Grep \
+    $INSTALL_LANG/%|nls-13013-Desktop_Tools|/Xload \
+    $INSTALL_LANG/%|nls-13013-Desktop_Tools|/Tar \
+    $INSTALL_LANG/%|nls-13013-Desktop_Tools|/TarList \
+    $INSTALL_LANG/%|nls-13013-Desktop_Tools|/TarUnpack \
+    $INSTALL_LANG/%|nls-13013-Desktop_Tools|/File \
+    $INSTALL_LANG/%|nls-13013-Desktop_Tools|/Uncompress \
+    $INSTALL_LANG/%|nls-13013-Desktop_Tools|/Vi \
+    $INSTALL_LANG/%|nls-13013-Desktop_Tools|/DttermErrorlog \
+    $INSTALL_LANG/%|nls-13013-Desktop_Tools|/Xterm \
+    $INSTALL_LANG/%|nls-13013-Desktop_Tools|/Xdpyinfo \
+    $INSTALL_LANG/%|nls-13013-Desktop_Tools|/Xwd \
+    $INSTALL_LANG/%|nls-13013-Desktop_Tools|/Xwud \
+"
+ETC_FILES_ACTION="\
+    $INSTALL_LANG/%|nls-13010-Printers|/DtPrint \
+"
+
+if [ ! -d $INSTALL_TOP ];
+then
+    echo "No install directory: $INSTALL_TOP"
+    exit
+fi
+
+CreateInstallTarget() {
+    DoesDirExist=0
+    MkdirTmp=
+    for i
+    do
+        if [ x$MkdirTmp = x ];
+        then
+            MkdirTmp=$i
+        else
+            MkdirTmp=$MkdirTmp/$i
+        fi
+        if [ ! -d $MkdirTmp ];
+        then
+            mkdir $MkdirTmp
+            DoesDirExist=1
+        fi
+    done
+    if [ $DoesDirExist = 1 ];
+    then
+        echo "Made directory $MkdirTmp"
+    fi
+}
+
+CheckBuildTarget() {
+    DoesFileExist=1
+    if [ ! -f $1 ];
+    then
+        echo "File $1 Not in build"
+        DoesFileExist=0
+    else
+        echo "File $1 Found in build"
+    fi
+}
+
+CheckBuildTarget $BUILD_TOP/action
+if [ $DoesFileExist = 1 ];
+then
+
+#-----------------------------------------------------------
+# Create a direcotry for appmanager
+#-----------------------------------------------------------
+    CreateInstallTarget $TOOLBOX_TOP $INSTALL_LANG
+    for i in $DIRS_APPMAN1
+    do
+        CreateInstallTarget $TOOLBOX_TOP $INSTALL_LANG $i
+    done
+    for i in $DIRS_APPMAN2
+    do
+        CreateInstallTarget $TOOLBOX_TOP $INSTALL_LANG $i
+    done
+
+    CreateInstallTarget $ETC_TOOLBOX_TOP $INSTALL_LANG
+    for i in $ETC_DIRS_APPMAN
+    do
+        CreateInstallTarget $ETC_TOOLBOX_TOP $INSTALL_LANG $i
+    done
+
+#-----------------------------------------------------------
+# Install action name files
+#-----------------------------------------------------------
+    for i in $FILES_ACTION
+    do
+        cp -fp $BUILD_TOP/action $TOOLBOX_TOP/$i
+        chown bin $TOOLBOX_TOP/$i
+        chmod 0555 $TOOLBOX_TOP/$i
+        chgrp bin $TOOLBOX_TOP/$i
+        echo "Installed file $i"
+    done
+
+    for i in $ETC_FILES_ACTION
+    do
+        cp -fp $BUILD_TOP/action $ETC_TOOLBOX_TOP/$i
+        chown bin $ETC_TOOLBOX_TOP/$i
+        chmod 0555 $ETC_TOOLBOX_TOP/$i
+        chgrp bin $ETC_TOOLBOX_TOP/$i
+        echo "Installed file $i"
+    done
+
+fi

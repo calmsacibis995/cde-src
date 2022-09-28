@@ -1,0 +1,52 @@
+/* @(#)getattributes.src	1.2 97/04/29 SMI */
+
+token create token1
+#include "setup.src"
+token set token1 serviceoption messagestorename /tmp/test.mbx
+
+! /usr/bin/rm -f /tmp/test.mbx /tmp/.test.mbx_* /tmp/.test.mbx_dt_index
+! /usr/bin/cp test3.mbx /tmp/test.mbx
+! /usr/bin/chmod 660 /tmp/test.mbx
+
+/**/# Create, startup and open a dataport
+port create port1
+port startup port1
+port open port1 token1
+
+port getstructure port1 1:7
+
+port getattributes port1 1 0.1
+port getattributes port1 1 0.1.1
+port getattributes port1 1 0.1.2
+port getattributes port1 1 0.1.3
+
+port getattributes port1 2 0.1
+port getattributes port1 2 0.1.1
+port getattributes port1 2 0.1.2
+port getattributes port1 2 0.1.2.1
+port getattributes port1 2 0.1.2.2
+port getattributes port1 2 0.1.2.3
+
+port getattributes port1 4 0.1.2.1.1.1
+port getattributes port1 4 0.1.2.1.1.1.1
+port getattributes port1 4 0.1.2.1.2
+port getattributes port1 4 0.1.2.1.2.1
+port getattributes port1 4 0.1.2.1.2.3
+port getattributes port1 4 0.1.2.1.2.3.1
+port getattributes port1 4 0.1.2.1.2.3.2
+port getattributes port1 4 0.1.2.1.2.3.3
+
+port getattributes port1 5 0.1
+port getattributes port1 5 0.1.1
+port getattributes port1 5 0.1.2
+port getattributes port1 5 0.1.2.1
+port getattributes port1 5 0.1.2.2
+port getattributes port1 5 0.1.2.3
+
+
+/**/# Close the port and exit
+port close port1
+port shutdown port1
+port delete port1
+
+quit

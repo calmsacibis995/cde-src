@@ -1,0 +1,67 @@
+.de Lc
+.\" version of .LI that emboldens its argument
+.TP \\n()Jn
+\s-1\f3\\$1\f1\s+1
+..
+.TH tt_file_quit 3 "1 March 1996" "ToolTalk 1.3" "ToolTalk Functions"
+.BH "1 March 1996"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.IX "tt_file_quit" "" "tt_file_quit(3)" ""
+.SH NAME
+tt_file_quit \- register lack of interest in messages that involve a file
+.SH SYNOPSIS
+.ft 3
+.nf
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'Tt_status tt_file_quit('u
+Tt_status tt_file_quit(const char *\f2filepath\fP);
+.PP
+.fi
+.SH DESCRIPTION
+The
+.BR tt_file_quit (\|)
+function
+informs the ToolTalk service that the process is no longer interested in
+messages that involve the specified file.
+.PP
+The ToolTalk service removes this file value from any currently registered
+patterns and sets the default file to
+.BR \s-1NULL\s+1 .
+.PP
+The
+.I filepath
+argument is the name of the file in which the process is no longer interested.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.BR tt_file_quit (\|)
+function returns the status of the operation as one of the following
+.B Tt_status
+values:
+.PP
+.RS 3
+.nr )J 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_DBAVAIL
+.br
+The ToolTalk service could not access the
+ToolTalk database needed for this operation.
+.Lc TT_ERR_DBEXIST
+.br
+The ToolTalk service could not access the
+specified ToolTalk database in the expected place.
+.Lc TT_ERR_PATH
+.br
+The specified pathname included an unsearchable directory.
+.PP
+.RE
+.nr )J 0
+.SH "SEE ALSO"
+.na
+.BR tt_c (5),
+.BR tt_default_file (3).

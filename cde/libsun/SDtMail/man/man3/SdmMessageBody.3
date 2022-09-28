@@ -1,0 +1,830 @@
+.de LI
+.\" simulate -mm .LIs by turning them into .TPs
+.TP \\n()Jn
+\\$1
+..
+.de Lc
+.\" version of .LI that emboldens its argument
+.TP \\n()Jn
+\s-1\f3\\$1\f1\s+1
+..
+.TH SdmMessageBody 3 "07/03/96"
+.BH "07/03/96"
+.\" @(#)SdmMessageBody.3	1.6 96/07/03 SMI
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994, 1995, 1996 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994, 1995, 1996 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994, 1995, 1996 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994, 1995, 1996 Novell, Inc.
+.SH NAME
+SdmMessageBody \- Allow retrieval and manipulation of message body part components
+.SH SYNOPSIS
+.\"
+.SS Includes
+.ft 3
+.nf
+#include <Sdtmail.hh>
+#include <MessageBody.hh>
+.\"
+.SS Creation
+.ft 3
+.nf
+.sp 0.5v
+.ta \w'SdmErrorCode SdmMessage.SdmMessageBodyFactory('u
+SdmErrorCode SdmMessage.SdmMessageBodyFactory(SdmError& \f2err\fP,
+	SdmMessageBody*& \f2r_body\fP); 
+.fi
+.ft 1
+.\"
+.SS Methods
+.nf
+.PP
+.ft 3
+.ta \w'SdmErrorCode DeleteMessageBodyFromMessage('u
+SdmErrorCode DeleteMessageBodyFromMessage(SdmError& \f2err\fP,
+	SdmBoolean& \f2r_previousState\fP,
+	SdmBoolean \f2newState\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetAttribute('u
+SdmErrorCode GetAttribute(SdmError \f2&err\fP,
+	SdmString& \f2r_attribute\fP,
+	const SdmString& \f2attribute\fP)
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetAttributes('u
+SdmErrorCode GetAttributes(SdmError \f2&err\fP,
+	SdmStrStrL& \f2r_attribute\fP)
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetAttributes('u
+SdmErrorCode GetAttributes(SdmError \f2&err\fP,
+	SdmStrStrL& \f2r_attributes\fP,
+	const SdmMessageAttributeAbstractFlags \f2aattributes\fP)
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetAttributes('u
+SdmErrorCode GetAttributes(SdmError \f2&err\fP,
+	SdmStrStrL& \f2r_attributes\fP,
+	const SdmStringL& \f2attributes\fP)
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetBodyPartNumber('u
+SdmErrorCode GetBodyPartNumber(SdmError& \f2err\fP,
+	int& \f2bodyPartNumber\fP)
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetContents('u
+SdmErrorCode GetContents(SdmError& \f2err\fP,
+	SdmContentBuffer& \f2r_contents\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetContents_Async('u
+SdmErrorCode GetContents_Async(SdmError& \f2err\fP,
+	const SdmServiceFunction& \f2svf\fP,
+	void* \f2clientData\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetMessageCacheStatus('u
+SdmErrorCode GetMessageCacheStatus(SdmError& \f2err\fP,
+	SdmBoolean& \f2r_status\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetStructure('u
+SdmErrorCode GetStructure(SdmError \f2&err\fP,
+	SdmMessageBodyStructure& \f2r_struct\fP);      
+.PP
+.ft 3
+.ta \w'SdmErrorCode Parent('u
+SdmErrorCode Parent(SdmError& \f2err\fP,
+	SdmMessage*& \f2r_message\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode SdmMessageFactory('u
+SdmErrorCode SdmMessageFactory(SdmError& \f2err\fP,
+	SdmMessage*& \f2r_nestedMessage\fP)
+.PP
+.ft 3
+.ta \w'SdmErrorCode SetAttribute('u
+SdmErrorCode SetAttribute(SdmError \f2&err\fP,
+	const SdmMessageAttributeAbstractFlags \f2aattribute\fP,
+	const SdmString& \f2attribute_value\fP)
+.PP
+.ft 3
+.ta \w'SdmErrorCode SetAttribute('u
+SdmErrorCode SetAttribute(SdmError \f2&err\fP,
+	const SdmString& \f2attribute\fP,
+	const SdmString& \f2attribute_value\fP)
+.PP
+.ft 3
+.ta \w'SdmErrorCode SetContents('u
+SdmErrorCode SetContents(SdmError \f2&err\fP,
+	const SdmString& \f2r_contents\fP)
+.PP
+.ft 3
+.ta \w'SdmErrorCode SetContents_Async('u
+SdmErrorCode SetContents_Async(SdmError \f2&err\fP,
+	const SdmServiceFunction& \f2svf\fP,
+	void* \f2clientData\fP,
+	const SdmString& \f2r_contents\fP)
+.PP
+.ft 3
+.ta \w'SdmErrorCode SetStructure('u
+SdmErrorCode SetStructure(SdmError \f2&err\fP,
+	const SdmMessageBodyStructure& \f2bodyStructure\fP);
+.fi
+.ft 1
+.\" end of methods list
+.ta 0.25i 0.50i 0.75i 1.0i 1.25i 1.50i 1.75i 2.0i 2.5i 3.0i
+.SH DESCRIPTION
+The SdmMessageBody object encapsulates the concept of "the body of a message" as a
+container, allowing the creation and manipulation of one or more "body parts", which are a
+component of a SdmMessage, and which contain the actual data portions of a message.
+.PP
+You would typically create a message body object when it is desired to operate directly on
+the body object (such as determine the type of data in the body part, retrieve the
+contents, etc.)
+.PP
+.PP
+See SdmGlossary(3) for a detailed list of general definitions.
+.PP
+.\"
+.SH CREATION
+A SdmMessageBody object is never created directly by a front end application; its
+constructor is private and cannot be accessed by front end applications. A SdmMessageBody
+object is created by invoking the SdmMessageBodyFactory method of a previously created
+SdmMessage object. The following code snippet creates an message body object for the first
+message body in the first message in a message store:
+.PP
+.nf
+	SdmError err;
+	SdmConnection* con;
+	SdmSession* ses;
+	SdmMessageStore* mst;
+	SdmMessage* msg;
+	SdmMessageBody* mbody;
+	SdmToken* tokenName;
+
+	con = new SdmConnection(appName);
+	if (con->StartUp(err) != Sdm_EC_Success) {
+		// connection could not be started: handle error
+	}
+	if (con->SdmSessionFactory(err, ses, SdmDefs::ST_InSession) 
+		!= Sdm_EC_Success) {
+		// session could not be created: handle error
+	}
+	if (ses->StartUp(err) != Sdm_EC_Success) {
+		// session could not be started: handle error
+	}
+	if (ses->SdmMessageStoreFactory(err, mst) != Sdm_EC_Success) {
+		// message store could not be created: handle error
+	}
+	if (mst->StartUp(err) != Sdm_EC_Success) {
+		// message store could not be started: handle error
+	}
+	if (mst->Open(err, tokenName) != Sdm_EC_Success) {
+		// message store could not be opened: handle error
+	}
+	if (mst->SdmMessageFactory(err, msg, 1) != Sdm_EC_Success) {
+		// message could not be created: handle error
+	}
+	if (msg->SdmMessageBodyFactory(err, mbody, 1) != Sdm_EC_Success) {
+		// message body could not be created: handle error
+	}
+.fi
+.PP
+.SH DESTRUCTION
+This object is destroyed automatically when the message that created it is destroyed;
+its destructor is private and cannot be accessed by front end applications. No attempt
+should ever be made to destroy a handle to a SdmMessageBody object.
+.PP
+There is a \f3DeleteMessageBodyFromMessage\fP method supplied; however, 
+which sets the "deleted state" of this message body so that 
+it does not get included in the message when the message is commited 
+to the store or submitted for transport .
+See below for details.
+.\"
+.SH METHODS
+Primary methods allow the retrieval and manipulation of attributes and contents.
+Secondary methods allow retrieving and manipulating the structure 
+of the message body part.
+.\"
+.SS \f3DeleteMessageBodyFromMessage\fP
+(\f3err\fP, \f3r_previousState\fP, \f3newState\fP)
+.PP
+Set or clear the "deleted state" of this message body, returning the
+previous deleted state setting. Any message body may be marked for deletion; it
+does not take effect immediately, but rather is remembered until the message is
+either committed (rewritten to a message store) or submitted (given to a
+transport for sending). A message body marked for deletion will not be included
+in the message when it is committed or submitted.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)\fP"
+.br
+Error container, used to store return result code.
+.LI "\f3r_previousState\fP (\f3SdmBoolean&\fP)"
+.br
+The previous "deleted state" of this message body is returned here;
+that is, the deleted state immediately before it
+is changed by this method. It is Sdm_True if this message body is marked for
+deletion, or Sdm_False if this message body is not marked for deletion.
+.LI "\f3newState\fP (\f3SdmBoolean\fP)"
+.br
+The new state for this message body; Sdm_True causes this message body
+to be marked for deletion, while Sdm_False causes this message body to not
+be marked for deletion.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetAttribute\fP
+(\f3err\fP, \f3r_attribute\fP, \f3attribute\fP)
+.PP
+Get one attribute by attribute name from this message body. Return the attribute
+by attribute field body text.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_attribute\fP (\f3SdmString&\fP)
+.br
+The attribute field body text is returned in this simple data type.
+.LI "\f3attribute\fP (\f3SdmString&\fP)"
+.br
+The text of the attribute field to retrieve from the message body.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetAttributes\fP
+(\f3err\fP, \f3r_attributes\fP, \f3aattributes\fP)
+.PP
+Get one or more attributes specified by abstract attribute bit mask from this message
+body. Return the attributes by attribute field name and attribute field body text.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_attributes\fP (\f3SdmStrStrL&\fP)"
+.br
+All attributes specified by the abstact attribute flag mask are returned in this
+container. The container is a vector of String value pairs, where each entry in
+the vector corresponds to a single attribute in the message body. The first
+string value corresponds to one of the attribute field name text, and the second
+string value corresponds to the contents of the attribute field body.
+.br
+
+NOTE: This container must be empty (have no elements) before calling this method; after
+the call returns, it is the responsibility of the caller to destroy the container
+when the information in it is no longer needed.
+.LI "\f3aattributes\fP (\f3SdmMessageAttributeAbstractFlags\fP)"
+.br
+A bit mask representing the attributes to be retrieved from the message body; a bit that
+is on indicates the attribute should be retrieved.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetAttributes\fP
+(\f3err\fP, \f3r_attributes\fP)
+.PP
+Get all attributes for this message body. Return the attributes by attribute
+field name and attribute field body text.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_attributes\fP (\f3SdmStrStrL&\fP)"
+.br
+All attributes for this message body are returned in this container. The
+container is a vector of String value pairs, where each entry in the vector
+corresponds to a single attribute in the message body. The first string value
+corresponds to one of the attribute field name text, and the second string value
+corresponds to the contents of the attribute field body.
+.br
+
+NOTE: This container must be empty (have no elements) before calling this method; after
+the call returns, it is the responsibility of the caller to destroy the container
+when the information in it is no longer needed.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetAttributes\fP
+(\f3err\fP, \f3r_attributes\fP, \f3attribute\fP)
+.PP
+Get one or more attributes specified by abstract attribute bit mask from this message
+body. Return the attributes by attribute field name and attribute field body text.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_attributes\fP (\f3SdmStrStrL&\fP)"
+.br
+All attributes specified by the abstact name text vector are returned in this
+container. The container is a vector of Integer String value pairs, where each
+entry in the vector corresponds to a single attribute in the message body. The
+first string value corresponds to one of the attribute field name text, and the
+second string value corresponds to the contents of the attribute field body.
+.br
+
+NOTE: This container must be empty (have no elements) before calling this method; after
+the call returns, it is the responsibility of the caller to destroy the container
+when the information in it is no longer needed.
+.LI "\f3attributes\fP (\f3SdmStringL&\fP)"
+.br
+A vector of strings containing the text of the attribute fields to retrieve from the
+message body.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetBodyPartNumber\fP
+(\f3err\fP, \f3bodyPartNumber\fP)
+.PP
+Retrieve the message body part number for this body part in the message.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_bodyPartNumber\fP (\f3int&\fP)"
+.br
+The message body part number for this body part in the message is returned in this simple
+data type.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetContents\fP
+(\f3err\fP, \f3r_contents\fP)
+.PP
+Return the contents for this object; in the case of this message body object, the
+"contents" refer to the complete processed data for this part of the message; the body
+part is completely parsed and processed. Typically used when displaying the body part,
+when saving the body part or passing it off to an action.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_contents\fP (\f3SdmContentBuffer&\fP)"
+.br
+The processed contents of this object is returned in this simple data type.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetContents_Async\fP
+(\f3err\fP, \f3svf\fP, \f3clientData\fP)
+.PP
+Same as GetContents() except that this method returns immediately after making an
+asynchronous request to perform the requested operation. The service function provided
+in the call is invoked when the operation is completed.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3svf\fP (\f3const SdmServiceFunction&\fP)"
+.br
+The service function to be called when the request is completed. 
+
+The event passed to the service function is of type "Sdm_Event_GetMessageBodyContents".
+.LI "\f3clientData\fP (\f3void*\fP)"
+.br
+Specific client data that is passed unmodified to the service function when it is
+called. This should contain context sufficient to allow the service function to
+execute. This overrides the "user data" provided when the service function is defined. If
+this client data is NULL, then the user data defined in the service function is passed
+instead.
+.br
+
+In a C++ environment this is typically the "this" pointer of the invoking
+object.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetMessageCacheStatus\fP
+(\f3err\fP, \f3r_status\fP)
+.PP
+Returns boolean indicating whether message body is currently cached.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_status\fP (\f3SdmBoolean&\fP)"
+.br
+A boolean is returned in this simple data type indicating whether this 
+message body part is cached.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetStructure\fP
+(\f3err\fP, \f3r_struct\fP)
+.PP
+Return the structure of this message body part. A message body has an underlying structure
+that defines the characteristics of the contents. You would use this information to
+determine the type of the data in the body part, if there is a disposition (inline,
+attachment) for the data, file name, etc.
+.PP
+See SdmGlossary(3) for details on message body structures.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_struct\fP (\f3SdmMessageBodyStructure&\fP)"
+.br
+The structure of this message body is returned in this container.
+.br
+
+NOTE: this container is filled in with copies of relevant data; any existing data in the
+container is destroyed. After the call returns, it is the responsibility of the caller to
+destroy the container when the information in it is no longer needed.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3Parent\fP
+(\f3err\fP, \f3r_message\fP)
+.PP
+Provide a handle to the parent message that created this message body. Used to access
+methods of the parent of this message body.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_message\fP (\f3SdmMessage*&\fP)"
+.br
+A pointer to a SdmMessage object; upon successful completion, this pointer variable is
+filled in with a handle to the SdmMessage object that created this message body, which may
+then be used to manipulate it.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3SdmMessageFactory\fP
+(\f3err\fP, \f3r_nestedMessage\fP)
+.PP
+Return a handle to a SdmMessage object for a message that is "nested" within this body
+part. If this body part is a container for encapsulated body parts (e.g. the message body
+structure \f3mbs_is_nested_message\fP flag is set), then this method can be invoked to
+return a SdmMessage object that references this encapsulated message. This new SdmMessage
+object in turn can be used to access the components of that encapsulated message
+(e.g. obtain one or more SdmMessageBody objects to gain access to the body parts contained
+therein.)
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_nestedMessage\fP (\f3SdmMessage*&\fP)"
+.br
+A pointer to a SdmMessage object; upon successful completion, this pointer variable is
+filled in with a handle to the SdmMessage object created for the message nested within
+this body part. If there is no such nested message, this method returns an error.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.\"
+.SS \f3SetAttribute\fP
+(\f3err\fP, \f3aattribute\fP, \f3attributevalue\fP)
+.PP
+FUTURE IMPLEMENTATION: Set an attribute (specified by abstract attribute flag bit) in this
+message body, deleting any previous values set for the same attribute field.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3aattribute\fP (\f3const SdmMessageAttributeAbstractFlags\fP)
+.br
+A bit mask specifying the bit for the attribute to be set. If more than one bit is
+set, the result is undefined.
+.LI "\f3attributevalue\fP (\f3SdmString&\fP)
+.br
+The text for the body value of the attribute to set.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3SetAttribute\fP
+(\f3err\fP, \f3attribute\fP, \f3attributevalue\fP)
+.PP
+FUTURE IMPLEMENTATION: Set an attribute (specified by attribute name text) in this message
+body, deleting any previous values set for the same attribute field.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3attribute\fP (\f3SdmString&\fP)"
+.br
+The text describing the attribute field to be set.
+.LI "\f3attributevalue\fP (\f3SdmString&\fP)"
+.br
+The text for the body value of the attribute to set.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3SetContents\fP
+(\f3err\fP, \f3contents\fP)
+.PP
+Set the contents for this body part, replacing any previous contents.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3contents\fP (\f3SdmString&\fP)"
+.br
+A string containing the contents to set this body part to.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3SetContents_Async\fP
+(\f3err\fP, \f3svf\fP, \f3clientData\fP)
+.PP
+Same as SetContents() except that this method returns immediately after making an
+asynchronous request to perform the requested operation. The service function provided
+in the call is invoked when the operation is completed.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3svf\fP (\f3const SdmServiceFunction&\fP)"
+.br
+The service function to be called when the request is completed. 
+
+The event passed to the service function is of type "Sdm_Event_SetMessageBodyContents".
+.LI "\f3clientData\fP (\f3void*\fP)"
+.br
+Specific client data that is passed unmodified to the service function when it is
+called. This should contain context sufficient to allow the service function to
+execute. This overrides the "user data" provided when the service function is defined. If
+this client data is NULL, then the user data defined in the service function is passed
+instead.
+.br
+
+In a C++ environment this is typically the "this" pointer of the invoking
+object.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3SetStructure\fP
+(\f3err\fP, \f3bodyStructure\fP)
+.PP
+Set the structure of this message body part. 
+A message body has an underlying structure
+that defines the characteristics of the contents. 
+You can set use this structure to set the disposition (inline,
+attachment) for the data, file name, message description,
+unix mode, and/or message id for this body part.
+.PP
+See SdmGlossary(3) for details on message body structures.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3bodyStructure\fP (\f3const SdmMessageBodyStructure&\fP)"
+.br
+The structure containing the content characteristics to set 
+this body part to.
+
+.br
+NOTE: Before calling SetStructure, you should call GetStructure to 
+fill in the message body structure with the current characteristics 
+of the body part.  Change the fields you would like to set 
+in the structure and then call SetStructure with the resulting structure.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.PP
+.RE
+.nr )J 0
+.\"
+.SH "SEE ALSO"
+.na
+.BR SdmError (3),
+.BR SdmGlossary (3),
+.BR SdmMessage (3),
+.BR SdmMessageEnvelope (3),
+.BR SdmMessageStore (3),
+.BR SdmServiceFunction (3)

@@ -1,0 +1,118 @@
+
+/*
+ *	$XConsortium: ab.rules /main/cde1_maint/4 1995/10/23 11:15:19 rcs $
+ *
+ *	@(#)ab.rules	1.4 02 Mar 1994	
+ *
+ * 	RESTRICTED CONFIDENTIAL INFORMATION:
+ *	
+ *	The information in this document is subject to special
+ *	restrictions in a confidential disclosure agreement between
+ *	HP, IBM, Sun, USL, SCO and Univel.  Do not distribute this
+ *	document outside HP, IBM, Sun, USL, SCO, or Univel without
+ *	Sun's specific written approval.  This document and all copies
+ *	and derivative works thereof must be returned or destroyed at
+ *	Sun's request.
+ *
+ *	Copyright 1993 Sun Microsystems, Inc.  All rights reserved.
+ *
+ */
+
+/* 
+ * Rule to link files from current directory to a remote directory
+ */
+
+#ifndef BuildAbIncludes
+#define BuildAbIncludes(_target,srclist,dstsubdir,dstupdir)		@@\
+_target: dstsubdir							@@\
+	@(set -x; cd dstsubdir; for i in srclist; do \			@@\
+		$(RM) $$i; \						@@\
+		$(LN) dstupdir/$$i .; \					@@\
+	done)
+#endif /* BuildAbIncludes */
+
+#ifndef BuildTempLinks
+#ifdef USLArchitecture
+#define BuildTempLinks(_target,srclist,dstsubdir,dstupdir)		@@\
+_target:: 								@@\
+	@(set -x; for i in srclist; do \				@@\
+		$(RM) $$i; \						@@\
+		$(LN) dstupdir/$$i .; \					@@\
+	done)
+#else
+#define BuildTempLinks(_target,srclist,dstsubdir,dstupdir) /* */
+#endif  /* USLArchitecture */
+#endif /* BuildAbIncludes */
+
+#ifndef USLCodegenLink
+#ifdef USLArchitecture
+#define USLCodegenLink							@@\
+includes::								@@\
+	$(RM) dtcodegen							@@\
+	$(LN) ../abmf/$(DTCODEGEN_BUILD) dtcodegen			@@\
+									@@\
+clean::									@@\
+	$(RM) dtcodegen
+#else
+#define USLCodegenLink  /* */
+#endif  /* USLArchitecture */
+#endif /* USLCodegenLink */
+
+/* 
+ * Rule to create a help volume using dthelptag
+ */
+
+#ifndef HelpVolumeTarget
+#define HelpVolumeTarget(volbasename,helpsrc,cmdopts,paropts)		@@\
+all:: volbasename.sdl							@@\
+									@@\
+volbasename.sdl:: helpsrc						@@\
+	HELPTAGPASS1=$(HELPTAGPASS1DEF) \				@@\
+	HELPTAGPASS2=$(HELPTAGPASS2DEF) \				@@\
+	sh $(HELPTAG) cmdopts volbasename paropts
+#endif /* HelpVolumeTarget */
+
+/*
+ * Rule to generate a message catalog using gencat
+ */
+#ifndef AbMessageCatalogTarget
+#define AbMessageCatalogTarget(catalogname)				@@\
+AllTarget(catalogname.cat)						@@\
+									@@\
+catalogname.cat:: $(SOURCES.msg)					@@\
+	gencat catalogname.cat $(SOURCES.msg)
+#endif /* AbMessageCatalogTarget */
+
+/*
+ * Rule to generate module ui.c, ui.h, and stubs.c files
+ * Looks messy now - I can't figure out how to just ifdef out the
+ * $(UIFILE).c + $(UIFILE).h + $(STUBSFILE).c: $(PROJFILE).bip $(MODFILE).bil
+ * line.
+ */
+#ifdef SunArchitecture
+#ifndef BilTarget
+#define BilTarget(module, project)						@@\
+PROJFILE = project								@@\
+MODFILE.module = module								@@\
+UIFILE.module = Concat(module,_ui)						@@\
+STUBSFILE.module = Concat(module,_stubs)					@@\
+$(UIFILE.module).c + $(UIFILE.module).h + $(STUBSFILE.module).c: $(PROJFILE).bip $(MODFILE.module).bil		@@\
+	$(LOCAL_DTCODEGEN) -changed -merge -p $(PROJFILE).bip $(MODFILE.module).bil	@@\
+$(UIFILE.module).o: $(UIFILE.module).c $(UIFILE.module).h $(MODFILE.module).bil					@@\
+$(STUBSFILE.module).o: $(STUBSFILE.module).c $(UIFILE.module).c $(UIFILE.module).h $(MODFILE.module).bil	@@\
+	
+#endif /* BilTarget */
+#else
+#ifndef BilTarget
+#define BilTarget(module, project)						@@\
+PROJFILE = project								@@\
+MODFILE.module = module								@@\
+UIFILE.module = Concat(module,_ui)						@@\
+STUBSFILE.module = Concat(module,_stubs)					@@\
+$(UIFILE.module).c $(UIFILE.module).h $(STUBSFILE.module).c: $(PROJFILE).bip $(MODFILE.module).bil		@@\
+	$(LOCAL_DTCODEGEN) -changed -merge -p $(PROJFILE).bip $(MODFILE.module).bil	@@\
+$(UIFILE.module).o: $(UIFILE.module).c $(UIFILE.module).h $(MODFILE.module).bil					@@\
+$(STUBSFILE.module).o: $(STUBSFILE.module).c $(UIFILE.module).c $(UIFILE.module).h $(MODFILE.module).bil	@@\
+	
+#endif /* BilTarget */
+#endif /* SunArchitecture */

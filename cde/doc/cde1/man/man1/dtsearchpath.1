@@ -1,0 +1,1018 @@
+.\"--- 
+.\"---  dtsearchpath man page
+.\"--- 
+.\"---  Revision 1.0
+.\"---
+.\"--- Variable definition section
+.\"---
+.\" S1 for dtsearchpath
+.de S1
+\f(CWdtsearchpath\fR
+..
+.de S2
+\f(CWDTMOUNTPOINT\fR
+..
+.\"---
+.\"----------------------------------------------------------------------------
+.\"----------------------------------------------------------------------------
+.TH dtsearchpath 1X "5 August 1994"
+.BH "5 August -1994"
+.\"---
+.\"----------------------------------------------------------------------------
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+\f(CWdtsearchpath\fR \- set desktop search paths
+.\"----------------------------------------------------------------------------
+.SH SYNOPSIS
+\f(CWdtsearchpath\fR [ \f(CW-u\fR \fI\fIusername\fR ] [ \f(CW-v\fR ] 
+[ \f(CW-o\fR ]
+.SH DESCRIPTION
+The 
+.S1
+command line utility
+sets local and remote locations that desktop components should 
+search\(emfor Application Manager groups, for filetype and action defintions, 
+for desktop icons, and for help files.
+.PP
+The \f(CW/usr/dt/bin/Xsession\fR startup script sources
+the user's 
+\f(CW$HOME/.dtprofile\fR
+script and any scripts located under \f(CW/etc/dt/config/Xsession.d\fR
+and \f(CW/usr/dt/config/Xsession.d\fR. After sourcing the \f(CWXsession.d\fR
+files, the \f(CWXsession\fR script will invoke
+\f(CW/usr/dt/bin/dtsearchpath\fR to 
+set and export the environment variables DTAPPSEARCHPATH, DTDATABASESEARCHPATH, DTHELPSEARCHPATH, XMICONSEARCHPATH, and XMICONBMSEARCHPATH (see 
+\fIENVIRONMENT\fR below for a more detailed description).
+.SS Search Path Syntax
+Each of the exported search path variables is supported by, i.e. built from, two comma-separated search path environment variables. For example: DTAPPSEARCHPATH is supported by DTSPSYSAPPHOSTS and DTSPUSERAPPHOSTS. XMICONSEARCHPATH is supported by DTSPSYSICON and DTSPUSERICON.
+.PP
+The input search path environment variables fall into two categories -
+those that support the host:/path syntax and those that do not. If the name of
+the input environment variable contains the string 'HOSTS', it will
+support host:/path syntax. The syntax for search paths that support
+host:/path is:
+.TP 6
+search path element
+.br
+\fI\fI[ host \fB|\fI pathname \fB|\fI hostname+pathname ]\fR
+.TP 6
+host
+.br
+.IB <hostname> :
+.TP 6
+.br
+pathname
+.br
+\fB/\fI<absolute path>\fR
+.PP
+The syntax for search paths that do not support host:/path is:
+.TP 6
+search path element
+.br
+\fI\fI[ pathname ]\fR
+.TP 6
+.br
+pathname
+.br
+\fB/\fI<absolute path>\fR
+.PP
+.SS Examples
+To set the Icon search path to include the
+\f(CW/usr/local/games/icons\fR subdirectory, 
+the following line would appear
+in a script in the \f(CW/etc/dt/config/Xsession.d/\fR subdirectory:
+.P
+.in +5
+\f(CWDTSPSYSICON=/usr/local/games/icons\fR
+.in -5
+.P
+To set the Database search path to include host \f(CWmarlin\fR,
+the following line would appear
+in a script in the \f(CW/etc/dt/config/Xsession.d/\fR subdirectory:
+.P
+.in +5
+\f(CWDTSPSYSDATABASEHOSTS=marlin:\fR
+.in -5
+.P
+To set the Application Manager path to include the applications on host
+steelhead under subdirectory \f(CW/usr/local\fR, and under the default
+help location on host \f(CWhalibut\fR,
+the following line would appear
+in a script in the \f(CW/etc/dt/config/Xsession.d/\fR subdirectory:
+.P
+.in +5
+\f(CWDTSPSYSAPPHOSTS=steelhead:/usr/local,halibut:\fR
+.in -5
+.P
+.S1
+parses these path elements and transforms them into a form suitable
+for the desktop components.
+.PP
+If a 
+.I host
+element is included,
+then the Tooltalk library's filename mapping capabilities will control how
+a path to files on that host are constructed.  
+For example, the path to file 
+\f(CW/tmp/file\fR on host \f(CWgoby\fR may be constructed
+as \f(CW/net/goby/tmp/file\fR or as \f(CW/nfs/goby/tmp/file\fR.
+.SS Default Locations
+By default, 
+.S1
+sets up three search locations for each subsystem.  In search 
+order, they are:
+.P
+.in +5
+The user's personal location, under \f(CW$HOME/.dt\fR.
+.in -5
+.P
+.in +5
+The system administrator's configuration location, under 
+\f(CW/etc/dt/appconfig\fR.
+.in -5
+.P
+.in +5
+The factory default location, under \f(CW/usr/dt/appconfig\fR.
+.in -5
+.SS Precedence
+When searching a path for a particular item, such as an icon file, the 
+desktop will always be satisfied by the first item found.  For example,
+when searching for an icon whose basename is
+\f(CWbeeper\fR,
+if that icon exists in both the 
+\f(CW/etc/dt/appconfig/icons\fR
+and the
+\f(CW/usr/dt/appconfig/icons\fR subdirectories,
+then the icon under
+\f(CW/etc/dt/appconfig/icons\fR
+will be found first and used, because that
+element appears first in the 
+\f(CWXMICONSEARCHPATH\fR.
+The search terminates when the first match occurs.
+.PP
+Each of the \f(CWDTSPSYS\fR search path environment variables has a
+corresponding \f(CWDTSPUSER\fR environment variable which will take
+precedence over the system setting.  The \f(CWDTSPUSER\fR values will
+be \fIprepended\fR to the \f(CWDT\fR search path whereas the
+\f(CWDTSPSYS\fR values will come after the $HOME/.dt
+configuration location but before the factory default location. 
+The relationship between the system administrator's customization and the
+default /etc/dt configuration location is up to the user of the 
+\f(CWDTSPSYS\fR value.
+.SH OPTIONS
+.TP
+.BI \-u " user"
+Causes
+.S1
+to return the search paths for the specified user.  This option is useful
+for system administrators who need to understand the search paths for
+a particular user.
+.TP
+.B \-v
+The verbose option causes
+.S1
+to print to standard output the values of the search environment.  By
+default, the command runs silently.
+.TP
+.B \-o
+The don't-optimize option causes
+.S1
+to add a path to the search path even if the path does not exist.
+.SH RETURN VALUES
+.TP 15
+0
+Command completed successfully.
+.TP 15
+1
+Command invoked with incorrect usage.
+.SH ENVIRONMENT
+.LP
+The values set by 
+.S1
+are passed through to the individual desktop subsystems, such as the action
+database and the help system, by means of environment variables.
+.PP
+The \f(CWDTSPSYSAPPHOSTS\fR variable is the primary environment
+variable and drives the remaining search paths for filetypes and
+actions, for desktop icons, and for help files.
+.PP
+In the following list, all values are derived from three places:  the
+user's $HOME directory (\f(CW$HOME/.dt\fR),
+the system configuration directory (\f(CW/etc/dt/appconfig\fR),
+and the factory defaults directory (\f(CW/usr/dt/appconfig\fR).
+The values are listed as tranformed for the individual desktop
+subsystems.
+.PP
+To verify these values, execute
+.S1
+with the verbose (\fB-v\fR) option.
+.TP 5
+.SM "DTAPPSEARCHPATH, DTSPSYSAPPHOSTS, DTSPUSERAPPHOSTS"
+.PP
+.in +5
+Used to discover application hosts and their registry subdirectories.
+The default transformed value is:
+.PP
+.in +10
+\f(CW$HOME/.dt/appmanager
+.br
+/etc/dt/appconfig/appmanager/%L
+.br
+/etc/dt/appconfig/appmanager/C
+.br
+/usr/dt/appconfig/appmanager/%L
+.br
+/usr/dt/appconfig/appmanager/C\fR
+.PP
+.in +5
+Where '%L' is the value of the LANG environment variable.
+.PP
+.in +5
+The value of DTAPPSEARCHPATH can be altered by either of two
+environment variables: DTSPSYSAPPHOSTS and/or DTSPUSERAPPHOSTS.
+DTSPSYSAPPHOSTS is for use by system administrators. Values are
+specified by adding a ksh script to the /etc/dt/config/Xsession.d
+directory that exports the variable.
+.PP
+.in +10
+export DTSPSYSAPPHOSTS=marlin:,goby:/vipapps,/opt
+.PP
+.in +5
+The expected syntax for DTSPSYSAPPHOSTS is a comma-separated list.
+DTSPSYSAPPHOSTS accepts host:, host:/path, or just /path.  The effect
+is to insert a searchpath after the configuration location 
+(/etc/dt/appconfig/appmanager) and before the factory default location
+(/usr/dt/appconfig/appmanager).
+.PP
+.in +10
+\f(CW$HOME/.dt/appmanager
+.br
+/etc/dt/appconfig/appmanager/%L
+.br
+/etc/dt/appconfig/appmanager/C
+.br
+/nfs/marlin/etc/dt/appconfig/appmanager/%L
+.br
+/nfs/marlin/etc/dt/appconfig/appmanager/C
+.br
+/nfs/goby/vipapps/appconfig/appmanager/%L
+.br
+/nfs/goby/vipapps/appconfig/appmanager/C
+.br
+/opt/appconfig/appmanager/%L
+.br
+/opt/appconfig/appmanager/C
+.br
+/usr/dt/appconfig/appmanager/%L
+.br
+/usr/dt/appconfig/appmanager/C\fR
+.PP
+.in +5
+If the system administrator wants the local configuration directory to
+appear in a different location within the configurable search paths,
+the special host term 'localhost:' can be inserted anywhere into the
+environment variable:
+.PP
+.in +10
+export DTSPSYSAPPHOSTS=marlin:,localhost:,goby:/vipapps,/opt
+.PP
+.in +5
+The resulting value for DTAPPSEARCHPATH would be:
+.PP
+.in +10
+\f(CW$HOME/.dt/appmanager
+.br
+/nfs/marlin/etc/dt/appconfig/appmanager/%L
+.br
+/nfs/marlin/etc/dt/appconfig/appmanager/C
+.br
+/etc/dt/appconfig/appmanager/%L
+.br
+/etc/dt/appconfig/appmanager/C
+.br
+/nfs/goby/vipapps/appconfig/appmanager/%L
+.br
+/nfs/goby/vipapps/appconfig/appmanager/C
+.br
+/opt/appconfig/appmanager/%L
+.br
+/opt/appconfig/appmanager/C
+.br
+/usr/dt/appconfig/appmanager/%L
+.br
+/usr/dt/appconfig/appmanager/C\fR
+.PP
+.in +5
+In fact, the value 'localhost:' can be inserted anywhere in the DTSPSYSAPPHOSTS
+value and its order within the DTSPSYSAPPHOSTS will be reflected in the 
+DTAPPSEARCHPATH value.
+.PP
+.in +5
+DTSPUSERAPPHOSTS is for use by end users. Values are specified by exporting
+the value in the user's .dtprofile.
+.PP
+.in +10
+export DTSPUSERAPPHOSTS=appsvr:,/myapps
+.PP
+.in +5
+DTSPUSERAPPHOSTS also accepts host:, host:/path, and /path
+specifications. The effect is to insert a searchpath before any other
+searchpath.
+.PP
+.in +10
+\f(CW/nfs/appsvr/etc/dt/appconfig/appmanager/%L
+.br
+/nfs/appsvr/etc/dt/appconfig/appmanager/C
+.br
+/myapps/appmanager/%L
+.br
+/myapps/appmanager/C
+.br
+$HOME/.dt/appmanager
+.br
+/etc/dt/appconfig/appmanager/%L
+.br
+/etc/dt/appconfig/appmanager/C
+.br
+/usr/dt/appconfig/appmanager/%L
+.br
+/usr/dt/appconfig/appmanager/C\fR
+.TP 10
+.SM "DTDATABASESEARCHPATH, DTSPSYSDATABASEHOSTS, DTSPUSERDATABASEHOSTS"
+.PP
+.in +5
+Used to collect filetype and action definitions, as expressed in
+\f(CW*.dt\fR files.  The default transformed value is:
+.PP
+.in +10
+\f(CW$HOME/.dt/types
+.br
+/etc/dt/appconfig/types/%L
+.br
+/etc/dt/appconfig/types/C
+.br
+/usr/dt/appconfig/types/%L
+.br
+/usr/dt/appconfig/types/C\fR
+.PP
+.in +5
+Where '%L' is the value of the LANG environment variable.
+.PP
+.in +5
+The value of DTDATABASESEARCHPATH can be altered by either of two
+environment variables: DTSPSYSDATABASEHOSTS and/or DTSPUSERDATABASEHOSTS.
+DTSPSYSDATABASEHOSTS is for use by system administrators. Values are
+specified by adding a ksh script to the /etc/dt/config/Xsession.d
+directory that exports the variable.
+.PP
+.in +10
+export DTSPSYSDATABASEHOSTS=marlin:,goby:/vipapps,/opt
+.PP
+.in +5
+The expected syntax for DTSPSYSDATABASEHOSTS is a comma-separated
+list.  DTSPSYSDATABASEHOSTS accepts host:, host:/path, or just /path.
+The effect is to insert a searchpath after the configuration location
+(/etc/dt/appconfig/types) and before the factory default location
+(/usr/dt/appconfig/types).
+.PP
+.in +10
+\f(CW$HOME/.dt/types
+.br
+/etc/dt/appconfig/types/%L
+.br
+/etc/dt/appconfig/types/C
+.br
+marlin:/etc/dt/appconfig/types/%L
+.br
+marlin:/etc/dt/appconfig/types/C
+.br
+goby:/vipapps/appconfig/types/%L
+.br
+goby:/vipapps/appconfig/types/C
+.br
+/opt/appconfig/types/%L
+.br
+/opt/appconfig/types/C
+.br
+/usr/dt/appconfig/types/%L
+.br
+/usr/dt/appconfig/types/C\fR
+.PP
+.in +5
+As is the case for DTAPPSEARCHPATH, the placement of the local configuration
+directory can be affected by the adding special host term 'localhost:' to the
+DTSPSYSDATABASEHOSTS environment variable.
+.PP
+.in +10
+export DTSPSYSDATABASEHOSTS=marlin:,localhost:,goby:/vipapps
+.PP
+.in +5
+The resulting value for DTDATABASESEARCHPATH would be:
+.PP
+.in +10
+\f(CW$HOME/.dt/types
+.br
+marlin:/etc/dt/appconfig/types/%L
+.br
+marlin:/etc/dt/appconfig/types/C
+.br
+/etc/dt/appconfig/types/%L
+.br
+/etc/dt/appconfig/types/C
+.br
+goby:/vipapps/appconfig/types/%L
+.br
+goby:/vipapps/appconfig/types/C
+.br
+/usr/dt/appconfig/types/%L
+.br
+/usr/dt/appconfig/types/C\fR
+.PP
+.in +5
+DTSPUSERDATABASEHOSTS is for use by end users. Values are specified by
+exporting the value in the user's .dtprofile.
+.PP
+.in +10
+export DTSPUSERDATABASEHOSTS=dbsvr:,/mytypes
+.PP
+.in +5
+DTSPUSERDATABASEHOSTS also accepts host:, host:/path, and /path
+specifications. The effect is to insert a searchpath before any other
+searchpath.
+.PP
+.in +10
+\f(CWdbsvr:/etc/dt/appconfig/types/%L
+.br
+dbsvr:/etc/dt/appconfig/types/C
+.br
+/mytypes/types/%L
+.br
+/mytypes/types/C
+.br
+$HOME/.dt/types
+.br
+/etc/dt/appconfig/types/%L
+.br
+/etc/dt/appconfig/types/C
+.br
+/usr/dt/appconfig/types/%L
+.br
+/usr/dt/appconfig/types/C\fR
+.TP 10
+.SM "XMICONSEARCHPATH, XMICONBMSEARCHPATH, DTSPSYSICON, DTSPUSERICON"
+.PP
+.in +5
+Used to locate desktop icons. The default transformed value is:
+.PP
+.in +10
+\f(CW$HOME/.dt/icons/0M.pm
+.br
+$HOME/.dt/icons/0M.bm
+.br
+$HOME/.dt/icons/%B
+.br
+/etc/dt/appconfig/icons/%L/0M.pm
+.br
+/etc/dt/appconfig/icons/%L/0M.bm
+.br
+/etc/dt/appconfig/icons/%L/%B
+.br
+/etc/dt/appconfig/icons/C/0M.pm
+.br
+/etc/dt/appconfig/icons/C/0M.bm
+.br
+/etc/dt/appconfig/icons/C/%B
+.br
+/usr/dt/appconfig/icons/%L/0M.pm
+.br
+/usr/dt/appconfig/icons/%L/0M.bm
+.br
+/usr/dt/appconfig/icons/%L/%B
+.br
+/usr/dt/appconfig/icons/C/0M.pm
+.br
+/usr/dt/appconfig/icons/C/0M.bm
+.br
+/usr/dt/appconfig/icons/C/%B
+.PP
+.in +5
+Where '%B' is the basename of the requested icon, '%M' is the magnitude 
+(size) of the icon, and '%L' is the value of the LANG environment variable.
+.PP
+.in +5
+The value of XMICONSEARCHPATH can be altered by either of two
+environment variables: DTSPSYSICON and/or DTSPUSERICON.
+DTSPSYSICON is for use by system administrators. Values are
+specified by adding a ksh script to the /etc/dt/config/Xsession.d
+directory that exports the variable.
+.PP
+.in +10
+export DTSPSYSICON=/vipapps/icons
+.PP
+.in +5
+The expected syntax for DTSPSYSICON is a comma-separated list.
+DTSPSYSICON accepts the /path format.  The effect
+is to insert a searchpath after the configuration location 
+(/etc/dt/appconfig/icons) and before the factory default location
+(/usr/dt/appconfig/icons).
+.PP
+.in +10
+\f(CW$HOME/.dt/icons/0M.pm
+.br
+$HOME/.dt/icons/0M.bm
+.br
+$HOME/.dt/icons/0M
+.br
+/etc/dt/appconfig/icons/%L/0M.pm
+.br
+/etc/dt/appconfig/icons/%L/0M.bm
+.br
+/etc/dt/appconfig/icons/%L/0M
+.br
+/etc/dt/appconfig/icons/C/0M.pm
+.br
+/etc/dt/appconfig/icons/C/0M.bm
+.br
+/etc/dt/appconfig/icons/C/0M
+.br
+/vipapps/icons/%L/0M.pm
+.br
+/vipapps/icons/%L/0M.bm
+.br
+/vipapps/icons/%L/0M
+.br
+/vipapps/icons/C/0M.pm
+.br
+/vipapps/icons/C/0M.bm
+.br
+/vipapps/icons/C/0M
+.br
+usr/dt/appconfig/icons/%L/0M.pm
+.br
+/usr/dt/appconfig/icons/%L/0M.bm
+.br
+/usr/dt/appconfig/icons/%L/0M
+.br
+/usr/dt/appconfig/types/C/0M.pm
+.br
+/usr/dt/appconfig/types/C/0M.bm
+.br
+/usr/dt/appconfig/types/C/0M\fR
+.PP
+.in +5
+The placement of the local configuration directory can be affected by
+the adding the path term /etc/dt/appconfig to the DTSPSYSICON
+environment variable.
+.PP
+.in +10
+export DTSPSYSICON=/vipapps/icons,/etc/dt/appconfig
+.PP
+.in +5
+The resulting value for XMICONSEARCHPATH would be:
+.PP
+.in +10
+\f(CW$HOME/.dt/icons/0M.pm
+.br
+$HOME/.dt/icons/0M.bm
+.br
+$HOME/.dt/icons/0M
+.br
+/vipapps/icons/%L/0M.pm
+.br
+/vipapps/icons/%L/0M.bm
+.br
+/vipapps/icons/%L/0M
+.br
+/vipapps/icons/C/0M.pm
+.br
+/vipapps/icons/C/0M.bm
+.br
+/vipapps/icons/C/0M
+.br
+/etc/dt/appconfig/icons/%L/0M.pm
+.br
+/etc/dt/appconfig/icons/%L/0M.bm
+.br
+/etc/dt/appconfig/icons/%L/0M
+.br
+/etc/dt/appconfig/icons/C/0M.pm
+.br
+/etc/dt/appconfig/icons/C/0M.bm
+.br
+/etc/dt/appconfig/icons/C/0M
+.br
+usr/dt/appconfig/icons/%L/0M.pm
+.br
+/usr/dt/appconfig/icons/%L/0M.bm
+.br
+/usr/dt/appconfig/icons/%L/0M
+.br
+/usr/dt/appconfig/types/C/0M.pm
+.br
+/usr/dt/appconfig/types/C/0M.bm
+.br
+/usr/dt/appconfig/types/C/0M\fR
+.PP
+.in +5
+DTSPUSERICON is for use by end users. Values are specified by
+exporting the value in the user's .dtprofile.
+.PP
+.in +10
+export DTSPUSERICON=$HOME/myicons
+.PP
+.in +5
+DTSPUSERICON accepts /path specifications. The effect is to insert a
+searchpath before any other searchpath.
+.PP
+.in +10
+\f(CW$HOME/myicons/0M.pm
+.br
+$HOME/myicons/0M.bm
+.br
+$HOME/myicons/0M
+.br
+$HOME/.dt/icons/0M.pm
+.br
+$HOME/.dt/icons/0M.bm
+.br
+$HOME/.dt/icons/0M
+.br
+/etc/dt/appconfig/icons/%L/0M.pm
+.br
+/etc/dt/appconfig/icons/%L/0M.bm
+.br
+/etc/dt/appconfig/icons/%L/0M
+.br
+/etc/dt/appconfig/icons/C/0M.pm
+.br
+/etc/dt/appconfig/icons/C/0M.bm
+.br
+/etc/dt/appconfig/icons/C/0M
+.br
+/usr/dt/appconfig/icons/%L/0M.pm
+.br
+/usr/dt/appconfig/icons/%L/0M.bm
+.br
+/usr/dt/appconfig/icons/%L/0M
+.br
+/usr/dt/appconfig/types/C/0M.pm
+.br
+/usr/dt/appconfig/types/C/0M.bm
+.br
+/usr/dt/appconfig/types/C/0M\fR
+.TP 10
+.SM "DTHELPSEARCHPATH, DTSPSYSHELP, DTSPUSERHELP"
+.PP
+.in +5
+Used to locate help volumes and families for the desktop help
+subsystem. The default transformed value is:
+.PP
+.in +10
+\f(CW$HOME/.dt/help/<session>/%H
+.br
+$HOME/.dt/help/<session>/%H.sdl
+.br
+$HOME/.dt/help/<session>/%H.hv
+.br
+$HOME/.dt/help/%H
+.br
+$HOME/.dt/help/%H.sdl
+.br
+$HOME/.dt/help/%H.hv
+.br
+/etc/dt/appconfig/help/%L/%H
+.br
+/etc/dt/appconfig/help/%L/%H.sdl
+.br
+/etc/dt/appconfig/help/%L/%H.hv
+.br
+/etc/dt/appconfig/help/C/%H
+.br
+/etc/dt/appconfig/help/C/%H.sdl
+.br
+/etc/dt/appconfig/help/C/%H.hv
+.br
+/usr/dt/appconfig/help/%L/%H
+.br
+/usr/dt/appconfig/help/%L/%H.sdl
+.br
+/usr/dt/appconfig/help/%L/%H.hv
+.br
+/usr/dt/appconfig/help/C/%H
+.br
+/usr/dt/appconfig/help/C/%H.sdl
+.br
+/usr/dt/appconfig/help/C/%H.hv\fR
+.PP
+.in +5
+Where '%H' is the basename of the requested help volume, and '%L' is the 
+value of the LANG environment variable.
+.PP
+.in +5
+The value of DTHELPSEARCHPATH can be altered by either of two
+environment variables: DTSPSYSHELP and/or DTSPUSERHELP.
+DTSPSYSHELP is for use by system administrators. Values are
+specified by adding a ksh script to the /etc/dt/config/Xsession.d
+directory that exports the variable.
+.PP
+.in +10
+export DTSPSYSHELP=/vipapps/help
+.PP
+.in +5
+The expected syntax for DTSPSYSHELP is a comma-separated list.
+DTSPSYSHELP accepts the /path format.  The effect
+is to insert a searchpath after the configuration location 
+(/etc/dt/appconfig/help) and before the factory default location
+(/usr/dt/appconfig/help).
+.PP
+.in +10
+\f(CW$HOME/.dt/help/<session>/%H
+.br
+$HOME/.dt/help/<session>/%H.sdl
+.br
+$HOME/.dt/help/<session>/%H.hv
+.br
+$HOME/.dt/help/%H
+.br
+$HOME/.dt/help/%H.sdl
+.br
+$HOME/.dt/help/%H.hv
+.br
+/etc/dt/appconfig/help/%L/%H
+.br
+/etc/dt/appconfig/help/%L/%H.sdl
+.br
+/etc/dt/appconfig/help/%L/%H.hv
+.br
+/etc/dt/appconfig/help/C/%H
+.br
+/etc/dt/appconfig/help/C/%H.sdl
+.br
+/etc/dt/appconfig/help/C/%H.hv
+.br
+/vipapps/help/%L/%H
+.br
+/vipapps/help/%L/%H.sdl
+.br
+/vipapps/help/%L/%H.hv
+.br
+/vipapps/help/C/%H
+.br
+/vipapps/help/C/%H.sdl
+.br
+/vipapps/help/C/%H.hv
+.br
+/usr/dt/appconfig/help/%L/%H
+.br
+/usr/dt/appconfig/help/%L/%H.sdl
+.br
+/usr/dt/appconfig/help/%L/%H.hv
+.br
+/usr/dt/appconfig/help/C/%H
+.br
+/usr/dt/appconfig/help/C/%H.sdl
+.br
+/usr/dt/appconfig/help/C/%H.hv\fR
+.PP
+.in +5
+The placement of the local configuration directory can be affected by
+the adding the path term /etc/dt/appconfig to the DTSPSYSHELP
+environment variable.
+.PP
+.in +10
+export DTSPSYSHELP=/vipapps/help,/etc/dt/appconfig
+.PP
+.in +5
+The resulting value for DTHELPSEARCHPATH would be:
+.PP
+.in +10
+\f(CW$HOME/.dt/help/<session>/%H
+.br
+$HOME/.dt/help/<session>/%H.sdl
+.br
+$HOME/.dt/help/<session>/%H.hv
+.br
+$HOME/.dt/help/%H
+.br
+$HOME/.dt/help/%H.sdl
+.br
+$HOME/.dt/help/%H.hv
+.br
+/vipapps/help/%L/%H
+.br
+/vipapps/help/%L/%H.sdl
+.br
+/vipapps/help/%L/%H.hv
+.br
+/vipapps/help/C/%H
+.br
+/vipapps/help/C/%H.sdl
+.br
+/vipapps/help/C/%H.hv
+.br
+/etc/dt/appconfig/help/%L/%H
+.br
+/etc/dt/appconfig/help/%L/%H.sdl
+.br
+/etc/dt/appconfig/help/%L/%H.hv
+.br
+/etc/dt/appconfig/help/C/%H
+.br
+/etc/dt/appconfig/help/C/%H.sdl
+.br
+/etc/dt/appconfig/help/C/%H.hv
+.br
+/usr/dt/appconfig/help/%L/%H
+.br
+/usr/dt/appconfig/help/%L/%H.sdl
+.br
+/usr/dt/appconfig/help/%L/%H.hv
+.br
+/usr/dt/appconfig/help/C/%H
+.br
+/usr/dt/appconfig/help/C/%H.sdl
+.br
+/usr/dt/appconfig/help/C/%H.hv\fR
+.PP
+.in +5
+DTSPUSERHELP is for use by end users. Values are specified by
+exporting the value in the user's .dtprofile.
+.PP
+.in +10
+export DTSPUSERHELP=$HOME/myhelp
+.PP
+.in +5
+DTSPUSERHELP accepts /path specifications. The effect is to insert a
+searchpath before any other searchpath.
+.PP
+.in +10
+\f(CW$HOME/myhelp/%H
+.br
+$HOME/myhelp/%H.sdl
+.br
+$HOME/myhelp/%H.hv
+.br
+$HOME/.dt/help/<session>/%H
+.br
+$HOME/.dt/help/<session>/%H.sdl
+.br
+$HOME/.dt/help/<session>/%H.hv
+.br
+$HOME/.dt/help/%H
+.br
+$HOME/.dt/help/%H.sdl
+.br
+$HOME/.dt/help/%H.hv
+.br
+/etc/dt/appconfig/help/%L/%H
+.br
+/etc/dt/appconfig/help/%L/%H.sdl
+.br
+/etc/dt/appconfig/help/%L/%H.hv
+.br
+/etc/dt/appconfig/help/C/%H
+.br
+/etc/dt/appconfig/help/C/%H.sdl
+z.br
+/etc/dt/appconfig/help/C/%H.hv
+.br
+/usr/dt/appconfig/help/%L/%H
+.br
+/usr/dt/appconfig/help/%L/%H.sdl
+.br
+/usr/dt/appconfig/help/%L/%H.hv
+.br
+/usr/dt/appconfig/help/C/%H
+.br
+/usr/dt/appconfig/help/C/%H.sdl
+.br
+/usr/dt/appconfig/help/C/%H.hv\fR
+.PP
+.in +5
+(See also \fIOPTIMIZATIONS\fR below.)
+.PP
+.in +5
+At the conclusion of \f(CWdtsearchpath\fR, then \f(CWDTSPSYS\fR and
+\f(CWDTSPUSER\fR variables are explicitly unset, so that only the
+\f(CWDT*SEARCHPATH\fR values remain.
+.TP 10
+.SM "MANPATH, DTMANPATH"
+.PP
+.in +5
+In addition to setting the application search paths,
+.S1
+augments the \f(CWMANPATH\fR environment variable with the path to the
+CDE man pages,
+.B /usr/dt/man.
+For example, if the value of \f(CWMANPATH\fR prior to execution of:
+.S1
+is
+.PP
+.in +10
+/net/manserver/usr/man:/usr/man
+.PP
+.in +5
+then the augmented value will be:
+.PP
+.in +10
+/usr/dt/man:/net/manserver/usr/man:/usr/man.
+.PP
+.in +5
+If the \f(CWMANPATH\fR environment variable is not set prior to the
+invocation of
+.S1
+, the system-defined default value of \f(CWMANPATH\fR will be included in the
+augmented \f(CWMANPATH\fR value. For example, if the system-defined 
+default value is:
+.PP
+.in +10
+/usr/man:/usr/local/man
+.PP
+.in +5
+then,
+.S1
+will generate a \f(CWMANPATH\fR value of:
+.PP
+.in +10
+/usr/dt/man:/usr/man:/usr/local/man
+.PP
+.SH LOCALES
+Each of the search path elements contain a path that references the LANG variable using the %L construct.  When the user
+selects a different language from the greeting screen and logs in, the
+search path will already be set up.  At the same time, the
+factory defaults are still included, but after the localized elements.
+.PP
+For example, if the user chooses
+the german locale
+from the greeting screen, then his/her
+\f(CWDTDATABASESEARCHPATH\fR
+will already include these elements, as specified by the \f(CW$LANG\fR value
+set at session startup:
+.PP
+.in +10
+\f(CW$HOME/.dt/types
+.br
+/etc/dt/appconfig/types/%L
+.br
+/etc/dt/appconfig/types/C
+.br
+/usr/dt/appconfig/types/%L
+.br
+/usr/dt/appconfig/types/C \fR
+.in -10
+.PP
+(See also \fIOPTIMIZATIONS\fR below.)
+.PP
+Note that the search path does \fInot\fR use locales under the user's 
+\f(CW$HOME\fR directory.  Whether the user adds personal icons under
+\f(CW$HOME/.dt/icons\fR or personal applications under 
+\f(CW$HOME/.dt/appmanager\fR, they will be found regardless of the language
+selected at login.
+.SH OPTIMIZATIONS
+Before exporting the search paths to the user's environment,
+.S1
+first checks to ensure that each subdirectory exists.  If a directory
+does not exist at login, then that element will not be added to the
+user's search path, to save needless file system accesses by the
+desktop components.
+.SH FILES
+.PD 0
+.TP 20
+\f(CW$HOME/.dtprofile\fR
+Enables setting of the user's DTSPUSER environment variables.
+.PD
+.PD 0
+.TP 20
+\f(CWXsession.d/*\fR
+Enables setting of the system DTSPSYS environment variables.
+.PD
+.SH "SEE ALSO"
+.BR dtappgather (1).
+.SH NOTES
+.LP
+In order to inject the values from
+.S1
+into the user's environment, the command must be
+\fIeval'd\fR,
+as is done by the 
+\f(CWXsession\fR
+login script. 
+.PP
+.in +10
+eval `/usr/dt/bin/dtsearchpath`
+.in -10
+.PP
+Simply running 
+.S1
+from the command line will have no affect on the parent shell.
+.PP
+It is not possible to affect the DT search paths after logging in.
+Components such as the Window Manager and File Manager inherit the
+values from
+.S1
+by being invoked from the same shell.  Hence, if the system
+administrator creates a new search path element for the end user,
+the user will not be able to access it until the next log in.

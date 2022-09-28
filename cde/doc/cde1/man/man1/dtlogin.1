@@ -1,0 +1,1767 @@
+'\" t
+.de LI
+.\" simulate -mm .LIs by turning them into .TPs
+.TP \\n()Jn
+\\$1
+..
+.\"--- 
+.\"    (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\"    (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\"    (c) Copyright 1993, 1994 International Business Machines Corp.
+.\"    (c) Copyright 1993, 1994 Novell, Inc.
+.\"--- 
+'\" t
+.TH dtlogin 1X "17 Feb. 1994"
+.BH "17 Feb. 1994""
+.SH NAME
+dtlogin \- CDE login service 
+.SH SYNOPSIS
+.B dtlogin
+[
+.B \-config
+.I configuration_file
+] 
+[
+.B \-daemon
+]
+[
+.B \-debug
+.I debug_level
+] [
+.B \-error
+.I error_log_file
+]
+.br
+[
+.B \-nodaemon
+] [
+.B \-resources
+.I resource_file
+] [
+.B \-server
+.I  server_entry
+] [
+.B \-session
+.I session_program
+]
+.SH DESCRIPTION
+.SS Key Supported Tasks
+The
+.B dtlogin
+client supports the following key tasks:
+.RS
+.IP \(em 3
+Launch of dtgreet login screen for explicitly managed local and
+remote displays and XDMCP managed remote displays.
+.IP \(em 3
+Access to traditional terminal (character) login from GUI login screen.
+.IP \(em 3
+System dependent user authentication and login.
+.IP \(em 3
+Launching the selected session.
+.RE
+.LP
+The
+.B dtlogin
+client provides services similar to those provided by init(1M),
+getty(1M) and login(1) on character terminals: prompting for login and
+password, authenticating the user, and running a ``session.''
+.LP
+A ``session'' is defined by the lifetime of a particular process; in
+the traditional character-based terminal world, it is the user's login
+shell process. In the DT context, it is the DT Session Manager.
+.LP
+If the DT Session Manager is not used, the typical substitute is
+either a window manager with an exit option, or a terminal emulator
+running a shell, where the lifetime of the terminal emulator is the
+lifetime of the shell process that it is running; thus reducing the X
+session to an emulation of the character-based terminal session.
+.LP
+When the session is terminated,
+.B dtlogin
+resets the X server and
+(optionally) restarts the whole process.
+.LP
+The
+.B dtlogin
+client supports management of remote displays using the X Display
+Manager Control Protocol, Version 1.0. (XDMCP).
+.LP
+When 
+.B dtlogin
+receives an Indirect query via XDMCP, it can run a
+chooser process to perform an XDMCP BroadcastQuery (or an
+XDMCP Query to specified hosts) on behalf of the display and
+offer a menu of possible hosts that offer XDMCP display
+management.  This feature is useful with X terminals that do
+not offer a host menu themselves.
+.LP
+Because
+.B dtlogin
+provides the first interface that users see, it is
+designed to be simple to use and easy to customize to the needs of a
+particular site.
+.SS Login Window
+The Login window allows to user to enter a user ID and password,
+select a startup session, and select a startup locale. User may also
+reset the X server or temporarily suspend the X server to access the
+command line login prompt.
+.LP
+Contents of Login window:
+.IP "\f3user name field\fP" 1.5i
+Entry field to enter user ID.
+.IP "\f3password field\fP" 1.5i
+Entry field to enter user password (no-echo).
+.IP "\f3OK\fP" 1.5i
+Authenticate user and launches session.
+.IP "\f3Start Over\fP" 1.5i
+Clear login and password field.
+.IP "\f3Options\fP" 1.5i
+Display menu for locale, session, command line login, and reset login screen. 
+.IP "\f3Help\fP" 1.5i
+Display help message.
+.SS Login Window \(em Options Menu
+Allows user to select locale name and login session type. Also allows
+user to restart the X server or switch to a character login prompt
+(for local displays).
+.LP
+Contents of Options Menu:
+.IP "\f3Language\fP" 1.5i
+Show Language menu.
+.IP "\f3Session\fP" 1.5i
+Show Session menu.
+.IP "\f3Command Line Login"\fP 1.5i
+Display character login prompt (local displays only).  Enabled when dtlogin
+was started by sytem at boot time (see dtconfig man page).  Disabled if dtlogin
+was manualy started (possibly for some configuration test) from a command line
+"root" login session for security reasons (would place user in a running "root"
+session).
+.IP "\f3Reset Login Screen\fP" 1.5i
+Restart X Server and return to login screen.
+.SS Login Window \(em Session Menu
+Allows user to select which desktop session should be started upon login.
+.LP
+Contents of Sessions Menu: 
+.IP "\f3Common Desktop Environment" 1.5i
+Start a CDE desktop session (Xsession)
+.IP "\f3OpenWindows Desktop" 1.5i
+Start an OpenWindows desktop (Xsession.ow)
+.IP "\f3User's Last Desktop" 1.5i
+Start desktop of type user ran on his previous login 
+.IP "\f3Fail-safe Session"1.5i
+Start a fail-safe session (Xfailsafe)
+.SS Login Window \(em Language Menu
+Selecting the language from the login screen Options menu immediately
+localizes the login screen and sets LANG for the next session. Login
+screen localization and LANG return to the default value upon
+conclusion of the session. The contents of this menu can vary
+depending upon the locales installed on the system and can be
+overridden by using the languageList resource. The default locale of C
+can be overridden using the language resource.
+.LP
+The system or 
+.B languageList
+locales specified are displayed as
+menu items in the Language menu. Alternate text to be displayed may
+be specified for a given locale name by using the
+.B languageName
+resource.
+.SS Controlling The Server
+The
+.B dtlogin
+client controls local servers using 
+POSIX
+signals. 
+.B SIGHUP
+is expected to reset the server, closing all client
+connections and performing other clean-up duties. 
+.B SIGTERM
+is expected to terminate the server. If these signals do not perform the
+expected actions, the resources resetSignal and termSignal can specify
+alternate signals.
+.LP
+To control remote servers not using XDMCP,
+.B dtlogin
+searches the window
+hierarchy on the display and uses the KillClient X protocol request in
+an attempt to clean up the terminal for the next session.  This may
+not actually kill all of the clients, since only those that have
+created windows are noticed.  XDMCP provides a more sure mechanism;
+when
+.B dtlogin
+closes its initial connection, the session is over and
+the terminal is required to close all other connections.
+.SS Controlling Dtlogin
+The
+.B dtlogin
+client responds to two signals: 
+.B SIGHUP
+and 
+.BR SIGTERM .
+When sent a 
+.BR SIGHUP ,
+dtlogin rereads the configuration file
+and the file specified by the servers resource and determines whether
+entries have been added or removed. If a new entry has been added,
+dtlogin starts a session on the associated display. Entries that have
+been removed are disabled immediately, meaning that any session in
+progress is terminated without notice, and no new session is started.
+.LP
+When sent a 
+.BR SIGTERM ,
+dtlogin terminates all sessions in progress and exits. This can 
+be used when shutting down the system.
+.SS Internationalization
+All labels and messages are localizable. The message catalog
+dtlogin.cat contains the localized  
+representations of the default labels and messages. 
+The
+.B dtlogin
+client reads the
+appropriate message catalog  
+indicated by the 
+.B LANG
+environment variable and displays the localized strings. An 
+option on the authentication screen allows the user to override the
+default language for the  
+subsequent session. If the authentication screen has been localized
+for the selected language, it is  
+redisplayed in that language; otherwise, it is displayed in the
+default language. In either case, the  
+LANG environment variable is set appropriately for the resulting session.
+.LP
+The resource
+.B  language
+is available in the
+.B dtlogin
+configuration file to change the default 
+language for a display. The resource 
+.B languageList
+is available in the
+.B dtlogin 
+configuration file to override the default set of languages displayed
+on the authentication screen.  The resource 
+.B languageName
+is available to provide a mapping from locale names to 
+the text displayed on the Language menu.
+.SS Authentication And Auditing
+The
+.B dtlogin
+client performs traditional local UNIX login and auditing. Additional
+authentication or auditing 
+function such as Kerberos or B1 may be added by individual vendors.
+.SS X Server Security
+The X server provides both user-based and host-based access control.
+.LP
+By default,
+.B dtlogin
+uses user-based access control to the X server
+(MIT-MAGIC-COOKIE-1). This 
+level of security allows access control on a per-user basis. It is
+based on a scheme where if a client  
+passes authorization data which is the same as the server has, it is
+allowed access. When a user  
+logs in, this authorization data is by default stored and protected in
+the
+.B $HOME/.Xauthority
+file. 
+.LP
+However, using host-based access control mechanisms may be preferable
+in environments with  
+unsecure networks as user-based access control allows any host to
+connect, given that it has  
+discovered the private key. Another drawback to user-based access
+control is that R2 or R3 clients  
+will be unable to connect to the server. 
+.LP
+The 
+.B authorize
+resource controls whether user-based or host-based access control is 
+used by
+.BR dtlogin .
+See also the
+.BR Xserver ,
+.BR Xsecurity ,
+.BR xhost ,
+and
+.B xauth
+man pages for more information. 
+.SH OPTIONS
+All options, except
+.BR \-config ,
+specify values that can also be specified
+in the configuration file as  
+resources. Typically, customization is done via the configuration file
+rather than command line  
+options. The options are most useful for debugging and one-shot tests.
+.TP 8
+.BI \-config " configuration_file"
+Specifies a resource file that specifies the remaining configuration
+parameters. This replaces the  
+dtlogin default Xconfig file. See the Xconfig section for more information.
+.TP 8
+.B \-daemon
+Specifies ``true'' as the value for the 
+.B daemonMode
+resource. This makes
+.B dtlogin
+close 
+all file descriptors, disassociate the controlling terminal and put
+itself in the background when it first  
+starts up (just like the host of other daemons).
+.TP 8
+.BI \-debug " debug_level"
+Specifies the numeric value for the 
+.B debugLevel
+resource. A non-zero value causes 
+dtlogin to print debugging statements to the terminal; it also disables the 
+.B daemonMode
+resource, forcing
+.B dtlogin
+to run synchronously.
+.TP 8
+.BI \-error " error_log_file"
+Specifies the value for the 
+.B errorLogFile
+resource. See the Xerrors section for more 
+information.
+.TP 8
+.B \-nodaemon
+Specifies ``false'' as the value for the 
+.BR  resource .
+.TP 8
+.BI \-resources " resource_file"
+Specifies the value for the 
+.B resources
+resource. See the Xresources section for more information.
+.TP 8
+.BI \-server " server_entry"
+Specifies the value for the 
+.B servers
+resource. See the Xservers section for more 
+information.
+.TP 8
+.BI \-udpPort " port_number"
+Specifies the value for the 
+.B requestPort
+resource. This sets the port-number that 
+dtlogin monitors for XDMCP requests. Since XDMCP uses the registered
+well-known udp port 177, 
+this resource should probably not be changed except for debugging.
+.TP 8
+.BI \-session " session_program"
+Specifies the value for the 
+.B session
+resource. See the Xsession section for more information.
+.SH RETURN VALUE
+Exit values are:
+.IP "0" 8
+Successful completion.
+.IP ">0" 8
+Error condition occurred.
+.SH RESOURCES
+The
+.B dtlogin
+client is controlled via the contents of the
+.B dtlogin
+configuration
+file, the default being
+.BR /usr/dt/config/Xconfig .
+Some resources control the behavior of
+.B dtlogin
+in general, some can be specified for a particular display.
+.SS GENERAL RESOURCES
+The
+.B dtlogin
+general resources are not display-specific and apply to
+all displays where appropriate. 
+.LP
+.TS
+center;
+cf3 cf3 cf3 cf3
+l l l l .
+
+Name	Class	Value Type	Default
+_
+accessFile	AccessFile	String	NULL
+authDir	AuthDir	String	/var/dt
+autoRescan	AutoRescan	Boolean	True
+daemonMode	DaemonMode	Boolean	False
+debugLevel	DebugLevel	Int	0
+errorLogFile	ErrorLogFile	String	NULL
+errorLogSize	ErrorLogSize	Int	50
+exportList	ExportList	String	NULL
+fontPathHead	FontPathHead	String	NULL
+fontPathTail	FontPathTail	String	NULL
+keyFile	KeyFile	String	/usr/dt/config/Xkeys
+lockPidFile	LockPidFile	Boolean	True
+networkDevice	NetworkDevice	String	/dev/dtremote
+pidFile	PidFile	String	NULL
+removeDomainname	RemoveDomainname	Boolean	True
+requestPort	RequestPort	Int	177
+servers	Servers	String	:0 Local local /system_dependent_path/X :0 
+sysParmsFile	SysParmsFile	String	/system_dependent_path
+timeZone	TimeZone	String	NULL
+wakeupInterval	WakeupInterval	Int	15
+.TE
+.SS  accessFile
+To prevent unauthorized XDMCP service and to allow
+forwarding of XDMCP IndirectQuery requests, this file
+contains a database of hostnames which are either
+allowed direct access to this machine, or have a list
+of hosts to which queries should be forwarded to.  The
+format of this file is described in the Xaccess section.
+If not set, all hosts will be allowed XDMCP service.
+.SS  authDir
+This is a directory name that
+.B dtlogin
+uses to temporarily store
+authorization files for  
+displays using XDMCP.
+.SS  autoRescan
+This boolean controls whether
+.B dtlogin
+rescans the configuration file
+and server file after a session terminates and the files have changed.
+You can force
+.B dtlogin
+to reread these files by sending a
+.B SIGHUP
+to the main process.
+.SS  daemonMode
+The
+.B dtlogin
+client can make itself into an unassociated daemon process. This is
+accomplished by forking and leaving the parent process to exit, then
+closing file descriptors and releasing the controlling terminal.  This
+is inconvenient when attempting to debug
+.BR dtlogin .
+Setting this
+resource to "false" disables daemonMode.
+.LP
+If
+.B dtlogin
+is started from
+.BR /etc/inittab ,
+it should not be run in
+daemon mode. Otherwise the init process will think it has terminated
+and will attempt to restart it.
+.SS debugLevel
+A non-zero value specified for this integer resource enables debugging
+information to be printed. It also disables daemon mode, which
+redirects the information into the bit-bucket.
+.BR dtlogin ,
+which is not
+normally useful.
+.SS  errorLogFile
+Error output is normally directed at the system console. To redirect
+it, set this resource to any file name. This file contains any output
+directed to stderr by Xsetup, Xstartup and Xreset.
+.SS  errorLogSize
+This resource specifies the maximum size of the error log file in
+kilobytes. When the limit is reached
+.B dtlogin
+will delete the oldest
+entries in the file until the file size is reduced to 75% of the
+maximum.
+.SS  exportList
+This resource can contain a set of variable names 
+separated by a space or tab. Each variable named is
+obtained from the
+.B dtlogin
+environment and loaded into the environment
+of the server and session. See the Environment section for details.
+.SS  fontPathHead
+This resource value is prepended to the default X server font path.
+.SS  fontPathTail
+This resource value is appended to the default X server font path.
+.SS  keyFile
+XDM-AUTHENTICATION-1 style XDMCP authentication requires that a
+private key be shared between
+.B dtlogin
+and the terminal. This resource
+specifies the file containing those values. Each entry in the file
+consists of a display name and the shared key. By default,
+.B dtlogin
+does not include support for XDM-AUTHENTICATION-1 because it requires
+DES, which is not generally distributable.
+.SS  lockPidFile
+This resource controls whether
+.B dtlogin
+uses file locking to prevent
+multiple instances of
+.B dtlogin
+from executing concurrently.
+.SS  networkDevice
+For remote connections, the value for 'line' in
+.B /etc/utmp
+must also
+exist as a device in the
+.B /dev
+directory for commands such as
+.B finger
+to operate properly. This resource specifies the pathname of the
+.B /dev
+file
+.B dtlogin
+will create when a remote display connects. For most
+platforms, the file will be created as a symbolic link to
+.BR /dev/null .
+The specified value must start with "/dev/", otherwise the value is
+discarded and no file is created.
+.SS  pidFile
+The filename specified is created to contain an ASCII representation
+of the process-ID of the main
+.B dtlogin
+process. This can be used when
+seding signals to
+.BR dtlogin .
+The
+.B dtlogin
+client also uses file locking to attempt
+to prevent more than one
+.B dtlogin
+from running on the same machine. See
+the
+.B lockPidFile
+resource for more information.
+.SS  removeDomainname
+When computing the display name for XDMCP clients,
+.B dtlogin
+typically
+creates a fully qualified host name for the terminal. As this is
+sometimes confusing,
+.B dtlogin
+removes the domain name portion of the
+host name if it is the same as the domain name for the local host when
+this variable is set.
+.SS  requestPort
+This indicates the UDP port number that
+.B dtlogin
+uses to listen for
+incoming XDMCP requests. Unless you need to debug the system, leave
+this with its default value.
+.SS  servers
+This resource either specifies a file name full of server entries, one
+per line (if the value starts with a slash), or a single server entry.
+Each entry indicates a display that should constantly be managed and
+that is not using XDMCP.
+.LP
+The general syntax for each entry is:
+.LP
+.RS
+.nf
+DisplayName DisplayClass DisplayType[@ite] [Command [options]]
+.RE
+.fi
+.LP
+A typical entry for local display number 0 is:
+.LP
+.RS
+.nf
+:0 Local local@console /usr/openwin/bin/X :0
+.RE
+.fi
+.RS
+.TP 8
+.B DisplayName
+The display name must be something that can be passed in the
+.B \-display
+option to any X program. This string is used in the display-specific
+resources to specify the particular display, so be careful to match
+the names (e.g., use "\f3:0 local /usr/openwin/bin/X :0"\fP
+instead of "\f3localhost:0 local /usr/openwin/bin/X :0\fP"
+if your other resources are specified as "\f3Dtlogin._0.session\fP").
+A `*' in this field will be expanded to "\f3<hostname>:0\fP" by
+.BR dtlogin .
+.TP 8
+.B DisplayClass
+The display class portion is also used in the display-specific
+resources as the class portion of the resource. This is useful if you
+have a large collection of similar displays (a group of X terminals,
+for example) and want to set resources for groups of them. When using
+XDMCP, the display is required to specify the display class, so
+perhaps your X terminal documentation describes a reasonably standard
+display class string for your
+device.
+.TP 8
+.B DisplayType
+A DisplayType of "local" indicates that an X server should be started
+for this entry. 
+
+A value of "foreign" indicates to attach to an existing
+X server.
+
+A value of "local_uid" indicates that an Xserver should be started
+for this entry under a specific user id.  A user name such as "root"
+must follow in next field.  In followin example, by placing "root" here,
+Xserver starts under the user id of "root".  On Sun system's this will 
+give Xserver the ability to raise interactive scheduling priority of a 
+client with mouse/keyboard focus to increase performance of the application.
+
+ :0 Local local_uid@console root /usr/openwin/bin/Xsun :0
+
+In limited situations, the Xserver should not be run under a "root" id
+for security reasons.  Examples are usually specific to Xserver extensions.
+On Sun Xservers one example involves the Display Postscript extension.
+If the DPS extension is granted access (via Xserver option line) to read
+and write Unix files via the "-dpsfileops" option (see Xsun man page) it
+should not be run under a "root" user id.  For increaseced security,
+could instead run it as the "nobody" user.
+
+ :0 Local local_uid@console nobody /usr/openwin/bin/Xsun :0 -dpsfileops
+.TP 8
+.B @ite
+On local bitmaps, the user may choose a "Command Line Login" option
+via the login screen, which temporarily suspends the X-server and
+presents the traditional character "login:" prompt. The user can then
+log in and perform non-X related tasks. When the user finishes and
+logs out, the X-server is restarted, and the login screen is
+redisplayed.
+.LP
+In order to support "Command Line Login" mode, the display must have
+an associated Internal Terminal Emulator (ITE) device. By default,
+dtlogin associates the ITE device "console" (\c
+.BR /dev/console )
+with display ":0". If your configuration does not match this
+default, specify "@<device>" for the display(s) with an associated ITE
+and "\c
+.BR @none "
+for all other displays listed in the servers file.
+.TP 8
+.B Command [options]
+This is the string used to start the X server.
+The
+.B dtlogin
+client will always
+connect to the X server using the DisplayName specified, so you might
+need to specify an explicit connection number as an option to your X
+server (:0 in the above example).
+.RE
+.SS  sysParmsFile
+This resource specifies a file containing shell commands, one of which
+sets the timezone environment variable (TZ) for the system. If the
+timezone is set via the shell syntax, "TZ=",
+.B dtlogin
+can use this
+information to set the timezone for the user session.
+.SS  timeZone
+This resource specifies the local time zone for
+.BR dtlogin .
+It is loaded
+into the environment of
+.B dtlogin
+as the value of the variable TZ and
+inherited by all subsequent sessions.
+.LP
+Some systems maintain a configuration file that contains the timezone
+setting (ex.
+.BR /etc/src.sh ).
+See the 
+.B sysParmsFile 
+resource.
+.SS  wakeupInterval
+If the user selects "Command Line Login" mode from the login screen,
+dtlogin terminates the X-server and allows the traditional
+character-based login prompt, "login:" to become visible. If the user
+does not log in within 2 * wakeupInterval seconds, the X-server is
+restarted. Once the user has logged in,
+.B dtlogin
+checks every
+wakeupInterval seconds to see if the user has logged out. If so, the
+X-server is restarted and the login screen is redisplayed.
+.SH DISPLAY RESOURCES
+The
+.B dtlogin
+client display resources can be specified for all displays or for a
+particular display. To specify a particular display, the display name
+is inserted into the resource name between ``Dtlogin'' and the final
+resource name segment. For example,
+.B Dtlogin.expo_0.startup
+is the name
+of the resource defining the startup shell file on the ``expo:0''
+display. The resource manager separates the name of the resource from
+its value with colons, and separates resource name parts with dots, so
+dtlogin uses underscores for the dots and colons when generating the
+resource name.
+.LP
+Resources can also be specified for a class of displays by inserting
+the class name instead of a display name. A display that is not
+managed by XDMCP can have its class affiliation specified in the file
+referenced by the servers resource. A display using XDMCP supplies its
+class affiliation as part of the XDMCP packet.
+.LP
+.TS
+center;
+cf3 cf3 cf3 cf3
+l l l l .
+
+Name	Class	Value Type	Default
+_
+authorize	Authorize	Boolean	False
+authName	AuthName	String	MIT-MAGIC-COOKIE-1
+authFile	AuthFile	String	NULL
+chooser		Chooser		String	/usr/dt/bin/dtchooser
+cpp	Cpp	String	system dep.
+environment	Environment	String	system dep.
+failsafeClient	FailsafeClient	String	/system_dep./xterm
+grabServer	GrabServer	Boolean	True
+grabTimeout	GrabTimeout	Int	3 seconds
+language	Language	String	system dep.
+languageList	LanguageList	String	NULL
+languageName	LanguageName	String	NULL
+openDelay	OpenDelay	Int	5 seconds
+openRepeat	OpenRepeat	Int	5 seconds
+openTimeout	OpenTimeout	Int	30 seconds
+pingInterval	PingInterval	Int	5 minutes
+pingTimeout	PingTimeout	Int	5 minutes
+reset	Reset	String	NULL
+resetForAuth	ResetForAuth	Boolean	False
+resetSignal	Signal	Int	1 SIGHUP
+resources	Resource	String	NULL
+session	Session	String	/usr/dt/bin/Xsession
+setup	Setup	String	NULL
+startAttempts	StartAttempts	Int	4
+startup	Startup	String	NULL
+systemPath	SystemPath	String	system_dep._path
+systemShell	SystemShell	String	/bin/sh
+terminateServer	TerminateServer	Boolean	True
+termSignal	Signal	Int	15 (SIGTERM)
+userAuthDir	UserAuthDir	String	/var/dt/tmp
+userPath	UserPath	String	system_dep._path
+xdmMode	XdmMode	Boolean	False
+xrdb	Xrdb	String	/system_dep./xrdb
+.TE
+.SS authorize
+Authorize is a boolean resource that controls whether
+.B dtlogin
+generates and uses authorization for the server connections. (See
+authName.)
+.SS  authName
+If authorize is used, authName specifies the type of authorization to
+be used. Currently,
+.B dtlogin
+supports only MIT-MAGIC-COOKIE-1
+authorization, XDM-AUTHORIZATION-1 could be supported, but DES is not
+generally distributable. XDMCP connections state which authorization
+types are supported dynamically, so authName is ignored in this case.
+(See authorize.)
+.SS  authFile
+This file is used to communicate the authorization data from
+.B dtlogin
+to the server, using the \-auth server command line option. It should
+be kept in a write- protected directory to prevent its erasure, which
+would disable the authorization mechanism in the server. If NULL,
+dtlogin will generate a file name.
+.SS  chooser
+Specifies the program run to offer a host menu for
+indirect queries redirected to the special host name
+CHOOSER.  /usr/dt/bin/dtchooser is the default. See the
+Xaccess section.
+.SS  cpp
+This specifies the path of the C preprocessor that is used by xrdb.
+.SS  environment
+This resource can contain a set of 
+.B <name>=<value>
+pairs separated by a space or tab. Each item is loaded into the
+environment of the server and session. See the Environment section for
+details.
+.SS  failsafeClient
+If the default session fails to execute,
+.B dtlogin
+falls back to this
+program. This program is executed with no arguments, but executes
+using the same environment variables as the session would have had.
+(See The Xfailsafe File.)
+.SS  grabServer
+See grabTimeout.
+.SS  grabTimeout
+To improve security,
+.B dtlogin
+grabs the server and keyboard while
+reading the name and password. The grabServer resource specifies if
+the server should be held while the name and password is read. When
+FALSE, the server is ungrabbed after the keyboard grab succeeds;
+otherwise, the server is grabbed until just before the session begins.
+The grabTimeout resource specifies the maximum time
+.B dtlogin
+will wait
+for the grab to succeed. The grab may fail if some other client has
+the server grabbed, or possibly if the network latencies are very
+high. The grabTimeout resource has a default of 3 seconds; be cautious
+when using this resource, since a user can be deceived by a look-alike
+window on the display. If the grab fails,
+.B dtlogin
+kills and restarts
+the server (if possible) and session.
+.LP
+Some X-terminals cannot display their login screens while the server
+is grabbed. Setting grabServer to false will allow the screen to be
+displayed, but opens the possibility that a user's login name can be
+stolen by copying the contents of the login screen. Since the keyboard
+is still grabbed and the password is not echoed, the password cannot
+be stolen.
+.SS  language
+This resource specifies the default setting for the 
+.B LANG
+environment variable.  If the
+.B dtlogin
+screen is localized for that
+language, it is displayed appropriately; otherwise, it is displayed in
+the language "C". The user may temporarily override this setting via
+an option on the login screen. When the subsequent session terminates,
+the
+.B LANG
+variable reverts to this setting.
+.SS  languageList
+This resource allows the user to override the default set of languages
+displayed in the "Language" menu of the login screen. It is useful if
+the set of languages actually used on a particular display is smaller
+than the set installed on the system. The resource value is a list of
+valid values for the LANG environment variable. Language values should
+be separated by one or more spaces or tabs.
+.SS  languageName
+This resource allows the user to override the default locale name
+displayed in the "Language" menu of the login screen with alternate
+text. This way, instead of users seeing a "En_US" item, they could see
+a "English (United States)" item instead. This
+resource is specified as
+.B
+"Dtlogin *<locale name>. languageName: text"
+as follows:
+.LP
+.RS
+.nf
+.B
+Dtlogin*En_US.languageName: English (United States)
+.B
+Dtlogin*Fr_CA.languageName: French (Canadian)
+.fi
+.SS  openDelay
+See 
+.B startAttempts
+.SS  openRepeat
+See 
+.B startAttempts
+.SS  openTimeout
+See 
+.B startAttempts
+.SS  pingInterval
+See 
+.B pingTimeout
+.SS  pingTimeout
+To discover when remote displays disappear,
+.B dtlogin
+occasionally
+"pings" them, using an X connection and sending XSync requests. The
+.B pingInterval
+resource specifies the time (in minutes) between successive ping
+attempts, and
+.B pingTimeout
+specifies the maximum wait time (in minutes) for the terminal to
+respond to the request. If the terminal does not respond, the session
+is terminated.
+The
+.B dtlogin
+client does not ping local displays. Although it may
+seem harmless, it is undesirable when a local session is terminated as
+a result of the server waiting (for remote filesystem service, for
+example) and not responding to the ping.
+.SS  reset
+This specifies a program that is run (as root) after the session
+terminates. If not set, no program is run. The conventional name is
+Xreset. See The Xreset File.
+.SS resetForAuth
+The original implementation of authorization in the sample server
+reread the authorization file at server reset time, instead of when
+checking the initial connection.  Since
+.B dtlogin
+generates the
+authorization information just before connecting to the display, an
+old server does not get current authorization information. This
+resource causes
+.B dtlogin
+to send
+.B SIGHUP
+to the server after setting up the file, causing an additional server
+reset to occur, during which time the new authorization information is
+read.
+.SS  resetSignal
+This resource specifies the signal
+.B dtlogin
+sends to reset the server.
+See the section Controlling The Server
+.SS  resources
+This resource specifies the name of the file to be loaded by 
+.B xrdb (1)
+as the resource data-base onto the root window of screen 0 of the
+display. This resource data base is loaded just before the
+authentication procedure is started, so it can control the appearance
+of the "login" window. See the section on the authentication screen,
+which describes the various resources that are appropriate to place in
+this file. There is no default value for this resource, but the
+conventional name is Xresources. See the Resource section.
+.SS  session
+This specifies the session to be executed for the authenticated user.
+By default, the
+.B /usr/dt/bin/Xsession
+file is run. The conventional
+name is Xsession. See The Xsession File.
+.SS  setup
+This specifies a program that is run (as root) prior to the display of
+the authentication screen. By default, no program is run. The
+conventional name for a file used here is Xsetup. See the Xsetup
+section.
+.SS  startAttempts
+Four numeric resources control the behavior of
+.B dtlogin
+when attempting
+to open reluctant servers: openDelay, openRepeat, openTimeout, and
+startAttempts. openDelay is the duration (in seconds) between
+successive attempts; openRepeat is the number of attempts to make;
+openTimeout is the amount of time to wait while actually attempting
+the opening (i.e., the maximum time spent in the connect (2) syscall);
+and startAttempts is the number of times the entire process occurs
+before giving up on the server. After openRepeat attempts have been
+made, or if openTimeout seconds elapse in any particular attempt,
+dtlogin terminates and restarts the server, attempting to connect
+again. This process is repeated startAttempts time, at which point the
+display is declared dead and disabled. (See openDelay, openRepeat, and
+openTimeout.)
+.SS  startup
+This specifies a program that is run (as root) after the
+authentication process succeeds.  By default, no program is run. The
+conventional name for a file used here is Xstartup. See the Xstartup
+section.
+.SS  systemPath
+The
+.B dtlogin
+client sets the 
+.B PATH
+environment variable for the startup and reset scripts to the value
+of this resource. Note the conspicuous absence of "." from this entry.
+This is a good practice to follow for root; it avoids many system
+penetration schemes.
+.SS  systemShell
+The
+.B dtlogin
+client sets the 
+.B SHELL
+environment variable for the startup and reset scripts 
+to the value of this resource.
+.SS  terminateServer
+This boolean resource specifies whether the X server should be
+terminated when a session terminates (instead of resetting it). This
+option can be used if the server tends to grow without bound over time
+in order to limit the amount of time the server is run continuously.
+.SS  termSignal
+This resource specifies the signal
+.B dtlogin
+sends to terminate the
+server. See the section Controlling The Server
+.SS  userAuthDir
+When
+.B dtlogin
+cannot write to the usual user authorization file (
+.BR $HOME/.Xauthority ),
+it creates a unique file name in this directory and points the 
+environment variable 
+.B XAUTHORITY
+at the created file.
+.SS  userPath
+The
+.B dtlogin
+client sets the 
+.B PATH
+environment variable for the session to this value. It 
+should be a colon-separated list of directories; see
+.BR sh (1)
+for a full
+description. 
+.SS xdmMode
+If True, the
+.B $HOME/.xsession
+file will be executed from Xsession upon user 
+authentication, rather than dtsession.
+.SS  xrdb
+Specifies the program used to load the resources.
+The authentication screen reads a name-password pair from the
+keyboard. As this is a Motif toolkit client, colors, fonts and some
+layout options can be controlled with resources. General resources for
+this screen should be put into the file named by the
+.B dtlogin
+.B  resources
+resource, the default being 
+.BR Xresources.   
+Language specific values such as text or fonts should be specified 
+in the 
+.B Dtlogin
+app-defaults file.
+.br
+.ne 2i
+.SS Logo Resources
+.LP
+.TS
+center;
+cf3 cf3 cf3 cf3
+l l l l .
+
+Name	Class	Value Type	Default
+_
+bitmapFile	BitmapFile	String	NULL
+background	Background	Pixel	#a8a8a8
+topShadowPixmap	TopShadowPixmap	String	25_foreground
+.TE
+.LP
+The default logo on the authentication screen may be replaced with a
+bitmap or pixmap of the user's choice. The resources should be
+prefaced with the string
+.B Dtlogin*logo*
+when specified.
+.RS
+.TP 8
+.B bitmapFile
+Specifies the absolute path name to the bitmap or pixmap file to be
+used for the logo. 
+.TP 8
+.B background 
+Specifies the background color for the logo.
+.TP 8
+.B topShadowPixmap
+Specifies the pixmap to use for the logo border shadow.
+.SS Alternate Desktop Session Resources
+.LP
+These resources allow adding additional desktops to the Login Managers
+option sessions menu.  Resource names and specific values used to 
+enable the Sun OpenWindow's desktop (as shipped with Sun's CDE) follow.
+.TS
+center;
+cf3 cf3 cf3 cf3
+l l l l .
+
+Name	Class	Value Type 	Example Value
+_
+altDtsIncrement	AltDtsIncrement	String	True
+altDtName	AltDtName	String	OpenWindows Desktop
+altDtKey	AltDtKey	String	/usr/openwin/bin/olwm
+altDtStart	AltDtStart	String	/usr/dt/config/Xsession.ow
+altDtLogo	AltDtLogo	String	OWlogo
+.TE
+.LP
+The file containing the above values will be found in 
+/usr/dt/config/C/Xresources.d/Xresources.ow.  They cause the OpenWindow desktop
+to be added to the option sessions menu.
+.LP
+Additional files may be added in this Xresources.d directory to allow
+additional X based desktops to appear on the Login Manager's sessions
+menu.  (or a file may be placed in /etc/dt/config/C/Xresources.d) for
+a workstation specific addition.
+.LP
+Same resource names would be used.  The presence of the altDtsIncrement 
+resource in these files causes an incremented count number to be appended 
+to the resources.  So actual values of above resouce example after they 
+are read into system might actuall be ... altDtName2, altDtKey2, altDtStart2,
+altDtLog2.  Next desktop added would then be ... altDtName3, altDtKey3, 
+altDtStart3, altDtlog3, etc.
+.LP
+The syntax for setting the following resources is
+.B Dtlogin*altDt...<n>
+where <n> is some number such as altDtName1, altDtName2, etc.  The number's
+are either added implicitly, such as the above Xresources.d example, useful
+for "package added" desktops.  Or the numbers can be explicitly added to 
+resources if used directly in the Xresources file to facilitate ordering of
+the desktops on the sessions menu. 
+.TP 8
+.B altDtName<n>
+Specifies the name of the alternate desktop.  This name will appear both
+on the sessions menu and also on the Login's greet window when the associated 
+desktop is selected as the login destination.
+.TP 8
+.B altDtKey<n> 
+Specifies a key file, one that if such a file is present, the alternate
+desktop is added to the option session menu of the Login Manager.  By
+convention, the file is often the desktop's window manager.  But it can
+actualy be any file uniquely associated with the alternate desktop.
+.TP 8
+.B altDtStart<n> 
+Specifies the script that starts the alternate desktop
+.TP 8
+.B altDtLogo<n>
+Base name of the alternate desktop's icon logo.  Either in XPM (color)
+or XBM (monochrome) format.  This logo will display on the Login greet 
+window when the associated desktop is selected as the login destination. 
+.RE
+.SS Greeting Resources
+The following resources describe the greeting string used on the login
+screen. The resources should be prefaced with the string
+.B Dtlogin*greeting*
+when specified.
+.LP
+.TS
+center;
+cf3 cf3 cf3 cf3
+l l l l .
+
+Name	Class	Value Type	Default
+_
+foreground	Foreground	Pixel	black
+background	Background	Pixel	dynamic
+fontList	FontList	FontList	-*-*schoolbook-medium-i-normal--18-*
+alignment	Alignment	String	ALIGNMENT_CENTER
+labelString	LabelString	String	Welcome to %LocalHost%
+persLabelString LabelString     String  Welcome %s
+.TE
+.RS
+.TP 8
+.B foreground
+Specifies the foreground color for the welcome message.
+.TP 8
+.B background
+Specifies the background color for the welcome message. The default is
+light-gray for color systems or white for monochrome systems.
+.TP 8
+.B fontList
+Specifies the font to use for the welcome message.
+.TP 8
+.B labelString
+Specifies the string to use for the welcome message. Multiple lines
+can be specified by including newline characters (\n) in the text. If
+the token %LocalHost" is included in the text, it will be replaced
+with the name of the host providing login service. If the token
+%DisplayName% is included in the text, it will be replaced with the
+display name.
+.TP 8
+.B persLabelString
+Specifies the string to use for the personalized welcome message. This is
+the message displayed after the use name has been entered. The %s will be
+replaced with the user name entered.
+.TP 8
+.B alignment
+Specifies the string to use for the alignment of the Welcome message. Valid
+values are ALIGNMENT_BEGINNING, ALIGNMENT_CENTER and ALIGNMENT_END.
+.RE
+.br
+.ne 2i
+.SS Matte Resources
+The following resources describe the matte layout used on the login
+screen. The resources should be prefaced with the string
+.BR Dtlogin*matte.
+when specified.
+.LP
+.TS
+center;
+cf3 cf3 cf3 cf3
+l l l l .
+
+Name	Class	Value Type	Default
+_
+width	Width	Int	806 for Highres displays
+			755 for Mediumres displays
+			585 for lowres displays
+height	Height	Int	412 for Highres displays
+			385 for Mediumres displays
+			300 for Lowres displays
+.TE
+.RS
+.TP 8
+.B width
+Specifies the width to use for the login_matte.
+.TP 8
+.B height
+Specifies the height to use for the login_matte.
+The following resources describe the fonts layout used on the login
+screen. The resources should be prefaced with the string
+.B Dtlogin*.
+when specified.
+.RE
+.SS Label Resources
+.LP
+.TS
+center;
+cf3 cf3 cf3 cf3
+l l l l .
+
+Name	Class	Value Type	Default
+_
+labelFont	LabelFont	String	-*-swiss 742-bold-r-normal-*-140-*-p-100-* for lowres displays
+			-*-swiss 742-medium-r-normal-*-140-*-p-110-* for high res displays.
+textFont	TextFont	String	-*-prestige-medium-r-normal-*-128-72-* for highres diqsplays.
+			-*-helvetica-bold-r-normal-*-100-* for lowres displays
+.TE
+.RS
+.TP 8
+.B labelFont
+Specifies the labelFont to use for the pushButtons and labels.
+.TP 8
+.B textFont
+Specifies the textFont to use for the pushButtons and labels.
+.RE
+.SH ENVIRONMENT
+The
+.B dtlogin
+client invokes the user's session with the following default environment:
+.SS  DISPLAY
+is set to the associated display name
+.SS  EDITOR
+is set to 
+.B /usr/dt/bin/dtpad
+.SS  HOME
+is set to the home directory of the user
+.SS  KBD_LANG
+is set to the value of LANG for applicable languages
+.SS  LANG
+is set to the current NLS language (if any)
+.SS  LC_ALL
+is set to the current NLS language (if any)
+.SS  LC_MESSAGES
+is set to the current NLS language (if any)
+.SS  LOGNAME
+is set to the user name
+.SS  MAIL
+is set to 
+.B /usr/mail/$USER 
+(system dependent)
+.SS  PATH
+is set to the value of the userPath resource
+.SS  USER
+is set to the user name
+.SS  SHELL
+is set to the user's default shell (from
+.BR /etc/passwd )
+.SS  TERM
+is set to 
+.B dtterm
+.SS  TZ
+is set to the value of the 
+.B timeZone
+resource or system default
+.SS  XAUTHORITY
+may be set to an authority file
+.SS Adding to the Environment List
+.LP
+Four methods are available to modify or add to this list depending on
+the desired scope of the resulting environment variable.
+.LP
+The 
+.B exportList
+resource is available to allow the export of variables provided to
+the
+.B dtlogin
+process by its parent. Variables specified by this method
+are available to both the display's X server process and the user's
+session and override any default settings. The resource accepts a
+string of <name> separated by at least one space or tab.
+.LP
+The 
+.B environment
+resource is available in the
+.B dtlogin
+configuration file to allow
+setting of environment variables on a global or per-display basis.
+Variables specified by this method are available to both the display's
+X server process and the user's session and override any default
+settings. The resource accepts a string of <name>=<value> pairs
+separated by at least one space or tab. The values specified must be
+constants because no shell is used to parse the string. See the
+Resources section for details on setting this resource.
+.LP
+For example:
+.LP
+.RS
+.B Dtlogin*environment:MAIL_HOST=blanco MAIL_SERVER=pablo
+.RE
+.LP
+Note: The environment variables LANG and TZ have their own dedicated
+resources in the configuration file and should not be set via
+environment.
+.LP
+Environment variables that require processing by a shell or are
+dependent on the value of another environment variable can be
+specified in the startup script Xsession. These variables are loaded
+into the environment of all users on the display, but not to the X
+server process. They override any previous settings of the same
+variable. The Xsession script accepts ksh syntax for setting
+environment variables. For example:
+.LP
+.RS
+.B MAIL=/usr/mail/$USER
+.RE
+.LP
+Finally, personal environment variables can be set on a per-user basis
+in the script file
+.BR $HOME/.dtprofile .
+.LP
+The
+.B dtlogin
+client accepts either sh, ksh, or csh syntax for the commands in this
+file. The commands should only be those that set environment
+variables, not any that perform terminal I/O, excepting
+.BR tset (1)
+or
+.BR stty (1).
+If the first line of
+.B \&.dtprofile
+is
+.BR #!/bin/sh ,
+.BR #!/bin/ksh ,
+or
+.BR #!/bin/csh ,
+.B dtlogin
+uses the appropriate shell to parse
+.BR \&.dtprofile .
+Otherwise, the user's default shell (\c
+.BR $SHELL )
+is used.
+.SH FILES
+The
+.B dtlogin
+client is designed to operate in a wide variety of environments and
+provides a suite of configuration files that can be changed to suit a
+particular system. The default
+.B dtlogin
+configuration files can be
+found in
+.B /usr/dt/config
+with the exception of Xsession which is stored
+in
+.BR /usr/dt/bin .
+They are listed below:
+.IP "\f3Xconfig\fP" 1.5i
+specifies other
+.B dtlogin
+configuration files and
+.B dtlogin 
+behavior
+.IP "\f3Xaccess\fP" 1.5i
+used by
+.B dtlogin
+to control access from displays requesting 
+XDMCP service
+.IP "\f3Xservers\fP" 1.5i
+contains the list of displays to for
+.B dtlogin
+to explicitly 
+manage
+.IP "\f3Xresources\fP" 1.5i
+contains resource definitions specifying the appearance 
+of the login screen
+.IP "\f3Xsetup\fP" 1.5i
+a script executed as `root' prior to display of the login screen
+.IP "\f3Xstartup\fP" 1.5i
+a script executed as `root' after user has successfully 
+authenticated
+.IP "\f3Xsession\fP" 1.5i
+a script executed as the authenticated `user' that starts the 
+user's session
+.IP "\f3Xfailsafe\fP" 1.5i
+a script executed as the authenticated `user' that starts a 
+failsafe session
+.IP "\f3Xreset\fP" 1.5i
+a script executed as `root' after the user's session has exited
+.SS The Xconfig File
+The Xconfig file contains the general resources for
+.B dtlogin
+and is the
+top of the
+.B dtlogin
+configuration file tree. Xconfig specifies the
+location of other
+.B dtlogin
+configuration and log files and specifies
+dtlogin behavior. The location of other
+.B dtlogin
+configuration and log
+files are specified by resource definitions. The defaults are listed
+below:
+.IP "\f3Dtlogin.errorLogFile:\fP" 2.5i
+/var/dt/Xerrors
+.IP "\f3Dtlogin.pidFile: \fP" 2.5i
+/var/dt/Xpid
+.IP "\f3Dtlogin.accessFile:\fP" 2.5i
+Xaccess
+.IP "\f3Dtlogin.servers:\fP" 2.5i
+Xservers
+.IP "\f3Dtlogin*resources:\fP" 2.5i
+%L/Xresources
+.IP "\f3Dtlogin*setup:"\fP 2.5i
+Xsetup
+.IP "\f3Dtlogin*startup:"\fP 2.5i
+Xstartup
+.IP "\f3Dtlogin*reset:\fP" 2.5i
+Xreset
+.IP "\f3Dtlogin*failsafeClient"\fP" 2.5i
+Xfailsafe
+.IP "\f3Dtlogin*session"\fP" 2.5i
+/usr/dt/bin/Xsession
+.RE
+.LP
+If the path specified for 
+.BR accessFile ,
+.BR servers ,
+.BR resources ,
+.BR setup ,
+.BR startup ,
+.BR reset ,
+.BR failsafeClient ,
+or
+.B session
+is relative, dtlogin will first look for the file in directory
+.BR /etc/dt/config ,
+then 
+.BR /usr/dt/config .
+.LP
+Note that some of the resources are specified with ``*'' separating
+the components. These resources can be made unique for each different
+display, by replacing the ``*'' with the display-name. See the DISPLAY
+RESOURCES section for a complete discussion.
+.LP
+The default Xconfig file is
+.BR /usr/dt/config/Xconfig .
+A system
+administrator can customize Xconfig by copying
+.B /usr/dt/config/Xconfig
+to
+.B /etc/dt/config/Xconfig
+and modifying
+.BR /etc/dt/config/Xconfig .
+.LP
+The default Xconfig file contains the configuration and log file
+entries shown above as well as a few vendor specific resource
+definitions and examples. See the GENERAL RESOURCES and DISPLAY
+RESOURCES sections for the complete list of resources that can be
+defined in Xconfig.
+.SS The Xaccess File
+The database file specified by the 
+.B accessFile
+resource provides information which
+.B dtlogin
+uses to control access
+from displays requesting XDMCP service. This file contains three
+types of entries:  entries which control the response to
+Direct and Broadcast queries, entries which control the
+response to Indirect queries, and macro definitions.
+.LP
+The format of a Direct entry is either a host name or a pattern. A pattern
+is distinguished from a host name by the inclusion of one or more meta
+characters (`*' matches any sequence of 0 or more characters, and `?'
+matches any single character) which are compared against the host name
+of the display device. If the entry is a host name, all comparisons
+are done using network addresses, so any name which converts to the
+correct network address may be used. For patterns, only canonical host
+names are used in the comparison, so ensure that you do not attempt to
+match aliases. Preceding either a host name or a pattern with a `!'
+character causes hosts which match that entry to be excluded.
+.LP
+An Indirect entry also contains a host name or pattern, but
+follows it with a list of host names or macros to which
+indirect queries should be sent. Indirect entries may also
+specify to have
+.B dtlogin
+run 
+.B dtchooser
+to offer a menu of hosts to which
+a login screen can be displayed.
+.LP
+A macro definition contains a macro name and a list of host
+names and other macros that the macro expands to.  To
+distinguish macros from hostnames, macro names start with a
+`%' character.  Macros may be nested.
+.LP
+When checking access for a particular display host, each entry is
+scanned in turn and the first matching entry determines the response.
+Direct and Broadcast entries are ignored when scanning for an Indirect
+entry and vice-versa.
+.LP
+Blank lines are ignored, `#' is treated as a comment delimiter causing
+the rest of that line to be ignored, and `\\newline' causes the newline
+to be ignored, allowing indirect host lists to span multiple lines.
+.LP
+Here is an example Xaccess file: DJB
+.LP
+.RS
+.nf
+#
+# Xaccess \(em XDMCP access control file
+#
+
+#
+# Direct/Broadcast query entries
+#
+!xtra.lcs.mit.edu # disallow direct/broadcast service for xtra
+bambi.ogi.edu     # allow access from this particular display
+*.lcs.mit.edu     # allow access from any display in LCS
+
+#
+# Indirect query entries
+#
+
+#define %HOSTS macro
+%HOSTS		expo.lcs.mit.edu xenon.lcs.mit.edu \\
+			excess.lcs.mit.edu kanga.lcs.mit.edu
+
+#force extract to contact xenon
+extract.lcs.mit.edu xenon.lcs.mit.edu
+
+#disallow indirect access by xtra
+!xtra.lcs.mit.edu   dummy
+
+#all others get to choose among %HOSTS
+*.lcs.mit.edu       %HOSTS
+.fi
+.RE
+.LP
+If XDMCP access is granted, a temporary file may be created in the
+directory specified by
+.B authDir
+which contains authorization information for the X-terminal. It is
+deleted when the session starts.
+.LP
+For X terminals that do not offer a host menu for use with
+Broadcast or Indirect queries, the chooser program can do
+this for them.  In the 
+.B Xaccess
+file, specify ``CHOOSER'' as
+the first entry in the Indirect host list.  Chooser will
+send a Query request to each of the remaining host names in
+the list and offer a menu of all the hosts that respond.
+.LP
+The list may consist of the word ``BROADCAST,'' in which
+case chooser will send a Broadcast instead, again offering a
+menu of all hosts that respond.  Note that on some operating
+systems, UDP packets cannot be broadcast, so this feature
+will not work.
+.LP
+Example 
+.B Xaccess 
+file using chooser:
+.LP
+.nf
+#offer a menu of these hosts to extract
+extract.lcs.mit.edu CHOOSER %HOSTS
+
+#offer a menu of all hosts to xtra
+xtra.lcs.mit.edu    CHOOSER BROADCAST
+.fi
+.LP
+The program to use for chooser is specified by the
+.B chooser
+resource.  Resources for this
+program can be put into the file named by
+.BR resources.
+.LP
+The default Xaccess file is
+.BR /usr/dt/config/Xaccess .
+A system
+administrator can customize Xaccess by copying
+.B /usr/dt/config/Xaccess
+to
+.B /etc/dt/config/Xaccess
+and modifying
+.BR /etc/dt/config/Xaccess .
+.LP
+The default Xaccess file contains no entries.
+.SS The Xservers File
+Contains the list of displays to manage. See the 
+.B servers
+resource description under GENERAL RESOURCES for more information.
+.LP
+The default Xservers file is
+.BR /usr/dt/config/Xservers .
+A system
+administrator can customize Xservers by copying
+.B /usr/dt/config/Xservers
+to
+.B /etc/dt/config/Xservers
+and modifying
+.BR /etc/dt/config/Xservers .
+.LP
+The default Xservers file contains an entry for one local display. 
+.SS The Xresources File
+Contains the resource definitions specifying the appearance of the
+login screen. See the dtgreet specification for more information.
+.LP
+The default Xresources file is
+.BR /usr/dt/config/Xresources .
+A system
+administrator can customize Xresources by copying
+.B /usr/dt/config/Xresources
+to
+.B /etc/dt/config/Xresources
+and modifying
+.BR /etc/dt/config/Xresources .
+.SS The Xsetup File
+This file is typically a shell script. It is run as "root" and should
+be very careful about security. This script is run before the login
+screen is displayed. No arguments of any kind are passed to the
+script.  Dtlogin waits until this script exits before displaying the
+login screen.
+.LP
+The default Xsetup file is
+.BR /usr/dt/config/Xsetup .
+A system
+administrator can customize Xsetup by copying
+.B /usr/dt/config/Xsetup
+to
+.B /etc/dt/config/Xsetup
+and modifying
+.BR /etc/dt/config/Xsetup .
+.LP
+The default Xsetup file contains vendor specific code but typically
+contains code that sets up the X server prior to the display of the
+login screen, such as setting up keyboard maps.
+.SS The Xstartup File
+This file is typically a shell script. It is run as "root" and should
+be very careful about security. This is the place to put commands that
+display the message of the day or do other system-level functions on
+behalf of the user. Various environment variables are set for the use
+of this script:
+.IP "\f3DISPLAY\fP" 1.5i
+set to the associated display name
+.IP "\f3HOME\fP" 1.5i
+set to the home directory of the user
+.IP "\f3PATH\fP" 1.5i
+set to the value of the systemPath resource
+.IP "\f3USER\fP" 1.5i
+set to the user name
+.IP "\f3SHELL\fP" 1.5i
+set to the value of the systemShell resource
+.LP
+No arguments of any kind are passed to the script. Dtlogin waits until
+this script exits before starting the user session. If the exit value
+of this script is non-zero,
+.B dtlogin
+discontinues the session
+immediately and starts another authentication cycle.
+.LP
+The default Xstartup file is
+.BR /usr/dt/config/Xstartup .
+A system
+administrator can customize Xstartup by copying
+.B /usr/dt/config/Xstartup
+to
+.B /etc/dt/config/Xstartup
+and modifying
+.BR /etc/dt/config/Xstartup .
+.LP
+The default Xstartup file contains code to change ownership of
+.B /dev/console
+to the user whose session is running on the console.
+.SS The Xsession File
+This script initializes a user's session and invokes the desktop
+session manager. It is run with the permissions of the authorized
+user, and has several environment variables pre-set. See the
+Environment section for a list of the pre-set variables.
+.LP
+The default Xsession file is
+.BR /usr/dt/bin/Xsession .
+A system
+administrator can customize Xsession by copying
+.B /usr/dt/bin/Xsession
+to
+.B /etc/dt/config/Xsession
+and modifying
+.BR /etc/dt/config/Xsession .
+The
+.B session
+resource defined in Xconfig must also be changed to reference the
+customized Xsession file. See the Xconfig section for information on
+how to update the Xconfig file.
+.LP
+The default Xsession file contains session initialization code. It
+does contain some vendor specific code but its general function is as
+follows:
+.RS
+.IP \(em 3
+Sources the user's
+.B $HOME/.dtprofile
+.IP \(em 3
+Sources any
+.B /etc/dt/config/Xsession.d/*
+scripts
+.IP \(em 3
+Sources any
+.B /usr/dt/config/Xsession.d/*
+scripts
+.IP \(em 3
+Launches in the background the desktop welcome client, dthello
+.IP \(em 3
+Sources the application search path setup script, dtsearchpath 
+.IP \(em 3
+Launches in the background the help setup client, dthelpgen
+.IP \(em 3
+Launches in the background the application manager directory setup
+client, dtappgather 
+.IP \(em 3
+Execs the desktop session manager, dtsession
+.RE
+.PP
+System administrators are discouraged from customizing the Xsession file.
+.SS The Xreset File
+Symmetrical with Xstartup, this script is run after the user session
+has terminated. Run as root, it should probably contain commands that
+undo the effects of commands in Xstartup, such as unmounting
+directories from file servers. The collection of environment variables
+that were passed to Xstartup are also given to Xreset.
+.LP
+The default Xreset file is
+.BR /usr/dt/config/Xreset .
+A system
+administrator can customize Xreset by copying
+.B /usr/dt/config/Xreset
+to
+.B /etc/dt/config/Xreset
+and modifying
+.BR /etc/dt/config/Xreset .
+.LP
+The default Xreset file contains code change ownership of
+.B /dev/console
+back to root.
+.SH STATUS FILES
+.SS The Xerrors File
+Contains error messages from
+.B dtlogin
+and anything output to stderr by
+Xsetup, Xstartup or Xreset.  The system administrator can use the
+contents of this file for
+.B dtlogin
+troubleshooting. The
+.B errorLogSize
+resource limits the size of the Xerrors file and can
+prevent it from growing without bound.  
+.LP
+A system administrator can change the pathname of the Xerrors file by setting the 
+.B errorLogFile
+resource in the Xconfig file. See the Xconfig section for
+information on how to update the Xconfig file. 
+.SS The Xpid File
+Contains the process ID of the master
+.B dtlogin
+process which can be
+used when sending signals to
+.BR dtlogin . 
+A system administrator can change the pathname of the Xpid file by setting the
+.B  pidFile
+resource in the Xconfig file. See the Xconfig section for information
+on how to update the Xconfig file. 
+.SH ERROR MESSAGES
+.RS
+.IP \(em 3
+Login incorrect; please try again.
+.IP \(em 3
+Unable to change to home directory.
+.IP \(em 3
+Sorry. Maximum number of users already logged in.
+.IP \(em 3
+Login error, invalid user ID.
+.IP \(em 3
+Login error, invalid group ID.
+.IP \(em 3
+Login error, invalid audit ID.
+.IP \(em 3
+Login error, invalid audit flag.
+.IP \(em 3
+Logins are currently disabled.
+.IP \(em 3
+Your current password has expired.
+.RE
+

@@ -1,0 +1,74 @@
+.TH tt_spec_prop_set 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+tt_spec_prop_set \- replace property values
+.SH SYNOPSIS
+.yS
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'Tt_status tt_spec_prop_set('u
+Tt_status tt_spec_prop_set(const char *\f2objid\fP,
+	const char *\f2propname\fP,
+	const char *\f2value\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn tt_spec_prop_set
+function
+replaces any values currently stored under this property of the object spec
+with a new value.
+.P
+The
+.I objid
+argument is the identifier of the object involved in this operation.
+The
+.I propname
+argument is the name of the property which stores the values.
+The
+.I value
+argument is the value to be placed in the property value list.
+If value is
+.Cn NULL ,
+the
+property is removed entirely.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn tt_spec_prop_set
+function returns the status of the operation as one of the following
+.B Tt_status
+values:
+.VL 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_DBAVAIL
+.br
+The ToolTalk service could not access the
+ToolTalk database needed for this operation.
+.Lc TT_ERR_DBEXIST
+.br
+The ToolTalk service could not access the
+specified ToolTalk database in the expected place.
+.Lc TT_ERR_NOMP
+.br
+The
+.Cm ttsession 1
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_OBJID
+.br
+The
+.I objid
+passed to the ToolTalk service does not reference an existing object spec.
+.Lc TT_ERR_PROPLEN
+.br
+The specified property value is too long.
+(The maximum size is implementation specific, but is at least 2048.)
+.Lc TT_ERR_PROPNAME
+.br
+The specified property name is syntactically invalid.
+.LE
+.SH "SEE ALSO"
+.Hd Tt/tt_c.h 5,
+.Fn tt_spec_prop_add 3.

@@ -1,0 +1,65 @@
+\######################################################################
+\#
+\#     printerNN.dt
+\#
+\#     Template file for configuring printers in the printer sub-panel.
+\#
+\#    (c) Copyright 1993, 1994 Hewlett-Packard Company
+\#    (c) Copyright 1993, 1994 International Business Machines Corp.
+\#    (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+\#    (c) Copyright 1993, 1994 Unix System Labs, Inc., a subsidiary
+\#        of Novell, Inc.
+\#
+\#     $XConsortium: printerNN.dt.src /main/cde1_maint/1 1995/07/15 03:09:01 drk $
+\#
+\######################################################################
+
+\###############################
+\#
+\# To configure a printer in the DT printer slide-up:
+\#
+\#	1. Identify which printer icon in the slide-up panel should be
+\#	   associated with the printer.  Icons are numbered from the
+\#	   top beginning with 01.  (E.g 01 is the top icon, 02 is the
+\#	   next, etc.)
+\#
+\#	2. Copy this file to CDE_INSTALLATION_TOP/examples/types/printer<NN>.dt
+\#	   where <NN> is replaced by the number of the icon.  For
+\#	   example, copy it to CDE_INSTALLATION_TOP/examples/types/printer01.dt to
+\#	   configure the top printer.
+\#
+\#	3. Edit the "set PRINTER_NUMBER=nn" line below and replace
+\#	   "nn" with the number of the printer icon.  For example,
+\#	   change it to "set PRINTER_NUMBER=01" for the top printer
+\#	   icon. 
+\#
+\#	4. Edit the "set PRINTER_NAME=name" line below and replace
+\#	   "name" with the device name assigned to the printer in step
+\#	   1.
+\#
+\#	5. Invoke the ReloadApps action from the System_Admin
+\#	   container of the General toolbox.
+\#
+\################################
+
+set PRINTER_NUMBER=nn
+set PRINTER_NAME=name
+
+ACTION Print${PRINTER_NUMBER}
+{
+	ARG_TYPE 	*
+	TYPE		COMMAND
+	WINDOW_TYPE	NO_STDIO
+	EXEC_STRING	lp -d${PRINTER_NAME} %(File)Args%
+}
+
+ACTION PrinterInfo${PRINTER_NUMBER}
+{
+        TYPE		COMMAND
+	WINDOW_TYPE	OUTPUT_ONLY
+	EXEC_STRING	\
+	  sh -c ' \
+	    (echo %|nls-8001-#"Printer#|; \
+	   lpstat -r -p${PRINTER_NAME}) | \${PAGER:-more}; \
+	    echo %|nls-8002-#Select#|'
+}

@@ -1,0 +1,84 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Novell, Inc
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1988 by Massachusetts Institute of Technology
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH XmClipboardInquireCount 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmClipboardInquireCount\fP \- A clipboard function that returns the number of data item formats
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/Xm.h>
+\&#include <Xm/CutPaste.h>
+.sp \n(PDu
+.ta 1i
+.nf
+int \fIXmClipboardInquireCount\fI (\fBdisplay, window, count,
+	max_format_name_length\fI)
+.ta .5i 1.5i
+.nf
+	Display	\fB* display\fI;
+	Window	\fBwindow\fI;
+	int	\fB* count\fI;
+	unsigned long	\fB* max_format_name_length\fI;
+.wH
+.fi
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+\fIXmClipboardInquireCount\fP returns the number of data item formats available
+for the data item in the clipboard.  This function also returns the
+maximum name-length for all formats in which the data item is
+stored.
+.IP "\fBdisplay\fP"
+Specifies a pointer to the \fIDisplay\fP structure that was returned in a
+previous call to \fIXOpenDisplay\fP or \fIXtDisplay\fP.
+.IP "\fBwindow\fP"
+Specifies a widget's window ID that relates the application window to the
+clipboard.  The widget's window ID can be obtained by using
+\fIXtWindow\fP.
+The same application instance should pass the same window ID to each of the
+clipboard functions that it calls.
+.IP "\fBcount\fP"
+Returns the number of data item formats available for the data item
+in the clipboard.  If no formats are available, this argument equals zero.
+The count includes the formats that were passed by name.
+.IP "\fBmax_format_name_length\fP"
+Specifies the maximum length of all format names for the data item in
+the clipboard.
+.SH RETURN VALUE
+.IP "\fIClipboardSuccess\fP"
+The function is successful.
+.IP "\fIClipboardLocked\fP"
+The function failed because the clipboard was locked by another
+application.  The application can continue to call the function again with
+the same parameters until the lock goes away.  This gives the application
+the opportunity to ask if the user wants to keep trying or to give up
+on the operation.
+.IP "\fIClipboardNoData\fP"
+The function could not find data on the clipboard corresponding to the
+format requested.
+This could occur because the clipboard is empty; there is data
+on the clipboard but not in the requested format; or the data in
+the requested format was passed by name and is no longer available.
+.SH RELATED INFORMATION
+.na
+\fIXmClipboardStartCopy(3X)\fP.
+.ad

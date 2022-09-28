@@ -1,0 +1,108 @@
+.de LI
+.\" simulate -mm .LIs by turning them into .TPs
+.TP \\n()Jn
+\\$1
+..
+.TH dtprintinfo 1 "12 October 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+dtprintinfo \- the Common Desktop Environment Print Viewer
+.SH SYNOPSIS
+.yS
+dtprintinfo 
+[ -p <\f2printer\fP> | -all | -populate | -help ]
+.yE
+.SH DESCRIPTION
+The dtprintinfo program provides a graphical interface that
+displays the status of print queues and print jobs.
+Additional information about print queues or print
+jobs can be retrieved within the interface, individual print
+queue labels and icons can be customized, and individual
+print jobs can be canceled.  Print jobs can be submitted by
+dragging files from the File Manager utility to a print queue
+icon in a dtprintinfo window.
+.SS KEY SUPPORTED TASKS
+.IP \(em 3
+Displaying configured print queues on the system.
+.IP \(em 3
+Displaying print queue and print job properties.
+.IP \(em 3
+Changing print queue labels and icons.
+.IP \(em 3
+Submitting print jobs.
+.IP \(em 3
+Canceling print jobs.
+.SH NO OPTIONS
+.sp .5
+When the dtprintinfo command is started without any options, 
+it shows the LPDEST printer or the system default printer if
+LPDEST is not set.
+.SH OPTIONS
+.sp .5
+.SS -p \f2<printer>\fP
+Display information only for the specified \f2<printer>\fP.
+.SS -all
+Display information for all printers.
+.SS -populate
+The
+.I -populate
+option is available only for root. This
+option creates default printer actions for all printers
+in /etc/dt/appconfig/types/LANG. If LANG is not defined, 
+the actions are created in /etc/dt/appconfig/types/C.
+The post-installation process uses the 
+.I -populate
+feature to create default printer actions in /etc/dt/appconfig/types/C.
+.SS -help
+Display command line option help.
+.SH RESOURCES
+Resource are stored in /usr/dt/app-defaults/$LANG/Dtprintinfo.
+.sp .5
+.SS \f2updateInterval\fP
+The \f2updateInterval\fP resource determines how often the dtprintinfo
+program checks the printer.  The default value is every 30 seconds.
+.SH ENVIRONMENT
+.sp .5
+.SS LPDEST
+This environment variable determines which print queue to display 
+when the dtprintinfo command is started without any options.
+.SH BROADCAST MESSAGES
+None.
+.SH WARNING MESSAGES
+.sp .5
+.RS
+.P
+- Are you sure you want to cancel <\f2job\fP>? -
+.RE
+The dtprintinfo program displays a prompt before a print <\f2job\fP> is canceled.
+.SH "EXIT STATUS"
+The following exit values are returned:
+.PP
+.RS 3
+.nr )J 4
+.LI \h"\w'>'u"0
+Successful completion.
+.LI >0
+An invocation error was detected.
+.PP
+.RE
+.nr )J 0
+.SH EXAMPLES
+.SS dtprintinfo
+.sp .5
+Display the status of the LPDEST printer or the system default printer.
+.SS dtprintinfo -p lp0
+.sp .5
+Display the status of the print queue called \f2lp0\fP.
+.SS dtprintinfo -all
+.sp .5
+Display the status of all print queues.
+.SH FILES
+.sp .5
+The dtprintinfo program stores a <printer>_Print.dt datatype file for
+each customized print queue action in the $HOME/.dt/types directory.
+.SH "SEE ALSO"
+.BR dtlp (1), dtprintinfoaction (5)

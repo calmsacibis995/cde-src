@@ -1,0 +1,462 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH XmMessageBox 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmMessageBox\fP \- The MessageBox widget class
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/MessageB.h>
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+MessageBox is a dialog class used for creating simple message dialogs.
+Convenience dialogs based on MessageBox are provided for several common
+interaction tasks, which include giving information, asking questions, and
+reporting errors.
+.PP 
+A MessageBox dialog is typically transient in nature, displayed for the
+duration of a single interaction.
+MessageBox is a subclass of XmBulletinBoard and
+depends on it for much of its general dialog behavior.
+.PP
+The default value for \fIXmNinitialFocus\fP 
+is the value of \fIXmNdefaultButton\fP.
+.PP 
+A typical MessageBox contains a message symbol, a message, and up to
+three standard default PushButtons:  \fIOK, Cancel\fP, and \fIHelp\fP.
+It is laid out with the symbol and message on top and the
+PushButtons on the bottom.  The help button is positioned to the side
+of the other push buttons.
+You can localize the default symbols and button labels for MessageBox
+convenience dialogs.
+.PP
+The user can specify resources in a resource file for the gadgets
+created automatically that contain the MessageBox symbol pixmap
+and separator.  The gadget names are "Symbol" and "Separator".
+.PP
+A MessageBox can also be customized by creating and managing new
+children that are added to the MessageBox children created
+automatically by the convenience dialogs.
+In the case of
+TemplateDialog, only the separator child is created by default.
+If the callback, string, or pixmap symbol resources are specified,
+the appropriate child will be created.
+.PP
+Additional children are laid out in the following manner:
+.TP
+\(bu
+The first MenuBar child is placed at the top of the window.
+.TP
+\(bu
+All \fIXmPushButton\fP
+widgets or gadgets, and their subclasses are
+placed after the \fIOK\fP button in the order of their creation.
+.TP
+\(bu
+A child that is not in the above categories is placed above
+the row of buttons.  If a message label exists, the child is placed below
+the label.  If a message pixmap exists, but a message label is absent, the
+child is placed on the same row as the pixmap.  The child behaves as a
+work area and grows or shrinks to fill the space above the
+row of buttons.  The layout of multiple work area children is
+undefined.
+.PP 
+.ne 15
+At initialization, MessageBox looks for the following bitmap files:
+.wH
+.rS 
+.TP
+\(bu
+xm_error
+.TP
+\(bu
+xm_information
+.TP
+\(bu
+xm_question
+.TP
+\(bu
+xm_working
+.TP
+\(bu
+xm_warning
+.wH
+.rE
+.PP 
+See \fIXmGetPixmap(3X)\fP for a list of the paths that are searched for
+these files.
+.SS "Classes"
+MessageBox inherits behavior and resources from \fICore\fP,
+\fIComposite\fP, \fIConstraint\fP,
+\fIXmManager\fP, and \fIXmBulletinBoard\fP.
+.PP 
+The class pointer is \fIxmMessageBoxWidgetClass\fP.
+.PP 
+The class name is \fIXmMessageBox\fP.
+.SS "New Resources"
+The following table defines a set of widget resources used by the programmer
+to specify data.  The programmer can also set the resource values for the
+inherited classes to set attributes for this widget.  To reference a
+resource by name or by class in a .Xdefaults file, remove the \fIXmN\fP or
+\fIXmC\fP prefix and use the remaining letters.  To specify one of the defined
+values for a resource in a .Xdefaults file, remove the \fIXm\fP prefix and use
+the remaining letters (in either lowercase or uppercase, but include any
+underscores between words).
+The codes in the access column indicate if the given resource can be
+set at creation time (C),
+set by using \fIXtSetValues\fP (S),
+retrieved by using \fIXtGetValues\fP (G), or is not applicable (N/A).
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmMessageBox Resource Set
+Name	Class	Type	Default	Access
+_
+XmNcancelCallback	XmCCallback	XtCallbackList	NULL	C
+XmNcancelLabelString	XmCCancelLabelString	XmString	dynamic	CSG
+XmNdefaultButtonType	XmCDefaultButtonType	unsigned char	XmDIALOG_OK_BUTTON	CSG
+XmNdialogType	XmCDialogType	unsigned char	XmDIALOG_MESSAGE	CSG
+XmNhelpLabelString	XmCHelpLabelString	XmString	dynamic	CSG
+XmNmessageAlignment	XmCAlignment	unsigned char	XmALIGNMENT_BEGINNING	CSG
+XmNmessageString	XmCMessageString	XmString	""	CSG
+XmNminimizeButtons	XmCMinimizeButtons	Boolean	False	CSG
+XmNokCallback	XmCCallback	XtCallbackList	NULL	C
+XmNokLabelString	XmCOkLabelString	XmString	dynamic	CSG
+XmNsymbolPixmap	XmCPixmap	Pixmap	dynamic	CSG
+.TE
+.KE
+.in
+.sp 1
+.nL
+.ne 20
+.IP "\fIXmNcancelCallback\fP"
+Specifies the list of callbacks that is called when
+the user clicks on the cancel button.
+The reason sent by the callback is \fIXmCR_CANCEL\fP.
+.IP "\fIXmNcancelLabelString\fP"
+Specifies the string label for the cancel button.
+The default for this resource depends on the locale.
+In the C locale the default is "Cancel".
+.IP "\fIXmNdefaultButtonType\fP"
+Specifies the default PushButton.
+A value of \fIXmDIALOG_NONE\fP means that there should be no default
+PushButton.
+The following are valid types:
+.wH
+.rS 
+.TP
+\(bu
+\fIXmDIALOG_CANCEL_BUTTON\fP
+.TP
+\(bu
+\fIXmDIALOG_OK_BUTTON\fP
+.TP
+\(bu
+\fIXmDIALOG_HELP_BUTTON\fP
+.TP
+\(bu
+\fIXmDIALOG_NONE\fP
+.wH
+.rE
+.IP "\fIXmNdialogType\fP"
+Specifies the type of MessageBox dialog, which determines
+the default message symbol.
+The following are the possible values for this resource:
+.wH
+.rS 
+.TP
+\(bu
+\fIXmDIALOG_ERROR\fP \- indicates an ErrorDialog
+.TP
+\(bu
+\fIXmDIALOG_INFORMATION\fP \- indicates an InformationDialog
+.TP
+\(bu
+\fIXmDIALOG_MESSAGE\fP \- indicates a MessageDialog.
+This is the default MessageBox dialog type.
+It does not have an associated message symbol.
+.TP
+\(bu
+\fIXmDIALOG_QUESTION\fP \- indicates a QuestionDialog
+.TP
+\(bu
+\fIXmDIALOG_TEMPLATE\fP \- indicates a TemplateDialog.
+The TemplateDialog contains only a separator child.  It does not
+have an associated message symbol.
+.TP
+\(bu
+\fIXmDIALOG_WARNING\fP \- indicates a WarningDialog
+.TP
+\(bu
+\fIXmDIALOG_WORKING\fP \- indicates a WorkingDialog
+.wH
+.rE
+.PP
+If this resource is changed via \fIXtSetValues\fP, the symbol bitmap is
+modified to the new \fIXmNdialogType\fP bitmap unless
+\fIXmNsymbolPixmap\fP is also being set in the call to
+\fIXtSetValues\fP.
+If the dialog type does not have an associated message symbol, then no
+bitmap will be displayed.
+.nL
+.IP "\fIXmNhelpLabelString\fP"
+Specifies the string label for the help button.
+The default for this resource depends on the locale.
+In the C locale the default is "Help".
+.nL
+.ne 12
+.IP "\fIXmNmessageAlignment\fP"
+Controls the alignment of the message Label.
+Possible values include the following:
+.wH
+.rS 
+.TP
+\(bu
+\fIXmALIGNMENT_BEGINNING\fP \- the default
+.TP
+\(bu
+\fIXmALIGNMENT_CENTER\fP
+.TP
+\(bu
+\fIXmALIGNMENT_END\fP
+.wH
+.rE
+.IP "\fIXmNmessageString\fP"
+Specifies the string to be used as the message.
+.IP "\fIXmNminimizeButtons\fP"
+Sets the buttons to the width of the widest button and height of the
+tallest button if False.  If True, button width and height are
+set to the preferred size of each button.
+.IP "\fIXmNokCallback\fP"
+Specifies the list of callbacks that is called when
+the user clicks on the OK button.
+The reason sent by the callback is \fIXmCR_OK\fP.
+.IP "\fIXmNokLabelString\fP"
+Specifies the string label for the OK button.
+The default for this resource depends on the locale.
+In the C locale the default is "OK".
+.IP "\fIXmNsymbolPixmap\fP"
+Specifies the pixmap label to be used as the message symbol.
+.SS "Inherited Resources"
+MessageBox inherits behavior and resources from the following
+superclasses.  For a complete description of each resource, refer to the
+man page for that superclass.
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmBulletinBoard Resource Set
+Name	Class	Type	Default	Access
+_
+XmNallowOverlap	XmCAllowOverlap	Boolean	True	CSG
+XmNautoUnmanage	XmCAutoUnmanage	Boolean	True	CG
+XmNbuttonFontList	XmCButtonFontList	XmFontList	dynamic	CSG
+XmNcancelButton	XmCWidget	Widget	Cancel button	SG
+XmNdefaultButton	XmCWidget	Widget	dynamic	SG
+XmNdefaultPosition	XmCDefaultPosition	Boolean	True	CSG
+XmNdialogStyle	XmCDialogStyle	unsigned char	dynamic	CSG
+XmNdialogTitle	XmCDialogTitle	XmString	NULL	CSG
+XmNfocusCallback	XmCCallback	XtCallbackList	NULL	C
+XmNlabelFontList	XmCLabelFontList	XmFontList	dynamic	CSG
+XmNmapCallback	XmCCallback	XtCallbackList	NULL	C
+XmNmarginHeight	XmCMarginHeight	Dimension	10	CSG
+XmNmarginWidth	XmCMarginWidth	Dimension	10 	CSG
+XmNnoResize	XmCNoResize	Boolean	False	CSG
+.wH
+.tH
+XmNresizePolicy	XmCResizePolicy	unsigned char	XmRESIZE_ANY	CSG
+XmNshadowType	XmCShadowType	unsigned char	XmSHADOW_OUT	CSG
+XmNtextFontList	XmCTextFontList	XmFontList	dynamic	CSG
+XmNtextTranslations	XmCTranslations	XtTranslations	NULL	C
+XmNunmapCallback	XmCCallback	XtCallbackList	NULL	C
+.TE
+.KE
+.in
+.sp 1
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmManager Resource Set
+Name	Class	Type	Default	Access
+_
+XmNbottomShadowColor	XmCBottomShadowColor	Pixel	dynamic	CSG
+XmNbottomShadowPixmap	XmCBottomShadowPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNforeground	XmCForeground	Pixel	dynamic	CSG
+XmNhelpCallback	XmCCallback	XtCallbackList	NULL	C
+XmNhighlightColor	XmCHighlightColor	Pixel	dynamic	CSG
+XmNhighlightPixmap	XmCHighlightPixmap	Pixmap	dynamic	CSG
+XmNinitialFocus	XmCInitialFocus	Widget	dynamic	CSG
+XmNnavigationType	XmCNavigationType	XmNavigationType	XmTAB_GROUP	CSG
+XmNshadowThickness	XmCShadowThickness	Dimension	dynamic	CSG
+XmNstringDirection	XmCStringDirection	XmStringDirection	dynamic	CG
+XmNtopShadowColor	XmCTopShadowColor	Pixel	dynamic	CSG
+XmNtopShadowPixmap	XmCTopShadowPixmap	Pixmap	dynamic	CSG
+XmNtraversalOn	XmCTraversalOn	Boolean	True	CSG
+XmNunitType	XmCUnitType	unsigned char	dynamic	CSG
+XmNuserData	XmCUserData	XtPointer	NULL	CSG
+.TE
+.KE
+.in
+.sp 1
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+Composite Resource Set
+Name	Class	Type	Default	Access
+_
+XmNchildren	XmCReadOnly	WidgetList	NULL	G
+XmNinsertPosition	XmCInsertPosition	XtOrderProc	NULL	CSG
+XmNnumChildren	XmCReadOnly	Cardinal	0	G
+.TE
+.KE
+.in
+.sp 1
+.P 
+.wH
+.in 0 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+Core Resource Set
+Name	Class	Type	Default	Access
+_
+XmNaccelerators	XmCAccelerators	XtAccelerators	dynamic	N/A
+XmNancestorSensitive	XmCSensitive	Boolean	dynamic	G
+XmNbackground	XmCBackground	Pixel	dynamic	CSG
+XmNbackgroundPixmap	XmCPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNborderColor	XmCBorderColor	Pixel	XtDefaultForeground	CSG
+XmNborderPixmap	XmCPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNborderWidth	XmCBorderWidth	Dimension	0	CSG
+XmNcolormap	XmCColormap	Colormap	dynamic	CG
+XmNdepth	XmCDepth	int	dynamic	CG
+XmNdestroyCallback	XmCCallback	XtCallbackList	NULL	C
+XmNheight	XmCHeight	Dimension	dynamic	CSG
+XmNinitialResourcesPersistent	XmCInitialResourcesPersistent	Boolean	True	C
+XmNmappedWhenManaged	XmCMappedWhenManaged	Boolean	True	CSG
+XmNscreen	XmCScreen	Screen *	dynamic	CG
+.wH
+.tH
+XmNsensitive	XmCSensitive	Boolean	True	CSG
+XmNtranslations	XmCTranslations	XtTranslations	dynamic	CSG
+XmNwidth	XmCWidth	Dimension	dynamic	CSG
+XmNx	XmCPosition	Position	0	CSG
+XmNy	XmCPosition	Position	0	CSG
+.TE
+.KE
+.in
+.sp 1
+.wH
+.in  
+.SS "Callback Information"
+A pointer to the following structure is passed to each callback:
+.sS
+.iS
+.ta .25i 1.50i
+.nf
+typedef struct
+{
+	int	\fBreason\fI;
+	\fIXEvent	\fB* event\fI;
+} XmAnyCallbackStruct;
+.iE
+.sE
+.wH
+.fi
+.IP "\fBreason\fP"
+Indicates why the callback was invoked
+.IP "\fBevent\fP"
+Points to the \fIXEvent\fP that triggered the callback
+.SS "Translations"
+.ne 20
+XmMessageBox includes the translations from XmManager.
+.SS "Additional Behavior"
+The XmMessageBox widget has the additional behavior described below:
+.IP "\fIMAny\ KCancel\fP:"
+Calls the activate callbacks for the cancel button if it is sensitive.
+.IP "\fIKActivate\fP:"
+Calls the activate callbacks for the button with the keyboard focus.
+If no button has the keyboard focus, calls the activate callbacks
+for the default button if it is sensitive.
+.IP "\fI<Ok\ Button\ Activated>\fP:"
+Calls the callbacks for \fIXmNokCallback\fP.
+.IP "\fI<Cancel\ Button\ Activated>\fP:"
+Calls the callbacks for \fIXmNcancelCallback\fP.
+.IP "\fI<Help\ Button\ Activated>\fP:"
+Calls the callbacks for \fIXmNhelpCallback\fP.
+.IP "\fI<FocusIn>\fP:"
+Calls the callbacks for \fIXmNfocusCallback\fP.
+.IP "\fI<Map>\fP:"
+Calls the callbacks for \fIXmNmapCallback\fP if the parent is a
+DialogShell.
+.IP "\fI<Unmap>\fP:"
+Calls the callbacks for \fIXmNunmapCallback\fP if the parent is a
+DialogShell.
+.SS "Virtual Bindings"
+The bindings for virtual keys are vendor specific.
+For information about bindings for virtual buttons and keys, see \fIVirtualBindings(3X)\fP.
+.nL
+.ne 20
+.SH RELATED INFORMATION
+.na
+\fIComposite(3X)\fP,
+\fIConstraint(3X)\fP,
+\fICore(3X)\fP,
+\fIXmBulletinBoard(3X)\fP,
+\fIXmCreateErrorDialog(3X)\fP,
+\fIXmCreateInformationDialog(3X)\fP,
+\fIXmCreateMessageBox(3X)\fP,
+\fIXmCreateMessageDialog(3X)\fP,
+\fIXmCreateQuestionDialog(3X)\fP,
+\fIXmCreateTemplateDialog(3X)\fP,
+\fIXmCreateWarningDialog(3X)\fP,
+\fIXmCreateWorkingDialog(3X)\fP,
+\fIXmManager(3X)\fP, and
+\fIXmMessageBoxGetChild(3X)\fP.
+.ad

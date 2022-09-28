@@ -1,0 +1,53 @@
+.TH tt_close 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+tt_close \- close the current default procid
+.SH SYNOPSIS
+.yS
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'Tt_status tt_close('u
+Tt_status tt_close(void);
+.yE
+.SH DESCRIPTION
+The
+.Fn tt_close
+function
+closes the current default
+procid.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn tt_close
+function returns the status of the operation as one of the following
+.B Tt_status
+values:
+.VL 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_NOMP
+.br
+The
+.Cm ttsession 1
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_PROCID
+.br
+The current default process identifier is out of date or invalid.
+.LE
+.SH "APPLICATION USAGE"
+When the
+.Fn tt_close
+function call is successful, the
+procid
+will no longer be active.
+For any subsequent API calls the process must, therefore,
+first call
+.Fn tt_default_procid_set
+to specify a
+procid.
+.SH "SEE ALSO"
+.Hd Tt/tt_c.h 5,
+.Fn tt_open 3,
+.Fn tt_context_join 3.

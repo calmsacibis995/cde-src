@@ -1,0 +1,43 @@
+XCOMM libsun @(#)Imakefile	1.5 97/05/23 SMI
+XCOMM Copyright (c) 1996 Sun Microsystems, Inc.
+
+DEBUG_FLAG	=	-g -DDEBUG -KPIC
+OPT_FLAG	=	-xO3
+OPT_SPARC	=	-xspace
+
+all:: TheCclient
+
+#ifdef DEBUGTREE
+DBG_OR_OPT	=	$(DEBUG_FLAG)
+SHLIB		=	libc-client.so.1
+#else
+#ifdef sparc
+OPT_FLAG	+=	$(OPT_SPARC)
+#endif /*sparc*/
+SHDLIB		=
+#endif /*DEBUGTREE*/
+
+#ifdef DEBUGTREE
+TheCclient:
+	$(MAKE) -f BuildMakeFile "BLD_FLAGS=$(DEBUG_FLAG)" "SHLIB=$(SHLIB)" debug
+#else
+TheCclient:
+	$(MAKE) -f BuildMakeFile "BLD_FLAGS=$(OPT_FLAG)" "SHLIB=$(SHLIB)" opt
+#endif /*DEBUGTREE*/
+
+opt:
+	$(MAKE) -f BuildMakeFile opt
+
+debug:
+	$(MAKE) -f BuildMakeFile debug
+
+tcov:
+	$(MAKE) -f BuildMakeFile tcov
+
+includes::
+	$(MAKE) -f BuildMakeFile includes
+
+clean::
+	$(MAKE) -f BuildMakeFile clean
+
+.NO_PARALLEL:

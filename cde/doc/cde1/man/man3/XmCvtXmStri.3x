@@ -1,0 +1,85 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH XmCvtXmStringToCT 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmCvtXmStringToCT\fP \- A compound string function that converts a compound string to compound text
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/Xm.h>
+.sp \n(PDu
+char * XmCvtXmStringToCT (\fBstring\fI)
+.ta .5i 1.75i
+.nf
+	XmString	\fBstring\fI;
+.wH
+.fi
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+\fIXmCvtXmStringToCT\fP converts a compound string to a (char *) string
+in compound text format.
+The application must call \fIXtAppInitialize\fP before calling this
+function.
+The converter uses the font list tag associated with a given compound
+string segment to select a compound text format for that segment.
+A registry defines a mapping between font list tags and compound text
+encoding formats.
+The converter uses the following algorithm for each compound string
+segment:
+.AL
+.LI
+If the compound string segment tag is mapped to
+\fIXmFONTLIST_DEFAULT_TAG\fP in the registry, the converter passes the
+text of the compound string segment to \fIXmbTextListToTextProperty\fP
+with an encoding style of \fIXCompoundTextStyle\fP and uses the
+resulting compound text for that segment.
+.LI
+If the compound string segment tag is mapped to an MIT registered
+charset in the registry, the converter creates the compound text for
+that segment using the charset (from the registry) and the text of the
+compound string segment as defined in the X Consortium Standard
+\*ECompound Text Encoding\fP.
+.LI
+If the compound string segment tag is mapped to a charset in the
+registry that is neither \fIXmFONTLIST_DEFAULT_TAG\fP nor an MIT
+registered charset, the converter creates the compound text for that
+segment using the charset (from the registry) and the text of the
+compound string segment as an "extended segment" with a variable number
+of octets per character.
+.LI
+If the compound string segment tag is not mapped in the registry, the
+result is implementation dependent.
+.LE
+.IP "\fBstring\fP"
+Specifies a compound string to be converted to compound text.
+.SH RETURN VALUE
+Returns a (char *) string in compound text format.
+This format is described in the X Consortium Standard \*ECompound Text
+Encoding\fP.
+.SH RELATED INFORMATION
+.na
+\fIXmCvtCTToXmString(3X)\fP,
+\fIXmFontList(3X)\fP,
+\fIXmMapSegmentEncoding(3X)\fP,
+\fIXmRegisterSegmentEncoding(3X)\fP, and
+\fIXmString\fP.
+.ad

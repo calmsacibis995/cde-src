@@ -1,0 +1,209 @@
+93.11.05
+
+         Comparing Two Approaches to Remote Mailbox Access: 
+                           IMAP vs. POP
+
+                            Terry Gray
+               Director, Networks & Distributed Computing
+                     University of Washington
+
+There are several different approaches to building a distributed electronic
+mail infrastructure.  For example: LAN-oriented, vendor specific systems;
+single time-sharing machine solutions; and Internet-oriented
+mailserver-based solutions.  The principal options in this last category
+are DMSP (Distributed Mail System Protocol), POP (Post Office Protocol),
+and IMAP (Internet Message Access Protocol).  These protocols are more
+robust foundations for a distributed email system than vendor-specific
+systems requiring gateways to Internet mail.  Of these three, POP is the
+oldest and consequently the best known.  DMSP is largely limited to a
+single application, PCMAIL, and is known primarily for its disconnected
+(offline) operation capabilities. IMAP offers significant advantages over
+POP.  This gap is likely to widen as a result of the imminent addition of
+disconnected operation extensions to IMAP. 
+
+With POP (Post Office Protocol), mail is delivered to a shared server, and
+a personal computer user periodically connects to the server and downloads
+all of the pending mail to the "client" machine.  Thereafter, all mail
+processing is local to the client machine.  Think of POP as providing a
+store-and-forward service, intended to move mail (on demand) from an
+intermediate server (drop point) to a single destination machine, usually a
+PC or Mac. Once delivered to the PC or Mac, the messages are typically
+deleted from the POP server. 
+
+IMAP is a client-server mail protocol designed to permit manipulation of
+remote mailboxes as if they were local.  With IMAP, mail is again delivered
+to a shared server, but the mail client machine does not normally copy it
+all at once and then delete it from the server.  It's more of a
+client-server model, where the IMAP client can ask the server for headers,
+or the bodies of specified messages, or to search for messages meeting
+certain criteria. Messages in the mail repository can be marked as deleted
+and subsequently expunged, but they stay on the repository until the user
+takes such action.  Depending on the IMAP client implementation and the
+mail architecture desired by a system manager, the user may save messages
+directly on the client machine, or save them on the server, or be given
+the choice of doing either. 
+
+While POP and IMAP both allow access to mail on a remote server from a
+variety of different client platforms, they reflect two different paradigms
+and styles of use.  POP works best for people who use a single client
+machine all the time; it is not well-suited for the goals of accessing
+one's inbox of recent messages or saved-message folders from different
+places and different machines at different times. 
+
+The strength of POP, other than its wide availability, is that it minimizes
+use of server resources and connect time when used via dialup.  However,
+since IMAP is a functional superset of POP, it can also be used in the "POP
+paradigm" of connecting to a mail server, retrieving all the pending
+messages, and disconnecting.  Thus, the only advantage of the POP
+*protocol* over IMAP relates to software availability and not
+functionality.  As the amount of IMAP software is growing rapidly, the
+historic prevalence of POP is of diminishing importance when compared to
+the many advantages of IMAP. 
+
+Because IMAP can mimic all of the POP mail retrieval functions, it is
+useful to distinguish the characteristics of the IMAP and POP *paradigms*,
+as well as the protocols themselves.  The paradigms define what the user
+can do in each model; the protocol characteristics relate to efficiency,
+performance, etc.  Here are some of the key similarities and differences
+between the two...
+
+o POP and IMAP reflect two different paradigms:
+  -POP = store-and-forward (usually to a single client).
+  -IMAP = multiple client-server mailbox access.
+
+o Characteristics common to both POP and IMAP:
+  -Mail is delivered to a shared, "always up" mail server.
+  -New mail accessible from a variety of client platform types.
+  -New mail accessible from anywhere in network.
+  -Offline mail processing possible, though neither designed for it.
+  -Protocols are open; defined by Internet RFCs.
+  -Freely available implementations (including source) available.
+  -Clients available for PCs, Macs, and Unix.
+  -Commercial implementations available.
+  -Internet oriented; no SMTP mail gateways required.
+
+o POP paradigm advantages:
+  -Minimum use of connect time.
+  -Minimum use of server resources.
+
+o POP protocol advantages:
+  -Simpler protocol; easier to implement.
+  -More client software currently available.
+
+o IMAP paradigm advantages:
+  -Saved-message folders may be stored on server (as well as INBOX).
+  -Allows access to INBOX (not just new mail) from multiple platforms.
+  -Allows concurrent access to a shared mailbox from multiple platforms.
+  -Allows concurrent access to mailboxes on multiple mailservers.
+  -Offers improved offline mail handling.
+  -Allows selective transfer of messages/parts to client (local Save).
+  -Can also use POP paradigm, for minimum connect time and server resources.
+
+o IMAP protocol advantages:
+  -Suitable for accessing non-email data; e.g., NetNews, documents.
+  -Faster startup time, as only the headers are fetched initially.
+  -Allows selective fetching of individual MIME message body parts.
+  -Effective over low-speed links.
+  -Ability to use server for searching.
+  -Offline processing w/resynchronizing is a planned enhancement.
+
+"Saved-message folders may be stored on server (as well as INBOX)" allows
+"dataless" clients and/or nomadic users (e.g. student labs). 
+
+"Allows access to INBOX (not just new mail) from multiple platforms" means
+that if you have a Mac in your office, and PC at home, and a Unix machine
+in the lab, you can move freely among them and access the same INBOX. 
+
+"Allows concurrent access to a shared mailbox from multiple platforms."
+This capability is useful when multiple individuals are processing messages
+coming into a common inbox.  Changes in mailbox state can be presented to
+all concurrently active clients via IMAP. 
+
+"Allows concurrent access to multiple inboxes on multiple mailservers."
+This is useful for people who have partitioned their incoming mail streams,
+either via delivery filters, or by having different accounts for different
+purposes. 
+
+IMAP "offers improved offline mail handling" compared to POP. Unlike the
+DMSP protocol used in the PCMAIL program, neither POP nor IMAP was designed
+with offline use as a primary goal.  However, POP is widely used for this,
+even though it is not particularly well-suited for the task. POP requires
+you to either entrust all of your mail to your client machine (which may be
+about to go thru an airport xray machine), or to over-ride the normal POP
+server behavior of deleting the mail on the server, and manually
+resynchronizing the diverging mailbox states at a later time.  IMAP can do
+better:  you can connect to the server, save to a local folder all or
+selected messages, and disconnect.  The advantages over POP are that (1)
+the saved messages may be retained on the server, but *marked* as deleted,
+so they can be distinguished later from unselected or more recent messages,
+and expunged once it is clear they won't be needed, and (2) the ability to
+save (download) selectively --especially important when one has a 2MB audio
+message in the mailbox and is reading mail via a low-bandwidth connection
+from a machine that has no sound capability. 
+
+"Allows selective transfer of messages/parts to client (local Save)."
+Especially when connecting to a mail server via low-bandwidth lines, it is
+useful to be able to defer transferring messages that are not of immediate
+interest until a more propitious time.  Moreover, with multimedia or
+multipart MIME messages, transferring selected parts of a message in
+increasingly useful. Efficient processing of MIME messages is one of the
+major advantages of IMAP over POP.  MIME stands for Multipurpose Internet
+Mail Extensions.  It is a technique for encoding arbitrary files as
+attachments to SMTP and RFC-822 compatible Internet mail messages.  This is
+something that proprietary, LAN-oriented, mail systems have had for some
+time, and now is finally available for the Internet.  It allows one to send
+spreadsheets, word processing docs, images, and audio to 5 or 10 million of
+"your closest Internet friends".  MIME has one particularly nice
+capability: it allows inclusion of alternate representations.  For example,
+a plain-text version of a document, plus a fax or RTF version.  With IMAP,
+the receiving mail user agent gets to decide which message parts to
+transfer and present to the user, falling back to plain text if that's all
+it can do. 
+
+Even though MIME support is not yet pervasive, its importance and impact on
+the IMAP/POP question should not be underestimated. There is tremendous
+pent-up demand for this capability and it is taking off fast.  In fact,
+people are already using MIME for things that have nothing to do with mail
+(e.g. encoding different representations of technical documents, for
+campus-wide information systems.) MIME is orthogonal to IMAP and POP,
+except that IMAP and MIME are extremely complementary, and there are
+already IMAP clients that understand MIME.  (POP clients can and will be
+taught to understand MIME, too, but the fact that POP copies all pending
+messages at startup, and MIME messages can be very large, means that POP
+users may need to become even more patient!)
+
+"Can also use POP paradigm, for minimum connect time and server resources."
+The POP paradigm is of interest in situations where the only access to a
+mail server is via expensive dialup connections and multi-platform access
+to one's inbox(es) is not needed.  It is also useful in environments where
+client machines are resource-rich and servers are resource-poor.  However,
+because IMAP is a superset of POP functionality, IMAP can be used in "POP
+mode". That is, IMAP clients can be designed to provide the option of
+transfering all messages to the client and processing them locally
+(generally offline), thus providing the same advantages POP has in terms of
+minimizing connect time and use of server resources. 
+
+In summary, the fact that IMAP provides access to a persistent remote mail
+store, and does not move all pending messages to the client machine, offers
+more flexible access to that mail, and provides significant performance
+advantages over POP in terms of start-up time and access to large MIME
+messages.  The option of accessing remote saved-message folders and/or
+NetNews via IMAP (and from the same mail user agent) provides additional
+architectural flexibility in comparison to POP. 
+
+A reasonable conclusion is that the only advantage of POP over IMAP is
+that there is currently more POP software available.  However, this is
+changing rapidly, and IMAP's functional advantages over POP are nothing
+less than overwhelming. 
+
+IMAP2 is defined in RFC-1176.  An "IMAP2bis" document describing recent
+extensions to IMAP is available (along with various IMAP clients and a
+server) in the /mail directory of ftp.cac.washington.edu.  Also available
+from the same place is a POP server that, in addition to offering the
+normal POP service, can relay commands to an IMAP server, thus permitting
+existing POP clients to access an IMAP server.  The IMAP server available
+from UW also incorporates a NetNews driver, used at UW as part of its
+Campus-Wide Information System. 
+
+---------------------------------------------------------------------------
+

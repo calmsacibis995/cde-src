@@ -1,0 +1,67 @@
+# %%  (c) Copyright 1993, 1994 Hewlett-Packard Company			
+# %%  (c) Copyright 1993, 1994 International Business Machines Corp.	
+# %%  (c) Copyright 1993, 1994 Sun Microsystems, Inc.			
+# %%  (c) Copyright 1993, 1994 Novell, Inc. 				
+# %%  $Revision: $ 			 				
+#
+#
+# @(#)SunMakefile	1.5 93/11/05
+#
+# The ToolTalk tttrace makefile
+#
+# Copyright (c) 1992 by Sun Microsystems, Inc.
+#
+
+TT_DIR = ../..
+THIS_DIR = bin/tttrace
+
+include $(TT_DIR)/SunMakefile-head.mk
+
+all::		Bin-g
+
+$(BIN_TARGETS)::	tttrace
+
+$(INSTALL_TARGETS)::	$(INSTALL_DIR)/bin/tttrace
+
+$(BB_TARGETS)::		tttrace
+
+Clean::
+	$(RM) tttrace
+
+TTTRACE_CONTENTS =	tttrace.o tttrace_objs.o
+
+CPPFLAGS	+=	$(CPPFLAGS-bin) -I. -I$(TT_DIR)/slib -I$(TT_DIR)/proto/include
+CCFLAGS		+=	$(CCFLAGS-bin)
+CFLAGS		+=	$(CFLAGS-bin)
+LDFLAGS		+=	$(LDFLAGS-bin)
+
+MAP_CCFLAGS_glob=
+MAP_CCFLAGS_SunOS_5=	
+MAP_CCFLAGS_loc	=	$(MAP_CCFLAGS_$(OS_NAME)_$(OS_VERSION))
+MAP_CCFLAGS	=	$(MAP_CCFLAGS_glob$(MAP_CCFLAGS_loc))$(MAP_CCFLAGS_loc)
+
+LDFLAGS-O	+=	$(MAP_CCFLAGS)
+LDFLAGS-g	+=	$(MAP_CCFLAGS)
+
+MYLDLIBS_SunOS_4=	-lce -lX -lI18N -ldl
+MYLDLIBS_SunOS_5=	-lw
+LDLIBS		+=	$(MYLDLIBS_$(OS_NAME)_$(OS_VERSION))
+
+EXTRA_LD_RUN_PATH-g=	/tt/proto/lib:
+
+%/tttrace.o	:=	CPPFLAGS +=     $(CPPFLAGS-version)
+
+OBJECTS =	$(TTTRACE_CONTENTS:%=$(DERIVED)/%)
+
+# We don't try to generate a general rule for linking tttrace, since
+# it links differently from any other binary in the system anyway.
+# Trailing -Bstatic ensures libC is linked statically -- that could
+# go away in the future when libC is bundled.
+
+tttrace:	$$(DERIVED) $$(OBJECTS) \
+		$$(SLIBDEPENDENCY) $$(LIBDEPENDENCY)
+	LD_RUN_PATH=$(EXTRA_LD_RUN_PATH$(VARIANT))$(LD_RUN_PATH) \
+	$(LINK.cc) -o $@ $(OBJECTS) \
+	-lstt -ltt $(LDLIBS) -Bstatic
+
+include $(TT_DIR)/SunMakefile-tail.mk

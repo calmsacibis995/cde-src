@@ -1,0 +1,110 @@
+XCOMM platform:  $XConsortium: usl.cf /main/cde1_maint/6 1995/12/01 11:08:08 gtsang $
+/* added at hp */
+VENDOR = usl
+HARDWARE = INTEL
+
+#ifndef ForceNormalLib
+#define ForceNormalLib YES
+#endif
+
+#ifndef BInstallCmd
+#define BInstallCmd /usr/sbin/install
+#endif
+
+#ifndef SharedLibDtMail
+#define SharedLibDtMail HasSharedLibraries
+#endif
+
+#ifndef CPlusPlusPositionIndependentCFlags
+#define CPlusPlusPositionIndependentCFlags -K PIC
+#endif
+#ifndef PositionIndependentCFlags
+#define PositionIndependentCFlags -K PIC
+#endif
+
+#define DefineOldLibraryRules /* pull in oldlib.rules */
+
+/* Forces use and build of Xt from build tree */
+#ifndef USE_XT_FROM_SYSTEM_ONLY
+#define USE_XT_FROM_SYSTEM_ONLY NO
+#endif
+
+#ifndef SharedXtRev
+#define SharedXtRev 5
+#endif
+
+#ifndef LinkArchivedBms
+#define LinkArchivedBms YES
+#endif
+#ifndef LinkArchivedSoftLib
+#define LinkArchivedSoftLib     YES
+#endif
+#ifndef DefaultCPlusPlusIncludes
+#define DefaultCPlusPlusIncludes -I/usr/add-on/C++/incl
+#endif
+XIMPLIB = -L$(USRLIBDIR) -lXimp
+/* end added at hp */
+
+#ifndef ProjectRoot
+#define ProjectRoot /usr/X
+#endif
+
+#ifndef OSMajorVersion
+#define OSMajorVersion		2
+#endif
+#ifndef OSMinorVersion
+#define OSMinorVersion		0
+#endif
+
+#define SystemV4		YES
+/* The default here is to use the streams interface for Xlib, but various
+ * other things (X server, font server, font library, phigs, xdm chooser)
+ * still depend on sockets being around, so we always link with -lsocket.
+ */
+#define BootstrapCFlags		-Dusl -DSVR4
+
+#define ExtraLibraries 		-lsocket -lnsl -ldl \
+				-lgen -lresolv $(WIDECHARSYSLIB)
+#define NeedWidePrototypes	NO	/* experimental */
+#define PatheticCpp		YES
+#define DefaultCCOptions	-Xa
+#define	PreProcessCmd		/usr/ccs/lib/cpp $(ALLDEFINES)
+#ifndef HasSockets
+#define HasSockets YES
+#endif
+#define NeedConstPrototypes             YES
+#define NeedVarargsPrototypes           YES
+#define NeedNestedPrototypes            YES
+#ifndef StandardDefines
+#define StandardDefines -DSVR4 -DUSL -DANSICPP -DNLS16 -DOSMAJORVERSION=OSMajorVersion -DOSMINORVERSION=OSMinorVersion -DAIX_ILS -DMESSAGE_CAT
+#endif
+
+#ifndef StandardCppDefines
+#define StandardCppDefines
+#endif
+
+#define CppCmd                  $(TOOLS)/usr/ccs/lib/$(PFX)cpp
+#define LnCmd                   /bin/ln -s
+
+#define OSVendor                "Unix System Laboratories"
+#define OSName                  SVR4 Release 4.1 ES
+
+           YACC = $(PFX)yacc -p$(TOOLS)/usr/ccs/lib/yaccpar
+            LEX = $(PFX)lex -l$(TOOLS)/usr/ccs/lib/lex/ncform
+
+/*
+ * STAR system puts wierd numbers in the next line; there should not be any 
+ * numbers in the next line.
+ * If you see any numbers, replace the numbers with the correct
+ * string and then start the build
+ * The existince of Ctl-A () in this comment should prevent STAR from
+ * replacing 101.  Do not remove this comment.
+ */
+#define XFileSearchPathBase /usr/X/lib/locale/%L/%T/%N103S:/usr/X/lib/locale/%l/%T/%N103S:/usr/X/lib/locale/%L/%T/%N%S:/usr/X/lib/locale/%l/%T/%N%S:/usr/X/lib/%L/%T/%N103S:/usr/X/lib/%l/%T/%N103S:/usr/X/lib/%T/%N103S:/usr/X/lib/%L/%T/%N%S:/usr/X/lib/%l/%T/%N%S:/usr/X/lib/%T/%N%S:/usr/X/lib/locale/C/%T/%N103S:/usr/X/lib/locale/C/%T/%N%S
+
+/* gencat needs to be run with -m option
+ */
+#define MakeMessCatFlags -m
+
+#include <sv4Lib.rules>
+

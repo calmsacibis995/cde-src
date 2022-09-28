@@ -1,0 +1,66 @@
+/* tt/slib/Imakefile */
+
+#include <Library.tmpl>
+
+TT_DIR = ..
+#include "../tooltalk.tmpl"
+
+/* General case INCLUDES DEFINES
+ * Each individual architecture may have more or less of the above.
+ * Use EXTRA_DEFINES and EXTRA_INCLUDES to add defines and includes
+ * to an individual architecture.
+ */
+#ifdef SunArchitecture
+EXTRA_DEFINES = -D_TS_ERRNO -D_REENTRANT -DSVR4 -DOS_VERSION=OSMajorVersion -DOS_MINOR_VERSION=OSMinorVersion
+EXTRA_INCLUDES = -I../mini_isam
+#endif
+
+DEFINES = 
+INCLUDES = -I. -I../lib
+
+#ifdef HPArchitecture
+EXTRA_C++OPTIONS = $(ESLIT++_OPTION)
+#endif
+
+SRCS = \
+mp_ce_attrs.C \
+mp_observer.C		mp_observer_utils.C				\
+mp_otype.C		mp_otype_utils.C	   mp_ptype.C		\
+mp_ptype_utils.C	mp_rpc_implement.C	   mp_rpc_server.C	\
+mp_rpc_server_utils.C	mp_s_file.C		   mp_s_file_utils.C	\
+mp_s_message.C		mp_s_message_utils.C	   mp_s_mp.C		\
+mp_s_pattern.C		mp_s_pattern_utils.C	   mp_s_procid.C	\
+mp_s_procid_utils.C	mp_s_msg_context.C	   mp_s_pat_context.C	\
+mp_s_session.C		mp_s_session_prop.C	   mp_s_session_utils.C \
+mp_s_xdr_functions.C	mp_self_procid.C				\
+mp_signature.C		mp_signature_utils.C	   mp_typedb.C		\
+mp_typedb_utils.C	tt_isstrerror.C
+
+
+OBJS = \
+mp_ce_attrs.o \
+mp_observer.o		mp_observer_utils.o	\
+mp_otype.o		mp_otype_utils.o	mp_ptype.o		\
+mp_ptype_utils.o	mp_rpc_implement.o	mp_rpc_server.o		\
+mp_rpc_server_utils.o	mp_s_file.o		mp_s_file_utils.o	\
+mp_s_message.o		mp_s_message_utils.o	mp_s_mp.o		\
+mp_s_pattern.o		mp_s_pattern_utils.o	mp_s_procid.o		\
+mp_s_procid_utils.o	mp_s_msg_context.o	mp_s_pat_context.o	\
+mp_s_session.o		mp_s_session_prop.o	mp_s_session_utils.o	\
+mp_s_xdr_functions.o	mp_self_procid.o				\
+mp_signature.o		mp_signature_utils.o	mp_typedb.o		\
+mp_typedb_utils.o	tt_isstrerror.o
+
+
+all::
+
+/* Build the .o's */
+NormalLibraryObjectRule()
+NormalLibraryTarget(stt,$(OBJS))
+/* undoubtedly incorrect
+InstallLibrary(stt,$(USRLIBDIR))
+*/
+
+LintLibraryTarget(stt,$(SRCS))
+
+DependTarget()

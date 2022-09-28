@@ -1,0 +1,517 @@
+.\" "@(#)sdtcm_admin.1	1.4 96/06/04 Sun Microsystems, Inc."
+.\" Copyright (c) 1996, Sun Microsystems, Inc.
+.\" All Rights Reserved
+.TH sdtcm_admin 1 "10 May 1996"
+.SH NAME
+sdtcm_admin \- calendar administration utility
+.SH SYNOPSIS
+.B sdtcm_admin
+.B \-a
+[
+.BI \-c " <calendar@host>"
+]
+.br
+.B sdtcm_admin
+.B \-d
+[
+.BI \-c " <calendar@host>"
+] [
+.B \-f
+]
+.br
+.B sdtcm_admin
+.B \-i
+[
+.BI \-c " <calendar@host>"
+]
+.br
+.B sdtcm_admin
+.B \-l
+[
+.BI \-h " <hostname>"
+]
+.br
+.B sdtcm_admin
+.BI \-p " <symbolic-mode-list>"
+.if n .ti +5n
+[
+.BI \-c " <calendar@host>"
+] [
+.BI \-n " <name>"
+]
+.br
+.B sdtcm_admin
+.B \-x
+[
+.BI \-c " <calendar@host>"
+]
+.br
+.B sdtcm_admin
+.B \-z
+.if n .ti +5n
+[
+.BI \-c " <calendar@host>"
+] [
+.BI \-n " <name>"
+]
+.br
+.SH AVAILABILITY
+.LP
+SUNWdtdst
+.SH DESCRIPTION
+The 
+.B sdtcm_admin
+utility is used to administer calendars on local or remote systems.  This
+utility is useful for creating calendars for both users and non-users (no
+uid) on the system.  The
+.B \-a
+and
+.B \-d
+options are used to add and delete calendars.  Use the
+.B \-i
+option to display information about calendars for which you have
+permission.  The 
+.B \-l
+option is used to list calendars on a system.  The
+.B \-l
+option used in conjunction with
+.BI \-h " hostname" 
+provides a way to list calendars that exist on remote hosts.  The
+.B \-p
+option is used to modify a calendar's access list.  To list the calendar's 
+access list and rights use the 
+.B \-x
+option.  Use
+.B \-z
+to remove a username from an access list.
+.LP
+Unless otherwise specified by the
+.B -c
+option, this command acts on the user's calendar.  The name of the user's 
+calendar is determined by the login name of the user and the
+hostname given by the 
+.B "deskset.calendar.Location" 
+resource in the $HOME/.desksetdefaults file.  The hostname value can be 
+controlled by using 
+.B dtcm(1)'s 
+option sheet under ``Display Settings''.  If this value is not set
+the hostname is determined by using the local host the command is 
+executed from.
+.LP
+It is worth noting that the CDE calendar manager supports two calendar file
+formats.  The OpenWindows data format (data version 3) and the CDE data
+format (data version 4).  Some of the options listed below are not
+supported or work differently on version 3 data.  Options that are not
+supported on version 3 data will return an ``unsupported'' error message.
+The only option that works differently between the versions is
+.B -p
+and those differences are explained below.  The sdtcm_convert(1) program
+can be used to convert between different data formats.
+.br
+.SH OPTIONS
+.TP
+.B \-a
+Add a new calendar.  Without any additional modifiers this option will 
+create a calendar for the user.  The
+.B "-c"
+option can be used in conjunction with the
+.B \-a
+option to create calendars either locally or remotely.  This option can be
+used by root to create a calendar for a user on the system.  When root
+creates a calendar for a user the calendar ownership is changed to be
+that of the user.  It is worth noting that
+.I login1
+(where 
+.I login1
+is not root) cannot create a calendar called
+.I login2
+if 
+.I login2
+exists in the passwd file or map.  Only
+.I login2
+has privileges to create their own calendar.  Additionally
+.I login1
+cannot create a calendar of any name on a host that cannot look up
+.I login1
+in the passwd map or file.
+.TP
+.B \-d
+Delete an existing calendar.  Without any additional modifiers this option
+will delete the user's calendar.  The
+.B \-c
+option can be used in conjunction with the
+.B "-d"
+option to delete calendars either locally or remotely.  The
+.B \-f
+option is used to turn off the confirmation prompt.
+.TP
+.B \-i
+Print information about a calendar.  Alternate calendars can be specified
+by using the
+.B \-c
+option.
+.TP
+.B \-l
+List calendars on a host.  This option will list the calendars that exist
+on a host.  This option is supported on version 5 and greater calendar servers.
+The
+.B \-h
+option can be used to specify the host.
+.TP
+.B \-p
+Modify calendar's access list.  The 
+.B \-p
+option must be used in conjunction with the 
+.B \-n
+option.  The
+.B \-n
+option specifies the username of the person for whom access is being changed.  
+The
+.B \-p
+option takes a comma-separated list (with no intervening whitespace) of 
+access modifiers or the keyword
+.B noaccess
+as a required argument.  An access modifier is made up of 
+three components of the form:
+.sp 1
+.RS 10
+.I access
+.I operator
+.I permissions
+.RE
+.sp 1
+.in 1i
+Operations are performed in the order given.  Multiple
+.I permissions
+letters following a single operator cause the corresponding
+operations to be performed simultaneously.
+.RS 10
+.TP 10
+.I access
+One of the following sets of characters
+.BR pu ,
+.BR sp ,
+.BR pr ,
+.BR at ,
+and
+.B ar
+specifying whose permissions are to be changed or assigned:
+.sp 1
+.RS 10
+.PD 0
+.TP 10
+.B pu
+public entry access
+.TP 10
+.B sp
+semiprivate entry access
+.TP 10
+.B pr
+private entry access
+.TP 10
+.B at
+calendar attribute access
+.TP 10
+.B ar
+access role
+.PD
+.RE
+.TP 10
+.I operator
+Either
+.BR \(pl ,
+.BR \(mi ,
+or
+.BR \(eq ,
+signifying how permissions are to be changed:
+.LP
+.RS 10
+.TP 10
+.B +
+Add permissions.  Add the permissions represented by
+.I permissions.
+.TP
+.B -
+Take away permissions.  Clear the permissions represented by
+.I permissions.
+.TP
+.B =
+Assign permissions absolutely.  Set the current permissions to be those
+represented by
+.I permissions.
+.RE
+.TP 10
+.IR permission
+Any combination of the following permissions can be used with the
+.BR pu ,
+.BR sp ,
+.BR pr , 
+or 
+.B at
+access types:
+.sp 1
+.RS 10
+.PD 0
+.TP 10
+.B v
+view permission
+.TP 10
+.B i
+insert permission
+.TP 10
+.B c
+change permission
+.sp
+.in 2.5i
+Any combination of the following access roles can be used with the
+.B ar
+access type:
+.sp
+.TP 10
+.B a
+author role
+.TP 10
+.B o
+owner role
+.sp
+.RE
+.in 1i
+Public entries represented by 
+.B pu
+are entries that were entered from dtcm(1) with a privacy 
+setting of ``Others See Time and Text''.  Semiprivate entries represented
+by
+.B sp
+are entries
+that were entered with a privacy setting of ``Others See Time Only''.  
+Individuals
+with public view access to the calendar will see all entries with a privacy
+setting of ``Others See Time and Text'' and only see the time of
+``Others See Time Only'' entries.  Individuals with Semiprivate view access
+to the calendar will be able to see ``Others See Time Only'' entries
+as if they where ``Others See Time and Text'' entries.  Individuals with
+private view access represented by
+.B pr
+will be able to see ``Others See Nothing''
+entires as if they were ``Others See Time and Text'' entires.  Granting
+an individual private access does not give public or semiprivate access also.
+Each permission is independent of the other.
+.sp
+Calendar attribute access, controlled by
+.BR at,
+provides a way for the administrator of the calendar
+to control who can view, insert or modify information about the calendar.
+Some examples of calendar attributes are the access list, the calendar
+size, and ownership information.
+The
+.B "-l"
+or
+.B "-x"
+options can only be used by users who have view access to the calendar's
+attributes.  The 
+.B \-p
+option can only be used by users that have insert or change permission
+for the calendar's attributes.
+.sp
+Access roles (
+.B ar
+) provide a user with a set of permissions.
+The owner's role grants the individual all the rights that are associated 
+with owning the calendar.  This includes the ability to delete the 
+calendar from the system.  The user that created the calendar is 
+implicitly granted 
+.I owner
+rights.  The author's role grants the individual the right to delete 
+entries the individual created in the calendar.
+.sp
+To revoke all access to a calendar for a particular user specify
+.BR noaccess .  
+This will prevent the user from accessing the calendar.
+Simply removing the user from the access list may not be sufficient if
+there also exists a ``world'' entry in the access list.  The ``world''
+entry applies to all users not explicitly listed in the access list.
+.sp
+.RS
+.BI "-p noaccess -n" " username"
+.RE
+.in 1i
+.sp
+The following access modifier can be used to grant a user view, insert, 
+and change permissions for your public and semiprivate entries along with
+author's rights: 
+.sp
+.RS
+.BI "-p pu=vic,sp=vic,ar=a -n" " username"
+.RE
+.sp
+.in 1i
+To later remove insert and change access for that same person the following
+access modifier can be used:
+.sp
+.RS
+.BI "-p pu-ic,sp-ic -n" " username"
+.sp
+.RE
+.in 1i
+If the data version of the calendar is less than 4 (use the
+.B -i
+option to see the version) then the
+.B -p
+option takes as an argument any combination of the characters
+.BR b ,
+.BR i ,
+and
+.B d
+.sp 1
+.RS 10
+.PD 0
+.TP 10
+.B b
+browse permissions
+.TP 10
+.B i
+insert permissions
+.TP 10
+.B d
+delete permissions
+.sp
+.RE
+.in 1i
+The following access modifier can be used to grant a user browse and insert 
+permissions for your entries.  [In calendar data versions prior to version 
+4 there was no notion of public, semiprivate or private entries].
+.RS
+.sp
+.BI "-p bi -n" " username"
+.RE
+.in 1i
+.sp
+The expanded permissions model is only supported on data version 4 and later
+calendars.
+.sp
+.RE
+.TP
+.B \-x
+List calendar's access and rights.  This option lists the calendar's
+access list and rights in an abbreviated form.
+.sp
+.TP
+.B \-z
+Remove a username from the access list.  This option when used in conjunction
+with the
+.B -n
+.I username
+option removes the username from the access list.
+.sp
+.LP
+These additional options can be used as modifiers to the options list above:
+.sp
+.TP
+.BI "-c " "calendar@host"
+Names the calendar to be accessed, created or changed.  This option can be
+used as a modifier to all the options listed above except for the
+.B -l
+option.
+.sp
+.TP
+.B \-f
+Turns off the confirmation prompt when deleting a calendar.  This option can
+only be used as a modifier to the
+.B -d
+option.
+.sp
+.TP
+.BI "-h " "hostname"
+Names the host to list calendars from.  This option can only be used with
+the
+.B -l
+option.
+.sp
+.TP
+.BI "-n " "username"
+Names the user to be added, removed or modified in the calendar access
+list.  The
+.I username
+can be in the form of username@host or just username.  This option can
+be used with the
+.B -p
+and
+.B -z
+options.
+.RE
+.sp
+.SH EXAMPLES
+To create a new calendar named ``vacation'' on the host ``scoots'' use:
+.sp
+.IP
+.B "example% sdtcm_admin -a -c vacation@scoots"
+.sp
+.LP
+To list the calendars that are on the host ``scoots'' use:
+.sp
+.IP
+.B "example% sdstcm_admin -l -h scoots"
+.sp
+.LP
+To retrieve information about your calendar use:
+.sp
+.IP
+.B "example% sdtcm_admin -i"
+.sp
+.LP
+To retrieve information about another calendar called ``schedule'' that exists 
+on your local system called ``boomer'' use:
+.sp
+.IP
+.B "example% sdtcm_admin -i -c schedule@boomer"
+.sp
+.LP
+To grant view permissions to the user ``taj'' to all of your public,
+semiprivate, and private entries use:
+.sp
+.IP
+.B "example% sdtcm_admin -n taj -p pu=v,sp=v,pr=v"
+.sp
+.LP
+To then grant the user ``taj'' the permission to insert public entries
+from the host ``sacto'' use:
+.sp
+.IP
+.B "example% sdtcm_admin -n taj@sacto -p pu+i"
+.sp
+.LP
+To grant the user ``nikki'' owner privileges to your calendar use:
+.sp
+.IP
+.B "example% sdtcm_admin -p ar+o -n nikki"
+.sp
+.LP
+To remove the user ``taj@sacto'' from the access list on the calendar
+``vacation@scoots'' use:
+.sp
+.IP
+.B "example% sdtcm_admin -z -n taj@sacto -c vacation@scoots"
+.sp
+.SH "EXIT STATUS"
+.TP 4
+.B 0
+Application ran without error.
+.TP
+.B >0
+An error occurred.
+.sp
+.SH FILES
+.PD 0
+.TP 35
+.B $HOME/.desksetdefaults
+default calendar location information
+.PD
+.sp
+.SH SEE ALSO
+.BR dtcm (1),
+.BR rpc.cmsd (1),
+.BR sdtcm_convert (1),
+.BR dtcm_delete (1),
+.BR dtcm_editor (1),
+.BR dtcm_insert (1),
+.BR dtcm_lookup (1)

@@ -1,0 +1,339 @@
+.TH TT_STRING "" "17 December 1996" "" "TOOLTALK CLASSES"
+.SH NAME
+_Tt_string - dynamically allocated, reference counted string class
+.SH SYNOPSIS
+.nf
+.sp2
+#include "util/tt_string.h"
+
+// Note there are a few public methods that are not documented here.
+// These are very special-purpose ones, constructors provided
+// to do automatic conversions from _Tt_string_buf classes, etc.
+// You shouldn't need to know about them unless you are working
+// on _Tt_string itself, in which case you should be reading the code.
+
+class _Tt_string {
+.ti -14n
+	public:
+.ti -10n
+	_Tt_string();
+.ti -10n
+	_Tt_string(const char *s);
+.ti -10n
+	_Tt_string(const unsigned char *s, int len);
+.ti -10n
+	_Tt_string(int len);
+.ti -10n
+	_Tt_string& operator=(const char *s);
+.ti -10n
+	_Tt_string& set(const unsigned char *s, int len);
+.ti -10n
+	char& operator[](int offset) const;
+.ti -10n
+	const char& operator[](int offset) const;
+.ti -10n
+	char* operator*() const;
+.ti -10n
+	const char* operator*() const;
+.ti -10n
+	_Tt_string left(int len) const;
+.ti -10n
+	_Tt_string right(int len) const;
+.ti -10n
+	_Tt_string mid(int offset, int len) const;
+.ti -10n
+	_Tt_string split(int i, _Tt_string &prefix);
+.ti -10n	
+	_Tt_string split(char c, _Tt_string &prefix) const;
+.ti -10n
+	_Tt_string split(const char *s, _Tt_string &prefix) const;
+.ti -10n
+	_Tt_string rsplit(char c, _Tt_string &prefix) const;
+.ti -10n
+	_Tt_string quote_nulls() const;
+.ti -10n
+	_Tt_string unquote_nulls() const;
+.ti -10n
+	_Tt_string cat(const _Tt_string &s);
+.ti -10n
+	_Tt_string cat(char c) const;
+.ti -10n
+	_Tt_string cat(int i) const;
+.ti -10n
+	_Tt_string cat(unsigned int i) const;
+.ti -10n
+	_Tt_string cat(long i) const;
+.ti -10n
+	_Tt_string cat(unsigned long i) const;
+.ti -10n
+	_Tt_string replace(const char *old, const _Tt_string &with) const;
+.ti -10n
+	int len() const;
+.ti -10n
+	int operator=\^=(_Tt_string& s) const;
+.ti -10n
+	int operator<(_Tt_string& s) const;
+.ti -10n
+	int operator>(_Tt_string& s) const;
+.ti -10n
+	int operator!=(_Tt_string &s) const;
+.ti -10n
+	int operator<=(_Tt_string &s) const;
+.ti -10n
+	int operator>=(_Tt_string &s) const;
+.ti -10n
+	int sh_match(const _Tt_string &s) const;
+.ti -10n
+	int index(char c) const;
+.in -16n
+	int index(const char *s) const;
+.in -16n
+	int rindex(char c) const;
+.in -16n
+	int hash(int max_buckets) const;
+.in -16n
+	bool_t xdr(XDR *xdrs);
+.in -16n
+	void print(void) const;
+.in -16n
+	void print(const _Tt_ostream &os, int max_print_width = 80000,
+		   int quote_it = 0) const;
+.in -16n
+	int cmp(const _Tt_string &s) const {return cmp(s->content, s->length);}
+.in -16n
+	int cmp(const char *q, int qlen = -1) const;
+};
+	
+.fi
+.SH DESCRIPTION
+.LP
+.I _Tt_string 
+is a class which implements a character string and operations
+on it. The string is stored internally with a length count, so the string
+can contain embedded nulls. The actual _Tt_string class is just a pointer,
+the actual storage is hidded in another class; reference counts are
+maintained (by a ptr_to(TYPE) generic class instantiation) so that
+strings can conveniently be passed in and out of functions without
+lots of copying or worrying about storage leaks.
+.LP
+The classes _Tt_string_list and _Tt_string_list_cursor also exist,
+which give the standard list operations over a list of strings.
+.SH FUNCTIONS
+.TP 20n
+_Tt_string()
+The simple constructor. This creates an uninitialized string; initialize
+the string through assignment before doing anything else with it.
+.TP 20n
+_Tt_string(const char *s)
+Constructs a _Tt_string containing a copy of the supplied "C" string.
+Useful for initializing strings with quoted constants. This constructor
+also acts as a conversion operator, so most places that you can supply a
+_Tt_string, you can supply a "char *".  For example, if x is a _Tt_string,
+then x.cat("-test") works and returns the value of x concatenated with "-test".
+.TP 20n
+_Tt_string(const unsigned char *, int len)
+Constructs a _Tt_string from a array of bytes and a length (in bytes).
+Use this to create and initialize byte strings (which may contain imbedded
+nulls.) 
+.TP 20n
+operator =(const char *s)
+Assigns the _Tt_string the value of the C string.
+A reference to the _Tt_string is returned so operations can be chained.
+.TP 20n
+set(const unsigned char *s, int n)
+Assigns a new value to a _Tt_string from a array of bytes and a length 
+(in bytes).
+Use this to assign _Tt_strings from byte strings (which may contain imbedded
+nulls.) 
+A reference to the _Tt_string is returned so operations can be chained.
+.TP 20n
+operator [](int offset)
+A reference to the character at the given offset in the string is returned;
+the character can be displayed, replaced through assignment, etc.
+Also available in a const version that returns const, for use in const
+methods.
+.TP 20n
+operator char *()
+The _Tt_string is converted to a (char *) pointing to the string's contents.
+This allows implicit conversions (e.g. _Tt_string x("x"); puts(x); ), as well
+as explicit casts (printf("%s",(char *)x);).
+Also available in a version that returns const char * when that's what's
+wanted.
+.TP 20n
+left(int n)
+Returns a string containing the leftmost n characters of the string.
+Example: _Tt_string x("abcd"); x.left(2) =\^= "ab".
+.TP 20n
+right(int n)
+Returns a string containing the rightmost n characters of the string.
+Example: _Tt_string x("abcd"); x.right(2) =\^= "cd".
+.TP 20n
+mid(int o, int n)
+Returns a string containing n characters, extracted starting at offset o
+(zero based.)
+Example: _Tt_string x("abcd"); x.mid(1,2) =\^= "bc".
+.TP 20n
+split(int i, _Tt_string &prefix)
+All characters up to (but not including) position i are
+returned as parameter "prefix"; the rest of the string (after position i,
+but not including position i) are returned as the function result.
+.TP 20n
+split(char c, _Tt_string &prefix)
+finds the first occurrence of character c in
+this string.  All characters up to (but not including) c are
+returned as parameter "prefix"; the rest of the string (after c,
+but not including c) are returned as the function result.
+If the character does not include character c, prefix is returned
+as null and this string is returned as the result.
+.TP 20n
+split(const char *s , _Tt_string &prefix)
+finds the first occurrence of C string sharacter c in
+this string.  All characters up to (but not including) s are
+returned as parameter "prefix"; the rest of the string (after s,
+but not including s) are returned as the function result.
+If the character does not include character s, prefix is returned
+as null and this string is returned as the result.
+.TP 20n
+rsplit(char c, _Tt_string &prefix)
+finds the last occurrence of character c in
+this string.  All characters up to (but not including) c are
+returned as parameter "prefix"; the rest of the string (after c,
+but not including c) are returned as the function result.
+If the character does not include character c, prefix is returned
+as null and this string is returned as the result.
+.TP 20n
+quote_nulls()
+returns a _Tt_string containing this string, with all
+embedded nulls replaced with "\\0", and all "\\" replaced
+with "\\\\".  This gives a string which can be safely treated as
+a "C" string, and which can be turned back into the original
+form with unquote_nulls(). 
+.TP 20n
+unquote_nulls()
+returns a _Tt_string containing this string, with all
+backslash-quoted characters replaced by their equivalents, in particular
+\\0 is replaced by a null.  0 is the only special escape code.
+.TP 20n
+cat(const _Tt_string &s)
+returns this string with s concatenated to it.
+.TP 20n
+cat(char c)
+Returns this string with the given character appended to it.
+.TP 20n
+cat(int i)
+Returns this string with the decimal equivalent of i appended.
+.TP 20n
+cat(unsigned int i)
+Returns this string with the decimal equivalent of i appended.
+.TP 20n
+cat(long i)
+Returns this string with the decimal equivalent of i appended.
+.TP 20n
+cat(unsigned long i)
+Returns this string with the decimal equivalent of i appended.
+.TP 20n
+len()
+Returns the length of the string.
+.TP 20n
+replace(const char *old, const _Tt_string &with)
+Return a new string, with each instance of old in this string replaced
+by with.  No rescan, so replacing "x" with "xx" does not loop.
+If old is null, this string is returned unchanged.
+.TP 20n
+operator=\^=, <, >, !=, <=, >=
+Comparison operators that do the obvious thing.
+These also exist in flavors taking const _Tt_string &, char *,
+and const char * as the argument, so all natural combinations 
+work.
+.TP 20n
+sh_match
+The argument is a shell-style pattern (allows [], *, ?).
+Returns 1 of this string matches the pattern, else returns 0.
+.TP 20n
+index(char c)
+Return an integer index to the first occurrence of c in the string, or -1 if
+the string does not contain c.
+.TP 20n
+index(const char *s)
+Return an integer index to the first occurrence of C-string s in the
+string, or -1 if the string does not contain s.
+.TP 20n
+rindex(char c)
+Return an integer index to the last occurrence of c in the string, or -1 if
+the string does not contain c.
+.TP 20n
+hash(int max_buckets)
+Compute and return a hash code for the string.
+The returned code will be greater than or equal to 0 and
+less than max_buckets.
+The same string value will always give the same hash code for
+the same max_buckets value.
+This hash function is used to create tables with string keys,
+see tt_table.h.
+.TP 20n
+xdr(XDR *xdrs)
+Serialize or deserialize the string according to the given
+XDR stream.
+.TP 20n
+print(const _Tt_ostream &os, int max_print_width = 80000, int quote_it = 0)
+Print the string on the given _Tt_ostream, with the specified
+max width.
+If quote_it is true the string representation is surrounded with
+double quotes.
+The printed representation is used for debugging and tracing.
+The number of characters written is limited, and
+non-printable characters are written as escape sequences.
+.TP 20n
+cmp(const _Tt_string s)
+Compare this string and string s and return -1, 0, or 1
+when this string is less than, equal, or greater than s respectively.
+Normally one uses the comparison operators but this gives
+a reasonable strcmp() equivalent for the few cases where it is
+more natural.
+.TP 20n
+cmp(const char *q, int qlen = -1)
+Compare this string and the string formed by taking the first
+``qlen'' characters in array q and return -1, 0, or 1
+when this string is less than, equal, or greater than s respectively.
+Normally one uses the comparison operators but this gives
+a reasonable strcmp() equivalent for the few cases where it is
+more natural.
+Note the characters in array q can include nulls.
+If q really is a null-terminated C-string, specify
+or default qlen as -1 and strlen(q) will be used
+as the length of the comparison string.
+.SH EXAMPLES
+.nf
+#include "tt_const.h"
+#include "util/tt_string.h"
+#include <stdio.h>
+
+void
+main()
+{
+	_Tt_string hi("Hello");
+	_Tt_string wrld("World");
+	_Tt_string comma(", ");
+	_Tt_string buf;
+
+	printf("Should be \\"Hello\\": \\"%s\\"\\n",(char *)hi);
+	buf = hi.cat(comma).cat(wrld);
+	printf("Should be \\"Hello, World\\": \\"%s\\"\\n",(char *)buf);
+	printf("Should be \\"Hell\\": \\"%s\\"\\n",(char *)buf.left(4));
+	printf("Should be \\"olrd\\": \\"%s\\"\\n",(char *)buf.right(4));
+	printf("Should be \\"llo,\\": \\"%s\\"\\n",(char *)buf.mid(2,4));
+
+	printf("Should be \\"ee\\": \\"%c%c\\"\\n", hi[1], buf[1]);
+
+	printf("Should be 5: %d\\n", buf.index(','));
+	printf("Should be -1: %d\\n", buf.index('*'));
+
+	buf = "";
+	buf = buf.cat("This is").cat(" pretty cool.");
+	puts("Is this pretty cool?" );
+	// following line tests automatic conversion to char *
+	puts(buf);
+}
+.fi
+.SH "SEE ALSO"
+.BR list (3)

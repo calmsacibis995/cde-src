@@ -1,0 +1,419 @@
+.\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.\"--- 
+.\"---  dtlp man page
+.\"--- 
+.\"---  $Revision 1.4$
+.\"---
+.\" S1 for dtlp
+.de S1
+\f(CWdtlp\fR
+..
+.\""""""" "Print" as used in "Print actions"
+.de S2
+\f(CWPrint\fR
+..
+.\""""""" "Print" as used in "Print dialog"
+.de S3
+\f(CWPrint\fR
+..
+.de S4
+\f(CWlp\fR
+..
+.\"---
+.\"----------------------------------------------------------------------------
+.\"----------------------------------------------------------------------------
+.TH dtlp 1 "12 August 1994"
+.BH "12 August -1994"
+.\"---
+.\"----------------------------------------------------------------------------
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994 Novell, Inc.
+.\" *************************************************************************
+.SH NAME
+\f(CWdtlp\fR \- gather \f(CWlp\fR parameters and print a file
+.\"----------------------------------------------------------------------------
+.SH SYNOPSIS
+.TP 12
+\f(CWdtlp\fR
+\fR[\fB-b\fI banner_title\fR]
+\fR[\fB-d\fI lpdest\fR]
+\fR[\fB-m\fI print_command\fR]
+\fR[\fB-n\fI copy_count\fR]
+\fR[\fB-o\fI other_options\fR]
+\fR[\fB-u\fI user_filename\fR]
+\fR[\fB-a\fR]
+\fR[\fB-e\fR]
+\fR[\fB-h\fR]
+\fR[\fB-r\fR]
+\fR[\fB-s\fR]
+\fR[\fB-v\fR]
+\fR[\fB-w\fR]
+\fR[\fIprint_file\fR]
+.SH DESCRIPTION
+The 
+.S1
+command line utility is a front-end to the 
+.S4
+subsystem.
+.S1
+gathers 
+.S4
+print options and prints a specified
+file.  It operates in two modes:
+.TP 4
+\(em
+GUI mode.  
+By default,
+.S1
+posts a friendly 
+.S3
+dialog that appears with \f(CWPrint\fR,
+\f(CWCancel\fR, and \f(CWHelp\fR pushbuttons. 
+.TP 4
+\(em
+Silent mode.  When invoked with the \fIsilent\fR flag,
+.S1
+does not present the GUI input dialog.
+It collects input parameters from the command line and environment
+variables.
+.\"""""""""""""""""""""""""sssssssss
+.SS The Print Dialog
+When invoked normally, 
+.S1
+posts a 
+.S3
+dialog that shows:
+.TP 4
+\(em
+\f(CWFile:\fR The name of the file to print (a read-only text label).
+.TP 4
+\(em
+\f(CWPrinter:\fR  The printer device. 
+The default is the value of the \f(CWLPDEST\fR environment variable.  If
+\f(CWLPDEST\fR is unset, then the properly localized default printer string
+appears in the text field, if it exists.
+.TP 4
+\(em
+\f(CWCopies:\fR The number of copies to print.  The default is 1.
+.TP 4
+\(em
+\f(CWBanner Page Title:\fR The title to appear on the printed banner page,
+and, if formatted, in the header of each page.
+.TP 4
+\(em
+\f(CWPrint Page Numbers:\fR
+A checkbox to indicate
+whether the file should be printed formatted (run through the
+\f(CWpr -f\fR command) or printed unformatted.
+.TP 4
+\(em
+\f(CWPrint Command Options:\fR Any options to be passed directly to the
+.S4
+command.  For example, some implementations support the \f(CW-o2\fR
+option to
+.S4
+to enable double-page printing.
+.P
+When the user presses the \f(CWPrint\fR button, these settings are
+passed onto the
+.S4
+subsystem,
+along with the values of any other environment settings (see the
+\fIENVIRONMENT\fR section below).
+.\""""""""""""""""""""
+.SH OPTIONS
+The
+.S1
+command accepts a \fIprint_file\fR name specification. If a 
+\fIprint_file\fR is not specified, standard input is assumed. When used in
+this fashion, the \fB-u\fI user_filename\fR option can be used to
+pass a name to 
+.S1
+for display in the 
+.S3
+dialog.
+
+.SS Command Line Options and the ENVIRONMENT Setting
+.S1
+is sensitive to some ENVIRONMENT settings.
+In the case in which both a command line option and a complementary environment 
+setting are
+specified, the command line option takes precedence.
+.SS Command Line Options
+.TP
+.BI \-b " banner_title"
+Set the string used in printing the banner on the title page.
+If the \f(CW-r\fR option is also specified, then print this same string
+on the page headers.
+.TP
+.BI \-d " lpdest"
+Set the printer destination for the file.
+.TP
+.BI \-m " print_command"
+Use this value as the path name of the 
+.S4
+print command. The default is
+\f(CWlp\fR.
+.TP
+.BI \-n " copy_count"
+Print this many copies.  Default is 1.
+.TP
+.BI \-o " other_options"
+Pass these options directly through to the
+\f(CWprint_command\fR, without any interpretation.  This setting is 
+intended for users with advanced printing knowledge.
+.TP
+.BI \-u " user_filename"
+Use this value as the name of file as it should appear in the
+.S3
+dialog or print output.
+Default is \f(CWprint_file\fR.
+Equivalent to the \f(CWDTPRINTUSERFILENAME\fR
+setting in the \fIENVIRONMENT\fR section below.
+.TP
+.BI \-a
+Causes the file to be formatted with the \f(CWman\fR
+command.
+If set, then other formatting specifications (such
+as \f(CW-r\fR) are ignored.
+.TP
+.BI \-e
+Remove the file after printing it.
+This functionality is intended for temporary files generated by
+applications that
+don't need to persist beyond the act of printing.
+Equivalent to the \f(CWDTPRINTFILEREMOVE\fR
+setting in the \fIENVIRONMENT\fR section below.
+.TP
+.BI \-h
+Print out a help message.
+.TP
+.BI \-r
+Format the file before printing it, by running it through
+the \f(CWpr -f\fR command.
+.TP
+.BI \-s
+Print the file silently, without posting the
+.S3
+dialog.  
+Equivalent to the \f(CWDTPRINTSILENT\fR
+setting in the \fIENVIRONMENT\fR section below.
+.TP
+.BI \-v
+Print out verbose messages during the print process.
+.TP
+.BI \-w
+Causes output to the printer to be sent raw, with no
+interpretation of tabs, backspaces, formfeeds, and
+binary characters.  Useful for printing PCL and PS files.
+If set, then other formatting specifications (such
+as \f(CW-r\fR) are ignored; however, the \f(CW-a\fR option
+will take precedence over this setting.
+.TP
+.I " print_file"
+Print this file.
+If \fIprint_file\fR
+is not supplied, standard input is assumed.
+.SS ENVIRONMENT
+Following are the names and meanings
+of the environment values that affect the operation of
+\f(CWdtlp\fR:
+.TP 15
+.SM LANG
+Use the specified value to determine the locale of the message strings that 
+appear in the
+.S2
+dialog.
+.TP 15
+.SM LPDEST
+Use the specified value as the printer destination for the file.
+.TP 15
+.SM DTPRINTCWD
+If set to an existing, usable directory, then this setting
+causes
+.S1
+to execute the
+.S4
+command pipeline from that
+directory. By default, uses the current directory
+from which 
+.S1
+is invoked.
+.TP 15
+.SM DTPRINTFILEREMOVE
+Equivalent to the \f(CW-e\fR
+command line setting.
+Value must be \f(CWTrue\fR
+or \f(CWFalse\fR (case is ignored).
+Default is \f(CWFalse\fR.
+.TP 15
+.SM DTPRINTSILENT
+Equivalent to the \f(CW-s\fR
+command line setting.
+Value must be \f(CWTrue\fR
+or \f(CWFalse\fR (case is ignored).
+Default is \f(CWFalse\fR.
+.TP 15
+.SM DTPRINTUSERFILENAME
+Equivalent to the \f(CW-u\fR
+command line setting.
+.SS Reconciling Options
+In the case of conflicting formatting options,
+.S1
+uses the following decisions to reconcile them:
+.TP 4
+\(em
+If any \fIraw\fR
+(as with \f(CW-w\fR), or \fIman\fR (as with
+\f(CW-a\fR)
+options are specified, then all
+other page formatting and numbering options are turned off.
+.TP 4
+\(em
+Otherwise, page printing and formatting are allowed.
+.P
+In a formatted operation:
+.TP 4
+\(em
+If a banner title is specified (as with
+\f(CW-b\fR), then it will be used
+as the page header.
+.TP 4
+\(em
+Else, if a user filename is specified (as with 
+\f(CW-u\fR or
+\f(CWDTPRINTUSERFILENAME\fR), then it will be used as the page
+header.
+.TP 4
+\(em
+Otherwise, the filename itself will be used as the page header.
+.SH RETURN VALUES
+.TP 15
+0
+Command completed successfully.
+.TP 15
+-1
+The user pressed the \f(CWCancel\fR button.
+.TP 15
+2
+Usage error.
+.TP 15
+3
+There is no specified file to print.
+.TP 15
+4
+Unable to find the \f(CWdtksh\fR initialization file,
+\f(CW/usr/dt/scripts/DtFuncs.sh\fR.
+.TP 15
+5
+The file is an invalid file (e.g., a directory or a device file).
+.TP 15
+6
+The user has no read permission on the file.
+.P
+.SH EXAMPLES
+.SS Command Line
+The following command line causes
+.S1
+to post a 
+.S3
+dialog
+for \f(CWfile1\fR with a name displayed of
+\f(CWYour File\fR and with the default printer chosen:
+.nf
+.in +10
+/usr/dt/bin/dtlp -u "Your File" file1
+.in -10
+.fi
+.sp
+The following command line causes
+.S1
+to print silently two copies of \f(CWfile2\fR on printer 
+\f(CWlaser3\fR:
+.sp
+.nf
+.in +10
+/usr/dt/bin/dtlp -n 2 -d laser3 -s file2
+.in -10
+.fi
+.SS Action Definition
+The following \f(CWPrint\fR action would cause a PCL file to 
+be printed using the
+.S1
+command.
+.nf
+.in +5
+\f(CW
+ACTION Print
+{
+        LABEL           Print
+        ARG_TYPE        PCL
+        TYPE            COMMAND
+        WINDOW_TYPE     NO_STDIO
+        EXEC_STRING     /usr/dt/bin/dtlp -w %Arg_1%
+}
+\fR
+.in -5
+.fi
+The following \f(CWPrint\fR action would cause a man page file to 
+be printed using the
+.S1
+command.
+.nf
+.in +5
+\f(CW
+ACTION Print
+{
+        LABEL           Print
+        ARG_TYPE        MAN_PAGE
+        TYPE            COMMAND
+        WINDOW_TYPE     NO_STDIO
+        EXEC_STRING     /usr/dt/bin/dtlp -a %Arg_1%
+}
+\fR
+.in -5
+.fi
+.P
+By default,
+these actions will post the
+.S3
+dialog.
+.SH LOCALES AND CODESETS
+The strings that appear in the
+.S3
+dialog are localizable.
+.P
+.SH FILES
+.PD 0
+.TP 10
+\f(CW/usr/dt/appconfig/types/C/print.dt\fR
+Defines the default system \f(CWPrint\fR action.
+.sp
+.TP 10
+\f(CW/usr/dt/appconfig/types/C/dt.dt\fR
+Defines the default \f(CWPrint\fR actions for
+man pages (type \f(CWMAN\fR), ASCII files (type \f(CWTEXTFILE\fR),
+PCL files (type \f(CWPCL\fR), and PS files (type \f(CWPOSTSCRIPT\fR).
+.sp
+.TP 10
+\f(CW/etc/dt/appconfig/types/C/*.dt\fR
+The datatype files that implement the per-printer \f(CWPrint\fR
+action; these are created by the \f(CWdtprintinfo -populate\fR command.
+.sp
+.TP 10
+\f(CW/usr/dt/scripts/DtFuncs.sh\fR
+The \f(CWdtksh\fR initialization file that defines a number
+of GUI convenience functions, as for creating a dialog box.
+.SH BUGS
+The 
+.S1
+.S3
+dialog cannot accept quote marks (either \f(CW'\fR or \f(CW"\fR)
+in the \f(CWBanner Page Title\fR text field.
+.SH "SEE ALSO"
+.BR dtsearchpath (1),
+.BR dtprintinfo (1).
+.\""""""""""""""""""""""""""""    eof  """"""""""""""""""""""""""""""""

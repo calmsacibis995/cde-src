@@ -1,0 +1,57 @@
+bug 1255118: OW calendar manager doesn't show correct permissions for V4 calendar
+/etc/inetd.conf contains:
+100068/2-5 dgram rpc/udp wait root /usr/dt/bin/rpc.cmsd rpc.cmsd
+
+Create a calendar for a new user (user1) who has no existing calendar
+using dtcm, thus creating the callog file in V4 format.  Give
+View/Insert/Change permission to another user (user2).  If user2 starts
+dtcm viewing user1 calendar, they are able to modify the calendar just
+fine.  If user2 starts OW cm on user1 calendar, they are not able to
+modify the calendar at all.  If you convert callog file back to v3
+format using sdtcm_convert, all is well.  The conversion converts the
+permissions fine, and OW cm is able to insert in user1 calendar.
+
+--------------------------------------------------------------------------------------
+
+This is a two part bug. One bug is in the conversion program sdtcm_convert. The
+other bug is in the rpc.cmsd. 
+
+The sdtcm_convert part of the bug:
+When a user converts the callog.<user> file stored 
+in /usr/spool/calendar, from a version 3 or less format to version 4 format, 
+using the sdtcm_convert program, the permissions are converted incorrectly.
+If a user has Insert permissions, then after the conversion the user is given
+only Public/Insert persmissions. The user should be given Public, SemiPublic,
+and Private Insert permissions. Also if a user has been given Delete permissions,
+then after the conversion the user is given only Public/Delete permissions, when
+the user should be given Public, Semi-Public and Private permissions.  Since 
+OWcm doesnt have this granularity of access control Insert and Delete
+access in OWcm should translate to Insert and Delete access for ALL appointments
+regardless of appointment type.
+
+The rpc.cmsd part of the bug:
+In the CDE/dtcm world, the granularity of the access permissions is greater, 
+i.e., a user can have Browse, Insert, Delete permissions for Public, 
+SemiPublic and Private appointments. In the OWcm world, a user can be given 
+Browse, Insert, Delete permissions for all appointments regardless of 
+the appointment *type*. Currently the CDE rpc.cmsd
+has strict mode access for OWcm users. That is, since the granularity
+of the access model in OW is stricter, the CDE rpc.cmsd enforces a strict
+mode policy for OW users, which stipulates that if they user doesnt 
+have access to ALL appointment types, then they should not be given any 
+access whatsover for that user. While in theory this may sound rational,
+in practicality it  doesnt work, because now users that once had access 
+to calendars, no longer do. The fix is to give a looser access control to 
+OW users and open up the access so that OWcm users can have the access 
+to calendars as they once did, pre CDE days. In strict mode, to allow
+access to insert, for example, the policy is such that the user must have
+Insert access to ALL apointment types before the rpc.cmsd will allow the
+insertion of any appointment type. Since Insert access for OWcm users is translated
+to Insert access for Public appointments only, the actual insert fails.
+When enforcing an non-strict model, the CDE rpc.cmsd will allow insert
+access for a OWcm user if ANY of the various appointment types are opened
+up for insert access. The thinking behind this is that Insert access for
+OWcm users implies insert access for ALL appointments types since there is no
+way to specify access to particular appointment types via OWcm and therefore 
+if access is given for any appointment type, the rpc.cmcsd will open up insert
+access for all appointment types for OWcm users.

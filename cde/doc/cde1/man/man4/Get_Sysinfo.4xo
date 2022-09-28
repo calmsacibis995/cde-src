@@ -1,0 +1,68 @@
+.TH Get_Sysinfo 4 "13 May 1994"
+.SH NAME
+Get_Sysinfo request \- get information about a tool's host
+.SH SYNOPSIS
+.yS
+.ta \w@Get_Sysinfo(@u
+Get_Sysinfo(out string \f2sysname\fP,
+	out string \f2nodename\fP,
+	out string \f2release\fP,
+	out string \f2version\fP,
+	out string \f2machine\fP);
+.yE
+.SH DESCRIPTION
+The
+.I Get_Sysinfo
+request gets information about the handler's host.
+.P
+The
+.I sysname
+argument
+is the name of the host's operating system.
+.P
+The
+.I nodename
+argument
+is the name of the host.
+.P
+The
+.I release
+and
+.I version
+arguments are
+implementation-specific information about the host's operating system.
+.P
+The
+.I machine
+argument
+is an implementation-specific name that identifies the hardware
+on which the operating system is running.
+.SH "APPLICATION USAGE"
+The
+.Fn ttdt_session_join 3,
+function
+can be used to register for,
+and transparently process, the
+.I Get_Sysinfo
+request.
+.SH EXAMPLES
+The
+.I Get_Sysinfo
+message can be sent as in the following example:
+.Cs I
+Tt_message msg = tttk_message_create(0, TT_REQUEST, TT_SESSION,
+			the_recipient_procid, TTDT_GET_SYSINFO,
+			my_callback);
+tt_message_arg_add(msg, TT_OUT, Tttk_string, 0);
+tt_message_arg_add(msg, TT_OUT, Tttk_string, 0);
+tt_message_arg_add(msg, TT_OUT, Tttk_string, 0);
+tt_message_arg_add(msg, TT_OUT, Tttk_string, 0);
+tt_message_arg_add(msg, TT_OUT, Tttk_string, 0);
+tt_message_send(msg);
+.Ce
+.SH "SEE ALSO"
+.Fn uname 2
+.xo in the \*(ZK,
+.Fn tt_message_arg_add 3,
+.Fn tt_message_send 3,
+.Fn ttdt_session_join 3.

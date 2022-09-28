@@ -1,0 +1,113 @@
+.TH DtActionQuit 3 "4 April 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994 Novell, Inc.
+.\" *************************************************************************
+.SH NAME
+DtActionQuit \- terminate Cde actions
+.iX "DtActionQuit"
+.SH SYNOPSIS
+.yS
+#include <Dt/Action.h>
+.sp 0.5v
+.ta \w'DtActionStatus DtActionQuit('u
+DtActionStatus DtActionQuit(DtActionInvocationID \f2id\fP,
+	unsigned long \f2timeout\fP,
+	int \f2silent\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn DtActionQuit
+function notifies actions associated with
+a specific invocation ID to quit as soon as possible.
+.P
+The
+.I id
+argument specifies an invocation ID, as returned by
+.Fn DtActionInvoke 3.
+.P
+The
+.I timeout
+argument controls how
+.Fn DtActionQuit
+behaves.
+If
+.I timeout
+is set to zero,
+.Fn DtActionQuit
+asynchronously sends appropriate quit notifications and exits immediately.
+As actions receive and process the quit notifications, they may trigger a
+.Fn DtActionCallbackProc 3
+with the appropriate return status.
+If
+.I timeout
+is set to a positive value,
+.Fn DtActionQuit
+blocks up to
+.I timeout
+milliseconds, waiting for all actions to
+receive, process and reply to the quit notifications.
+The action service drops actions that do not respond within the
+.I timeout
+period.
+Actions that quit within the
+.I timeout
+period cause
+.Fn DtActionQuit
+to trigger a
+.Fn DtActionCallbackProc 3
+immediately with the appropriate return status.
+.P
+The
+.I silent
+argument is a Boolean that indicates whether the
+actions are allowed to block on user input before terminating.
+If False, the actions may choose to post dialogs (for example, for the
+purpose of dealing with unsaved changes).
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn DtActionQuit
+function returns the following:
+.VL 6
+.Lc DtACTION_OK
+.br
+.Fn DtActionQuit
+succeeded in initiating the quit requests and the corresponding
+.Fn DtActionCallbackProc 3
+is called as actions respond to the quit requests.
+.LE
+.P
+If unsuccessful, the
+.Fn DtActionQuit
+function returns:
+.VL 6
+.Lc DtACTION_INVALID_ID
+.br
+The specified
+.I id
+is not valid.
+It is possible that the
+.I id
+was once valid, but that all actions
+associated with the
+.I id
+have since completed.
+.LE
+.SH "APPLICATION USAGE"
+The
+.Fn DtActionQuit
+function does not return error codes; however, the user is notified
+interactively, via error dialogs, of severe errors.
+.Fn DtActionQuit
+is not guaranteed to quit all actions.
+A
+.Cn COMMAND
+action, for example, may choose to block the quit signal it receives.
+.SH "SEE ALSO"
+.Hd Dt/Action.h 5,
+.Fn DtActionInvoke 3,
+.Fn DtActionCallbackProc 3,
+.Fn DtActionQuitType 3.

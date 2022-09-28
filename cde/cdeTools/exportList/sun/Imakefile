@@ -1,0 +1,17 @@
+XCOMM $XConsortium: Imakefile /main/cde1_maint/2 1995/10/23 11:23:47 drk $
+all::
+
+/* For install of developer's build environment */
+LOCAL_BINSTALL_BINDEST = bin
+LOCAL_BINSTALL_MISCDEST = misc
+
+/* export exportlistgen to binstall */
+BuildMultipleInstall(exportlistgen,$(LOCAL_BINSTALL_BINDEST))
+BuildMultipleInstall(motifelistgen,$(LOCAL_BINSTALL_BINDEST))
+BuildMultipleInstall(mapfile.motif,$(LOCAL_BINSTALL_MISCDEST))
+
+/* ensure that scripts are executable */
+includes:: exportlistgen motifelistgen
+	chmod +x $?
+
+depend::

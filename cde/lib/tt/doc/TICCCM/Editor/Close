@@ -1,0 +1,109 @@
+.TH Close Editor "07 Sep 1993" "SunSoft" "ToolTalk ICCCM"
+.SH NAME
+.PP
+Close - close a buffer or view
+.SH SYNOPSIS
+.so ../.synopsis
+[\fIfile\fR]	Close(	in	bufferID	\fIdocBuf\f(CW,	
+		in	boolean	\fIinquisitive\f(CW,	
+		in	boolean	\fIforce\f(CW	
+		[out	\fImediaType	contents\f(CW] );	
+[\fIfile\fR]	Close(	in	viewID	\fIdocView\f(CW,	
+		in	boolean	\fIinquisitive\f(CW,	
+		in	boolean	\fIforce\f(CW	
+		[out	\fImediaType	contents\f(CW] );
+.ft
+.fi
+.SH DESCRIPTION
+.PP
+Release a reference to a buffer or view, optionally returning
+the contents of the document.  After the last reference to
+a buffer or view is released, the buffer or view is destroyed.  (The
+.I shareLevel
+parameter of the
+.B Open
+request allows for the creation of multiple references to the same
+buffer or view.)
+.PP
+If the buffer or view is being destroyed, then before replying the
+handler should unregister any patterns it had registered for handling
+operations on the buffer (e.g., 
+.BR Seek ,
+.BR Goto ,
+.BR Copy ,
+.BR Paste ,
+.BR Close )
+or view (e.g.,
+.BR Set_View ,
+.BR Seek ,
+.BR Goto ,
+.BR Close ).
+.SH REQUIRED ARGUMENTS
+.PP
+.HP 5
+.PD 0
+\f(CWbufferID\fR \fIdocBuf\fR
+.TP
+\f(CWviewID\fR \fIdocView\fR
+.PD
+The ID of the buffer or view to which a reference is being released.
+.TP
+\f(CWboolean\fR \fIinquisitive\fR
+Boolean value indicating whether the handler is allowed to
+block on user input while carrying out the request.  (If true, the
+handler is nevertheless not required to seek such input.)
+.TP
+\f(CWboolean\fR \fIforce\fR
+Boolean value indicating whether the handler should
+close the buffer or view even if circumstances
+are such that the tool ordinarily would not do so.
+.IP
+For example, a tool might have a policy of not closing with
+unsaved changes unless the user has been asked whether the
+changes should be saved.  When
+.I force
+is true, such a tool should close even when doing so would lose
+changes that the user has not been asked about saving.
+.SH OPTIONAL ARGUMENTS
+.so ../Media/.contents
+.SH ERRORS
+.TP
+\f(BITT_ERR_NOMATCH\fR
+No editor has a pattern handling the
+.BR Close ()
+request for
+.I docBuf
+.RI ( docView ),
+and so it may not be a valid \f(CWbufferID\fR (\f(CWviewID\fR).
+.TP
+\f(BITT_DESKTOP_CANCELED\fR
+.I force
+was false, and the user (or the tool) decided to cancel the
+operation.
+.TP
+\f(BITT_MEDIA_ERR_FORMAT\fR
+The document in
+.I docBuf
+(or
+.IR docView )
+is of a media type other than
+.IR mediaType .
+.TP
+\f(BITT_DESKTOP_ENODATA\fR
+The \fIcontents\fR argument is being returned with no value
+(and the file attribute of the reply is not set) because the
+document in
+.I docBuf
+(or
+.IR docView )
+was empty.  When this condition occurs, the handler should not
+fail the
+.BR Close ()
+request.
+.SH SEE ALSO
+.PP
+.BR Intro (TICCCM),
+.BR Intro (Desktop),
+.BR Intro (Media),
+.BR Intro (Editor),
+.BR Open (Editor)

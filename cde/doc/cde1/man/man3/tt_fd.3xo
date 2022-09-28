@@ -1,0 +1,67 @@
+.TH tt_fd 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+tt_fd \- return a file descriptor
+.SH SYNOPSIS
+.yS
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'int tt_fd('u
+int tt_fd(void);
+.yE
+.SH DESCRIPTION
+The
+.Fn tt_fd
+function
+returns a file descriptor.
+The returned file descriptor alerts the process that a message has
+arrived for the default
+procid
+in the default session.
+.P
+File descriptors are either active or inactive.
+When the file descriptor becomes
+active, the process must call
+.Fn tt_message_receive 3
+to receive the message.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn tt_fd
+function returns the file descriptor for the current
+procid.
+The application can use
+.Fn tt_int_error 3
+to extract one of the following
+.B Tt_status
+values from the returned integer:
+.VL 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_NOMP
+.br
+The
+.Cm ttsession 1
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_PROCID
+.br
+The current default process identifier is out of date or invalid.
+.Lc TT_ERR_SESSION
+.br
+The specified ToolTalk session is out of date or invalid.
+.LE
+.SH "APPLICATION USAGE"
+The application must have a separate file descriptor for each
+procid.
+To get an
+associated file descriptor, the application should use
+.Fn tt_fd
+each time it calls
+.Fn tt_open 3.
+.SH "SEE ALSO"
+.Hd Tt/tt_c.h 5,
+.Fn tt_open 3,
+.Fn tt_int_error 3,
+.Fn tt_message_receive 3.

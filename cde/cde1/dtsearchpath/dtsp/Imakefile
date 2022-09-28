@@ -1,0 +1,87 @@
+XCOMM $XConsortium: Imakefile /main/cde1_maint/3 1995/10/09 15:05:48 pascale $
+#include <Library.tmpl>
+
+/* General case INCLUDES DEFINES
+ * Each individual architecture may have more or less of the above.
+ * Use EXTRA_DEFINES and EXTRA_INCLUDES to add defines and includes
+ * to an individual architecture.
+ */
+INCLUDES = -I. -I../libCliSrv
+
+/* DEPLIBS contains the list of library depencies for a client.
+ * LOCAL_LIBRARIES contains the list of libraries on the link line.
+ * Generally, the dependency form of a library has DEP as a prefix.
+ * e.g. put $(XLIB) in LOCAL_LIBRARIES and $(DEPXLIB) in DEPLIBS.
+ * NOTE: if DEPLIBS is not set here, it is by default null and there
+ *       are no library dependencies for clients.
+ *       You cannot put -Llibpath into DEPLIBS. You must put actual
+ *       paths to the library.
+ */
+CLISRVLIB = ../libCliSrv/libCliSrv.a
+DEPCLISRVLIB = $(CLISRVLIB)
+
+DEPLIBS = $(DEPCLISRVLIB)
+LOCAL_LIBRARIES = $(CLISRVLIB) $(TTLIB)
+
+/* put EXTRA_DEFINES and EXTRA_INCLUDES and anything else below */
+#ifdef HPArchitecture
+# if (!HasSharedLibraries || ARCHIVED_LINK || LinkArchivedtt)
+   LOCAL_LIBRARIES = $(CLISRVLIB) $(TTLIB) $(XLIB)
+# endif
+#endif
+
+#ifdef SunArchitecture
+.KEEP_STATE:
+.PARALLEL:
+SYS_LIBRARIES = -ldl $(I18NSYSLIB)
+LAST_LOAD_FLAGS = -lC -lm -lc -ladm
+EXTRA_DEFINES = -DIOSTREAMSWORKS
+#endif
+
+#ifdef RsArchitecture
+NONSHAREDLIBCOBJ = nonsharelibC.o
+EXTRA_DEFINES = -DIOSTREAMSWORKS
+#endif
+
+#ifdef USLArchitecture
+LOCAL_LIBRARIES = $(CLISRVLIB) $(TTLIB) $(XTOOLLIB) $(XLIB)
+#endif
+
+#ifdef UXPArchitecture
+LOCAL_LIBRARIES = $(CLISRVLIB) $(TTLIB) $(XTOOLLIB) $(XLIB)
+#endif
+
+#ifdef AlphaArchitecture
+#endif
+
+HEADERS=\
+	Environ.h \
+	Options.h \
+	SearchPath.h \
+	TTFile.h \
+	cstring.h
+
+SRCS = \
+	AppSearchPath.C \
+	DbSearchPath.C \
+	HelpSearchPath.C \
+	IconSearchPath.C \
+	ManSearchPath.C \
+	Options.C \
+	SearchPath.C \
+	dtsearchpath.C
+
+OBJS = \
+	AppSearchPath.o \
+	DbSearchPath.o \
+	HelpSearchPath.o \
+	IconSearchPath.o \
+	ManSearchPath.o \
+	Options.o \
+	SearchPath.o \
+	dtsearchpath.o \
+	$(NONSHAREDLIBCOBJ)
+
+NormalLibraryObjectRule()
+ComplexProgramTarget(dtsp)
+

@@ -1,0 +1,62 @@
+# %%  (c) Copyright 1993, 1994 Hewlett-Packard Company			
+# %%  (c) Copyright 1993, 1994 International Business Machines Corp.	
+# %%  (c) Copyright 1993, 1994 Sun Microsystems, Inc.			
+# %%  (c) Copyright 1993, 1994 Novell, Inc. 				
+# %%  $Revision: $ 			 				
+#
+# The ToolTalk server-library makefile
+#
+# This directory contains routines that are not needed in the
+# ToolTalk client library, yet are shared among multiple
+# ToolTalk binaries (ttsession, tt_type_comp, ttdbck)
+#
+# Copyright (c) 1992 by Sun Microsystems, Inc.
+#
+
+TT_DIR = ..
+THIS_DIR = slib
+
+include $(TT_DIR)/SunMakefile-head.mk
+
+LDFLAGS-lib	+= -L${XW_HOME}/lib
+
+all::	Proto-g
+
+Proto-%::	$(PROTO_DIR)/lib/libstt.a
+
+Clean::
+	$(RM) libstt.a
+
+$(PROTO_DIR)/lib/libstt.a: libstt.a
+		$(TTINSTALL) $(PROTO_DIR)/lib $(@F)
+
+LIBSTT_CONTENTS= \
+mp_ce_attrs.o \
+mp_observer.o		 mp_observer_utils.o				\
+mp_otype.o		 mp_otype_utils.o	 mp_ptype.o		\
+mp_ptype_utils.o	 mp_rpc_implement.o	 mp_rpc_server.o	\
+mp_rpc_server_utils.o	 mp_s_file.o		 mp_s_file_utils.o	\
+mp_s_message.o		 mp_s_message_utils.o	 mp_s_mp.o		\
+mp_s_pattern.o		 mp_s_pattern_utils.o	 mp_s_procid.o		\
+mp_s_procid_utils.o	 mp_s_msg_context.o	 mp_s_pat_context.o	\
+mp_s_session.o		 mp_s_session_prop.o	 mp_s_session_utils.o	\
+mp_s_xdr_functions.o 	 mp_self_procid.o \
+mp_signature.o		 mp_signature_utils.o	 mp_typedb.o		\
+mp_typedb_utils.o	 tt_isstrerror.o
+
+
+# Any additional include libraries or other flags
+# needed by just a few modules are handled
+# as special cases with conditional macros.
+%/mp_typedb.o	\
+%/mp_s_session.o \
+		:=	CPPFLAGS +=	-I$(OPENWINHOME)/include -I$(XW_HOME)/include
+
+
+OBJECTS	=	$(LIBSTT_CONTENTS:%=$(DERIVED)/%)
+
+
+libstt.a:		$$(DERIVED) $$(OBJECTS)
+	rm -fr $@;$(AR) qc $@ $(OBJECTS); $(RANLIB) $@
+
+include $(TT_DIR)/SunMakefile-tail.mk

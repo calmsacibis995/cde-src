@@ -1,0 +1,91 @@
+.TH tttk_Xt_input_handler 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+tttk_Xt_input_handler \- Process ToolTalk events for Xt clients
+.SH SYNOPSIS
+.yS
+#include <Tt/tttk.h>
+.sp 0.5v
+.ta \w'void tttk_Xt_input_handler('u
+void tttk_Xt_input_handler(XtPointer \f2procid\fP,
+	int *\f2source\fP,
+	XtInputId *\f2id\fP);
+.yE
+.SH DESCRIPTION
+If
+.I procid
+is not
+.Cn NULL ,
+.Fn tttk_Xt_input_handler
+passes it to
+.Fn tt_default_procid_set 3.
+The
+.Fn tttk_Xt_input_handler
+function then calls
+.Fn tt_message_receive 3,
+which retrieves the next message available, if any, for the default
+procid.
+If
+.Fn tt_message_receive 3
+returns
+.Cn TT_ERR_NOMP ,
+then
+.Fn tttk_Xt_input_handler
+closes the default
+procid
+with
+.Fn ttdt_close 3,
+and removes the input source
+.I *id
+with
+.Fn XtRemoveInput 3X
+if
+.I id
+is not zero.
+If a message is available and
+.Fn tt_message_receive 3
+returns it (indicating it was not consumed by any message or pattern
+callback), then the ToolTalk service passes the message to
+.Fn tttk_message_abandon 3.
+.SH "RETURN VALUE"
+The
+.Fn tttk_Xt_input_handler
+returns no value.
+.SH "APPLICATION USAGE"
+The application should use
+.Fn tttk_Xt_input_handler
+as its Xt input handler unless some
+messages are expected not to be consumed by callbacks.
+(The only messages that
+absolutely cannot be intercepted and consumed by callbacks are those
+that match observe signatures in a
+ptype
+or
+otype.)
+.SH EXAMPLES
+.Cs
+int myTtFd;
+char *myProcID;
+myProcID = ttdt_open(&myTtFd, "WhizzyCalc", "Acme", "1.0", 1);
+/* ... */
+/* Process the message that started us, if any */
+tttk_Xt_input_handler(myProcID, 0, 0);
+/* ... */
+XtAppAddInput(myContext, myTtFd, (XtPointer)XtInputReadMask,
+		tttk_Xt_input_handler, myProcID);
+.Ce
+.SH "SEE ALSO"
+.Hd Tt/tttk.h 5,
+.Fn ttdt_close 3,
+.Fn tttk_message_abandon 3,
+.Fn tt_default_procid_set 3,
+.Fn tt_message_receive 3,
+.Fn XtAppAddInput 3X,
+.cde .Fn XtRemoveInput 3X,
+.xos
+.Fn XtRemoveInput
+in the \*(Zt,
+.xoe

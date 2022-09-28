@@ -1,0 +1,98 @@
+.TH ttdt_Get_Modified 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+ttdt_Get_Modified \- ask if any ToolTalk client has changes pending on a file
+.SH SYNOPSIS
+.yS
+#include <Tt/tttk.h>
+.sp 0.5v
+.ta \w'int ttdt_Get_Modified('u
+int ttdt_Get_Modified(Tt_message \f2context\fP,
+	const char *\f2pathname\fP,
+	Tt_scope \f2the_scope\fP,
+	XtAppContext \f2app2run\fP,
+	int \f2ms_timeout\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn ttdt_Get_Modified
+function
+sends a
+.IR Get_Modified
+request in the scope
+.I the_scope
+and waits for the reply.
+A
+.IR Get_Modified
+request asks if any ToolTalk client has
+changes pending on
+.I pathname
+that it intends to make persistent.
+.P
+The
+.I context
+argument describes the environment to use.
+If
+.I context
+is not zero, messages created by
+.Fn ttdt_Get_Modified
+inherit from
+.I context
+all contexts whose slotname begins with the characters
+.Cn ENV_ .
+That is, the environment described in
+.I context
+is propagated to messages created by
+.Fn ttdt_Get_Modified .
+.P
+The
+.I pathname
+argument is a pointer to a pathname
+on which the client is operating.
+.P
+The
+.I the_scope
+argument identifies the scope of the request.
+If
+.I the_scope
+is
+.Cn TT_SCOPE_NONE ,
+.Fn ttdt_Get_Modified
+tries
+.Cn TT_BOTH ,
+and falls back to
+.Cn TT_FILE_IN_SESSION
+if, for example,
+the ToolTalk database server
+is not installed on the file server that owns
+.IR pathname .
+.P
+The
+.Fn ttdt_Get_Modified
+function
+passes
+.I app2run
+and
+.I ms_timeout
+to
+.Fn tttk_block_while 3,
+blocking on the reply to the
+.IR Get_Modified
+request it sends.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn ttdt_Get_Modified
+function returns non-zero if the
+.IR Get_Modified
+request receives an affirmative reply within
+.I ms_timeout
+milliseconds;
+otherwise, it returns zero.
+.SH "SEE ALSO"
+.Hd Tt/tttk.h 5,
+.Fn ttdt_file_join 3,
+.Fn ttdt_file_event 3,
+.Fn tttk_block_while 3.

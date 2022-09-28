@@ -1,0 +1,124 @@
+.TH Deposit 4 "1 March 1996" "ToolTalk 1.3" "Document and Media Exchange Message Sets"
+.de Lc
+.\" version of .LI that emboldens its argument
+.TP \\n()Jn
+\s-1\f3\\$1\f1\s+1
+..
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.BH "1 March 1996" 
+.IX "Deposit.4" "" "Deposit.4" "" 
+.SH NAME
+Deposit \- save a document to its backing store
+.SH SYNOPSIS
+.ft 3
+.nf
+.ta \w'[\f2file\fP] Deposit('u
+[\f2file\fP] Deposit(in \f2mediaType contents\fP
+	[in messageID \f2commission\fP]);
+.PP
+.fi
+.SH DESCRIPTION
+The
+.I Deposit
+request saves a document to its backing store.
+This request is different from the
+.I Save
+request in that the requester (not the handler) has the data to be saved.
+.PP
+The
+.I contents
+argument
+is the contents of the document.
+If this argument is unset
+(in other words, has a value of
+.BR (char\ *)0 ) ,
+then the contents of the document are in
+the file named in the message's
+.I file
+attribute.
+The data type
+.RI ( mediaType )
+of the
+.I contents
+argument should be
+.BR string ,
+unless nulls are valid in the given media type,
+in which case the data type must be
+.BR bytes .
+.PP
+The
+.I commission
+argument contains the message ID of the
+.I Edit
+request that caused the creation of this buffer.
+.SH "APPLICATION USAGE"
+The
+.BR ttmedia_load (3)
+function can be used to register for,
+and help process, this message.
+.PP
+This message can be sent with the
+.BR ttmedia_Deposit (3)
+function.
+.PP
+The
+.I Deposit
+request is useful for cases where the user may perform
+an intermediate save of modifications to a document that is the subject of an
+.I Edit
+or
+.I Display
+request in progress.
+In the latter case, the
+.I Deposit
+may fail on a
+.BR \s-1TT_DESKTOP_EACCES\s+1
+error if the handler does not allow updates to the document being displayed.
+.PP
+Handlers receiving this request should reply before deleting
+any file named in the message's
+.I file
+attribute,
+but this is optional
+and applications should not rely on this.
+.SH ERRORS
+The ToolTalk service may return one of the following errors
+in processing the
+.I Deposit
+request:
+.PP
+.RS 3
+.nr )J 6
+.Lc TT_DESKTOP_EACCES
+.br
+The document is read-only.
+.Lc TT_DESKTOP_ENOENT
+.br
+The file that was alleged to contain the document does not exist.
+.Lc TT_DESKTOP_ENODATA
+.br
+The in-mode
+.I contents
+argument had no value and the
+.I file
+attribute
+of the message was not set.
+.Lc TT_MEDIA_ERR_FORMAT
+.br
+The document is not a valid instance of the media type.
+.PP
+.RE
+.nr )J 0
+.SH "SEE ALSO"
+.na
+.BR ttmedia_load (3),
+.BR ttmedia_Deposit (3);
+.IR Intro ,
+.IR Display ,
+.IR Edit ,
+.I Status
+requests.

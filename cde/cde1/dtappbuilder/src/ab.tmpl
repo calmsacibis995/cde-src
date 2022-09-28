@@ -1,0 +1,160 @@
+/*
+ *	$XConsortium: ab.tmpl /main/cde1_maint/8 1995/10/23 10:58:44 rcs $
+ *
+ *	@(#)ab.tmpl	1.21 17 Jan 1995	
+ *
+ * 	RESTRICTED CONFIDENTIAL INFORMATION:
+ *	
+ *	The information in this document is subject to special
+ *	restrictions in a confidential disclosure agreement between
+ *	HP, IBM, Sun, USL, Fujitsu,  SCO and Univel.  Do not distribute this
+ *	document outside HP, IBM, Sun, USL, Fujitsu, SCO, or Univel without
+ *	Sun's specific written approval.  This document and all copies
+ *	and derivative works thereof must be returned or destroyed at
+ *	Sun's request.
+ *
+ *	Copyright 1993 Sun Microsystems, Inc.  All rights reserved.
+ *
+ */
+
+/*
+ * Variables private to the App Builder src directory and general imake
+ * variables set for App Builder builds
+ *
+ * ABINCLUDES		path from any one of ab subdirs to include
+ */
+
+/*
+ * App Builder private variables
+ */
+ABINCLUDES = ../include
+
+/*
+ * Variables for dtcodegen
+ */
+
+/* If uil was built with shared libraries, we need to add an environment
+ * variable to find those libraries in other than the default locations
+ * If the toolkit is also in the tree. Set UIL_TOOLKITPATH
+ */
+#if !USE_XT_FROM_SYSTEM_ONLY
+DTCODEGEN_TOOLKITPATH = :$(TOOLKITSRC)
+#endif
+
+#if UseAltBuildScheme
+#if defined(UXPArchitecture)
+DTCODEGENLIBPATHS = $(SHAREDLIBPATH)=$(BINSTALL_LIBDIR):$(LD_LIBRARY_PATH)
+#else
+DTCODEGENLIBPATHS = $(SHAREDLIBPATH)=$(BINSTALL_LIBDIR)
+#endif /* UXPArchitecture */
+#else /* UseAltBuildScheme */
+#if defined(UXPArchitecture)
+DTCODEGENLIBPATHS = $(SHAREDLIBPATH)=$(DTWIDGETSRC):$(CDESRC)/dtterm:$(DTHELPSRC):$(DTSVCSRC):$(TTSRC)/lib:$(XMSRC)$(DTCODEGEN_TOOLKITPATH):$(LD_LIBRARY_PATH)
+#else
+#if defined(USLArchitecture)
+DTCODEGENLIBPATHS = $(SHAREDLIBPATH)=$(DTWIDGETSRC):$(CDESRC)/dtterm:$(DTHELPSRC):$(DTSVCSRC):$(TTSRC)/lib:$(XMSRC)$(DTCODEGEN_TOOLKITPATH):/usr/X/lib
+#else
+DTCODEGENLIBPATHS = $(SHAREDLIBPATH)=$(DTWIDGETSRC):$(CDESRC)/dtterm:$(DTHELPSRC):$(DTSVCSRC):$(TTSRC)/lib:$(XMSRC)$(DTCODEGEN_TOOLKITPATH)
+#endif /* USLArchitecture */
+#endif /* UXPArchitecture */
+#endif
+
+#if defined(USLArchitecture)
+LOCAL_DTCODEGEN = $(DTCODEGENLIBPATHS) ./dtcodegen
+#else
+LINKCC = $(PURIFY) cc
+LOCAL_DTCODEGEN = $(DTCODEGENLIBPATHS) ../abmf/dtcodegen
+#endif
+
+#if defined(SunArchitecture) || defined(USLArchitecture) || defined(UXPArchitecture) || defined(AlphaArchitecture)
+
+SHAREDLIBPATH = LD_LIBRARY_PATH
+#endif
+#ifdef RsArchitecture
+SHAREDLIBPATH = LIBPATH
+#endif
+#ifdef HPArchitecture
+SHAREDLIBPATH = SHLIB_PATH
+#endif
+
+/*
+ * use only posix-compliant functions
+ * and force ansi compliance
+ */
+
+/*
+ * We're going to add a clean target, so we need this here, so that
+ * clean does not become the default
+ */
+default_target: all
+
+/*
+ * Imake variables
+ */
+#ifdef SunArchitecture
+/*
+ * -xF and -M cause reordering of executable
+ */
+LOCAL_LDFLAGS = -M Mapfile
+EXTRA_CCOPTIONS =  -D_POSIX_SOURCE=1 -Xc -xF
+.KEEP_STATE:
+clean::
+	touch .make.state
+	$(RM) .make.*
+#endif
+
+#if defined(USLArchitecture)
+EXTRA_CCOPTIONS = -D_POSIX_SOURCE=1 -DNDEBUG
+#else
+#if defined(UXPArchitecture)
+EXTRA_CCOPTIONS = -D_POSIX_SOURCE=1 -Xc -DNDEBUG
+#elif defined(AlphaArchitecture)
+EXTRA_CCOPTIONS =  -D_XOPEN_SOURCE=1 -D_OSF_SOURCE=1
+/* default storage(40000) is not enough to process ./src/libABil/bil_parse.y */
+YACCFLAGS = -N100000
+#else
+YACC = YaccCmd
+LEX = LexCmd
+#endif
+#endif
+
+#ifdef HPArchitecture
+/*
+ * use only posix-compliant functions
+ * Set yaccflags here because hp.cf does not have -Nc20000
+ * The YACCFLAGS line will be removed if/when hp.cf is updated
+ */
+EXTRA_CCOPTIONS =  -D_POSIX_SOURCE=1
+YACCFLAGS = -Nm100000 -Nc20000
+#endif
+
+#ifdef IBMArchitecture
+/*
+ * use only posix-compliant functions
+ * and force ansi compliance
+ */
+EXTRA_CCOPTIONS =  -D_POSIX_SOURCE=1
+YACCFLAGS = -Nm100000
+#endif
+
+
+/*
+ * Create the necesary build-time include directories
+ */
+#ifdef SunArchitecture
+.NO_PARALLEL: $(ABINCLUDES)/ab $(ABINCLUDES)/ab_private
+.NO_PARALLEL: depend install binstall install.man includes shared_includes localincludes $(PROGRAM) $(LIBRARY) $(TARGET)
+#endif
+
+$(ABINCLUDES)/ab_private:
+	$(MKDIRHIER) $(ABINCLUDES)/ab_private
+
+$(ABINCLUDES)/ab:
+	$(MKDIRHIER) $(ABINCLUDES)/ab
+
+includes:: $(ABINCLUDES)/ab $(ABINCLUDES)/ab_private
+
+/*
+ * Turn off linking with libSDtFwa until find memory access problems.
+ */
+SDTFWALIB =

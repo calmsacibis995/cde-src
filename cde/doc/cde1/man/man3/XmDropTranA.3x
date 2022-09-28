@@ -1,0 +1,182 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+...\" **
+...\" **
+...\" **  (c) Copyright 1991, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1991 by Hewlett-Packard Company
+...\" **
+...\" **
+.TH XmDropTransfer 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmDropTransfer\fP \- The DropTransfer widget class
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/DragDrop.h>
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+DropTransfer provides a set of resources that identifies
+the procedures and associated information required by the
+toolkit in order to process and complete a drop transaction.
+Clients should not explicitly create a DropTransfer widget.
+Instead, a client initiates a transfer by calling
+\fIXmDropTransferStart\fP, which initializes and returns a
+DropTransfer widget.  If this function is called within an
+\fIXmNdropProc\fP callback, the actual transfers are initiated
+after the callback returns.  Even if no data needs to be transferred,
+\fIXmDropTransferStart\fP needs to be called (typically with
+no arguments, or just setting \fIXmNtransferStatus\fP) to finish
+the drag and drop transaction.
+.PP
+The \fIXmNdropTransfers\fP resource specifies a transfer
+list that describes the requested target types for the source
+data.  A transfer list is an array of \fIXmDropTransferEntryRec\fP
+structures, each of which identifies a target type.  The
+transfer list is analogous to the MULTIPLE selections capability
+defined in the \*EInter-Client Communication Conventions Manual\fP
+(ICCCM). 
+.PP
+The DropTransfer resource, \fIXmNtransferProc\fP, specifies a
+transfer procedure of type XtSelectionCallbackProc that
+delivers the requested selection data.  This procedure operates
+in conjunction with the underlying Xt selection capabilities and
+is called for each target in the transfer list.  Additional target
+types can be requested after a transfer is initiated by calling
+the \fIXmDropTransferAdd\fP function.
+.SS "Structures"
+An \fIXmDropTransferEntry\fP is a pointer to the following structure of
+type \fIXmDropTransferEntryRec\fP, which identifies a selection
+target associated with a given drop transaction:  
+.sS
+.iS
+.ta .25i 1.25i
+.nf
+typedef struct
+{
+	XtPointer	\fBclient_data\fI;
+	Atom	\fBtarget\fI;
+} XmDropTransferEntryRec, *XmDropTransferEntry;
+.iE
+.sE
+.PP
+.IP "\fBclient_data\fP
+Specifies any additional information required 
+by this selection target
+.IP "\fBtarget\fP
+Specifies a selection target associated with the drop
+operation
+.SS "Classes"
+DropTransfer inherits behavior and a resource from \fIObject\fP.
+.PP
+The class pointer is \fIxmDropTransferObjectClass\fP.
+.PP
+The class name is \fIXmDropTransfer\fP.
+.SS "New Resources"
+The following table defines a set of widget resources used by the
+programmer to specify data.  The programmer can also set the
+resource values for the inherited classes to set attributes for
+this widget.  To reference a resource by name or by class in
+a .Xdefaults file, remove the \fIXmN\fP or \fIXmC\fP prefix and use
+the remaining letters.  To specify one of the defined values for a
+resource in a .Xdefaults file, remove the \fIXm\fP prefix and use
+the remaining letters (in either lowercase or uppercase, but include
+any underscores between words).  The codes in the access column
+indicate if the given resource can be set at creation time (\fIC\fP),
+set by using \fIXtSetValues\fP (\fIS\fP), retrieved by using
+\fIXtGetValues\fP (\fIG\fP), or is not applicable (\fIN/A\fP).
+.PP
+.sp 1
+.in 0
+.KS
+.TS
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmDropTransfer Resource Set
+Name	Class	Type	Default	Access
+_
+XmNdropTransfers	XmCDropTransfers	XmDropTransferEntryRec *	NULL	CG
+XmNincremental	XmCIncremental	Boolean	False	CSG
+XmNnumDropTransfers	XmCNumDropTransfers	Cardinal	0	CSG
+XmNtransferProc	XmCTransferProc	XtSelectionCallbackProc	NULL	CSG
+XmNtransferStatus	XmCTransferStatus	unsigned char	XmTRANSFER_SUCCESS	CSG
+.TE
+.KE
+.in
+.sp 1
+.PP
+.IP "\fIXmNdropTransfers\fP"
+Specifies the address of an array of drop transfer entry records.  The
+drop transfer is complete when all the entries in the list have been
+processed.
+.IP "\fIXmNincremental\fP"
+Specifies a Boolean value that indicates whether the transfer on the
+receiver side uses the Xt incremental selection transfer mechanism
+described in \*EX Toolkit Intrinsics \- C Language Interface\fP.
+If the value is True, the receiver uses incremental transfer; if the
+value is False, the receiver uses atomic transfer.
+.IP "\fIXmNnumDropTransfers\fP"
+Specifies the number of entries in \fIXmNdropTransfers\fP.  If
+this resource is set to 0 at any time, the transfer is considered
+complete.  The value of \fIXmNtransferStatus\fP determines the
+completion handshaking process.
+.IP "\fIXmNtransferProc\fP"
+Specifies a procedure of type \fIXtSelectionCallbackProc\fP that
+delivers the requested selection values.
+The \fBwidget\fP argument passed to this procedure is the DropTransfer
+widget.
+The selection atom passed is _MOTIF_DROP.
+For additional information on selection callback procedures, see \*EX
+Toolkit Intrinsics \- C Language Interface\fP.
+.IP "\fIXmNtransferStatus\fP"
+Specifies the current status of the drop transfer.  The client
+updates this value when the transfer ends and communicates
+the value to the initiator.  The possible values are
+.IP "\fIXmTRANSFER_SUCCESS\fP
+The transfer succeeded.
+.IP "\fIXmTRANSFER_FAILURE\fP
+The transfer failed.
+.LE
+.SS "Inherited Resources"
+DropTransfer inherits behavior and a resource from \fIObject\fP.
+For a complete description of this resource, refer
+to the \fIObject\fP reference page.
+.PP
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+Object Resource Set
+Name	Class	Type	Default	Access
+_
+XmNdestroyCallback	XmCCallback	XtCallbackList	NULL	C
+.TE
+.KE
+.in
+.sp 1
+.PP
+.SH "RELATED INFORMATION"
+.na
+\fIObject(3X)\fP,
+\fIXmDisplay(3X)\fP,
+\fIXmDragContext(3X)\fP,
+\fIXmDragIcon(3X)\fP,
+\fIXmDropSite(3X)\fP,
+\fIXmDropTransferAdd(3X)\fP, and
+\fIXmDropTransferStart(3X)\fP.
+.ad

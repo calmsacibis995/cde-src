@@ -1,0 +1,54 @@
+.TH DtTermSubprocReap 3 "21 Apr 1994"
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994 Novell, Inc.
+.\" *************************************************************************
+.SH NAME
+DtTermSubprocReap \- allow a DtTerm widget to clean up after subprocess termination
+.iX "DtCreateTerm"
+.iX "creation functions" "DtCreateTerm"
+.SH SYNOPSIS
+.yS
+#include <Dt/Term.h>
+.sp 0.5v
+.ta \w'Widget DtTermSubprocReap('u
+Widget DtTermSubprocReap(pid_t \f2pid\fP,
+	int \f2stat_loc\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn DtTermSubprocReap 
+function allows \fBDtTerm\fP widgets to function correctly
+in applications that have installed a \f3SIGCHLD\fP signal handler.
+.P
+The \f2pid\fP argument specifies the process ID of the child process 
+\f3wait(2)\fP
+returns.
+The \f2stat_loc\fP argument specifies the termination information 
+\f3wait(2)\fP
+returns.
+.SH "RETURN VALUES"
+The 
+.Fn DtTermSubprocReap 
+function returns no value.
+.SH "APPLICATION USAGE"
+The
+.Fn DtTermSubprocReap 
+function allows an application to install its own \f3SIGCHLD\fP signal handler.
+The application must call the 
+.Fn DtTermSubprocReap 
+function after performing a 
+\f3wait(2)\fP
+(or associated function) on a terminated child process.
+If the child process is associated with a
+\f3DtTerm\fP widget, the widget's data structures are cleaned
+up and the associated callbacks invoked.
+.SH "SEE ALSO"
+.cde .Hd Dt/Term.h 5.
+.xo .Hd Dt/Term.h .
+
+
+
+

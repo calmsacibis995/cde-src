@@ -1,0 +1,510 @@
+XCOMM $XConsortium: Imakefile /main/cde1_maint/9 1995/10/13 14:46:42 drk $
+/* NOTE!!!
+ * all .o's are built in the Dutil* 
+ * subdirectories. Each .o must have a listing in *OBJS
+ * and SHARED_*OBJS in this file.
+ */
+#define IHaveSubdirs
+#define PassCDebugFlags /**/
+
+#ifdef UseExportLists
+EXPORTLIST = YES
+#endif
+#ifdef SunArchitecture
+.NO_PARALLEL:
+#endif
+
+
+SUBDIRS=DtUtil1 DtUtil2 $(SPCDLIBS) DtXpm
+
+MakeSubdirs($(SUBDIRS))
+DependSubdirs($(SUBDIRS))
+
+
+#ifndef DoNormalLib
+#define DoNormalLib NormalLibDtSvc
+#endif
+#ifndef DoSharedLib
+#define DoSharedLib SharedLibDtSvc
+#endif
+
+#include <Library.tmpl>
+
+/* General case INCLUDES DEFINES
+ * Each individual architecture may have more or less of the above.
+ * Use EXTRA_DEFINES and EXTRA_INCLUDES to add defines and includes
+ * to an individual architecture.
+ */
+DEFINES = -DXK_MISCELLANY -DMULTIBYTE
+INCLUDES =  -I. -Iinclude
+
+#ifdef AlphaArchitecture
+EXTRA_DEFINES = -DMESSAGE_CAT -DMULTIBYTE
+#endif
+
+#ifdef SCOArchitecture
+EXTRA_DEFINES = -DMESSAGE_CAT -DMULTIBYTE
+#endif
+
+#ifdef HPArchitecture
+EXTRA_DEFINES = -DMESSAGE_CAT -DMULTIBYTE
+#endif
+
+#if defined(RsArchitecture) 
+#  if SharedLibDtSvc
+REQUIREDLIBS = $(XMLIB) $(XTOOLLIB) $(XLIB) $(CPLUSLIB) $(TTLIB)
+#  endif
+#endif
+
+#if defined(ApolloArchitecture) 
+EXTRA_DEFINES = -D_MESSAGE_CAT
+EXTRA_INCLUDES = -I/bsd4.3/usr/include -I/sys5/usr/include
+#endif
+
+#if defined(HPOSFArchitecture) 
+#endif
+
+#ifdef SunArchitecture
+EXTRA_DEFINES=-DNO_REGCOMP
+
+#if defined(REORDER_PROFILED)
+C++ = CC -pg $(BBAFLAGS)
+CC = cc -xpg $(BBAFLAGS)
+LD = cc
+REQUIREDLIBS = $(ALL_LIBPATH) $(TTLIB) $(XMLIB) $(XTOOLLIB) $(XLIB) -lc -lsocket -lnsl -ldl -lgen -L/usr/dt/lib -lmcount
+#else
+REQUIREDLIBS = $(ALL_LIBPATH) $(TTLIB) $(XMLIB) $(XTOOLLIB) $(XLIB) -lc -lsocket -lnsl -ldl -lgen
+#endif
+
+#endif
+
+#ifdef USLArchitecture
+EXTRA_DEFINES=-DNO_REGCOMP
+REQUIREDLIBS = $(ALL_LIBPATH) $(TTLIB) $(XMLIB) $(XTOOLLIB) $(XLIB)
+#endif
+
+#ifdef UXPArchitecture
+EXTRA_DEFINES=-DNO_REGCOMP
+#endif
+
+#ifdef AlphaArchitecture
+SO_REQLIBS = $(ALL_LIBPATH) $(XMLIB) $(XTOOLLIB) $(XLIB) -lm -lc -lcxx $(TTLIB)
+#endif
+
+INSTALLFLAGS = $(INSTINCFLAGS)
+
+LINTLIBS = $(LINTXLIB) $(LINTXTOOL) $(LINTXM) 
+
+
+/* NOTE!!!
+ * All .o's are built in the 
+ * subdirectories. Each .o must have a listing in *OBJS
+ * and SHARED_*OBJS in this file.
+ */
+DTUTIL1_OBJS1 = \
+	DtUtil1/Action.o \
+	DtUtil1/ActionTt.o \
+	DtUtil1/ActionFind.o \
+	DtUtil1/ActionDb.o \
+	DtUtil1/ActionUtil.o \
+	DtUtil1/CmdSpc.o \
+	DtUtil1/CmdMain.o \
+	DtUtil1/CmdProcess.o \
+	DtUtil1/CmdUtilityP.o \
+	DtUtil1/DbReader.o \
+	DtUtil1/DbUtil.o \
+	DtUtil1/Dnd.o \
+	DtUtil1/DndDrag.o \
+	DtUtil1/DndDrop.o \
+	DtUtil1/DndIcon.o \
+	DtUtil1/DndBuff.o \
+	DtUtil1/DndFile.o \
+	DtUtil1/DndText.o \
+	DtUtil1/Dt.o \
+	DtUtil1/Dts.o \
+	DtUtil1/Dts64.o \
+	DtUtil1/DtsDb.o \
+	DtUtil1/DtsSort.o \
+	DtUtil1/DbLoad.o \
+	DtUtil1/DtsInit.o \
+	DtUtil1/DtHash.o \
+	DtUtil1/intarray.o \
+	DtUtil1/inttab.o \
+	DtUtil1/strtab.o \
+	DtUtil1/MMDb.o \
+	DtUtil1/DtsMM.o \
+	DtUtil1/GetMwmW.o \
+	DtUtil1/GetVWmHint.o \
+	DtUtil1/Qualify.o \
+	DtUtil1/Saver.o \
+	DtUtil1/SetVWmHint.o \
+	DtUtil1/SmComm.o \
+	DtUtil1/SmUtil.o \
+	DtUtil1/WmAddDelWs.o \
+	DtUtil1/WmBackWin.o \
+	DtUtil1/WmChBackD.o \
+	DtUtil1/WmGWsInfo.o \
+	DtUtil1/WmGWsList.o \
+	DtUtil1/WmMarquee.o \
+	DtUtil1/WmRestart.o \
+	DtUtil1/WmRmWsFcn.o \
+	DtUtil1/WmSetTitle.o \
+	DtUtil1/WmSetWs.o \
+	DtUtil1/WmWsCallB.o \
+	DtUtil1/WmWsHints.o \
+	DtUtil1/WmWsOccupy.o
+
+SHARED_DTUTIL1_OBJS1 = \
+	DtUtil1/shared/Action.o \
+	DtUtil1/shared/ActionTt.o \
+	DtUtil1/shared/ActionFind.o \
+	DtUtil1/shared/ActionDb.o \
+	DtUtil1/shared/ActionUtil.o \
+	DtUtil1/shared/CmdSpc.o \
+	DtUtil1/shared/CmdMain.o \
+	DtUtil1/shared/CmdProcess.o \
+	DtUtil1/shared/CmdUtilityP.o \
+	DtUtil1/shared/DbReader.o \
+	DtUtil1/shared/DbUtil.o \
+	DtUtil1/shared/Dnd.o \
+	DtUtil1/shared/DndDrag.o \
+	DtUtil1/shared/DndDrop.o \
+	DtUtil1/shared/DndIcon.o \
+	DtUtil1/shared/DndBuff.o \
+	DtUtil1/shared/DndFile.o \
+	DtUtil1/shared/DndText.o \
+	DtUtil1/shared/Dt.o \
+	DtUtil1/shared/Dts64.o \
+	DtUtil1/shared/DtsDb.o \
+	DtUtil1/shared/DtsSort.o \
+	DtUtil1/shared/DbLoad.o \
+	DtUtil1/shared/DtsInit.o \
+	DtUtil1/shared/DtHash.o \
+	DtUtil1/shared/intarray.o \
+	DtUtil1/shared/inttab.o \
+	DtUtil1/shared/strtab.o \
+	DtUtil1/shared/MMDb.o \
+	DtUtil1/shared/DtsMM.o \
+	DtUtil1/shared/GetMwmW.o \
+	DtUtil1/shared/GetVWmHint.o \
+	DtUtil1/shared/Qualify.o \
+	DtUtil1/shared/Saver.o \
+	DtUtil1/shared/SetVWmHint.o \
+	DtUtil1/shared/SmComm.o \
+	DtUtil1/shared/SmUtil.o \
+	DtUtil1/shared/WmAddDelWs.o \
+	DtUtil1/shared/WmBackWin.o \
+	DtUtil1/shared/WmChBackD.o \
+	DtUtil1/shared/WmGWsInfo.o \
+	DtUtil1/shared/WmGWsList.o \
+	DtUtil1/shared/WmMarquee.o \
+	DtUtil1/shared/WmRestart.o \
+	DtUtil1/shared/WmRmWsFcn.o \
+	DtUtil1/shared/WmSetTitle.o \
+	DtUtil1/shared/WmSetWs.o \
+	DtUtil1/shared/WmWsCallB.o \
+	DtUtil1/shared/WmWsHints.o \
+	DtUtil1/shared/WmWsOccupy.o
+
+
+#if defined(RsArchitecture) || (defined(HPArchitecture) && (OSMajorVersion > 9))|| defined(USLArchitecture) || defined(UXPArchitecture) || defined(AlphaArchitecture)
+DTUTIL1_OBJS2 = 
+SHARED_DTUTIL1_OBJS2 = 
+#else
+DTUTIL1_OBJS2 =  DtUtil1/Fnmatch.o
+SHARED_DTUTIL1_OBJS2 =  DtUtil1/shared/Fnmatch.o
+#endif
+
+/* NOTE!!!
+ * all .o's are built in the Dutil* 
+ * subdirectories. Each .o must have a listing in *OBJS
+ * and SHARED_*OBJS in this file.
+ */
+
+#ifdef SunArchitecture
+DTUTIL2_OBJS_EXTRA = \
+	DtUtil2/SunDtHelp.o \
+	DtUtil2/XlationSvc.o \
+	DtUtil2/LocaleXlate.o
+
+SHARED_DTUTIL2_OBJS_EXTRA = \
+	DtUtil2/shared/SunDtHelp.o \
+	DtUtil2/shared/XlationSvc.o \
+	DtUtil2/shared/LocaleXlate.o
+#else
+DTUTIL2_OBJS_EXTRA=
+SHARED_DTUTIL2_OBJS_EXTRA=
+#endif
+
+DTUTIL2_OBJS = \
+	$(DTUTIL2_OBJS_EXTRA) \
+	DtUtil2/ChkpntClient.o \
+	DtUtil2/ChkpntListen.o \
+	DtUtil2/DtEnvMap.o \
+	DtUtil2/DtNlUtils.o \
+	DtUtil2/EnvControl.o \
+	DtUtil2/FileUtil.o \
+	DtUtil2/GetDispRes.o \
+	DtUtil2/GetMessage.o \
+	DtUtil2/HourGlass.o \
+	DtUtil2/SharedProcs.o \
+	DtUtil2/SmCreateDirs.o \
+	DtUtil2/UErrNoBMS.o \
+	DtUtil2/Utility.o \
+	DtUtil2/ActIndicator.o \
+	DtUtil2/CmdUtility.o \
+	DtUtil2/DtGetMessage.o \
+	DtUtil2/DtUtil.o \
+	DtUtil2/CommonErr.o \
+	DtUtil2/GetEmbed.o \
+	DtUtil2/Hash.o \
+	DtUtil2/PrintXErr.o \
+	DtUtil2/XmWrap.o \
+	DtUtil2/addToRes.o \
+	DtUtil2/lock.o \
+	DtUtil2/SvcTT.o
+
+SHARED_DTUTIL2_OBJS = \
+	$(SHARED_DTUTIL2_OBJS_EXTRA) \
+	DtUtil2/shared/ChkpntClient.o \
+	DtUtil2/shared/ChkpntListen.o \
+	DtUtil2/shared/DtEnvMap.o \
+	DtUtil2/shared/DtNlUtils.o \
+	DtUtil2/shared/EnvControl.o \
+	DtUtil2/shared/FileUtil.o \
+	DtUtil2/shared/GetDispRes.o \
+	DtUtil2/shared/GetMessage.o \
+	DtUtil2/shared/HourGlass.o \
+	DtUtil2/shared/SharedProcs.o \
+	DtUtil2/shared/SmCreateDirs.o \
+	DtUtil2/shared/UErrNoBMS.o \
+	DtUtil2/shared/Utility.o \
+	DtUtil2/shared/ActIndicator.o \
+	DtUtil2/shared/CmdUtility.o \
+	DtUtil2/shared/DtGetMessage.o \
+	DtUtil2/shared/DtUtil.o \
+	DtUtil2/shared/CommonErr.o \
+	DtUtil2/shared/GetEmbed.o \
+	DtUtil2/shared/Hash.o \
+	DtUtil2/shared/PrintXErr.o \
+	DtUtil2/shared/XmWrap.o \
+	DtUtil2/shared/addToRes.o \
+	DtUtil2/shared/lock.o \
+	DtUtil2/shared/SvcTT.o
+
+
+#if	UseDtEncap
+
+SPCDLIBS= DtEncap DtCodelibs
+
+/* NOTE!!!
+ * all .o's are built in the Dutil* 
+ * subdirectories. Each .o must have a listing in *OBJS
+ * and SHARED_*OBJS in this file.
+ */
+DTCODELIBS_OBJS3 = \
+	DtCodelibs/buf.o \
+	DtCodelibs/filegen.o \
+	DtCodelibs/mbschr.o \
+	DtCodelibs/pathcollapse.o \
+	DtCodelibs/privbuf.o \
+	DtCodelibs/shellscan.o \
+	DtCodelibs/strcase.o \
+	DtCodelibs/strend.o \
+	DtCodelibs/strhash.o \
+	DtCodelibs/stringio.o \
+	DtCodelibs/strtokx.o \
+	DtCodelibs/strwcmp.o
+
+SHARED_DTCODELIBS_OBJS3 = \
+	DtCodelibs/shared/buf.o \
+	DtCodelibs/shared/filegen.o \
+	DtCodelibs/shared/mbschr.o \
+	DtCodelibs/shared/pathcollapse.o \
+	DtCodelibs/shared/privbuf.o \
+	DtCodelibs/shared/shellscan.o \
+	DtCodelibs/shared/strcase.o \
+	DtCodelibs/shared/strend.o \
+	DtCodelibs/shared/strhash.o \
+	DtCodelibs/shared/stringio.o \
+	DtCodelibs/shared/strtokx.o \
+	DtCodelibs/shared/strwcmp.o
+
+/* NOTE!!!
+ * all .o's are built in the Dutil* 
+ * subdirectories. Each .o must have a listing in *OBJS
+ * and SHARED_*OBJS in this file.
+ */
+DTENCAP_OBJS4 = \
+	DtEncap/MemoryMgr.o \
+	DtEncap/SbEvent.o \
+	DtEncap/Symbolic.o \
+	DtEncap/bmsglob.o \
+	DtEncap/connect.o \
+	DtEncap/local.o \
+	DtEncap/nls.o \
+	DtEncap/noio.o \
+	DtEncap/pathwexp.o \
+	DtEncap/pipe.o \
+	DtEncap/pty.o \
+	DtEncap/remote.o \
+	DtEncap/sbstdinc.o \
+	DtEncap/scoop.o \
+	DtEncap/spc-env.o \
+	DtEncap/spc-error.o \
+	DtEncap/spc-exec.o \
+	DtEncap/spc-net.o \
+	DtEncap/spc-obj.o \
+	DtEncap/spc-proto.o \
+	DtEncap/spc-sm.o \
+	DtEncap/spc-termio.o \
+	DtEncap/spc-util.o \
+	DtEncap/spc-xt.o \
+	DtEncap/spc.o \
+	DtEncap/stringbuf.o \
+	DtEncap/usersig.o
+
+
+SHARED_DTENCAP_OBJS4 = \
+	DtEncap/shared/MemoryMgr.o \
+	DtEncap/shared/SbEvent.o \
+	DtEncap/shared/Symbolic.o \
+	DtEncap/shared/bmsglob.o \
+	DtEncap/shared/connect.o \
+	DtEncap/shared/local.o \
+	DtEncap/shared/nls.o \
+	DtEncap/shared/noio.o \
+	DtEncap/shared/pathwexp.o \
+	DtEncap/shared/pipe.o \
+	DtEncap/shared/pty.o \
+	DtEncap/shared/remote.o \
+	DtEncap/shared/sbstdinc.o \
+	DtEncap/shared/scoop.o \
+	DtEncap/shared/spc-env.o \
+	DtEncap/shared/spc-error.o \
+	DtEncap/shared/spc-exec.o \
+	DtEncap/shared/spc-net.o \
+	DtEncap/shared/spc-obj.o \
+	DtEncap/shared/spc-proto.o \
+	DtEncap/shared/spc-sm.o \
+	DtEncap/shared/spc-termio.o \
+	DtEncap/shared/spc-util.o \
+	DtEncap/shared/spc-xt.o \
+	DtEncap/shared/spc.o \
+	DtEncap/shared/stringbuf.o \
+	DtEncap/shared/usersig.o
+
+#endif	/* UseDtEncap */
+
+DTXPM_OBJS5 = \
+	DtXpm/XpmCrIFData.o \
+	DtXpm/XpmCrPFData.o \
+	DtXpm/XpmCrDataFP.o \
+	DtXpm/XpmCrDataFI.o \
+	DtXpm/XpmRdFToI.o \
+	DtXpm/XpmRdFToP.o \
+	DtXpm/XpmWrFFrI.o \
+	DtXpm/XpmWrFFrP.o \
+	DtXpm/create.o \
+	DtXpm/data.o \
+	DtXpm/hashtable.o \
+	DtXpm/misc.o \
+	DtXpm/parse.o \
+	DtXpm/rgb.o \
+	DtXpm/scan.o
+
+SHARED_DTXPM_OBJS5 = \
+	DtXpm/shared/XpmCrIFData.o \
+	DtXpm/shared/XpmCrPFData.o \
+	DtXpm/shared/XpmCrDataFP.o \
+	DtXpm/shared/XpmCrDataFI.o \
+	DtXpm/shared/XpmRdFToI.o \
+	DtXpm/shared/XpmRdFToP.o \
+	DtXpm/shared/XpmWrFFrI.o \
+	DtXpm/shared/XpmWrFFrP.o \
+	DtXpm/shared/create.o \
+	DtXpm/shared/data.o \
+	DtXpm/shared/hashtable.o \
+	DtXpm/shared/misc.o \
+	DtXpm/shared/parse.o \
+	DtXpm/shared/rgb.o \
+	DtXpm/shared/scan.o
+
+
+/* #ifdef SCOArchitecture  uncertain what this means -marca */
+/* DtGetMessage.o breaks the MS loader.  Remove it for now */
+/* all:: DtGetMessage.o libDt.a */
+
+#ifdef AlphaArchitecture
+SRCS = version.c svc_init.c 
+OBJS = version.o svc_init.o \
+            $(DTUTIL1_OBJS1) $(DTUTIL1_OBJS2) $(DTUTIL2_OBJS) \
+	    $(DTCODELIBS_OBJS3) $(DTENCAP_OBJS4) $(DTXPM_OBJS5)
+SHARED_OBJS = shared/version.o shared/svc_init.o \
+		$(SHARED_DTUTIL1_OBJS1) \
+		$(SHARED_DTUTIL1_OBJS2) $(SHARED_DTUTIL2_OBJS) \
+		$(SHARED_DTCODELIBS_OBJS3) $(SHARED_DTENCAP_OBJS4) \
+		$(SHARED_DTXPM_OBJS5)
+#else
+SRCS = version.c 
+OBJS = version.o $(DTUTIL1_OBJS1) $(DTUTIL1_OBJS2) $(DTUTIL2_OBJS) \
+	$(DTCODELIBS_OBJS3) $(DTENCAP_OBJS4) $(DTXPM_OBJS5)
+SHARED_OBJS = shared/version.o $(SHARED_DTUTIL1_OBJS1) \
+		$(SHARED_DTUTIL1_OBJS2) $(SHARED_DTUTIL2_OBJS) \
+		$(SHARED_DTCODELIBS_OBJS3) $(SHARED_DTENCAP_OBJS4) \
+		$(SHARED_DTXPM_OBJS5)
+#endif
+
+#if defined(USLArchitecture) || defined(UXPArchitecture)
+SHARED_OBJS_1 = shared/version.o $(SHARED_DTUTIL1_OBJS1) \
+                $(SHARED_DTUTIL1_OBJS2) $(SHARED_DTUTIL2_OBJS)
+SHARED_OBJS_2 = $(SHARED_DTCODELIBS_OBJS3) $(SHARED_DTENCAP_OBJS4)
+SHARED_OBJS_3 = $(SHARED_DTXPM_OBJS5)
+#endif
+
+all::
+
+shared/version.o:version.o
+
+#ifdef AlphaArchitecture
+shared/svc_init.o:svc_init.o
+#endif
+
+LibraryObjectRule()
+
+/* For install of developer's build environment */
+LOCAL_BINSTALL_LIBDEST = lib
+
+#if DoSharedLib
+#if DoNormalLib
+#if defined(USLArchitecture)  || defined(UXPArchitecture)
+SharedLibraryTarget3(DtSvc,$(SODTSVCREV),$(SHARED_OBJS_1),$(SHARED_OBJS_2),$(SHARED_OBJS_3),.,.)
+#else
+SharedLibraryTarget(DtSvc,$(SODTSVCREV),$(SHARED_OBJS),.,.)
+#endif /* USL Architecture */
+#else
+SharedLibraryTarget(DtSvc,$(SODTSVCREV),$(OBJS),.,.)
+#endif
+SharedLibraryBuildInstall(DtSvc,$(SODTSVCREV),$(LOCAL_BINSTALL_LIBDEST))
+InstallSharedLibrary(DtSvc,$(SODTSVCREV),$(USRLIBDIR))
+#endif
+#if DoNormalLib
+NormalLibraryTarget(DtSvc,$(OBJS))
+NormalLibraryBuildInstall(DtSvc,$(LOCAL_BINSTALL_LIBDEST))
+InstallLibrary(DtSvc,$(USRLIBDIR))
+#endif
+
+LintLibraryTarget(DtSvc,$(SRCS))
+
+MakeDirectories(install,$(INCDIR)/Dt)
+
+InstallLintLibrary(DtSvc,$(LINTLIBDIR))
+
+
+DependTarget()
+
+MakeDirectories(install,$(INCDIR)/Dt)
+
+InstallLibrary(DtSvc,$(USRLIBDIR))
+InstallLintLibrary(DtSvc,$(LINTLIBDIR))
+

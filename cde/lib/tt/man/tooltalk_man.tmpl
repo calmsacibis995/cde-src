@@ -1,0 +1,92 @@
+/* Common definitions for manpage Imakefiles. 				*/
+/* Over on the doc side where most of then manpages are this is just 	*/
+/* replicated in each man<n> directory, but I can't bring myself to	*/
+/* do that.  								*/
+
+#ifdef HPArchitecture  
+VENDOR_ARG = -h
+#endif
+
+#ifdef RsArchitecture
+VENDOR_ARG = -i
+#endif
+
+#ifdef SunArchitecture
+VENDOR_ARG = -s
+#endif
+
+#ifdef USLArchitecture
+VENDOR_ARG = -u
+#endif
+
+#ifdef UXPArchitecture
+VENDOR_ARG = -u
+#endif
+
+
+DT2MAN = $(BINSTALL_BINDIR)/dt2man
+
+MANROFF = /usr/bin/troff -man
+
+#if defined(HugeLibrary) && HugeLibrary
+all:: $(OBJS1)
+all:: $(OBJS2)
+all:: $(OBJS3)
+#else
+all:: $(OBJS)
+#endif
+
+.SUFFIXES: .1xo .1 .2xo .2 .3xo .3 .4xo .4 .5xo .5 .6xo .6
+
+.1xo.1:
+	$(RM) $@
+	$(DT2MAN) $(VENDOR_ARG) $? >$@
+
+.2xo.2:
+	$(RM) $@
+	$(DT2MAN) $(VENDOR_ARG) $? >$@
+
+.3xo.3:
+	$(RM) $@
+	$(DT2MAN) $(VENDOR_ARG) $? >$@
+
+.4xo.4:
+	$(RM) $@
+	$(DT2MAN) $(VENDOR_ARG) $? >$@
+
+.5xo.5:
+	$(RM) $@
+	$(DT2MAN) $(VENDOR_ARG) $? >$@
+
+.6xo.6:
+	$(RM) $@
+	$(DT2MAN) $(VENDOR_ARG) $? >$@
+
+/* XXX - this was deleted  to make the build env,
+ * which doesn't have SCCS dirs, compile successfully
+ * under the new, non-.xo files, format.  It should
+ * really check for SCCS subdirs and only then do
+ * a "make clean", but I don't have time to fix it. -rja
+clean::
+	$(RM) $(OBJS)
+*/
+
+depend::
+
+includes::
+
+print::
+	$(TBL) $(OBJS) | $(MANROFF)
+
+#ifdef SunArchitecture
+
+postscript:	manpages.ps
+	@echo PostScript for man pages is in $(PWD)/manpages.ps
+
+manpages.ps: $(OBJS)
+	$(TBL) $(OBJS) | $(MANROFF) | /usr/lib/lp/postscript/dpost >manpages.ps
+
+clean::
+	$(RM) manpages.ps
+
+#endif

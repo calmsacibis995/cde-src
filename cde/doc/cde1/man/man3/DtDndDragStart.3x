@@ -1,0 +1,474 @@
+.TH DtDndDragStart 3X "25 Jan 1994"
+.BH "25 Jan - 1994"
+.SH NAME
+DtDndDragStart, DtVaDndDragStart \- initiate a drag
+.SH SYNOPSIS
+.LP
+.nf
+.ft 3
+#include <Dt/Dnd.h>
+.sp .6v
+Widget DtDndDragStart(
+	Widget dragSource,
+	XEvent *event,
+	DtDndProtocol protocol,
+	Cardinal numItems,
+	unsigned char operations,
+	XtCallbackList convertCallback,
+	XtCallbackList dragFinishCallback,
+	ArgList argList,
+	Cardinal argCount)
+
+Widget DtVaDndDragStart(
+	Widget dragSource,
+	XEvent *event,
+	DtDndProtocol protocol,
+	Cardinal numItems,
+	unsigned char operations,
+	XtCallbackList convertCallback,
+	XtCallbackList dragFinishCallback,
+	...)
+.ft 1
+.fi
+.SH DESCRIPTION
+.\"---
+.\"--- The _1st_index_term_ and _2nd_index_term_ will appear in the manual
+.\"--- index.  _format_of_1st_ and _format_of_2nd_ specify formatting for
+.\"--- these index entries.
+.\"---
+.IX "DtDndDragStart" "DtVaDndDragStart" "_format_of_1st_" "_format_of_2nd_"
+.LP
+These functions initiate a Motif drag with drag visuals appropriate to the
+type of data being dragged and updates the translation table of the drag
+context.
+
+.I DtDndDragStart
+is called from the application's dragMotionHandler which interprets
+mouse events to determine when a drag should begin.
+
+The difference between
+.I DtDndDragStart
+and
+.I DtVaDndDragStart
+is how the argument list is passed. The argument list is passed as an
+ArgList to
+.I DtDndDragStart
+and using VarArgs for
+.I DtVaDndDragStart.
+.SS Parameters
+The required parameters passed to
+.I DtDndDragStart
+are used as follows.
+.TP 15
+.I Widget dragSource 
+is the widget which received the event that triggered the drag.
+.TP 15 
+.I XEvent *event
+is the button press or button motion event which triggered the drag.
+.TP 15 
+.I DtDndProtocol protocol
+specifies the protocol used for the data transfer. Valid values are
+.BR DtDND_TEXT_TRANSFER,
+.BR DtDND_FILENAME_TRANSFER,
+and
+.BR DtDND_DATA_TRANSFER.
+If
+.BR DtDND_DATA_TRANSFER
+is specified, then the type of data being transfered must be specified with
+.I XmNexportTargets
+and 
+.I XmNnumExportTargets
+in the argument list.
+.TP 15
+.I Cardinal numItems
+specifies the number of items being dragged.
+.TP 15 
+.I unsigned char operations
+indicates which operations the dragSource supports. The options are
+.BR XmDROP_MOVE,
+.BR XmDROP_COPY,
+and
+.BR XmDROP_LINK.
+A drag source may support any combination of these operations. A
+combination of operations is specified by oring several operation
+values together. For example, to support the move and copy operations,
+specify:
+.BR XmDROP_MOVE | XmDROP_COPY.
+.TP 15 
+.I XtCallbackList convertCallback
+is invoked when a drop has started and the drop site has requested
+data from the drag source. The
+.I convertCallback
+is responsible for providing the data which is transfered to the drop site.
+The parameters for the
+.I convertCallback
+are the Motif Drag Context, an XtPointer to application-supplied client data,
+and an XtPointer to a
+.I DtDndConvertCallbackStruct
+structure.
+.TP 15 
+.I XtCallbackList dragFinishCallback
+is invoked when the drag and drop transaction is complete. The
+.I dragFinishCallback
+should reset any drag motion handler and free any memory allocated
+by the drag source during the drag and drop transaction. The parameters
+for the
+.I dragFinishCallback
+are the Motif Drag Context, an XtPointer to application-supplied client data,
+and an XtPointer to a
+.I DtDndDragFinishCallbackStruct
+structure.
+.SS Argument Value Pairs
+The set of optional argument-value pairs that can be used with either
+.I DtDndDragStart
+or 
+.I DtVaDndDragStart
+are as follows. Motif resources may be set via the argument list as well
+provided they are not resources that are used by the drag and drop subsystem.
+.TP 15
+.I DtNsourceIcon (Widget)
+Specifies the
+.I XmDragIcon
+used to represent the data being dragged. This icon is created using either
+.I DtCreateDragSourceIcon
+or
+.I XmCreateDragIcon.
+If 
+.I DtNsourceIcon
+is NULL then a default icon is used which is appropriate for the data
+begin dragged. Default: NULL.
+.TP 15
+.I DtNdropOnRootCallback (XtCallbackList)
+Specifies the callback to be called when the drop occurs on the desktop.
+This callback is only for use by specialized clients such as file managers.
+If
+.I DtNdropOnRootCallback
+is NULL then drops onto the desktop background will not be allowed.
+Default: NULL
+.SS Callback Information
+Each of the callbacks for
+.I DtDndDragStart
+has an associated callback structure. These callbacks cannot be used
+with the
+.I XtAddCallback
+interface. 
+.LP
+A pointer to the following structure is passed to the
+.I convertCallback.
+.LP
+.nf
+.ft 3
+.sp .5v
+typedef struct {
+	int reason;
+	XEvent *event;
+	DtDndContext dragData;
+	DtDndStatus status;
+} DtDndConvertCallbackStruct, *DtDndConvertCallback;
+.ft 1
+.fi
+.TP 15
+.I reason
+indicates why the callback was invoked. The possible reasons for this
+callback are DtCR_DND_CONVERT_DATA and DtCR_DND_CONVERT_DELETE.
+.TP 15
+.I event
+points to the
+.I XEvent
+that triggered the callback.
+.TP 15
+.I dragData
+specifies the
+.I DtDndContext
+that contains the data to be dragged. If the
+.I reason
+is DtCR_DND_CONVERT_DATA,
+the application should provide the data by setting the relevant fields in
+the
+.I DtDndContext.
+If the
+.I reason
+is DtCR_DND_CONVERT_DELETE, the application should delete the original data which
+completes a move operation.
+.TP 15
+.I status
+indicates the status of the conversion. The application can set this to
+.BR DtDND_FAILURE
+to cancel the conversion and consequently the drag and drop operation.
+The value of
+.I status
+is normally
+.BR DtDND_SUCCESS.
+.LP
+A pointer to the following structure is passed to the
+.I dragFinishCallback.
+.LP
+.nf
+.ft 3
+.sp .5v
+typedef struct {
+	int reason;
+	XEvent *event;
+	Widget sourceIcon;
+	DtDndContext dragData;
+} DtDndDragFinishCallbackStruct, *DtDndDragFinishCallback;
+.ft 1
+.fi
+.TP 15
+.I reason
+indicates why the callback was invoked. The valid reason for this callback is
+DtCR_DND_DRAG_FINISH.
+.TP 15
+.I event
+points to the
+.I XEvent
+that triggered the callback.
+.TP 15
+.I sourceIcon
+specifies the source icon registered in the call to
+.I DtDndDragStart.
+This widget is provided to allow the application to free data associated
+with the source icon and destroy the source icon if desired.
+.TP 15
+.I dragData
+specifies the
+.I DtDndContext
+that contains the data that was dragged. The application should free any
+data it associated with the
+.I dragData.
+.SS Structures
+.LP
+The following structures are used by the drag source in the
+.I convertCallback
+and
+.I dragFinishCallback
+to communicate data between the application and the drag and drop subsystem.
+The 
+.I DtDndContext
+structure is passed to these callbacks as
+.I dragData
+in the callback structure appropriate to the callback.
+
+In the 
+.I convertCallback
+the application which is acting as the drag source is responsible for filling
+in the
+.I DtDndContext
+structure with the data being transfered.
+
+In the
+.I dragFinishCallback.
+the application acting as the drag source is responsible for freeing any
+data it allocated for use in the
+.I DtDndContext
+structure.
+.nf
+.ft 3
+.sp .5v
+typedef struct _DtDndContext {
+	DtDndProtocol protocol;
+	union {
+		DtDndFile file;
+		DtDndText text;
+		DtDndData data;
+	} u;
+} DtDndContext;
+.ft 1
+.fi
+.TP 15
+.I protocol
+indicates the data transfer protocol under which the data in the
+.I DtDndContext
+is being transfered. Valid values are
+.BR DtDND_TEXT_TRANSFER,
+.BR DtDND_FILENAME_TRANSFER,
+and
+.BR DtDND_DATA_TRANSFER.
+.TP 15
+.I u
+is a union containing data which should be stored and read in the format
+corresponding to the specified
+.I protocol.
+The data structures corresponding to the transfer protocols are as follows.
+.LP
+This structure is used with the
+.BR DtDND_FILENAME_TRANSFER
+protocol.
+.nf
+.ft 3
+.sp .5v
+typedef struct _DtDndFile {
+	char *hostName;
+	char **fileNames;
+	char **fileFormats;
+	Cardinal numItems;
+} DtDndFile;
+.ft 1
+.fi
+.TP 15
+.I char *hostName
+points to the name of the host machine on which the drag source resides.
+.TP 15
+.I char **fileNames
+is an array of pointers to the names of the files being transfered. The
+application is responsible for allocating the memory for each file name.
+The number of file names is indicated by
+.I numItems.
+.TP 15
+.I char **fileFormats
+is an array of pointers optionally containing the file formats of the files
+being transfered. The application is responsible for allocating memory
+for the format strings. The number of format strings is indicated by
+.I numItems.
+.TP 15
+.I Cardinal numItems
+indicates the number of files in the list of
+.I fileNames
+and the number of formats in the list of
+.I fileFormats.
+.LP
+This structure is used with the
+.BR DtDND_TEXT_TRANSFER
+protocol.
+.nf
+.ft 3
+.sp .5v
+typedef struct _DtDndText {
+	XmString *strings;
+	Cardinal numItems;
+} DtDndText;
+.ft 1
+.fi
+.TP 15
+.I XmString *strings
+contains pointers to the strings being transfered. The application is
+responsible for allocating memory to contain the strings.
+.TP 15
+.I Cardinal numItems
+indicates the number of strings in the list of
+.I strings.
+.LP
+This structure is used with the
+.BR DtDND_DATA_TRANSFER
+protocol.
+.nf
+.ft 3
+.sp .5v
+typedef struct _DtDndData {
+	Atom target;
+	Atom type;
+	void *buf;
+	int format;
+	int length;
+	XmString label;
+} DtDndData;
+.ft 1
+.fi
+.TP 15
+.I Atom target
+specifies what the data is. This is application-defined.
+.TP 15
+.I Atom type
+specifies the type of the data such as XA_STRING, XA_INTEGER,
+or an application-defined type.
+.TP 15
+.I void *buf
+points to the data being transfered. The application is responsible for
+allocating the memory for this buffer.
+.TP 15
+.I int format
+indicates the format of the data with valid values being 8, 16, and 32.
+.TP 15
+.I int length
+indicates the number of pieces of data in the buffer. Thus, the length of
+the buffer in bytes is
+.I format
+/ 8 *
+.I length.
+.TP 15
+.I XmString label
+provides a user-readable label for the data being dragged.
+.ft 1
+.fi
+.SS Motif Resources
+When
+.I DtDndDragStart
+is called, the following Motif resources are modified. The application
+should not modify these resources directly.
+
+These resources are modified by
+.I DtDndDragStart
+in the Motif Drag Context.
+
+.I XmNblendModel
+.br
+.I XmNclientData
+.br
+.I XmNconvertProc
+.br
+.I XmNcursorBackground
+.br
+.I XmNcursorForeground
+.br
+.I XmNdragDropFinishCallback
+.br
+.I XmNdragOperations
+.br
+.I XmNdropFinishCallback
+.br
+.I XmNdropStartCallback
+.br
+.I XmNexportTargets
+.br
+.I XmNnumExportTargets
+.br
+.I XmNsourcePixmapIcon
+.br
+.I XmNtopLevelEnterCallback
+
+These resources are modified by
+.I DtDndDragStart
+in the Motif Drag Icons.
+
+.I XmNattachment
+.br
+.I XmNdepth
+.br
+.I XmNheight
+.br
+.I XmNhotX
+.br
+.I XmNhotY
+.br
+.I XmNmask
+.br
+.I XmNoffsetX
+.br
+.I XmNoffsetY
+.br
+.I XmNpixmap
+.br
+.I XmNwidth
+.SH RETURN VALUES
+.TP 15
+Widget dragContext
+.I DtDndDragStart
+returns the drag context widget created when the Motif drag is started.
+.SH SEE ALSO
+.BR DtCreateDragSourceIcon (3X),
+.BR DtDndDropRegister (3X),
+.BR DtVaDndDropRegister (3X),
+.BR DtDndDropUnregister (3X),
+.BR XmCreateDragIcon (3X),
+.BR XmDragContext (3X),
+.BR XmDragIcon (3X),
+.BR XmDragStart (3X).
+.SH COPYRIGHT
+.LP
+(c) Copyright 1994 Hewlett-Packard Company
+.br
+(c) Copyright 1994 International Business Machines Corp.
+.br
+(c) Copyright 1994 Sun Microsystems, Inc.
+.br
+(c) Copyright 1994 Unix Systems Labs, Inc., a susidiary of Novell, Inc.

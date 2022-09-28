@@ -1,0 +1,1060 @@
+<!-- Help volume: Loginmgr -->
+<!-- File name:   Config   -->
+
+<chapter id=ConfigureLoginManager>Configuring Login Manager
+
+        <idx|customizing: Login Manager|
+        <idx|Login Manager: customizing|
+
+Login manager is responsible for:
+
+<list bullet>
+
+* Reading initial configuration files.  These files configure the desktop for
+  various types of systems, such as character-display consoles,
+  X-terminals, and systems with multiple displays
+
+* Starting the X server.
+
+* Displaying the login screen and validating the login and password
+  supplied by the user.
+
+* Starting the &ProductName; Session Manager.
+
+<\list>
+
+
+<s1 id=DefaultLoginMgrConfig>The Default Login Manager Configuration
+
+        <idx|default: Login Manager configuration|
+        <idx|Login Manager: default configuration|
+        <idx|configuration, default for Login Manager|
+
+Login Manager configuration files are set up to run &ProductName; on these
+configurations:
+<list bullet>
+* System with a single bitmap display that is also the system console.
+* Diskless clusters consisting of cnodes, each with a single bitmap display
+that is the system console.
+<\list>
+
+
+<procedure>See Also
+<list bullet tight>
+* <xref CharDispConsolesSI>
+* <xref MultipleDisplaysSI>.
+<\list>
+
+
+
+
+<s1 id=CustomizingLoginScreenSI>Customizing the Login Screen
+
+        <idx|customizing: login screen|
+        <idx|login screen: customizing|
+        <idx|screen: login|
+
+You can customize:
+<list bullet>
+* Appearance&emdash;the logo, greeting, color, and fonts.
+* Entries in the language menu.
+* The transition screen&emdash;the screen displayed after you log in,
+before your workspace backdrops appear.
+<\list>
+
+
+
+
+<s2 id=ToChangeLoginAppearanceTA>To Change the Login Screen Appearance
+
+        <idx|changing: login screen appearance|
+        <idx|login screen: changing appearance|
+        <idx|appearance: changing login screen|
+
+
+<list order>
+* Use the syntax:
+<ex>
+Dtlogin*%%resource%%:   %%value%%
+<\ex>
+
+to set resources in the appropriate configuration files:
+
+        <list bullet tight>
+        * ``/opt/dt/app-defaults/%%language%%/Dtlogin''.  Use this file
+           for language-dependent resources such as fonts and text.
+
+        *   ``/etc/opt/dt/Xresources''. Use this file for language-independent
+           resources such as layout, colors, and cursor.
+
+        <\list>
+
+        If a resource is specified in both places, the one in ``Xresources'' has
+        precedence.
+
+* Reread the Login Manager configuration files
+(see <xref ToRereadLoginConfigFilesTA>).
+
+<\list>
+
+
+
+<procedure>Logo image
+<ex>
+Dtlogin*logo*bitmapFile: %%path%%
+<\ex>
+
+<procedure>Logo position
+<list bullet>
+* Percent of the logo above the login matte:
+<ex>
+Dtlogin*logo*verticalOffset: %%percent%%
+<\ex>
+* x,y position:
+<ex>
+Dtlogin*logo*x: %%pixels%%
+Dtlogin*logo*y: %%pixels%%
+<\ex>
+<\list>
+
+<procedure>General logo appearance
+<ex>
+Dtlogin*logo*%%resource%%:   %%value%%
+<\ex>
+
+<procedure>Fonts
+<ex>
+Dtlogin*textFont:   %%font%%
+Dtlogin*labelFont:  %%font%%
+<\ex>
+
+<procedure>Content and appearance of greeting:
+<ex>
+Dtlogin*greeting.labelString:   %%string%%
+Dtlogin*greeting.fontList:      %%font%%
+<\ex>
+To include the host name in the greeting, use the string
+``%LocalHost%''.
+
+
+<procedure>Example
+These lines set colors and fonts for the login screen.
+
+<ex smaller>
+Dtlogin*background:     lightgray
+Dtlogin*highlightColor: #ef506f
+Dtlogin*textFont:       -*-prestige-medium-r--normal-*-128-72-*
+Dtlogin*labelFont:      -*-swiss 742-medium-r-normal-*-140-*-p-110-*
+<\ex>
+
+
+<procedure>Example
+These lines specify a bitmap and background color for
+the logo:
+<ex smaller>
+Dtlogin*logo*bitmapFile:  /usr/local/lib/X11/dt/bitmaps/MYlogo.bm
+Dtlogin*logo*background:  #ef506f
+<\ex>
+
+<procedure>Example
+This line in ``Xresources'' specifies the login screen greeting:
+<ex smaller>
+Dtlogin*greeting.labelString: This is %LocalHost%
+<\ex>
+
+<procedure>See Also
+<list bullet tight>
+* <xref ToRereadLoginConfigFilesTA> covers how to reread Login Manager
+ resources.
+* <xref MultipleDisplaysResourcesTA> covers using different resources for
+different displays.
+* The comments in ``/etc/opt/dt/Xresources'' and
+  ``opt/dt/app-defaults/%%language%%/C'' contain more information
+about login screen resources.
+<\list>
+
+
+
+<s2 id=ToChangeTheLanguageMenuTA>To Customize the Language Menu
+
+        <idx|customizing: language menu|
+        <idx|language menu, customizing|
+        <idx|menu: language|
+
+<list order>
+* Set the ``languageList'' resource in ``/etc/opt/dt/Xconfig'':
+<ex>
+Dtlogin*languageList: %%language%% [%%language%% &ellipsis;]
+<\ex>
+where %%language%% is a valid value for the LANG environment variable.
+
+* Reread the Login Manager configuration files.  See <xref ToRereadLoginConfigFilesTA>.
+<\list>
+
+
+
+<s2 id=ToCustomizeLangMenu>To Customize Language Menu Items
+
+<list order>
+* Set the ``languageName'' resource in ``/opt/dt/app-defaults/Dtlogin'':
+
+   <ex>
+   Dtlogin*%%language%%*languageName:  %%text%%
+   <\ex>
+
+ where %%language%% is a valid value for the LANG environment variable,
+ and %%text%% is the entry that will appear in the menu.
+
+* Reread the Login Manager configuration files.  See <xref ToRereadLoginConfigFilesTA>.
+
+<\list>
+
+
+
+<s1 id=CustomizingLoginBehaviorSI>Customizing Login Manager Behavior
+
+
+        <idx|customizing: Login Manager behavior|
+        <idx|Login Manager: customizing behavior|
+        <idx|behavior: Login Manager|
+
+This section covers how to:
+<list bullet>
+* Display a message of the day.
+* Run system-wide scripts at login and logout.
+* Use a different X server.
+<\list>
+
+
+<!-- MODULE ToDisplayMessageofDayTA lm20002.TAa -->
+<s2 id=ToDisplayMessageofDayTA>To Display a Message of the Day
+
+        <idx|displaying: message of day at login|
+        <idx|message of day at login|
+        <idx|login message of day|
+        <idx|daily message at login|
+
+<list order>
+* Create a file containing the message of the day.
+* Log in as root.
+* In ``/etc/opt/dt/Xsession'',
+find the line that defines the variable DtHELLO:
+<ex>
+DtHELLO=$DtDIR/dthello
+<\ex>
+* Modify the line to include the ``-file'' option, which takes as its
+parameter the name of the file containing the message of the day:
+<ex>
+DtHELLO=$DtDIR/dthello -file %%path%%
+<\ex>
+<\list>
+
+The ``dthello'' client
+displays the transition window after the user login and password are
+validated, before the session manager is run.
+
+By default, ``dthello'' displays a welcome message.
+
+The -file option specifies files containing additional messages.
+Up to five files can be added; each uses a separate -file option.
+
+<procedure>Example
+The following line
+adds the general message of the day and a user-specified message.
+
+<ex smaller>
+DtHELLO=$DtDIR/dthello -file /etc/motd -file $HOME/mymessage
+<\ex>
+
+
+
+<s2 id=ToRunScriptAtLoginTA>To Run System-Wide Scripts at Login and Logout
+        <idx|startup: customizing|
+        <idx|``Xstartup'' file: for customizing startup|
+        <idx|login: system-wide script|
+        <idx|logout: script, system-wide|
+        <idx|system-wide: scripts at login and logout|
+        <idx|running: system-wide scripts at login and logout|
+        <idx|script: login and logout, system-wide|
+
+
+<list bullet>
+* Log in as root.
+
+* Create or open for editing one of the following files in the ``/etc/opt/dt''
+  directory:
+
+     <lablist>
+     <labheads>\File Name\ Description
+
+      \Xsetup\    Runs as root before the Login screen is displayed; is
+                  usually a shell script.
+
+      \Xstartup\  Runs as root after the user has been authenticated,
+                        before the session
+                  manager is started; is usually a shell script
+
+      \Xreset\   Runs at as root logout; is usually a shell script.
+                 You can use ``Xreset'' to undo tasks done by ``Xstartup''.
+
+     <\lablist>
+
+* Edit the file to contain commands you want run.
+
+<\list>
+
+
+<procedure>Environment variables for `Xstartup' and `Xreset'
+        <idx|environment variables: used by ``Xstartup''|
+        <idx|variables, environment: ``Xstartup''|
+        <idx|``Xstartup'' environment variables|
+        <idx|DISPLAY environment variable|
+        <idx|environment variable: DISPLAY|
+        <idx|USER environment variable|
+        <idx|environment variable: USER|
+        <idx|HOME environment variable|
+        <idx|environment variable: HOME|
+        <idx|PATH environment variable|
+        <idx|environment variable: PATH|
+        <idx|SHELL environment variable|
+        <idx|environment variable: SHELL|
+        <idx|XAUTHORITY environment variable|
+        <idx|environment variable: XAUTHORITY|
+
+These environment variables are set while ``Xsetup'', ``Xstartup'' and
+``Xreset'' are running:
+
+<lablist>
+
+<labheads>\Variable\ Value
+
+\DISPLAY\ Display name.
+
+\USER\ Name of user logging in or out (NULL for ``Xsetup'').
+
+\HOME\ Home directory of the user (NULL for ``Xsetup'').
+
+\PATH\ Value of the ``systemPath'' resource in
+``Xconfig''.
+
+\SHELL\ Value of the ``systemShell'' resource in ``Xconfig''.
+
+\XAUTHORITY\ May be set to an authority file.
+
+\TZ\ Set to the current time zone.
+<\lablist>
+
+
+<need 3in>
+<s2 id=ToRunDifferentServerTA>To Run a Different X server
+
+        <idx|running: different X server|
+        <idx|X server: running different|
+        <idx|server: X server, running different|
+
+<list bullet>
+* Edit the line in ``/etc/opt/dt/Xservers'' that starts the server.
+<\list>
+
+The change takes effect the next time the user logs in.
+``Xservers'' contains a line for each server.  The syntax for specifying a
+server is:
+
+<syntax>
+%%DisplayName%% %%DisplayClass%% %%DisplayType%% %%Command%%
+<\syntax>
+
+<lablist>
+\%%DisplayName%%\ $DISPLAY.  The display name that is passed to X
+programs by the
+``-display'' option.  The default is %%hostname%%``:0''.
+
+\%%DisplayClass%%\ Used in setting display-specific resources for a
+particular class of displays.
+\%%DisplayType%%\ Set to ``local''.
+
+\%%Command%%\ The command line to start the server (for local servers only).
+<\lablist>
+
+<procedure>Example
+The following entry in ``Xservers'' starts the server
+``/usr/bin/X11/X'' on display ``sysaaa:0''.
+<ex smaller>
+sysaaa:0 Local local /usr/bin/X11/X :0
+<\ex>
+
+The %%hostname%% can be a simple host name (for example, ``sysaaa'') or a
+fully qualified domain name (for example, ``sysaaa.cv.it.com'').
+
+
+
+
+<procedure>See Also
+<list bullet>
+* <xref ConfiguringXterminalsSI> covers connecting to the X server on an X
+terminal.
+* <xref ToRereadLoginConfigFilesTA> explains how to reread ``Xconfig''.
+<\list>
+
+
+<s1 id=GeneralLoginAdminSI>General Login Manager Database Administration
+
+        <idx|Login Manager: database administration|
+        <idx|database administration, Login Manager|
+
+Since Login Manager starts when the system is booted before a user has
+logged in, Login Manager must log errors separately from errors written
+during an &ProductName; session.
+
+Login Manager configuration files must be reread in order for changes made
+to Login Manager confuration files to take effect.  Ordinarily, this is
+done by logging out and back in, but Login Manager files can be reread
+within a session.
+
+<s2 id=ToDisplayLoginManagerErrorsTA>To Display Login Manager Errors
+
+        <idx|displaying: Login Manager errors|
+        <idx|Login Manager: displaying errors|
+        <idx|errors: displaying Login Manager errors|
+
+<list bullet>
+* Read ``/etc/opt/dt/Xerrors''.
+<\list>
+
+``Xerrors'' records errors produced by:
+<list bullet>
+* ``dtlogin''.
+* Any standard error output by ``Xsetup'', ``Xstartup'', and ``Xreset''.
+<\list>
+
+
+
+
+<s2 id=ToRereadLoginConfigFilesTA>To Reread Login Manager Configuration Files
+
+        <idx|rereading: Login Manager configuration files|
+        <idx|Login Manager: rereading configuration files|
+        <idx|configuration files: Login Manager rereading|
+
+<list bullet>
+
+* Log out.  The configuration files are reread and take effect at the next
+  login screen.
+
+* Choose Reload Login Resources from the Options menu on the Login
+  screen.
+<\list>
+
+
+<s1 id=LoginReferenceSI>Login Manager Configuration Files and Concepts
+
+
+        <idx|reference information: Login Manager|
+        <idx|Login Manager: reference|
+        <idx|default: Login Manager configuration|
+        <idx|Login Manager: default configuration|
+        <idx|configuration, default for Login Manager|
+
+
+This section covers:
+<list bullet>
+* Default configuration
+* Login Manager files.
+* How (the order in which) Login Manager accomplishes its functionality.
+<\list>
+
+
+Login Manager configuration files are set up to run &ProductName; on
+a system with a single bitmap display that is also the system console.
+
+For other configurations, you must edit a Login Manager configuration file.
+
+
+<!-- MODULE ComponentsofLoginManagerTO lm50001.TOa -->
+<s2 id=ComponentsofLoginManagerTO>Login Manager Files
+
+        <idx|Login Manager: files|
+
+<procedure>Executables
+The functionality of Login Manager is provided by three &ProductName; clients
+in ``/usr/dt/bin''.
+
+        <idx|``dtlogin''|
+        <idx|``dtgreet''|
+        <idx|``dthello''|
+        <idx|Login Manager: ``dtlogin''|
+        <idx|Login Manager: ``dthello''|
+        <idx|Login Manager: ``dtgreet''|
+
+<lablist width=1in>
+<labheads>\Client\Description
+\``dtlogin''\Performs configuration tasks and spawns another
+``dtlogin'' process for each display in the system.  Thus, there will be
+!!n!!+1 ``dtlogin'' clients running, where !!n!! is the number of displays
+managed by the system.
+\``dtgreet''\Provides the functionality of the login screen.
+\``dthello''\Provides a transition effect between successful login and
+the beginning of the &ProductName; session.  By default, this is a welcome message
+and copyright notice.
+<\lablist>
+
+<procedure>System-wide configuration files
+These files are located in ``/etc/opt/dt''.
+
+        <idx|Login Manager: configuration files|
+        <idx|``Xconfig'' file|
+        <idx|``Xservers'' file|
+        <idx|``Xresources'' file|
+        <idx|``Xstartup'' file|
+        <idx|``Xsession'': file|
+        <idx|``Xreset'' file|
+
+<lablist>
+<labheads>\File Name \Description
+
+\``Xconfig'' \Contains the resources for the behavior of ``dtlogin''.  It
+can also define new locations for the other ``dtlogin'' configuration files.
+
+\``Xservers'' \Contains a list of servers to be run by ``dtlogin''.
+
+\``Xresources''\Contains language-independent resources for the appearance of the
+login screen (for example, layout and color).  See "Login Manager App-Defaults,"
+below, for additional information.
+
+\``Xsetup''\Shell script that is run as root before the Login screen
+is displayed.
+
+\``Xstartup'' \Program (usually a shell script) that is run as root after the
+user login and password is validated.
+
+\``Xsession'' \Shell script that sets up the user environment variables,
+runs ``dthello'',  and
+invokes the session manager.
+
+\``Xreset''\Shell script that is run as root upon termination of an &ProductName;
+session.  It can be used to return the system to its pre-``Xstartup''
+configuration.
+
+<\lablist>
+
+<procedure>Login Manager App-Defaults
+
+The Login Manager app-defaults file is
+``/opt/dt/app-defaults/%%language%%/Dtlogin''.
+Use the app-defaults file to set Language-dependent resources such as fonts
+and text.
+
+
+
+<procedure>User-specific configuration files
+These files are located in the user's home directory.
+
+        <idx|``dtlogin'': user-specific files|
+        <idx|``.dtprofile'' file|
+        <idx|``.Xauthority'' file|
+        <idx|environment variables: ``.dtprofile''|
+
+<lablist>
+<labheads>\File Name\Description
+\``.Xauthority '' \Contains authorization information needed by clients that
+require an authorization mechanism to connect to the server.
+\``.dtprofile '' \Contains environment variables.
+<\lablist>
+
+<procedure>See Also
+<list bullet tight>
+* The ``dtlogin'' man page.
+<\list>
+
+
+<s2 id=HowLoginManagerStartsSessionTO>How Login Manager Starts a &ProductName; Session
+
+        <idx|Login Manager: how it starts session|
+        <idx|session: how Login Manager starts|
+        <idx|starting: session, how Login Manager starts|
+        <idx|``dtlogin'': how it works|
+        <idx|``Xconfig'' file|
+        <idx|``Xservers'' file|
+        <idx|``Xresources'' file|
+
+<list order>
+* The Login Manager executable (``dtlogin'') is started by the init process
+during the system boot sequence.
+* ``dtlogin'' reads ``/etc/opt/dt/Xconfig''.  ``Xconfig'' contains
+resources for various login manager actions.
+
+* ``dtlogin'' reads the following files in ``/etc/opt/dt'':
+
+<list bullet>
+* ``Xservers'', or the file identified by the
+resource ``Dtlogin.servers'' in the ``Xconfig'' file.
+* ``Xresources'', or the file identified by the ``Dtlogin*resources''
+resource in the ``Xconfig'' file.
+<\list>
+* The parent ``dtlogin'' starts the X server for each local display.
+* The parent ``dtlogin'' starts another ``dtlogin'' process for each
+managed display.
+<\list>
+
+        <idx|``dtgreet''|
+        <idx|``Xstartup'' file|
+        <idx|``Xsession'': file|
+        <idx|``.dtprofile'' file: when read|
+        <idx|``dthello''|
+        <idx|``dtsession'', run by ``dtlogin''|
+
+The following steps happen for each ``dtlogin'' started by the
+parent ``dtlogin'':
+
+<list order>
+
+*   Before the Login screen is displayed, ``dtlogin'' runs
+  ``/etc/opt/dt/Xsetup'' if it exists.
+
+
+* ``dtlogin'' invokes ``dtgreet''. ``dtgreet'' loads the app-defaults
+   file ``/opt/dt/app-defaults/%%language%%/Dtlogin'' and then
+   displays the Login screen.
+
+*  Once the user login and password have been validated, ``dtlogin'' runs
+  ``/etc/opt/dt/Xstartup'' if it is present.
+
+*  ``dtlogin'' sets certain environment variables to default values.
+
+* ``dtlogin'' then runs ``/etc/opt/dt/Xsession'', which performs several
+  operations:
+
+<list bullet>
+* It runs ``dthello'', which displays the message of the day or some other
+transition effect.
+* It reads ``$HOME/.dtprofile'', which may contain additional
+environment variables or variables that override those set
+automatically by ``dtlogin''.
+<\list>
+
+* ``dtlogin'' invokes the session manager, ``dtsession''.
+<\list>
+
+        <idx|``Xreset'' file|
+        <idx|session: termination|
+        <idx|terminating: session|
+
+When the user terminates a session, Login Manager runs ``Xreset'' if
+it is present.
+
+
+
+
+<s1 id=CharDispConsolesSI>Configuring Character-Display Consoles
+        <idx|configuring: character-display console|
+        <idx|character-display console, configuring|
+        <idx|console, character-display|
+
+A character-display console is a configuration in which the console is
+!!not!! a bitmap device.
+
+
+
+<s2 id=ToConfigureCharDispTA>To Configure a Character-Display Console if No Bitmap Display is Present
+
+        <idx|configuring: character-display console|
+        <idx|character-display console, configuring|
+        <idx|console, character-display|
+
+
+<list order>
+* Comment out the line in ``/etc/opt/dt/Xservers'' that starts the X
+server.
+<ex smaller>
+# * Local local@console /%%path%%/X :0
+<\ex>
+* Reread the Login Manager configuration files.
+<\list>
+
+
+
+<procedure>See Also
+<list bullet tight>
+* <xref ToRereadLoginConfigFilesTA> explains how to reread ``Xconfig''.
+<\list>
+
+<s2 id=ToConfigureCharDispWithBitmapTA>To Configure a Character-Display Console if a Bitmap Display Exists
+
+        <idx|configuring: character-display console|
+        <idx|character-display console, configuring|
+        <idx|console, character-display|
+
+
+<list order>
+* Edit the line in ``/etc/opt/dt/Xservers'' that starts the X
+server to read:
+<ex smaller>
+* Local local@none /%%path%%/X :0
+<\ex>
+* Reread the Login Manager configuration files.
+<\list>
+
+
+
+
+<procedure>See Also
+<list bullet tight>
+* <xref ToRereadLoginConfigFilesTA> explains how to reread ``Xconfig''.
+<\list>
+
+<s1 id=ConfiguringXterminalsSI>Configuring X-Terminals
+
+
+        <idx|X-terminals: configuring|
+        <idx|server: foreign|
+        <idx|foreign server|
+
+An X-terminal system consists of a display, keyboard, and mouse that runs
+only the X server; clients, including &ProductName;, are run on one or more "host"
+systems on the networks.  Output from the clients is directed to the
+X-terminal display.
+
+Wherever possible, you should use terminals that support XDMCP.
+
+
+
+<s2 id=ToConfigureXDMCPterminalsTA>To Configure Terminals that Support XDMCP
+
+        <idx|X-terminals: protocols|
+        <idx|XDMCP: protocol|
+        <idx|server: R4|
+        <idx|R4 server|
+
+<list order>
+* Make sure Login Manager is running on the host system.
+* Enable XDMCP on the X-terminal and direct it to contact Login Manager on
+the host system.
+<\list>
+
+        <idx|terminal: supporting XDMCP|
+        <idx|XDMCP: terminals supporting|
+
+XDMCP (X Display Manager Control Protocol)
+provides a mechanism by which X-terminals can request login services from a
+network host.  It ensures that the X-terminal is communicating with a valid
+login manager, and provides the protocol for exchanging authentication
+information between the X-terminal and the host login manager.
+
+
+<procedure>See Also
+<list bullet tight>
+* <xref ToLimitAccessByTerminalTA>.
+* Documentation for your X-terminal covers the procedure for enabling XDMCP.
+<\list>
+
+
+<s2 id=ToLimitAccessByTerminalTA>To Limit Access by X-terminals to a Host
+
+        <idx|limiting: access by X-terminals to host|
+        <idx|X-terminal access to host, limiting|
+
+<list bullet>
+* Edit ``/etc/opt/dt/Xaccess'' on the host.  List only those
+X-terminals permitted to access Login Manager.
+<\list>
+
+If ``Xaccess'' is empty, any host can connect.
+
+
+<s2 id=ToUseWorkstationAsTerminalTA>To Use a Workstation as an X-Terminal.
+
+        <idx|X-terminal, using workstation as|
+
+<list bullet>
+
+* From a command line, execute:
+<ex>
+/usr/bin/X11/X -query %%hostname%%
+<\ex>
+<\list>
+
+
+
+The X server of the workstation acting as an X terminal must:
+
+<list>
+
+* Support XDMCP and the ``-query'' command-line option.
+
+* Provide ``xhost'' permission (in ``/etc/X*.hosts'') to the
+  terminal host.
+
+<\list>
+
+
+
+<s2 id=ToConfigureNonXDMCPTerminals>To Configure Non-XDMCP Terminals
+
+        <idx|X-terminals: editing Xservers for|
+        <idx|``Xservers'' file: editing for X-terminals|
+        <idx|configuring: non-XDMCP terminals|
+
+<list order>
+* Edit ``/etc/opt/dt/Xservers'' to include an entry for each terminal.
+The %%displayType%% of each terminal must be ``foreign''.
+* Reread the Login Manager configuration files.
+<\list>
+
+When Login Manager receives a SIGHUP, it rereads ``Xconfig'' and the
+``Xservers''
+file (or the file specified by the ``Dtlogin.servers'' resource).
+If it finds a new entry, ``dtlogin'' starts managing that display.  If
+an entry has been removed, the process associated with that entry is
+immediately terminated.
+
+
+<procedure>Example
+The following lines in ``Xservers'' directs ``dtlogin'' to
+manage sessions on two non-XDMCP terminals.
+
+<ex smaller>
+ext1:0 NPD200X foreign
+ext2:0 QCP-19 foreign
+<\ex>
+
+
+<procedure>See Also
+<list bullet>
+* <xref ToRereadLoginConfigFilesTA> explains how to reread the Login Manager
+configuration files.
+<\list>
+
+
+
+<s1 id=MultipleDisplaysSI>Configuring Multiple-Displays
+        <idx|configuring: multiple displays|
+        <idx|multiple-displays, configuring|
+        <idx|display: configuring multiple displays|
+
+This section explains how to configure Login Manager to run on systems with
+two or more displays.
+
+When a system includes multiple displays, the following configuration
+requirements must be met:
+<list bullet>
+* A server must be started on each display.
+* No Windows mode must be configured for each display.
+* It may be necessary or desirable to invoke different ``dtlogin''
+resources for each display.
+* It may be necessary or desirable to use different system-wide environment
+variables for each display.
+<\list>
+
+
+<s2 id=ToStartServerOnEachDisplayTA>To Start the Server on Each Display
+
+        <idx|starting: server on each display|
+        <idx|server: starting on each display|
+        <idx|display: starting server on each|
+
+<list bullet>
+* Edit ``/etc/opt/dt/Xservers'' to start an X server on each display.
+<\list>
+
+<procedure>Syntax
+The general syntax for starting the server is:
+<syntax>
+%%DisplayName%% %%DisplayClass%% %%DisplayType%%[%%@ite%%] %%Command%%
+<\syntax>
+
+
+Only displays with an associated ITE (Internal Terminal Emulator) can
+operate in No Windows Mode.  No Windows mode temporarily disables
+&ProductName; for the display and runs a !!getty!! process if one is not
+already started.  This allows the user to log in and perform tasks not
+possible under &ProductName;.  When the user logs out, &ProductName; is
+restarted for the display.  If a !!getty!! is not already running on a
+display, Login Manager starts one when No Windows Mode is invoked.
+
+<procedure>Default configuration
+When %%ite%% is omitted, display ``:0'' is
+associated with the ITE (``/dev/console'').
+
+<procedure>To specify a different display as ITE
+<list bullet>
+* On the ++ITE++ display, set %%ite%% to the character device.
+* On all other displays, set %%ite%% to ``none''.
+<\list>
+
+<procedure>Example
+The following entries in ``Xservers'' start a server
+on three local displays on ``sysaaa:0''.
+Display ``:0'' will be the console (ITE).
+<ex smaller>
+sysaaa:0 Local local /usr/bin/X11/X :0
+sysaaa:1 Local local /usr/bin/X11/X :1
+sysaaa:2 Local local /usr/bin/X11/X :2
+<\ex>
+
+<procedure>Example
+On host ``sysbbb'', the bitmap display ``:0'' is !!not!! the ITE; the ITE
+is associated with device ``/dev/ttyi1''.
+The following entries in ``Xservers'' start servers on the two bitmap
+displays with No Windows Mode enabled on ``:1''.
+
+<ex smaller>
+sysaaa:0 Local local@none /usr/bin/X11/X :0
+sysaaa:1 Local local@ttyi1 /usr/bin/X11/X :1
+<\ex>
+
+
+
+
+<procedure>See Also
+<list bullet tight>
+* <xref ToRunDifferentServerTA> covers the syntax for starting a server in
+``Xservers''.
+<\list>
+
+
+
+<s2 id=ToSpecifyDisplayNameInXconfigTA>To Specify the Display Name in `Xconfig'
+
+        <idx|specifying: display name in ``Xconfig''|
+        <idx|display name in ``Xconfig''|
+        <idx|``Xconfig'', display name|
+
+You cannot use regular ``%%hostname%%:0'' syntax for the display name
+in ``/etc/opt/dt/Xconfig''.
+<list bullet>
+* Use underscore in place of the colon.
+* In a fully-qualified host name, use underscores in place of the periods.
+<\list>
+
+<procedure>Example
+<ex smaller>
+Dtlogin.claaa_0.%%resource%%: %%value%%
+Dtlogin.sysaaa_prsm_ld_edu_0.%%resource%%: %%value%%
+<\ex>
+
+
+
+
+<s2 id=MultipleDisplaysResourcesTA>To Use Different Login Manager\Resources for Each Display
+
+        <idx|``dtlogin'': resources for each display, different|
+        <idx|resources: ``dtlogin'', different for each display|
+        <idx|display: different ``dtlogin'' resources|
+
+<list order>
+
+* Use the ``resources'' resource in ``/etc/opt/dt/Xconfig'' to specify
+  a different resource file for each display (this file will be the
+  equivalent to ``/etc/opt/dt/Xresources''):
+
+<ex>
+Dtlogin.%%DisplayName%%.resources: %%path%%/%%file%%
+<\ex>
+
+* Create each of the resource files specified in ``Xconfig''.
+
+* In each file, place the ``dtlogin'' resources for that display.
+
+<\list>
+
+<procedure>Example
+The following lines in ``Xconfig'' specify different resource files for
+three displays.
+
+<ex smaller>
+Dtlogin.sysaaa_0.resources: /etc/opt/dt/Xresources0
+Dtlogin.sysaaa_1.resources: /etc/opt/dt/Xresources1
+Dtlogin.sysaaa_2.resources: /etc/opt/dt/Xresources2
+<\ex>
+
+
+<procedure>See Also
+<list bullet tight>
+* <xref ToChangeLoginAppearanceTA> covers setting resources in
+``Xresources''.
+* <xref ToSpecifyDisplayNameInXconfigTA> explains the syntax for display name in
+``Xconfig''.
+<\list>
+
+
+<s2 id=MultipleDisplaysStartupTA>To Run Different Scripts for Each Display
+
+        <idx|startup: script for each display different|
+        <idx|display: startup script different for each|
+
+<list bullet>
+
+* Use the ``startup'', ``reset'',  and ``setup'' resources
+in ``/etc/opt/dt/Xconfig'' to specify different
+scripts
+for each display (these files will be run instead of ``Xstartup'',
+``Xreset'', and ``Xsetup''.
+file):
+<ex>
+Dtlogin*%%DisplayName%%*startup: /%%path%%/%%file%%
+Dtlogin*%%DisplayName%%*startup: /%%path%%/%%file%%
+Dtlogin*%%DisplayName%%*startup: /%%path%%/%%file%%
+<\ex>
+<\list>
+
+The startup script is run as root after the user has logged in, before the
+&ProductName; session is started.
+
+The script ``/etc/opt/dt/Xreset'' can be used to reverse the setting
+made in ``Xstartup''.  ``Xreset'' runs when the user logs out.
+
+<procedure>Example
+The following lines in ``Xconfig'' specify different scripts for
+two displays.
+
+<ex smaller>
+Dtlogin.sysaaa_0*startup:    /etc/opt/dt/Xstartup0
+Dtlogin.sysaaa_1*startup:    /etc/opt/dt/Xstartup1
+Dtlogin.sysaaa_0*setup:      /etc/opt/dt/Xsetup0
+Dtlogin.sysaaa_1*setup:      /etc/opt/dt/Xsetup1
+Dtlogin.sysaaa_0*reset:      /etc/opt/dt/Xreset0
+Dtlogin.sysaaa_1*reset:      /etc/opt/dt/Xreset1
+<\ex>
+
+
+
+<procedure>See Also
+<list bullet tight>
+* <xref ToSpecifyDisplayNameInXconfigTA> explains the syntax for display name in
+``Xconfig''.
+<\list>
+
+<s2 id=MultipleDisplaysEnvVarTA>To Set Different System-wide Environment Variables for Each Display
+
+        <idx|setting: different system-wide environment variables for each display|
+        <idx|system-wide: environment variables, different for each display|
+        <idx|environment variables: different for each display|
+        <idx|variables, environment: different for each display|
+        <idx|display: environment variables different for each|
+
+<list bullet>
+* Set the ``environment'' resource in ``/etc/opt/dt/Xconfig''
+separately for each display:
+<ex>
+Dtlogin*%%DisplayName%%*environment: %%value%%  %%&ellipsis;%%
+<\ex>
+Separate variable assignments with a space or tab.
+<\list>
+
+Do !!not!! use the environment resource to set TZ and LANG.
+
+There is no shell processing within ``Xconfig''.
+
+
+<procedure>Example
+The following lines in ``Xconfig'' set variables for two displays.
+
+
+<ex smaller>
+Dtlogin*syshere_0*environment: EDITOR=vi \
+                                 SB_DISPLAY_ADDR=0xB00000
+Dtlogin*syshere_1*environment: EDITOR=emacs \
+                                 SB_DISPLAY_ADDR=0xB00000
+<\ex>
+
+<!-- EOF: Config -->

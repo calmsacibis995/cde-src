@@ -1,0 +1,75 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+.\" **
+.\" **
+.\" ** (c) Copyright 1994 Hewlett-Packard Company
+.\" ** (c) Copyright 1994 International Business Machines Corp.
+.\" ** (c) Copyright 1994 Sun Microsystems, Inc.
+.\" ** (c) Copyright 1994 Unix Systems Labs, Inc., a subsidiary of Novell, Inc.
+.\" **
+.\" **
+.TH DtWsmGetCurrentBackdropWindows 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Common Desktop Environment 1.0: January 1994
+.SH NAME
+\fBDtWsmGetCurrentBackdropWindows\fP \- get list of windows that make up
+the backdrop for the current workspace.
+.iX "DtWsmGetCurrentBackdropWindows"
+.iX "workspace functions" "DtWsmGetCurrentBackdropWindows"
+.sp .5
+.SH SYNOPSIS
+\fB
+\&#include <Dt/Wsm.h>
+.sp .5
+Status DtWsmGetCurrentBackdropWindows (
+.br
+.ta 0.75i 2.20i
+	Display *	\fIdisplay\fP,
+.br
+	Window	\fIroot\fP,
+.br
+	Window **	\fIppWins\fP,
+.br
+	int *	\fIpNumWins\fP)
+.fi
+\fP
+.SH DESCRIPTION
+\fBDtWsmGetCurrentBackdropWindows\fP is designed to work with the 
+Common Desktop Environment window/workspace manager (dtwm).
+.PP
+\fBDtWsmGetCurrentBackdropWindows\fP returns a list of the windows 
+that are used in the backdrop for the current workspace.
+.sp .5
+.IP "\fIdisplay\fP" 1.00i
+The X display.
+.IP "\fIroot\fP" 1.00i
+The root window of the screen of interest.
+.IP "\fIppWins\fP" 1.00i
+Address of a pointer to receive the returned pointer to the list of
+window identifiers. This data should be freed with \fBXtFree(3X)\fP. 
+If there is no backdrop window for a workspace, then a NULL pointer is
+returned.
+.IP "\fIpNumWins\fP" 1.00i
+Address of a integer to receive the number of elements in the window
+list. If there is no backdrop window for the workspace, then the number
+returned here is zero.
+.PP
+.sp .5
+.SH RETURN VALUE
+.IP "\fBSuccess\fP" 1.00i
+The number of windows returned is in \fI*pNumWins\fP. If there is no
+backdrop, then this number is zero and no data was allocated and needs
+to be freed. If the number is greater than zero, then data was allocated
+and a pointer returned in \fI*ppWins\fP.
+.IP "not \fBSuccess\fP" 1.00i
+The function failed and no data was allocated or returned. This may be
+due to a memory allocation error or failure to find the correct
+workspace information (i.e. dtwm was not running).
+.sp .5
+.SH RELATED INFORMATION
+\fBdtwm(1X)\fP, \fBDtWsmGetCurrentWorkspace\fP, 
+\fBDtWsmGetWorkspaceInfo(3X)\fP.
+.sp .5

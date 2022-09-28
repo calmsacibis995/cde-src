@@ -1,0 +1,51 @@
+#!/usr/bin/ksh
+
+if (($# > 0))
+then
+	packages="$*"
+else
+	packages="SUNWdtcor"
+fi
+
+echo Making $packages
+
+for i in $packages
+do
+	if test $i = SUNWdtcor
+	then
+		cd ${i}
+                sccs get pkginfo.${i}
+                chmod 666 pkginfo.${i}
+                sed s/REV=/REV=${CDE_PACK_VER}.${CDE_PACK_DATE}/ pkginfo.${i} > pkginfo.${i}.tmp
+                mv pkginfo.${i}.tmp pkginfo.${i}
+                chmod 444 pkginfo.${i}
+                pkgmk -a ${BUILD_ARCH} \
+                -b ${BUILD_TREE} \
+                -o -d ${CDE_PACK_DIR}/ -f ./prototype.${i}
+                cd ..
+	elif test $i = SUNWdtcor2.6
+	then
+		cd ${i}
+                sccs get pkginfo.SUNWdtcor
+                chmod 666 pkginfo.SUNWdtcor
+                sed s/REV=/REV=${CDE_PACK_VER}.${CDE_PACK_DATE}/ pkginfo.SUNWdtcor > pkginfo.SUNWdtcor.tmp
+                mv pkginfo.SUNWdtcor.tmp pkginfo.SUNWdtcor
+                chmod 444 pkginfo.SUNWdtcor
+                pkgmk -a ${BUILD_ARCH} \
+                -b ${BUILD_TREE} \
+                -o -d ${BUILD_TREE}/pkgs/packages/ -f ./prototype.SUNWdtcor
+                cd ..
+	else
+		cd ${i}
+                sccs get pkginfo.${i}
+                chmod 666 pkginfo.${i}
+                sed s/REV=/REV=${CDE_PACK_VER}.${CDE_PACK_DATE}/ pkginfo.${i} > pkginfo.${i}.tmp
+                mv pkginfo.${i}.tmp pkginfo.${i}
+                chmod 444 pkginfo.${i}
+                pkgmk -a ${BUILD_ARCH} \
+                -b ${BUILD_TREE} \
+                -o -d ${CDE_PACK_DIR}/ -f ./prototype.${i}
+                cd ..
+
+	fi
+done

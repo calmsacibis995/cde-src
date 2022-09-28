@@ -1,0 +1,255 @@
+.\"--- 
+.\"    (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\"    (c) Copyright 1993, 1994 International Business Machines Corp.
+.\"    (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\"    (c) Copyright 1993, 1994 Novell, Inc.
+.\"--- 
+.TH dtscreen 1X "17 Feb. 1994"
+.BH "17 Feb. 1994""
+.SH NAME
+dtscreen - the Common Desktop Environment animated screen savers
+.SH SYNOPSIS
+dtscreen [
+.BI \-display " dsp"
+] [
+.BI \-delay " usecs"
+]
+.P
+ [
+.BI \-batchcount " num"
+] [
+.BI \-saturation " value"
+]
+.P
+ [
+.BI \-nice " nicelevel"
+] [
+.BI \-mode " mode"
+]
+.SH DESCRIPTION
+The dtscreen client supports the following key tasks.
+.RS
+.P
+- Draws an animated image on a provided window id(s).
+.P
+- Does not assume the size of the provided window(s). 
+.P
+- Provides a set of selectable animated images.
+.P
+- Animation parameters such as nice, speed, number and saturation may be specified.
+.RE
+.PP
+The dtscreen client provides the default screen saver animations for
+the desktop. When launched, it will query the desktop using the
+.BDtSaverGetWindows()
+API for the set for window ids on which to
+draw. These window ids could be the cover windows created by the
+session manager for session lock, or a window imbedded in the style
+manager's session lock customization dialog.  Once obtained, the
+dtscreen client will proceed to draw in these windows using the
+specified options. If dtscreen cannot obtain the set of window ids, it
+will create its own. Normally, the dtscreen client will be invoked
+directly by the session manager, or by the style manager.
+.P
+Note that the Session Manager, dtsession, is responsible for locking
+the session and prompting for a password to unlock.
+.P
+The session manager may launch the dtscreen client to provide screen
+saver animations during session lock. Refer to the session manager
+specification for resources controlling the launching of screen savers
+by the session manager.
+.P
+The style manager may launch the dtscreen client to provide a preview
+of a screen saver animation during customization. Refer to the style
+manager specification for information on how to integrate a screen
+saver client such as dtscreen into the desktop.
+.P
+The dtsession client provides a selectable set of animations. These are:
+.IP \f3hop\fP 1.5i
+Hopalong iterated fractals.
+.IP \f3life\fP 1.5i
+Conway's game of life.
+.IP \f3qix\fP 1.5i
+Spinning lines.
+.IP \f3image\fP 1.5i
+Random bouncing image.
+.IP \f3swarm\fP 1.5i
+Swarm of bees.
+.IP \f3rotor\fP 1.5i
+Rotor
+.IP \f3pyro\fP 1.5i
+Fireworks.
+.IP \f3flame\fP 1.5i
+Cosmic Flame Fractals.
+.IP \f3worm\fP 1.5i
+Wiggly Worms.
+.IP \f3random\fP 1.5i
+Random mode.
+.P
+The dtscreen client animations are based on xlock(1).
+.SH OPTIONS
+.sp .5
+.BI \-display " dsp"
+.RS
+The display on which animations will be drawn.
+.RE
+.sp .5
+.BI \-delay " usecs"
+.RS
+The delay option sets the speed at which a mode will operate. It
+simply sets the number of microseconds to delay between batches of
+"hopalong pixels", "qix lines", "life generations", "image blits", and
+"swarm motions".
+.RE
+.sp .5
+.BI \-batchcount " num"
+.RS
+The batchcount option sets the number of things to do per batch to
+num. In qix mode this refers to the number of lines rendered in the
+same color. In hop mode this refers to the number of pixels rendered
+in the same color. In image mode this refers to the number of X logos
+on the screen at once. in swarm mode this refers to the number of
+bees. In life mode it means nothing.
+.RE
+.sp .5
+.BI \-saturation " value"
+.RS
+The saturation option sets the saturation of the color ramp used to
+value. 0 is grayscale, 1 is very rich color and 0.4 is a nice pastel.
+.RE
+.sp .5
+.BI \-nice " nicelevel"
+.RS
+The nice option sets the system nicelevel of the dtscreen process to
+nicelevel.
+.RE
+.sp .5
+.BI \-mode " mode"
+.RS
+The mode option specifies which animation should be displayed. Values
+are:
+.RE
+.IP "\f3hop\fP" 1.5i
+Hopalong iterated fractals.
+.IP "\f3life\fP" 1.5i
+Conway's game of life.
+.IP "\f3qix\fP" 1.5i
+ Spinning lines.
+.IP "\f3image\fP" 1.5i
+ Random bouncing image.
+.IP "\f3swarm\fP" 1.5i
+ Swarm of bees.
+.IP "\f3rotor\fP"  1.5i
+ Rotor
+.IP "\f3pyro\fP" 1.5i
+ Fireworks.
+.IP "\f3flame\fP" 1.5i
+ Cosmic Flame Fractals.
+.IP "\f3worm\fP" 1.5i
+ Wiggly Worms.
+.IP "\f3random\fP" 1.5i
+ Random mode.
+.SH RETURN VALUE
+ Exit values are:
+.IP "\f30\fP" 1.5i
+Successful completion.
+.IP "\f3>0\fP" 1.5i
+Error condition occurred.
+.SH EXAMPLES
+.sp .5
+.SS dtscreen -mode swarm
+Display the swarm animation.
+.SH RESOURCES
+.TS
+center;
+cf3 cf3 cf3 cf3
+l l l l .
+Name	ClassClass	Type 	Default
+_
+mode	Mode	String	swarm
+nice	Nice	Int	16
+delay	Delay	Int	1000
+batchcount	Batchcount	Int	100
+saturation	Saturation	Float	1.0
+hop.delay	Delay	Int	0
+hop.batchcount	Batchcount	Int	1000
+hop.saturation	Saturation	Float	1
+image.delay	Delay	Int	2000000
+image.batchcount	Batchcount	Int	8
+image.saturation	Saturation	Float	0.2
+qix.delay	Delay	Int	30000
+qix.batchcount	Batchcount	Int	64
+qix.saturation	Saturation	Float	1
+life.delay	Delay	Int	1000000
+life.batchcount	Batchcount	Int	1
+life.saturation	Saturation	Float	1
+swarm.delay	Delay	Int	10000
+swarm.batchcount	Batchcount	Int	100
+swarm.saturation	Saturation	Float	1
+rotor.delay	Delay	Int	10000
+rotor.batchcount	Batchcount	Int	4
+rotor.saturation	Saturation	Float	0.4
+pyro.delay	Delay	Int	15000
+pyro.batchcount	Batchcount	Int	40
+pyro.saturation	Saturation	Float	1.0
+flame.delay	Delay	Int	10000
+flame.batchcount	Batchcount	Int	20
+flame.saturation	Saturation	Float	1.0
+worm.delay	Delay	Int	10000
+worm.batchcount	Batchcount	Int	20
+worm.saturation	Saturation	Float	1.0
+.TE
+.SS delay
+The delay option sets the speed at which a mode will operate. It
+simply sets the number of microseconds to delay between batches of
+"hopalong pixels", "qix lines", "life generations", "image blits", and
+"swarm motions".
+.sp .5
+.SS batchcount
+The batchcount option sets the number of things to do per batch to
+num. In qix mode this refers to the number of lines rendered in the
+same color. In hop mode this refers to the number of pixels rendered
+in the same color. In image mode this refers to the number of X logos
+on the screen at once. in swarm mode this refers to the number of
+bees. In life mode it means nothing.
+.sp .5
+.SS saturation
+The saturation option sets the saturation of the color ramp used to
+value. 0 is grayscale, 1 is very rich color and 0.4 is a nice pastel.
+.sp .5
+.SS nice
+The nice option sets the system nicelevel of the dtscreen process to
+nicelevel.
+.sp .5
+.SS mode
+The mode option specifies which animation should be displayed. Values
+are:
+.IP hop 1.5i
+ Hopalong iterated fractals.
+.IP life 1.5i
+ Conway's game of life.
+.IP qix 1.5i
+ Spinning lines.
+.IP image 1.5i
+ Random bouncing image.
+.IP swarm 1.5i
+ Swarm of bees.
+.IP rotor 1.5i
+ Rotor
+.IP pyro 1.5i
+ Fireworks.
+.IP flame 1.5i
+ Cosmic Flame Fractals.
+.IP worm 1.5i
+ Wiggly Worms.
+.IP random 1.5i
+ Random mode.
+.SH SEE ALSO
+.IP dtsession 1.5i
+Launches the dtscreen client during session lock.
+Provides resources that can be used to control this event. Locks and
+unlocks a session.
+.IP dtstyle 1.5i
+Launched the dtscreen client during session lock
+customization. Provides the methods by which additional screen saver
+clients may be integrated into the desktop.

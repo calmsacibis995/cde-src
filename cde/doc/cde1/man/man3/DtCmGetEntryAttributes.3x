@@ -1,0 +1,127 @@
+.\" *************************************************************************
+.\" **
+.\" ** (c) Copyright 1993,1994 Hewlett-Packard Company 
+.\" **      All Rights Reserved.
+.\" **
+.\" ** (c) Copyright 1993,1994 International Business Machines Corp. 
+.\" **      All Rights Reserved.
+.\" **  
+.\" ** (c) Copyright 1993,1994 Sun Microsystems, Inc.
+.\" **      All Rights Reserved.
+.\" **
+.\" ** (c) Copyright 1993,1994 Unix Systems Labs, Inc., a susidiary of Novell, Inc
+.\" **      All Rights Reserved.
+.\" **
+.\" *************************************************************************
+.\"----------------------------------------------------------------------------
+.\" %\&Z%%\&M% %\&I% %\&E% SMI;
+.TH DtCmGetEntryAttributes 3X "26 January 1994"
+.BH "26 January -_1994"
+.\"---
+.\"----------------------------------------------------------------------------
+.SH NAME
+DtCmGetEntryAttributes(3X) \- Get attribute values of an entry.
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- DESCRIPTION 
+.\"--- This section tells concisely what the command (function, device or
+.\"--- file format) does and includes the parameter list. 
+.\"---
+.SH DESCRIPTION
+\&#include <Dt/DtCm.h>
+.sp .5
+DtCmStatus DtCmGetEntryAttributes (
+.br
+.ta 0.75i 1.75i
+        DtCmEntry	\fIentry\fP,
+.br
+        DtCmAttributes	\fIattrs\fP,
+.br
+        int 		\fInum_attrs\fP)
+.fi
+\fP
+.SH
+\fBDtCmGetEntryAttributes\fP gets the attribute values of the attributes 
+specified in attrs, which is a pointer to an array of \fBDtCmAttribute\fP 
+structure with \fInum_attrs\fP elements. If an attribute specified in 
+\fIattrs\fP is not found, the value field \fIval\fP of the corresponding 
+element is set to \fBNULL\fP.
+ 
+The application is responsible for freeing the returned attribute values. 
+See \fBDtCmFreeAttributeValues\fP.
+
+.sp .5
+.IP "\fIentry\fP" 1.25i
+Specifies the entry to get the attribute values.
+.IP "\fIattrs\fP" 1.25i
+Specifies the array of \fBDtCmAttribute\fP structures which contains
+the attribute names and address to return the attribute values.
+.IP "\fInum_attrs\fP" 1.25i
+Specifies the number of elements in \fIattrs\fP.
+.sp .5
+.PP
+
+
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- RETURN VALUES
+.\"--- This section appears in pages from Sections 2 and 3 only.
+.\"--- List the _values_ that the function returns and give _explanations_.
+.\"---
+.SH "RETURN VALUES"
+The function returns a status indicating whether the function is 
+completed successfully. If it is successful, attribute values are 
+returned in the array pointed to by \fIattrs\fP.
+.\"---
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- ERRORS
+.\"--- This section lists and explains _ERROR-CODES_ that the function may
+.\"--- may generate.  List _ERROR-CODES_ alphabetically.
+.\"---
+.SH ERRORS
+.SH
+.IP "\fBDT_CM_ERR_MEMORY\fP" 2.5i
+Not enough memory.
+.IP "\fBDT_CM_ERR_OBJECT\fP" 2.5i
+Bad object or wrong object type.
+.IP "\fBDT_CM_OK\fP" 2.5i
+The call is completed successfully.
+.PP
+.sp
+.\"---
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- EXAMPLES
+.\"--- This section gives examples of how to use the command (function
+.\"--- or file format).  Always preface an example with an introduction.
+.\"--- If there are multiple examples, use separate subsection headings
+.\"--- for each _example-type_.  Otherwise, omit these headings.
+.\"---
+.SH EXAMPLES
+To get at the time attribute for an entry, do the following.  It is
+assumed that DtCmLookupEntries had already been called.
+
+get_time(DtCmAttributes *attrs, DtCmEntry *entries, int num_attrs)
+{
+	DtCmStatus stat;
+	int i, time, num_entries;
+
+	attrs[0].name = DT_CM_ATTR_TIME;
+	num_attrs = 1;
+
+	for (i = 0; i < num_entries; i++) {
+		DtCmGetEntryAttributes(entries[i], attrs, num_attrs);
+		time = attrs[APPT_TIME].attr_nval;
+	}
+}
+
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- SEE ALSO
+.\"--- This section lists references to other man pages, sample files, etc.
+.\"---
+.SH "SEE ALSO"
+.BR DtCmOpenCalendar (3X),
+.BR DtCmCloseCalendar (3X),
+.BR DtCmFreeAttributeValues (3X)

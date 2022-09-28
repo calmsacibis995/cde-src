@@ -1,0 +1,157 @@
+<HTML>
+<HEAD>
+<TITLE>MCM Technical Backgrounder -- Mail Client Interoperability</TITLE>
+</HEAD>
+<BODY>
+<IMG SRC="/graphics/navbar2s.gif">
+<H2>MCM Technical Backgrounder:<BR>Solaris Mail Client Interoperability</H2>
+<P>
+What potential issues arise from the interoperability of <I>Roam</I> with existing
+Sun MUAs such as <I>OW Mailtool</I> and <I>Dtmail</I>?  What solutions exist? 
+<P>
+This document helps answer those questions.
+Written by developers of the
+different MUAs (<I>Roam</I>, <I>Dtmail</I>, <I>OW Mailtool</I>), we intend this document to be
+helpful to Sun employees, especially those in the IR and ENS departments 
+who may be faced with similar questions.
+<P>
+<IMG SRC="/graphics/lineblue.gif">
+<H2>The Solaris Mail Clients</H2>
+<P>
+First an overview of the different programs.
+<P>
+<H3>Roam</H3>
+<P>
+<I>Roam</I> is an IMAP client based on the IMAP protocol.
+In the IMAP model, the 
+mail resides in a remote server (aka "mail server").  The IMAP daemon,
+<I>imapd</I>,
+runs on the remote server containing the mail file.
+Users run <I>Roam</I> on their
+desktops, irrespective of how distant they are from the mail server (home,
+hotel, office desktop).  The client connects to the mail server indicated
+in the setup/preferences and thereafter, permits full mail management
+functionality.  <I>Roam</I> permits users to selectively download messages to
+the local machine, disconnect, manage the local messages, and then upload
+the changes back to the server.  <I>Roam</I> uses MIME, the latest Internet standard 
+for multimedia messages.  <I>Roam</I> also supports Sun Attachment format, Sun's
+format for multimedia messages which is obsoleted now.
+<P>
+<H3>Dtmail</H3>
+<P>
+<I>Dtmail</I> is an MUA built for the CDE Desktop.  It does not use IMAP and 
+operates on the mailfile directly.  It solves a different problem than
+<I>Roam</I>: it allows interoperability with the CDE Dekstop programs and runs
+using the CDE widget set. <I>Dtmail</I> is expected to use IMAP in the next
+version.  <I>Dtmail</I> also uses MIME, and supports Sun Attachment format.
+<P>
+<H3>OpenWindows Mailtool</H3>
+<P>
+Mailtool is the MUA originally built for the OW Desktop.  Like <I>Dtmail</I>m, it
+operates on the mailfile directly.  Unlike <I>Dtmail</I>, it does not interoperate
+with the CDE Desktop.  It supports MIME vaguely, Sun Attachment format
+strongly.  It is being obsoleted away.
+<P>
+<H2>Usage Scenarios</H2>
+<P>
+Users may be running <I>Roam</I> or <I>Dtmail</I> or <I>OW Mailtool</I>
+at any time on one of their folders, normally the /var/mail/<user> INBOX.
+They head to another place
+(home, office, etc.) and attempt to run an MUA on the same folder.
+What can happen?
+<P>
+Each MUA requires total control over the file they operate on.  This causes
+problems when users, operating an MUA on a file at work, go home and run
+another MUA on the same file.
+<P>
+<UL>
+<LI><B>Scenario 1:</B>
+User is running <I>Dtmail</I> at work.
+They go home and run <I>Roam</I> on the same folder.
+<P>
+<OL>
+<LI><I>Roam</I> takes control of the mailbox file.  
+<LI><I>Dtmail</I> will notice that <I>Roam</I> is operating on the folder.  
+    Control of the file is totally relinquished by <I>Dtmail</I>.
+    <I>Dtmail</I> will pop up a dialog indicating that it is confused -- it 
+    expected to have total control over the file.
+    Since user is not at work, the dialog will remain up until the
+    user comes to work.
+    Note that in the meantime,
+    the user is free to operate on the mailfile with <I>Roam</I>.
+<LI>On coming in to work, the user can click OK in the <I>Dtmail</I> dialog.
+    This will exit <I>Dtmail</I>.  
+</OL>
+<P>
+Users can restart <I>Dtmail</I> provided they don't have any other MUA
+operating on the same file (e.g., the home <I>Roam</I> session was exited).
+If <I>Dtmail</I> notices that there is another MUA monitoring the same file
+(e.g., the home <I>Roam</I> session is still alive), it will repeat the 
+"I'm confused..." dialog.
+<P>
+<LI><B>Scenario 2:</B>
+Users running <I>Roam</I> at work.  They go home and run <I>Roam</I> on the
+same folder.
+<P>
+No problem.  The home <I>Roam</I> session takes control of the mail file
+and underneath the covers.  The work <I>Roam</I> session disconnects from
+monitoring the mail file but does not exit.  All changes made by the
+home <I>Roam</I> session are saved into the mail file.
+
+<P>
+<LI><B>Scenario 3:</B>
+Users running <I>Roam</I> at home.
+They go to work and run <I>Roam</I> on the same folder.
+<P>
+No problem.  The work <I>Roam</I> session takes control of the mail file
+Underneath the covers, the home <I>Roam</I> session disconnects from
+monitoring the mail file but does not exit.  All changes made by the
+work <I>Roam</I> session are saved into the mail file.
+<P>
+
+<LI><B>Scenario 4:</B>
+Users running <I>OW Mailtool</I> at work.
+They go home and run <I>Roam</I> on the same folder.
+<P>
+<I>Mailtool</I> will do one of two possibilities: quit intelligently without
+damaging the mailbox OR damage the mailbox and dump core.
+</UL>
+<P>
+
+<H2>Attachment format confusion</H2>
+<P>
+As mentioned earlier,
+<I>Roam</I> and <I>Dtmail</I> use MIME predominantly whereas
+<I>OW Mailtool</I> uses Sun Attachment format predominantly.
+If a user knows that he/she will be sending or receiving messages to and from 
+<I>OW Mailtool</I> users most of the time,
+or always switch between <I>Roam</I> and <I>Mailtool</I>, 
+it is suggested they do the following:
+<P>
+In <I>Roam</I>:
+<P>
+<OL>
+<LI>Set the "Keep mime format" property to False.  
+This can be achieved via the Properties.. dialog under Mailbox item in 
+the menubar.  This will ensure <I>Roam</I> does not translate the messages to 
+MIME format automatically, retaining Sun Attachments as they are.
+<LI>If the user intends to send out messages with attachments, they
+should request <I>Roam</I> to send the attachments with Sun Attachment format.
+The default is MIME.
+Sun Attachment format can be chosen via the 
+<B>Send ... Options</B> menu item or from each Send window where there exists
+a toggle button at the top of the window.
+</OL>
+<P>
+<H2>Recommendation</H2>
+<P>
+It is recommended that if users intend to use <I>Roam</I>,
+they should be recommended to use it at work and at home.
+This will eliminate mailfile disaster possiblities.
+Interoperability of <I>Roam</I> with other mailers, esp <I>OW Mailtool</I>,
+always increases the odds of mailfile corruptions.
+
+<P>
+<I>Written by <A HREF="mailto:satish@glob.eng.sun.com">Satish Ramachandran</A>, 95/10/23<BR>
+Conversion to HTML by <A HREF="mailto:csg@clavinova.eng.sun.com">Carl S. Gutekunst</A>, 95/11/17</I>
+<IMG SRC="/graphics/lineblue.gif">

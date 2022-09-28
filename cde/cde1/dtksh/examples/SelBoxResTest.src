@@ -1,0 +1,62 @@
+\#! CDE_INSTALLATION_TOP/bin/dtksh
+
+\##########################################################################
+\#  (c) Copyright 1993, 1994 Hewlett-Packard Company	
+\#  (c) Copyright 1993, 1994 International Business Machines Corp.
+\#  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+\#  (c) Copyright 1993, 1994 Unix System Labs, Inc., a subsidiary of
+\#      Novell, Inc.
+\##########################################################################
+
+
+\#
+\# This sample shell script verifies that the selection box properly
+\# interprets the 'childPlacement' resource.  Using a timer, it will
+\# set the resource to a particular value, verify it is correct, and
+\# then repeat for the next setting.
+\#
+
+Timeout3()
+{
+   XtGetValues $SB childPlacement:CP
+   echo ChildPlacement 
+   echo "   Expected = PLACE_TOP"
+   echo "   Actual   = " $CP
+}
+
+Timeout2()
+{
+   XtGetValues $SB childPlacement:CP
+   echo ChildPlacement 
+   echo "   Expected = PLACE_BELOW_SELECTION"
+   echo "   Actual   = " $CP
+   XtSetValues $SB childPlacement:PLACE_TOP
+   XtAddTimeOut ID 5000 "Timeout3"
+}
+
+Timeout1()
+{
+   XtGetValues $SB childPlacement:CP
+   echo ChildPlacement 
+   echo "   Expected = PLACE_ABOVE_SELECTION"
+   echo "   Actual   = " $CP
+   XtSetValues $SB childPlacement:PLACE_BELOW_SELECTION
+   XtAddTimeOut ID 5000 "Timeout2"
+}
+
+
+\######################### Create the Main UI #################################
+
+XtInitialize TOPLEVEL selectionBoxTest SelectionBoxTest "$0" "$@"
+
+XtCreateManagedWidget SB sb XmSelectionBox $TOPLEVEL \
+	childPlacement:PLACE_ABOVE_SELECTION
+
+XtCreateManagedWidget SCALE scale XmScale $SB \
+	orientation:HORIZONTAL
+
+XtRealizeWidget $TOPLEVEL
+
+XtAddTimeOut ID 5000 "Timeout1"
+
+XtMainLoop

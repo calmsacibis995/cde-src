@@ -1,0 +1,71 @@
+.TH DtCMSetBodyPartContents 3 "17 January 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH "NAME"
+DtCMSetBodyPartContents \- set the content of a body part
+.SH "SYNOPSIS"
+.yS
+#include <Bento/DtCM.h>
+.sp 0.5v
+.ta \w'void DtCMSetBodyPartContents('u
+void DtCMSetBodyPartContents(DtCMBodyPart *\f2body_part\fP,
+	CMEnv *\f2error\fP,
+	CMGlobalName \f2type_name\fP,
+	CMPtr \f2data\fP,
+	CMSize \f2data_size\fP);
+.yE
+.SH "DESCRIPTION"
+The
+.Fn DtCMSetBodyPartContents
+function is used to set the content of the body part.
+The current content and type information for the body part are replaced
+with the values provided by this function.
+The size of the existing contents for the body part are adjusted to match
+the new size specified.
+.P
+The
+.I body_part
+argument is a body-part structure returned by any of the
+.Fn DtCMGetBodyPart 3,
+.Fn DtCMGetNextBodyPart 3,
+or
+.Fn DtCMNewBodyPart 3
+functions.
+The
+.I error
+argument is a pointer to an error return structure.
+The
+.I type_name
+argument is the type associated with the contents.
+The type must be one of the names listed in
+.cX datafmtnaming .
+The
+.I data
+argument is the data to be written as the contents of the body part.
+The
+.I data_size
+argument is the size of the contents buffer in bytes.
+.SH "RETURN VALUE"
+The
+.Fn DtCMSetBodyPartContents
+function returns no value.
+If an error occurs,
+.Fn DtCMSetBodyPartContents
+sets the major code in the
+.I error
+structure to
+.Cn USER_EXCEPTION ,
+and the application can use the
+.Fn CMRexception_number
+function to determine the minor code.
+See the Error API Appendix in the \*(ZB.
+.SH "SEE ALSO"
+.Fn DtCMGetBodyPart 3,
+.Fn DtCMGetBodyPartContents 3,
+.Fn DtCMGetNextBodyPart 3,
+.Fn DtCMNewBodyPart 3,
+.Hd Bento/DtCM.h 5;
+.Fn CMRexception_number
+in the \*(ZB.

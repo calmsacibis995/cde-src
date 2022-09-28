@@ -1,0 +1,48 @@
+XCOMM RefCclient @(#)Imakefile	1.4 96/10/10 SMI
+XCOMM Copyright (c) 1996 Sun Microsystems, Inc.
+
+/*
+ * Imakefile for creating binstall links to a reference Cclient install
+ */
+
+#ifndef UseReferenceCclient
+#define UseReferenceCclient	YES
+#endif
+
+REFERENCE_PKGNAME	= RefCclient
+REFERENCE_PKGBASE	= /
+REFERENCE_PKGDIR	= opt/SUNWimcc
+
+#include <sun/Reference.tmpl>
+
+CCLIENT_INCDIR	= c-client
+CCLIENT_HEADERS	= \
+	VALID.h \
+	env.h \
+	env_unix.h \
+	fs.h \
+	ftl.h \
+	linkage.c \
+	linkage.h \
+	mail.h \
+	misc.h \
+	nl.h \
+	os_sv5.h \
+	rfc822.h \
+	smtp.h \
+	tcp.h
+
+CCLIENT_LIBRARY	= libc-client.a
+
+all:
+
+#if UseReferenceCclient
+
+ReferenceHeadersList($(CCLIENT_HEADERS),$(CCLIENT_INCDIR),NullParameter)
+
+ReferenceArchiveLibrary($(CCLIENT_LIBRARY))
+
+#endif /* UseReferenceCclient */
+
+depend:
+

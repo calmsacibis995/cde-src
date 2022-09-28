@@ -1,0 +1,299 @@
+.TH LIST "" "17 December 1996" "" "TOOLTALK CLASSES"
+.SH NAME
+list - generic linked list classes
+.SH SYNOPSIS
+The generic linked list class macros in tt_list.h are used by class definers
+to create lists of real class instances.  The underlying class is referred
+to as "TYPE" below. Substitute the actual underlying class name in your code.
+.nf
+.sp2
+#include "xxx/TYPE.h"
+
+class TYPE_list {                                                   
+.in +16n
+.ti -10n
+TYPE_list();                                                
+.ti -10n
+TYPE_list(TYPE_list &t);                                
+.ti -10n
+~TYPE_list();                                               
+.ti -10n
+void flush();
+.ti -10n
+TYPE_list& push(const TYPE_ptr &e);
+.ti -10n
+TYPE_list& pop();
+.ti -10n
+TYPE_list& append(const TYPE_ptr &e);
+.ti -10n
+TYPE_list& append_ordered(const TYPE_ptr &e);
+.ti -10n
+TYPE_list& append(TYPE_list_ptr l);
+.ti -10n
+TYPE_list& append_destructive(TYPE_list_ptr l);
+.ti -10n
+TYPE_list& dequeue();
+.ti -10n
+TYPE_ptr top();
+.ti -10n
+TYPE_ptr bot();
+.ti -10n
+TYPE_ptr operator[](int n);
+.ti -10n
+int count();
+.ti -10n
+int is_empty();
+.in -16n
+};
+
+class TYPE_list_cursor {
+.in +16n
+.ti -10n
+TYPE_list_cursor();
+.ti -10n
+TYPE_list_cursor(TYPE_list_cursor &c);
+.ti -10n
+TYPE_list_cursor(TYPE_list_ptr l);
+.ti -10n
+TYPE_ptr operator*();
+.ti -10n
+TYPE_ptr operator->();
+.ti -10n
+TYPE_list_cursor& reset();
+.ti -10n
+TYPE_list_cursor& reset(TYPE_list_ptr l);
+.ti -10n
+int next();
+.ti -10n
+int prev();
+.ti -10n
+TYPE_list_cursor& insert(TYPE_ptr p);
+.ti -10n
+TYPE_list_cursor& remove();
+.ti -10n
+int is_valid();
+.in -16n
+};
+.fi
+.SH DESCRIPTION
+.LP
+The
+.I TYPE_list
+class is a list of other objects.  Simple operations, like pushing new
+elements on the front, can be performed on the list object directly.
+For more complicated operations, such as iterating over each element in the
+list, inserting elements in the middle, or deleting elements from the
+middle, the
+.I TYPE_list_cursor
+class is used. A
+.I TYPE_list_cursor
+instance is a ``finger'' that points into a list. Multiple cursors can point
+into the same list at once, but in the current (and probably final)
+implementation, if one cursor inserts or deletes an element, the other
+cursors can get moderately confused (or
+.I extremely
+confused if the element under a cursor is deleted through another cursor.)
+.LP
+.SH FUNCTIONS
+.SS TYPE_list
+.TP 20n
+TYPE_list()
+The constructor. This just creates an empty list.
+.TP 20n
+TYPE_list(TYPE_list &t)
+The copy constructor. This copies the entire list (a ``top level'' copy; the
+actual elements are not duplicated, but their reference counts are
+incremented.) List copying is quite expensive so this should be used with
+care.
+.TP 20n
+~_TT_link()
+The destructor. This destroys the list, decrementing the reference counts
+for all the elements.
+.TP 20n
+flush()
+Deletes all the elements from the list, decrememting the
+reference counts for all the elements, but preserving
+the list itself intact but empty.
+This is slightly cheaper than destroying the old
+list and making a new one.
+.TP 20n
+push(const TYPE_ptr &e)
+Adds a new element on the top of the list. 
+A reference to the list is returned so operations can be chained.
+.TP 20n
+pop()
+The element at the top of the list is deleted.
+A reference to the list is returned so operations can be chained.
+.TP 20n
+append(TYPE_ptr const &e)
+Adds a new element on the bottom of the list.
+A reference to the list is returned so operations can be chained.
+.TP 20n
+append_ordered(TYPE_ptr const &e)
+Adds a new element in order to a list which is assumed already to
+be in order. 
+This method does not exist for all list types.
+Each list type that does implement it defines the
+ordering for its own convenience.
+A reference to the list is returned so operations can be chained.
+.TP 20n
+append(TYPE_list_ptr l)
+Appends all the elements in list l to the bottom of the list.
+A reference to the list is returned so operations can be chained.
+.TP 20n
+append_destructive(TYPE_list_ptr l)
+Appends the entire list pointed to by l to the list. As a side effect,
+the list pointed to by l becomes empty.
+This admittedly bizarre side effect makes the implementation much faster, since
+the list elements can be reused instead of copied, and for the particular
+use that prompted append_destructive to be added, the side effect is not
+inconvenient since the list being appended is destroyed immediately
+afterwards anyway.
+A reference to the list is returned so operations can be chained.
+.TP 20n
+dequeue()
+The element at the bottom of the list is deleted.
+A reference to the list is returned so operations can be chained.
+.TP 20n
+top()
+Return a TYPE_ptr pointing to the element at the top of the list.
+.TP 20n
+bot()
+Return a TYPE_ptr pointing to the element at the bottom of the list.
+.TP 20n
+operator[](int n)
+Return a TYPE_ptr pointing to the
+.IR n -th
+element of the list.
+.TP 20n
+count()
+Return as an int the number of elements in the list.
+.TP 20n
+is_empty()
+Return 1 if the list is empty or 0 if the list contains at least one element.
+.TP 20n
+flush()
+Removes all the members from the list.  Moderately faster than just
+destroying the list and constructing a new one.
+.SS TYPE_list_cursor
+.TP 20n
+TYPE_list()
+The default constructor. This just creates a cursor that doesn't point
+anywhere. A cursor constructed this way must be
+initialized with the
+.B reset(TYPE_list_ptr l)
+function before anything else is done to it.
+.TP 20n
+TYPE_list_cursor(TYPE_list_cursor &t)
+The copy constructor. This creates another cursor pointing to the same place
+the original cursor pointed.
+.TP 20n
+TYPE_list_cursor(TYPE_list_ptr l)
+The initializing constructor. This creates a cursor pointing before the first
+element in the TYPE_list pointed to by its argument. This is the usual
+way to create a cursor.
+The cursor points ``before the first element'' so that a next() will
+step to the first element.
+.TP 20n
+~_TT_link()
+The destructor. 
+.TP 20n
+operator *()
+Dereferencing a cursor with the unary * operator yields a TYPE_ptr
+pointing to
+to the element under the cursor.
+.TP 20n
+operator ->()
+Dereferencing a cursor with the -> operator gives access to members
+to the element under the cursor.
+.TP 20n
+reset()
+The cursor is reset to point before the first element of the list.
+The cursor points ``before the first element'' so that a next() will
+step to the first element.
+A reference to the list is returned so operations can be chained.
+.TP 20n
+reset(TYPE_list_ptr l)
+The cursor is reset to point before the first element of the named list.
+The cursor points "before the first element" so that a next() will
+step to the first element.
+A reference to the list is returned so operations can be chained.
+.TP 20n
+next()
+The cursor is advanced to the next element in the list.
+The return value is 0 if there is no next element, else 1.
+.TP 20n
+prev()
+The cursor is backed up to the previous element in the list.
+The return value is 0 if there is no previous element, else 1.
+.TP 20n
+insert(TYPE_ptr p)
+Insert a new element after the current element. The new element becomes
+the current element.
+A reference to the list is returned so operations can be chained.
+.TP 20n
+remove()
+Remove the current element.  The cursor is left ``between'' elements
+so that a next() will move the cursor to the element that was after
+the deleted element, and a prev() will move the cursor to the
+element that was before the deleted element.
+A reference to the list is returned so operations can be chained.
+.TP 20n
+is_valid()
+Returns 1 if the cursor points somewhere (so that operator * will work),
+or 0 if the cursor doesn't point anywhere (next() off the end, not
+initialized, etc.)
+.SH EXAMPLES
+.SS Creating _list classes
+Here is a sample .h and .cc file which declares and implements classes
+``sample'', ``sample_ptr'', ``sample_list'', ``sample_list_ptr'', and
+``sample_list_cursor''.
+.nf
+.sp 2
+/* sample.h */
+#ifndef _SAMPLE_H
+#define _SAMPLE_H
+
+#include "util/tt_list.h"
+
+declare_list_of(sample)
+class sample {
+      public:
+	int stuff;
+      private:
+	include_ref_counts(sample);
+};
+#endif
+
+/* sample.cc */
+#include "xxx/sample.h"
+implement_list_of(sample)
+
+
+.fi
+.SS Using _list classes
+.nf
+/* create a list */
+sample_list_ptr l = new sample_list;
+sample_ptr p, q, r;
+
+p = new sample(1);
+q = new sample(2);
+r = new sample(3);
+l->push(p).push(q).push(r); /* note chaining */
+
+/* iterate over the list */
+
+sample_list_cursor c(l);
+while(c.next()) {
+  printf("%d",c->stuff);
+}
+.fi
+.SH BUGS
+.PP
+Cursors should know about each other so deletions don't mess other cursors
+up.
+.PP
+declare_list_of() calls declare_ptr_to() which is unguarded (guards
+are hard inside #defines...), so always use either declare_list_of()
+or declare_ptr_to(), but not both.

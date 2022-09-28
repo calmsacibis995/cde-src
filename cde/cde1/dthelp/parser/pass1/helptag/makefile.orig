@@ -1,0 +1,218 @@
+SHELL=/bin/csh
+# 
+# This makefile should reside in the application directory.  It 
+# defines the rules for creating a MARKUP application.  You should
+# be able to generate correct Makefiles for a new application by
+# modifying this Makefile; there is no need to modify the Makefiles
+# in the constituent directories (util, build, eltdef, parser).
+# 
+
+.SUFFIXES : .e .arc .c .h
+#
+# Macro definitions.  Modify these as necessary for a different
+# MARKUP application.  Usually you only need to supply the correct
+# directory names for the APPLDEFS macro.
+#
+UTIL = ../util/
+
+APPL = ../helptag/
+
+DTDFILE = $(APPL)hptag.dtd
+
+IFFILE = $(APPL)help.if
+
+#
+# The APPLDEFS are passed to the constituent makefiles.  
+#
+APPLDEFS = UTIL=$(UTIL) APPL=$(APPL) DTDFILE=$(DTDFILE) IFFILE=$(IFFILE) PAPPL=$(APPL)
+
+#
+# Header files.  Many are used in PARSER, but are defined here 
+# because they are used by application-dependent files.
+#
+ELTHDRS = $(UTIL)entdef.h $(UTIL)entext.h
+
+PARSEHDRS = $(UTIL)basic.h $(UTIL)trie.h $(UTIL)common.h \
+	$(UTIL)dtddef.h $(UTIL)dtdext.h $(UTIL)sparse.h \
+	../parser/parser.h ../parser/proto.h 
+
+#
+APPLHDRS = $(PARSEHDRS) $(ELTHDRS) \
+	$(UTIL)version.h \
+	$(APPL)global.h $(APPL)charconv.h $(APPL)roman8.h $(APPL)fproto.h \
+	../parser/pval.h ../parser/globdec.h ../parser/signonx.h \
+	../parser/userinc.h 
+
+#
+# DEPENDFILES is a list of all the application-dependent files
+# that need to be put into the PARSER directory.  
+#
+# Modify this part of the Makefile for a different application.
+#
+DEPENDFILES = calculat.o custom.o default.o figure.o \
+	grphpar.o make.o need.o option.o out.o table.o \
+	help.o xref.o 
+
+#
+# Construct the commands used in the rules (e.g., "make clean ...").
+#
+MAKEPROG = make
+MAKECMD = $(MAKEPROG) $(APPLDEFS)
+CLEANCMD = $(MAKEPROG) clean $(APPLDEFS)
+MINICMD = $(MAKEPROG) mini $(APPLDEFS)
+ARCCMD = arc u 
+MAKEARCCMD = $(MAKEPROG) arc $(APPLDEFS)
+UNARCCMD = arc xw
+COPYCMD = cp 
+DELCMD = -rm -f
+
+# Implicit rules for constructing objects 
+.c.o:
+	cc -c -g -I $(UTIL) -I ../parser -I . $<
+	$(COPYCMD) $*.o ../parser/$*.t
+
+#
+# Modify the name of the final executable (MARKUP application).
+#
+tag.e tag all appl : util build eltdef parser
+	$(COPYCMD) ../parser/parser.e tag.e
+
+util :
+	(pushd "../util" ; $(MAKECMD) ; popd )
+
+#
+# The file 'template' is created by each run of BUILD.E.  The
+# template is for generating the application's interface file 
+# (the .if file).
+build :
+	(pushd "../build" ; $(MAKECMD) ; popd )
+	$(COPYCMD) ../build/template .
+
+eltdef :
+	(pushd "../eltdef" ; $(MAKECMD) ; popd )
+
+parser :
+	(pushd "../parser" ; $(MAKECMD) ; popd )
+
+#
+# The target DEPEND causes all application-dependent files to be 
+# compiled and copied to the /PARSER directory.  The "make depend"
+# command is issued from the Makefile in /PARSER.
+# 
+depend : $(DEPENDFILES) 
+
+#
+# Put the application-dependent files into the PARSER directory
+# if they have changed since the last compilation.  
+#
+# Modify this part of the Makefile for a different application.
+#
+calculat.o : calculat.c $(APPLHDRS)
+
+custom.o : custom.c $(APPLHDRS)
+
+default.o : default.c $(APPLHDRS)
+
+figure.o : figure.c $(APPLHDRS) grphpar.h
+
+grphpar.o : grphpar.c grphpar.h $(UTIL)basic.h
+
+make.o : make.c $(APPLHDRS)
+
+need.o : need.c $(APPLHDRS)
+
+option.o : option.c $(APPLHDRS)
+
+out.o : out.c $(APPLHDRS)
+
+table.o : table.c $(APPLHDRS)
+
+#tex.o : tex.c $(APPLHDRS)
+help.o : help.c $(APPLHDRS)
+
+xref.o : xref.c $(APPLHDRS)
+
+# Miscellaneous targets like "clean", "arc", etc.
+
+clean : cleanappl
+	(pushd "../util" ; $(CLEANCMD) ; popd )
+	(pushd "../build" ; $(CLEANCMD); popd )
+	(pushd "../eltdef" ; $(CLEANCMD); popd )
+	(pushd "../parser" ; $(CLEANCMD); popd )
+
+mini minimum minimal : miniappl
+	(pushd "../util" ; $(MINICMD) ; popd )
+	(pushd "../build" ; $(MINICMD); popd )
+	(pushd "../eltdef" ; $(MINICMD); popd )
+	(pushd "../parser" ; $(MINICMD); popd )
+
+cleanappl : 
+	$(DELCMD) *.o
+	$(DELCMD) *.t
+	$(DELCMD) *.a
+	$(DELCMD) *.e
+
+miniappl : 
+	$(DELCMD) *.o
+	$(DELCMD) *.t
+	$(DELCMD) *.a
+
+#
+# ARC generates .ARC files, one for each constituent directory, and
+# places them in the application directory.
+#
+
+arc :
+	@echo Use ARCALL for all of Markup, or ARCAPPL for application files only.
+
+arcall : arcappl arcutil arcbuild arceltdef arcparser 
+
+arcutil :
+	(pushd "../util" ; $(MAKEARCCMD) ; popd ; \
+		$(COPYCMD) ../util/util.arc . )
+
+arcbuild :
+	(pushd "../build" ; $(MAKEARCCMD) ; popd ; \
+		$(COPYCMD) ../build/build.arc . )
+
+arceltdef :
+	(pushd "../eltdef" ; $(MAKEARCCMD) ; popd ; \
+		$(COPYCMD) ../eltdef/eltdef.arc . )
+
+arcparser :
+	(pushd "../parser" ; $(MAKEARCCMD) ; popd ; \
+		$(COPYCMD) ../parser/parser.arc . )
+
+arcappl archptag :
+	if exist hptag.arc $(COPYCMD) hptag.arc hptag.old
+	$(ARCCMD) hptag.arc *.c *.h linkcmd.dos linkcmd.unx $(DTDFILE) tex.if \
+	makefile makefile.doc make.ini delim.* 
+
+#
+# UNARC copies all the .ARC files to the appropriate directories, 
+# then extracts the files from each.
+#
+
+unarc dearc : unarcappl unarcutil unarcbuild unarceltdef unarcparser 
+
+unarcutil :
+	( $(COPYCMD) util.arc ../util; pushd "../util" ; \
+	  $(UNARCCMD) util.arc ; popd )
+
+unarcbuild :
+	( $(COPYCMD) build.arc ../build; pushd "../build" ; \
+	  $(UNARCCMD) build.arc ; popd )
+
+unarceltdef :
+	( $(COPYCMD) eltdef.arc ../eltdef; pushd "../eltdef" ; \
+	  $(UNARCCMD) eltdef.arc; popd )
+
+unarcparser : 
+	( $(COPYCMD) parser.arc ../parser; pushd "../parser" ; \
+	  $(UNARCCMD) parser.arc ; popd )
+
+unarcappl unarchptag :
+	$(UNARCCMD) hptag.arc 
+
+tags :
+	etags -t *.c *.h *.if

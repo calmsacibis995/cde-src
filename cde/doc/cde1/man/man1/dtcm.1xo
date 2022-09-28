@@ -1,0 +1,512 @@
+.TH dtcm 1 "4 April 1995"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.SH NAME
+dtcm \(em the CDE Calendar Manager
+.SH SYNOPSIS
+.yS
+dtcm
+[\-c\0\f2calendar\fP]
+[\-p\0\f2printer\fP]
+[\-v\0\f2view\fP]
+.yE
+.SH DESCRIPTION
+The
+.Cm dtcm
+utility is the GUI for CDE appointment and resource
+scheduling.
+It can be used to:
+.VL 3
+.LI \(bu
+Display day, week, month, and year views of the user's calendar
+.LI \(bu
+Schedule single or repeating calendar entries
+.LI \(bu
+Browse and edit another user's calendar
+.LI \(bu
+Schedule reminders to give the user notice of events
+.LI \(bu
+Restrict access to the user's calendar
+.LI \(bu
+Print high-quality hardcopy
+.LI \(bu
+View and Schedule entries for a group of calendars
+.LI \(bu
+Change the time zone context
+.LI \(bu
+Announce appointments via electronic mail
+.LI \(bu
+Schedule appointments received in electronic mail
+.LE
+.SH OPTIONS
+The following options are available
+along with  all of the standard X Toolkit command-line options:
+.VL 6
+.LI \f3\-c\0\f2calendar\f1
+.br
+Specifies the calendar to display.
+The default value is equivalent to
+.BR $USER@$HOST .
+.LI \f3\-p\0\f2printer\f1
+.br
+Specifies the default printer.
+The default is the system's default printer.
+.LI \f3\-v\0\f2view\f1
+.br
+Specifies the initial view.
+Values can be
+.BR day ,
+.BR week ,
+.BR month
+or
+.BR year .
+.LE
+.SH OPERANDS
+None.
+.SH STDIN
+Not used.
+.SH "INPUT FILES"
+None.
+.SH "ENVIRONMENT VARIABLES"
+The following environment variables affect the execution of
+.Cm dtcm :
+.VL 15
+.LI \f2HOME\fP
+Determine the user's home directory,
+the location of configuration files.
+.LI \f2LANG\fP
+Provide a default value for the internationalization variables
+that are unset or null.
+If
+.I LANG
+is unset or null, the corresponding value from the
+implementation-specific default locale will be used.
+If any of the internationalization variables contains an invalid setting,
+dtcm behaves as if none of the variables had been defined.
+.LI \f2LC_ALL\fP
+If set to a non-empty string value,
+override the values of all the other internationalization variables.
+.LI \f2LC_MESSAGES\fP
+Determine the locale that is used to affect
+the format and contents of diagnostic
+messages written to standard error
+and informative messages written to standard output.
+.LI \f2NLSPATH\fP
+Determine the location of message catalogues
+for the processing of
+.IR LC_MESSAGES .
+.LI \f2XAPPLRESDIR\fP
+Specify the name of a directory that contains application-specific resources.
+If this environment variable
+is defined, and is set to an existing directory, then it is searched (in
+addition to the standard locations) for files containing
+application-specific resource specifications.
+.LI \f2XENVIRONMENT\fP
+.br
+Specify the name of a resource file with
+user- or machine-specific resources.
+If this variable is not defined,
+.Cm dtcm
+looks for a file named
+.BR $HOME/.Xdefaults- \c
+.I hostname
+instead,
+where
+.I hostname
+is the name of the host where the application is executing.
+.LI \f2XFILESEARCHPATH\fP
+.br
+Define a language-dependent location of
+.BR app-defaults .
+.LI \f2XMODIFIER\fP
+Specify which input method to use.
+.LI \f2XUSERFILESEARCHPATH\fP
+.br
+Control where X applications look for their
+.B app-defaults
+resource files.
+The default is located in the directory
+.BR /usr/dt/app-defaults .
+The user must set
+.I XUSERFILESEARCHPATH
+if the user's resource
+files are not in this location.
+.LE
+.SH "RESOURCES"
+The
+.Cm dtcm
+utility allows the user to specify behavior through X11 resources
+as well as the command-line interface.
+The application class name for
+.Cm dtcm
+is
+.BR Dtcm .
+To set application resources, the user can copy the system default version of
+the file
+.B /usr/dt/app-defaults/<LANG>/Dtcm
+to a personal version
+(typically
+.BR $HOME/app-defaults/Dtcm ,
+but the location is dependent on the value of the
+.I XAPPLRESDIR
+environment variable)
+and edit it with the appropriate changes.
+The following are the supported resources and their default values:
+.P
+.cde .ne 10
+.DS
+.TS
+.xo expand box tab(@);
+.cde center expand tab(@);
+cf3 ssss
+.xo lf3 1 | lf3 1 | lf3 1 | lf3 1
+.xo lf3 1 | lf3 1 | lf3 1 | l   1 .
+.cde lf3 1 lf3 1 lf3 1 lf3 1
+.cde lf3 1 lf3 1 lf3 1 l   1 .
+Basic Resources
+_
+Name@Class@Type@Default
+_
+labelFont@LabelFont@XmRFontList@\f2varies\fP
+viewFont@ViewFont@XmRFontList@\f2varies\fP
+boldFont@BoldFont@XmRFontList@\f2varies\fP
+iconFont@IconFont@XmRFontList@-dt-application-bold-r-normal-
+@@@   sans-*-180-*-*-p-*-*-*:
+application-@Application-@XmRXmString@application
+   FontFamily@   FontFamily
+.TE
+.P
+.VL 6
+.LI \f3labelFont\fP
+.br
+Specifies the font to use for the labels in the calendar's views.
+.LI \f3viewFont\fP
+.br
+Specifies the font to use for the text of the appointments in the
+calendar's views.
+.LI \f3boldFont\fP
+.br
+Specifies the font to use for the time ranges in the week view.
+.LI \f3iconFont\fP
+.br
+Specifies the icon font.
+.LI \f3applicationFontFamily\fP
+.br
+Specifies the font family name to use for the text of the
+appointments in the calendar's views.
+A font will be used
+with this family name and appropriate size to match the
+system font size chosen via
+.Cm dtstyle 1.
+The
+.B viewFont
+and
+.B boldFont
+resources have a higher precedent than
+.BR applicationFontFamily .
+.LE
+.SH "ASYNCHRONOUS EVENTS"
+.xo Default.
+.cde The
+.cde .Cm dtcm
+.cde utility takes the standard action for all signals.
+.SH STDOUT
+Not used.
+.SH STDERR
+Used only for diagnostic messages.
+.SH "OUTPUT FILES"
+None.
+.SH "EXTENDED DESCRIPTION"
+A
+.I calendar
+is a persistent entity existing somewhere on the network,
+which contains scheduling data for a
+.IR user .
+A
+.I "calendar entry"
+is an event recorded within the context of a calendar.
+Calendar entries supported by
+.Cm dtcm
+are
+.I appointment
+and
+.IR to-do .
+Calendar entries can be
+.I single
+or
+.I repeat
+entries.
+A calendar entry may have one or more
+.I reminders
+associated with it.
+A reminder causes
+.Cm dtcm
+to notify the user by issuing an
+.I alarm
+when the system time enters the user's specified
+.I "reminder notice period"
+before the event.
+When viewing the user's calendar, there is the notion of the
+.IR "current date" ,
+which is the date the user last selected by selecting the Day View,
+or by clicking in any of the other views.
+The current date does not change until the user selects
+another date, even if he or she
+has navigated out of a view that would contain
+the current date.
+.P
+The
+.Cm dtcm
+utility presents a
+.IR "network calendar model" .
+To operate on a calendar
+belonging to some user on the network,
+.Cm dtcm
+establishes a session with a
+.IR "calendar server" .
+The calendar server is (conceptually at least)
+a separate process running on the host where the calendar is located.
+It manages all the calendars for the host on which it is running, and
+can service multiple connected applications simultaneously.
+The calendar server responds to authentication, session control and
+calendar transactions initiated by
+.Cm dtcm .
+In addition,
+.Cm dtcm
+responds to
+events occurring at the server, such as updates caused by other connected
+application instances.
+.HU Usage
+The
+.Cm dtcm
+utility has a single main window, containing a graphical calendar.
+The user can choose to view day, week, month or year in the main window.
+Navigating between the views is achieved by selecting the view from the
+.I View
+menu, or by clicking one of the navigation buttons displayed
+in the current view.
+.VL 6
+.LI "\f3File Menu\fP"
+.VL 6
+.LI "\f3Print Current View\fP"
+.br
+Prints hard-copy based on the currently displayed calendar view.
+.LI "\f3Print .\|.\|.\fP"
+Allows the user to specify parameters for a print job, such as
+number of copies, orientation, scaling, report type.
+.LI "\f3Options .\|.\|.\fP"
+.br
+Displays default options for all of
+.Cm dtcm 's
+global attributes.
+.LI "\f3Exit\fP"
+Terminates the
+.Cm dtcm
+application.
+.LE
+.LI "\f3Edit Menu\fP"
+.VL 6
+.LI "\f3Appointment .\|.\|.\fP"
+.br
+Displays the appointment editor, described below.
+.LI "\f3ToDo .\|.\|.\fP"
+Displays the To Do editor, described below.
+.LE
+.LI "\f3View Menu\fP"
+.VL 6
+.LI "\f3Day\fP"
+Changes the current view in the main window to Day View.
+.LI "\f3Week\fP"
+Changes the current view in the main window to Week View.
+.LI "\f3Month\fP"
+Changes the current view in the main window to Month View.
+.LI "\f3Year\fP"
+Changes the current view in the main window to Year View.
+.LI "\f3Appointment List .\|.\|.\fP"
+.br
+Displays the
+.I "Appointment List"
+dialog box.
+.LI "\f3ToDo List .\|.\|.\fP"
+.br
+Displays the
+.I "ToDo List"
+dialog box.
+.LI "\f3Find .\|.\|.\fP"
+Displays the
+.I Find
+dialog box, so the user can locate
+calendar entries by specifying some search criteria.
+.LI "\f3Go to Date .\|.\|.\fP"
+.br
+Displays the
+.I "Go to Date"
+dialog, so the user can
+change the view to a specified date.
+This is a convenient
+way to get to dates that are distant from the current date.
+.LI "\f3Time Zone\fP"
+Displays the
+.I "Time Zone"
+dialog, so the user can
+set the time zone to which appointment times are relative.
+.LE
+.LI "\f3Browse Menu\fP"
+.VL 6
+.LI "\f3Show Other Calendar .\|.\|.\fP"
+.br
+Displays a dialog box,
+in the main window,
+to let the user connect to a different calendar than
+the one currently displayed.
+Only a single calendar is displayed at once.
+.LI "\f3Compare Calendars .\|.\|.\fP"
+.br
+Displays the
+.I "Compare Calendars"
+dialog box, described below.
+.LI "\f3Menu Editor .\|.\|.\fP"
+.br
+Displays a dialog box that allows the user to add frequently used calendars
+to the
+.I Browse
+menu for this and future sessions with
+.Cm dtcm .
+.LI "\f3<user>@<host>\fP"
+.sp -0.4v
+.LI "\f3\&.\|.\|.\fP"
+This sequence of entries consists of the user's own calendar, followed by
+an optional list of calendars that the user can add to the menu using the
+.I "Menu Editor 
+option described above.
+The user's own calendar always appears first.
+The other options are listed in alphabetical order.
+.LE
+.LE
+.HU "Secondary Windows"
+In addition to the main window,
+.Cm dtcm
+has several secondary windows,
+which give the user access to the scheduling and browsing features of
+.Cm dtcm .
+.P
+The
+.I "Appointment Editor"
+allows scheduling of appointments.
+An appointment
+is the most common type of calendar entry.
+It is useful for scheduling time slots in the user's
+calendar, and can be exported to other users either by
+direct entry to their calendars, or through electronic mail.
+To invoke the appointment editor, the user selects it from the
+.I Edit
+menu in the main window, or double-clicks anywhere in the
+graphical calendar view.
+.P
+The
+.I "To Do Editor"
+allows the user to maintain a list of to-do items for his or her
+personal use.
+To-do entries are not visible to other
+.Cm dtcm
+users who
+are browsing the user's calendar; they are private to the user.
+To-do entries differ
+from appointments in that they do not necessarily appear as scheduled events
+in the user's calendar views.
+If a to-do entry has a
+.I "Due Date"
+associated with it,
+it will be displayed in the calendar view.
+The main purpose of to-do entries
+is to allow the user to maintain a list of work items, without necessarily
+allocating calendar time for them.
+The to-do editor is invoked by selecting
+it from the
+.I Edit
+menu in the main window.
+.P
+The
+.I "Group Appointment Editor"
+allows the user to schedule an appointment on
+multiple calendars at once.
+It is invoked by clicking
+.I Schedule
+in the
+.I "Compare Calendars"
+window.
+The user may optionally
+announce the appointment over electronic mail.
+.P
+The
+.I "Compare Calendars"
+window allows the user to connect to several calendars
+simultaneously, and get a graphical overview of busy and available time
+in the resultant ``virtual calendar.''
+The compare calendars window is invoked by
+selecting it from the
+.I Browse
+menu in the main window.
+.P
+The
+.I Options
+window, accessible from the
+.I File
+menu, gives the user access
+to the
+.Cm dtcm
+options that the user can configure.
+There are several
+categories of options:
+Editor Defaults; Display Settings; Access List and
+Permissions; Printer Settings and Date Format.
+The user can set the options to suit his or her
+requirements, and save them by clicking
+.IR Apply .
+.SH "EXIT STATUS"
+The following exit values are returned:
+.VL 4
+.LI \h"\w'>'u"0
+Successful completion.
+.LI >0
+An error occurred.
+.LE
+.SH "CONSEQUENCES OF ERRORS"
+Default.
+.SH "APPLICATION USAGE"
+None.
+.cdes
+.SH FILES
+.TP 20
+.B /usr/dt/bin/dtcm
+The executable for
+.Cm dtcm .
+.TP 20
+.B /usr/dt/app-defaults/<LANG>/Dtcm
+The system-default application defaults file for
+.Cm dtcm .
+.TP 20
+.B /usr/dt/appconfig/types/<LANG>/dtcm.dt
+The file of default calendar-specific actions.
+See
+.BR dtactionfile (4).
+.TP 20
+.B /usr/dt/bin/rpc/rpc.cmsd
+The calendar daemon (server) that manages calendars on a machine.
+.TP 20
+.B /var/spool/calendar/callog.<user>
+The persistent calendar database for a user on this machine.
+.cdee
+.SH EXAMPLES
+None.
+.SH "SEE ALSO"
+.Cm rpc.cmsd 1,
+.Cm dtcm_delete 1,
+.Cm dtcm_editor 1,
+.Cm dtcm_insert 1,
+.Cm dtcm_lookup 1,
+.BR dtactionfile (4),
+.BR X11 (7).

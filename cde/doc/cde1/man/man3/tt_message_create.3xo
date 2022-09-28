@@ -1,0 +1,61 @@
+.TH tt_message_create 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+tt_message_create \- create a new message object
+.SH SYNOPSIS
+.yS
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'Tt_message tt_message_create('u
+Tt_message tt_message_create(void);
+.yE
+.SH DESCRIPTION
+The
+.Fn tt_message_create
+function creates a new message object.
+.P
+The ToolTalk service returns a message handle that is an opaque pointer to a
+ToolTalk structure.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn tt_message_create
+function returns the unique opaque handle that identifies the message object.
+The application can use
+.Fn tt_ptr_error 3
+to extract one of the following
+.B Tt_status
+values from the returned handle:
+.VL 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_NOMP
+.br
+The
+.Cm ttsession 1
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_PROCID
+.br
+The process identification is not valid.
+.LE
+.SH "APPLICATION USAGE"
+A return value of
+.Cn TT_ERR_PROCID
+implies that
+.Fn tt_open 3
+was not issued before
+.Fn tt_message_create .
+.P
+If the ToolTalk service is unable to create a message when requested,
+.Fn tt_message_create
+returns an invalid handle.
+When the application attempts to use this handle with another
+ToolTalk function, the ToolTalk service will return
+.Cn TT_ERR_POINTER .
+.SH "SEE ALSO"
+.Hd Tt/tt_c.h 5,
+.Fn tt_open 3,
+.Fn tt_message_send 3,
+.Fn tt_message_destroy 3.

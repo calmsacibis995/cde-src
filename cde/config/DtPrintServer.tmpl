@@ -1,0 +1,108 @@
+/*
+ * Server imakefile info  - this contains any special redefinitions, etc.
+ * that Imakefiles in the server subtree will need.
+ */
+
+XCOMM $XConsortium: Server.tmpl,v 1.5 91/05/06 19:00:26 rws Exp $
+
+#define PassCDebugFlags 'CDEBUGFLAGS=$(CDEBUGFLAGS)' 'CC=$(CC)' 'CCOPTIONS=$(CCOPTIONS)'
+
+#ifndef ServerCcCmd
+#define ServerCcCmd CcCmd
+#endif
+#ifndef ServerCCOptions
+#define ServerCCOptions DefaultCCOptions
+#endif
+#ifndef ServerDefines
+#define ServerDefines StandardDefines
+#endif
+#ifndef ServerCDebugFlags
+#define ServerCDebugFlags OptimizedCDebugFlags
+/* #define ServerCDebugFlags -g */
+#endif
+
+         CC = ServerCcCmd
+  CCOPTIONS = ServerCCOptions
+CDEBUGFLAGS = ServerCDebugFlags
+EXT_DEFINES = ExtensionDefines
+
+/*
+ * Hacks to get this stuff to compile in the wrong place in the tree.
+ */
+SERVERSRC = $(DTPRINTSERVICESSRC)/server
+
+/*
+ * This sort of stuff is usually in Project.tmpl, but this is specific
+ * to our little world
+ */
+#define XprintServer                 YES
+#define BuildPrintServer             YES
+
+#define BuildPrintBezierExt	     NO
+#define BuildPrintXTestExt1          NO
+#define BuildPrintShapeExt           YES
+#define BuildPrintShmExt             YES
+#define BuildPrintPexExt             YES
+#define BuildPrintMultiBufferExt     YES
+#define BuildPrintXInputExt          NO
+#define BuildPrintXTestExt           NO
+#define BuildPrintBigReqExt          YES
+#define BuildPrintMITMiscExt         YES
+#define BuildPrintXIdleExt           NO
+#define BuildPrintXIE                NO
+#define BuildPrintXTrapExt           NO
+#define BuildPrintScreenSaverExt     NO
+#define BuildPrintXvExt		     NO
+
+#if BuildPrintBezierExt
+BEZIERDEFINES= -DBEZIER
+#endif
+#if BuildPrintXTestExt1
+XTESTEXT1DEFINES= -DXTESTEXT1
+#endif
+#if BuildPrintShapeExt
+SHAPEDEFINES= -DSHAPE
+#endif
+#if BuildPrintShmExt
+SHMDEFINES= -DMITSHM
+#endif
+#if BuildPrintPexExt
+PEXDEFINES= -DPEX
+#endif
+#if BuildPrintMultiBufferExt
+MULTIBUFDEFINES= -DMULTIBUFFER
+#endif
+#if BuildPrintXInputExt
+INPUTDEFINES= -DXINPUT
+#endif
+#if BuildPrintXTestExt
+XTESTDEFINES= -DXTEST
+#endif
+#if BuildPrintBigReqExt
+BIGREQDEFINES= -DBIGREQS
+#endif
+#if BuildPrintMITMiscExt
+MITMISCDEFINES= -DMITMISC
+#endif
+#if BuildPrintXIdleExt
+IDLEDEFINES= -DXIDLE
+#endif
+/*
+ * What about XIE ?
+ */
+#if BuildPrintXTrapExt
+XTRAPDEFINES= -DXTRAP
+#endif
+#if BuildPrintScreenSaverExt
+SCREENSAVERDEFINES= -DSCREENSAVER
+#endif
+#if BuildPrintXvExt
+XVDEFINES= -DXV
+#else
+XVDEFINES=
+#endif
+
+PRINT_EXT_DEFINES = $(BEZIERDEFINES) $(XTESTEXT1DEFINES) $(SHAPEDEFINES) $(SHMDEFINES) $(PEXDEFINES) $(MULTIBUFDEFINES) $(INPUTDEFINES) $(XTESTDEFINES) $(BIGREQDEFINES) $(MITMISCDEFINES) $(IDLEDEFINES) $(XTRAPDEFINES) $(SCREENSAVERDEFINES) $(XVDEFINES)
+
+
+STD_DEFINES = StandardDefines $(PRINT_EXT_DEFINES) AllocateLocalDefines

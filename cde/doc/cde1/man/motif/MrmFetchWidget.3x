@@ -1,0 +1,108 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Novell, Inc
+...\" **
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH MrmFetchWidget 3X
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIMrmFetchWidget\fP \- Fetches and creates any indexed (UIL named) application widgets and its children
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Mrm/MrmPublic.h>
+.sp \n(PDu
+Cardinal MrmFetchWidget(\fBhierarchy_id, index, parent_widget, widget, class\fI)
+.ta .5i 1.5i
+.nf
+	MrmHierarchy	\fBhierarchy_id\fI;
+	String	\fBindex\fI;
+	Widget	\fBparent_widget\fI;
+	Widget	*\fBwidget\fI;
+	MrmType	*\fBclass\fI;
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+The
+\fIMrmFetchWidget\fP
+function
+fetches and creates an
+indexed application widget and its children.
+The indexed application widget is any widget that is named in UIL.
+In
+.ne 2i
+fetch operations, the fetched widget's subtree is also
+fetched and created.
+This widget must not appear as the child of a widget within its own
+subtree. \fIMrmFetchWidget\fP does not execute \fIXtManageChild\fP
+for the newly created widget.
+.IP "\fBhierarchy_id\fP"
+Specifies the ID of the \fIuid\fP hierarchy that contains the
+interface definition.
+The \fBhierarchy_id\fP was returned in a previous call to
+\fIMrmOpenHierarchyPerDisplay\fP.
+.IP "\fBindex\fP"
+Specifies the UIL name of the widget to fetch.
+.IP "\fBparent_widget\fP"
+Specifies the parent widget ID.
+.IP "\fBwidget\fP"
+Returns the widget ID of the created widget.
+.IP "\fBclass\fP"
+Returns the class code identifying MRM's widget class.
+The widget class code for the main window widget, for example, is
+\fIMRMwcMainWindow\fP.
+Literals identifying MRM widget class codes are defined in \fIMrm.h\fP.
+.PP 
+An application can fetch
+any named widget in the \fIuid\fP hierarchy using
+\fIMrmFetchWidget\fP.
+\fIMrmFetchWidget\fP
+can be called at any time to fetch a widget that was not fetched at
+application startup.
+\fIMrmFetchWidget\fP
+can be used to defer fetching pop-up
+widgets until they are first
+referenced (presumably in a callback), and then used to fetch them
+once.
+.PP 
+\fIMrmFetchWidget\fP
+can also create multiple instances of a widget (and its subtree).
+In this case, the \fIuid\fP definition functions as a template;
+a widget definition can be fetched any number of times.
+An application can use
+this to make multiple instances of a widget, for example, in a
+dialog box box or menu.
+.PP 
+The index (UIL name) that identifies the widget must be
+known to the application.
+.nL
+.ne 15
+.SH RETURN VALUE
+This function returns one of these status return constants:
+.IP "\fIMrmSUCCESS\fP"
+The function executed successfully.
+.IP "\fIMrmBAD_HIERARCHY\fP"
+The hierarchy ID was invalid.
+.IP "\fIMrmNOT_FOUND\fP"
+The widget was not found in UID hierarchy.
+.IP "\fIMrmFAILURE\fP"
+The function failed.
+.SH RELATED INFORMATION
+.na
+\fIMrmOpenHierarchyPerDisplay(3X)\fP,
+\fIMrmFetchWidgetOverride(3X)\fP.
+.ad

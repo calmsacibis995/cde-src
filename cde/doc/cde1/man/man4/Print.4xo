@@ -1,0 +1,142 @@
+.TH Print 4 "13 May 1994"
+.SH NAME
+Print request \- print a document
+.SH SYNOPSIS
+.yS
+.ta \w'[\f2file\fP] Print('u
+[\f2file\fP] Print(in \f2mediaType contents\fP,
+	in boolean \f2inquisitive\fP,
+	in boolean \f2covert\fP
+	[in title \f2docName\fP]);
+.yE
+.SH DESCRIPTION
+The
+.I Print
+request causes the handler to print a document.
+The handler must act as if the user had issued,
+(via the handler's user interface)
+either a ``Print One'' or ``Print...'' command,
+depending on the value of the
+.I inquisitive
+argument.
+.P
+The
+.I contents
+argument
+is the contents of the document.
+If this argument is unset
+(in other words, has a value of
+.BR (char\ *)0 ) ,
+then the contents of the document are in
+the file named in the message's
+.I file
+attribute.
+The data type
+.RI ( mediaType )
+of the
+.I contents
+argument should be
+.BR string ,
+unless nulls are valid in the given media type,
+in which case the data type must be
+.BR bytes .
+.P
+The
+.I inquisitive
+argument is a
+.B boolean
+value
+indicating whether the handler is allowed to block on user input
+while carrying out the request.
+However, even if
+.I inquisitive
+is True, the handler is not required to seek such input.
+.P
+The
+.I covert
+argument is a
+.B boolean
+value indicating whether the handler may make itself apparent to the user
+as it carries out the request.
+If False, the recipient need not make itself apparent.
+.P
+If both the
+.I inquisitive
+argument and the
+.I covert
+argument are True, the recipient should attempt to limit its presence
+to the minimum needed to receive any user input desired;
+for example, through iconification.
+.P
+The
+.I docName
+argument contains the name of the document.
+If the
+.I docName
+argument is absent and the
+.I file
+attribute is set,
+the file name is considered to be the title of the document.
+This string would be suitable for display in a window title bar, for example.
+.SH "APPLICATION USAGE"
+The
+.Fn ttmedia_ptype_declare 3
+function can be used to register for,
+and help process, this message.
+.P
+This message can be sent with the
+.Fn ttmedia_load 3
+function.
+.SH EXAMPLES
+To print a PostScript document, the application can send a request of the form:
+.Cs I
+.ta \w'Print('u
+Print(in PostScript \f2contents\fP,
+	in boolean \f2inquisitive\fP,
+	in boolean \f2covert\fP);
+.Ce
+.P
+with a first argument whose value is a vector of bytes such as:
+.Cs I
+%!\en/inch {72 mul} def...
+.Ce
+.P
+The
+.B \en
+in the example represents the ISO C newline character.
+.P
+To print a PostScript document contained in a file,
+the application can send the
+.I Print
+request as above,
+with the
+.I file
+attribute set to the relevant file
+and with the value of the first argument not set.
+.SH ERRORS
+The ToolTalk service may return one of the following errors
+in processing the
+.I Print
+request:
+.VL 6
+.Lc TT_DESKTOP_ENOENT
+.br
+The file that was alleged to contain the document does not exist.
+.Lc TT_DESKTOP_ENODATA
+.br
+The in-mode
+.I contents
+argument had no value and the
+.I file
+attribute
+of the message was not set.
+.Lc TT_MEDIA_ERR_FORMAT
+.br
+The document is not a valid instance of the media type.
+.LE
+.SH "SEE ALSO"
+.Fn ttmedia_ptype_declare 3,
+.Fn ttmedia_load 3;
+.IR Intro ,
+.I Status
+requests.

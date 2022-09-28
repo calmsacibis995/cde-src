@@ -1,0 +1,108 @@
+.TH ttdt_subcontract_manage 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+ttdt_subcontract_manage \- manage an outstanding request
+.SH SYNOPSIS
+.yS
+#include <Tt/tttk.h>
+.sp 0.5v
+.ta \w'Tt_pattern *ttdt_subcontract_manage('u
+Tt_pattern *ttdt_subcontract_manage(Tt_message \f2subcontract\fP,
+	Ttdt_contract_cb \f2cb\fP,
+	Widget \f2shell\fP,
+	void *\f2clientdata\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn ttdt_subcontract_manage
+function
+allows a requester to manage the standard Desktop interactions
+with the tool that is handling the request.
+The
+.Fn ttdt_subcontract_manage
+function registers in the default session for
+.Cn TT_HANDLER -\c
+addressed requests
+.IR Get_Geometry
+and
+.IR Get_XInfo ,
+and
+.IR Status
+notices.
+.P
+If
+.I shell
+is not
+.Cn NULL ,
+the ToolTalk service
+handles the
+.IR Get_Geometry
+and
+.IR Get_XInfo ,
+and
+.IR Status
+notices transparently;
+otherwise, it passes them to
+.IR cb .
+.P
+See
+.Fn ttdt_session_join 3
+for a description of a
+.B Ttdt_contract_cb
+callback.
+.P
+If
+.I subcontract
+is destroyed by
+.Fn tttk_message_destroy ,
+then the patterns will also be destroyed;
+otherwise, the caller
+is responsible for iterating over the array and destroying each pattern.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn ttdt_subcontract_manage
+function
+returns a null-terminated array of
+.BR Tt_pattern ,
+and associates this array with
+.IR subcontract ;
+otherwise, it returns an error pointer.
+The application can use
+.Fn tt_ptr_error 3
+to extract one of the following
+.B Tt_status
+values from the returned handle:
+.VL 8
+.Lc TT_DESKTOP_EINVAL
+.br
+Both the
+.I shell
+and
+.I cb
+arguments were
+.Cn NULL .
+.Lc TT_ERR_NOMEM
+.br
+There is insufficient memory available to perform the function.
+.Lc TT_ERR_NOMP
+.br
+The
+.Cm ttsession 1
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_POINTER
+.br
+The
+.I subcontract
+argument was not a valid
+.BR Tt_message .
+.Lc TT_ERR_PROCID
+.br
+The specified process identifier is out of date or invalid.
+.LE
+.SH "SEE ALSO"
+.Hd Tt/tttk.h 5,
+.Fn ttdt_session_join 3,
+.Fn tttk_message_destroy 3.

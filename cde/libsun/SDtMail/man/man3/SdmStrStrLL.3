@@ -1,0 +1,83 @@
+.de LI
+.\" simulate -mm .LIs by turning them into .TPs
+.TP \\n()Jn
+\\$1
+..
+.de Lc
+.\" version of .LI that emboldens its argument
+.TP \\n()Jn
+\s-1\f3\\$1\f1\s+1
+..
+.TH SdmStrStrLL 3 "05/07/96"
+.BH "05/07/96"
+.\" @(#)SdmStrStrLL.3	1.3 96/05/07 SMI
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994, 1995, 1996 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994, 1995, 1996 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994, 1995, 1996 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994, 1995, 1996 Novell, Inc.
+.SH NAME
+SdmStrStrLL \- vector of pointers to vectors of SdmStrStrL objects
+.SH SYNOPSIS
+.\"
+.SS Includes
+.ft 3
+.nf
+#include <Sdtmail.hh>
+.\"
+.SS Creation
+.ft 3
+.nf
+.sp 0.5v
+.ta \w'new SdmStrStrLL('u
+new SdmStrStrLL();
+.PP
+.ft 3
+.ta \w'new SdmStrStrLL('u
+new SdmStrStrLL(int \f2numelements\fP);
+.PP
+.ft 3
+.ta \w'new SdmStrStrLL('u
+new SdmStrStrLL(const SdmStrStrLL& \f2strstrll\fP);
+.fi
+.ft 1
+.\"
+.\" end of methods list
+.ta 0.25i 0.50i 0.75i 1.0i 1.25i 1.50i 1.75i 2.0i 2.5i 3.0i
+.SH DESCRIPTION
+The SdmStrStrLL object is a convenience object; it is merely a vector of
+SdmStrStrL objects:
+.PP
+.nf
+	typedef SdmPtrVector<SdmStrStrL *> SdmStrStrLL;
+.fi
+.PP
+It is extensively used to return lists of lists of string pairs; for example, retrieval
+of headers, attributes, etc. from multiple messages.
+.SH Operators nad Methods
+All operators and methods that are valid for any class templated from the
+SdmPtrVector template class apply to the SdmStrStrLL object. The contained
+SdmStrStrL objects can then be manipulated with operators and methods that are
+valid for any class templated from the SdmVector template class.
+.SS Vector Contents
+This is a pointer (as opposed to an object) vector; only pointers to the actual
+objects are stored in such a vector; therefore, any such object need not have
+copy constructor and assignment operators.
+.PP
+Since the SdmPtrVector container stores pointers to objects as opposed to copies
+of actual objects themselves, care must be taken when assigning and copying
+pointers into and out of the vector.
+.PP
+By default, the contents of the vector are NOT automatically destroyed when the
+vector itself is destroyed. You must make sure that the objects are destroyed
+when they are no longer needed (to avoid memory leaks), and make sure that the
+destructor for each object is not called more than once.
+.\"
+.PP
+.RE
+.nr )J 0
+.SH "SEE ALSO"
+.na
+.BR SdmPtrVector (3),
+.BR SdmStrStr (3),
+.BR SdmStrStrL (3)

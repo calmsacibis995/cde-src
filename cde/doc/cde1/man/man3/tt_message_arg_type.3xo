@@ -1,0 +1,66 @@
+.TH tt_message_arg_type 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+tt_message_arg_type \- retrieve the type of a message argument
+.SH SYNOPSIS
+.yS
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'char *tt_message_arg_type('u
+char *tt_message_arg_type(Tt_message \f2m\fP,
+	int \f2n\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn tt_message_arg_type
+function
+retrieves the type of the
+.IR n th
+message argument.
+.P
+The
+.I m
+argument is the opaque handle for the message involved in this operation.
+The
+.I n
+argument is the number of the argument to be retrieved.
+The first argument is numbered zero.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn tt_message_arg_type
+function returns the type of the
+.IR n th
+message argument.
+The application can use
+.Fn tt_ptr_error 3
+to extract one of the following
+.B Tt_status
+values from the returned pointer:
+.VL 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_NOMP
+.br
+The
+.Cm ttsession 1
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_NUM
+.br
+The integer value passed was invalid (out of range).
+.Lc TT_ERR_POINTER
+.br
+The pointer passed does not point to an object of
+the correct type for this operation.
+.LE
+.SH "APPLICATION USAGE"
+The application can use
+.Fn tt_free 3
+to free any data stored in the address returned by the
+ToolTalk API.
+.SH "SEE ALSO"
+.Hd Tt/tt_c.h 5,
+.Fn tt_ptr_error 3,
+.Fn tt_free 3.

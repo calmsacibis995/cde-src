@@ -1,0 +1,56 @@
+/* XPM */
+/****************************************************************
+*  Copyright (c) 1996 Sun Microsystems, Inc.
+*  All Rights Reserved
+*****************************************************************/
+static char * SDtwebbr_m_pm[] = {
+/* width height ncolors cpp [x_hot y_hot] */
+"32 32 14 1 0 0",
+/* colors */
+" 	s none	m none	c none",
+".	s iconGray5	m black	c #737373737373",
+"X	s iconGray7	m black	c #424242424242",
+"o	s iconGray2	m white	c #bdbdbdbdbdbd",
+"O	s iconGray4	m white	c #949494949494",
+"+	s iconColor2	m white	c white",
+"@	s iconColor5	m black	c blue",
+"#	s iconGray8	m black	c #212121212121",
+"$	s iconColor7	m white	c cyan",
+"%	s iconColor4	m white	c green",
+"&	s iconGray6	m black	c #636363636363",
+"*	s iconColor1	m black	c black",
+"=	s iconGray3	m white	c #adadadadadad",
+"-	s iconGray1	m white	c #dededededede",
+/* pixels */
+"             .XXXXXXX.          ",
+"           .XXoOo+oo@XX.++.     ",
+"          XXo+++o++ooOoX.#+.    ",
+"         XOo++++oo$Oo$@O@. +#   ",
+"         Xo++++$%$oOO&O&OX#+#   ",
+"        Xoo++++%$o$OOO&&@O++.   ",
+"   +++++Xooo+%ooo$oO&%&O++##    ",
+"  +.###Xo+o+oo$ooooo++++##@X    ",
+" +.#   XO@$@%$o+++++#####&XX    ",
+"  +++++++++++++#####O&oO&OX*    ",
+"  .############O$o%O&&@&&XX*    ",
+"       ##O@OoO$Oo&OO$oO&&X@*    ",
+"       XO@OoO%&@O$O$@&&XXXXX    ",
+"       XOO@OoO&&&&@&$OX&X@*X    ",
+"    .+++++++++++++&&@&XXXX*+    ",
+"    +=============#XXXXX@*X#++  ",
+"    +=XXXXXXXXXXO=#XX@XXX*  .#+ ",
+"    +=X.........+=#@XX@**.    +#",
+"    +=X.+O......+=#X****.     +#",
+"    +=X.+.......+=#***X       +#",
+"    +=X.........+=#*X        +#.",
+"    +=X.........+=#        ++#. ",
+"    +=X.........+=#      ++##.  ",
+"    +=O++++++++++=#    ++##.    ",
+"    +=============#   +##.      ",
+"    .#############.  +#.        ",
+"       #X&&&&&X#    +#.         ",
+"   .................##          ",
+"  ++.+.+.+.+.+.++.+.+#          ",
+" ++.+.+.+.+.+.+.++.+++#         ",
+"-----------------------#        ",
+"########################        "};

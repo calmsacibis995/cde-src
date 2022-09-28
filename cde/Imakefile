@@ -1,0 +1,121 @@
+XCOMM $XConsortium: Imakefile /main/cde1_maint/5 1995/11/21 11:53:16 barstow $
+
+#define IHaveSubdirs
+#define PassCDebugFlags
+
+      WORLDOPTS = -k
+     CHECKFNSRC = $(UTILSRC)/checkfn
+        CHECKFN = $(CHECKFNSRC)/checkfn
+/* define DONT_BUILD_LEARNING_PRODUCTS in localtree.tmpl
+ * if you don't want to build this big chunk.
+ * This also prevents the man pages from building.
+ */
+
+#ifndef DONT_BUILD_LEARNING_PRODUCTS
+COSE_LEARN_PROD=doc/cde1/LearningProducts
+CDEMANDIR = doc/cde1/man
+#endif
+
+#if SunCDE
+SUNCDE_LIBDIR	= libsun
+SUNCDE_CLIDIR	= cdesun
+SUNCDE_LOCALIZEDDIR	= cde1/localized
+#else
+SUNCDE_LIBDIR	= 
+SUNCDE_CLIDIR	= 
+SUNCDE_LOCALIZEDDIR	= 
+#endif
+
+#ifndef BuildMotif
+#define BuildMotif YES
+#endif
+
+#if BuildMotif
+OSF = osf
+#endif
+
+#ifdef BUILDBINSTALLDIRSONLY
+SUBDIRS = config util logs include cdeTools lib \
+	lib1 $(OSF) $(SUNCDE_LIBDIR) cde1 $(SUNCDE_CLIDIR) \
+	$(SUNCDE_LOCALIZEDDIR) databases admin
+#else
+SUBDIRS = config util logs include cdeTools lib \
+	lib1 $(OSF) $(SUNCDE_LIBDIR) cde1 $(SUNCDE_CLIDIR) \
+	$(SUNCDE_LOCALIZEDDIR) databases admin \
+	$(COSE_LEARN_PROD) $(CDEMANDIR)
+#endif
+
+
+LINTLIBDIRS= \
+        $(LIBSRC) \
+        $(CDELIBSRC)
+
+
+MakeSubdirs($(SUBDIRS))
+
+MakeLintLibSubdirs($(LINTLIBDIRS))
+
+#ifdef SunArchitecture
+.NO_PARALLEL:
+#endif
+
+XCOMM
+XCOMM Watch out!!!  Make sure you do make includes after removing X11....
+XCOMM
+clean::
+	$(RM) -r X11 $(BDESTDIR)
+
+includes::
+
+
+XCOMM
+XCOMM before depending, be sure to have run make includes
+XCOMM
+/* depend::  includes */
+
+DependSubdirs($(SUBDIRS))
+
+XCOMM do not name your log file make.log when you run this ...
+World::
+	@echo ""
+	@echo "Building Release 5 of the X Window System"
+	@echo ""
+	@echo "##############################################################"
+	@echo "# Did you remember to check the configuration parameters in  #"
+	@echo "# the directory ./config and set BOOTSTRAPCFLAGS if needed?  #"
+	@echo "##############################################################"
+	@echo ""
+	@date
+	@echo ""
+	cd $(IMAKESRC); $(MAKE) $(MFLAGS) -f Makefile.ini clean; $(MAKE) $(MFLAGS) -f Makefile.ini BOOTSTRAPCFLAGS="$(BOOTSTRAPCFLAGS)"
+	-$(RM) Makefile.bak; $(MV) Makefile Makefile.bak
+	$(MAKE) $(MFLAGS) -f Makefile.bak Makefile
+	$(MAKE) $(MFLAGS) Makefiles
+	$(MAKE) $(MFLAGS) clean
+	$(MAKE) $(MFLAGS) includes
+	$(MAKE) $(MFLAGS) depend
+	$(MAKE) $(MFLAGS) $(WORLDOPTS)
+	@echo ""
+	@date
+	@echo ""
+	@echo "Full build of Release 5 of the X Window System complete."
+	@echo ""
+
+Everything::
+	@echo ""
+	@echo "Rebuilding Release 5 of the X Window System"
+	@echo ""
+	@date
+	@echo ""
+	cd $(IMAKESRC); $(MAKE) $(MFLAGS) -f Makefile.ini BOOTSTRAPCFLAGS="$(BOOTSTRAPCFLAGS)"
+	-$(RM) Makefile.bak; $(MV) Makefile Makefile.bak
+	$(MAKE) $(MFLAGS) -f Makefile.bak Makefile
+	$(MAKE) $(MFLAGS) Makefiles
+	$(MAKE) $(MFLAGS) includes
+	$(MAKE) $(MFLAGS) depend
+	$(MAKE) $(MFLAGS) $(WORLDOPTS)
+	@echo ""
+	@date
+	@echo ""
+	@echo "Rebuild of Release 5 of the X Window System complete."
+	@echo ""

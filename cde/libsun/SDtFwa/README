@@ -1,0 +1,116 @@
+
+Document from ASARC 1996/007:
+
+--------------------------------------------------------------------------------
+
+Richard M. Goldstein
+Desktop Performance
+2/20/96
+
+
+Flyweight Allocator for CDE
+===========================
+	
+
+Overview
+--------
+	The Desktop Performance team has observed (see attached data) that,
+	while CDE is a significant consumer of memory, some 74% of the dynamic
+	memory is allocated in chunks of 32 bytes or less.  Given that the
+	system malloc implementation in libc has an overhead of 8 bytes per
+	allocation, we can expect to make more efficient use of memory by 
+	elimiating the 25-100% overhead on these small allocations.  Thus,
+	the primary goal of the flyweight allocator is to provide 0-overhead
+	allocations to malloc calls of 32 bytes or less.  Further more, we
+	can reduce the amount of wasted space by subdividing the small 
+	allocations into a few specific strategic bucket sizes.
+
+	The flyweight allocator is designed as a typical malloc interposer,
+	it exports the symbols "malloc", "free" and "realloc" which the client
+	must link ahead of libc malloc (or other malloc) in order to take
+	advantage of.  LD_PRELOAD is another method of using the flyweight
+	allocator when it is compiled as a shared object.  It therefor inter-
+	cepts all calls to the system allocation routines and handles all
+	of the requests for 32 or fewer bytes from a locally reserved arena,
+	otherwise it forwards the request to the system malloc.
+
+	The current intent is to provide the flyweight allocator as its own
+	shared library, or as part of a new, unspecified, private shared
+	library.  Putting it into an existing CDE library, such as DtSvc,
+	would expose it to non-dt clients and require a higher interface
+	classification then the intended Consoidation Private.  We request
+	the ARC assist in naming this library, which should fit the existing
+	CDE conventions.
+	
+	There are other malloc implementations on Solaris besides the libc
+	version.  Here is a breakdown on why we chose to use own method:
+
+		libbsdmalloc:		4-byte overhead,
+					bsd semantics, 
+					not MT-safe.
+
+		libmalloc:		4-byte overhead
+					Only exists as ".a"
+					broken for malloc 0 (bug 1232759)
+
+		libmapmalloc:		16-byte overhead.
+					no buckets (or size-smarts).
+
+		libfast:		0-overhead
+					Not MT-safe
+					No small-alloc specialization
+
+
+
+Technical Description
+---------------------
+
+	Current Tunable Parameters
+	--------------------------
+	Arena:			400 pages + 1 for bookkeeping info.
+	Current Bucket Sizes:	8,   16,  24,  32
+	Bucket Size Dist:	20%, 30%, 30%, 20%	(% of whole Arena)
+
+	
+	Notes:  The Arena is mapped no-reserve (i.e. no physical memory
+	instantiated).  The acutal pages are mapped on demand.  The 
+	breakdown of buckets into pre-determined percentages of the Arena
+	is used during "free" operations so that the object's bucket size
+	can be determined by simple pointer arithmetic.
+
+
+	The flyweight alloctor initializes itself on the first call to
+	malloc.  It reserves an "arena" from /dev/zero and divides it up
+	into bucket sizes common to CDE clients.  The arena mapping is
+	then instantiated on a per-page basis as the memory is needed.
+	Allocation of a size larger then these buckets gets passed on to
+	the system malloc.  If this malloc parceled out the last free
+	slot on it's page of memory, it scans the list of free pages
+	for that bucket size and retain the one with the most open slots.
+	If none are found, i.e. all the pages for this bucket are full,
+	then retain NULL and the next malloc from that bucket will 
+	instantiate a new page.
+
+	On a call to free, this address is used to determine if the memory
+	came from one of these buckets and, if not, sent on to the system
+	free.  The free list is managed on a per-page basis in an attempt
+	to reduce fragmentation.  Each page's free list is used up before 
+	allocating from a different/new page.  At the point when a given 
+	page is full, the flywt allocator does a scan of the list of pages
+	for this bucket size looking for the page with the most empty slots.
+	The free lists themselves use the first 4/8 bytes of the free slot
+	as a pointer to the next free slot, thus there is minimal space
+	overhead for maintaining the free lists.
+
+	The list of pages in the "arena" and other bookkeeping information
+	is all kept on a single page of memory at the beginning of the
+	arena mapping.  This page is therefore expected to remain hot.
+	This also allows us to easilly attach via an external client and
+	monitor the behavior of the flyweight allocator dynamically, with
+	minimal interruption to the running process.  This information 
+	includes, essentially, all of the dynamic information about the
+	allocator, including the pagesize, the bucket information, and
+	the list of pages in terms of their free list information.
+
+
+--------------------------------------------------------------------------------

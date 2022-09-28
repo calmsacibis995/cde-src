@@ -1,0 +1,106 @@
+XCOMM $XConsortium: Imakefile /main/cde1_maint/2 1995/10/04 13:31:17 gtsang $
+/* tt/lib/tttk/Imakefile */
+/* The default for the defines NormalLibtt and SharedLibtt are set in
+ * config/Project.tmpl.
+ * If NormalLibtt and ! SharedLibtt, only non-pic code is built in
+ *    current directory.
+ * If NormalLibtt and SharedLibtt, non-pic code is built in the current
+ *    directory and pic code is built in the shared subdirectory.
+ * If !NormalLibtt and SharedLibtt, only pic code is built in the 
+ *    current directory.
+ * The default defines for NormalLibtt and SharedLittt can be overwritten 
+ *    in many places. See the file config/ExtensionsToImake for 
+ *    information.
+ */
+#ifndef DoNormalLib
+#define DoNormalLib NormalLibtt
+#endif
+#ifndef DoSharedLib
+#define DoSharedLib SharedLibtt
+#endif
+
+#include <Library.tmpl>
+
+TT_DIR = ../..
+#include "../../tooltalk.tmpl"
+
+/* unlike much of the rest of the library, we do need X and CDE includes here*/
+
+
+/* General case INCLUDES DEFINES
+ * Each individual architecture may have more or less of the above.
+ * Use EXTRA_DEFINES and EXTRA_INCLUDES to add defines and includes
+ * to an individual architecture.
+ */
+DEFINES =
+INCLUDES = -I../../lib
+
+/* put EXTRA_DEFINES and EXTRA_INCLUDES and anything else below */
+#ifdef HPArchitecture
+EXTRA_C++OPTIONS = $(ESLIT++_OPTION)
+#endif
+
+#ifdef SunArchitecture
+EXTRA_DEFINES = -D_REENTRANT -DSVR4 -DOS_VERSION=OSMajorVersion -DOS_MINOR_VERSION=OSMinorVersion 
+#endif
+
+#ifdef RsArchitecture
+#endif
+
+#ifdef USLArchitecture
+#endif
+
+#ifdef UXPArchitecture
+#endif
+
+HEADERS = tttk.h
+
+TTINCLUDEDEST = $(CDEINCLUDEDEST)/Tt
+
+/*** NOTE!
+ *** Every time a .o is added below it needs to be added to
+ *** the lib/tt/lib Imakefile in DB_OBJS and SHARED_DB_OBJS
+ ***/
+
+SRCS = \
+tttk.C \
+ttdesktop.C \
+ttmedia.C \
+tttkmessage.C \
+tttkpattern.C \
+ttdtfile.C \
+tttkutils.C \
+tttk2free.C \
+ttdtprocid.C
+
+
+OBJS = \
+tttk.o \
+ttdesktop.o \
+ttmedia.o \
+tttkmessage.o \
+tttkpattern.o \
+ttdtfile.o \
+tttkutils.o \
+tttk2free.o \
+ttdtprocid.o 
+
+
+
+/* Build the .o's */
+LibraryObjectRule()
+
+all:: $(OBJS)
+
+
+/* Library built up one level */
+
+DependTarget()
+
+BuildIncludes($(HEADERS),$(TTINCLUDEDEST),../..)
+/* For install of developer's build environment */
+LOCAL_BINSTALL_INCLUDEDEST = include/Tt
+BuildMultipleInstall($(HEADERS),$(LOCAL_BINSTALL_INCLUDEDEST))
+
+
+includes::

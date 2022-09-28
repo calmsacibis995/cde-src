@@ -1,0 +1,342 @@
+.cdes
+.TH DtDndProtocol 4 "17 June 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.SH NAME
+DtDndProtocol \(em drag and drop matching and transfer protocols
+.SH DESCRIPTION
+.cdee
+The drag and drop protocols provide policy for
+matching and data transfer between the drag initiator and
+the drop receiver of file names, selected text spans and
+application-defined structured data formats.
+.P
+The drag and drop protocols use the standard X11 selection targets,
+where available, with the addition of several new selection targets
+where required.
+.P
+These protocols provide for the transfer of the following types of data:
+.cde .VL 2
+.xo .BL
+.LI \(bu
+Selected Text
+.LI \(bu
+File Names
+.LI \(bu
+Buffers
+.LE
+.cde .SH "PROTOCOL OVERVIEW"
+.xo .H 3 "Protocol Overview"
+Each protocol consists of the following:
+.cde .HU "Drag and Drop API Protocol"
+.xo .H 4 "Drag and Drop API Protocol"
+Each protocol described corresponds to a specific
+.B DtDndProtocol
+enumeration value.
+.br
+.cde .HU "Export/Import Targets"
+.xo .H 4 "Export/Import Targets"
+The Motif drag and drop API provides support for matching of the data
+transfer protocol between the drag initiator and the various drop receivers.
+This allows the user to determine readily which drop sites will accept the
+dragged data.
+.P
+The drag initiator sets the
+.B XmNexportTargets
+resource of the
+.B XmDragContext
+to the list of target atoms that describe the data being dragged.
+The drop receiver sets the
+.B XmNimportTargets
+resource of the
+.B XmDropSite
+to the list of target atoms that describe the data that it will accept.
+The Motif drag and drop subsystem allows drops when the
+.B XmNexportTargets
+and
+.B XmNimportTargets
+have at least one target in common.
+.cde .HU "Data Transfer Protocol"
+.xo .H 4 "Data Transfer Protocol"
+Once the drag initiator has dropped on the drop receiver, the transfer
+of data is begun.
+The transfer is accomplished using X selections and
+is controlled by the drop receiver.
+.P
+The drop receiver starts all transfers by converting
+the selection into the ICCCM
+.Cn TARGETS
+target to get the set of available selection targets.
+(See the \*(Zi for a description of converting targets.)
+It then chooses
+the appropriate selections from that set and requests that the drag
+initiator convert each requested selection.
+Each protocol has a set
+of selection targets that are used to transfer all the necessary data.
+These target conversions are usually initiated by calling
+.Fn XmDropTransferStart .
+.cde .HU "Move Completion"
+.xo .H 4 "Move Completion"
+When the operation of the drop is
+.Cn XmDROP_MOVE ,
+the drop receiver must complete the move using an appropriate method.
+For most data transfers, this is accomplished by converting
+the selection into the ICCCM
+.Cn DELETE
+target to tell the drag initiator that it may delete the data.
+For most file name transfers, this is accomplished via the file system.
+.cde .SH "TEXT TRANSFER PROTOCOL"
+.xo .H 3 "Text Transfer Protocol"
+The text transfer protocol is used to exchange text selections.
+.cde .HU "Drag and Drop API"
+.xo .H 4 "Drag and Drop API"
+This is the protocol used when a
+.B DtDndProtocol
+of
+.Cn DtDND_TEXT_TRANSFER
+is specified.
+.cde .HU "Export/Import Targets"
+.xo .H 4 "Export/Import Targets"
+The export or import targets are any of the following; the target
+describing the character encoding of the text selection,
+.Cn COMPOUND_TEXT ,
+.Cn STRING
+or
+.Cn TEXT .
+.cde .HU "Data Transfer Protocol"
+.xo .H 4 "Data Transfer Protocol"
+The transfer of text selections follows the protocols described in the
+.cde ICCCM manual.
+.xo ICCCM section of the \*(Zi.
+If the character encoding of the drag initiator and drop
+receiver are the same, that target should be converted to get the
+text selection.
+If the character encoding are different, the drop
+receiver should attempt to convert the standard text targets in the
+following order:
+.Cn COMPOUND_TEXT ,
+.Cn STRING
+or
+.Cn TEXT .
+.cde .HU "Move Completion"
+.xo .H 4 "Move Completion"
+The move is completed by converting the selection into the ICCCM
+.Cn DELETE
+target.
+.br
+.cde .SH "FILE NAME TRANSFER PROTOCOL"
+.xo .H 3 "File Name Transfer Protocol"
+The transfer protocol is used to exchange file names.
+.cde .HU "Drag and Drop API"
+.xo .H 4 "Drag and Drop API"
+This is the protocol used when a
+.B DtDndProtocol
+of
+.Cn DtDND_FILENAME_TRANSFER
+is specified.
+.cde .HU "Export/Import Targets"
+.xo .H 4 "Export/Import Targets"
+The export or import targets are
+.Cn FILE_NAME
+and, optionally,
+.Cn _DT_NETFILE
+if capable of providing the file name in network canonical form using
+.Fn tt_file_netfile 3
+and
+.Fn tt_netfile_file 3.
+.cde .HU "Data Transfer Protocol"
+.xo .H 4 "Data Transfer Protocol"
+If the ICCCM
+.Cn HOST_NAME
+target is in the list of target atoms, it is converted.
+If the returned host name is
+different than the host name for the drop receiver and the
+.Cn _DT_NETFILE
+target is in the list of target atoms, it is converted.
+The drag initiator uses
+.Fn tt_file_netfile 3
+to encode the file names and the drop receiver uses
+.Fn tt_netfile_file 3
+to decode the file names.
+.P
+If the hosts are the same for both the drag initiator and the drop receiver
+or either the
+.Cn HOST_NAME
+or the
+.Cn _DT_NETFILE
+targets are not in the list of target atoms
+from the drag initiator, the drop receiver
+converts the ICCCM
+.Cn FILE_NAME
+target.
+No encoding of the file names occurs in this case.
+.cde .HU "Move Completion"
+.xo .H 4 "Move Completion"
+Moves of file names can be accomplished atomically using standard file
+system operations.
+Drop receivers are encouraged to use the file system.
+The drop receiver may alternatively choose to use the ICCCM
+.Cn DELETE
+target to complete the
+.Cn XmDROP_MOVE
+and the drag initiator must be ready to comply.
+.br
+.cde .SH "BUFFER TRANSFER PROTOCOL"
+.xo .H 3 "Buffer Transfer Protocol"
+The transfer protocol is used to exchange memory buffers.
+.br
+.cde .HU "Drag and Drop API"
+.xo .H 4 "Drag and Drop API"
+This is the protocol used when a
+.B DtDndProtocol
+of
+.Cn DtDND_BUFFER_TRANSFER
+is specified.
+.br
+.cde .HU "Export/Import Targets"
+.xo .H 4 "Export/Import Targets"
+The export and import targets are
+.Cn _DT_BUFFER_DATA ,
+.Cn _DT_BUFFER_LENGTHS
+and, optionally,
+.Cn _DT_BUFFER_NAMES .
+.br
+.cde .HU "Data Transfer Protocol"
+.xo .H 4 "Data Transfer Protocol"
+The
+.Cn _DT_BUFFER_DATA
+and
+.Cn _DT_BUFFER_LENGTHS
+targets are converted to transfer the buffer data.
+.P
+The data of the buffers is encoded into the
+.Cn _DT_BUFFER_DATA
+target as an array of bytes.
+The lengths in bytes of each buffer are encoded into
+.Cn _DT_BUFFER_LENGTHS .
+Each length is used to index into the
+.Cn _DT_BUFFER_DATA
+array.
+.P
+If the
+.Cn _DT_BUFFER_NAMES
+target is available, it is converted to transfer
+the names of the buffers.
+.br
+.cde .HU "Move Completion"
+.xo .H 4 "Move Completion"
+The move is completed by converting the selection into the ICCCM
+.Cn DELETE
+target.
+.br
+.cde .SH "SELECTION TARGETS"
+.xo .H 3 "Selection Targets"
+The following table describes the selection targets used in the
+drag and drop data matching and transfer protocols.
+.br
+.cde .ne 15
+.DS
+.fi
+.S -1
+.TS
+.xo expand box tab(@);
+.xo lb | lb | lbw(2.7i)
+.xo l  | l  | l .
+.cde expand tab(@);
+.cde lb lb lbw(2.7i)
+.cde lb lb l .
+Atom@Type@Description
+_
+TARGETS@ATOM@T{
+.na
+A list of valid target atoms.
+.cde See ICCCM section 2.6.2.
+.xo See section 3.6.2 of the \*(Zi.
+T}
+DELETE@NULL@T{
+.na
+Used to delete the dropped data.
+If the drop receiver wishes to perform
+a move operation on the data, after copying the data it should
+request conversion of the
+.Cn DELETE
+target.
+.cde See ICCCM section 2.6.3.1.
+.xo See section 3.6.3 of the \*(Zi.
+T}
+COMPOUND_TEXT@COMPOUND_TEXT@T{
+.na
+The text selection in compound text format.
+.cde See ICCCM section 2.7.1.
+.xo See section 3.7.1 of the \*(Zi.
+T}
+STRING@STRING@T{
+.na
+The text selection in ISO Latin-1 format.
+.cde See ICCCM section 2.7.1.
+.xo See section 3.7.1 of the \*(Zi.
+T}
+TEXT@TEXT@T{
+.na
+The text selection in the format preferred by the selection holder.
+.cde See ICCCM section 2.7.1.
+.xo See section 3.7.1 of the \*(Zi.
+T}
+HOST_NAME@TEXT@T{
+.na
+The name of the machine running the client as seen from the
+machine running the server.
+.cde See ICCCM section 2.6.2.
+.xo See section 3.6.2 of the \*(Zi.
+T}
+FILE_NAME@TEXT@T{
+.na
+The full path name of the files.
+.cde See ICCCM section 2.6.2.
+.xo See section 3.6.2 of the \*(Zi.
+T}
+_DT_NETFILE@TEXT@T{
+.na
+The full pathname of the files, each encoded using
+.Fn tt_file_netfile 3
+and decoded using
+.Fn tt_netfile_file 3.
+T}
+_DT_BUFFER_DATA@_DT_BUFFER_DATA@T{
+.na
+The buffer data in an array of bytes.
+T}
+_DT_BUFFER_LENGTHS@INTEGER@T{
+.na
+The lengths in bytes of each buffer
+in the
+.Cn _DT_BUFFER_NAMES
+array.
+T}
+_DT_BUFFER_NAMES@STRING@T{
+.na
+The names of each buffer,
+suitable for use as a file name.
+T}
+.TE
+.S +1
+.DE
+.cdes
+.SH "SEE ALSO"
+.Hd Dt/Dnd.h 5,
+.Fn DtDndDragStart 3,
+.Fn DtDndVaDragStart 3,
+.Fn DtDndVaDropRegister 3,
+.Fn DtDndDropUnregister 3,
+.Fn DtDropTransferStart 3,
+.Fn XmDragContext 3,
+.Fn XmDragStart 3,
+.Fn XmDropRegister 3,
+.Fn XmDropSite 3,
+.Fn tt_file_netfile 3,
+.Fn tt_netfile_file 3,
+.BR "X11/R5 Inter-Client Communications Conventions Manual (ICCCM)"
+.cdee

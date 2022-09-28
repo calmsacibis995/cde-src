@@ -1,0 +1,83 @@
+.TH DtActionIcon 3 "17 Jan 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994, 1995 Unix System Labs, Inc.,
+.\" **      a subsidiary of Novell, Inc.
+.\" *************************************************************************
+.SH NAME
+DtActionIcon \- get the icon information for an action
+.SH SYNOPSIS
+.yS
+#include <Dt/Action.h>
+.sp 0.5v
+.ta \w'char *DtActionIcon('u
+char *DtActionIcon(char *\f2actionName\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn DtActionIcon
+function gets the icon information for an action.
+The
+.I actionName
+argument is the name of the action.
+.Fn DtActionIcon
+returns the name of the icon associated with an
+.I actionName
+action.
+If the action definition does not explicitly identify an icon
+name, this function returns the default action icon name,
+as described in
+.cde .BR dtactionfile (4)
+.cde (``Action Selection'').
+.xo .cX actionselection .
+The default action icon name can be customized using the
+.B actionIcon
+X resource.
+.P
+If there are multiple
+.I actionName
+actions, the string returned is the
+icon associated with the most general action.
+The most general action is the one with the lowest precedence,
+as described in
+.cde .BR dtactionfile (4)
+.cde (``Action Selection'').
+.xo .cX actionselection .
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn DtActionIcon
+function returns a
+newly allocated copy of the icon name string
+(\c
+.Cn ICON
+field) associated with the action;
+otherwise, it returns
+.Cn NULL .
+.br
+.SH "APPLICATION USAGE"
+The
+.Fn DtActionIcon
+function is useful for applications that provide a graphical interface
+to actions.
+.P
+The application should use
+.Fn XtFree 3X
+to free the icon name string returned by the
+.Fn DtActionIcon
+function.
+.SH "SEE ALSO"
+.Hd Dt/Action.h 5,
+.cdes
+.Fn XtFree 3X
+.BR dtactionfile (4),
+.BR dtdtfile (4).
+.cdee
+.xos
+.Fn XtFree 3X
+in the \*(Zt;
+.cX dtactionfile ,
+.cX dtdtfile .
+.xoe

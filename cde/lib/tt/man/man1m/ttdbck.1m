@@ -1,0 +1,149 @@
+.TH ttdbck 1M "1 March 1996" "ToolTalk 1.3" "ToolTalk Commands" 
+.BH "1 March 1996"
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\"  (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\"  (c) Copyright 1993, 1994 International Business Machines Corp.
+.IX "ttdbck.1m" "" "ttdbck.1m" "" 
+.SH NAME
+ttdbck \- display, check, or repair ToolTalk databases
+.SH SYNOPSIS
+.B ttdbck
+[
+.I selection\ opts
+]
+[
+.I diagnosis\ opts
+]
+[
+.I display\ opts
+]
+[
+.I repair\ opts
+]
+.br
+	[
+.I data-base-directory
+]...
+.SH DESCRIPTION
+.LP
+.B ttdbck
+is the ToolTalk database maintenance tool.
+It allows direct inspection of ToolTalk spec data, detection of
+inconsistencies, and repair of problems.
+.SH OPTIONS
+.TP
+.I data-base-directory
+Names the directory or directories containing the ToolTalk database to be
+inspected or repaired. If no directories are named, the current directory is
+assumed.  If a directory path does not end in ``TT_DB'', ``TT_DB''
+is appended.
+.IP
+The user running the command must have read access to the files in the
+directory to inspect the data and write access to repair the data.
+Since ToolTalk databases are typically accessible only to root, this
+command is normally run as root.
+.SS Selection options
+The selection options determine which specs in the database are displayed
+or modified.  If no selection options are given, all specs in the database
+are displayed.  To prevent massive accidental changes to ToolTalk
+databases, no repair options except
+.B -I
+are allowed unless a selection or
+diagnosis option is given.
+.TP
+.BI \-f\  filename
+Restricts the set of specs to be inspected or modified to those which
+describe objects in the named file. The file name can contain shell-style
+wildcards which must be escaped to prevent the shell from expanding them.
+.TP
+.BI \-k\  objidkey
+An object id key, specifying a particular spec to be displayed or modified.
+The object id key can be obtained from a previous invocation of
+.BR ttdbck ;
+one might display a set of specs, determine the one that needs repair, and
+specify its key here.
+.TP
+.BI \-t\  type
+Restricts the set of specs to be inspected or modified to those with
+otype
+.I type.
+The type name can contain shell-style wildcards which must be escaped
+to prevent the shell from expanding them.
+.SS Diagnosis options
+These options check for and report on inconsistencies in the selected specs.
+Only specs selected by the selection options are checked.  If a diagnosis
+option is given, any display or repair option is applied only to specs which
+fail the diagnostic check.
+.TP
+.B \-b
+Check for badly formed specs: those which have no file or type or those
+which have types not defined in the type database.
+.TP
+.B \-x
+Check for specs which refer to files that no longer exist.
+.SS Display options
+These options determine which data is printed for each selected spec.
+.TP
+.B \-i
+Display the object id (including the object id key.)
+.TP
+.B \-m
+Display the mandatory data that must appear in every spec: the otype
+of the object described by the spec and the file in which the spec is
+stored.
+.TP
+.B \-p
+Display all the properties and values for each selected spec.
+.TP
+.B \-a
+Display all data (equivalent to specifying
+.BR \-imp )
+.SS Repair options
+.TP
+.BI \-I
+Invoke the NetISAM isrepair() function for all files accessed.
+This action is applied before any other inspection or repair
+action.
+This option should be used when normal operations
+return EBADFILE (error code 105).
+.TP
+.BI \-F \ filename
+Change the file name for the selected specs to the supplied file name.
+.TP
+.BI \-T \ otypeid
+Change the type of the selected specs to the given otype.
+.TP
+.B \-Z
+Remove the selected specs entirely.
+.SH EXAMPLES
+.IP
+.B ttdbck -bxi /home
+.LP
+In the /home/TT_DB directory, finds all badly formed specs and specs that
+refer to non-existent files and prints their ids.
+.IP
+.B ttdbck -f /home/sample/data -F /home/sample/data1 /home
+.LP
+In the /home/TT_DB directory, finds all specs that refer to objects in
+file /home/sample/data and changes them to refer to /home/sample/data1.
+.IP
+.B ttdbck -t Sample_Otype_Name -Z /export/TT_DB
+.LP
+In the /export/TT_DB directory, finds all specs that refer to objects
+of type
+.I Sample_Otype_Name
+and deletes the specs.
+.SH FILES
+.PD 0
+.TP 20
+.B /path/TT_DB
+ToolTalk database
+.PD
+.SH NOTES
+.LP
+The
+.B ttdbck
+command should be run on the same machine where the TT_DB files
+being inspected and repaired physically exist.  That is, don't try to access
+the TT_DB files via NFS.
+

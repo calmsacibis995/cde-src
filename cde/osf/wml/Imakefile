@@ -1,0 +1,137 @@
+XCOMM 
+XCOMM (c) Copyright 1989, 1990, 1991, 1992 OPEN SOFTWARE FOUNDATION, INC. 
+XCOMM ALL RIGHTS RESERVED 
+XCOMM 
+XCOMM 
+XCOMM Motif Release 1.2.1
+XCOMM 
+XCOMM   $XConsortium: Imakefile /main/cde1_maint/3 1995/10/05 15:46:35 mgreess $
+INCLUDES = -I. -I$(INCLUDESRC) -I$(MINCLUDESRC) -I$(MLIBSRC)
+LOCAL_LIBRARIES = BuildClientLibs
+DEPLIBS = BuildClientDepLibs
+
+WML_LIBPATH = ./wmldbcreate -o $@
+
+#if defined (SunArchitecture)
+.NO_PARALLEL:
+SYS_LIBRARIES = -lm -ldl -lw -lgen
+WML_LIBPATH = LD_LIBRARY_PATH=$(MRMSRC):$(XMSRC):$(TOOLKITSRC):$(USRLIBDIR) ./wmldbcreate -o $@
+#endif
+
+#ifdef HPArchitecture
+WML_LIBPATH = SHLIB_PATH=$(MRMSRC):$(XMSRC):$(USRLIBDIR) ./wmldbcreate -o $@
+#endif
+
+#if defined (RsArchitecture)
+WML_LIBPATH = LIBPATH=$(MRMSRC):$(XMSRC):$(USRLIBDIR) ./wmldbcreate -o $@
+#endif
+
+#if defined (USLArchitecture)
+SYS_LIBRARIES = -lm -ldl $(WIDECHARSYSLIB) -lgen
+WML_LIBPATH = LD_LIBRARY_PATH=$(MRMSRC):$(XMSRC):$(TOOLKITSRC):$(USRLIBDIR) ./wmldbcreate -o $@
+#endif
+
+#if defined (UXPArchitecture)
+SYS_LIBRARIES = -lm -ldl $(WIDECHARSYSLIB) -lgen
+WML_LIBPATH = LD_LIBRARY_PATH=$(MRMSRC):$(XMSRC):$(TOOLKITSRC):$(USRLIBDIR):$(CXXLIBDIR) ./wmldbcreate -o $@
+#endif
+
+#ifndef USLArchitecture
+#ifndef UXPArchitecture
+YACC = YaccCmd
+LEX = LexCmd
+#endif
+#endif
+
+
+ 
+SRCS1 =	wml.c		wmlouth.c	wmloutmm.c \
+	wmloutp1.c	wmlresolve.c	wmlsynbld.c	wmlutils.c \
+	wmldbcreate.c
+ 
+OBJS1 =	wml.o		wmloutkey.o	wmlouth.o	wmloutmm.o \
+	wmloutp1.o	wmlresolve.o	wmlsynbld.o	wmlutils.o
+ 
+SRCS2 = wmluiltok.l
+ 
+OBJS2 = wmlparse.o
+ 
+SRCS = $(SRCS1) $(SRCS2)
+ 
+YACCTARGETS = UilLexPars.c	UilLexPars.h
+
+WMLTARGETS = UilConst.h	UilKeyTab.h	 \
+	UilSymArTa.h	UilSymArTy.h	UilSymCSet.h	UilSymCtl.h \
+	UilSymEnum.h	UilSymGen.h	UilSymNam.h	UilSymRArg.h \
+	UilSymReas.h	UilTokName.h	UilUrmClas.h	UilSymChCl.h \
+	UilSymChTa.h
+
+TARGETS = $(YACCTARGETS) $(WMLTARGETS)
+ 
+TABLE = motif.wml
+WMDTABLE = motif.wmd
+WMLTOOLS = wml wmluiltok
+REPORT = wml.report
+
+NormalLibraryObjectRule()
+ 
+all::	DONE
+
+DONE:	$(WMDTABLE) $(TARGETS)
+	(cd $(UILSRC); $(RM) $(TARGETS) UilDBDef.h)
+	cp $(TARGETS) UilDBDef.h $(UILSRC)
+	touch DONE
+
+NormalLibraryTarget(wml,$(OBJS2) $(OBJS1))
+
+install:: all
+ 
+wml::	libwml.a
+	$(CC) $(CFLAGS) libwml.a -o wml
+
+NormalProgramTarget(wmldbcreate,wmldbcreate.o,$(DEPLIBS),$(LOCAL_LIBRARIES),$(SYSLIBS))
+
+wmlparse.c:	wmlparse.y wmllex.l
+	$(LEX) wmllex.l
+	$(MV) lex.yy.c wmllex.c
+	$(YACC) -d $(YACCFLAGS) wmlparse.y
+	$(RM) wmlparse.c wmlparse.h
+	$(MV) y.tab.c wmlparse.c
+	$(MV) y.tab.h wmlparse.h
+ 
+wmlparse.h::	wmlparse.y wmllex.l
+	$(LEX) wmllex.l
+	$(MV) lex.yy.c wmllex.c
+	$(YACC) -d $(YACCFLAGS) wmlparse.y
+	$(MV) y.tab.c wmlparse.c
+	$(MV) y.tab.h wmlparse.h
+ 
+wmluiltok::	wmluiltok.l
+	$(LEX) wmluiltok.l
+	$(CC) $(CFLAGS) lex.yy.c -ll -o wmluiltok
+
+$(TARGETS):	$(WMLTOOLS) $(TABLE)
+	$(RM) $(TARGETS) $(REPORT) wml-uil.mm
+	$(YACC) -d $(YACCFLAGS) Uil.y
+	$(MV) y.tab.c UilLexPars.c
+	$(MV) y.tab.h UilLexPars.h
+	./wmluiltok < Uil.y > tokens.dat
+	$(RM) wml-uil.mm
+	./wml $(TABLE)
+	$(RM) tokens.dat
+
+$(WMDTABLE):	wmldbcreate
+	$(WML_LIBPATH)
+
+clean::
+	$(RM) $(TARGETS) $(WMDTABLE) $(REPORT) lex.yy.c libwml.a wml \
+	*.mm *.sdml *.txt wmlparse.c wmlparse.h wmluiltok wmllex.c \
+	tokens.dat DONE
+ 
+depend:: wmlparse.h 
+
+DependTarget()
+
+includes::	$(TARGETS)
+	(cd $(UILSRC); $(RM) $(TARGETS) UilDBDef.h)
+	cp $(TARGETS) UilDBDef.h $(UILSRC)

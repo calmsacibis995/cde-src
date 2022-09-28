@@ -1,0 +1,96 @@
+.TH Deposit Media "05 Apr 1994" "SunSoft" "ToolTalk Policy"
+.SH NAME
+.PP
+Deposit \- save this document to its backing store
+.SH SYNOPSIS
+.so ../.synopsis
+[\fIfile\f(CW]	Deposit(	in	\fImediaType	contents\f(CW	
+.\"		[in	bufferID	\fIbeingDeposited\f(CW	
+		[in	messageID	\fIcommission\f(CW] );	
+.\" [\fIfile\f(CW]	Deposit(	in	\fImediaType	contents\f(CW,	
+.\"		out	bufferID	\fIbeingDeposited\f(CW	
+.\"		[in	title	\fIdocName\f(CW] );
+.ft
+.fi
+.SH DESCRIPTION
+.LP
+Save this document to its backing store.  This request is
+different from the \f(CWSave()\fR request, because here the requestor
+(and not the handler) has the data that needs to be written.
+.SH REQUIRED ARGUMENTS
+.so .contents
+Any file named in the message's file attribute should not be
+deleted until this request is replied to.
+.PP
+.\".PD 0
+.\".HP 5
+.\"\f(CWbufferID\fR \fIbeingDeposited\fR
+.TP
+\f(CWmessageID\fR \fIcommission\fR
+.PD
+.\"Identifier for the buffer being deposited to backing store.
+.\"The identifier is
+.\"either
+.\".PD 0
+.\".RS 8
+.\".HP 2
+.\"\(bu
+.\"the \f(CWbufferID\fR returned e.g. when this buffer was created via
+.\"the \f(CWOpen()\fR request, or
+.\".HP 2
+.\"\(bu
+The \f(CWmessageID\fR of the \f(CWEdit()\fR request that occasioned the
+creation of this buffer.
+.\".RE
+.\".PD
+.\".IP
+.\"If
+.\".I beingDeposited
+.\"is an \f(CWout\fR parameter, then a new document
+.\"is being created and the handling container application is
+.\"being asked to save it and return a new \f(CWbufferID\fR for
+.\"it.
+.SH OPTIONAL ARGUMENTS
+.so .title
+.SH EXAMPLES
+.LP
+This request is especially useful for when the user performs
+an intermediate save of her modifications to a document
+that is the subject of an
+.BR Edit ()
+or
+.BR Display ()
+request in progress.  (In the latter case, the
+.BR Deposit ()
+may be failed with
+.SM TT_DESKTOP_EACCES
+if the handler does
+not choose to allow updates to the document being displayed.)
+.\".LP
+.\"The second variant of this request can be issued by editors that
+.\"allow the user to create, as an afterthought, extra documents
+.\""near" the document that was just edited.  This can be useful if
+.\"the each document in the series can serve as the template or
+.\"starting point for the next document.  Of course, if the handling
+.\"container application does not support the notion of accomodating
+.\"uninvited documents, it should reject the request.
+.PP
+.BR ttmedia_load ()
+can be used to register for
+and help process this message.
+.PP
+This message can be sent with
+.BR ttmedia_Deposit ().
+.SH ERRORS
+.so .errors
+.TP
+\f(BITT_DESKTOP_EACCES\fP
+The document is read-only.
+.SH SEE ALSO
+.PP
+.BR Intro (Desktop),
+.BR Status (Desktop),
+.BR Intro (Media),
+.\".BR Open (Editor),
+.BR Edit (Media),
+.BR Display (Media)

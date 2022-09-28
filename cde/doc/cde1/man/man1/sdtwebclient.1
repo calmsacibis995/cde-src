@@ -1,0 +1,107 @@
+.\" @(#)sdtwebclient.1	1.3 97/05/20 SMI
+.\" (c) Copyright 1996 Sun Microsystems, Inc.
+.\"--- 
+.TH sdtwebclient 1 "20 Jun 1996"
+.BH "20 Jun 1996"
+.\"---
+.SH NAME
+sdtwebclient \- web browser client
+.SH AVAILABILITY
+SUNWdtdst
+.SH SYNOPSIS
+.B sdtwebclient 
+.RB [ \-b
+.IR browser ]
+.RB [ \-o
+.IR browser-options ]
+.RI [ url-string ]
+.SH DESCRIPTION
+Start a web browser client if available.
+.B sdtwebclient
+searches $PATH for an available web browser.
+The set of browsers searched for are:
+.I
+netscape,
+.I
+sdthotjava,
+and
+.I
+hotjava
+in that order.
+Other browsers can be specified with the \-b option.
+.LP
+.B sdtwebclient
+is useful for scripts which want to use a web browser
+without hard coding a specific browser or which want
+a normalized exit status.
+.SH OPTIONS
+.TP
+.BI \-b \ browser
+Start
+.I browser
+command instead of searching for an available browser.
+Useful for specifying a particular browser.
+.TP
+.BI \-o \ browser-options
+Pass
+.I browser-options
+to
+.I
+browser
+specified by \-b option.
+.SH OPERANDS
+.TP
+.I url-string
+The URL (Uniform Resource Location) to pass to the web browser.
+If not specified the web browser usually uses a default
+home page URL instead.
+.SH "EXAMPLES"
+To start a web browser on its default home page use:
+.IP
+.B "example% sdtwebclient"
+.LP
+To start
+.I
+netscape
+on its default home page use:
+.IP
+.B "example% sdtwebclient -b netscape"
+.LP
+To start a web browser on a particular home page use:
+.IP
+.B "example% sdtwebclient http://www.sun.com"
+.SH "NETSCAPE SUPPORT"
+When
+.I netscape
+is used,
+.B sdtwebclient
+uses the
+.I \-remote
+command line option with the
+.I openURL
+argument to attempt to tell a running
+.I netscape
+to open a new web browser window.
+If no
+.I netscape
+is already running then one will be started.
+.LP
+The
+.I Remote Control of Netscape
+is described further at
+.I http://home.netscape.com/newsref/std/x-remote.html
+.SH EXIT STATUS
+.TP 5
+.B 0
+Successful completion.
+.TP
+.B 1
+Invalid command line options.
+.TP
+.B 2
+Browser not found in $PATH.
+.PD
+.sp
+.SH "SEE ALSO"
+.BR dtaction (1)
+.BR sdtwebaction (5)

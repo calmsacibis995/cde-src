@@ -1,0 +1,81 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Novell, Inc
+...\" **
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH XmTextFieldGetSubstringWcs 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmTextFieldGetSubstringWcs\fP \- A TextField function that retrieves a
+a portion of a wide character internal text buffer
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/TextF.h>
+.sp \n(PDu
+int XmTextFieldGetSubstringWcs (\fBwidget, start, num_chars, buffer_size, buffer\fI)
+.ta .5i 1.7i
+.nf
+	Widget		\fBwidget\fI;
+	XmTextPosition	\fBstart\fI;
+	int		\fBnum_chars\fI;
+	int		\fBbuffer_size\fI;
+	wchar_t		*\fBbuffer\fI;
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+\fIXmTextFieldGetSubstringWcs\fP retrieves a copy of a portion of the internal
+text buffer of a TextField widget that is stored in a wide character
+format.  The function copies a specified number of characters from 
+a given start position in the internal text buffer into a buffer
+provided by the application.  A NULL terminator is placed at the
+end of the copied data.
+.IP "\fBwidget\fP"
+Specifies the TextField widget ID.
+.IP "\fBstart\fP"
+Specifies the beginning character position from which the data will be
+retrieved.  This is an integer number of characters from the beginning of
+the text buffer.  The first character position is 0.
+.IP "\fBnum_chars\fP"
+Specifies the number of \fIwchar_t\fP characters to be copied into
+the provided buffer.
+.IP "\fBbuffer_size\fP"
+Specifies the size of the supplied buffer as a number of \fIwchar_t\fP
+storage locations.  The minimum size is \fBnum_chars\fP + 1.
+.IP "\fBbuffer\fP"
+Specifies the wide character buffer into which the internal
+text buffer will be copied. 
+.PP
+For a complete definition of TextField and its associated resources,
+see \fIXmTextField(3X)\fP.
+.SH RETURN VALUE
+.IP "\fIXmCOPY_SUCCEEDED\fP"
+The function was successful.
+.IP "\fIXmCOPY_FAILED\fP"
+The function failed because it was unable to copy the 
+specified number of characters into the buffer provided.
+The buffer size may be insufficient.  The contents of
+\fBbuffer\fP are undefined.
+.IP "\fIXmCOPY_TRUNCATED\fP"
+The requested number of characters extended beyond the internal
+buffer.  The function copied characters to the end of the buffer
+and terminated the string with a NULL terminator; fewer than 
+\fBnum_chars\fP characters were copied.
+.SH RELATED INFORMATION
+.na
+\fIXmTextField(3X)\fP and \fIXmTextFieldGetSubstring(3X)\fP.
+.ad

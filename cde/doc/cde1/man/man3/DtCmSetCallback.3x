@@ -1,0 +1,160 @@
+.\" *************************************************************************
+.\" **
+.\" ** (c) Copyright 1993,1994 Hewlett-Packard Company 
+.\" **      All Rights Reserved.
+.\" **
+.\" ** (c) Copyright 1993,1994 International Business Machines Corp. 
+.\" **      All Rights Reserved.
+.\" **  
+.\" ** (c) Copyright 1993,1994 Sun Microsystems, Inc.
+.\" **      All Rights Reserved.
+.\" **
+.\" ** (c) Copyright 1993,1994 Unix Systems Labs, Inc., a susidiary of Novell, Inc
+.\" **      All Rights Reserved.
+.\" **
+.\" *************************************************************************
+.\"----------------------------------------------------------------------------
+.\" %\&Z%%\&M% %\&I% %\&E% SMI;
+.TH DtCmSetCallback 3X "26 January 1994"
+.BH "26 January -_1994"
+.\"---
+.\"----------------------------------------------------------------------------
+.SH NAME
+DtCmSetCallback(3X) \- Register callback procedure to be invoked when the specified type of update occurs in the calendar.
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- DESCRIPTION 
+.\"--- This section tells concisely what the command (function, device or
+.\"--- file format) does and includes the parameter list. 
+.\"---
+.SH DESCRIPTION
+\&#include <Dt/DtCm.h>
+.sp .5
+DtCmStatus DtCmSetCallback (
+.br
+.ta 0.75i 1.75i
+        DtCmCalendar	\fIcal\fP,
+.br
+        int		\fIupdate_type\fP,
+.br
+        DtCmCallbackProc	\fIproc\fP,
+.br
+        XtAppContext	\fIapp_context\fP,
+.br
+        DtCmCallbackProc *	\fIold_proc_r\fP)
+.fi
+\fP
+.SH
+\fBDtCmSetCallback\fP registers the procedure to be invoked whenever one 
+of the specified types of update given in \fIupdate_type\fP is made to 
+the calendar.  \fIProc\fP replaces the callback procedure currently 
+registered with the calendar. Setting \fIupdate_type\fP to zero or 
+\fIproc\fP to NULL disables callbacks for this calendar.  If the 
+application is Xt based, \fIapp_context\fP specifies the application 
+context.  It should be set to NULL for other kinds of applications. 
+If \fIold_proc_r\fP is not NULL, the previous callback procedure 
+registered is returned.
+.sp
+\fIupdate_type\fP is constructed by OR-ing the following flags: 
+\fBDT_CM_CALENDAR_OPENED, DT_CM_CALENDAR_REMOVED, 
+DT_CM_CALENDAR_ATTRIBUTE_UPDATED, DT_CM_ENTRY_INSERTED, 
+DT_CM_ENTRY_DELETED\fP, and \fBDT_CM_ENTRY_UPDATED\fP. 
+This parameter is ignored for calendars of version 2 to 4.
+.sp .5
+.IP "\fIcal\fP" 1.25i
+Specifies the calendar to set callback procedure.
+.IP "\fIupdate_type\fP" 1.25i
+Specifies the types of update events interested.
+.IP "\fIproc\fP" 1.25i
+Callback procedure to be invoked when one of the specified types of update event occurs in the calendar.
+.IP "\fIapp_context\fP" 1.25i
+Specifies the Xt application context of the application.
+.IP "\fIold_proc_r\fP" 1.25i
+Returns the previous callback procedure registered.
+.sp .5
+.PP
+
+\fBDtCmCallbackProc\fP is defined as:
+.sp .5
+DtCmStatus DtCmSetCallback (
+.br
+.ta 0.75i 1.75i
+        DtCmCalendar	\fIcal\fP,
+.br
+        unsigned long	\fIupdate_type\fP,
+.br
+        char *		\fIuser\fP,
+.br
+        char **		\fInew_ids\fP,
+.br
+        char **		\fIold_ids\fP,
+.br
+        int		\fIsize\fP)
+.fi
+\fP
+.SH
+The parameters to the callback function are the calendar that is 
+updated, the type of update, the user who did the update, an 
+array of new entry identifiers, an array of old entry identifiers, 
+and the size of the arrays.  When new entries are inserted in the 
+calendar (update type \fBDT_CM_ENTRY_INSERTED\fP), only identifiers 
+of new entries are returned and \fIold_ids\fP will be \fBNULL\fP.  When 
+existing entries are deleted from the calendar (update type 
+\fBDT_CM_ENTRY_DELETED\fP), \fInew_ids\fP will be \fBNULL\fP and 
+the identifiers of deleted entries are contained in \fIold_ids\fP. 
+For update type \fBDT_CM_ENTRY_UPDATED\fP, identifiers of the updated 
+entries are contained in \fIold_ids\fP. And if the update results in 
+new entries, the identifier of the new entries will be contained in 
+the corresponding elements in the array pointed to by \fInew_ids\fP. 
+For CM servers of version 2 to 4, no information about the update is 
+provided. When the callback procedure is invoked, only the \fIcal\fP
+parameter is filled in.
+
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- RETURN VALUES
+.\"--- This section appears in pages from Sections 2 and 3 only.
+.\"--- List the _values_ that the function returns and give _explanations_.
+.\"---
+.SH "RETURN VALUES"
+The function returns a status indicating whether the function is 
+completed successfully. If \fIold_proc_r\fP is not \fBNULL\fP, the 
+previous callback procedure registered is returned in it.
+
+.\"---
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- ERRORS
+.\"--- This section lists and explains _ERROR-CODES_ that the function may
+.\"--- may generate.  List _ERROR-CODES_ alphabetically.
+.\"---
+.SH ERRORS
+.SH
+.IP "\fBDT_CM_ERR_OBJECT\fP" 2.5i
+Bad object or wrong object type.
+.IP "\fBDT_CM_ERR_PARAMETER\fP" 2.5i
+Invalid parameter.
+.IP "\fBDT_CM_OK\fP" 2.5i
+The call is completed successfully.
+.PP
+.sp
+.\"---
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- EXAMPLES
+.\"--- This section gives examples of how to use the command (function
+.\"--- or file format).  Always preface an example with an introduction.
+.\"--- If there are multiple examples, use separate subsection headings
+.\"--- for each _example-type_.  Otherwise, omit these headings.
+.\"---
+.SH EXAMPLES
+NEED MARKUP HERE, SIMILAR TO SYNOPSIS
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- SEE ALSO
+.\"--- This section lists references to other man pages, sample files, etc.
+.\"---
+.SH "SEE ALSO"
+.BR DtCmOpenCalendar (3X),
+.BR DtCmCloseCalendar (3X),
+.BR DtCmRemoveCalendar (3X)

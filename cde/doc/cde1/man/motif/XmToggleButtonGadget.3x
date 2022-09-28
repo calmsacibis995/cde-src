@@ -1,0 +1,558 @@
+'\" t
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Novell, Inc
+...\" **
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH XmToggleButtonGadget 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmToggleButtonGadget\fP \- The ToggleButtonGadget widget class
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/ToggleBG.h>
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+ToggleButtonGadget sets nontransitory state data within an
+application.  Usually this gadget consists of an indicator
+(square or diamond or circle) with either text or a pixmap on one side of it.
+However,
+it can also consist of just text or a pixmap without the indicator.
+.PP 
+The toggle graphics display a \fI1-of-many\fP
+or \fIN-of-many\fP selection state.
+When a toggle indicator is displayed, a square with or without a check mark
+indicator shows an \fIN-of-many\fP
+selection state and a diamond or a circle indicator shows a
+\fI1-of-many\fP selection state.
+.PP 
+ToggleButtonGadget
+implies a selected or unselected state.
+In the case of a label and an indicator, an
+empty indicator (square or diamond or circle shaped) indicates that
+ToggleButtonGadget
+is unselected, and a filled indicator shows that it is selected.
+The indicator may be filled with a check mark or the highlight color.
+In the case of a pixmap
+toggle, different pixmaps are used to display the selected/unselected states.
+.PP 
+.ne 7
+The default behavior associated with a ToggleButtonGadget in a menu depends on
+the type of menu system in which it resides.
+By default, \fIBSelect\fP controls the behavior of the ToggleButtonGadget.
+In addition, \fIBMenu\fP controls the behavior of the ToggleButtonGadget if
+it resides in a Menu system.
+The actual mouse button used is determined by its RowColumn parent.
+.PP 
+To accommodate the toggle indicator when created,
+Label's resource \fIXmNmarginLeft\fP may
+be increased.
+.SS "Classes"
+ToggleButtonGadget inherits behavior and
+resources from \fIObject\fP, \fIRectObj\fP, \fIXmGadget\fP
+and \fIXmLabelGadget\fP classes.
+.PP 
+The class pointer is \fIxmToggleButtonGadgetClass\fP.
+.PP 
+The class name is \fIXmToggleButtonGadget\fP.
+.SS "New Resources"
+The following table defines a set of widget resources used by the programmer
+to specify data.  The programmer can also set the resource values for the
+inherited classes to set attributes for this widget.  To reference a
+resource by name or by class in a .Xdefaults file, remove the \fIXmN\fP or
+\fIXmC\fP prefix and use the remaining letters.  To specify one of the defined
+values for a resource in a .Xdefaults file, remove the \fIXm\fP prefix and use
+the remaining letters (in either lowercase or uppercase, but include any
+underscores between
+words).
+The codes in the access column indicate if the given resource can be
+set at creation time (C),
+set by using \fIXtSetValues\fP (S),
+retrieved by using \fIXtGetValues\fP (G), or is not applicable (N/A).
+.P 
+.wH
+.in 0 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmToggleButtonGadget Resource Set
+Name	Class	Type	Default	Access
+_
+XmNarmCallback	XmCArmCallback	XtCallbackList	NULL	C
+XmNdisarmCallback	XmCDisarmCallback	XtCallbackList	NULL	C
+XmNfillOnSelect	XmCFillOnSelect	Boolean	dynamic	CSG
+XmNindicatorOn	XmCIndicatorOn	Boolean	True	CSG
+XmNindicatorSize	XmCIndicatorSize	Dimension	dynamic	CSG
+XmNindicatorType	XmCIndicatorType	unsigned char	dynamic	CSG
+XmNselectColor	XmCSelectColor	Pixel	dynamic	CSG
+XmNselectInsensitivePixmap	XmCSelectInsensitivePixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNselectPixmap	XmCSelectPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNset	XmCSet	Boolean	False	CSG
+XmNspacing	XmCSpacing	Dimension	4	CSG
+XmNvalueChangedCallback	XmCValueChangedCallback	XtCallbackList	NULL	C
+XmNvisibleWhenOff	XmCVisibleWhenOff	Boolean	dynamic	CSG
+.TE
+.KE
+.in
+.sp 1
+.nL
+.ne 10
+.IP "\fIXmNarmCallback\fP"
+Specifies a list of callbacks
+that is called when the ToggleButtonGadget is armed.
+To arm this gadget, press the active mouse button
+while the pointer is inside the ToggleButtonGadget.
+For this callback, the reason is \fIXmCR_ARM\fP.
+.IP "\fIXmNdisarmCallback\fP"
+Specifies a list of callbacks
+called when ToggleButtonGadget is disarmed.
+To disarm this gadget, press and release the active
+mouse button while the pointer is inside the ToggleButtonGadget.
+The gadget is also disarmed
+when the user moves out of the gadget
+and releases the mouse button when the pointer is outside the gadget.
+For this callback, the reason is \fIXmCR_DISARM\fP.
+.IP "\fIXmNfillOnSelect\fP"
+Fills the indicator with the color specified in
+\fIXmNselectColor\fP and switches the top and bottom shadow
+colors when set to True.  Otherwise, it switches only the top
+and bottom shadow colors.  The default is set to the value
+of \fIXmNindicatorOn\fP.  When \fIXmNindicatorOn\fP is False,
+and \fIXmNfillOnSelect\fP is set explicitly to True, the
+background is filled with the color specified by \fIXmNselectColor\fP.
+.IP "\fIXmNindicatorOn\fP"
+Specifies that a toggle indicator is drawn to one side of the toggle
+text or pixmap when set to True.  When set to False, no space is allocated
+for the indicator, and it is not displayed.  If \fIXmNindicatorOn\fP is True,
+the indicator shadows are switched when the button is selected or unselected,
+but any shadows around the entire gadget are not switched.
+However, if
+\fIXmNindicatorOn\fP is False, any shadows around the
+entire gadget are switched when the toggle is selected or unselected.
+.IP "\fIXmNindicatorSize\fP"
+Sets the size of the indicator.
+If no value is specified, the size of the indicator is based on the size
+of the label string or pixmap.
+If the label string or pixmap changes, the size of the indicator is
+recomputed based on the size of the label string or pixmap.
+Once a
+value has been specified for \fIXmNindicatorSize\fP, the
+indicator has that size, regardless of the size of the label string or
+pixmap, until a new value is specified.
+.IP "\fIXmNindicatorType\fP"
+Specifies if the indicator is a \fI1-of\fP or
+an \fIN-of\fP indicator.  For the \fI1-of\fP indicator, the
+value is \fIXmONE_OF_MANY\fP.  For the \fIN-of\fP indicator,
+the value is \fIXmN_OF_MANY\fP.
+.IP
+The look of the ToggleButtonGadget visual is controlled by the XmDisplay
+resource \fIenableToggleVisual\fP.
+The \fIenableToggleVisual\fP resource defaults to False with the following
+ToggleButtonGadget visuals:
+.wH
+.rS 
+.TP
+\(bu
+\fIXmONE_OF_MANY\fP - a shadowed diamond
+.TP
+\(bu
+\fIXmN_OF_MANY\fP - a shadowed square
+.wH
+.rE
+.nL
+.ne 6
+.IP
+When \fIenableToggleVisual\fP is True, the ToggleButtonGadget visuals are:
+.wH
+.rS 
+.TP
+\(bu
+\fIXmONE_OF_MANY\fP - a shadowed circle
+.TP
+\(bu
+\fIXmN_OF_MANY\fP - a shadowed square with a check mark when set
+.wH
+.rE
+.nL
+.ne 6
+.IP
+This resource specifies only the visuals
+and does not enforce the behavior.
+When the ToggleButtonGadget is in a RadioBox, the default is
+\fIXmONE_OF_MANY\fP; otherwise, the default is \fIXmN_OF_MANY\fP.
+.IP "\fIXmNselectColor\fP"
+Allows the application to specify what color fills the center of the
+square or diamond-shaped indicator when it is set.  If this color is
+the same as either the top or the bottom shadow color of the indicator,
+a one-pixel-wide margin is left between the shadows and the fill;  otherwise,
+it is filled completely.
+This resource's default for a color display depends on the value of the
+XmDisplay resource \fIenableToggleColor\fP.
+If \fIenableToggleColor\fP is False (the default), then is a color between the
+background and the bottom shadow color is chosen.
+When \fIenableToggleColor\fP is True, then the select color is the highlight
+color for the gadget.
+For a monochrome display, the default is set to the foreground color.  To set
+the background of the button to \fIXmNselectColor\fP when
+\fIXmNindicatorOn\fP is False, the value of \fIXmNfillOnSelect\fP must
+be explicitly set to True.
+.IP "\fIXmNselectInsensitivePixmap\fP"
+Specifies a pixmap used as the button face when the ToggleButtonGadget
+is selected and
+the button is insensitive if the LabelGadget resource \fIXmNlabelType\fP
+is \fIXmPIXMAP\fP.  If the ToggleButtonGadget
+is unselected and the button is insensitive, the pixmap in
+\fIXmNlabelInsensitivePixmap\fP is used as the button face.
+If no value is specified for \fIXmNlabelInsensitivePixmap\fP, that
+resource is set to the value specified for
+\fIXmNselectInsensitivePixmap\fP.
+.IP "\fIXmNselectPixmap\fP"
+Specifies the pixmap to be used as the button
+face if \fIXmNlabelType\fP is \fIXmPIXMAP\fP and
+the ToggleButtonGadget is selected.
+When the ToggleButtonGadget is unselected,
+the pixmap specified in LabelGadget's \fIXmNlabelPixmap\fP is used.
+If no value is specified for \fIXmNlabelPixmap\fP, that resource is set
+to the value specified for \fIXmNselectPixmap\fP.
+.IP "\fIXmNset\fP"
+Represents the state of the ToggleButton.  A value of false indicates
+that the ToggleButton is not set.   A value of true indicates that
+the ToggleButton is set.  Setting this resource sets the state of the
+ToggleButton.
+.IP "\fIXmNspacing\fP"
+Specifies the amount of spacing between the toggle indicator and the
+toggle label (text or pixmap).
+.nL
+.ne 6
+.IP "\fIXmNvalueChangedCallback\fP"
+Specifies a list of callbacks
+called when the ToggleButtonGadget value
+is changed.  To change the value,
+press and release the active mouse button while the pointer
+is inside the ToggleButtonGadget.  This action
+also causes the gadget to be disarmed.
+For this callback, the reason is \fIXmCR_VALUE_CHANGED\fP.
+.IP "\fIXmNvisibleWhenOff\fP"
+Indicates that the toggle indicator is visible in the unselected state when
+the Boolean value is True.
+When the ToggleButtonGadget is in a menu, the default value is False.
+When the ToggleButtonGadget is in a RadioBox, the default value is True.
+.nL
+.ne 6
+.SS "Inherited Resources"
+ToggleButtonGadget inherits behavior and resources from the following
+superclasses.  For a complete description of each resource, refer to the
+man page for that superclass.
+.P 
+.wH
+.in 0 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmLabelGadget Resource Set
+Name	Class	Type	Default	Access
+_
+XmNaccelerator	XmCAccelerator	String	NULL	CSG
+XmNacceleratorText	XmCAcceleratorText	XmString	NULL 	CSG
+XmNalignment	XmCAlignment	unsigned char	dynamic	CSG
+XmNfontList	XmCFontList	XmFontList	dynamic	CSG
+XmNlabelInsensitivePixmap	XmCLabelInsensitivePixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNlabelPixmap	XmCLabelPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNlabelString	XmCXmString	XmString	dynamic	CSG
+XmNlabelType	XmCLabelType	unsigned char	XmSTRING	CSG
+XmNmarginBottom	XmCMarginBottom	Dimension	dynamic	CSG
+XmNmarginHeight	XmCMarginHeight	Dimension	2	CSG
+XmNmarginLeft	XmCMarginLeft	Dimension	dynamic	CSG
+XmNmarginRight	XmCMarginRight	Dimension	0	CSG
+XmNmarginTop	XmCMarginTop	Dimension	dynamic	CSG
+XmNmarginWidth	XmCMarginWidth	Dimension	2	CSG
+.wH
+.tH
+XmNmnemonic	XmCMnemonic	KeySym	NULL	CSG
+XmNmnemonicCharSet	XmCMnemonicCharSet	String	dynamic	CSG
+XmNrecomputeSize	XmCRecomputeSize	Boolean	True	CSG
+XmNstringDirection	XmCStringDirection	XmStringDirection	dynamic	CSG
+.TE
+.KE
+.in
+.sp 1
+.wH
+.in  
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmGadget Resource Set
+Name	Class	Type	Default	Access
+_
+XmNbottomShadowColor	XmCBottomShadowColor	Pixel	dynamic	G
+XmNhelpCallback	XmCCallback	XtCallbackList	NULL	C
+XmNhighlightColor	XmCHighlightColor	Pixel	dynamic	G
+XmNhighlightOnEnter	XmCHighlightOnEnter	Boolean	False	CSG
+XmNhighlightThickness	XmCHighlightThickness	Dimension	2	CSG
+XmNnavigationType	XmCNavigationType	XmNavigationType	XmNONE	CSG
+XmNshadowThickness	XmCShadowThickness	Dimension	dynamic	CSG
+XmNtopShadowColor	XmCTopShadowColor	Pixel	dynamic	G
+XmNtraversalOn	XmCTraversalOn	Boolean	True	CSG
+XmNunitType	XmCUnitType	unsigned char	dynamic	CSG
+XmNuserData	XmCUserData	XtPointer	NULL	CSG
+.TE
+.KE
+.in
+.sp 1
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+RectObj Resource Set
+Name	Class	Type	Default	Access
+_
+XmNancestorSensitive	XmCSensitive	Boolean	dynamic	G
+XmNborderWidth	XmCBorderWidth	Dimension	0	CSG
+XmNheight	XmCHeight	Dimension	dynamic	CSG
+XmNsensitive	XmCSensitive	Boolean	True	CSG
+XmNwidth	XmCWidth	Dimension	dynamic	CSG
+XmNx	XmCPosition	Position	0	CSG
+XmNy	XmCPosition	Position	0	CSG
+.TE
+.KE
+.in
+.sp 1
+.P
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+Object Resource Set
+Name	Class	Type	Default	Access
+_
+XmNdestroyCallback	XmCCallback	XtCallbackList	NULL	C
+.TE
+.KE
+.in
+.sp 1
+.SS "Callback Information"
+A pointer to the following structure is passed to each callback:
+.sS
+.iS
+.ta .25i 1.50i
+.nf
+typedef struct
+{
+	int	\fBreason\fI;
+	\fIXEvent	\fB* event\fI;
+	\fIint	\fBset\fI;
+} XmToggleButtonCallbackStruct;
+.iE
+.sE
+.wH
+.fi
+.IP "\fBreason\fP"
+Indicates why the callback was invoked
+.IP "\fBevent\fP"
+Points to the \fIXEvent\fP that triggered the callback
+.IP "\fBset\fP"
+Reflects the ToggleButtonGadget's current state when the callback occurred,
+either True (selected) or False (unselected)
+.SS "Behavior"
+XmToggleButtonGadget includes behavior from XmGadget.
+XmToggleButtonGadget includes menu traversal behavior from XmLabelGadget.
+Additional XmToggleButtonGadget behavior is described below:
+.IP "\fIBDrag\ Press\fP:"
+Drags the contents of a ToggleButtonGadget label, identified by
+pressing \fIBDrag\fP.  This action creates a DragContext object
+whose \fIXmNexportTargets\fP resource is set to "COMPOUND_TEXT" for
+a label type of \fIXmSTRING\fP; otherwise, "PIXMAP" if the
+label type is \fIXmPIXMAP\fP.  This action is undefined for
+ToggleButtonGadgets used in a menu system.
+.IP
+This action is disabled if the XmDisplay's \fIenableUnselectableDrag\fP
+resource is True.
+.IP "\fIBSelect\ Press\fP:"
+In a menu, this action unposts any menus posted by the ToggleButtonGadget's
+parent menu,
+disables keyboard traversal for the menu, and enables mouse traversal
+for the menu.
+It draws the shadow in the armed state
+and, unless the button is already armed, calls the \fIXmNarmCallback\fP
+callbacks.
+.IP
+Outside a menu, if the button was previously unset, this action does the
+following:
+If \fIXmNindicatorOn\fP is True, it draws the indicator shadow so that
+the indicator looks pressed; if \fIXmNfillOnSelect\fP is True, it fills
+the indicator with the color specified by \fIXmNselectColor\fP.
+If \fIXmNindicatorOn\fP is False, it draws the button shadow so that the
+button looks pressed.
+If \fIXmNlabelType\fP is \fIXmPIXMAP\fP, the \fIXmNselectPixmap\fP is
+used as the button face.
+Calls the \fIXmNarmCallback\fP callbacks.
+.IP
+Outside a menu, if the button was previously set, this action does the
+following:
+If both \fIXmNindicatorOn\fP and \fIXmNvisibleWhenOff\fP are True, it
+draws the indicator shadow so that the indicator looks raised; if
+\fIXmNfillOnSelect\fP is True, it fills the indicator with the
+background color.
+If \fIXmNindicatorOn\fP is False, it draws the button shadow so that the
+button looks raised.
+If \fIXmNlabelType\fP is \fIXmPIXMAP\fP, the \fIXmNlabelPixmap\fP is
+used as the button face.
+Calls the \fIXmNarmCallback\fP callbacks.
+.IP "\fIBSelect\ Release\fP:"
+In a menu, this action does the following:
+It unposts all menus in the menu hierarchy.
+If the ToggleButtonGadget was previously set, unsets it; if the ToggleButtonGadget
+was previously unset, sets it.
+It calls the \fIXmNvalueChangedCallback\fP callbacks and then the
+\fIXmNdisarmCallback\fP callbacks.
+.IP
+If the button is outside a menu and the pointer is within the button,
+this action does the following:
+If the button was previously unset, sets it; if the button was
+previously set, unsets it.
+Calls the \fIXmNvalueChangedCallback\fP callbacks.
+.IP
+If the button is outside a menu, calls the \fIXmNdisarmCallback\fP
+callbacks.
+.IP "\fIKHelp\fP:"
+In a Pulldown or Popup MenuPane, unposts all menus in the menu hierarchy
+and,
+when the shell's keyboard focus policy is \fIXmEXPLICT\fP,
+restores keyboard focus to the widget that had the focus before
+the menu system was entered.
+Calls the callbacks for \fIXmNhelpCallback\fP if any exist.
+If there are no help callbacks for this widget, this action calls the
+help callbacks for the nearest ancestor that has them.
+.IP "\*KActivate\fP:"
+In a menu, does the following: unposts all menus in the menu hierarchy;
+unless the button is already armed, calls the \fIXmNarmCallback\fP
+callbacks; and calls the \fIXmNvalueChangedCallback\fP and
+\fIXmNdisarmCallback\fP callbacks.  Outside a menu,
+if the parent is a manager, passes the event to the parent.
+.IP "\fIKSelect\fP:"
+If the ToggleButtonGadget was previously set, unsets it; if the
+ToggleButtonGadget was previously unset, sets it.
+.IP
+In a menu, does the following:
+Unposts all menus in the menu hierarchy.
+Unless the button is already armed,
+calls the \fIXmNarmCallback\fP callbacks.
+Calls the \fIXmNvalueChangedCallback\fP and
+\fIXmNdisarmCallback\fP callbacks.
+.IP
+Outside a menu, if the button was previously unset, this action does the
+following:
+If \fIXmNindicatorOn\fP is True, it draws the indicator shadow so that
+the indicator looks pressed; if \fIXmNfillOnSelect\fP is True, it fills
+the indicator with the color specified by \fIXmNselectColor\fP.
+If \fIXmNindicatorOn\fP is False, it draws the button shadow so that the
+button looks pressed.
+If \fIXmNlabelType\fP
+is \fIXmPIXMAP\fP, the \fIXmNselectPixmap\fP is
+used as the button face.
+Calls the \fIXmNarmCallback\fP, \fIXmNvalueChangedCallback\fP,
+\fIXmNdisarmCallback\fP callbacks.
+.IP
+Outside a menu, if the button was previously set, this action does the
+following:
+If both \fIXmNindicatorOn\fP and \fIXmNvisibleWhenOff\fP are True, it
+draws the indicator shadow so that the indicator looks raised; if
+\fIXmNfillOnSelect\fP is True, it fills the indicator with the
+background color.
+If \fIXmNindicatorOn\fP is False, it draws the button shadow so that the
+button looks raised.
+If \fIXmNlabelType\fP is \fIXmPIXMAP\fP, the \fIXmNlabelPixmap\fP is
+used as the button face.
+Calls the \fIXmNarmCallback\fP, \fIXmNvalueChangedCallback\fP, and
+\fIXmNdisarmCallback\fP callbacks.
+.nL
+.ne 10
+.IP "\fIMAny\ KCancel\fP:"
+In a toplevel Pulldown MenuPane from a MenuBar, unposts the menu,
+disarms the MenuBar CascadeButton and the MenuBar, and,
+when the shell's keyboard focus policy is \fIXmEXPLICT\fP,
+restores keyboard
+focus to the widget that had the focus before the MenuBar was
+entered.
+In other Pulldown MenuPanes, unposts the menu.
+Outside a menu, if the parent is a manager, this action passes the event to the
+parent.
+.IP
+In a Popup MenuPane, unposts the menu and restores keyboard focus to the
+widget from which the menu was posted.
+.IP "\fI<Enter>\fP:"
+In a menu, if keyboard traversal is enabled, this action does nothing.
+Otherwise, it draws the shadow in the armed state and calls the
+\fIXmNarmCallback\fP callbacks.
+.IP
+If the ToggleButtonGadget is not in a menu and the cursor leaves and then
+reenters the ToggleButtonGadget while the button is pressed, this
+action restores the button's armed appearance.
+.IP "\fI<Leave>\fP:"
+In a menu, if keyboard traversal is enabled, this action does nothing.
+Otherwise, it draws the shadow in the unarmed state and calls the
+\fIXmNdisarmCallback\fP callbacks.
+.IP
+If the ToggleButtonGadget is not in a menu and the cursor leaves the
+ToggleButtonGadget while the button is pressed, this action restores
+the button's unarmed appearance.
+.SS "Virtual Bindings"
+The bindings for virtual keys are vendor specific.
+For information about bindings for virtual buttons and keys, see \fIVirtualBindings(3X)\fP.
+.ne 10
+.nL
+.ne 10
+.SH RELATED INFORMATION
+.na
+\fIObject(3X)\fP,
+\fIRectObj(3X)\fP,
+\fIXmCreateRadioBox(3X)\fP,
+\fIXmCreateToggleButtonGadget(3X)\fP,
+\fIXmDisplay(3X)\fP,
+\fIXmGadget(3X)\fP,
+\fIXmLabelGadget(3X)\fP,
+\fIXmRowColumn(3X)\fP,
+\fIXmToggleButtonGadgetGetState(3X)\fP, and
+\fIXmToggleButtonGadgetSetState(3X)\fP.
+.ad

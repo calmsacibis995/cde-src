@@ -1,0 +1,151 @@
+.de Lc
+.\" version of .LI that emboldens its argument
+.TP \\n()Jn
+\s-1\f3\\$1\f1\s+1
+..
+.TH ttdt_Save 3 "1 March 1996" "ToolTalk 1.3" "ToolTalk Functions"
+.BH "1 March 1996"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.IX "ttdt_Save.3" "" "ttdt_Save.3" "" 
+.SH NAME
+ttdt_Save \- request a ToolTalk client to save a file
+.SH SYNOPSIS
+.ft 3
+.nf
+#include <Tt/tttk.h>
+.sp 0.5v
+.ta \w'Tt_status ttdt_Save('u
+Tt_status ttdt_Save(Tt_message \f2context\fP,
+	const char *\f2pathname\fP,
+	Tt_scope \f2the_scope\fP,
+	XtAppContext \f2app2run\fP,
+	int \f2ms_timeout\fP);
+.PP
+.fi
+.SH DESCRIPTION
+The
+.BR ttdt_Save (\|)
+function
+sends a
+.IR Save
+request in the
+.I the_scope
+argument and waits for the reply.
+A
+.IR Save
+request asks the handling ToolTalk client to
+save any changes pending on
+.IR pathname .
+.PP
+The
+.I context
+argument describes the environment to use.
+If
+.I context
+is not zero, messages created by
+.BR ttdt_Save (\|)
+inherit from
+.I context
+all contexts whose slotname begins with the characters
+.BR \s-1ENV_\s+1 .
+.PP
+The
+.I the_scope
+argument identifies the scope of the request.
+If
+.I the_scope
+is
+.BR \s-1TT_SCOPE_NONE\s+1 ,
+.BR ttdt_Save (\|)
+tries
+.BR \s-1TT_BOTH\s+1 ,
+and falls back to
+.BR \s-1TT_FILE_IN_SESSION\s+1
+if, for example,
+the ToolTalk database server
+is not installed on the file server that owns
+.IR pathname .
+.PP
+The
+.BR ttdt_Save (\|)
+function
+passes
+.I app2run
+and
+.I ms_timeout
+to
+.BR tttk_block_while (3),
+blocking on the reply to the
+.IR Save
+request it sends.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.BR ttdt_Save (\|)
+function returns the status of the operation as one of the following
+.B Tt_status
+values:
+.PP
+.RS 3
+.nr )J 8
+.Lc TT_OK
+The sent request received an affirmative reply within
+.I ms_timeout
+milliseconds.
+.Lc TT_DESKTOP_ETIMEDOUT
+.br
+No reply was received within
+.I ms_timeout
+milliseconds.
+.Lc TT_DESKTOP_EPROTO
+.br
+The request was failed, but the handler set the
+.BR tt_message_status (\|)
+of the failure reply to
+.BR \s-1TT_OK\s+1 ,
+instead of a specific error status.
+.Lc TT_ERR_DBAVAIL
+.br
+The ToolTalk service could not access the ToolTalk database
+needed for this operation.
+.Lc TT_ERR_DBEXIST
+.br
+The ToolTalk service could not access the specified ToolTalk database
+in the expected place.
+.Lc TT_ERR_NOMEM
+.br
+There is insufficient memory available to perform the function.
+.Lc TT_ERR_NOMP
+.br
+The
+.BR ttsession (1)
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_OVERFLOW
+.br
+The ToolTalk service has more active messages than it can handle.
+(The maximum number of active messages is
+.ne 2
+implementation specific, but is at least 2000.)
+.Lc TT_ERR_POINTER
+.br
+The
+.I pathname
+argument was
+.BR \s-1NULL\s+1
+or was a ToolTalk error pointer.
+.Lc TT_ERR_PROCID
+.br
+The specified process identifier is out of date or invalid.
+.PP
+.RE
+.nr )J 0
+.SH "SEE ALSO"
+.na
+.BR tttk (5),
+.BR ttdt_Revert (3),
+.BR ttdt_file_join (3),
+.BR ttdt_file_event (3),
+.BR tttk_block_while (3).

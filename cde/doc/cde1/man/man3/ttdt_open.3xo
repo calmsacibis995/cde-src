@@ -1,0 +1,66 @@
+.TH ttdt_open 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+ttdt_open \- create a ToolTalk communication endpoint
+.SH SYNOPSIS
+.yS
+#include <Tt/tttk.h>
+.sp 0.5v
+.ta \w'char *ttdt_open('u
+char *ttdt_open(int *\f2ttfd\fP,
+	const char *\f2toolname\fP,
+	const char *\f2vendor\fP,
+	const char *\f2version\fP,
+	int \f2sendStarted\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn ttdt_open
+function calls
+.Fn tt_open 3
+and
+.Fn tt_fd 3.
+It associates
+.IR toolname ,
+.IR vendor
+and
+.I version
+with the created
+procid,
+and initializes the new
+procid's
+default contexts from the process environment.
+If
+.IR sendStarted
+is True,
+.Fn ttdt_open
+sends a
+.I Started
+notice.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn ttdt_open
+function
+returns the created
+procid
+in a string that can be freed with
+.Fn tt_free ;
+otherwise, the
+.Fn ttdt_open
+function may return any of the errors returned by
+.Fn tt_open 3
+and
+.Fn tt_fd 3.
+.P
+No errors are propagated if sending the
+.I Started
+notice fails.
+.SH "SEE ALSO"
+.Hd Tt/tttk.h 5,
+.Fn ttdt_close 3,
+.Fn tt_open 3,
+.Fn tt_fd 3,
+.Fn tt_free 3.

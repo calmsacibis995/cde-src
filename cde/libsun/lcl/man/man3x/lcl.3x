@@ -1,0 +1,526 @@
+liblcl                locale conversion library functions	12/11/1996
+
+
+NAME
+        lcl_open, lcl_close
+        lct_create, lct_destroy, lct_setvalues, lct_getvalues
+
+SYNOPSIS
+	#include  "lcl.h"
+
+	LCLd lcl_open(char *locale) ; 
+
+	void lcl_close(LCLd lcld) ; 
+
+	LCTd lct_create(LCLd lcld, ..., NULL);
+
+	LCTd lct_destroy(LCTd lctd);
+
+	LclError *lct_setvalues(LCTd lctd, char* form, ..., NULL);
+
+	LclError *lct_getvalues(LCTd lctd, char* form, ..., NULL);
+
+	void lcl_destroy_charset_list(LclCharsetList *);
+
+	void lcl_destroy_segment_set(LclCharsetSegmentSet *);
+
+	void lcl_destroy_content_info(LclContentInfo *);
+
+	void lcl_destroy_error(LclError *);
+
+DESCRIPTION
+
+     These functions are used to create, access, and destroy locale
+     based data, to be used for converting characters or sequences of
+     characters from one codeset to another codeset.
+
+     lcl_open() is used to load individual locale data tables and
+     initialize the lcl system. The lcl_close() are used to close
+     individual locale data tables and records as well as a locale
+     descriptor list.
+     lcl_open() is called with one argument, the locale name.
+     On success, it returns a Non-Nil LCLd locale descriptor for use
+     by other LCL library functions.  
+     If Nil is specified as locale, the current locale is used.
+
+     lct_create() and lct_destroy() are used to create and destory
+     a locale text(encoded text in the locale specific encodings)
+     context and returns the locale text descriptor LCTd. All the 
+     encoding conversion and charset handling is performed through 
+     LCTd.
+     The locale text bound to LCTd is not editable. Therefore, LCTd
+     must be created per message.
+
+     lct_create() is called with the following three attributes.
+-----------------------------------------------------------------------------
+Attribute Name	  Type                                             C-S-G
+----------------------------------------------------------------------------
+LctNSourceType	  LctNAttribute	         			    C-G
+LctNSourceForm	  LctNAttribute					    C-G
+LctNKeepReference LctNAttribute			  		    C-G
+----------------------------------------------------------------------------
+
+     The C-S-G indicate whether the attribute can be specified through
+     lct_create(), lct_setvalues() or lct_getvalues().
+
+     The LctNSourceType is to specify the source text type.
+     Its value is one of the attribute of following list.
+
+Values of LctNSourceType
+------------------------
+
+Value		     nargs	args type	Description
+----------------------------------------------------------------------------
+LctNMsgText		2	const char*	RFC822/MIME/V3 mail header 
+				const char*	RFC822/MIME/V3 mail body   
+LctNPlainText		1	const char*	Plain Text                 
+LctNTaggedText		1	const char*	MIME/V3 Tagged Text        
+LctNSeparatedTaggedText	2	const char*	MIME/V3 Tagged Text header
+				const char*	MIME/V3 Tagged Text body
+-----------------------------------------------------------------------------
+     Each argument should be null-terminated string. For the types which
+     have two arguments, one of arguments can be left unset using LctNNone
+     instead of string. But in this case, it is user's responsibility to
+     set additional attribute informations to library to get correct result.
+     For example, if mail header is set to LctNNone for LctNMsgText type,
+     user may set the charset name by which mail body is encoded.
+
+     The LctNSourceForm is to specify the source text form.
+     Its value is one of the attribute of following list.
+
+Values of LctNSourceForm
+-----------------------
+
+Value 			Description
+-----------------------------------------------------------------------
+LctNDisplayForm			  Represents Displayable
+LctNPrintForm			  Represents the form for printing
+LctNInComingStreamForm		  Represents InComing Stream(reading mail)
+LctNOutGoingStreamForm		  Represents OutGoing Stream(sending mail)
+				  in MIME format
+LctNOutGoingStreamForm_V3	  Represents OutGoing Stream(sending mail)
+				  in Sun Mailtool format
+LctNOutGoingStreamForm_V3_Attach  Represents OutGoing Stream(sending mail)
+				  in Sun Mailtool format with attachments
+LctNUnknownForm			  Represents unknown content
+LctNFileForm(*1)		  Represents external files for read/write.
+LctNAppForm(*1)			  Represents attachment.
+-----------------------------------------------------------------------
+*1. not implemented yet
+
+     The LctNKeepReference is to specify whether the source text
+     can be kept as a reference or not.
+     This option is to improve performance by skipping data replication
+     when the application can maintain the lifetime of source text 
+     always longer than the lifetime of lct associated with.
+
+     Its value is one of the attribute of the following list.
+
+Value of LctNKeepReference
+--------------------------
+
+Value   Description
+----------------------------------------------------------------------------
+LctNKeepByValue	     Object replicates the argumenets, as regular object
+                     instantiation.(Default)
+LctNKeepByReference  Object just keeps the reference of the arguments.
+                     lifetime of the arguments must be maintained to be longer
+                     than LCTd. The option is only to improve performance by
+                     skipping replication. lcl library makes no change in
+		     the referenced content (read only).
+----------------------------------------------------------------------------
+
+  Example.
+
+   LCLd lcld = lcl_open(locale);
+
+	// Some code to get one message from spool, store the header part
+	// in buf_header, strore the body part in buf_body.
+
+   LCTd lclt = lct_create(lcld, LctNSourceType, 
+				    LctNMsgText, buf_header, buf_body,
+				LctNSourceForm, LctCInComingStreamForm,
+				LctNKeepReference, LctNKeepByReference,
+				NULL);
+     
+
+     The lct_setvalues() and lct_getvalues() set and get character 
+     conversion attribute refering to the locale specified by 'lctd'. 
+     The second argument LctNSourceForm is to specify to which form
+     the following attribute affects.
+     The attributes can be set/get are listed in the followings.
+
+-----------------------------------------------------------
+Attribute			Type			S-G
+-----------------------------------------------------------
+LctNHeaderCharset		char*			S-G
+LctNHeaderCharsetList		LclCharsetList*		S-G
+LctNHeaderPossibleCharsetList	LclCharsetList*		G
+LctNHeaderSegment		LclCharsetSegmentSet*	G
+LctNHeaderEncoding		char*			S-G
+LctNBodyCharset			char*			S-G
+LctNBodyCharsetList		LclCharsetList*		S-G
+LctNBodyPossibleCharsetList	LclCharsetList*		G
+LctNBodySegment			LclCharsetSegmentSet*	G
+LctNBodyEncoding		char*			S-G
+LctNTaggedTextCharset		char*			S-G
+LctNTaggedTextCharsetList	LclCharsetList*		S-G
+LctNTaggedTextPossibleCharsetList LclCharsetList*	G
+LctNTaggedTextSegment		LclCharsetSegmentSet*	G
+LctNTaggedTextEncoding		char*			S-G	
+LctNPlainTextCharset		char*			S-G
+LctNPlainTextCharsetList	LclCharsetList*		S-G
+LctNPlainTextPossibleCharsetList LclCharsetList*	G
+LctNPlainTextSegment		LclCharsetSegmentSet*	G
+LctNPlainTextEncoding		char*			S-G	
+
+LctNMailType			char*			S-G
+LctNAddHeader			char*			S
+LctNContentOfHeaderSegment	LclCharsetSegmentSet*	G
+LctNContentOfTaggedTextSegment	LclCharsetSegmentSet*	G
+LctNBodyCharsetEncoding		char*			G
+LctNQuerySourceType		LclContentInfo*		G
+
+     Basic 5 sorts of attributes are defined for each content types,
+     LctN*Charset, LctN*CharsetList, LctN*PossibleCharsetList, LctN*Segment
+     and LctN*Encoding.
+
+     LctN*Charset is to set/get the charset of the Form specified.
+     The argument is the name of the charset.
+     The name of charset is Form and context sensitive. In case of set/get
+     the charset of mail Forms (LctNInComingStreamForm, LctNOutGoingStreamForm,
+     LctNOutGoingStreamForm_V3, LctNOutGoingStreamForm_V3_Attach), the charset
+     name is the one used in mail (if LctNMailType is set to LctNMailTypeV3,
+     the one used in V3 format mail, otherwise the one used in MIME format
+     mail). Except these mail Forms, the charset name is the name used in
+     iconv.
+
+     LctN*CharsetList is to set/get the list of charset of the Form
+     specified in priority order. The argument is a list of name of the 
+     charset in LclCharsetList. The name of charset is Form and context
+     sensitive.
+
+     LctN*PossibleCharsetList to get the list of the possible charset
+     of the Form specified in priority order. The argument is a list of 
+     name of the charset in LclCharsetList. The result is a subset of the
+     result of LctNHeaderCharsetList. Library check the possibility of the
+     conversion between each charset and the charset specified in
+     LctNDisplayForm. This attribute is used in only 2 cases, The one is
+     getting from the locale texts created as LctNInComingStreamForm
+     specifying LctNInComingStreamForm as LctNSourceType, and the other is
+     getting from the locale texts created as LctNDisplayForm specifying
+     LctNOutGoingStreamForm as LctNSourceType. The name of charset is
+     context sensitive. If LctNMailType is set to LctNMailTypeV3, the one
+     used in V3 format mail, otherwise the one used in MIME format mail.
+
+     LctN*Segment to get the text. If the text consists of multiple
+     charset which can not be expressed in the single codeset is segmentized
+     at the boundary of each codeset, and stored as separate segment in 
+     LclCharsetSegment. The name of charset is Form and context sensitive.
+
+     LctN*Encoding is to get/set the encoding, such as Base64/Quoted-
+     Printable to the Form specified. The argument is name of the encoding.
+     The name is the same as the one defined MIME.
+
+     Each content type is used as follows:
+
+Content types of LctNSourceType
+-------------------------------
+
+SourceType	    Content type	 args type	Description
+----------------------------------------------------------------------------
+LctNMsgText		Header		RFC822/MIME/V3 mail header 
+			Body		RFC822/MIME/V3 mail body   
+LctNPlainText		PlainText	Plain Text                 
+LctNTaggedText		TaggedText	MIME/V3 Tagged Text        
+LctNSeparatedTaggedText	Header		MIME/V3 Tagged Text header
+			Body		MIME/V3 Tagged Text body
+-----------------------------------------------------------------------------
+
+     For example, LctNHeaderCharset and LctNBodyCharset is applicable to the
+     locale text created as LctNMsgText and LctNSeparatedTaggedText,
+     LctNPlainTextCharset is applicable to the one created as LctNPlainText,
+     and LctNTaggedTextCharset is applicable to the one created as
+     LctNTaggedText.
+     
+
+     LctNMailType is to get/set the mail type, such as RFC822/MIME/V3 mail
+     type to LctNInComingStreamForm and LctNOutGoingStreamForm.
+
+Values of LctNMailType
+-----------------------
+
+Value 			Description
+-----------------------------------------------------------------------
+LctNMailTypeMime	Represents Displayable
+LctNMailTypeV3		Represents InComing Stream(reading mail)
+LctNMailType822		Represents OutGoing Stream(sending mail)
+LctNMailTypeUnknown	Represents external files for read/write.
+-----------------------------------------------------------------------
+
+     About LctNInComingStreamForm, if LctNMailTypeUnknown is specified,
+     library automatically determine the type from header or body(if header
+     is not available) and set the result to this attribute. Otherwise,
+     the value set to this attribute is prior to automatic determination.
+
+     LctNAddHeader is to add header contents to locale text after it is
+     created. The argument is null-terminated string and it is copied and
+     add to the end of the original buffer. For using this attribute, locale
+     text must be created setting LctNKeepReference to LctNKeepByValue.
+
+     LctNContentOfHeaderSegment is to get the header segment without charset
+     and encoding of Content-Type: tag from the locale text created specifying
+     LctNMsgText or LctNSeparatedTaggedText as LctNSourceType. This attribute
+     is applicable to only LctNOutGoingStreamForm.
+
+     LctNContentOfTaggedTextSegment is to get the body part of LctNTaggedText.
+     This is applicable to the locale text created specifying LctNTaggedText
+     as LctNSourceType. If the locale text was created specifying
+     LctNInComingStreamForm as LctNSourceForm, the form argument can be set to
+     LctNDisplayForm. If the locale text was created specifying LctNDisplayForm
+     as LctNSourceForm, the form argument can be set to LctNOutGoingStreamForm.
+
+     LctNBodyCharsetEncoding is to get encoding name from not Source Type but
+     charset name set to Source Type. A charset name sensitive encoding type
+     is retrived.
+
+     LctNQueryType is to get the type of content which is created specifying
+     LctNSourceType as LctNUnknown. If the content is text, it also guessed
+     charset name list of the text in priority order.
+     The type value is one of the following list.
+
+Values of content type
+-----------------------
+
+Value 			Description
+-----------------------------------------------------------------------
+LclSourceUnknownType	Represents unknown type
+LclSoutceTextType	Represents text type
+LclSourceBinaryType	Represents binary type
+-----------------------------------------------------------------------
+
+     On success, lcl_set_values() and lcl_get_values() returns
+     (LctError *)NULL, otherwise it returns LctError struct.
+
+typedef struct {
+        char    *attribute;	// name of attribute in which the error occurs
+        unsigned long   error_code; // error code
+        void    *detail;	// detailed error information (not used)
+} LclError;
+
+
+Values of error_code
+-----------------------
+
+Value 			Attributes in the error can occur
+-----------------------------------------------------------------------
+LctErrorInvalidAttribute
+			all the attributes
+
+LctErrorNotEnoughResource
+			all the attributes
+
+LctErrorIconvCannotOpen LctNHeaderSegment, LctNBodySegment,
+			LctNTaggedTextSegment, LctNPlainTextSegment,
+			LctNContentOfHeaderSegment,
+			LctNContentOfTaggedTextSegment
+
+LctErrorIconvError	LctNHeaderSegment, LctNBodySegment,
+			LctNTaggedTextSegment, LctNPlainTextSegment,
+			LctNContentOfHeaderSegment,
+			LctNContentOfTaggedTextSegment
+
+LctErrorDBCannotFindIconvDef
+			LctNHeaderSegment, LctNBodySegment,
+			LctNTaggedTextSegment, LctNPlainTextSegment,
+			LctNContentOfHeaderSegment,
+			LctNContentOfTaggedTextSegment
+
+LctErrorDBCannotFindFromCharset
+			LctNHeaderSegment, LctNBodySegment,
+			LctNTaggedTextSegment, LctNPlainTextSegment,
+			LctNContentOfHeaderSegment,
+			LctNContentOfTaggedTextSegment
+
+LctErrorDBCannotFindToCharset
+			LctNHeaderSegment, LctNBodySegment,
+			LctNTaggedTextSegment, LctNPlainTextSegment,
+			LctNContentOfHeaderSegment,
+			LctNContentOfTaggedTextSegment
+
+LctErrorIconvNonIdenticalConversion
+			LctNHeaderSegment, LctNBodySegment,
+			LctNTaggedTextSegment, LctNPlainTextSegment,
+			LctNContentOfHeaderSegment,
+			LctNContentOfTaggedTextSegment
+
+LctErrorIconvHalfDone
+			LctNHeaderSegment, LctNBodySegment,
+			LctNTaggedTextSegment, LctNPlainTextSegment,
+			LctNContentOfHeaderSegment,
+			LctNContentOfTaggedTextSegment
+-----------------------------------------------------------------------
+
+     LctErrorNotEnoughResource is returned if it fail to malloc().
+
+     LctErrorInvalidAttribute is returned if the specified attribute name
+     is invalid.
+
+     LctErrorIconvCannotOpen is returned if the conversion fails because
+     it can't open iconv.
+
+     LctErrorIconvError is returned if the conversion fails in iconv function.
+
+     LctErrorDBCannotFindIconvDef is returned if the conversion fails because
+     the conversion between source and target charsets is not defined in
+     locale DB.
+     
+     LctErrorDBCannotFindFromCharset is returned if the conversion fails
+     because the source charset specified is not defined in locale DB.
+
+     LctErrorDBCannotFindToCharset is returned if the conversion fails
+     because the target charset specified is not defined in locale DB.
+
+     LctErrorIconvNonIdenticalConversion is returned if iconv performed
+     non-identical conversion.
+
+     LctErrorIconvHalfDone is returned if the conversion stopped due to
+     an input character that does not belong to the input codeset.
+
+     If LctError is returned, the attributes before the one in which error
+     occured is valid, the one in which error occured is not valid except
+     the case that error_code is LctErrorIconvNonIdenticalConversion or
+     LctErrorIconvHalfDone. The attributes after the one in which error
+     occured is not valid.
+
+     If LctError is returned, it should be freed by user. The destroy function
+     lcl_destroy_error() is offered.
+
+     All the arguments passed to lct_setvalues() are just looked or copied in
+     the library if needed. These arguments should be freed by user.
+
+     All the auguments returned by lct_getvalues() should be freed by user.
+     For the structs, destroy functions are offered.
+
+     lcl_destroy_segment_set() free the LclCharsetSementSet struct passed and
+     its all contents. If some of contents are used after destroying the
+     struct, they should be copied before destroy or set NULL to the struct
+     members. If null is set to the member of the struct, the member is not
+     freed.
+     
+     lcl_destroy_charset_list() free the LclCharsetList struct passed and
+     its all contents. If some of contents are used after destroying the
+     struct, they should be copied before destroy or set NULL to the struct
+     members. If null is set to the member of the struct, the member is not
+     freed.
+
+
+  Example.
+
+    // To get the mail header to display.
+    rv = lct_getvalues(lctd, LctCDisplayForm,
+			LctNHeaderSegment, &segment_set, NULL);
+    if(rv){
+	// error
+	if((rv->error_code == LctErrorIconvNonIdenticalConversion) ||
+	(rv->error_code == LctErrorIconvHalfDone))
+	    lcl_destroy_segment_set(segment_set);
+	lcl_destroy_error(rv);
+    }
+    else{
+	// The code to display the mail header in the arg segment
+	// The encoded subject lines in the header are already 
+	// decoded and converted into the displayable codeset accordingly.
+        lcl_destroy_segment_set(segment_set);
+    }
+
+    // To get the mail body to display.
+    rv = lct_getvalues(lctd, LctCDisplayForm,
+			LctNBodySegment, &segment_set, NULL);
+    if(rv){
+	// error
+	if((rv->error_code == LctErrorIconvNonIdenticalConversion) ||
+	(rv->error_code == LctErrorIconvHalfDone))
+	    lcl_destroy_segment_set(segment_set);
+	lcl_destroy_error(rv);
+    }
+    else{
+	// The code to display the mail body in the arg segment
+	// The encoded body, such as QP is already 
+	// decoded and converted into the displayable codeset accordingly.
+	lcl_destroy_segment_set(segment_set);
+    }
+
+
+  Example 2.
+
+    // Wrong characters are displayed due to the "wrong charset-tag" from
+    // Mailtool. To fix the codeset, get the possible charset list first.
+    rv = lct_getvalues(lctd, LctCInComingStearmForm,
+			LctNBodyPossibleCharsetList, &list, NULL);
+    if(rv){
+	// error
+	lcl_destroy_error(rv);
+    }
+    else{
+	// The code to display the list of possible character sets
+	// to display, 
+	// User to pick the one charset from the list.
+    	rv = lct_setvalues(lctd, LctCInComingStearmForm,
+			LctNBodyCharset, charset_picked, NULL);
+	// destroy return charset list
+	lcl_destroy_charset_list(list);
+	if(rv){
+	    // error
+	    lcl_destroy_error(rv);
+	}
+	else{
+	    // Charset is fixed, we should get the displayable
+	    // text again.
+    	    rv = lct_getvalues(lctd, LctCDisplayForm,
+				LctNBodySegment, &segment_set, NULL);
+    	    if(!rv){
+		// error
+		if((rv->error_code == LctErrorIconvNonIdenticalConversion) ||
+		(rv->error_code == LctErrorIconvHalfDone))
+		    lcl_destroy_segment_set(segment_set);
+		lcl_destroy_error(rv);
+	    }
+	    else{
+	        // The code to display the mail body in the arg segment
+		lcl_destroy_segment_set(segment_set);
+	    }
+	}
+    }
+
+
+DATA TYPES
+
+    typedef struct {
+	char* segment ;  // segment of char* consists to single charset.
+	char* charset;	 // name of charset for the segment.
+	size_t size;	 // size of segment in bytes.
+    } LclCharsetSegment; // represents a text segment.
+
+    typedef struct {
+	int num;		// number of elements in LclCharsetSegments
+	LclCharsetSegment *seg; // An array of LclCharsetSegments
+    } LclCharsetSegmentSet;	// represents a text consists of multiple
+				// text segments.
+
+    typedef struct {
+	int num;	  	// number of elements in charset array.
+	char	**charset;	// an array of charset names.
+    } LclCharsetList;		// represents an array of charset names.
+
+    typedef struct {
+        LclContentType  type;		// content type
+        LclCharsetList  *charset_list;	// if content type is text, guessed
+    } LclContentInfo			// charset list of the text.
+					// otherwise Null.
+
+    typedef struct {
+	char	*attribute;	    // attribute name where the error occurs
+	unsigned long   error_code; // error_code
+	void	*detail;	    // reserved
+    }

@@ -1,0 +1,74 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH XmActivateProtocol 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmActivateProtocol\fP \- A VendorShell function that activates a protocol
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/Xm.h>
+\&#include <Xm/Protocols.h>
+.sp \n(PDu
+void XmActivateProtocol (\fBshell, property, protocol\fI)
+.ta .5i 1.5i
+.nf
+	Widget	\fBshell\fI;
+	Atom	\fBproperty\fI;
+	Atom	\fBprotocol\fI;
+.sp \n(PDu
+void XmActivateWMProtocol (\fBshell, protocol\fI)
+	Widget	\fBshell\fI;
+	Atom	\fBprotocol\fI;
+.wH
+.fi
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+\fIXmActivateProtocol\fP activates a protocol.  It
+updates the handlers and the \fBproperty\fP if
+the \fBshell\fP is realized.  It is sometimes useful to allow
+a protocol's state information (callback lists, and so on) to persist, even though
+the client may choose to temporarily resign from the interaction.  This is
+supported by allowing a \fBprotocol\fP to be in one of two states:  active or
+inactive.  If the \fBprotocol\fP is active and the \fBshell\fP is realized,
+.ne 5
+the \fBproperty\fP contains the \fBprotocol\fP \fIAtom\fP.
+If the \fBprotocol\fP is inactive, the \fIAtom\fP is not present in
+the \fBproperty\fP.
+.PP 
+\fIXmActivateWMProtocol\fP is a convenience interface.
+It calls \fIXmActivateProtocol\fP
+with the property value set to the atom returned by
+interning \fIWM_PROTOCOLS\fP.
+.IP "\fBshell\fP"
+Specifies the widget with which the protocol property is associated.
+.IP "\fBproperty\fP"
+Specifies the protocol property.
+.IP "\fBprotocol\fP"
+Specifies the protocol \fIAtom\fP (or an \fIint\fP type cast to \fIAtom\fP).
+.PP 
+For a complete definition of VendorShell and its associated resources, see
+\fIVendorShell(3X)\fP.
+.SH RELATED INFORMATION
+.na
+\fIVendorShell(3X)\fP, \fIXmActivateWMProtocol(3X)\fP
+and \fIXmInternAtom(3X)\fP.
+.ad

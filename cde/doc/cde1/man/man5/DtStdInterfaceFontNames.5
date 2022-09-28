@@ -1,0 +1,405 @@
+.\" (c) Copyright 1994 Hewlett-Packard Company
+.\" (c) Copyright 1994 International Business Machines Corp.
+.\" (c) Copyright 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1994 Unix System Labs, Inc., a subsidiary of Novell, Inc.
+.TH DtStdInterfaceFontNames 5
+.SH NAME
+DtStdInterfaceFontNames \- CDE Standard Interface Font Names:
+a set of platform-independent interface font names needed by the CDE GUI
+.SH SYNOPSIS
+The CDE Standard Interface Font Names are a set of generic X Window System font names, needed by the CDE GUI
+itself, that are used for user interface elements such as button
+labels, window titles, and text fields.
+These names, for 7 sizes of 2 typefaces, must exist on all CDE platforms,
+and they should be provided in any X\ server product on which the CDE desktop is meant to run; 
+7 sizes of a 3rd typeface are recommended.
+They are typically mapped to
+existing fonts on the platform using the font alias mechanism, 
+although this method is not required.
+.SH DESCRIPTION
+CDE 1.0 does not come with a common set of fonts on all vendors'
+platforms, and it must be able to run on X\ servers and X terminals from non-CDE
+vendors if those vendors so desire.  Therefore, there are a standard set of ``generic'' font names
+and sizes that each CDE vendor makes available on their CDE systems and
+that X\ server vendors may make available on their X\ servers and terminals.  The
+names map to existing fonts on each vendor's platform and may vary
+from vendor to vendor.
+.PP
+The CDE Standard Interface Font Names described here allow clients
+making up the CDE desktop, such as \f3dtterm\fP and \f3dtwm\fP, to use
+a single set of default fonts in their \f3app-defaults\fP files,
+without concern for the CDE platform or X\ server on which CDE is
+running.
+(The CDE Standard Application Font Names, described in
+.BR DtStdAppFontNames (5),
+provide a similar mechanism for applications running on the CDE desktop.)
+.PP
+.SS Background
+Interface fonts are designed by user interface experts for the narrow
+purpose of making the menus, labels, and fields of a graphical user
+interface highly readable.  They are usually finely hand-tuned
+bitmapped fonts, intended for use on visual displays only and not on
+printers, and many of the glyphs have been specially modified for this purpose.
+Interface fonts can be contrasted with application fonts, which are the
+fonts used within an application running on the CDE desktop.  Interface
+fonts come in a restricted set of styles and are used for short strings
+of text, whereas application fonts usually come in a variety of designs,
+styles, and weights and are used for emphasis, cross-references, section
+headers, etc.
+.PP
+.SS Rationale
+Common font names are required to prevent CDE clients like \f3dtterm\fP
+from needing different
+.ft 3
+app-defaults
+.R
+files on each CDE platform.
+In addition, any X\ server or X terminal
+vendor may ensure that the CDE desktop can run on their X\ server by
+mapping these standard names to fonts of the corresponding style on
+their individual X platforms.
+.PP
+Interface fonts are needed because of user interface and cognitive
+research that has examined the readability of various fonts on the
+display screens in use today and found that many fine adjustments
+(e.g., for centering, baseline, height, and alignment) must be made to
+characters in a font to make them clear, distinguishable, and
+consistent when used for the interface objects of a GUI. And by using
+hand-tuned interface fonts for the GUI objects, the desktop can achieve
+a very clean, crisp visual appearance.
+.PP
+Interface fonts are broken into 2 categories: system and user.
+Cognitive research has shown that this distinction is important for the
+usability and readability of GUIs. System fonts are those used when the
+system is presenting information to the user (e.g., in buttons). User
+fonts are those used for text that a user enters into the system (e.g.,
+for a text field or terminal emulator).
+.PP
+.SS "XLFD Field Values for the Standard Interface Font Names"
+These standard names are available using the X Window System
+XLFD font naming scheme.
+It is important to understand that there are 3 aspects to the standard names:
+.RS 3
+.PD .1
+.IP \(bu 3
+the
+.I "underlying font"
+on each X\ server platform that a standard name is mapped to:
+.br
+This will probably be different on each platform
+.IP \(bu 3
+the
+.I "standard name"
+itself, a full XLFD name mapped to the underlying font:
+.br
+This will probably be different on each platform
+.IP \(bu 3
+the font resource
+.I "pattern"
+containing the \f3*\fP wildcards, used in \f3app-defaults\fP files, that will match the full XLFD name of the standard name:
+.br
+This is the same across all platforms, for a given use in an \f3app-defaults\fP file
+.PD
+.RE
+.PP
+Each CDE or X\ server vendor implementing this specification must provide full XLFD names for the standard names, mapped to underlying fonts of their choice, so that the XLFD patterns used in CDE client \f3app-defaults\fP files will always match one of the full XLFD names provided.
+.PP
+The Standard Interface Font Names are identified by the presence of the
+following XLFD field name values:
+.RS 3
+.PD .1
+.IP \(bu 3
+FOUNDRY is \f3dt\fP
+.IP \(bu 3
+FAMILY_NAME is either \f3interface system\fP or \f3interface user\fP
+(there is a blank between the two words in each family name)
+.PD
+.RE
+In addition, the other fields of the XLFD names defining the standard names are constrained as follows:
+.RS 3
+.PD .1
+.IP \(bu 3
+WEIGHT_NAME is either \f3medium\fP or \f3bold\fP
+.IP \(bu 3
+SLANT is always \f3r\fP 
+.IP \(bu 3
+SETWIDTH_NAME is always \f3normal\fP
+.IP \(bu 3
+SPACING is \f3p\fP or \f3m\fP 
+(it must be \f3m\fP for \f3interface user\fP fonts, and
+should be \f3p\fP for \f3interface system\fP fonts although \f3m\fP is acceptable)
+.IP \(bu 3
+ADD_STYLE_NAME contains both a nominal size value in the range \f3xxs\fP to \f3xxl\fP (see below),
+as well as either \f3sans\fP for sans serif fonts or \f3serif\fP for serif, if appropriate for the underlying font
+.IP \(bu 3
+The numeric fields 
+(PIXEL_SIZE,
+POINT_SIZE,
+RESOLUTION_X,
+RESOLUTION_Y,
+and
+AVERAGE_WIDTH)
+must contain the same values as the underlying font.
+.IP \(bu 3
+CHARSET_REGISTRY and CHARSET_ENCODING are not specified;
+the standard names may be implemented for any CDE locale.
+.PD
+.RE
+.PP
+Although the \f3sans\fP and \f3serif\fP values in the ADD_STYLE_NAME field are not required by the
+XLFD font convention, they are always part of the CDE Standard Font
+Names when the underlying fonts are characterized as serif or sans serif. However, this specification makes no restriction on whether
+the interface fonts are serif or sans serif, just that\(emwhichever they
+are\(emthe relevant attribute is coded in the ADD_STYLE_NAME field.
+Thus, the standard names for Japanese fonts, which are not characterized as being serif or sans serif, would not include this designation in the ADD_STYLE_NAME field.
+.PP
+.SS "Restricted Set of Styles Available"
+Unlike the Standard Application Font Names, only a limited set of
+styles is available in the Standard Interface Font Names. The styles
+available represent the minimum set currently considered necessary for
+the desktop GUI needs:
+.RS 3
+.PD .1
+.IP \(bu 3
+a medium weight of an interface system font, preferably proportionally spaced (but mono-spaced is acceptable if appropriate for the locale)
+.IP \(bu 3
+a medium weight of an interface user font, always mono-spaced
+.IP \(bu 3
+a bold weight of an interface user font, always mono-spaced
+(the standard font names for this generic typeface are highly recommended if available for the targeted fonts and locale, but are not required)
+.PD
+.RE
+.PP
+.SS "Named Set of Point Sizes Available"
+In addition, the set of 7 point sizes for each of the 3 styles that are
+part of this specification are ``named'' point sizes, using string
+values in the ADD_STYLE_NAME field.
+Thus, XLFD patterns matching these names match a size based on the named size, not on a numeric size, even though the latter does exist in the XLFD name.
+These named sizes are used because the exact size of
+an interface font is less important than its nominal size, and vendor
+and hardware differences for the hand-tuned interface fonts do not allow common numeric point sizes to be
+assured across platforms. The 7 nominal sizes are as follows:
+.RS 3
+.PD .1
+.IP \(bu 3
+\f3xxs\fP: extra extra small
+.IP \(bu 3
+\f3xs\fP: extra small
+.IP \(bu 3
+\f3s\fP: small
+.IP \(bu 3
+\f3m\fP: medium
+.IP \(bu 3
+\f3l\fP: large
+.IP \(bu 3
+\f3xl\fP: extra large
+.IP \(bu 3
+\f3xxl\fP: extra extra large
+.PD
+.RE
+.PP
+The goal of these named sizes is to provide enough fonts so that both
+the variety of display monitor sizes and resolutions that CDE will run
+on, and the range of user preferences for comfortably reading button
+labels, window titles, and the like, can be accommodated in the GUI.
+Thus, both the smallest size, \f3xxs\fP, and the largest size,
+\f3xxl\fP, are meant to be reasonable sizes for displaying, and
+viewing, the CDE desktop on common displays and X terminals;
+they are not meant to imply either hard-to-read fine print or
+headline-sized display type.
+.PP
+These named size values must occur first in the ADD_STYLE_NAME
+field, before any use of the values \f3serif\fP or \f3sans\fP (one of
+which is always required when the underlying font can be so characterized) and before any other additional stylistic
+attribute that might be appropriate.
+This is important when specifying wild-carded patterns in a resource
+specification for these fonts, since whether the underlying font these
+names are mapped to is serif or sans serif is not a part of this
+specification, and the match must work for all XLFD names provided 
+under this specification by CDE platform vendors or other X\ server vendors.
+.PP
+.SS "Example XLFD Patterns for the Standard Names"
+Using these values, the XLFD pattern
+.EX
+-dt-interface*-*
+.EE
+would match the full set of CDE Standard Interface Font Names on a platform.
+.PP
+The full set of 21 CDE Standard Interface Font Names can also be
+represented, in a more meaningful way, as follows:
+.EX
+-dt-interface system-medium-r-normal-*-*-*-*-*-*-*-iso8859-1
+-dt-interface user-medium-r-normal-*-*-*-*-*-m-*-iso8859-1
+-dt-interface user-bold-r-normal-*-*-*-*-*-m-*-iso8859-1
+.EE
+The full set of patterns, usable in \f3app-defaults\fP files, for all 7
+sizes for the system font, for example, is:
+.EX
+-dt-interface system-medium-r-normal-xxs*-*-*-*-*-*-*-iso8859-1
+-dt-interface system-medium-r-normal-xs*-*-*-*-*-*-*-iso8859-1
+-dt-interface system-medium-r-normal-s*-*-*-*-*-*-*-iso8859-1
+-dt-interface system-medium-r-normal-m*-*-*-*-*-*-*-iso8859-1
+-dt-interface system-medium-r-normal-l*-*-*-*-*-*-*-iso8859-1
+-dt-interface system-medium-r-normal-xl*-*-*-*-*-*-*-iso8859-1
+-dt-interface system-medium-r-normal-xxl*-*-*-*-*-*-*-iso8859-1
+.EE
+These patterns could be used in a resource file and will match the
+full CDE Standard Interface Names for Latin-1 locales on all CDE, or complying X
+server, platforms.
+.PP
+Note in these wild-carded XLFD names that the ADD_STYLE_NAME field has a pattern,
+such as \f3xxs*\fP, and that the pattern is partly a string
+(\f3xxs\fP) and partly the pattern-matching character \f3*\fP.
+The full XLFD name this pattern matches\(emthe XLFD name implementing the
+Standard Interface name\(emwill often contain \f3sans\fP or \f3serif\fP
+in the field, after the \f3xxs\fP and a space,
+and so the \f3*\fP is essential to match that \f3sans\fP or \f3serif\fP string (and any additional style attribute string that might be in the underlying name).
+Note also that the SPACING field is wild-carded in the pattern for the system font, since either \f3p\fP or \f3m\fP may appear in the standard name being matched.
+.PP
+.SS "CDE Platform Vendor and X Server Vendor Implementation of These Names"
+Each CDE platform vendor and X\ server vendor provides mappings of their
+own fonts to XLFD names meeting this specification, so that CDE clients will
+work on their platform.
+The actual XLFD names will vary from platform to platform, just as the
+fonts they are mapped to, since they contain some of the same values
+as the XLFD name of the underlying font.
+What does not vary is the behavior: the
+common patterns in which only specified fields are used will match each
+platform's standard names.  
+This is guaranteed by the field specifications given earlier.
+.PP
+There is no precise specification of how the named sizes \f3xxs\fP to \f3xxl\fP are mapped to sizes of underlying fonts in each platform or X\ server product,
+though each size must be equal to or larger than the previous size.
+Nonetheless, some guidelines are appropriate.
+.PP
+Interface fonts have been developed because of human factors research on visual clarity of text on displays, and this has been done in the context of the display technology typically available today, mostly in the 100 dots per inch (DPI) range.
+That, and the use of standard point sizes (10, 12, 14, 18) in the graphics arts, have resulted in the development in the industry of hand-tuned bitmapped fonts for a set of ``pixel heights'' that are likely to be used for these standard names.
+However, making the CDE desktop usable with a range of point sizes effectively means, in addition to legibility for the user, that the various CDE applications fit ``appropriately'' on the screen using those point sizes.
+This means, for example, that two application windows can appear side by side on a typical display or that a certain number of buttons can appear across the screen.
+.PP
+Thus, these guidelines are expressed not only in pixel sizes, to reflect current usage, but also in percentage of monitor height.
+This allows them to remain appropriate as technological evolution improves display resolution and monitor size (e.g., wall-mounted monitors).
+The ideal set of sizes would form a linear progression from the smallest (\f3xxs\fP) to the largest (\f3xxl\fP), although this is not achievable.
+The basic guideline is that the \f3xxl\fP font should be, in pixels, no less than 0.9% of the height of the display resolution, in pixels;
+the \f3xxl\fP font should be no more than 2.6% of the height.
+.PP
+As an approximate example that does not represent any existing mapping of fonts to a display, this table shows how the named sizes might map to real bitmapped fonts of a given pixel size, and how large those sizes are in percentage and point size terms:
+.TS
+center box tab(:);
+cfB s s s 
+cfI | cfI | cfI | cfI 
+cfI | cfI | cfI | cfI 
+lfB | n |  n | n.
+.sp .4
+Sample Range of Named Sizes on a 1280x1024 Display
+.sp .4
+_
+named:# of:size as %:pointsize on
+size:pixels:of 1024 height:100 DPI screen:
+_
+xxs:10:0.98%:7.2
+xs:12:1.12%:8.7
+s:14:1.37%:10.1
+m:17:1.66%:12.3
+l:20:1.95%:14.6
+xl:23:2.25%:16.6
+xxl:26:2.54%:18.8
+.TE
+.PP
+Thus, the following requirements are placed on each CDE or X\ server vendor's implementation of the Standard Interface Font Names:
+.RS 3
+.PD .1
+.IP \(bu 3
+The names must be fully specified XLFD names, without wild cards.
+.IP \(bu 3
+The WEIGHT_NAME, SLANT, SETWIDTH_NAME,  SPACING, CHARSET_REGISTRY, and
+CHARSET_ENCODING fields must contain valid values as defined previously and must match those in the underlying font.
+.IP \(bu 3
+The ADD_STYLE_NAME field must contain both a named size (e.g.,
+\f3xxs\fP) and, if appropriate, either the \f3serif\fP or \f3sans\fP designation,
+whichever matches the underlying font; any additional words about the
+style of the underlying font, if defined for the underlying font, must
+also be used. The named size must be first in the field, and must be
+separated from any following word in the field with a blank.
+.IP \(bu 3
+The named sizes \f3xxs\fP through \f3xxl\fP must be mapped to fonts
+that are progressively larger than or equal to the previous one in the list.
+Thus, several standard names with adjacent sizes (e.g., \f3xxs\fP and \f3xs\fP) may be mapped to the same font (e.g., if there is not enough variety in sizes in the underlying fonts).
+.IP \(bu 3
+The implemented names should attempt to meet the guidelines discussed in the previous paragraph and table.
+.PP
+For example, assume that vendor A is using this font for the extra
+small system font:
+.EX
+.SM "-bitstream-swiss-medium-r-normal--11-90-85-85-p-81-iso8859-1"
+.EE
+and that vendor B is using this font for the extra small system font:
+.EX
+.SM "-vendorb-ersatz-medium-r-normal-xyz-8-80-75-75-m-72-iso8859-1"
+.EE
+(the value \f3xyz\fP in the ADD_STYLE_NAME field represents some kind of additional style attribute of the font, such as Expert).
+Also assume that the first font is sans serif but the second one, \f3ersatz\fP, is a serif font.  Their
+respective standard names would be implemented on their platforms as:
+.EX
+.SM "-dt-interface system-medium-r-normal-xs sans-11-90-85-85-p-81-iso8859-1"
+.SM "-dt-interface system-medium-r-normal-xs serif xyz-8-80-75-75-m-72-iso8859-1"
+.EE
+Defined this way, both names will match the single XLFD pattern used in a common
+\f3app-defaults\fP file:
+.EX
+.SM "-dt-interface system-medium-r-normal-xs*-*-*-*-*-*-*-iso8859-1"
+.EE
+.PP
+.SS "Default CDE Mapping of the Standard Interface Font Names"
+There is no default mapping of these interface names to X11R5 fonts;
+the mapping is vendor-specific.
+.PP
+.SH "USAGE"
+A CDE desktop client developer will code a single \f3app-defaults\fP
+file to specify font resources for their client and use it across all
+CDE platforms.
+Since the 
+FOUNDRY,
+FAMILY_NAME,
+WEIGHT_NAME,
+SLANT,
+and
+SETWIDTH_NAME
+fields of the standard names are the same across different vendors' platforms,
+these values can be used in the resource specification in the \f3app-defaults\fP file.
+However, other fields (ADD_STYLE_NAME, PIXEL_SIZE, POINT_SIZE,
+RESOLUTION_X, RESOLUTION_Y, SPACING, and AVERAGE_WIDTH) will vary across
+platforms, and so must be wild-carded in the resource specification
+(ADD_STYLE_NAME is partially wildcarded).
+As was shown in the previous example:
+.EX
+.SM "-dt-interface system-medium-r-normal-xs*-*-*-*-*-*-*-iso8859-1"
+.EE
+is an XLFD pattern, used in a single resource specification, that
+matches a single 
+standard name on different CDE or X\ server platforms.
+(And if the last 2 fields, CHARSET_REGISTRY and CHARSET_ENCODING, were wildcarded, then the pattern could work across locales as well.)
+Note that the named size
+(\f3xs\fP in this example) is part of the pattern, but the \f3serif\fP/\f3sans serif\fP
+designation is not; this is required to obtain the desired nominal size
+(whatever it may be in the mapped font), while still matching either
+\f3serif\fP or \f3sans serif\fP in the standard name.
+.PP
+Note that if a CDE desktop application tries to open a font using one
+of these standard names, and the X\ server does not know about these names, the application will usually fall back on using the \f3fixed\fP and \f3variable\fP font aliases that are typically provided in all X\ servers.
+When this happens, the CDE desktop will be more difficult to use, visually, than if its expected font names were available.
+.SH "SEE ALSO"
+.BR dtstyle (1),
+.BR dtterm (1),
+.BR DtStdAppFontNames (5)
+.SH NOTES
+There is no requirement on a CDE platform or X\ server vendor to
+implement these standard names in a particular way.  Several mechanisms
+are possible:  duplicate font files with altered naming attributes,
+X11R5 font aliases, or vendor-specific mechanisms.
+The only requirement
+is that an XLFD pattern, written with attributes taken from the set
+that define the standard names, can be successfully used to open a font
+with the Xlib function \f3XLoadFont\fP; and, specifically, the Xlib
+function \f3XListFonts\fP need NOT return the same XLFD name for the
+pattern on different CDE or X\ server platforms.

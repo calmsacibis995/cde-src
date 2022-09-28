@@ -1,0 +1,141 @@
+.TH Quit 4 "13 May 1994"
+.SH NAME
+Quit request \- terminate an operation or an entire tool
+.SH SYNOPSIS
+.yS
+.ta \w@Quit(@u
+Quit(in boolean \f2silent\fP,
+	in boolean \f2force\fP
+	[in messageID \f2operation2Quit\fP]);
+.yE
+.SH DESCRIPTION
+The
+.I Quit
+request
+terminates an operation or an entire tool.
+Without the optional
+.I operation2Quit
+argument, this request asks the handling procid to quit.
+If the request succeeds, one or more ToolTalk procids should call
+.Fn tt_close 3,
+and zero or more processes should exit.
+.P
+With the optional
+.I operation2Quit
+argument, this request asks the handler to terminate the indicated request.
+(Whether the terminated request must therefore be failed
+depends on its semantics.
+Often, termination can be considered to
+mean that the requested operation has been carried out to the
+requester's satisfaction.)
+.P
+The
+.I Quit
+request should be failed (and the status code set
+appropriately) when the termination is not performed\(emfor
+example, because the
+.I silent
+argument was false and the user canceled the quit.
+.P
+The
+.I silent
+argument affects user notification of termination.
+If
+.I silent
+is True, the handler is not allowed to
+block on user input before terminating itself (or the indicated operation).
+If it is False, however,
+the handler may seek such input.
+.P
+The
+.I force
+argument
+is a Boolean value indicating whether the handler should
+terminate itself (or the indicated operation) even if circumstances
+are such that the tool ordinarily would not perform the termination.
+.P
+For example, a tool might have a policy of not quitting with
+unsaved changes unless the user has been asked whether the
+changes should be saved.
+When
+.I force
+is true, such a tool should terminate even when doing so would lose
+changes that the user has not been asked by the tool about saving.
+.P
+The
+.I operation2Quit
+argument
+is the request that should be terminated.
+For a request to be
+terminable, the handler must have sent a
+.I Status
+notice back to the requester (thus
+identifying itself to the requester).
+.SH ERRORS
+The ToolTalk service may return one of the following errors
+in processing the
+.I Quit
+request:
+.VL 6
+.Lc TT_DESKTOP_ECANCELED
+.br
+The user overrode the
+.I Quit
+request.
+.Lc TT_DESKTOP_ENOMSG
+.br
+The
+.I operation2Quit
+argument does not refer to any message currently known by the handler.
+.LE
+.SH "APPLICATION USAGE"
+The
+.Fn ttdt_session_join 3,
+and
+.Fn ttdt_message_accept 3,
+functions can be used to register for,
+and help process, the
+.I Quit
+request.
+.P
+In the successful case,
+``zero or more'' procids
+are cited because a single process can instantiate multiple independent
+procids, and a single procid can conceivably be implemented by a set
+of cooperating processes.
+.SH EXAMPLES
+The
+.I Quit
+request can be sent as in the following example:
+.Cs I
+Tt_message msg = tttk_message_create(0, TT_REQUEST, TT_SESSION,
+			the_recipient_procid, TTDT_QUIT,
+			my_callback);
+tt_message_iarg_add(msg, TT_IN, Tttk_boolean, 0);
+tt_message_iarg_add(msg, TT_IN, Tttk_boolean, 0);
+tt_message_send(msg);
+.Ce
+.cdes 
+.SH WARNINGS
+.I Quit
+can also be sent as a multicast notice, as an
+.I edict 
+to all tools in the scope of the message.
+The consequences of doing so can be severe and unexpected.
+.cdee
+.suns
+.SH BUGS
+The
+.I silent
+argument should have its polarity reversed, to be like the
+.I inquisitive
+argument of several of the
+.B Media
+messages.
+.sune
+.SH "SEE ALSO"
+.Fn tt_close 3,
+.Fn tt_message_iarg_add 3,
+.Fn tt_message_send 3,
+.Fn ttdt_message_accept 3,
+.Fn ttdt_session_join 3.

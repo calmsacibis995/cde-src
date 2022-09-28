@@ -1,0 +1,399 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+.\" *************************************************************************
+.\" **
+.\" ** (c) Copyright 1993,1994 Hewlett-Packard Company 
+.\" **      All Rights Reserved.
+.\" **
+.\" ** (c) Copyright 1993,1994 International Business Machines Corp. 
+.\" **      All Rights Reserved.
+.\" **  
+.\" ** (c) Copyright 1993,1994 Sun Microsystems, Inc.
+.\" **      All Rights Reserved.
+.\" **
+.\" **
+.\" *************************************************************************
+.\"---
+.\".TH _title _#S_ "_dd_ _Month_ _19yy_"
+.TH DtActionInvoke 3 "04 April 1994"
+.\".BH "_dd_ _Month_ -_19yy_"
+.BH \*(DT 
+.\"---
+.\"---------------------------------------------------------------------------
+.SH NAME
+DtActionInvoke(3) \(em  the API for invoking a CDE action.
+.\"---
+.\"---------------------------------------------------------------------------
+.\"---
+.\"--- SYNOPSIS 
+.\"--- This section is a syntax diagram.  Use the following lines for pages in
+.\"--- manual Sections 1, 1M, 5 and 8:
+.\"---
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <X11/Intrinsic.h> 
+\&#include <Dt/Action.h>
+.sp \n(PDu
+DtActionInvocationID DtActionInvoke (
+.ta .5i 1.75i
+.nf
+	Widget	\fIw\fP,
+	char	\fI*actionName\fP,
+	int	\fIargCount\fP,
+	ActionArgp	\fIactionArgs\fP,
+	char	\fI*termOpts\fP,
+	char	\fI*execHost\fP,
+	char	\fI*cwd\fP,
+	int	\fIuseIndicator\fP,
+	DtActionStatusUpdateCallbackProc   \fIstausUpdateCb\fP,
+	XtPointer	\fIclient_data\fP)
+.wH
+.fi
+.iE
+.sE
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- DESCRIPTION 
+.\"--- This section tells concisely what the command (function, device or
+.\"--- file format) does and includes the parameter list. 
+.\"---
+.SH DESCRIPTION
+\fBDtActionInvoke\fP provides a way to invoke desktop actions on arguments
+which may be of any of the recognized object classes: files or buffers.
+A callback can also be registered for receiving action-done status, and for
+receiving return arguments.
+.P
+The actions and datatypes databases must have been initialized and loaded 
+(using \fBDtInitialize(3)\fP and \fBDtDbLoad(3)\fP) before \fBDtActionInvoke\fP
+can run successfully.  A number of action-instance-specific parameters are
+provided which allow modification of the Action's behavior.
+.IP \fIw\fP
+A Widget which will become the parent of any dialogs or error messages which
+may result from the action invocation.  This widget should be a toplevel
+application shell widget which will continue to exist for the expected lifetime
+of the action.  This parameter must have a non-NULL value.
+.IP \fIactionName\fP
+The name of the action which is to be invoked.  The action database
+may define more than one action with the same name.  The action selected
+for a particular invocation depends on the class, type and number of
+arguments provided.  This parameter must have a non-NULL value.
+.IP \fIargCount\fP
+The number of action arguments provided in the array referenced by
+\fIactionArgs\fP.
+.IP \fIactionArgs\fP
+An array of action argument structures containing information about the
+arguments for this action invocation.  If there are no arguments then the
+value of actionArgs may be NULL.
+.IP \fItermOpts\fP
+An (optional) string providing special execution information for the terminal
+emulator used for \fBCOMMAND\fP actions of Window Type: TERMINAL or
+PERM_TERMINAL.  If this string contains embedded blanks then it must be
+quoted.  This string is typically used to pass on title, geometry, color,
+font, etc. information to the terminal emulator.  It must be in a form
+recognizable by the expected terminal emulator.  This parameter may be NULL.
+.IP \fIexecHost\fP
+An (optional) string identifying a preferred execution host for this action.
+The \fIexecHost\fP specified here will be placed at the head of the list of
+execution hosts defined in the action definition.  This parameter will
+generally be a NULL pointer.
+.IP \fIcwd\fP
+An (optional) string identifying a default working directory for the action.
+File name arguments are interpreted relative to this directory, which
+must reside in the local filename space (e.g. /usr/tmp or /net/hostb/tmp).
+This value is only used if the action definition does not explicitly specify
+a working directory in the \fBCWD\fP field of the action definition.  This
+parameter will generally be a NULL pointer.
+.IP \fIuseIndicator\fP
+If \fIuseIndicator\fP is non-zero then the activity indicator light on the
+front panel will be made to flash in conjunction with this action.
+.IP \fIstatusUpdateCb\fP
+An (optional) callback that may be activated if returnable status is
+available on the invoked action(s) (e.g. a \fBTT_MSG(TT_REQUEST)\fP returning
+\fBDtACTION_DONE\fP). If NULL, the resulting action(s) will be started under
+the "fire and forget" model, and \fIDtActionInvocationID\fP will be returned
+as NULL.
+.IP \fIclient_data\fP
+(Optional) data to be passed to the \fIstatusUpdateCb\fP callback when
+invoked.
+.PP
+\fBDtActionInvoke\fP searches the action database for an entry which
+matches the specified action name, and accepts arguments of the class,
+type and count provided.
+.PP
+If a matching \fBCOMMAND\fP action is found, then the associated execution
+string will be used as a pattern for constructing the final command
+string; the supplied arguments will be inserted into the indicated
+positions within the execution string.  If any required arguments are
+missing, then the user will be prompted to supply them, by means of a
+dialog box.  Arguments that are flagged as \fIwritable\fP in the action
+argument structure will be returned if they are modified, and a
+\fIstatusUpdateCb\fP is registered.
+.PP
+If a matching \fBTT_MSG\fP action is found, then the associated message will
+be sent, with the supplied arguments inserted into the indicated
+message fields.  If any required arguments are missing, then the user
+will be prompted to supply them, by means of a dialog box.  Arguments
+that are flagged as \fIwritable\fP in the action argument structure
+ActionArg may be returned if the corresponding \fBTT_ARGn_MODE\fP argument
+has a mode of \fBTT_OUT\fP or \fBTT_INOUT\fP, and a \fIstatusUpdateCb\fP is
+registered.   If an argument is flagged as non-\fIwritable\fP but the
+corresponding \fBTT_ARGn_MODE\fP argument has a mode of \fBTT_OUT\fP or
+\fBTT_INOUT\fP, then libDtSvc will respect the callers non-\fIwritable\fP
+setting and optimize by not returning modified arguments.
+.PP
+The data structure for an action argument is as follows:
+.nf
+
+typedef struct {
+   int     argClass;   /* object type: File, Buffer or NULL */
+   union {
+      struct  { /* DtACTION_FILE class info */
+         char     *name;    /* ...file name in local filename space,
+                               preferably with correct extension */
+      } file;
+      struct  { /* DtACTION_BUFFER class info */
+         void     *bp;      /* ... pointer to buffer in memory */
+         int      size;     /* ... size of buffer in bytes */
+         char     *type;    /* ... buffer type - used to derive the
+                               tmp file ext */
+         Boolean  writable; /* ... used to set permission on tmp file -
+                               also implies object should be returned */
+      } buffer;
+   } u;  /* union tag */
+} ActionArg, *ActionArgp;
+
+.fi
+Where \fIargClass\fP is one of \fBDtACTION_FILE\fP or \fBDtACTION_BUFFER\fP.
+For action arguments returned by a \fIstatusUpdateCb\fP, \fIargClass\fP may
+also be set by libDtSvc to \fBDtACTION_NULLARG\fP to indicate that the
+argument is not being updated or has been removed.   \fBDtACTION_NULLARG\fP
+cannot be present in action arguments passed to \fBDtActionInvoke\fP.
+.PP
+\fBDtActionInvoke\fP accepts a pointer to an array of such structures
+describing the objects to be provided as arguments to the action.  It is
+up to the caller to allocate space for the array.  The caller may free
+the memory after \fBDtActionInvoke\fP returns.
+.PP
+It is possible for a single call to \fBDtActionInvoke\fP to initiate
+several actions or messages.  As an example:  if an action is given
+three files, but only needs one, three instances of the action will be
+started, one for each file.  As a result, a single returned
+\fIDtActionInvocationID\fP may represent a group of running actions, and
+subsequent DtAction calls will operate on that group of actions.
+.PP
+For \fBDtACTION_BUFFER\fP arguments, if the type field is set to NULL,
+then libDtSvc will type the buffer \fI*bp\fP by content (see dtdtfile(4)).
+If the buffer pointer \fIbp\fP is NULL, and/or \fIsize\fP is
+equal to zero, a buffer with no contents will be used in the
+resulting action.  If returned, the buffer pointer \fIbp\fP will be
+defined, and \fIsize\fP will be equal or greater than zero.  When
+necessary, and transparent to the caller, buffers are automatically
+converted to temporary files by libDtSvc prior to actual action
+invocation, and reconverted back to buffers after action termination.
+.PP
+For \fBDtACTION_FILE\fP arguments, \fIname\fP is required; this is the
+name of the file being referenced.  The \fIhost\fP field is optional; if
+a non-NULL value is provided, the file \fIname\fP will be interpreted
+relative to this host.
+.PP
+Optional parameters may be NULL.
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- RETURN VALUES
+.\"--- This section appears in pages from Sections 2 and 3 only.
+.\"--- List the _values_ that the function returns and give _explanations_.
+.\"---
+.SH "RETURN VALUES"
+.PP
+A \fIDtActionInvocationID\fP that can be used in the other DtAction
+calls, when applicable, to subsequently access the invoked action(s).
+
+Currently, if the resulting action is a \fBCOMMAND\fP action or a
+\fBTT_MSG(TT_REQUEST)\fP action, then calls such as \fBDtActionQuit\fP
+can be issued.
+
+The useful lifetime of a \fIDtActionInvocationID\fP is dictated by the
+resulting action type.  For \fBCOMMAND\fP actions, the useful lifetime
+is until the command exits; if a \fIstatusUpdateCb\fP is registered,
+the \fIDtActionInvocationID\fP is useful until the corresponding
+\fIstatusUpdateCb\fP returns \fBDtACTION_DONE\fP or any other equivalent
+termination status.
+
+For resulting \fBTT_MSG(TT_REQUEST)\fP actions, the
+\fIDtActionInvocationID\fP lifetime is the same as for \fBCOMMAND\fP
+actions.
+
+For resulting \fPTT_MSG(TT_NOTICE)\fP actions, the useful lifetime for
+\fIDtActionInvocationID\fP is brief; until the notice is sent.
+
+\fIDtActionInvocationID\fP's are only recycled after many have been
+generated.
+
+.SH "X11 RESOURCES"
+.PP
+This section describes the X11 resources recognized by the Action Library and
+its subcomponents.  In general the resource class string always begins with an
+upper case letter. The corresponding resource name sting begins with the lower
+case of the same letter.  These resources can be defined for all clients using
+the Action Library API by specifying "*resourceName: value". For example, to
+set the terminal emulator to "xterm" for all clients, use 
+"*localTerminal: xterm". The resources can also be defined on a per client
+basis. For example, use "Dtfile*localTerminal: xterm" to set the terminal
+emulator to "xterm" for the "dtfile" client only.
+.PP
+The following X11 resources are recognized:
+.TP
+\(bu 
+LocalTerminal \(em specifies an alternate local terminal emulator
+.TP
+\(bu
+RemoteTerminal \(em specifies a comma-separated list of host/terminal emulator pairs.
+.TP
+\(bu
+AutoXhosting \(em turns the autoXhosting feature on or off.
+.TP
+\(bu
+WaitTime \(em defines a threshold time interval for "successful" command completion.
+.PP
+The \fILocalTerminal\fP resource defines an alternate local terminal emulator
+to be used by Command actions of Window Type TERMINAL or PERM_TERMINAL.
+The default terminal emulator is: "dtterm".  
+.PP
+The \fIRemoteTerminal\fP resource defines a comma-separated list of 
+"host:terminal emulator" pairs.  When a remote command action is executed on
+one of the hosts in the list, the terminal emulator associated with that host
+will be used for that command. All specified terminal emulators must recognize
+the "-e" parameter. (see xterm(1)).  The default is to use \fIlocalTerminal\fP.
+.PP
+The \fIAutoXhosting\fP resource can be used to turn the "automatic Xhosting"
+feature on or off. In situations where remote clients are required to open
+windows on the local display, they must be granted display access. This can be
+done by providing the remote client access to the key for this display 
+(via xauth(1x)) or by granting blanket access to the remote system via
+xhost(1x). If the \fIautoXhosting\fP resource value is "True" then blanket
+access is automatically granted to a given remote system, using xhost,
+whenever a remote action to that system is invoked.  The default value for
+this resource is: "False".
+.PP
+The \fIWaitTime\fP resource can be used to assign an alternative integer value,
+in seconds, to the threshold successful return time interval.  
+If a Command action of Window Type: TERMINAL fails; then the terminal emulator
+may be unmapped before the user has a chance to read the stderr from the
+failed command. This resource provides a workaround to this problem. If a 
+TERMINAL window command exits before WaitTime seconds have elapsed then the
+terminal emulator window is forced to remain open, as if it were of type
+PERM_TERMINAL.  The default value of \fIWaitTime\fP is 3 seconds.
+.\"---
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- ERRORS
+.\"--- This section lists and explains _ERROR-CODES_ that the function may
+.\"--- may generate.  List _ERROR-CODES_ alphabetically.
+.\"---
+.SH ERRORS
+.PP
+This function does not return error codes, however the user will be notified
+of severe errors interactively via error dialogs.  Low level errors (e.g.
+errors encountered reading the action database) will be reported in the 
+desktop errorlog file (usually in $HOME/.dt/errorlog).
+.\"---
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- EXAMPLES
+.\"--- This section gives examples of how to use the command (function
+.\"--- or file format).  Always preface an example with an introduction.
+.\"--- If there are multiple examples, use separate subsection headings
+.\"--- for each _example-type_.  Otherwise, omit these headings.
+.\"---
+.SH EXAMPLES
+.P
+Given the following action definition:
+.nf
+
+ACTION Edit
+{
+	LABEL		"Text Edit Action"
+	ARG_CLASS	BUFFER, FILE
+	ARG_TYPE	TEXT
+	TYPE		COMMAND
+	WINDOW_TYPE	TERMINAL
+	EXEC_STRING	"textedit %Args%"
+	DESCRIPTION	This action will invoke the "edit" command on an \
+			arbitrary number of arguments.  A terminal emulator \
+			will be provided for this action's I/O. EXEC_HOST and \
+			CWD are not specified so the defaults will be used \
+			for both quantities.
+}
+
+.fi
+The following invocation:  
+.nf
+
+        DtActionInvoke(w,"Edit",3,aap,NULL,NULL,NULL,NULL,1,
+                       myCallback,myClientData);
+
+.fi
+will invoke the action "Edit" on the arguments supplied by \fIaap\fP. The
+working directory for the action will default to the current working
+directory. The execution host will be the default execution host.
+.P
+If the variable \fIaap\fP points to an array of ActionArg data structures 
+containing the following information:
+.nf
+
+    {
+        argClass = DtACTION_FILE;
+        struct {
+            name="/myhome/file1.txt";
+            host="remotehost";
+        } file;
+    }
+    {
+        argClass = DtACTION_FILE;
+        struct {
+            name="file2.txt";
+            host=NULL;
+        } file;
+    }
+    {
+        argClass = DtACTION_BUFFER;
+        struct {
+            bp=(void *) myEditBuffer;
+            size=lengthOfMyEditBuffer;
+            type="TEXT";
+            writable=TRUE;
+        } buffer;
+    }
+
+.fi
+and assuming the "remotehost" filesystem is mounted at "/net/remotehost", then
+the "Edit" action will result in the execution string:
+.sp
+.nf
+    textedit /net/remotehost/myhome/file1.txt file2.txt /tmp/<tmpnam>.txt
+.fi
+.PP
+When the action completes, \fImyCallback\fP will be called and
+the buffer argument may be returned through the callback.
+.sp
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- SEE ALSO
+.\"--- This section lists references to other man pages, sample files, etc.
+.\"---
+.SH "SEE ALSO"
+.BR  DtDbLoad(3),
+.BR  DtActionLabel(3),
+.BR  DtActionIcon(3)
+.BR  DtActionDescription(3),
+.BR  DtActionExists(3),
+.BR  DtActionStatusUpdateCallbackProc(3),
+.BR  DtActionQuit(3),
+.BR  dtactionfile(4)
+.BR  dtdtfile(4)
+

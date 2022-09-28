@@ -1,0 +1,166 @@
+.de Lc
+.\" version of .LI that emboldens its argument
+.TP \\n()Jn
+\s-1\f3\\$1\f1\s+1
+..
+.TH ttdt_file_request 3 "1 March 1996" "ToolTalk 1.3" "ToolTalk Functions"
+.BH "1 March 1996"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.IX "ttdt_file_request.3" "" "ttdt_file_request.3" "" 
+.SH NAME
+ttdt_file_request \- create and send a standard ToolTalk request about a file
+.SH SYNOPSIS
+.ft 3
+.nf
+#include <Tt/tttk.h>
+.sp 0.5v
+.ta \w'Tt_message ttdt_file_request('u
+Tt_message ttdt_file_request(Tt_message \f2context\fP,
+	Tttk_op \f2op\fP,
+	Tt_scope \f2scope\fP,
+	const char *\f2pathname\fP,
+	Ttdt_file_cb \f2cb\fP,
+	void *\f2client_data\fP,
+	int \f2send_and_destroy\fP);
+.PP
+.fi
+.SH DESCRIPTION
+The
+.BR ttdt_file_request (\|)
+function
+is used to create (and optionally send) any of
+the standard Desktop file requests
+such as
+.IR Get_Modified ,
+.IR Save ,
+and
+.IR Revert .
+.PP
+The
+.BR ttdt_file_request (\|)
+function
+creates a request with the specified
+.I op
+and
+.IR scope ,
+and sets its file attribute to
+.IR pathname .
+The function adds an unset argument of
+.B Tt_mode
+.BR \s-1TT_IN\s+1
+and
+vtype
+.IR File
+to the request, per the Desktop messaging conventions.
+If
+.I op
+is
+.BR \s-1TTDT_GET_MODIFIED\s+1 ,
+.BR ttdt_file_request (\|)
+also adds an unset
+.BR \s-1TT_OUT\s+1
+argument of
+vtype
+.IR Boolean
+to the request.
+The
+.BR ttdt_file_request (\|)
+function
+installs
+.I cb
+as a message callback for the created request, and ensures that
+.I client_data
+will be passed into the callback.
+(The
+.B Ttdt_file_cb
+callback is described under
+.BR ttdt_file_join (3)).
+If
+.I send
+is True,
+.BR ttdt_file_request (\|)
+sends the request before returning the handle to it;
+otherwise, it only creates the request.
+.PP
+The
+.I context
+argument describes the environment to use.
+If
+.I context
+is not zero, messages created by
+.BR ttdt_file_request (\|)
+inherit from
+.I context
+all contexts whose slotname begins with the characters
+.BR \s-1ENV_\s+1 .
+.SH "RETURN VALUE"
+Upon successful completion, the
+.BR ttdt_file_request (\|)
+function returns the created
+.BR Tt_message ;
+otherwise, it returns an error pointer.
+The application can use
+.BR tt_ptr_error (3)
+to extract one of the following
+.B Tt_status
+values from the returned handle:
+.PP
+.RS 3
+.nr )J 8
+.Lc TT_ERR_DBAVAIL
+.br
+The ToolTalk service could not access the ToolTalk database
+needed for this operation.
+.Lc TT_ERR_DBEXIST
+.br
+The ToolTalk service could not access the specified ToolTalk database
+in the expected place.
+.Lc TT_ERR_NOMEM
+.br
+There is insufficient memory available to perform the function.
+.Lc TT_ERR_NOMP
+.br
+The
+.BR ttsession (1)
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_OVERFLOW
+.br
+The ToolTalk service has more active messages than it can handle.
+(The maximum number of active messages is
+.ne 2
+implementation specific, but is at least 2000.)
+.Lc TT_ERR_POINTER
+.br
+The
+.I pathname
+argument was
+.BR \s-1NULL\s+1
+or was a ToolTalk error pointer.
+.Lc TT_ERR_PROCID
+.br
+The specified process identifier is out of date or invalid.
+.PP
+.RE
+.nr )J 0
+.SH "APPLICATION USAGE"
+The
+.BR ttdt_file_request (\|)
+function
+is a lower-level interface than
+.BR ttdt_Get_Modified (\|),
+.BR ttdt_Save (\|),
+and
+.BR ttdt_Revert (\|),
+since the latter functions create and send the request and then block
+on its reply.
+.SH "SEE ALSO"
+.na
+.BR tttk (5),
+.BR ttdt_Get_Modified (3),
+.BR ttdt_Save (3),
+.BR ttdt_Revert (3),
+.BR ttdt_file_join (3).

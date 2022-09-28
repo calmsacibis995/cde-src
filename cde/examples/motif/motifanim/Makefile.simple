@@ -1,0 +1,76 @@
+#
+# @(#)customer-svr4.mk	1.6 93/01/26 SMI
+# User Makefile for the OSF Motif Demo sample sources
+# Requires SunOS 5.x (or later) Make(1).
+#
+
+#
+# Environment set up
+#
+
+# If OPENWINHOME is not set, default to /usr/openwin for the location of 
+# OpenWindows
+OPENWINHOME:sh	= echo ${OPENWINHOME:-/usr/openwin}
+
+# If MOTIFHOME is not set, default to /usr/dt for the location of
+# Motif
+MOTIFHOME:sh  = echo ${MOTIFHOME:-/usr/dt}
+
+# Logging compilation messages to file instead of console
+#LOGGING = 2> $@.errlog > $@.errlog
+
+#
+# Source package description
+#
+
+COMMAND =       motifanim
+
+OBJ	=	motifanim.o
+
+UID	=	motifanim.uid dog.uid plane.uid superman.uid
+
+BITMAPS	=	superman1.xbm superman2.xbm superman3.xbm \
+		superman4.xbm superman5.xbm superman6.xbm
+
+DEFINES		= -Dsun
+		# -DDEBUG	if debugging output is desired
+
+LIBRARIES	= -lXm -lMrm -lXt -lX11
+
+#
+# Derived macros
+#
+
+INCLUDES	= -I${OPENWINHOME}/include -I${MOTIFHOME}/include
+CPPFLAGS       += ${DEFINES} ${INCLUDES}
+
+CFLAGS	       += -O
+		# -g	for debugging
+
+LIBDIRS		= -L$(OPENWINHOME)/lib -L$(MOTIFHOME)/lib
+LDFLAGS		= $(LIBDIRS) $(LIBRARIES)
+
+#
+# Rule sets
+#
+
+#
+# UIL suffix rules
+#
+.SUFFIXES :	.uil .uid
+.uil.uid:
+	uil -o $*.uid $<
+
+.c.o:
+	$(COMPILE.c) $(OUTPUT_OPTION) $< $(LOGGING)
+
+all: ${COMMAND} $(UID)
+
+${COMMAND}: $(OBJ) $(BITMAPS)
+	$(CC) $(CFLAGS) $(CPPFLAGS) $@.o $(OBJ) $(LDFLAGS) -o $@
+
+clean:
+	rm -f $(OBJ) $(UID) ${COMMAND} *.errlog
+
+# end of Makefile.customer
+#

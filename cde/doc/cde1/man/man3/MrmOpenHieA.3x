@@ -1,0 +1,199 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH MrmOpenHierarchy 3X
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIMrmOpenHierarchy\fP \- Allocates a hierarchy ID and opens all the UID files in the hierarchy
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Mrm/MrmPublic.h>
+.sp \n(PDu
+.ta 1i
+.nf
+Cardinal MrmOpenHierarchy(\fBnum_files, file_names_list, ancillary_structures_list, hierarchy_id\fI)
+.ta .5i 2.5i
+.nf
+	MrmCount	\fBnum_files\fI;
+	String	\fBfile_names_list\fI[];
+	MrmOsOpenParamPtr	*\fBancillary_structures_list\fI;
+	MrmHierarchy	*\fBhierarchy_id\fI;
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+This routine is obsolete and exists for compatibility with previous
+releases.  It is replaced by \fIMrmOpenHierarchyPerDisplay\fP.
+\fIMrmOpenHierarchy\fP is identical to \fIMrmOpenHierarchyPerDisplay\fP
+except that \fIMrmOpenHierarchy\fP does not take a \fBdisplay\fP
+argument.
+.IP "\fBnum_files\fP"
+Specifies the number of files in the name list.
+.IP "\fBfile_names_list\fP"
+Specifies an array of character strings that identify
+the UID files.
+.IP "\fBancillary_structures_list\fP"
+A list of operating-system-dependent ancillary structures corresponding
+to such things as filenames, clobber flag, and so forth.
+This argument should be NULL for most operations.
+If you need to reference this structure,
+see the definition of
+\fIMrmOsOpenParamPtr\fP
+in
+\fIMrmPublic.h\fP
+for more information.
+.IP "\fBhierarchy_id\fP"
+Returns the search hierarchy ID.
+The search hierarchy ID identifies the list of UID files that
+MRM searches (in order) when performing subsequent
+fetch calls.
+.PP 
+Each UID file string in \fBfile_names_list\fP can specify either a full
+pathname or a filename.
+If a UID file string has a leading slash (/), it specifies a full
+pathname, and MRM opens the file as specified.
+Otherwise, the UID file string specifies a filename.
+In this case MRM looks for the file along a search path specified by the
+\fIUIDPATH\fP environment variable or by a default search path, which
+varies depending on whether or not the \fIXAPPLRESDIR\fP environment
+variable is set.
+.PP 
+The \fIUIDPATH\fP environment variable specifies a search path and
+naming conventions associated with UID files.
+It can contain the substitution field %U, where the UID file string from
+the \fBfile_names_list\fP argument to \fIMrmOpenHierarchyPerDisplay\fP is
+substituted for %U.
+It can also contain the substitution fields accepted by
+\fIXtResolvePathname\fP.
+The substitution field %T is always mapped to \fIuid\fP.
+The entire path is first searched with %S mapped to \fI\&.uid\fP and
+then, if no file is found, is searched again with %S mapped to NULL.
+.P
+If no display is set prior to calling this function, the result of
+this function's call to \fIXtResolvePathname\fP is undefined.
+.P
+For example, the following \fIUIDPATH\fP value and
+\fIMrmOpenHierarchy\fP call cause MRM to open two separate UID files:
+.oS
+UIDPATH=/uidlib/%L/%U.uid:/uidlib/%U/%L
+  static char *uid_files[] = {"/usr/users/me/test.uid", "test2"};
+  MrmHierarchy  *Hierarchy_id;
+  MrmOpenHierarchy((MrmCount)2,uid_files, NULL, Hierarchy_id)
+.oE
+.PP 
+MRM opens the first file, \fI/usr/users/me/test.uid\fP, as specified in
+the \fBfile_names_list\fP argument to \fIMrmOpenHierarchy\fP, because
+the UID file string in the \fBfile_names_list\fP argument specifies a
+full pathname.
+MRM looks for the second file,
+.ne 6
+\fItest2\fP,
+first as
+\fI/uidlib/%L/test2.uid\fP
+and second as
+\fI/uidlib/test2/%L\fP,
+where the display's language string is substituted for %L.
+.PP 
+After
+\fIMrmOpenHierarchy\fP
+opens the UID hierarchy, you should not delete or modify the
+UID files until you close the UID hierarchy by calling
+\fIMrmCloseHierarchy\fP.
+.PP 
+If \fIUIDPATH\fP is not set but the environment variable
+\fIXAPPLRESDIR\fP is set, MRM searches the following pathnames:
+.iS
+.ta 1i
+.nf
+	22:59:55S
+	$XAPPLRESDIR/%L/uid/%N/22:59:55S
+	$XAPPLRESDIR/%l/uid/%N/22:59:55S
+	$XAPPLRESDIR/uid/%N/22:59:55S
+	$XAPPLRESDIR/%L/uid/22:59:55S
+	$XAPPLRESDIR/%l/uid/22:59:55S
+	$XAPPLRESDIR/uid/22:59:55S
+	$HOME/uid/22:59:55S
+	$HOME/22:59:55S
+	/usr/lib/X11/%L/uid/%N/22:59:55S
+	/usr/lib/X11/%l/uid/%N/22:59:55S
+	/usr/lib/X11/uid/%N/22:59:55S
+	/usr/lib/X11/%L/uid/22:59:55S
+	/usr/lib/X11/%l/uid/22:59:55S
+	/usr/lib/X11/uid/22:59:55S
+	/usr/include/X11/uid/22:59:55S
+.wH
+.fi
+.iE
+.PP 
+If neither \fIUIDPATH\fP nor \fIXAPPLRESDIR\fP is set, MRM searches the
+following pathnames:
+.iS
+.ta 1i
+.nf
+	22:59:55S
+	$HOME/%L/uid/%N/22:59:55S
+	$HOME/%l/uid/%N/22:59:55S
+	$HOME/uid/%N/22:59:55S
+	$HOME/%L/uid/22:59:55S
+	$HOME/%l/uid/22:59:55S
+	$HOME/uid/22:59:55S
+	$HOME/22:59:55S
+	/usr/lib/X11/%L/uid/%N/22:59:55S
+	/usr/lib/X11/%l/uid/%N/22:59:55S
+	/usr/lib/X11/uid/%N/22:59:55S
+	/usr/lib/X11/%L/uid/22:59:55S
+	/usr/lib/X11/%l/uid/22:59:55S
+	/usr/lib/X11/uid/22:59:55S
+	/usr/include/X11/uid/22:59:55S
+.wH
+.fi
+.iE
+.PP
+These paths are defaults that vendors may change.
+For example, a vendor may use different directories for
+\fI/usr/lib/X11\fP and \fI/usr/include/X11\fP.
+.PP 
+The following substitutions are used in these paths:
+.IP "\fI%U\fP"
+The UID file string, from the \fBfile_names_list\fP argument.
+.IP "\fI%N\fP"
+The class name of the application.
+.IP "\fI%L\fP"
+The display's language string.
+.IP "\fI%l\fP"
+The language component of the display's language string.
+.IP "\fI%S\fP"
+The suffix to the file name.
+The entire path is searched first with a suffix of \fI\&.uil\fP, and if
+no file is found, it is searched again with a NULL suffix.
+.nL
+.ne 10
+.SH RETURN VALUE
+This function returns one of these status return constants:
+.IP "\fIMrmSUCCESS\fP"
+The function executed successfully.
+.IP "\fIMrmNOT_FOUND\fP"
+File not found.
+.IP "\fIMrmFAILURE\fP"
+The function failed.
+.SH RELATED INFORMATION
+.na
+\fIMrmOpenHierarchyPerDisplay(3X)\fP and
+\fIMrmCloseHierarchy(3X)\fP.
+.ad

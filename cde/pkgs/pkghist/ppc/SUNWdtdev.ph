@@ -1,0 +1,4 @@
+PKG=SUNWdtdev
+ARCH=ppc
+VERSION=1000
+PKGRM=yes

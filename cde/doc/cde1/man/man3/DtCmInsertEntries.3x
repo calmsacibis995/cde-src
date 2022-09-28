@@ -1,0 +1,164 @@
+.\" *************************************************************************
+.\" **
+.\" ** (c) Copyright 1993,1994 Hewlett-Packard Company 
+.\" **      All Rights Reserved.
+.\" **
+.\" ** (c) Copyright 1993,1994 International Business Machines Corp. 
+.\" **      All Rights Reserved.
+.\" **  
+.\" ** (c) Copyright 1993,1994 Sun Microsystems, Inc.
+.\" **      All Rights Reserved.
+.\" **
+.\" ** (c) Copyright 1993,1994 Unix Systems Labs, Inc., a susidiary of Novell, Inc
+.\" **      All Rights Reserved.
+.\" **
+.\" *************************************************************************
+.\"----------------------------------------------------------------------------
+.\" %\&Z%%\&M% %\&I% %\&E% SMI;
+.TH DtCmInsertEntries 3X "26 January 1994"
+.BH "26 January -_1994"
+.\"---
+.\"----------------------------------------------------------------------------
+.SH NAME
+DtCmInsertEntries(3X) \- Insert new entries in the calendar.
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- DESCRIPTION 
+.\"--- This section tells concisely what the command (function, device or
+.\"--- file format) does and includes the parameter list. 
+.\"---
+.SH DESCRIPTION
+\&#include <Dt/DtCm.h>
+.sp .5
+DtCmStatus DtCmInsertEntries (
+.br
+.ta 0.75i 1.75i
+        DtCmCalendar	\fIcal\fP,
+.br
+        DtCmAttributes *	\fIattrs\fP,
+.br
+        int		\fInum_entries\fP,
+.br
+        int		\fInum_attrs\fP,
+.br
+        DtCmEntry **		\fIentries_r\fP,
+.br
+        DtCmStatus **		\fIstatus_r\fP)
+.fi
+\fP
+.SH
+\fBDtCmInsertEntries\fP inserts a list of entries in the calendar. The 
+attributes of the entries are specified by \fIattrs\fP which is an 
+array of \fBDtCmAttributes\fP with \fInum_entries\fP elements. 
+Each element, pointing to an array of \fBDtCmAttribute\fP structures, 
+specifies the attributes for one entry. An array of handles to the 
+new entries is returned in \fIentries_r\fP. The array has \fInum_entries\fP 
+elements. It is possible that some entries are inserted successfully 
+and some are not. In that case, \fBDT_CM_ERR_PARTIAL\fP will be returned 
+by the function and the corresponding element in the returned array will 
+be set to \fBNULL\fP. If \fBDT_CM_ERR_PARTIAL\fP is returned and 
+\fIstatus_r\fP is not \fBNULL\fP, an array of status values with 
+\fInum_entries\fP elements will be returned in \fIstatus_r\fP. Each 
+status value indicates whether the corresponding entry is inserted 
+successfully or an error occurred. The caller is responsible for 
+freeing the returned arrays by calling \fBDtCmFreeEntries\fP and free 
+respectively.
+
+.sp .5
+.IP "\fIcal\fP" 1.25i
+Specifies the calendar to insert the entry.
+.IP "\fIattrs\fP" 1.25i
+Specifies the entry's attributes.
+.IP "\fInum_entries\fP" 1.25i
+Specifies the number of elements in attrs.
+.IP "\fIentries_r\fP" 1.25i
+Returns an array of handles to the new entries.
+.IP "\fIstatus_r\fP" 1.25i
+Returns an array of status values.
+.sp .5
+.PP
+The user needs insert access to insert entries.
+.sp
+The set of attributes that are supported by all servers is:
+.sp
+The set of read-only attributes is:
+
+
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- RETURN VALUES
+.\"--- This section appears in pages from Sections 2 and 3 only.
+.\"--- List the _values_ that the function returns and give _explanations_.
+.\"---
+.SH "RETURN VALUES"
+The function returns a status indicating whether the function is 
+completed succe ssfully. If \fBDT_CM_OK\fP or \fBDT_CM_ERR_PARTIAL\fP 
+is returned, an array of handles to the new entries is returned in 
+\fIentries_r\fP. If the function returns \fBDT_CM_ERR_PARTIAL\fP and 
+\fIstatus_r\fP is not \fBNULL\fP, an array of status values for the 
+corresponding entries will be returned in \fIstatus_r\fP.
+
+.\"---
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- ERRORS
+.\"--- This section lists and explains _ERROR-CODES_ that the function may
+.\"--- may generate.  List _ERROR-CODES_ alphabetically.
+.\"---
+.SH ERRORS
+.SH
+One of the following status values may be returned:
+.IP "\fBDT_CM_ERR_AUTH\fP" 2.5i
+The client does not have insert access on the calendar.
+.IP "\fBDT_CM_ERR_MEMORY\fP" 2.5i
+Not enough memory.
+.IP "\fBDT_CM_ERR_OBJECT\fP" 2.5i
+Bad object or wrong object type.
+.IP "\fBDT_CM_ERR_PARAMETER\fP" 2.5i
+Invalid parameter.
+.IP "\fBDT_CM_ERR_PARTIAL\fP" 2.5i
+Only some entries are inserted successfully.
+.IP "\fBDT_CM_ERR_SERVER\fP" 2.5i
+Server problem.
+.IP "\fBDT_CM_OK\fP" 2.5i
+The call is completed successfully.
+.PP
+.sp
+One of the following status values may be stored in the array returned 
+in \fIstatus_r\fP.
+.IP "\fBDT_CM_ERR_DATA_TYPE\fP" 2.5i
+Invalid data type specified for predefined attributes.
+.IP "\fBDT_CM_ERR_MEMORY\fP" 2.5i
+Not enough memory.
+.IP "\fBDT_CM_ERR_NOT_SUPPORTED\fP" 2.5i
+Attributes not supported by the server are specified.
+.IP "\fBDT_CM_ERR_PARAMETER\fP" 2.5i
+Invalid parameter.
+.IP "\fBDT_CM_ERR_READONLY\fP" 2.5i
+Read-only attribute specified.
+.IP "\fBDT_CM_ERR_SPACE\fP" 2.5i
+Not enough space left on device.
+.IP "\fBDT_CM_OK\fP" 2.5i
+The call is completed successfully.
+.PP
+.sp
+.\"---
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- EXAMPLES
+.\"--- This section gives examples of how to use the command (function
+.\"--- or file format).  Always preface an example with an introduction.
+.\"--- If there are multiple examples, use separate subsection headings
+.\"--- for each _example-type_.  Otherwise, omit these headings.
+.\"---
+.SH EXAMPLES
+NEED MARKUP HERE, SIMILAR TO SYNOPSIS
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- SEE ALSO
+.\"--- This section lists references to other man pages, sample files, etc.
+.\"---
+.SH "SEE ALSO"
+.BR DtCmOpenCalendar (3X),
+.BR DtCmCloseCalendar (3X),
+.BR DtCmFreeEntries (3X)

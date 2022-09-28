@@ -1,0 +1,163 @@
+.de LI
+.\" simulate -mm .LIs by turning them into .TPs
+.TP \\n()Jn
+\\$1
+..
+.TH rpc.cmsd 1m "28 May 1997"
+.BH "11 May 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+rpc.cmsd \(mi calendar manager service daemon
+.SH SYNOPSIS
+.ft 3
+.fi
+.na
+rpc.cmsd
+[\(mic\]
+[\(mid\]
+[\(mig\0\f2hhmm\fP]
+.PP
+.fi
+.SH DESCRIPTION
+The
+.BR rpc.cmsd 
+is a small database  manager  for  appointment  and
+resource-scheduling  data.  Its  primary client is 
+.BR dtcm ,
+a  productivity  tool  included  with  CDE.
+.BR rpc.cmsd  
+is  normally  invoked by
+.BR inetd (1M)
+when a rpc request is received.
+.PP
+When
+.BR rpc.cmsd
+is started, it reads its configuration file once.
+It reads the configuration file again whenever it receives a
+.BR SIGUSR1
+signal.  Please refer to the manual page of
+.BR cmsd.conf (4)
+for more information.
+.PP
+By default,
+.BR rpc.cmsd
+does garbage collection by writing the internal calendar image
+out to the calendar file at 4:00 am each day.
+If the
+.B \(mig
+option is specified,
+.BR rpc.cmsd
+does garbage collection at the specified time instead of the default time.
+.PP
+The local super-user has special administrative privilege and
+has full access to all calendars residing on the local machine.
+.SH OPTIONS
+The following options are available:
+.PP
+.RS 3
+.nr )J 6
+.LI \f3\(mic\fP
+Turns on strict CSA access mode.  In this mode, semi-private
+calendar entries (entries with the value of the classification attribute
+set to CSA_CLASS_CONFIDENTIAL (see
+.BR csa (5))
+are viewable only by users who are granted
+such view access.  By default, this mode is turned off and users who are not
+granted view access to semi-private calendar entries can see the
+time of such entries.
+.LI \f3\(mid\fP
+Enables debugging output.
+.LI \f3\(mig\0\f2hhmm\fP
+Specifies the time of garbage collection in the 24 hour system.
+hh is the hour number (0-23) and mm is the minute number (00-59).
+The default is 0400.
+.nr )J 6
+.RE
+.nr )J 0
+.SH OPERANDS
+None.
+.SH STDIN
+Not used.
+.SH "INPUT FILES"
+The database format used by the 
+.BR rpc.cmsd 
+is private.
+.SH "ENVIRONMENT VARIABLES"
+None.
+.SH "RESOURCES"
+None.
+.SH "ASYNCHRONOUS EVENTS"
+.BR Rpc.cmsd
+reacts to two signals.  If it receives the
+.BR SIGHUP
+signal, it finishes processing the current rpc request and
+exits.
+If it receives the
+.BR SIGUSR1
+signal, it finishes processing the current rpc request and
+rereads the configuration file.
+.SH STDOUT
+When the
+.B \(mid
+option is used,
+.BR rpc.cmsd 
+writes the debugging information to stdout.
+.SH STDERR
+None.
+.SH "OUTPUT FILES"
+None.
+.SH "EXTENDED DESCRIPTION"
+None.
+.SH "EXIT STATUS"
+When the process exits,
+.BR rpc.cmsd 
+exits with the status of the exited child.
+Otherwise, the following exit values are returned:
+.PP
+.RS 3
+.nr )J 4
+.LI 0
+Normal termination.
+A zero exit status means
+.BR rpc.cmsd 
+has received a
+.BR SIGHUP
+signal, and terminated normally.
+.LI -1
+Abnormal termination.  Permissions on the database file or 
+directory were incorrect.
+.LI 1
+RPC memory managment errors have prevented successful operation,
+a socket operation failed in a nonrecoverable way, or could not create 
+a udp service.
+.LI 2
+Could not create a TLI connnection.
+.LI 3
+Could not register the service.
+.RE
+.nr )J 0
+.SH "CONSEQUENCES OF ERRORS"
+The
+.BR rpc.cmsd 
+utility takes the standard action for all signals.
+.SH "APPLICATION USAGE"
+To run 
+.BR rpc.cmsd 
+in standalone mode, the user must be root.
+.SH EXAMPLES
+None.
+.SH "SEE ALSO"
+.na
+.BR dtcm (1),
+.BR dtcm_lookup (1),
+.BR dtcm_delete (1),
+.BR dtcm_insert (1),
+.BR sdtcm_admin (1),
+.BR sdtcm_convert (1),
+.BR csa (5)
+.BR inetd (1M)
+

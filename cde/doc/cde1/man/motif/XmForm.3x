@@ -1,0 +1,803 @@
+'\" t
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Novell, Inc
+...\" **
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH XmForm 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmForm\fP \- The Form widget class
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/Form.h>
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+Form is a container widget with no input semantics of its own.
+Constraints are placed on children of the Form to define attachments
+for each of the child's four sides.
+These attachments can be to the Form, to another child widget or gadget,
+to a relative position within the Form, or to the initial position of
+the child.
+The attachments determine the layout behavior of the Form when resizing
+occurs.
+.PP
+The default value for \fIXmNinitialFocus\fP is the value of
+\fIXmNdefaultButton\fP.
+.P
+Following are some important considerations in using a Form:
+.TP
+\(bu
+Every child must have an attachment on either the left or the right.
+If initialization or \fIXtSetValues\fP leaves a widget without
+such an attachment, the result depends upon the value of
+\fIXmNrubberPositioning\fP.
+.PP
+If \fIXmNrubberPositioning\fP is False, the child is given an
+\fIXmNleftAttachment\fP of \fIXmATTACH_FORM\fP and an
+\fIXmNleftOffset\fP equal to its current \fBx\fP value.
+.PP
+.ne 10
+If \fIXmNrubberPositioning\fP is True, the child is given an
+\fIXmNleftAttachment\fP of \fIXmATTACH_POSITION\fP and an
+\fIXmNleftPosition\fP proportional to the current \fBx\fP value divided
+by the width of the Form.
+.PP
+In either case, if the child has not been previously given an \fBx\fP
+value, its \fBx\fP value is taken to be 0, which places the child at the
+left side of the Form.
+.TP
+\(bu
+If you want to create a child without any attachments, and then
+later (e.g., after creating and managing it, but before realizing it)
+give it a right attachment via \fIXtSetValues\fP, you must set its
+\fIXmNleftAttachment\fP to \fIXmATTACH_NONE\fP at the same time.
+.TP
+\(bu
+The \fIXmNresizable\fP resource controls only whether a geometry request
+by the child will be granted.
+It has no effect on whether the child's size can be changed because of
+changes in geometry of the Form or of other children.
+.TP
+\(bu
+Every child has a preferred width, based on geometry requests it
+makes (whether they are granted or not).
+.TP
+\(bu
+If a child has attachments on both the left and the right sides,
+its size is completely controlled by the Form.
+It can be shrunk below its preferred width or enlarged above it, if
+necessary, due to other constraints.
+In addition, the child's geometry requests to change its own width may
+be refused.
+.TP
+\(bu
+If a child has attachments on only its left or right side, it will
+always be at its preferred width (if resizable, otherwise at is current
+width).
+This may cause it to be clipped by the Form or by other children.
+.TP
+\(bu
+If a child's left (or right) attachment is set to \fIXmATTACH_SELF\fP, its
+corresponding left (or right) offset is forced to 0.
+The attachment is then changed to \fIXmATTACH_POSITION\fP, with a
+position that corresponds to \fBx\fP value of the child's left (or
+right) edge.
+To fix the position of a side at a specific \fBx\fP value use
+\fIXmATTACH_FORM\fP or \fIXmATTACH_OPPOSITE_FORM\fP with the \fBx\fP
+value as the left (or right) offset.
+.TP
+\(bu
+Unmapping a child has no effect on the Form except that the child
+is not mapped.
+.nL
+.ne 15
+.TP
+\(bu
+Unmanaging a child unmaps it.
+If no other child is attached to it, or if all children attached to it
+and all children recursively attached to them are also all unmanaged,
+all of those children are treated as if they did not exist in
+determining the size of the Form.
+.TP
+\(bu
+When using \fIXtSetValues\fP to change the \fIXmNx\fP resource of a
+child, you must simultaneously set its left attachment to either
+\fIXmATTACH_SELF\fP or \fIXmATTACH_NONE\fP.
+Otherwise, the request is not granted.
+If \fIXmNresizable\fP is False, the request is granted only if the
+child's size can remain the same.
+.TP
+\(bu
+A left (or right) attachment of \fIXmATTACH_WIDGET\fP, where
+\fIXmNleftWidget\fP (or \fIXmNrightWidget\fP) is NULL, acts like an
+attachment of \fIXmATTACH_FORM\fP.
+.TP
+\(bu
+If an attachment is made to a widget that is not a child of the
+Form, but an ancestor of the widget is a child of the Form, the
+attachment is made to the ancestor.
+.PP 
+All these considerations are true of top and bottom attachments as well,
+with top acting like left, bottom acting like right, \fBy\fP acting like
+\fBx\fP, and height acting like width.
+.SS "Classes"
+Form inherits behavior and resources from \fICore\fP,
+\fIComposite\fP, \fIConstraint\fP,
+\fIXmManager\fP, and \fIXmBulletinBoard\fP classes.
+.PP 
+The class pointer is \fIxmFormWidgetClass\fP.
+.PP 
+The class name is \fIXmForm\fP.
+.SS "New Resources"
+The following table defines a set of widget resources used by the
+programmer to specify data.  The programmer can also set the resource
+values for the inherited classes to set attributes for this widget.
+To reference a resource by name or by class in a .Xdefaults file,
+remove the \fIXmN\fP or \fIXmC\fP prefix and use the remaining letters.
+To specify one of the defined values for a resource in a .Xdefaults
+file, remove the \fIXm\fP prefix and use the remaining letters (in
+.ne 10
+either lowercase or uppercase, but include any underscores between
+words).  The codes in the access column indicate if the given resource
+can be set at creation time (C), set by using \fIXtSetValues\fP
+(S), retrieved by using \fIXtGetValues\fP (G), or is not
+applicable (N/A).
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmForm Resource Set
+Name	Class	Type	Default	Access
+_
+XmNfractionBase	XmCMaxValue	int	100	CSG
+XmNhorizontalSpacing	XmCSpacing	Dimension	0	CSG
+XmNrubberPositioning	XmCRubberPositioning	Boolean	False	CSG
+XmNverticalSpacing	XmCSpacing	Dimension	0	CSG
+.TE
+.KE
+.in
+.sp 1
+.IP "\fIXmNfractionBase\fP"
+Specifies the denominator used in calculating the relative position of
+a child widget using \fIXmATTACH_POSITION\fP constraints.
+The value must not be 0.
+.PP
+If the value of a child's \fIXmNleftAttachment\fP (or
+\fIXmNrightAttachment\fP) is \fIXmATTACH_POSITION\fP, the position of
+the left (or right) side of the child is relative to the left
+side of the Form and is a fraction of the width of the Form.
+This fraction is the value of the child's \fIXmNleftPosition\fP (or
+\fIXmNrightPosition\fP) resource divided by the value of the Form's
+\fIXmNfractionBase\fP.
+.PP
+If the value of a child's \fIXmNtopAttachment\fP (or
+\fIXmNbottomAttachment\fP) is \fIXmATTACH_POSITION\fP, the position of
+the top (or bottom) side of the child is relative to the top
+side of the Form and is a fraction of the height of the Form.
+This fraction is the value of the child's \fIXmNtopPosition\fP (or
+\fIXmNbottomPosition\fP) resource divided by the value of the Form's
+\fIXmNfractionBase\fP.
+.nL
+.ne 15
+.IP "\fIXmNhorizontalSpacing\fP"
+Specifies the offset for right and left attachments.  This resource is
+only used if no offset resource is specified (when attaching to a 
+widget), or if no margin resource is specified (when attaching 
+to the Form).
+.IP "\fIXmNrubberPositioning\fP"
+Indicates the default near (left) and top attachments for a child of the
+Form.
+(\fINote:\fP  Whether this resource actually applies to the left or
+right side of the child and its attachment may depend on the value of
+the \fIXmNstringDirection\fP resource.)
+.PP
+The default left attachment is applied whenever initialization or
+\fIXtSetValues\fP leaves the child without either a left or right
+attachment.
+The default top attachment is applied whenever initialization or
+\fIXtSetValues\fP leaves the child without either a top or bottom
+attachment.
+.P
+If this Boolean resource is set to False, \fIXmNleftAttachment\fP and
+\fIXmNtopAttachment\fP default to \fIXmATTACH_FORM\fP,
+\fIXmNleftOffset\fP defaults to the current \fBx\fP value of the left
+side of the child,
+and \fIXmNtopOffset\fP defaults to the current
+\fBy\fP value of the child.
+The effect is to position the child according to its absolute distance
+from the left or top side of the Form.
+.PP
+If this resource is set to True, \fIXmNleftAttachment\fP and
+\fIXmNtopAttachment\fP default to \fIXmATTACH_POSITION\fP,
+\fIXmNleftPosition\fP defaults to a value proportional to the current
+\fBx\fP value of the left side of the child divided by the width of the
+Form, and \fIXmNtopPosition\fP defaults to a value proportional to the
+current \fBy\fP value of the child divided by the height of the Form.
+The effect is to position the child relative to the left or top
+side of the Form and in proportion to the width or height of the Form.
+.IP "\fIXmNverticalSpacing\fP"
+Specifies the offset for top and bottom attachments.  This resource is
+only used if no offset resource is specified (when attaching to a 
+widget), or if no margin resource is specified (when attaching 
+to the Form).
+.P 
+.wH
+.in 0 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmForm Constraint Resource Set
+Name	Class	Type	Default	Access
+_
+XmNbottomAttachment	XmCAttachment	unsigned char	XmATTACH_NONE	CSG
+XmNbottomOffset	XmCOffset	int	0	CSG
+XmNbottomPosition	XmCAttachment	int	0	CSG
+XmNbottomWidget	XmCWidget	Widget	NULL	CSG
+XmNleftAttachment	XmCAttachment	unsigned char	XmATTACH_NONE	CSG
+XmNleftOffset	XmCOffset	int	0	CSG
+XmNleftPosition	XmCAttachment	int	0	CSG
+XmNleftWidget	XmCWidget	Widget	NULL	CSG
+XmNresizable	XmCBoolean	Boolean	True	CSG
+XmNrightAttachment	XmCAttachment	unsigned char	XmATTACH_NONE	CSG
+XmNrightOffset	XmCOffset	int	0	CSG
+XmNrightPosition	XmCAttachment	int	0	CSG
+XmNrightWidget	XmCWidget	Widget	NULL	CSG
+XmNtopAttachment	XmCAttachment	unsigned char	XmATTACH_NONE	CSG
+.wH
+.tH
+XmNtopOffset	XmCOffset	int	0	CSG
+XmNtopPosition	XmCAttachment	int	0	CSG
+XmNtopWidget	XmCWidget	Widget	NULL	CSG
+.TE
+.KE
+.in
+.sp 1
+.wH
+.in  
+.IP "\fIXmNbottomAttachment\fP"
+Specifies attachment of the bottom side of the child.  It can have the
+following values:
+.wH
+.rS 
+.TP
+\(bu
+\fIXmATTACH_NONE\fP \- Do not attach the bottom side of the child.
+.TP
+\(bu
+\fIXmATTACH_FORM\fP \- Attach the bottom side of the child to the bottom
+side of the Form.
+.TP
+\(bu
+\fIXmATTACH_OPPOSITE_FORM\fP \- Attach the bottom side of the child to
+the top side of the Form.
+\fIXmNbottomOffset\fP can be used to determine the visibility of the
+child.
+.TP
+\(bu
+\fIXmATTACH_WIDGET\fP \- Attach the bottom side of the child to the top
+side of the widget or
+gadget specified in the \fIXmNbottomWidget\fP resource.
+If \fIXmNbottomWidget\fP is NULL, \fIXmATTACH_WIDGET\fP is replaced by
+\fIXmATTACH_FORM\fP, and the child is attached to the bottom side of the
+Form.
+.TP
+\(bu
+\fIXmATTACH_OPPOSITE_WIDGET\fP \- Attach the bottom side of the child to
+the bottom side of the widget or
+gadget specified in the \fIXmNbottomWidget\fP resource.
+.nL
+.ne 20
+.TP
+\(bu
+\fIXmATTACH_POSITION\fP \- Attach the bottom side of the child to a
+position that is relative to
+the top side of the Form and in proportion to the height of the Form.
+This position is determined by the \fIXmNbottomPosition\fP and
+\fIXmNfractionBase\fP resources.
+.TP
+\(bu
+\fIXmATTACH_SELF\fP \- Attach the bottom side of the child to a position
+that is proportional
+to the current \fBy\fP value of the bottom of the child divided by the
+height of the Form.
+This position is determined by the \fIXmNbottomPosition\fP and
+\fIXmNfractionBase\fP resources.
+.ne 4
+\fIXmNbottomPosition\fP is set to a value proportional to the current
+\fBy\fP value of the bottom of the child divided by the height of the
+Form.
+.wH
+.rE
+.IP "\fIXmNbottomOffset\fP"
+Specifies the constant offset between the bottom side of the
+child and the object to which it is
+attached.
+The relationship established remains, regardless of any resizing operations
+that occur.
+When this resource is explicitly set, the value of \fIXmNverticalSpacing\fP
+is ignored.
+.IP "\fIXmNbottomPosition\fP"
+This resource is used to determine the position of the bottom side of
+the child when the child's \fIXmNbottomAttachment\fP is set to
+\fIXmATTACH_POSITION\fP.
+In this case the position of the bottom side of the child is relative to
+the top side of the Form and is a fraction of the height of the Form.
+This fraction is the value of the child's \fIXmNbottomPosition\fP
+resource divided by the value of the Form's \fIXmNfractionBase\fP.
+For example, if the child's \fIXmNbottomPosition\fP is 50, the Form's
+\fIXmNfractionBase\fP is 100, and the Form's height is 200, the position
+of the bottom side of the child is 100.
+.IP "\fIXmNbottomWidget\fP"
+Specifies the widget or gadget to which
+the bottom side of the child is attached.
+This resource is used if \fIXmNbottomAttachment\fP is set to either
+\fIXmATTACH_WIDGET\fP
+or \fIXmATTACH_OPPOSITE_WIDGET\fP.
+.PP
+A string-to-widget resource converter is automatically installed for use
+with this resource.
+With this converter, the widget that is to be the value of the resource
+must exist at the time the widget that has the resource is created.
+.nL
+.ne 15
+.IP "\fIXmNleftAttachment\fP"
+Specifies attachment of the near (left) side of the child.
+(\fINote:\fP  Whether this resource actually applies to the left or
+right side of the child and its attachment may depend on the value of
+the \fIXmNstringDirection\fP resource.)
+It can have the following values:
+.wH
+.rS 
+.TP
+\(bu
+\fIXmATTACH_NONE\fP \- Do not attach the left side of the child.
+If \fIXmNrightAttachment\fP is also \fIXmATTACH_NONE\fP, this value is
+ignored and the child is given a default left attachment.
+.TP
+\(bu
+\fIXmATTACH_FORM\fP \- Attach the left side of the child to the left
+side of the Form.
+.TP
+\(bu
+\fIXmATTACH_OPPOSITE_FORM\fP \- Attach the left side of the child to the
+right side of the Form.
+\fIXmNleftOffset\fP can be used to determine the visibility of the
+child.
+.TP
+\(bu
+\fIXmATTACH_WIDGET\fP \- Attach the left side of the child to the right
+side of the widget or
+gadget specified in the \fIXmNleftWidget\fP resource.
+If \fIXmNleftWidget\fP is NULL, \fIXmATTACH_WIDGET\fP is replaced by
+\fIXmATTACH_FORM\fP, and the child is attached to the left side of the
+Form.
+.TP
+\(bu
+\fIXmATTACH_OPPOSITE_WIDGET\fP \- Attach the left side of the child to
+the left side of the widget or
+gadget specified in the \fIXmNleftWidget\fP resource.
+.TP
+\(bu
+\fIXmATTACH_POSITION\fP \- Attach the left side of the child to a
+position that is relative to
+the left side of the Form and in proportion to the width of the Form.
+This position is determined by the \fIXmNleftPosition\fP and
+\fIXmNfractionBase\fP resources.
+.TP
+\(bu
+\fIXmATTACH_SELF\fP \- Attach the left side of the child to a position
+that is proportional to
+the current \fBx\fP value of the left side of the child divided by the
+width of the Form.
+This position is determined by the \fIXmNleftPosition\fP and
+\fIXmNfractionBase\fP resources.
+.ne 6
+\fIXmNleftPosition\fP is set to a value proportional to the current
+\fBx\fP value of the left side of the child divided by the width of the
+Form.
+.wH
+.rE
+.ne 15
+.IP "\fIXmNleftOffset\fP"
+Specifies the constant offset between the near (left) side of the
+child and the object to which it is attached.
+(\fINote:\fP  Whether this resource actually applies to the left or
+right side of the child and its attachment may depend on the value of
+the \fIXmNstringDirection\fP resource.)
+The relationship established remains, regardless of any resizing operations
+that occur.
+When this resource is explicitly set, the value of \fIXmNhorizontalSpacing\fP
+is ignored.
+.IP "\fIXmNleftPosition\fP"
+This resource is used to determine the position of the near (left) side
+of the child when the child's \fIXmNleftAttachment\fP is set to
+\fIXmATTACH_POSITION\fP.
+(\fINote:\fP  Whether this resource actually applies to the left or
+right side of the child and its attachment may depend on the value of
+the \fIXmNstringDirection\fP resource.)
+.PP
+In this case the position of the left side of the child is relative to
+the left side of the Form and is a fraction of the width of the Form.
+This fraction is the value of the child's \fIXmNleftPosition\fP resource
+divided by the value of the Form's \fIXmNfractionBase\fP.
+For example, if the child's \fIXmNleftPosition\fP is 50, the Form's
+\fIXmNfractionBase\fP is 100, and the Form's width is 200, the position
+of the left side of the child is 100.
+.IP "\fIXmNleftWidget\fP"
+Specifies the widget or gadget to which the near (left) side of the
+child is attached.
+(\fINote:\fP  Whether this resource actually applies to the left or
+right side of the child and its attachment may depend on the value of
+the \fIXmNstringDirection\fP resource.)
+This resource is used if \fIXmNleftAttachment\fP
+is set to either \fIXmATTACH_WIDGET\fP
+or \fIXmATTACH_OPPOSITE_WIDGET\fP.
+.PP
+A string-to-widget resource converter is automatically installed for use
+with this resource.
+With this converter, the widget that is to be the value of the resource
+must exist at the time the widget that has the resource is created.
+.nL
+.ne 4
+.IP "\fIXmNresizable\fP"
+This Boolean resource specifies whether or not a child's request for a
+new size is (conditionally) granted by the Form.
+If this resource is set to True the request is granted if possible.
+If this resource is set to False the request is always refused.
+.PP
+If a child has both left and right attachments, its width is completely
+controlled by the Form, regardless of the value of the child's
+\fIXmNresizable\fP resource.
+If a child has a left or right attachment but not both, the child's
+\fIXmNwidth\fP is used in setting its width if the value of the child's
+\fIXmNresizable\fP resource is True.
+These conditions are also true for top and bottom attachments, with
+height acting like width.
+.IP "\fIXmNrightAttachment\fP"
+Specifies attachment of the far (right) side of the child.
+(\fINote:\fP  Whether this resource actually applies to the left or
+right side of the child and its attachment may depend on the value of
+the \fIXmNstringDirection\fP resource.)
+It can have the following values:
+.wH
+.rS 
+.TP
+\(bu
+\fIXmATTACH_NONE\fP \- Do not attach the right side of the child.
+.TP
+\(bu
+\fIXmATTACH_FORM\fP \- Attach the right side of the child to the right
+side of the Form.
+.TP
+\(bu
+\fIXmATTACH_OPPOSITE_FORM\fP \- Attach the right side of the child to
+the left side of the Form.
+\fIXmNrightOffset\fP can be used to determine the visibility of the
+child.
+.TP
+\(bu
+\fIXmATTACH_WIDGET\fP \- Attach the right side of the child to the left
+side of the widget or
+gadget specified in the \fIXmNrightWidget\fP resource.
+If \fIXmNrightWidget\fP is NULL, \fIXmATTACH_WIDGET\fP is replaced by
+\fIXmATTACH_FORM\fP, and the child is attached to the right side of the
+Form.
+.TP
+\(bu
+\fIXmATTACH_OPPOSITE_WIDGET\fP \- Attach the right side of the child to
+the right side of the widget or
+gadget specified in the \fIXmNrightWidget\fP resource.
+.nL
+.ne 4
+.TP
+\(bu
+\fIXmATTACH_POSITION\fP \- Attach the right side of the child to a
+position that is relative to
+the left side of the Form and in proportion to the width of the Form.
+This position is determined by the \fIXmNrightPosition\fP and
+\fIXmNfractionBase\fP resources.
+.TP
+\(bu
+\fIXmATTACH_SELF\fP \- Attach the right side of the child to a position
+that is proportional to
+the current \fBx\fP value of the right side of the child divided by the
+width of the Form.
+This position is determined by the \fIXmNrightPosition\fP and
+\fIXmNfractionBase\fP resources.
+\fIXmNrightPosition\fP is set to a value proportional to the current
+\fBx\fP value of the right side of the child divided by the width of the
+Form.
+.wH
+.rE
+.IP "\fIXmNrightOffset\fP"
+Specifies the constant offset between the far (right) side of the
+child and the object to which it is attached.
+(\fINote:\fP  Whether this resource actually applies to the left or
+right side of the child and its attachment may depend on the value of
+the \fIXmNstringDirection\fP resource.)
+The relationship established remains, regardless of any resizing operations
+that occur.
+When this resource is explicitly set, the value of \fIXmNhorizontalSpacing\fP
+is ignored.
+.IP "\fIXmNrightPosition\fP"
+This resource is used to determine the position of the far (right) side
+of the child when the child's \fIXmNrightAttachment\fP is set to
+\fIXmATTACH_POSITION\fP.
+(\fINote:\fP  Whether this resource actually applies to the left or
+right side of the child and its attachment may depend on the value of
+the \fIXmNstringDirection\fP resource.)
+.PP
+In this case the position of the right side of the child is relative to
+the left side of the Form and is a fraction of the width of the Form.
+This fraction is the value of the child's \fIXmNrightPosition\fP resource
+divided by the value of the Form's \fIXmNfractionBase\fP.
+For example, if the child's \fIXmNrightPosition\fP is 50, the Form's
+\fIXmNfractionBase\fP is 100, and the Form's width is 200, the position
+of the right side of the child is 100.
+.nL
+.ne 5
+.IP "\fIXmNrightWidget\fP"
+Specifies the widget or gadget
+to which the far (right) side of the child is attached.
+(\fINote:\fP  Whether this resource actually applies to the left or
+right side of the child and its attachment may depend on the value of
+the \fIXmNstringDirection\fP resource.)
+This resource is used if \fIXmNrightAttachment\fP
+is set to either \fIXmATTACH_WIDGET\fP
+or \fIXmATTACH_OPPOSITE_WIDGET\fP.
+.PP
+A string-to-widget resource converter is automatically installed for use
+with this resource.
+With this converter, the widget that is to be the value of the resource
+must exist at the time the widget that has the resource is created.
+.IP "\fIXmNtopAttachment\fP"
+Specifies attachment of the top side of the child.  It can have
+following values:
+.wH
+.rS 
+.TP
+\(bu
+\fIXmATTACH_NONE\fP \- Do not attach the top side of the child.
+If \fIXmNbottomAttachment\fP is also \fIXmATTACH_NONE\fP, this value is
+ignored and the child is given a default top attachment.
+.TP
+\(bu
+\fIXmATTACH_FORM\fP \- Attach the top side of the child to the top side
+of the Form.
+.TP
+\(bu
+\fIXmATTACH_OPPOSITE_FORM\fP \- Attach the top side of the child to the
+bottom side of the Form.
+\fIXmNtopOffset\fP can be used to determine the visibility of the
+child.
+.TP
+\(bu
+\fIXmATTACH_WIDGET\fP \- Attach the top side of the child to the bottom
+side of the widget or
+gadget specified in the \fIXmNtopWidget\fP resource.
+If \fIXmNtopWidget\fP is NULL, \fIXmATTACH_WIDGET\fP is replaced by
+\fIXmATTACH_FORM\fP, and the child is attached to the top side of the
+Form.
+.TP
+\(bu
+\fIXmATTACH_OPPOSITE_WIDGET\fP \- Attach the top side of the child to
+the top side of the widget or
+gadget specified in the \fIXmNtopWidget\fP resource.
+.TP
+\(bu
+\fIXmATTACH_POSITION\fP \- Attach the top side of the child to a
+position that is relative to
+the top side of the Form and in proportion to the height of the Form.
+This position is determined by the \fIXmNtopPosition\fP and
+\fIXmNfractionBase\fP resources.
+.nL
+.ne 10
+.TP
+\(bu
+\fIXmATTACH_SELF\fP \- Attach the top side of the child to a position
+that is proportional to
+the current \fBy\fP value of the child divided by the height of the
+Form.
+This position is determined by the \fIXmNtopPosition\fP and
+\fIXmNfractionBase\fP resources.
+\fIXmNtopPosition\fP is set to a value proportional to the current
+\fBy\fP value of the child divided by the height of the Form.
+.wH
+.rE
+.IP "\fIXmNtopOffset\fP"
+Specifies the constant offset between the top side of the
+child and the object to which it is
+attached.
+The relationship established remains, regardless of any resizing operations
+that occur.
+When this resource is explicitly set, the value of \fIXmNverticalSpacing\fP
+is ignored.
+.IP "\fIXmNtopPosition\fP"
+This resource is used to determine the position of the top side of
+the child when the child's \fIXmNtopAttachment\fP is set to
+\fIXmATTACH_POSITION\fP.
+In this case the position of the top side of the child is relative to
+the top side of the Form and is a fraction of the height of the Form.
+This fraction is the value of the child's \fIXmNtopPosition\fP
+resource divided by the value of the Form's \fIXmNfractionBase\fP.
+For example, if the child's \fIXmNtopPosition\fP is 50, the Form's
+\fIXmNfractionBase\fP is 100, and the Form's height is 200, the position
+of the top side of the child is 100.
+.IP "\fIXmNtopWidget\fP"
+Specifies the widget or gadget to which the top
+side of the child is attached.
+This resource is used if \fIXmNtopAttachment\fP is
+set to either \fIXmATTACH_WIDGET\fP or \fIXmATTACH_OPPOSITE_WIDGET\fP.
+.PP
+A string-to-widget resource converter is automatically installed for use
+with this resource.
+With this converter, the widget that is to be the value of the resource
+must exist at the time the widget that has the resource is created.
+.SS "Inherited Resources"
+Form inherits behavior and resources from the following
+superclasses.  For a complete description of each resource, refer to the
+man page for that superclass.
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmBulletinBoard Resource Set
+Name	Class	Type	Default	Access
+_
+XmNallowOverlap	XmCAllowOverlap	Boolean	True	CSG
+XmNautoUnmanage	XmCAutoUnmanage	Boolean	True	CG
+XmNbuttonFontList	XmCButtonFontList	XmFontList	dynamic	CSG
+XmNcancelButton	XmCWidget	Widget	NULL	SG
+XmNdefaultButton	XmCWidget	Widget	NULL	SG
+XmNdefaultPosition	XmCDefaultPosition	Boolean	True	CSG
+XmNdialogStyle	XmCDialogStyle	unsigned char	dynamic	CSG
+XmNdialogTitle	XmCDialogTitle	XmString	NULL	CSG
+XmNfocusCallback	XmCCallback	XtCallbackList	NULL	C
+XmNlabelFontList	XmCLabelFontList	XmFontList	dynamic	CSG
+XmNmapCallback	XmCCallback	XtCallbackList	NULL	C
+XmNmarginHeight	XmCMarginHeight	Dimension	0	CSG
+XmNmarginWidth	XmCMarginWidth	Dimension	0 	CSG
+XmNnoResize	XmCNoResize	Boolean	False	CSG
+.wH
+.tH
+XmNresizePolicy	XmCResizePolicy	unsigned char	XmRESIZE_ANY	CSG
+XmNshadowType	XmCShadowType	unsigned char	XmSHADOW_OUT	CSG
+XmNtextFontList	XmCTextFontList	XmFontList	dynamic	CSG
+XmNtextTranslations	XmCTranslations	XtTranslations	NULL	C
+XmNunmapCallback	XmCCallback	XtCallbackList	NULL	C
+.TE
+.KE
+.in
+.sp 1
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmManager Resource Set
+Name	Class	Type	Default	Access
+_
+XmNbottomShadowColor	XmCBottomShadowColor	Pixel	dynamic	CSG
+XmNbottomShadowPixmap	XmCBottomShadowPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNforeground	XmCForeground	Pixel	dynamic	CSG
+XmNhelpCallback	XmCCallback	XtCallbackList	NULL	C
+XmNhighlightColor	XmCHighlightColor	Pixel	dynamic	CSG
+XmNhighlightPixmap	XmCHighlightPixmap	Pixmap	dynamic	CSG
+XmNinitialFocus	XmCInitialFocus	Widget	dynamic	CSG
+XmNnavigationType	XmCNavigationType	XmNavigationType	XmTAB_GROUP	CSG
+XmNshadowThickness	XmCShadowThickness	Dimension	dynamic	CSG
+XmNstringDirection	XmCStringDirection	XmStringDirection	dynamic	CG
+XmNtopShadowColor	XmCTopShadowColor	Pixel	dynamic	CSG
+XmNtopShadowPixmap	XmCTopShadowPixmap	Pixmap	dynamic	CSG
+XmNtraversalOn	XmCTraversalOn	Boolean	True	CSG
+XmNunitType	XmCUnitType	unsigned char	dynamic	CSG
+XmNuserData	XmCUserData	XtPointer	NULL	CSG
+.TE
+.KE
+.in
+.sp 1
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+Composite Resource Set
+Name	Class	Type	Default	Access
+_
+XmNchildren	XmCReadOnly	WidgetList	NULL	G
+XmNinsertPosition	XmCInsertPosition	XtOrderProc	NULL	CSG
+XmNnumChildren	XmCReadOnly	Cardinal	0	G
+.TE
+.KE
+.in
+.sp 1
+.P 
+.wH
+.in 0 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+Core Resource Set
+Name	Class	Type	Default	Access
+_
+XmNaccelerators	XmCAccelerators	XtAccelerators	dynamic	N/A
+XmNancestorSensitive	XmCSensitive	Boolean	dynamic	G
+XmNbackground	XmCBackground	Pixel	dynamic	CSG
+XmNbackgroundPixmap	XmCPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNborderColor	XmCBorderColor	Pixel	XtDefaultForeground	CSG
+XmNborderPixmap	XmCPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNborderWidth	XmCBorderWidth	Dimension	0	CSG
+XmNcolormap	XmCColormap	Colormap	dynamic	CG
+XmNdepth	XmCDepth	int	dynamic	CG
+XmNdestroyCallback	XmCCallback	XtCallbackList	NULL	C
+XmNheight	XmCHeight	Dimension	dynamic	CSG
+XmNinitialResourcesPersistent	XmCInitialResourcesPersistent	Boolean	True	C
+XmNmappedWhenManaged	XmCMappedWhenManaged	Boolean	True	CSG
+XmNscreen	XmCScreen	Screen *	dynamic	CG
+.wH
+.tH
+XmNsensitive	XmCSensitive	Boolean	True	CSG
+XmNtranslations	XmCTranslations	XtTranslations	dynamic	CSG
+XmNwidth	XmCWidth	Dimension	dynamic	CSG
+XmNx	XmCPosition	Position	0	CSG
+XmNy	XmCPosition	Position	0	CSG
+.TE
+.KE
+.in
+.sp 1
+.wH
+.in  
+.SS "Translations"
+XmForm inherits translations from XmBulletinBoard.
+.SH RELATED INFORMATION
+.na
+\fIComposite(3X)\fP, \fIConstraint(3X)\fP, \fICore(3X)\fP,
+\fIXmBulletinBoard(3X)\fP,
+\fIXmCreateForm\fP, \fIXmCreateFormDialog(3X)\fP, and
+\fIXmManager(3X)\fP.
+.ad

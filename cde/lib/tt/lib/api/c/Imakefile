@@ -1,0 +1,128 @@
+XCOMM $XConsortium: Imakefile /main/cde1_maint/2 1995/10/04 13:21:47 gtsang $
+/* tt/lib/api/c/Imakefile */
+/* The default for the defines NormalLibtt and SharedLibtt are set in
+ * config/Project.tmpl.
+ * If NormalLibtt and ! SharedLibtt, only non-pic code is built in
+ *    current directory.
+ * If NormalLibtt and SharedLibtt, non-pic code is built in the current
+ *    directory and pic code is built in the shared subdirectory.
+ * If !NormalLibtt and SharedLibtt, only pic code is built in the 
+ *    current directory.
+ * The default defines for NormalLibtt and SharedLittt can be overwritten 
+ *    in many places. See the file config/ExtensionsToImake for 
+ *    information.
+ */
+#ifndef DoNormalLib
+#define DoNormalLib NormalLibtt
+#endif
+#ifndef DoSharedLib
+#define DoSharedLib SharedLibtt
+#endif
+
+
+#include <Library.tmpl>
+
+TT_DIR = ../../..
+#include "../../../tooltalk.tmpl"
+
+/* We don't need the local, CDE, or X includes here (see tooltalk.tmpl) */
+CDEINCLUDES=
+XINCLUDES=
+
+
+/* General case INCLUDES DEFINES
+ * Each individual architecture may have more or less of the above.
+ * Use EXTRA_DEFINES and EXTRA_INCLUDES to add defines and includes
+ * to an individual architecture.
+ */
+INCLUDES = -I../../../lib
+
+/* put EXTRA_DEFINES and EXTRA_INCLUDES and anything else below */
+#ifdef HPArchitecture
+EXTRA_C++OPTIONS = $(ESLIT++_OPTION)
+#endif
+
+#ifdef SunArchitecture
+EXTRA_DEFINES = -D_REENTRANT -DSVR4 -DOS_VERSION=OSMajorVersion -DOS_MINOR_VERSION=OSMinorVersion 
+EXTRA_INCLUDES = -I../../../mini_isam
+#endif
+
+#ifdef RsArchitecture
+#endif
+
+#ifdef USLArchitecture
+#endif
+
+#ifdef UXPArchitecture
+#endif
+
+
+HEADERS = tt_c.h
+
+TTINCLUDEDEST = $(CDEINCLUDEDEST)/Tt
+
+
+SRCS = \
+api_api.C \
+api_storage.C \
+api_mp_otype.C \
+api_handle.C \
+api_xdr.C \
+api_file.C \
+api_filemap.C \
+api_mp.C \
+api_mp_io.C \
+api_message.C \
+api_utils.C \
+api_spec.C \
+api_default.C \
+api_pattern.C \
+api_session_prop.C \
+api_spec_map_ref.C \
+api_error.C \
+api_objid_spec.C \
+api_typecb.C \
+api_typecb_utils.C
+
+
+/*** NOTE! 
+ *** Every time a .o is added below it needs to be added to
+ *** the lib/tt/lib Imakefile in OBJS and SHARED_OBJS
+ ***/
+OBJS = \
+api_api.o \
+api_storage.o \
+api_mp_otype.o \
+api_handle.o \
+api_xdr.o \
+api_file.o \
+api_filemap.o \
+api_mp.o \
+api_mp_io.o \
+api_message.o \
+api_utils.o \
+api_spec.o \
+api_default.o \
+api_pattern.o \
+api_session_prop.o \
+api_spec_map_ref.o \
+api_error.o \
+api_objid_spec.o \
+api_typecb.o \
+api_typecb_utils.o
+
+
+/* Build the .o's */
+LibraryObjectRule()
+
+/* We don't build the library here, build it up in tt/lib instead. */
+all:: $(OBJS)
+
+DependTarget()
+
+BuildIncludes($(HEADERS),$(TTINCLUDEDEST),../..)
+/* For install of developer's build environment */
+LOCAL_BINSTALL_INCLUDEDEST = include/Tt
+BuildMultipleInstall($(HEADERS),$(LOCAL_BINSTALL_INCLUDEDEST))
+
+includes::

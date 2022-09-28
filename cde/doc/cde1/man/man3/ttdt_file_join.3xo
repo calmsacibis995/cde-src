@@ -1,0 +1,260 @@
+.TH ttdt_file_join 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+ttdt_file_join \- register to observe ToolTalk events on a file
+.SH SYNOPSIS
+.yS
+#include <Tt/tttk.h>
+.sp 0.5v
+.ta \w'Tt_pattern *ttdt_file_join('u
+Tt_pattern *ttdt_file_join(const char *\f2pathname\fP,
+	Tt_scope \f2the_scope\fP,
+	int \f2join\fP,
+	Ttdt_file_cb \f2cb\fP,
+	void *\f2clientdata\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn ttdt_file_join
+function registers to observe
+.IR Deleted ,
+.IR Modified ,
+.IR Reverted ,
+.IR Moved ,
+and
+.I Saved
+notices.
+.P
+If
+.I join
+is True,
+.Fn ttdt_file_join
+calls
+.Fn tt_file_join
+with a
+.I pathname
+argument.
+.P
+The
+.I the_scope
+argument identifies the scope of the request.
+If
+.I the_scope
+is
+.Cn TT_SCOPE_NONE ,
+it tries
+.Cn TT_BOTH ,
+and falls back to
+.Cn TT_FILE_IN_SESSION
+if, for example,
+the ToolTalk database server
+is not installed on the file server that owns
+.IR pathname .
+.P
+The
+.Fn ttdt_file_join
+function
+associates
+.I the_scope
+and a copy of
+.I pathname
+with the
+.BR Tt_pattern s
+returned, so that
+.Fn ttdt_file_quit
+can access them.
+Thus, the caller is free to modify or free
+.I pathname
+after
+.Fn ttdt_file_join
+returns.
+.P
+The
+.I clientdata
+argument points to arbitrary data that will be passed
+into the callback unmodified.
+.P
+The
+.B Ttdt_file_cb
+argument is a callback defined as:
+.Cs I
+.ta \w'Tt_message (*Ttdt_file_cb)('u
+Tt_message (*Ttdt_file_cb)(Tt_message \f2msg\fP,
+	Tttk_op \f2op\fP,
+	char *\f2pathname\fP,
+	void *\f2clientdata\fP,
+	int \f2same_euid_egid\fP,
+	int \f2same_procid\fP);
+.Ce
+.P
+The
+.I message
+argument is the message.
+The
+.I op
+argument is the operation.
+The
+.I pathname
+argument is the pathname of the file the message is about.
+The
+.I clientdata
+argument is the client data passed into
+.Fn ttdt_file_join .
+The
+.I same_euid_egid
+argument is
+True if the sender can be trusted;
+otherwise it is False.
+The
+.I same_procid
+argument is True if the sender
+is the same
+procid
+as the receiver;
+otherwise it is False.
+A
+.B Ttdt_file_cb
+must return the message if it does not consume the message.
+(Consuming means replying, rejecting or failing
+a request, and then destroying the message.)
+Otherwise, it must consume the message and return either zero or a
+.Fn tt_error_pointer
+cast to
+.BR Tt_message .
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn ttdt_file_join
+function
+returns a null-terminated array of
+.BR Tt_pattern ,
+which can be passed to
+.Fn ttdt_file_event 3
+to register for requests that the application should handle
+once it begins to modify the file;
+otherwise, it returns an error pointer.
+The application can use
+.Fn tt_ptr_error 3
+to extract one of the following
+.B Tt_status
+values from the returned handle:
+.VL 8
+.Lc TT_ERR_DBAVAIL
+.br
+The ToolTalk service could not access the ToolTalk database
+needed for this operation.
+.Lc TT_ERR_DBEXIST
+.br
+The ToolTalk service could not access the specified ToolTalk database
+in the expected place.
+.Lc TT_ERR_NOMEM
+.br
+There is insufficient memory available to perform the function.
+.Lc TT_ERR_NOMP
+.br
+The
+.Cm ttsession 1
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_PATH
+.br
+The specified pathname included an unsearchable directory.
+.LE
+.SH "APPLICATION USAGE"
+The null-terminated array of
+.BR Tt_pattern
+returned by
+.Fn ttdt_file_join
+should be destroyed by passing the array to
+.Fn ttdt_file_quit 3.
+.P
+The
+.I pathname
+argument to
+.B Ttdt_file_cb
+is a copy that can be freed using
+.Fn tt_free 3.
+.SH EXAMPLES
+This is the typical algorithm of a
+.BR Ttdt_file_cb :
+.Cs
+Tt_message myFileCB(Tt_message      msg,
+	Tttk_op         op,
+	char           *pathname,
+	int             trust,
+	int             isMe)
+{
+	tt_free(pathname);
+	Tt_status status = TT_OK;
+	switch(op) {
+	    case TTDT_MODIFIED:
+		if ((_modifiedByMe)&&(! isMe)) {
+			/* Hmm, the other editor either does not know or
+			 * does not care that we are already modifying the
+			 * file, so the last saver will win.
+			 */
+		} else {
+			/* Interrogate user if she ever modifies the buffer */
+			_modifiedByOther = 1;
+			XtAddCallback(myTextWidget, XmNmodifyVerifyCallback,
+				       myTextModifyCB, 0);
+		}
+		break;
+	    case TTDT_GET_MODIFIED:
+		tt_message_arg_ival_set(msg, 1, _modifiedByMe);
+		tt_message_reply(msg);
+		break;
+	    case TTDT_SAVE:
+		status = mySave(trust);
+		if (status == TT_OK) {
+			tt_message_reply(msg);
+		} else {
+			tttk_message_fail(msg, status, 0, 0);
+		}
+		break;
+	    case TTDT_REVERT:
+		status = myRevert(trust);
+		if (status == TT_OK) {
+			tt_message_reply(msg);
+		} else {
+			tttk_message_fail(msg, status, 0, 0);
+		}
+		break;
+	    case TTDT_REVERTED:
+		if (! isMe) {
+			_modifiedByOther = 0;
+		}
+		break;
+	    case TTDT_SAVED:
+		if (! isMe) {
+			_modifiedByOther = 0;
+			int choice = myUserChoice(myContext, myBaseFrame,
+						 "Another tool has saved "
+						 "this file.", 2, "Ignore",
+						 "Revert");
+			switch(choice) {
+			    case 1:
+				myRevert(1);
+				break;
+			}
+		}
+		break;
+	    case TTDT_MOVED:
+	    case TTDT_DELETED:
+		/* Do something appropriate */
+		break;
+	}
+	tttk_message_destroy(msg);
+	return 0;
+}
+.Ce
+.SH "SEE ALSO"
+.Hd Tt/tttk.h 5,
+.Fn ttdt_file_quit 3,
+.Fn ttdt_file_event 3,
+.Fn ttdt_Get_Modified 3,
+.Fn ttdt_Save 3,
+.Fn ttdt_Revert 3,
+.Fn tt_file_join 3,
+.Fn tt_free 3.

@@ -1,0 +1,356 @@
+XCOMM
+XCOMM  Imakefile ($TOP/cdesrc/cde1/dtcm/rpc.cmsd)
+XCOMM
+XCOMM  @(#)Imakefile	1.35 97/05/22 Copyright 1997 Sun Microsystems, Inc.
+XCOMM
+XCOMM  $XConsortium: Imakefile /main/cde1_maint/5 1995/10/13 18:43:29 barstow $
+XCOMM
+XCOMM  RESTRICTED CONFIDENTIAL INFORMATION:
+XCOMM
+XCOMM  The information in this document is subject to special
+XCOMM  restrictions in a confidential disclosure agreement between
+XCOMM  HP, IBM, Sun, USL, SCO and Univel.  Do not distribute this
+XCOMM  document outside HP, IBM, Sun, USL, SCO, or Univel without
+XCOMM  Sun's specific written approval.  This document and all copies
+XCOMM  and derivative works thereof must be returned or destroyed at
+XCOMM  Sun's request.
+XCOMM
+XCOMM  Copyright 1993 Sun Microsystems, Inc.  All rights reserved.
+XCOMM
+
+ TARGET_CONVERT = sdtcm_convert
+    TARGET_CMSD = rpc.cmsd
+       PROGRAMS = $(TARGET_CMSD) \
+		  $(TARGET_CONVERT)
+
+       INCLUDES = -I. -I../libcsa
+
+#ifdef SunArchitecture
+LOCAL_LIBRARIES = $(DTSVCLIB)
+#else
+LOCAL_LIBRARIES = $(DTHELPLIB)
+#endif /* SunArchitecture */
+
+        DEFINES = -DSVR4
+
+#ifdef RsArchitecture
+  EXTRA_DEFINES = -DBIG_ENDIAN -DAIX -DI_HAVE_NO_BOOL \
+		  -DSTRCASECMP_NOT_DEFINED -DRS6000
+EXTRA_LIBRARIES	= -lrpcsvc -lPW -ldiag -lc
+#endif
+
+#ifdef HPArchitecture
+  EXTRA_DEFINES = -DBIG_ENDIAN -DHPUX -DS9000 -DI_HAVE_NO_IDENT \
+                  -DI_HAVE_NO_BOOL
+EXTRA_LIBRARIES	= -lrpcsvc -lV3 -lc -lPW
+#endif
+
+#ifdef SunArchitecture
+.KEEP_STATE:
+.PARALLEL:
+
+  EXTRA_DEFINES += -DSunOS=$(OSMAJORVERSION)$(OSMINORVERSION) \
+			-D_POSIX_C_SOURCE=199506L
+  STD_DEFINES = -DSVR4 -D_XOPEN_VERSION=4 -D_XOPEN_SOURCE -D__EXTENSIONS__
+  STD_CPP_DEFINES= $(STD_DEFINES)
+  PROTO_DEFINES=
+
+#ifdef DEBUGTREE
+
+#ifdef CCOPTIONS
+#undef CCOPTIONS
+#endif
+
+CCOPTIONS = -Xa
+EXTRA_CCOPTIONS = -xstrconst -v -mt
+EXTRA_DEFINES += -DDEBUG
+#define DEBUG TRUE
+
+#else
+EXTRA_CCOPTIONS = -xstrconst -v -xO2 -mt
+#undef DEBUG
+#endif
+
+EXTRA_LIBRARIES = -i -lsocket -lnsl -lpthread -mt
+
+# rpc.cmsd doesn't want RPATH set.
+SHCLTLDFLAGS =
+
+#endif
+
+#ifdef AlphaArchitecture
+      SRCS_CMSD1 = ../dtcm/svc_init.c 
+#else
+      SRCS_CMSD1 =
+#endif
+
+      SRCS_CMSD2 = \
+		  parser.y \
+		  access.c \
+		  callback.c \
+		  cmscalendar.c \
+		  cmsconvert.c \
+		  cmsentry.c \
+		  cmsfunc.c \
+		  cmsmatch.c \
+		  delete.c \
+		  garbage.c \
+		  insert.c \
+                  lexit.c \
+                  list.c \
+                  log.c \
+		  lookup.c \
+		  programtable.c \
+		  reclotick.c \
+		  recount.c \
+		  relasttick.c \
+		  reminder.c \
+		  renexttick.c \
+		  repeat.c \
+		  reprevtick.c \
+		  rerule.c \
+		  reutil.c \
+		  rtable2.c \
+		  rtable3.c \
+		  rtable4.c \
+		  svcmain.c \
+		  tree.c \
+		  update.c \
+		  utility.c \
+		  v4ops.c \
+		  v5ops.c
+
+  SRCS_CMSD = $(SRCS_CMSD1) $(SRCS_CMSD2)
+
+  SRCS_CONVERT = \
+		  convertutil.c \
+		  parser.y \
+		  access.c \
+		  callback.c \
+		  cmscalendar.c \
+		  cmsconvert.c \
+		  cmsentry.c \
+		  cmsmatch.c \
+		  delete.c \
+		  garbage.c \
+		  i18nxlate.c \
+		  insert.c \
+                  lexit.c \
+                  list.c \
+                  log.c \
+		  lookup.c \
+		  reclotick.c \
+		  recount.c \
+		  relasttick.c \
+		  reminder.c \
+		  renexttick.c \
+		  repeat.c \
+		  reprevtick.c \
+		  rerule.c \
+		  reutil.c \
+		  tree.c \
+		  utility.c \
+		  v4ops.c \
+		  v5ops.c
+ 
+#ifdef AlphaArchitecture
+      OBJS_CMSD1 = ../dtcm/svc_init.o
+#else
+      OBJS_CMSD1 =
+#endif
+
+      OBJS_CMSD2 = \
+		  parser.o \
+		  access.o \
+		  callback.o \
+		  cmscalendar.o \
+		  cmsconvert.o \
+		  cmsentry.o \
+		  cmsfunc.o \
+		  cmsmatch.o \
+		  delete.o \
+		  garbage.o \
+		  insert.o \
+                  lexit.o \
+                  list.o \
+                  log.o \
+		  lookup.o \
+		  programtable.o \
+		  reclotick.o \
+		  recount.o \
+		  relasttick.o \
+		  reminder.o \
+		  renexttick.o \
+		  repeat.o \
+		  reprevtick.o \
+		  rerule.o \
+		  reutil.o \
+		  rtable2.o \
+		  rtable3.o \
+		  rtable4.o \
+		  svcmain.o \
+		  tree.o \
+		  update.o \
+		  utility.o \
+		  v4ops.o \
+		  v5ops.o
+
+      OBJS_CMSD = $(OBJS_CMSD1) $(OBJS_CMSD2)
+
+      OBJS_2_CMSD = \
+		  ../libcsa/attr.o \
+		  ../libcsa/appt4.o \
+		  ../libcsa/cmsdata.o \
+		  ../libcsa/cmxdr.o \
+		  ../libcsa/cmcbxdr.o \
+		  ../libcsa/convert2-4.o \
+		  ../libcsa/convert3-4.o \
+		  ../libcsa/convert4-2.o \
+		  ../libcsa/convert4-3.o \
+		  ../libcsa/convert4-5.o \
+		  ../libcsa/convert5-4.o \
+		  ../libcsa/hash.o \
+		  ../libcsa/iso8601.o \
+		  ../libcsa/laccess.o \
+		  ../libcsa/lutil.o \
+		  ../libcsa/match.o \
+		  ../libcsa/nametbl.o \
+		  ../libcsa/refree.o \
+		  ../libcsa/reparser.o \
+		  ../libcsa/rescan.o \
+		  ../libcsa/rtable2_xdr.o \
+		  ../libcsa/rtable3_xdr.o \
+		  ../libcsa/rtable4_xdr.o \
+		  ../libcsa/updateattrs.o
+
+  OBJS_CONVERT = \
+		  convertutil.o \
+		  parser.o \
+		  access.o \
+		  callback.o \
+		  cmscalendar.o \
+		  cmsconvert.o \
+		  cmsentry.o \
+		  cmsmatch.o \
+		  delete.o \
+		  garbage.o \
+		  i18nxlate.o \
+		  insert.o \
+                  lexit.o \
+                  list.o \
+                  log.o \
+		  lookup.o \
+		  reclotick.o \
+		  recount.o \
+		  relasttick.o \
+		  reminder.o \
+		  renexttick.o \
+		  repeat.o \
+		  reprevtick.o \
+		  rerule.o \
+		  reutil.o \
+		  tree.o \
+		  utility.o \
+		  v4ops.o \
+		  v5ops.o
+
+  OBJS_2_CONVERT = \
+		  ../libcsa/appt4.o \
+		  ../libcsa/attr.o \
+		  ../libcsa/cmsdata.o \
+		  ../libcsa/cmcbxdr.o \
+		  ../libcsa/cmxdr.o \
+		  ../libcsa/convert4-5.o \
+		  ../libcsa/convert5-4.o \
+		  ../libcsa/hash.o \
+		  ../libcsa/iso8601.o \
+		  ../libcsa/laccess.o \
+		  ../libcsa/lutil.o \
+		  ../libcsa/match.o \
+		  ../libcsa/nametbl.o \
+		  ../libcsa/refree.o \
+		  ../libcsa/reparser.o \
+		  ../libcsa/rescan.o \
+		  ../libcsa/rtable4_xdr.o \
+		  ../libcsa/updateattrs.o
+
+
+        HEADERS = \
+		  ../libcsa/agent.h \
+                  ../libcsa/ansi_c.h \
+		  ../libcsa/cmsdata.h \
+		  ../libcsa/convert4-5.h \
+		  ../libcsa/cm.h \
+		  ../libcsa/cmcb.h \
+		  ../libcsa/iso8601.h \
+		  ../libcsa/laccess.h \
+		  ../libcsa/lutil.h \
+		  ../libcsa/misc.h \
+		  ../libcsa/rerule.h \
+		  ../libcsa/rtable2.h \
+		  ../libcsa/rtable3.h \
+		  ../libcsa/rtable4.h \
+		  ../libcsa/updateattrs.h \
+		  cm_tbl.i \
+		  rtable2_tbl.i \
+		  rtable3_tbl.i \
+		  rtable4_tbl.i \
+		  access.h \
+		  callback.h \
+		  cmscalendar.h \
+		  cmsconvert.h \
+		  cmsentry.h \
+		  cmsmatch.h \
+		  data.h \
+		  delete.h \
+		  garbage.h \
+		  insert.h \
+		  lexer.h \
+		  list.h \
+		  log.h \
+		  lookup.h \
+		  parser.h \
+		  reminder.h \
+		  repeat.h \
+		  reutil.h \
+		  rpcextras.h \
+		  tree.h \
+		  update.h \
+		  utility.h \
+		  v4ops.h \
+		  v5ops.h
+
+all: $(PROGRAMS)
+
+NormalProgramTarget($(TARGET_CMSD), $(OBJS_CMSD) $(OBJS_2_CMSD), /**/, /**/, /**/)
+NormalProgramTarget($(TARGET_CONVERT), $(OBJS_CONVERT) $(OBJS_2_CONVERT), /**/, $(LOCAL_LIBRARIES) "-R/usr/dt/lib:/usr/openwin/lib", /**/)
+
+includes:: parser.h
+
+#ifndef SunArchitecture
+DependTarget3($(SRCS_CMSD),$(SRCS_CONVERT),/**/)
+#else
+depend:
+#endif
+
+
+../libcsa/reparser.c:
+        $(YACC) -d $(YFLAGS) $<
+        sed -e s/yyparse/_DtCm_rule_parser/g -e s/yy/_DtCm_yy/g y.tab.c > $*.c
+        sed s/yy/_DtCm_yy/g y.tab.h >  $*.h
+        $(RM) y.tab.c  y.tab.h
+
+.SUFFIXES: .y
+
+.y.c:
+	$(YACC) -d $(YFLAGS) $<
+	sed -e "s/yy/yyy/g" -e "\a# linea D" y.tab.c > $*.c
+	sed s/yy/yyy/g y.tab.h >  $*.h
+	$(RM) y.tab.c  y.tab.h
+
+parser.o parser.h:	parser.c
+
+clean::
+	$(RM) \
+        parser.h parser.c
+

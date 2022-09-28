@@ -1,0 +1,51 @@
+Compose(Request)		Editors			Compose(Request)
+
+NAME
+     Compose - compose a document
+
+SYNOPSIS
+         session Compose(    out <mediaType> contents
+			  /* in  messageID   msgID,
+			     in  string      title,
+                             in  string      template   */ );
+         file    Compose(    out <mediaType> contents
+			  /* in  messageID   msgID,
+			     in  string      title,
+                             in  string      template   */ );
+
+REQUIRED ARGUMENTS
+
+     <mediaType> contents
+
+          The contents of the document.  If the message is
+          file-scoped, the contents argument shall have no value, and
+          the document shall be contained in the scoped-to file.  The
+          data type of the contents argument shall be string, unless
+          nulls are legal in the given mediaType, in which case case
+          the data type shall be bytes.
+
+OPTIONAL ARGUMENTS
+
+     messageID msgID
+
+          Unique string created by the message sender, typically by
+          concatenating a procID and a counter.  This argument should
+          be included if the sender anticipates a need to communicate
+          with the handler about this request before it is completed,
+          e.g., to cancel it.
+
+     string title
+          
+          The name of the document, suitable for e.g. displaying in a
+          window titlebar.  If the title argument is absent and the
+          message is file-scoped, the scoped-to pathname may be
+          considered the title of the document.
+
+     string template
+          
+          Comma-separated list of pathnames of template file(s) to
+          master from.
+
+DESCRIPTION
+     Compose a document, and reply with the contents when the
+     composition is completed.

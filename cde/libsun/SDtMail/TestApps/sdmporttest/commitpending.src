@@ -1,0 +1,51 @@
+/* @(#)commitpending.src	1.2 97/04/29 SMI */
+
+token create token1
+#include "setup.src"
+token set token1 serviceoption messagestorename /tmp/test.mbx
+
+! /usr/bin/rm -f /tmp/test.mbx /tmp/.test.mbx_* /tmp/.test.mbx_dt_index
+! /usr/bin/rm -f /tmp/mail.out
+! /usr/bin/rm -f /tmp/monkey.au
+! /usr/bin/cp test1.mbx /tmp/test.mbx
+! /usr/bin/chmod 660 /tmp/test.mbx
+
+/**/# Create, startup and open the dataport
+port create port1
+port startup port1
+port open port1 token1
+
+/**/# create a new message not derived from any existing message
+/**/# this message is assigned message number -1
+
+port newmessagecreate port1 
+port addmessagebodytomessage port1 -1 text plain
+port replaceheader port1 -1 To LOGNAME
+port addheader port1 -1 subject test commit
+port addheader port1 -1 resent-from Napoleon
+port getstructure port1
+port setcontents port1 -1 0.1 the cow jumped over £ the moon
+port getstructure port1 -1
+port commitpendingmessagechanges port1 -1
+
+port newmessagecreate port1
+port addmessagebodytomessage port1 -2 text plain
+port addheader port1 -2 To LOGNAME
+port addheader port1 -2 subject another test
+port setcontents port1 -2 0.1 the cow jumped over the moon
+port getstructure port1 -2
+port getheaders port1 -2
+port commitpendingmessagechanges port1 -2
+
+port checkfornewmessages port1
+
+port getstructure port1
+port getheaders port1 7,8
+port getcontents port1 7 -p 0.1
+
+/**/# Close the dataport
+port close port1
+port shutdown port1
+port delete port1
+
+quit

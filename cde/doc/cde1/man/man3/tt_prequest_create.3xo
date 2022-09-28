@@ -1,0 +1,95 @@
+.TH tt_prequest_create 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+tt_prequest_create \- create a procedure request message
+.SH SYNOPSIS
+.yS
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'Tt_message tt_prequest_create('u
+Tt_message tt_prequest_create(Tt_scope \f2scope\fP,
+	const char *\f2op\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn tt_prequest_create
+function creates a message.
+The created message created contains the following:
+.P
+.in +6
+.B Tt_address
+=
+.Cn TT_PROCEDURE
+.br
+.B Tt_class
+=
+.Cn TT_REQUEST
+.P
+.xo .in -6
+The application can use the returned handle to add
+arguments and other attributes, and to send the message.
+.P
+The
+.I scope
+argument determines which processes are eligible to receive the message.
+The following values are defined:
+.VL 8
+.Lc TT_SESSION
+.br
+All processes joined to the indicated session are eligible.
+.Lc TT_FILE
+.br
+All processes joined to the indicated file are eligible.
+.Lc TT_BOTH
+.br
+All processes joined to either indicated file
+or the indicated session are eligible.
+.Lc TT_FILE_IN_SESSION
+.br
+All processes joined to both the indicated file
+and the indicated session are eligible.
+.LE
+.P
+The
+.I op
+argument is the operation to be performed by the receiving process.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn tt_prequest_create
+function returns the unique handle that identifies this message.
+The application can use
+.Fn tt_ptr_error 3
+to extract one of the following
+.B Tt_status
+values from the returned handle:
+.VL 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_NOMP
+.br
+The
+.Cm ttsession 1
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_PROCID
+.br
+The specified process identifier is out of date or invalid.
+.LE
+.SH "APPLICATION USAGE"
+The application should use
+.Fn tt_free 3
+to free any data stored in the address returned by the
+ToolTalk API.
+.P
+If the ToolTalk service is unable to create a message when requested,
+.Fn tt_prequest_create
+returns an invalid handle.
+When the application attempts to use this handle with another
+ToolTalk function, the ToolTalk service will return
+.Cn TT_ERR_POINTER .
+.SH "SEE ALSO"
+.Hd Tt/tt_c.h 5,
+.Fn tt_ptr_error 3,
+.Fn tt_free 3.

@@ -1,0 +1,65 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH XmTextCut 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmTextCut\fP \- A Text function that copies the primary selection to the clipboard and deletes the selected text
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/Text.h>
+.sp \n(PDu
+Boolean XmTextCut (\fBwidget, time\fI)
+.ta .5i 1.5i
+.nf
+	Widget	\fBwidget\fI;
+	Time	\fBtime\fI;
+.wH
+.fi
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+\fIXmTextCut\fP copies the primary selected text to the clipboard and
+then deletes the primary selected text.
+This routine calls the widget's \fIXmNvalueChangedCallback\fP and
+verification callbacks, either \fIXmNmodifyVerifyCallback\fP or
+\fIXmNmodifyVerifyCallbackWcs\fP, or both.  If both verification
+callback lists are registered, the procedures of the
+\fIXmNmodifyVerifyCallback\fP list are executed first and the resulting
+data is passed to the \fIXmNmodifyVerifyCallbackWcs\fP callbacks.
+.P 
+.IP "\fBwidget\fP"
+Specifies the Text widget ID.
+.IP "\fBtime\fP"
+Specifies the server time at which the selection value is to be modified.  This
+should be the time of the event which triggered this request.
+One source of a valid time stamp is the function \fIXtLastTimestampProcessed()\fP.
+.PP 
+For a complete definition of Text and its associated resources, see
+\fIXmText(3X)\fP.
+.SH RETURN VALUE
+This function returns False if the primary selection is NULL, if the
+\fBwidget\fP doesn't own the primary selection, or if the function is
+unable to gain ownership of the clipboard selection.  Otherwise, it
+returns True.
+.SH RELATED INFORMATION
+.na
+\fIXmText(3X)\fP.
+.ad

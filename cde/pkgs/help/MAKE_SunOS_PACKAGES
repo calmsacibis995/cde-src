@@ -1,0 +1,72 @@
+#!/usr/bin/ksh
+
+
+if (($# > 0))
+then
+	packages="$*"
+else
+	packages="SUNWdthe SUNWdthed SUNWdthev"
+fi
+
+
+echo Making $packages
+
+for i in $packages
+do
+	if test $i = SUNWdthe
+	then
+	 cd ${i}
+                sccs get pkginfo.${i}
+                chmod 666 pkginfo.${i}
+                sed s/REV=/REV=${CDE_PACK_VER}.${CDE_PACK_DATE}/ pkginfo.${i} > pkginfo.${i}.tmp
+                mv pkginfo.${i}.tmp pkginfo.${i}
+                chmod 444 pkginfo.${i}
+                pkgmk -a ${BUILD_ARCH} \
+                -b ${BUILD_TREE} \
+                -o -d ${CDE_PACK_DIR}/ -f ./prototype.${i}
+                cd ..
+
+	elif test $i = SUNWdthed
+        then
+
+	 cd ${i}
+                sccs get pkginfo.${i}
+                chmod 666 pkginfo.${i}
+                sed s/REV=/REV=${CDE_PACK_VER}.${CDE_PACK_DATE}/ pkginfo.${i} > pkginfo.${i}.tmp
+                mv pkginfo.${i}.tmp pkginfo.${i}
+                chmod 444 pkginfo.${i}
+                pkgmk -a ${BUILD_ARCH} \
+                -b ${BUILD_TREE} \
+                -o -d ${CDE_PACK_DIR}/ -f ./prototype.${i}
+                cd ..
+
+
+	elif test $i = SUNWdthev
+        then
+
+	 cd ${i}
+                sccs get pkginfo.${i}
+                chmod 666 pkginfo.${i}
+                sed s/REV=/REV=${CDE_PACK_VER}.${CDE_PACK_DATE}/ pkginfo.${i} > pkginfo.${i}.tmp
+                mv pkginfo.${i}.tmp pkginfo.${i}
+                chmod 444 pkginfo.${i}
+                pkgmk -a ${BUILD_ARCH} \
+                -b ${BUILD_TREE} \
+                -o -d ${CDE_PACK_DIR}/ -f ./prototype.${i}
+                cd ..
+
+	else
+
+	 cd ${i}
+                sccs get pkginfo.${i}
+                chmod 666 pkginfo.${i}
+                sed s/REV=/REV=${CDE_PACK_VER}.${CDE_PACK_DATE}/ pkginfo.${i} > pkginfo.${i}.tmp
+                mv pkginfo.${i}.tmp pkginfo.${i}
+                chmod 444 pkginfo.${i}
+                pkgmk -a ${BUILD_ARCH} \
+                -b ${BUILD_TREE} \
+                -o -d ${CDE_PACK_DIR}/ -f ./prototype.${i}
+                cd ..
+
+	fi
+done

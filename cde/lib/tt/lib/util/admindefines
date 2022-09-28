@@ -1,0 +1,29 @@
+#ifndef UseCPlusPlus
+#define UseCPlusPlus YES
+#endif
+#ifndef UnityVersion
+#define UnityVersion 1
+#endif
+#ifndef CdeVersion
+#define CdeVersion 1
+#endif
+#if defined(sparc)
+#ifdef ExtraCPlusPlusOptions
+#define admindefines_tmp ExtraCPlusPlusOptions -xregs=no%appl
+#undef ExtraCPlusPlusOptions
+#define ExtraCPlusPlusOptions _admindefines_tmp
+#undef admindefines_tmp
+#else
+#define ExtraCPlusPlusOptions -xregs=no%appl
+#endif
+#endif
+
+
+/* stock definition of LinkFile uses $? which can bring in unwanted */
+/* derived dependencies, at least in Sun make. */
+
+#undef LinkFile
+#define LinkFile(tofile,fromfile)                                       @@\
+tofile:: fromfile                                                       @@\
+        $(RM) $@                                                        @@\
+        $(LN) fromfile tofile

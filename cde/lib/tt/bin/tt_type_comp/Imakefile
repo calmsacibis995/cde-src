@@ -1,0 +1,128 @@
+XCOMM $XConsortium: Imakefile /main/cde1_maint/5 1995/10/16 08:55:27 barstow $
+/* bin/tt_type_comp/Imakefile */
+
+TT_DIR = ../..
+#include "../../tooltalk.tmpl"
+/* find libtt locally */
+LOCAL_TTLIB_DIR=../../lib  /* reset library top for correct dependencies */
+
+XINCLUDES=
+CDEINCLUDES=
+
+
+/* General case INCLUDES DEFINES
+ * Each individual architecture may have more or less of the above.
+ * Use EXTRA_DEFINES and EXTRA_INCLUDES to add defines and includes
+ * to an individual architecture.
+ */
+DEFINES = -DTT_VERSION_STRING=\"$(TT_VERSION)\"
+INCLUDES = -I../../lib -I../../slib 
+
+/* DEPLIBS contains the list of library depencies for a client.
+ * LOCAL_LIBRARIES contains the list of libraries on the link line.
+ * Generally, the dependency form of a library has DEP as a prefix.
+ * e.g. put $(XLIB) in LOCAL_LIBRARIES and $(DEPXLIB) in DEPLIBS.
+ * NOTE: if DEPLIBS is not set here, it is by default null and there
+ *       are no library dependencies for clients.
+ *       You cannot put -Llibpath into DEPLIBS. You must put actual
+ *       paths to the library.
+ */
+
+DEPLIBS = ../../slib/libstt.a $(DEPTTLIB_AND_MAYBE_XLIB)
+LOCAL_LIBRARIES = ../../slib/libstt.a ../../lib/util/copyright.o $(TTLIB_AND_MAYBE_XLIB)
+
+/* put EXTRA_DEFINES and EXTRA_INCLUDES and anything else below */
+#ifdef HpArchitecture
+#endif
+
+#ifdef SunArchitecture
+SYS_LIBRARIES = -ldl $(I18NSYSLIB) -lnsl
+EXTRA_DEFINES = -D_REENTRANT -DSVR4 -DOS_VERSION=OSMajorVersion -DOS_MINOR_VERSION=OSMinorVersion 
+EXTRA_INCLUDES = -I../../mini_isam
+#endif
+
+#ifdef RsArchitecture
+#endif
+
+#ifdef AlphaArchitecture
+SYS_LIBRARIES = $(SYS_LIBRARIES) -liconv
+EXTRA_DEFINES = -DTT_OSF_DEBUG -DSUN_ANSWERS_QS
+XCOMM On Alpha AXP/OSF/1, yacc and lex is run natively to eliminate 64 bit issues
+YACC = yacc
+LEX = lex
+#endif
+
+#ifdef USLArchitecture
+#endif
+
+#ifdef UXPArchitecture
+#endif
+
+SRCS1 = mp_type_comp.C \
+        mp_types_table.C
+
+OBJS1 = mp_type_comp.o \
+        mp_types_table.o
+
+#if !defined(AlphaArchitecture)
+SRCS2 = frozen.mp_types_lex.C \ 
+        frozen.mp_types_gram.C
+
+OBJS2 = frozen.mp_types_lex.o \
+        frozen.mp_types_gram.o  $(NONSHAREDLIBCOBJ)
+#else
+SRCS2 = mp_types_gram.y \
+        mp_types_lex.l
+
+OBJS2 = mp_types_gram.o \
+        mp_types_lex.o  $(NONSHAREDLIBCOBJ)
+#endif
+
+SRCS = $(SRCS1) $(SRCS2)
+OBJS = $(OBJS1) $(OBJS2)
+
+#ifdef AlphaArchitecture
+
+.SUFFIXES: .y
+.y.o :
+	$(RM) mp_types_gram.h $@
+	$(YACC) -d $<
+	sed 's/^\([int]*[ ]*\)yyparse(/\1_Tt_types_table::yyparse(/' y.tab.c > $*.C
+	$(MV) y.tab.h mp_types_gram.h
+	$(RM) y.tab.c
+	$(C++) -c $(C++FLAGS) $(_NOOP_) $*.C
+
+.SUFFIXES: .l
+.l.o :
+	$(RM) $@
+	$(LEX) $<
+	sed -e '/^# define output/d' \
+	-e '/^# define input/d' -e '/^# define unput/d' \
+	-e '/^#ident/d' \
+	-e 's/^yylex()/int _Tt_types_table::yylex()/' \
+	-e 's/^[int]*[ ]*yylook(/int _Tt_types_table::yylook(/' \
+	-e 's/^[int]*[ ]*yyback(/int _Tt_types_table::yyback(/' \
+	-e 's/(p, m)/(int *p, int m)/' -e 's/lex_input/input/' \
+	-e 's/lex_output/output/' -e '/^	int \*p;/ d' \
+	-e 's/struct yysvf {/struct yywork; struct yysvf {/' \
+	-e '/lex library/ q' lex.yy.c > $*.C
+	$(RM) lex.yy.c
+	$(C++) -c $(C++FLAGS) $(_NOOP_) $*.C
+
+#endif
+
+all::
+
+/* Build the .o's */
+NormalLibraryObjectRule()
+ComplexProgramTarget(tt_type_comp)
+BuildMultipleInstall(tt_type_comp,bin)
+
+#ifndef AlphaArchitecture
+frozen.mp_types_lex.o: mp_types_gram.h
+
+LinkFile(mp_types_gram.h,frozen.mp_types_gram.h)
+#else
+clean::
+	$(RM) mp_types_gram.h mp_types_gram.C mp_types_lex.C
+#endif

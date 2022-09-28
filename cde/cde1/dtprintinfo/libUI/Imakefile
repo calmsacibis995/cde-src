@@ -1,0 +1,93 @@
+XCOMM $XConsortium: Imakefile /main/cde1_maint/4 1995/10/09 10:16:09 pascale $
+DESKTOP_VERSION_STRING = DesktopVersionString
+
+MODULE=Test
+
+LOCAL_CPP_DEFINES = -DCDE_INSTALLATION_TOP=$(CDE_INSTALLATION_TOP) \
+                    -DCDE_CONFIGURATION_TOP=$(CDE_CONFIGURATION_TOP)
+
+#define IHaveSubdirs
+#define PassCDebugFlags 'CDEBUGFLAGS=$(CDEBUGFLAGS)'
+
+SUBDIRS = MotifUI
+
+MakeSubdirs($(SUBDIRS))
+DependSubdirs($(SUBDIRS))
+
+INCLUDES = -I. -IMotifUI
+
+/* DEPLIBS contains the list of library depencies for a client.
+ * LOCAL_LIBRARIES contains the list of libraries on the link line.
+ * Generally, the dependency form of a library has DEP as a prefix.
+ * e.g. put $(XLIB) in LOCAL_LIBRARIES and $(DEPXLIB) in DEPLIBS.
+ * NOTE: if DEPLIBS is not set here, it is by default null and there
+ *       are no library dependencies for clients.
+ *       You cannot put -Llibpath into DEPLIBS. You must put actual
+ *       paths to the library.
+ */
+
+#ifdef SunArchitecture
+
+.NO_PARALLEL:
+
+DEPLIBS = $(DEPDTSVCLIB) \
+		$(DEPXMLIB) $(DEPXTOOLLIB) $(DEPXLIB) ./MotifUI/libMotifUI.a
+LOCAL_LIBRARIES = ./MotifUI/libMotifUI.a \
+		$(DTSVCLIB) $(XMLIB) $(XTOOLLIB) $(XLIB)
+#else
+DEPLIBS = $(DEPDTHELPLIB) $(DEPDTSVCLIB) \
+		$(DEPXMLIB) $(DEPXTOOLLIB) $(DEPXLIB) ./MotifUI/libMotifUI.a
+LOCAL_LIBRARIES = ./MotifUI/libMotifUI.a \
+		$(DTHELPLIB) $(DTSVCLIB) $(XMLIB) $(XTOOLLIB) $(XLIB)
+#endif /* SunArchitecture */
+
+/* put EXTRA_DEFINES and EXTRA_INCLUDES and anything else below */
+#ifdef HPArchitecture
+/* on hp-ux, archiving libDtHelp requires the math library */
+#if ((!SharedLibDtHelp) || (ARCHIVED_LINK) || (LinkArchivedDtHelp))
+SYS_LIBRARIES = -lm
+#endif
+#endif
+
+#ifdef SunArchitecture
+SYS_LIBRARIES = -ldl $(WIDECHARSYSLIB) -lgen -lsocket -lnsl -lC
+LAST_LOAD_FLAGS = 
+EXTRA_DEFINES = -DNO_REGCOMP -DOSMAJORVERSION=$(OSMAJORVERSION) -DOSMINORVERSION=$(OSMINORVERSION)
+#endif
+
+#ifdef RsArchitecture
+NONSHAREDLIBCOBJ = nonsharelibC.o
+EXTRA_DEFINES = -DHAS_EXCEPTIONS
+#endif
+
+#ifdef USLArchitecture
+SYS_LIBRARIES = -lm
+EXTRA_DEFINES = -DNO_REGCOMP
+#endif
+
+#ifdef UXPArchitecture
+SYS_LIBRARIES = -lm
+EXTRA_DEFINES = -DNO_REGCOMP
+#endif
+
+#ifdef AlphaArchitecture
+EXTRA_DEFINES = -DMESSAGE_CAT
+#endif
+
+HEADERS=\
+	BaseUI.h
+
+SRCS = \
+	BaseUI.C \
+	Test.C
+
+OBJS = \
+	BaseUI.o \
+	Test.o \
+	$(NONSHAREDLIBCOBJ)
+
+NormalLibraryObjectRule()
+ComplexProgramTarget(Test)
+
+clean::
+	$(RM) *.map

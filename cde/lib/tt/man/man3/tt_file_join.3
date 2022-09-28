@@ -1,0 +1,78 @@
+.de Lc
+.\" version of .LI that emboldens its argument
+.TP \\n()Jn
+\s-1\f3\\$1\f1\s+1
+..
+.TH tt_file_join 3 "1 March 1996" "ToolTalk 1.3" "ToolTalk Functions"
+.BH "1 March 1996"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.IX "tt_file_join" "" "tt_file_join(3)" ""
+.SH NAME
+tt_file_join \- register interest in messages involving a file
+.SH SYNOPSIS
+.ft 3
+.nf
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'Tt_status tt_file_join('u
+Tt_status tt_file_join(const char *\f2filepath\fP);
+.PP
+.fi
+.SH DESCRIPTION
+The
+.BR tt_file_join (\|)
+function
+informs the ToolTalk service that the process is interested in messages
+that involve the specified file.
+.PP
+The ToolTalk service adds this file value to any currently registered patterns.
+The named file becomes the default file.
+.PP
+When the process joins a file, the ToolTalk service updates the file field
+of its registered patterns.
+The
+.BR tt_file_join (\|)
+call causes the pattern's ToolTalk
+session to be stored in the database.
+.PP
+The
+.I filepath
+argument is a pointer to the pathname of the file in which the
+process is interested.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.BR tt_file_join (\|)
+function returns the status of the operation as one of the following
+.B Tt_status
+values:
+.PP
+.RS 3
+.nr )J 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_DBAVAIL
+.br
+The ToolTalk service could not access the
+ToolTalk database needed for this operation.
+.Lc TT_ERR_DBEXIST
+.br
+The ToolTalk service could not access the
+specified ToolTalk database in the expected place.
+.Lc TT_ERR_NOMP
+.br
+The
+.BR ttsession (1)
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_PATH
+.br
+The specified pathname included an unsearchable directory.
+.PP
+.RE
+.nr )J 0
+.SH "SEE ALSO"
+.na
+.BR tt_c (5).

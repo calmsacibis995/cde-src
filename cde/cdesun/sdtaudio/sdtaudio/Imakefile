@@ -1,0 +1,37 @@
+XCOMM Imakefile; sdtaudio @(#)Imakefile	1.14 97/03/21 SMI
+XCOMM Copyright (c) 1996 Sun Microsystems, Inc.
+
+EXTRA_CCOPTIONS = -v
+
+DEFINES		= -DUSE_XAUDIO -D_REENTRANT -mt
+
+INCLUDES	= -I.
+
+DEPLIBS		= $(DEPDTSVCLIB) $(DEPDTWIDGETLIB) $(DEPTTLIB) \
+		  $(DEPXMLIB) $(DEPXTOOLLIB) $(DEPXLIB)
+
+LOCAL_LIBRARIES	= $(DTSVCLIB) $(DTWIDGETLIB) $(DTHELPLIB) $(TTLIB) \
+		  $(XMLIB) $(XTOOLLIB) $(XLIB)
+
+SYS_LIBRARIES	= -mt -ldl -lm
+
+XA_OBJS		= safile.o callbacks.o audiofile.o cb_utils.o
+
+${XA_OBJS}	:= CCOPTIONS = -Xa
+
+PROGRAMS	= sdtaudio
+
+OBJS		= sdtaudio.o sdtaudio_ui.o utils.o callbacks.o \
+		  audiofile.o thread.o g711.o file_utils.o \
+		  safile.o sa.o rec_init.o audtt.o cb_utils.o
+
+SRCS		= sdtaudio.c sdtaudio_ui.c utils.c callbacks.c \
+		  audiofile.c thread.c g711.c file_utils.c \
+		  safile.c sa.c rec_init.c audtt.c cb_utils.c
+
+NormalLibraryObjectRule()
+ComplexProgramTarget($(PROGRAMS))
+
+#ifdef SunArchitecture
+.KEEP_STATE:
+#endif /* SunArchitecture */

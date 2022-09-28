@@ -1,0 +1,36 @@
+.TH Modified Desktop "05 Apr 1994" "SunSoft" "ToolTalk Policy"
+.SH NAME
+.PP
+Modified, Reverted - an entity (e.g. a file) has been modified/reverted
+.SH SYNOPSIS
+.so ../.synopsis
+[\fIfile\f(CW]	Modified(	in	\fItype	ID\f(CW );	
+[\fIfile\f(CW]	Reverted(	in	\fItype	ID\f(CW );
+.ft
+.fi
+.SH DESCRIPTION
+.PP
+\f(CWModified()\fR is sent whenever a tool first modifies a volatile,
+non-shared (e.g., in-memory) representation of the persistent
+state of an entity (such as a file), with the intention of
+eventually making that representation persistent.  \f(CWReverted()\fR is
+sent when all the modifications to such a representation have
+been discarded.
+.SH REQUIRED ARGUMENTS
+.TP
+.I type ID
+The identity of the modified or reverted entity.
+.IP
+When
+.I type
+is \f(CWFile\fR, then this argument is unset (i.e., has a
+value of \f(CW(char *)0\fR), and it refers to the file or directory
+named in the message's file attribute.
+.SH EXAMPLES
+.PP
+.BR ttdt_file_join ()
+can be used to register for
+and help process these messages.
+.PP
+These messages can be sent with
+.BR ttdt_file_event ().

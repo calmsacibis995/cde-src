@@ -1,0 +1,376 @@
+.TH ttsession 1 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+ttsession \- the ToolTalk message server
+.SH SYNOPSIS
+.yS
+ttsession
+[\-hNpsStv]
+[\-E|\-X]
+[\-a\ \f2level\fP]
+[\-d\ \f2display\fP]
+[\-c\ [\f2command\fP]]
+.yE
+.SH DESCRIPTION
+The
+.Cm ttsession
+utility
+is the ToolTalk message server.
+This background process must be running
+before any messages can be sent or received.
+Each message server defines a
+.IR session .
+.P
+The message server has no user interface and typically runs in the
+background, started either by the user's
+.B \&.xinitrc
+file or automatically
+by any program that needs to send or receive a message.
+.SH OPTIONS
+.xos
+The
+.Cm ttsession
+utility supports the \*(Zu, except that the
+.B \-c
+option has an optional option-argument,
+which treats all of the following command-line arguments
+as a string to be passed to another shell invocation.
+.xoe
+The following options are available:
+.VL 6
+.LI \f3\-a\0\f2level\f1
+.br
+Set the server authentication level.
+The following
+.I level
+string values are supported:
+.VL 8
+.LI \f3unix\fP
+The sender and receiver must have the same user ID.
+.LI \f3des\fP
+The underlying RPC calls use
+.Cn AUTH_DES .
+.LE
+.LI \f3\-c\0[\f2command\f3]\f1
+.br
+Start a process tree session and run the given command.
+The
+.Cm ttsession
+utility sets the environment variable
+.I TT_SESSION
+to the name of this session.
+Any process started with this variable in the environment
+defaults to being in this session.
+If
+.I command
+is omitted,
+.Cm ttsession
+invokes the shell named by the
+.I SHELL
+environment variable.
+Everything after
+.B \-c
+on the command line is used as the command to be executed.
+.LI \f3\-d\0\f2display\f1
+.br
+Specify an X Windows display.
+The ToolTalk session will consist of those applications
+displaying on the named display.
+The default display is identified by the
+.I DISPLAY
+environment variable.
+.LI \f3\-E\fP
+Read in the types from the Classing Engine database.
+If neither
+.B \-E
+nor
+.B \-X
+is given,
+.B \-X
+is assumed.
+.LI \f3\-h\fP
+Write a help message to standard error that
+describes the command syntax of
+.Cm ttsession ,
+and exit.
+.LI \f3\-N\fP
+Maximize the number of clients allowed to connect to (in other words, open
+procids in) this session by attempting to raise the limit of
+open file descriptors.
+The precise number of clients is system-dependent;
+on some systems this option may have no effect.
+.LI \f3\-p\fP
+Write the name of a new process tree session to standard output, and then
+fork a background instance of
+.Cm ttsession
+to manage this new session.
+.LI \f3\-s\fP
+Silent.
+Do not write any warning messages to standard error.
+.LI \f3\-S\fP
+Do not fork a background instance to manage the
+.Cm ttsession
+session.
+.LI \f3\-t\fP
+Turn on trace mode.
+See
+.B "ASYNCHRONOUS EVENTS"
+for how to turn tracing on and off during execution.
+Tracing displays the state of a message when it is first seen by
+.Cm ttsession .
+The lifetime of the message is then shown by showing the result of
+matching the message against type signatures (dispatch stage) and then
+showing the result of matching the message against any registered
+message patterns (delivery stage).
+Any attempt to send the message to
+a given process is also shown together with the success of that attempt.
+.LI \f3\-v\fP
+Write the version number to standard output and exit.
+.LI \f3\-X\fP
+Read in the types from the following XDR format databases:
+.Cs I
+$HOME/.tt/types.xdr
+.xo <\f2implementation-specific system and network databases\fP>
+.cde /etc/tt/types.xdr
+.cde $OPENWINHOME/etc/tt/types.xdr
+/usr/dt/appconfig/tttypes/types.xdr
+.Ce
+.P
+The databases are listed order of decreasing precedence.
+Entries in
+.B $HOME/.tt/types.xdr
+override any like entries in the databases
+lower in the list, and so forth.
+.P
+These locations can be overridden by setting the
+.I TTPATH
+environment variable.
+See
+.BR "ENVIRONMENT VARIABLES" .
+.LE
+.SH OPERANDS
+None.
+.SH STDIN
+Not used.
+.SH "INPUT FILES"
+The XDR format databases listed by the
+.B \-X
+option are serialized ToolTalk data structures of
+an unspecified format, except that it is the same
+as the format of
+.Cm tt_type_comp 1
+output files.
+.SH "ENVIRONMENT VARIABLES"
+The following environment variables affect the execution of
+.Cm ttsession :
+.VL 15
+.cdes
+.LI \f2CEPATH\fP
+In Classing Engine mode, this variable tells the Classing Engine
+where to find the databases that contain ToolTalk types.
+See
+.Cm ce_db_build 1.
+.cdee
+.LI \f2DISPLAY\fP
+If
+.I TT_SESSION
+is not set and
+.I DISPLAY
+is set, then the value of
+.I DISPLAY
+will be used by all ToolTalk clients to identify the
+.Cm ttsession
+process serving their X display.
+If no such process is running, the ToolTalk
+service will auto-start one.
+.P
+If
+.Cm ttsession
+is run with the
+.B \-d
+option and
+.I DISPLAY
+is not set,
+.Cm ttsession
+sets
+.I DISPLAY
+to be the value of the
+.B \-d
+option for itself and all processes it forks.
+This helps ToolTalk clients to find the right X display when
+they are auto-started by
+.Cm ttsession .
+.LI \f2LANG\fP
+Provide a default value for the internationalization variables
+that are unset or null.
+If
+.I LANG
+is unset or null, the corresponding value from the
+implementation-specific default locale will be used.
+If any of the internationalization variables contains an invalid setting, the
+utility behaves as if none of the variables had been defined.
+.LI \f2LC_ALL\fP
+If set to a non-empty string value,
+override the values of all the other internationalization variables.
+.LI \f2LC_MESSAGES\fP
+Determine the locale that is used to affect
+the format and contents of diagnostic
+messages written to standard error
+and informative messages written to standard output.
+.LI \f2NLSPATH\fP
+Determine the location of message catalogues
+for the processing of
+.IR LC_MESSAGES .
+.LI \f2TT_ARG_TRACE_WIDTH\fP
+.br
+Specify the number of bytes of argument and context values to write when
+in trace mode.
+The default is to print the first 40 bytes.
+.LI \f2TTPATH\fP
+.cde In XDR mode, a
+.xo A
+colon-separated list of directories that tells ToolTalk
+where to find the ToolTalk types databases.
+The format of this variable is:
+.Cs I
+\f2userDir\f1[:\f2systemDir\f1[:\f2networkDir\f1]]
+.Ce
+.LI \f2TTSESSION_CMD\fP
+.br
+Specify the shell command to be used by all ToolTalk clients 
+for auto-starting
+.Cm ttsession .
+.LE
+.P
+The
+.Cm ttsession
+utility creates the following variable when it invokes another process:
+.VL 15
+.LI \f2TT_FILE\fP
+When
+.Cm ttsession
+invokes a tool to receive a message, it copies the file attribute
+(if any) of the message into this variable, formatted in the same
+manner as returned by the
+.Fn tt_message_file 3
+function.
+.LI \f2TT_SESSION\fP
+The
+.Cm ttsession
+utility uses this variable to communicate its session ID to the tools that
+it starts.
+The format of the variable is implementation specific.
+If this variable is set, the ToolTalk client library uses its
+value as the default session ID.
+.LI \f2TT_TOKEN\fP
+Inform the ToolTalk client library that it has been invoked by
+.Cm ttsession ,
+so that the client can confirm to
+.Cm ttsession
+that it started successfully.
+The format of the variable is implementation specific.
+.LE
+.P
+A tool started by
+.Cm ttsession
+must ensure that the
+.I TT_SESSION
+and
+.I TT_TOKEN
+are present in the environment of any processes it invokes.
+.SH "RESOURCES"
+None.
+.SH "ASYNCHRONOUS EVENTS"
+The
+.Cm ttsession
+utility reacts to two signals.
+If it receives the
+.Cn SIGUSR1
+signal, it toggles trace mode on or off (see the
+.B \-t
+option).
+If it receives the
+.Cn SIGUSR2
+signal, it rereads the types file.
+The
+.Cm ttsession
+utility takes the standard action for all other signals.
+.SH STDOUT
+When the
+.B \-v
+option is used,
+.Cm ttsession
+writes the version number in an unspecified format.
+When
+.B \-p
+is used,
+.Cm ttsession
+writes the name of a new process tree session.
+.SH STDERR
+Used only for diagnostic messages and the help message written by the
+.B \-h
+option.
+.SH "OUTPUT FILES"
+None.
+.SH "EXTENDED DESCRIPTION"
+None.
+.SH "EXIT STATUS"
+When the
+.B \-c
+child process exits,
+.Cm ttsession
+exits with the status of the exited child.
+Otherwise, the following exit values are returned:
+.VL 4
+.LI 0
+Normal termination.
+Without the
+.B \-c
+or
+.B \-S
+options, a zero exit status means
+.Cm ttsession
+has successfully forked an instance of itself that has begun
+serving the session.
+.LI 1
+Abnormal termination.
+The
+.Cm ttsession
+utility was given invalid command line options, was interrupted by
+.Cn SIGINT ,
+or encountered some internal error.
+.LI 2
+Collision.
+Another
+.Cm ttsession
+was found to be serving the session already.
+.LE
+.SH "CONSEQUENCES OF ERRORS"
+Default.
+.SH "APPLICATION USAGE"
+Since everything after
+.B \-c
+on the command line is used as the command to be executed,
+.B \-c
+should be the last option.
+.P
+Tracing is helpful for seeing how messages are
+dispatched and delivered, but the output may be voluminous.
+.P
+.SH EXAMPLES
+None.
+.SH "SEE ALSO"
+.Cm tt_type_comp 1,
+.Fn tt_message_file 3.
+.iN
+.mc 2
+The version of
+.Cm ttsession
+presented in Draft 1 was for discussion of specification
+format only.
+The technical changes made in this version have not been diff-marked.
+.sA
+.mc

@@ -1,0 +1,192 @@
+.TH DtEditorSaveContentsToFile 3 "30 July 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.\" *************************************************************************
+.SH NAME
+DtEditorSaveContentsToFile \- save the contents of a DtEditor widget to a file
+.SH SYNOPSIS
+.yS
+#include <Dt/Editor.h>
+.sp 0.5v
+.ta \w'DtEditorErrorCode DtEditorSaveContentsToFile('u
+DtEditorErrorCode DtEditorSaveContentsToFile(Widget \f2widget\fP,
+	char *\f2fileName\fP,
+	Boolean \f2overwriteIfExists\fP,
+	Boolean \f2hardCarriageReturns\fP,
+	Boolean \f2markContentsAsSaved\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn DtEditorSaveContentsToFile
+function saves the entire contents of the DtEditor widget to a file,
+optionally replacing soft line feeds (word wraps)
+with
+.tK newline s.
+If the file does not exist and the directory has the correct
+write permissions, the file is created.
+If the file exists and the
+.I overwriteIfExists
+argument is set to
+True,
+the contents of the file are overwritten.
+If the file or its directory does not have the correct write
+permissions, an error is returned.
+.P
+The DtEditor widget tracks whether its contents have changed since they were
+last saved or retrieved.
+If the
+.I markContentsAsSaved
+argument is set to False,
+a copy of the data is saved without affecting whether
+.Fn DtEditorCheckForUnsavedChanges 3
+reports that there are unsaved changes.
+This is useful if the application needs to save a copy of the
+contents to a temporary file.
+.P
+The
+.I widget
+argument specifies the DtEditor widget ID.
+.P
+The
+.I fileName
+argument is the pathname of the file
+relative to the local system.
+.P
+The
+.I overwriteIfExists
+argument, if set to
+True,
+causes
+.Fn DtEditorSaveContentsToFile
+to save the widget contents even though the file specified by the
+.I fileName
+argument exists and has correct write permissions.
+If this argument is set to
+False,
+.Fn DtEditorSaveContentsToFile
+returns
+.Cn DtEDITOR_WRITABLE_FILE .
+.P
+The
+.I hardCarriageReturns
+argument, if set to
+True,
+indicates that the widget should replace
+any soft line feeds (word wraps) with
+.tK newline s
+when saving
+the data.
+When this argument is set to
+False,
+any line wrapped because it reaches the
+right edge of the window, is saved as one complete line.
+.P
+The
+.I markContentsAsSaved
+argument, when set to
+True,
+causes the DtEditor widget to mark that
+all changes made to date have been saved.
+When this argument is set to
+False,
+the DtEditor widget
+does not change its status regarding unsaved changes.
+If an error arises during the save,
+the status does not change, regardless of the
+value of the
+.I markContentsAsSaved
+argument.
+.br
+.cde .P
+.cde For a complete definition of the DtEditor widget
+.cde and its associated resources, see
+.cde .Fn DtEditor 3.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn DtEditorSaveContentsToFile
+function returns
+.Cn DtEDITOR_\%NO_ERRORS ;
+otherwise, if it cannot save the data to the file,
+the function returns one of the following values:
+.VL 6
+.Lc DtEDITOR_INVALID_FILENAME
+.br
+No file was specified.
+.Lc DtEDITOR_UNWRITABLE_FILE
+.br
+The application does not have write
+permission for the file or directory.
+.Lc DtEDITOR_CHAR_SPECIAL_FILE
+.br
+The file is a device-special file.
+.Lc DtEDITOR_BLOCK_MODE_FILE
+.br
+The file is a block-mode device.
+.Lc DtEDITOR_NO_FILE_ACCESS
+.br
+The file cannot be accessed.
+.Lc DtEDITOR_SAVE_FAILED
+.br
+The contents could not be saved for an
+unspecified reason.
+.Lc DtEDITOR_WRITABLE_FILE
+.br
+The named files exist and the
+.I overwriteIfExists
+argument is set to
+False.
+.LE
+.SH EXAMPLES
+The following code segment saves the contents
+of a DtEditor widget to the local file, Foo, substituting
+.tK newline s
+for soft line feeds.
+It also indicates that all changes
+to the contents of the widget have been saved.
+.Cs I
+Widget                  editor;
+DtEditorErrorCode       status;
+char                    *fname = "Foo";
+Boolean                 overwrite = False,
+                        hardReturns = True,
+                        markContentsAsSaved = True;
+.sp 0.5v
+status = DtEditorSaveContentsToFile(editor, fname, overwrite,
+                                    hardReturns, markContentsAsSaved);
+.sp 0.5v
+switch(status )
+{
+        case DtEDITOR_NO_ERRORS:
+                break;
+.sp 0.5v
+        case DtEDITOR_WRITABLE_FILE:
+                printf("Save failed.  The file already exists.\en");
+                break;
+.sp 0.5v
+        default:
+                printf("Could not save contents.\en");
+                break;
+}
+.Ce
+.SH "APPLICATION USAGE"
+The application should use
+.Fn DtEditorGetContents 3
+to retrieve the data in a memory buffer,
+rather than a disk file.
+.SH "SEE ALSO"
+.Hd Dt/Editor.h 5,
+.Fn DtEditor 3,
+.Fn DtEditorAppend 3,
+.Fn DtEditorAppendFromFile 3,
+.Fn DtEditorCheckForUnsavedChanges 3,
+.Fn DtEditorGetContents 3,
+.Fn DtEditorInsert 3,
+.Fn DtEditorInsertFromFile 3,
+.Fn DtEditorReplace 3,
+.Fn DtEditorReplaceFromFile 3,
+.Fn DtEditorSetContentsFromFile 3,
+.Fn DtEditorSetContents 3.

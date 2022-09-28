@@ -1,0 +1,81 @@
+#######################################################################
+#
+#     helptag.vf
+#
+#     Actions and DataTypes for authoring HP Help information.
+#
+#     Hewlett-Packard Visual User Environment
+#
+#     Copyright (c) 1990 Hewlett-Packard Company
+#
+#     $Revision: 1.1 $
+#
+######################################################################
+
+###############################################################################
+#
+# WARNING:  This file may be overwritten in subsequent installations of
+#     HP DT.  Consequently, any system wide changes should be made to
+#     an equivalent database file in /usr/dt/config/types and not 
+#     in this file.
+#
+###############################################################################
+
+# The HP Help executables are shipped in /usr/vhelp/bin,  which is not
+# part of all the users' paths.  Therefore the following string is
+# defined to add this to the path before invoking the client.
+set VHELP_PATH=\$PATH:/usr/vhelp/bin
+
+DATA_ATTRIBUTES XVH_HTG
+{
+        ACTIONS         Open,Compile,CleanUp,Print
+        SMALL_ICON          questY.s
+        LARGE_ICON          questY.l
+        DESCRIPTION     This is a master HelpTag source file for the HP \
+			Help System.  Information in this file is fomatted \
+			using the HelpTag markup language, and must be \
+			compiled with the HelpTag software (`helptag') \
+			before viewing.
+}
+DATA_CRITERIA XVH_HTG1
+{
+	DATA_ATTRIBUTES_NAME XVH_HTG
+        MODE            !d
+        NAME_PATTERN    *.htg
+}
+
+ACTION Compile
+{
+	ARG_TYPE 	XVH_HTG
+	TYPE		MAP		HelpTag
+}
+
+ACTION CleanUp
+{
+	ARG_TYPE 	XVH_HTG
+	TYPE		MAP		CleanHelpTag
+}
+
+ACTION HelpTag
+{
+	TYPE		COMMAND
+	WINDOW_TYPE	NO_STDIO
+	EXEC_STRING	sh -c 'PATH=$VHELP_PATH helptag -clean \
+				  `basename %(File)Arg_1"HelpTag File:"%`; \
+			       PATH=$VHELP_PATH helptag \
+				  `basename %(File)Arg_1%`'
+	DESCRIPTION	The HelpTag action compiles a master HelpTag \
+			file to create run-time help files.  The run-time \
+			files can be displayed by an application using the \
+			HP Help System, or using the `helview' program.
+}
+
+ACTION CleanHelpTag
+{
+	TYPE		COMMAND
+	WINDOW_TYPE	NO_STDIO
+	EXEC_STRING	sh -c 'PATH=$VHELP_PATH helptag -clean \
+				  `basename %(File)Arg_1"HelpTag File:"%`'
+	DESCRIPTION	The CleanHelpTag action removes all run-time help \
+			files that are created by the HelpTag action.
+}

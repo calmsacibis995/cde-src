@@ -1,0 +1,131 @@
+.TH DtEditorGetContents 3 "30 July 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.\" ************************************************************************
+.SH NAME
+DtEditorGetContents \- retrieve the contents of a DtEditor widget
+.SH SYNOPSIS
+.yS
+#include <Dt/Editor.h>
+.sp 0.5v
+.ta \w'DtEditorErrorCode DtEditorGetContents('u
+DtEditorErrorCode DtEditorGetContents(Widget \f2widget\fP,
+	DtEditorContentRec *\f2data\fP,
+	Boolean \f2hardCarriageReturns\fP,
+	Boolean \f2markContentsAsSaved\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn DtEditorGetContents
+function retrieves the entire contents of a DtEditor widget as
+a string, wide character string or sized buffer of data.
+The data is transferred from the
+DtEditor widget using a
+.BR DtEditorContentRec ,
+which indicates the
+type of data being transferred along with the actual data.
+If desired, any soft
+line feeds (word wraps) can be replaced with
+.tK newline s.
+.P
+The DtEditor widget tracks whether its contents have changed since they
+were last saved or retrieved.
+Setting the
+.I markContentsAsSaved
+argument to True
+retrieves a copy of the data without
+affecting whether
+.Fn DtEditorCheckForUnsavedChanges 3
+reports that there are unsaved changes.
+This is useful if the application needs a temporary copy of the
+contents.
+.P
+The
+.I widget
+argument specifies the DtEditor widget ID.
+.P
+The
+.I data
+argument is a pointer to a data structure to receive
+the contents of
+.IR widget .
+.P
+The
+.I hardCarriageReturns
+argument, if set to
+True,
+indicates that the DtEditor widget should replace
+any soft line feeds (word wraps) with
+.tK newline s
+when saving
+the data.
+When
+.I hardCarriageReturns
+is set to
+False,
+any line wrapped because it reaches the
+right edge of the window is saved as one complete line.
+.P
+The
+.I markContentsAsSaved
+argument, if set to
+True,
+causes the DtEditor widget to mark that all changes made to date have been saved.
+When
+.I markContentsAsSaved
+is set to
+False,
+the DtEditor widget does not change its status regarding unsaved changes.
+.cde .P
+.cde For a complete definition of the DtEditor widget
+.cde and its associated resources, see
+.cde .Fn DtEditor 3.
+.P
+For a complete definition of
+.BR DtEditorContentRec ,
+see
+.Hd Dt/Editor 5.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn DtEditorGetContents
+function returns
+.Cn DtEDITOR_\%NO_ERRORS ;
+otherwise, it returns
+.Cn DtEDITOR_INVALID_TYPE
+if the Type field is not recognized.
+.SH EXAMPLES
+The following code segment retrieves the contents of a DtEditor widget,
+marking that all changes to date have been saved.
+.Cs I
+Widget                  editor;
+DtEditorContentRec      cr;
+DtEditorErrorCode       status;
+Boolean                 markContentsAsSaved = True;
+.sp 0.5v
+cr.type = DtEDITOR_TEXT;
+status = DtEditorGetContents(editor, &cr, markContentsAsSaved);
+if (status == DtEDITOR_NO_ERRORS)
+        printf("The contents are:\en%s\en", cr.value.string);
+else
+        printf("Unable to retrieve contents of the widget\en");
+.Ce
+.SH "APPLICATION USAGE"
+To write the data directly to a file, the application should use
+.Fn DtEditorSaveContentsToFile 3.
+.SH "SEE ALSO"
+.Hd Dt/Editor.h 5,
+.Fn DtEditor 3,
+.Fn DtEditorAppend 3,
+.Fn DtEditorAppendFromFile 3,
+.Fn DtEditorCheckForUnsavedChanges 3,
+.Fn DtEditorInsert 3,
+.Fn DtEditorInsertFromFile 3,
+.Fn DtEditorReplace 3,
+.Fn DtEditorReplaceFromFile 3,
+.Fn DtEditorSaveContentsToFile 3,
+.Fn DtEditorSetContents 3,
+.Fn DtEditorSetContentsFromFile 3.

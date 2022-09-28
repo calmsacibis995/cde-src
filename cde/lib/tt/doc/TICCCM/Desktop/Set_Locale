@@ -1,0 +1,92 @@
+.TH Set_Locale Desktop "04 Apr 1994" "SunSoft" "ToolTalk Policy"
+.SH NAME
+.PP
+Set_Locale, Get_Locale - set/get a tool's locale
+.SH SYNOPSIS
+.so ../.synopsis
+	Set_Locale(	in	string	\fIcategory\f(CW,	
+		in	string	\fIlocale\f(CW	
+		[...] );	
+	Get_Locale(	in	string	\fIcategory\f(CW,	
+		out	string	\fIlocale\f(CW	
+		[...] );
+.ft
+.fi
+.SH DESCRIPTION
+.PP
+Replace or report the POSIX locale of the indicated locale categories.
+.SH REQUIRED ARGUMENTS
+.TP
+\f(CWstring\fR \fIcategory\fR
+The locale category to set/get.  A locale category is a
+group of data types whose output formatting varies according to
+locale in a similar way.  ANSI C and X/Open locale categories
+are:
+.PD 0
+.RS 8
+.HP 2
+\(bu \f(CWLC_CTYPE\fR
+.HP 2
+\(bu \f(CWLC_NUMERIC\fR
+.HP 2
+\(bu \f(CWLC_TIME\fR
+.HP 2
+\(bu \f(CWLC_COLLATE\fR
+.HP 2
+\(bu \f(CWLC_MONETARY\fR
+.HP 2
+\(bu \f(CWLC_ALL\fR
+.HP 2
+\(bu \f(CWLC_MESSAGES\fR
+.RE
+.PD
+.TP
+\f(CWstring\fR \fIlocale\fR
+The name of the current locale of the indicated category, or the
+locale to set the indicated category to.  The value of locale is
+implementation-defined.  For example, Solaris defines
+such locales as \f(CWC\fR, \f(CWde\fR, \f(CWfr\fR, \f(CWit\fR, etc.
+.SH OPTIONAL ARGUMENTS
+.PP
+.PD 0
+.HP 8
+\f(CWstring\fR \fIcategory\fR
+.TP
+\f(CWstring\fR \fIlocale\fR
+.PD
+Extra pairs of these arguments may be included.
+.SH ERRORS
+.TP
+.SM TT_DESKTOP_EINVAL
+.I locale
+is not valid on the handler's host.
+.SH EXAMPLES
+.PP
+.BR ttdt_session_join ()
+can be used to register for and transparently process these messages.
+.PP
+These messages can be sent like so:
+.nf
+.ft CW
+.ps -2
+Tt_message msg = tttk_message_create( 0, TT_REQUEST, TT_SESSION,
+			the_recipient_procid, TTDT_SET_LOCALE,
+			my_callback );
+tt_message_arg_add( msg, TT_IN, Tttk_string, "LC_MONETARY" );
+tt_message_arg_add( msg, TT_IN, Tttk_string, "de" );
+tt_message_send( msg );
+.ps
+.ft
+.fi
+.PP
+Also, \f(CWGet_Locale\fR can be sent by
+.BR ttdt_sender_imprint_on (),
+with the reply being handled transparently.
+.SH WARNINGS
+.PP
+\f(CWSet_Locale()\fR
+.so .edict
+.SH SEE ALSO
+.PP
+.BR setlocale (3C),
+.I Solaris 2.3 Developer's Guide to Internationalization

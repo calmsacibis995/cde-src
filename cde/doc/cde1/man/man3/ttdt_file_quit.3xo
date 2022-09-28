@@ -1,0 +1,80 @@
+.TH ttdt_file_quit 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+ttdt_file_quit \- unregister interest in ToolTalk events about a file
+.SH SYNOPSIS
+.yS
+#include <Tt/tttk.h>
+.sp 0.5v
+.ta \w'Tt_status ttdt_file_quit('u
+Tt_status ttdt_file_quit(Tt_pattern *\f2patterns\fP,
+	int \f2quit\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn ttdt_file_quit
+function
+is used to unregister interest in the
+.I pathname
+that was passed to
+.Fn ttdt_file_join 3
+when
+.I patterns
+was created.
+The
+.Fn ttdt_file_quit
+function destroys
+.I patterns
+and sets the default file to
+.Cn NULL .
+.P
+If
+.I quit
+is True,
+.Fn ttdt_file_quit
+calls
+.Fn tt_file_quit 3
+with a
+.I pathname
+argument; otherwise, it returns without quitting.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn ttdt_file_quit
+function returns the status of the operation as one of the following
+.B Tt_status
+values:
+.VL 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_DBAVAIL
+.br
+The ToolTalk service could not access the ToolTalk database
+needed for this operation.
+.Lc TT_ERR_DBEXIST
+.br
+The ToolTalk service could not access the specified ToolTalk database
+in the expected place.
+.Lc TT_ERR_NOMP
+.br
+The
+.Cm ttsession 1
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_POINTER
+.br
+The
+.I patterns
+argument was
+.Cn NULL
+or otherwise invalid.
+.Lc TT_ERR_PROCID
+.br
+The specified process identifier is out of date or invalid.
+.LE
+.SH "SEE ALSO"
+.Hd Tt/tttk.h 5,
+.Fn ttdt_file_join 3,
+.Fn tt_default_file 3,
+.Fn tt_file_quit 3.

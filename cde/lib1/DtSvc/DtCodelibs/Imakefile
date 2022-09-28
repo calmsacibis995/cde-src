@@ -1,0 +1,141 @@
+/*
+ * File:	Imakefile $XConsortium: Imakefile /main/cde1_maint/4 1995/10/08 22:08:57 pascale $
+ *
+ * (c) Copyright 1993, 1994 Hewlett-Packard Company
+ * (c) Copyright 1993, 1994 International Business Machines Corp.
+ * (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+ * (c) Copyright 1993, 1994 Novell, Inc.
+ */
+#ifndef DoNormalLib
+#define DoNormalLib NormalLibDtSvc
+#endif
+#ifndef DoSharedLib
+#define DoSharedLib SharedLibDtSvc
+#endif
+
+#include <Library.tmpl>
+
+#if defined(REORDER_PROFILED)
+    C++ = CC -pg $(BBAFLAGS)
+    CC = cc -xpg $(BBAFLAGS)
+    LD = cc
+#endif
+
+/* General case INCLUDES DEFINES
+ * Each individual architecture may have more or less of the above.
+ * Use EXTRA_DEFINES and EXTRA_INCLUDES to add defines and includes
+ * to an individual architecture.
+ */
+DEFINES = -DXK_MISCELLANY -DMULTIBYTE
+INCLUDES = -I. -Icodelibs -I../include
+
+#ifdef SCOArchitecture
+EXTRA_DEFINES = -DMESSAGE_CAT -DMULTIBYTE
+#endif
+
+#ifdef HPArchitecture
+EXTRA_DEFINES = -DMESSAGE_CAT -DMULTIBYTE
+EXTRA_CCOPTIONS = $(ESLIT_OPTION) /* set in hp.cf */
+#ifndef DEBUGTREE /** turn off due to compiler problem in 9.0 **/
+EXTRA_C++OPTIONS = $(ESLIT++_OPTION)
+#endif
+#endif
+
+#if defined(RsArchitecture) 
+EXTRA_C++OPTIONS = -qlanglvl=compat
+#endif
+
+#ifdef SunArchitecture
+EXTRA_DEFINES=-DNO_REGCOMP
+#endif
+
+#ifdef USLArchitecture
+EXTRA_DEFINES=-DNO_REGCOMP
+#endif
+
+#ifdef UXPArchitecture
+EXTRA_DEFINES=-DNO_REGCOMP
+#endif
+
+#ifdef AlphaArchitecture
+EXTRA_DEFINES=-DMESSAGE_CAT -DMULTIBYTE
+#endif
+
+INSTALLFLAGS = $(INSTINCFLAGS)
+
+LINTLIBS = $(LINTXLIB) $(LINTXTOOL) $(LINTXM) 
+
+HEADERS = \
+	buf.h \
+	stringio.h \
+	codelibs/boolean.h \
+	codelibs/dynarray.h \
+	codelibs/exception.h \
+	codelibs/mbstring.h \
+	codelibs/nl_hack.h \
+	codelibs/pathutils.h \
+	codelibs/privbuf.h \
+	codelibs/shellutils.h \
+	codelibs/stringx.h \
+
+SRCS1 = \
+	mbschr.c \
+	pathcollapse.c
+
+SRCS2 = \
+	buf.C \
+	filegen.C \
+	privbuf.C \
+	shellscan.C \
+	strcase.C \
+	strend.C \
+	strhash.C \
+	stringio.C \
+	strtokx.C \
+	strwcmp.C 
+
+/* WARNING!!!!
+ * Any .o's added to this list need to be added to DTCODELIBS_OBJS3
+ * and SHARED_DTCODELIBS_OBJS3 in the DtSvc Imakefile.
+ */
+OBJS1 = \
+	mbschr.o \
+	pathcollapse.o
+
+
+/* WARNING!!!!
+ * Any .o's added to this list need to be added to DTCODELIBS_OBJS3
+ * and SHARED_DTCODELIBS_OBJS3 in the DtSvc Imakefile.
+ */
+OBJS2 = \
+	buf.o \
+	filegen.o \
+	privbuf.o \
+	shellscan.o \
+	strcase.o \
+	strend.o \
+	strhash.o \
+	stringio.o \
+	strtokx.o \
+	strwcmp.o 
+
+
+OBJS=$(OBJS1) $(OBJS2)
+SRCS=$(SRCS1) $(SRCS2)
+
+LibraryObjectRule()
+all:: $(OBJS)
+
+LintLibraryTarget(DtSvc,$(SRCS))
+
+/*
+ * These headers should not be made public
+ * No clients should access them directly -- library code can use -I BMSLIBSRC and/or
+ * -I LIBSOFTLIBSRC for the time being.
+ *
+ *  BuildIncludes($(HEADERS),$(DTINCLUDEDEST),../..) 
+ */
+
+DependTarget()
+
+includes::

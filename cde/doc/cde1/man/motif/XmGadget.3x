@@ -1,0 +1,278 @@
+'\" t
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Novell, Inc
+...\" **
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **
+.TH XmGadget 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmGadget\fP \- The Gadget widget class
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/Xm.h>
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+Gadget is a widget class used as
+a supporting superclass for other
+gadget classes.  It handles shadow-border drawing and highlighting, traversal
+activation and deactivation, and various callback lists needed by
+gadgets.
+.PP 
+The color and pixmap resources defined by XmManager are directly used by
+gadgets.  If \fIXtSetValues\fP is used
+to change one of the resources for a manager
+widget, all of the gadget children within the manager also change.
+.SS "Classes"
+Gadget inherits behavior and resources from \fIObject\fP and
+\fIRectObj\fP classes.
+.PP
+The class pointer is \fIxmGadgetClass\fP.
+.PP
+The class name is \fIXmGadget\fP.
+.SS "New Resources"
+The following table defines a set of widget resources used by the programmer
+to specify data.  The programmer can also set the resource values for the
+inherited classes to set attributes for this widget.  To reference a
+resource by name or by class in a .Xdefaults file, remove the \fIXmN\fP or
+\fIXmC\fP prefix and use the remaining letters.  To specify one of the defined
+values for a resource in a .Xdefaults file, remove the \fIXm\fP prefix and use
+the remaining letters (in either lowercase or uppercase, but include any
+underscores between words).
+The codes in the access column indicate if the given resource can be
+set at creation time (C),
+set by using \fIXtSetValues\fP (S),
+retrieved by using \fIXtGetValues\fP (G), or is not applicable (N/A).
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmGadget Resource Set
+Name	Class	Type	Default	Access
+_
+XmNbottomShadowColor	XmCBottomShadowColor	Pixel	dynamic	G
+XmNhelpCallback	XmCCallback	XtCallbackList	NULL	C
+XmNhighlightColor	XmCHighlightColor	Pixel	dynamic	G
+XmNhighlightOnEnter	XmCHighlightOnEnter	Boolean	False	CSG
+XmNhighlightThickness	XmCHighlightThickness	Dimension	2	CSG
+XmNnavigationType	XmCNavigationType	XmNavigationType	XmNONE	CSG
+XmNshadowThickness	XmCShadowThickness	Dimension	2	CSG
+XmNtopShadowColor	XmCTopShadowColor	Pixel	dynamic	G
+XmNtraversalOn	XmCTraversalOn	Boolean	True	CSG
+XmNunitType	XmCUnitType	unsigned char	dynamic	CSG
+XmNuserData	XmCUserData	XtPointer	NULL	CSG
+.TE
+.KE
+.in
+.sp 1
+.nL
+.ne 8
+.IP "\fIXmNbottomShadowColor\fP"
+Contains the color to use to draw the bottom and right sides of the
+border shadow.
+.IP "\fIXmNhelpCallback\fP"
+Specifies the list of callbacks that is called when the help key sequence
+is pressed.  The reason sent by the callback is \fIXmCR_HELP\fP.
+.IP "\fIXmNhighlightColor\fP"
+Contains the color of the highlighting rectangle.
+.IP "\fIXmNhighlightOnEnter\fP"
+Specifies if the highlighting rectangle is drawn when the cursor moves
+into the widget.
+If the shell's focus policy is \fIXmEXPLICIT\fP, this resource is
+ignored, and the widget is highlighted when it has the focus.
+If the shell's focus policy is \fIXmPOINTER\fP and if this resource is
+True, the highlighting rectangle is drawn when the the cursor moves into
+the widget.
+If the shell's focus policy is \fIXmPOINTER\fP and if this resource is
+False, the highlighting rectangle is not drawn when the the cursor moves
+into the widget.
+The default is False.
+.IP "\fIXmNhighlightThickness\fP"
+Specifies the thickness of the highlighting rectangle.
+.IP "\fIXmNnavigationType\fP"
+Determines whether the widget is a tab group.
+.wH
+.rS 
+.TP
+\(bu
+\fIXmNONE\fP indicates that the widget is not a tab group.
+.TP
+\(bu
+\fIXmTAB_GROUP\fP indicates that the widget is a tab group, unless
+another widget in the hierarchy has an \fIXmNnavigationType\fP of
+\fIXmEXCLUSIVE_TAB_GROUP\fP.
+.TP
+\(bu
+\fIXmSTICKY_TAB_GROUP\fP indicates that the widget is a tab group, even
+if another widget in the hierarchy has an \fIXmNnavigationType\fP of
+\fIXmEXCLUSIVE_TAB_GROUP\fP.
+.TP
+\(bu
+\fIXmEXCLUSIVE_TAB_GROUP\fP indicates that the widget is a tab group and
+that widgets in the hierarchy whose \fIXmNnavigationType\fP is
+\fIXmTAB_GROUP\fP are not tab groups.
+.PP
+When a parent widget has an \fIXmNnavigationType\fP of
+\fIXmEXCLUSIVE_TAB_GROUP\fP, traversal of non-tab-group widgets within
+the group is based on the order of those widgets in their parent's
+\fIXmNchildren\fP list.
+.PP
+When any widget in a hierarchy has an \fIXmNnavigationType\fP of
+\fIXmEXCLUSIVE_TAB_GROUP\fP, traversal of tab groups in the hierarchy
+proceeds to widgets in the order in which their \fIXmNnavigationType\fP
+resources were specified as \fIXmEXCLUSIVE_TAB_GROUP\fP or
+\fIXmSTICKY_TAB_GROUP\fP, whether by creating the widgets with that value,
+by calling \fIXtSetValues\fP, or by calling \fIXmAddTabGroup\fP.
+.wH
+.rE
+.nL
+.ne 8
+.IP "\fIXmNshadowThickness\fP"
+Specifies the size of the drawn border shadow.
+.IP "\fIXmNtopShadowColor\fP"
+Contains the color to use to draw the top and left sides of the border
+shadow.
+.IP "\fIXmNtraversalOn\fP"
+Specifies traversal activation for this gadget.
+.IP "\fIXmNunitType\fP"
+Provides the basic support for resolution independence.
+It defines the type of units a widget uses with sizing and
+positioning resources.
+If the widget's parent is a subclass of \fIXmManager\fP and if the
+\fIXmNunitType\fP resource is not explicitly set, it defaults to the
+unit type of the parent widget.
+If the widget's parent is not a subclass of \fIXmManager\fP, the
+resource has a default unit type of \fIXmPIXELS\fP.
+.PP
+\fIXmNunitType\fP can have the following values:
+.wH
+.rS 
+.TP
+\(bu
+\fIXmPIXELS\fP \- all values provided to the widget are treated as normal
+pixel values.
+.TP
+\(bu
+\fIXm100TH_MILLIMETERS\fP \- all values provided to the widget are treated
+as 1/100 millimeter.
+.TP
+\(bu
+\fIXm1000TH_INCHES\fP \- all values provided to the widget are treated as
+1/1000 inch.
+.TP
+\(bu
+\fIXm100TH_POINTS\fP \- all values provided to the widget are treated as
+1/100 point.  A point is a unit used in text processing
+applications and is defined as 1/72 inch.
+.TP
+\(bu
+\fIXm100TH_FONT_UNITS\fP \- all values provided to the widget are
+treated as 1/100 of a font unit.
+A font unit has horizontal and vertical components.
+These are the values of the XmScreen resources \fIXmNhorizontalFontUnit\fP
+and \fIXmNverticalFontUnit\fP.
+.wH
+.rE
+.IP "\fIXmNuserData\fP"
+Allows the application to attach any necessary specific data to the gadget.
+This is an internally unused resource.
+.nL
+.ne 10
+.SS "Inherited Resources"
+Gadget inherits the following resources from the named
+superclass.  For a complete description of each resource, refer to the
+man page for that superclass.
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+RectObj Resource Set
+Name	Class	Type	Default	Access
+_
+XmNancestorSensitive	XmCSensitive	Boolean	dynamic	G
+XmNborderWidth	XmCBorderWidth	Dimension	0	CSG
+XmNheight	XmCHeight	Dimension	dynamic	CSG
+XmNsensitive	XmCSensitive	Boolean	True	CSG
+XmNwidth	XmCWidth	Dimension	dynamic	CSG
+XmNx	XmCPosition	Position	0	CSG
+XmNy	XmCPosition	Position	0	CSG
+.TE
+.KE
+.in
+.sp 1
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+Object Resource Set
+Name	Class	Type	Default	Access
+_
+XmNdestroyCallback	XmCCallback	XtCallbackList	NULL	C
+.TE
+.KE
+.in
+.sp 1
+.SS "Callback Information"
+A pointer to the following structure is passed to each callback:
+.sS
+.iS
+.ta .25i 1.50i
+.nf
+typedef struct
+{
+	int	\fBreason\fI;
+	\fIXEvent	\fB* event\fI;
+} XmAnyCallbackStruct;
+.iE
+.sE
+.wH
+.fi
+.IP "\fBreason\fP"
+Indicates why the callback was invoked.
+For this callback, \fBreason\fP is set to \fIXmCR_HELP\fP.
+.IP "\fBevent\fP"
+Points to the \fIXEvent\fP that triggered the callback.
+.nL
+.ne 12
+.SS "Behavior"
+Gadgets cannot have translations associated with them.
+Because of this, a Gadget's behavior is determined by the Manager
+widget into which the Gadget is placed.  If focus is on a Gadget,
+events are passed to the Gadget by its Manager.
+.nL
+.ne 4
+.SH RELATED INFORMATION
+.na
+\fIObject(3X)\fP,
+\fIRectObj(3X)\fP,
+\fIXmManager(3X)\fP, and
+\fIXmScreen(3X)\fP.
+.ad

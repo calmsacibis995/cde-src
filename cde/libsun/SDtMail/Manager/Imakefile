@@ -1,0 +1,42 @@
+XCOMM @(#)Imakefile	1.2 96/05/13 SMI
+XCOMM Copyright (c) 1996 Sun Microsystems, Inc.
+
+LIBTOPDIR = ..
+LIBCURDIR = Manager
+
+#include "../ImakeSdm.tmpl"
+#include <Library.tmpl>
+
+HEADERS  = \
+	ISess.hh \
+	OSess.hh
+
+SRCS     = \
+	Connection.cc \
+	ISess.cc \
+	MailRc.cc \
+	OSess.cc \
+	Session.cc \
+	SessionLink.cc
+
+OBJS     = \
+	Connection.o \
+	ISess.o \
+	MailRc.o \
+	OSess.o \
+	Session.o \
+	SessionLink.o
+
+INCLUDES = $(SDMINCLUDES)
+DEFINES  = $(SDMDEFINES)
+
+LibraryObjectRule()
+
+AllTarget($(OBJS))
+
+SdmObjectListTarget($(LIBCURDIR),$(OBJS))
+
+SdmTestLibraryTarget($(LIBCURDIR),$(OBJS))
+
+DependTarget()
+

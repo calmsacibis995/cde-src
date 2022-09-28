@@ -1,0 +1,230 @@
+XCOMM
+XCOMM 	$XConsortium: Imakefile /main/cde1_maint/5 1995/10/12 19:28:38 pascale $
+XCOMM
+XCOMM 	@(#)Imakefile	1.11 02 Feb 1994
+XCOMM
+XCOMM 	RESTRICTED CONFIDENTIAL INFORMATION:
+XCOMM	
+XCOMM	The information in this document is subject to special
+XCOMM	restrictions in a confidential disclosure agreement between
+XCOMM	HP, IBM, Sun, USL, SCO, Fujitsu and Univel.  Do not distribute this
+XCOMM	document outside HP, IBM, Sun, USL, SCO, Fujitsu, or Univel without
+XCOMM	Sun's specific written approval.  This document and all copies
+XCOMM	and derivative works thereof must be returned or destroyed at
+XCOMM	Sun's request.
+XCOMM
+XCOMM	Copyright 1993 Sun Microsystems, Inc.  All rights reserved.
+XCOMM
+XCOMM
+
+#define PassCDebugFlags 'CDEBUGFLAGS=$(CDEBUGFLAGS)'
+
+#include "../ab.tmpl"
+#include "../ab.rules"
+
+    INCLUDES = -I. -I$(ABINCLUDES)
+
+INSTALLFLAGS = $(INSTINCFLAGS)
+
+    LINTLIBS = $(LINTXLIB) $(LINTXTOOL)
+
+     DEFINES =
+
+
+#ifdef CCOPTIONS  
+#undef CCOPTIONS
+#endif
+CCOPTIONS = -Xa
+
+#ifdef EXTRA_CCOPTIONS
+#undef EXTRA_CCOPTIONS
+#endif
+EXTRA_CCOPTIONS = -D_POSIX_SOURCE=1 -Xa -xF
+
+
+SOURCES.h.shipped =
+
+SOURCES.h.shared = \
+        abmf.h
+
+SOURCES.h.unshared = \
+	abmfP.h \
+	argsP.h \
+	cdefsP.h \
+	connectP.h \
+	create_declsP.h \
+	dtb_utils.h \
+	ui_header_fileP.h \
+	instancesP.h \
+	lib_func_stringsP.h \
+	make_fileP.h \
+	merge_cP.h \
+	motifdefsP.h \
+	msg_cvt.h \
+	msg_file.h \
+	msg_fileP.h \
+	obj_namesP.h \
+	parse_cP.h \
+	proj_c_fileP.h \
+	proj_header_fileP.h \
+	resource_fileP.h \
+	stubs_c_fileP.h \
+	ui_c_fileP.h \
+	ui_header_fileP.h \
+	utils_c_fileP.h \
+	utils_header_fileP.h \
+	utilsP.h \
+	write_cP.h \
+	write_codeP.h
+
+SOURCES.msg = \
+		dtcodegen.msg 	\
+		../libAButil/libAButil.msg \
+		../libABobjXm/libABobjXm.msg \
+		../libABil/libABil.msg
+SRCS = \
+        abmf.c \
+	args.c \
+	cdefs.c \
+	connect.c \
+	create_decls.c \
+	dtb_utils.c \
+	generate_code.c \
+	instances.c \
+	lib_func_strings.c \
+	make_file.c \
+	merge_c.c \
+	motifdefs.c \
+	msg_cvt.c \
+	msg_file.c \
+	obj_names.c \
+	parse_c.c \
+	proj_c_file.c \
+	proj_header_file.c \
+	resource_file.c \
+	stubs_c_file.c \
+	ui_c_file.c \
+	ui_header_file.c \
+	utils_c_fileP.h \
+	utils_header_fileP.h \
+        utils.c \
+	write_c.c \
+	write_code.c
+
+OBJS = \
+        abmf.o \
+	args.o \
+	cdefs.o \
+	connect.o \
+	create_decls.o \
+	dtb_utils.o \
+	generate_code.o \
+	instances.o \
+	lib_func_strings.o \
+	make_file.o \
+	merge_c.o \
+	motifdefs.o \
+	msg_cvt.o \
+	msg_file.o \
+	obj_names.o \
+	parse_c.o \
+	proj_c_file.o \
+	proj_header_file.o \
+	resource_file.o \
+	stubs_c_file.o \
+	ui_c_file.o \
+	ui_header_file.o \
+	utils_c_file.o \
+	utils_header_file.o \
+        utils.o \
+	write_c.o \
+	write_code.o
+
+  SYS_LIBRARIES = -lm
+
+#ifdef RsArchitecture
+SYS_LIBRARIES = -lm -liconv
+#endif
+
+#ifdef	SunArchitecture
+SYS_LIBRARIES = -lm -ldl $(WIDECHARSYSLIB) -lgen 
+WAITTARGET = .WAIT
+#endif	/* SunArchitecture */
+
+       PROGRAMS = dtcodegen
+   INSTALLFLAGS = -m 4755
+       LINTLIBS = $(XINPUTLIB) $(DTHELPLIB) $(DTSVCLIB) $(XMLIB) $(XTOOLLIB) $(XLIB)
+
+/* DEPLIBS contains the list of library depencies for a client.
+ * LOCAL_LIBRARIES contains the list of libraries on the link line.
+ * Generally, the dependency form of a library has DEP as a prefix.
+ * e.g. put $(XLIB) in LOCAL_LIBRARIES and $(DEPXLIB) in DEPLIBS.
+ * NOTE: if DEPLIBS is not set here, it is by default null and there
+ *       are no library dependencies for clients.
+ *       You cannot put -Llibpath into DEPLIBS. You must put actual
+ *       paths to the library.
+ */
+DEPLIBS = ../libABil/libABil.a  ../libABobjXm/libABobjXm.a  \
+                  ../libABobj/libABobj.a ../libAButil/libAButil.a \
+		  $(DEPDTWIDGETLIB) $(DEPDTTERMLIB) $(DEPDTHELPLIB) \
+		  $(DEPDTSVCLIB) $(DEPTTLIB) $(DEPXMLIB) \
+		  $(DEPXTOOLLIB) $(DEPXLIB)
+LOCAL_LIBRARIES = ../libABil/libABil.a  ../libABobjXm/libABobjXm.a  \
+                  ../libABobj/libABobj.a ../libAButil/libAButil.a \
+		  $(DTWIDGETLIB) $(DTTERMLIB) $(DTHELPLIB) \
+		  $(DTSVCLIB) $(TTLIB) $(XMLIB) $(XTOOLLIB) $(XLIB)
+
+#if defined(USLArchitecture)
+LOCAL_LIBRARIES = ../libABil/libABil.a  ../libABobjXm/libABobjXm.a  \
+                  ../libABobj/libABobj.a ../libAButil/libAButil.a \
+                  $(DTWIDGETLIB) $(DTSVCLIB) $(DTTERMLIB) $(DTHELPLIB) \
+                  $(XMLIB) $(XTOOLLIB) $(XLIB)
+#endif
+
+#if HasLdRunPath
+PristineProgramTarget($(DTCODEGEN_BUILD))
+BuildMultipleInstall($(DTCODEGEN_BUILD),bin)
+#endif
+
+#if defined(UXPArchitecture)
+LOCAL_LIBRARIES = ../libABil/libABil.a  ../libABobjXm/libABobjXm.a  \
+                  ../libABobj/libABobj.a ../libAButil/libAButil.a \
+                  $(DTWIDGETLIB) $(DTSVCLIB) $(DTTERMLIB) $(DTHELPLIB) \
+                  $(XMLIB) $(XTOOLLIB) $(XLIB)
+#endif
+
+
+ComplexProgramTarget(dtcodegen)
+
+BuildMultipleInstall(dtcodegen,bin)
+
+AbMessageCatalogTarget(dtcodegen)
+
+/*
+DependTarget()
+*/
+
+BuildAbIncludes(shared_includes, $(SOURCES.h.shared),../include/ab_private, ../../abmf)
+
+includes:: shared_includes $(WAITTARGET)
+
+ab_func_strings: ab_func_strings.o ../libAButil/libAButil.a
+	$(CC) $(CFLAGS) -o ab_func_strings ab_func_strings.o ../libAButil/libAButil.a $(SYS_LIBRARIES)
+ab_func_strings.o: ab_func_strings.c
+	$(CC) $(INCLUDES) $(CFLAGS) -c ab_func_strings.c
+
+#
+# Test harnesses and drivers
+#
+test_parse_main.o: parse_c.c
+	$(CC) $(CFLAGS) -DMAIN -c -o test_parse_main.o parse_c.c
+
+test_parse: test_parse_main.o ../libAButil/libAButil.a
+	$(CC) $(CFLAGS) -o test_parse test_parse_main.o ../libAButil/libAButil.a
+
+test_merge_main.o: merge_c.c
+	$(CC) $(CFLAGS) -DMAIN -c -o test_merge_main.o merge_c.c
+
+test_merge: test_merge_main.o parse_c.o ../libAButil/libAButil.a
+	$(LINKCC) $(CFLAGS) $(LDOPTIONS) -o test_merge test_merge_main.o parse_c.o ../libAButil/libAButil.a
+

@@ -1,0 +1,35 @@
+XCOMM $XConsortium: Imakefile /main/cde1_maint/1 1995/07/17 11:15:30 drk $
+#if !UseAnsiC
+EXTRA_DEFINES=-D_NO_PROTO -D_VUE_NO_PROTO -D_TS_ERRNO
+#endif
+
+#ifdef SunArchitecture
+EXTRA_DEFINES=-D_TS_ERRNO
+#endif
+
+        DEFINES = -DVERBOSE_REV_INFO
+          SRCS1 = \
+		  logger.c
+
+          OBJS1 = \
+		  logger.o
+
+  SYS_LIBRARIES = -lsocket -lnsl
+
+       PROGRAMS = logger
+   INSTALLFLAGS = -m 4755
+
+#ifdef DEBUGTREE
+#ifdef __hp9000s300
+   LDOPTIONS = $(CDEBUGFLAGS) -N
+#endif
+#endif
+
+all::
+NormalLibraryObjectRule()
+
+ComplexProgramTarget_1(logger,$(LOCAL_LIBRARIES),)
+
+NormalLintTarget($(SRCS1))
+
+install::

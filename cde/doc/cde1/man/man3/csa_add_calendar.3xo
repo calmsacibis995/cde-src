@@ -1,0 +1,185 @@
+.TH csa_add_calendar 3 "14 Oct 94"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.\" (c) Copyright 1994 X.400 API Association
+.SH NAME
+csa_add_calendar \- add a calendar to the calendar service
+.SH SYNOPSIS
+.yS
+#include <csa.h>
+.sp 0.5v
+.ta \w'CSA_return_code csa_add_calendar('u
+CSA_return_code csa_add_calendar(CSA_session_handle \f2session\fP,
+	CSA_calendar_user *\f2user\fP,
+	CSA_uint32 \f2number_attributes\fP,
+	CSA_attribute *\f2calendar_attributes\fP,
+	CSA_extension *\f2add_calendar_extensions\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn csa_add_calendar
+function creates a calendar on the calendar service.
+If
+the user does not have sufficient authority to add a
+calendar to the service, the error
+.Cn CSA_E_NO_AUTHORITY
+is returned.
+If the calendar already exists the error
+.Cn CSA_E_CALENDAR_EXISTS
+is returned.
+.SH ARGUMENTS
+.HU "Session (Session Handle)"
+Opaque session handle that represents a session with the
+calendaring service.
+.P
+Session handles are created by a logon function call and
+invalidated with a logoff function call.
+If the session
+handle is invalid, then the error
+.Cn CSA_E_INVALID_SESSION_HANDLE
+is returned.
+The session handle may be
+.Cn NULL
+if the calendar service does not require a session to be
+established in order to add a calendar.
+.HU "User (Calendar User)"
+A pointer to a calendar user structure.
+This specifies the
+user and name of the calendar to be added to the calendar
+service.
+.HU "Number Attributes (Uint32)"
+The number of elements in
+.I calendar_attributes
+argument.
+.HU "Calendar Attributes (Attributes)"
+A pointer to an array of attribute structures that specify
+the calendar attributes for the new calendar.
+.HU "Add CalendarExtensions (Extension)"
+A pointer to an array of
+.B CSA_extension
+structures for this function.
+The array may contain both
+input extensions for providing additional information to
+the function and output extensions for receiving
+information from the function.
+A value of
+.Cn NULL
+indicates that the caller is not using any extensions.
+See the extensions structure for more information.
+.SH "RETURN VALUE"
+.HU "Add Calendar Extensions (Extension)"
+If output extensions were passed to the function in the
+extensions list, the results from the service will be
+available in the extension.
+See the extensions structure for more information.
+Whether the function succeeded or
+not, and, if not, why.
+It may be success or one of the
+values listed under ERRORS below.
+.SH ERRORS
+The
+.Fn csa_add_calendar
+function returns the following error values:
+.VL 6
+.Lc CSA_E_CALENDAR_EXISTS
+.br
+The specified calendar already exists.
+.Lc CSA_E_DISK_FULL
+.br
+Insufficient disk space was available to complete
+the requested operation (this may refer to local or shared disk space).
+.Lc CSA_E_FAILURE
+.br
+There was a general failure that does not
+fit the description of any other error code.
+.Lc CSA_E_INSUFFICIENT_MEMORY
+.br
+Insufficient memory was available to complete the requested operation.
+.Lc CSA_E_INVALID_ATTRIBUTE
+.br
+An attribute was specified that was not defined by this
+specification and the implementation does not support the
+attribute as an application specific attribute.
+.Lc CSA_E_INVALID_ATTRIBUTE_VALUE
+.br
+An invalid attribute value was specified for an attribute.
+.Lc CSA_E_INVALID_FLAG
+.br
+A flag value in the
+.I flags
+argument was invalid.
+.Lc CSA_E_INVALID_FUNCTION_EXT
+.br
+The function extension requested is invalid.
+.Lc CSA_E_INVALID_PARAMETER
+.br
+A function parameter was invalid.
+.Lc CSA_E_INAVLID_SESSION_HANDLE
+.br
+.Lc CSA_E_INVALID_USER
+.br
+The specified calendar user is invalid.
+.Lc CSA_E_NO_AUTHORITY
+.br
+The user has insufficient authority for this function.
+.Lc CSA_E_NOT_SUPPORTED
+.br
+The operation requested is not supported by this implementation.
+.Lc CSA_E_READONLY
+.br
+.Lc CSA_E_SERVICE_UNAVAILABLE
+.br
+The requested calendar service is unavailable.
+.Lc CSA_E_TEXT_TOO_LARGE
+.br
+The size of the text string passed to the implementation is too large.
+.Lc CSA_E_UNSUPPORTED_ATTRIBUTE
+.br
+An attribute was encountered that is unsupported by the calendar service.
+.Lc CSA_E_UNSUPPORTED_CHARACTER_SET
+.br
+The character set requested is not supported.
+.Lc CSA_E_UNSUPPORTED_DATA_EXT
+.br
+The data extension requested is not supported.
+.Lc CSA_E_UNSUPPORTED_ENUM
+.br
+The specified enumerated value is not valid.
+.Lc CSA_E_UNSUPPORTED_FLAG
+.br
+The flag requested is not supported.
+.Lc CSA_E_UNSUPPORTED_FUNCTION_EXT
+.br
+The specified function extension is not supported or
+.Cn CSA_EXT_REQUIRED
+is set.
+.LE
+.SH "SEE ALSO"
+.Hd csa.h 5,
+.Fn csa_add_entry 3,
+.Fn csa_call_callbacks 3,
+.Fn csa_delete_calendar 3,
+.Fn csa_delete_entry 3,
+.Fn csa_free 3,
+.Fn csa_free_time_search 3,
+.Fn csa_list_calendar_attributes 3,
+.Fn csa_list_calendars 3,
+.Fn csa_list_entries 3,
+.Fn csa_list_entry_attributes 3,
+.Fn csa_list_entry_sequence 3,
+.Fn csa_logoff 3,
+.Fn csa_logon 3,
+.Fn csa_look_up 3,
+.Fn csa_query_configuration 3,
+.Fn csa_read_calendar_attributes 3,
+.Fn csa_read_entry_attributes 3,
+.Fn csa_read_next_reminder 3,
+.Fn csa_register_callback 3,
+.xo .Fn csa_restore 3,
+.xo .Fn csa_save 3,
+.Fn csa_unregister_callback 3,
+.Fn csa_update_calendar_attributes 3,
+.Fn csa_update_entry_attributes 3.

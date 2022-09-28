@@ -1,0 +1,384 @@
+.de LI
+.\" simulate -mm .LIs by turning them into .TPs
+.TP \\n()Jn
+\\$1
+..
+.de Lc
+.\" version of .LI that emboldens its argument
+.TP \\n()Jn
+\s-1\f3\\$1\f1\s+1
+..
+.TH SdmError 3 "08/05/96"
+.BH "08/05/96"
+.\" @(#)SdmError.3	1.8 96/08/05 SMI
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994, 1995, 1996 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994, 1995, 1996 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994, 1995, 1996 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994, 1995, 1996 Novell, Inc.
+.SH NAME
+SdmError \- Standard error container
+.SH SYNOPSIS
+.\"
+.SS Includes
+.ft 3
+.nf
+#include <Sdtmail.hh>
+.\"
+.SS Creation
+.ft 3
+.nf
+.sp 0.5v
+.ta \w'new SdmError('u
+new SdmError();
+.fi
+.ft 1
+.\"
+.SS Operators
+.PP
+.ft 3
+.nf
+.sp 0.5v
+SdmError& operator= (const SdmError& \f2err\fP);
+.PP
+.ft 3
+SdmError& operator= (const SdmErrorCode \f2errcode\fP);
+.PP
+.ft 3
+operator SdmErrorCode ();
+.PP
+.ft 3 
+SdmErrorCode operator[] (const int \f2minorIndex\fP);
+.fi
+.ft 1
+.\"
+.SS Methods
+.ft 3
+.nf
+.sp 0.5v
+void AddMajorErrorCode(SdmErrorCode \f2errorCode\fP);
+.PP
+.ft 3
+void AddMinorErrorCode(SdmErrorCode \f2errorCode\fP);
+.PP
+.ft 3
+SdmErrorCode ErrorCode();
+.PP
+.ft 3
+SdmErrorCode ErrorCode(const int \f2minorIndex\fP);
+.PP
+.ft 3
+const char* ErrorMessage();
+.PP
+.ft 3
+const char* ErrorMessage(const int \f2minorIndex\fP);
+.PP
+.ft 3
+int MinorCount();
+.PP
+.ft 3
+const char* OnlineHelpIndex();
+.PP
+.ft 3
+void Reset();
+.fi
+.ft 1
+.\" end of methods list
+.ta 0.25i 0.50i 0.75i 1.0i 1.25i 1.50i 1.75i 2.0i 2.5i 3.0i
+.SH DESCRIPTION
+The SdmError object encapsulates the concept of an error container. An error
+container is initially empty. By convention, any object that performs an
+operation that can return an error takes an error container as the first
+argument. If any errors occur while the object is performing an operation, the
+error container is updated with that information, and control is returned to the
+caller. The caller can then examine the error container to see if any errors are
+present, and if so, can decide how to handle the errors as it sees fit. Any
+object in the chain could choose to add to or alter the container before
+returning, as might be appropriate.
+.SS Typical Use
+Typically an error container is created by a front end application and passed in
+as an argument to each libSDtMail object operation. This error container is then
+passed down through the object call hierarchy by all of the various objects that
+implement the functionality requested by the front end application. An error at
+any point causes all of the objects to properly unwind, allowing the front end
+application to examine the error container and take the appropriate action.
+.SS Error Types
+An error container implements the concept of one "general" or "major" error and
+provides for zero or more "specific" or "minor" errors. For example, a general
+error might be "file operation failed" and a specific error might be "file not
+found". Typically a caller takes action based on the general error, while the
+specific errors are used to give an end user additional feedback when errors are
+reported.
+.PP
+For example, if an error container is passed in to a libSDtMail object, and upon
+return there are contained errors, the front end application could display an
+error dialog using the "general" error message as text. If there are any
+specific errors, a "more" button can be placed in this dialog, and if the user
+selects it, then another dialog could be displayed that contains the text of all
+the specific errors.
+.SS Calling Conventions
+With very few exceptions, all objects and methods implemented by libSDtMail follow a
+uniform set of rules for argument ordering, argument naming, return values, and
+error handling.  See SdmGlossary(3) for complete details.
+.SS Common Return Value
+The return code is always of type "SdmErrorCode" and can be used to determine
+whether or not there was an error in the call. The only value indicating success
+is Sdm_EC_Success, so one can code a test for success or failure of the call
+inline as:
+.PP
+.nf
+		if (call(args) != Sdm_EC_Success)
+		{
+			errorProcessing;
+		}
+.fi
+.PP
+All other values indicate failure; the are defined in Sdtmail.hh and all begin with
+the sequence "Sdm_EC_".
+.SS First Argument Always SdmError&
+The first argument is always of type "SDMError &" requiring that a previously
+created SdmError object be passed in by reference. The preferred paradigm is the
+highest level caller of a series of calls creates an SdmError object, which is
+then passed down the call hierarchy. At any point where an error occurs, the
+error object is "set", and the error code is returned, causing all calls in the
+hierarchy to return the same code, unwrapping all the way back up to the highest
+level caller. For example:
+.PP
+.nf
+		SdmErrorCode lowerFunction(SdmError& err)
+		{
+			if (call(err) != Sdm_EC_Success) {
+				return(err);
+			}
+			otherProcessing();
+			return(err);
+		}
+.fi
+.SS Simple Data Types
+Simple data types are the "exceptions to the rules". Since they implement data
+types that are expected to function with standard C operators, and in many cases
+have values that can be operated on, they are defined and used differently than
+other more complicated objects.
+.PP
+Simple data types do not take an SdmError argument; rather, they take arguments that are
+appropriate for the construction and duplication of the data type.
+.PP
+Simple data types do not return an SdmErrorCode return result; rather, they have values
+appropriate for the data type, allowing them to be operated on using the standard C
+operators.
+.\"
+.SH CREATION
+The only way to create an SdmError object is by calling the constructor directly
+with no arguments:
+.PP
+.nf
+	SdmError err;
+	SdmError *err = new SdmError();
+.fi
+.PP
+This creates a new SdmError object; the default value of the container is set to
+Sdm_EC_Success (indicating no error is contained).
+.\"
+.SH DESTRUCTION
+An SdmError object can be destroyed like any other object. It releases any storage that
+may have been accumulated in holding any contained errors.
+.\"
+.SH EXAMPLES
+The following sample code snippet invokes a libSDtMail object, passing in an error
+container as the first argument. Upon return, if there are contained errors,
+then the general and specific errors are printed to standard out. A special case
+is checked for, that of the "noMoreData" error code (made up for this example.)
+If this general error is indicated, then no error message is displayed to the
+user, because it is not an error per-se.
+.SS Simple Example
+.nf
+	SDMError err;
+	SDMGetSomeData(err, ...);	// Invoke mail mid end library object method
+	if (err != SCM_EC_Success) {
+		if (err == SDM_EC_noMoreData))
+			return;
+		printf("Error: %s\\n", err.ErrorMessage());
+		if (err.MinorCount())
+			for (int i = 0; i < err; i++)
+				printf("Reason: %d: %s\\n", err.MinorError(i), err.ErrorMessage(i));
+		return;
+	}
+.fi
+.SS Complex Example
+.nf
+	level0() {
+		SDMError err;
+		if (call1(err) != SDM_EC_Success) {
+			errorProcessing;
+		}
+	}
+	
+	SDMErrorCode call1(SDMError &err) {
+		doSomeProcessing;
+		if (call2(err) != SDM_EC_Success) {
+			return(err);
+		}
+		return(SDM_EC_Success);
+	}
+	
+	SDMErrorCode call2(SDMError &err) {
+		doSomeProcessing;
+		if (errorOccurred) {
+			return(err = SDM_EC_appropriateErrorCode);
+		}
+		return(SDM_EC_Success);
+	}
+.fi
+.\"
+.SH OPERATORS
+Some of the standard C operators are overloaded to function with the SdmError
+object.
+.SH Assignment
+(=)
+.PP
+An error object can be assigned an error (of type SdmErrorCode) or can be
+assigned the contents of another error object.
+.PP
+.nf
+		SdmError err1;
+		SdmError err2;
+
+		err1 = Sdm_EC_Fail;
+		err2 = err1;
+.fi
+.SH Conversion
+A SdmErrorCode type can be retrieved from an error object, so that the major and
+minor error types can be determined.
+.PP
+.nf
+		SdmError err;
+		SdmErrorCode majorError, minorError;
+
+		majorError = (SdmErrorCode) err;
+		minorError = (SdmErrorCode) err.MinorError(1);
+.fi
+.\"
+.SH METHODS
+The following methods are provided by error.
+.\"
+.SS \f3ErrorMessage\fP
+()
+
+This method returns a character string representing an error message describing
+the major error this error object is set to. This message is suitable for
+display to the user.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "none"
+.PP
+.RE
+.nr )J 0
+Return value: 
+.RS 3
+.nr )J 7
+.LI "\f3(const char *)\fP"
+.br
+A pointer to the error message corresponding to the major error this error
+object is set to. Note that this error message is valid only as long as the
+error object is valid; when the error object is destroyed, this pointer becomes
+invalid.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3MinorCount\fP
+()
+
+This method returns the number of minor errors contained in this error object.
+
+NOTE: minor errors are currently unimplemented; this always returns 0.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "none"
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(int)\fP"
+.br
+Number of minor errors contained in this error object; 0 if none.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3OnlineHelpIndex\fP
+()
+
+This method returns a character string representing the online help index for
+the major error contained in this error object.
+
+NOTE: online help index is currently unimplemented; this always returns 0.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "none"
+.PP
+.RE
+.nr )J 0
+Return value: 
+.RS 3
+.nr )J 7
+.LI "\f3(const char *)\fP"
+.br
+A pointer to the online help index corresponding to the major error this error
+object is set to. Note that this help index is valid only as long as the error
+object is valid; when the error object is destroyed, this pointer becomes
+invalid.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3Reset\fP
+()
+
+This method causes the error container to be reset to a state identical to that
+of having been just created; all minor errors are cleared, and the value of the
+error container is set to Sdm_EC_Success, indicating no error is contained.
+.PP
+This method is a convenience function and is equivalent to assigning "Sdm_EC_Success"
+to an error object, e.g. the following are equivalent:
+.PP
+.nf
+	SdmError err;
+
+	err = Sdm_EC_Success;
+	err.Reset();
+.fi
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "none"
+.PP
+.RE
+.nr )J 0
+Return value: 
+.RS 3
+.nr )J 7
+.LI "none"
+.PP
+.RE
+.nr )J 0
+.\"
+.RE
+.nr )J 0
+.SH "SEE ALSO"
+.na
+.BR SdmGlossary (3),
+.BR SdmIntro (3)

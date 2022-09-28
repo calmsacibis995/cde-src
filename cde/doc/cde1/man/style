@@ -1,0 +1,931 @@
+This file describes the usage of macros in the "common source format"
+that is converted by the dt2man script to man page format, or dt2xo
+to X/Open format.  It also offers various style rules for expressing
+man pages in "standardese" and using troff coding techniques that will
+make our man pages more uniform.
+
+Hal Jespersen
+SunSoft, Inc.
+M/S UMTV21-223
+2550 Garcia Ave
+Mountain View, CA 94043
+(415) 336-1436
+(415) 336-4253 FAX
+Hal.Jespersen@eng.sun.com
+
+REFERENCES
+----------
+You will need the following external references to understand this file:
+
+	Documentation on the troff -man and -mm macros [the former is
+	sometimes available via "man -5 man"]
+
+	General troff documentation
+
+	The actual drafts we are sending to X/Open.  Sections 1.3 and
+	1.4 of XCDI contain guidance on terminology and on the meaning of
+	the boilerplate text used in the templates for utilities.
+
+	The X/Open Editorial Style Guide, but only if you are producing
+	text that goes only to X/Open, which is generally not the case
+	for man-page authors.  [If you need it, anonymous-FTP to
+	ftp.xopen.co.uk and cd to /pub/Style_Guide.]
+
+MACRO PACKAGES
+--------------
+The common macro set is mostly based on the traditional man macros.
+Use only the following man macros:
+
+	.B		bold
+	.BR		bold, followed by roman
+	.RB		roman, followed by bold
+	.I		italic
+	.IR		italic, followed by roman
+	.RI		roman, followed by italic
+	.SH		major heading
+	.P		paragraph
+	.TH		start of man page
+	.TS/.TE		start/stop tbl table
+
+For the first seven above, you must use " " to protect spaces within
+arguments because these are used differently in the -mm macros X/Open
+uses.  For example:
+
+	NO:	.B All these words are bold
+	YES:	.B "All these words are bold"
+	NO:	.SH SEE ALSO
+	YES:	.SH "SEE ALSO"
+
+The common macro set also uses some troff -mm macros:
+
+	.HU		subheader [use instead of .SS]
+	.VL		start variable list [use instead of .TPs]
+	.LI		list item [use instead of .TPs]
+	.LE		end the list
+
+and adds some new macros, as described below in SYMBOL MACROS
+or one of the later sections.
+
+	.Cm		utility
+	.Cn		constant
+	.Cs/.Ce		start/stop code sample, fixed display
+	.Fn		function
+	.Hd		header
+	.iX		index entry
+	.Lc		variable-list item version of .Cn
+	.yS/.yE		start/stop SYNOPSIS entry
+
+These are the only macros you can use in common source.  If you have
+text that applies to X/Open only and have made it conditional by
+surrounding it with the .xos/.xoe flags [described below], you can use
+any of the macros in the X/Open Editorial Style Guide.
+
+SYMBOL MACROS
+-------------
+There are a number of macros that represent symbols--function names,
+headers, etc.--that may differ in appearance between X/Open and regular
+man pages.  Use the following macros.  Examples follow each.
+
+C-language Functions:
+
+	Italics() in X/Open, Bold with () or (vol) in Man.  Second
+	argument can be omitted; it is used for a volume number and/or
+	punctuation.
+
+		.Fn tt_open ;	(no volume number for same-page usage)
+		.Fn open 2
+		.Fn malloc 3c,
+
+	If you need leading punctuation, such as "(foo(), ...", code it
+	as follows:
+
+		(\c			[the \c continues the line]
+		.Fn foo ,
+		...
+Utilities:
+
+	Italics in X/Open, Bold with optional (vol) in Man.  Same
+	second argument as in .Fn.  (Don't call them "commands.")
+
+		.Cm ttsession ;	(no volume number for same-page usage)
+		.Cm stty 1M
+		.Cm grep 1,
+
+Headers:
+
+	<Bold> in X/Open, <bold> with optional (vol) in Man.
+	Same syntax as .Fn.  Do not code the <> brackets.
+	Always say "header," not "header file."
+
+		.Hd sys/types.h .
+		.Hd Bento/DtBento.h 5.
+
+Constants (all-cap symbols other than environment variables):
+
+	Roman in X/Open, Bold in Man.
+
+		.Cn O_CREAT
+		.Cn DtTERM_CHAR_CURSOR_BOX ),
+		.Lc NULL	[.VL list version]
+
+Environment Variables:
+
+	Italics, all caps in both versions.  Do not prefix with a '$'
+	in regular text (only shell script examples).
+
+		.I SHELL
+		.IR LC_MESSAGES ,
+		.LI \f2LANG\fP	[.VL list version]
+
+Widgets:
+
+	Roman in both versions.
+
+		The DtTerm widget ...
+
+X Resources:
+
+	Bold in both versions.
+
+		.B DtNreverseWrap
+		.BR XmNtextFontList ),
+		.LI \f3DtNverticalScrollBar\fP
+		.br
+
+Structures:
+
+	Bold in both versions.
+
+		.B stat
+		(\c
+		.BR DtTermStatusChangeCallbackStruct )
+	
+Pathnames:
+
+	Bold in both versions.
+
+		.B /etc/passwd
+		.BR \&.profile ,	[note \& to protect leading dot]
+		.LI \f3/tmp\fP		[.VL list version]
+
+Utility Options in Synopsis:
+
+	Courier in X/Open, bold in Man.  Option-arguments are
+	CourierOblique and italics, respectively.  Use \- for minus.
+	List single letters first in a group.  Code as follows and the
+	conversion scripts do the rest:
+
+		.yS
+		ttsession
+		[\-spStvhN]
+		[\-E|\-X]
+		[\-a\ \f2level\fP]
+		[\-d\ \f2display\fP]
+		[\-c\ [\f2command\fP]]
+		.yE
+
+Utility Options in Text:
+
+	Bold in both versions.  Use \- for minus.
+
+		.B \-x
+		.BR \-y ;
+		.BI \-f " makefile"	[note space]
+		\f3\(mif\ \fP\f2makefile\fP	[version of previous if
+				you're breaking across two lines]
+		.LI \f3\-a\0\f2level\f1	[.VL version; note usage of \0 as
+				an internal space and the return to font 1]
+
+OTHER MACROS
+------------
+Variable Lists:
+
+	.VL 6
+	.LI foo
+	text text text
+	.LI averylongtagneedsabreak
+	.br
+	text text text
+	.Lc R_OK
+	text text text
+	.LE
+
+	Note the use of .br in the fifth line.  If the .LI has
+	a long tag, you must follow it with a break.
+
+	If a .LI has an embedded space, use "\ " or "\0":
+
+		NO:	.LI the tag text
+		BETTER:	.LI "the tag text"
+			.br
+		BEST:	.LI "the\ tag\ text"
+			.br
+
+	If there are a few font changes, end them with \f1, not \fP:
+
+		NO:	.LI \f3\-x\fP\0\f2foo\fP\f3[\fP\f2bar\fP\f3]\fP
+			.br
+		YES:	.LI \f3\-x\0\f2foo\f3[\f2bar\f3]\f1
+			.br
+
+Bulleted Lists:
+
+	.xo .BL
+	.cde .VL 3
+	.LI \(bu
+	text text text
+	.LI \(bu
+	text text text
+	.LE
+
+Conditional Text:
+
+	.xos
+	Lines between .xos and .xoe [start/end] will
+	appear only in the X/Open version.
+	.xoe
+
+	.xo This single line [less the ".xo "] will also be only in X/Open.
+
+	.cdes
+	Lines between .cdes and .cdee will
+	appear only in the manpage version.
+	.cdee
+
+	.cde This single line [less the ".cde "] will also be man-only.
+
+	Also available for vendor-specific uses:
+
+		.hps/.hpe, .hp
+		.ibms/.ibme, .ibm
+		.suns/.sune, .sun
+		.usls/.usle, .usl
+
+	See CROSS-REFS below for more examples of this.
+
+Code Samples:
+
+	Any text used outside of troff "fill" mode, such as fragments
+	of C programs, or lists of symbols in a single column, is
+	put into a code sample block, similar to a -mm .DS/.DE:
+
+		.Cs I
+		foo(int bar)
+		{
+			bam();
+		}
+		.Ce
+
+		The following are valid values:
+		.Cs I
+		.Cn DT_FOO1
+		.Cn DT_FOO2
+		.Cn DT_FOO3
+		.Ce
+
+	The .Cs/Ce pair puts the text into Courier and sets up
+	tabs for code samples.  To use other fonts, use the
+	appropriate macros, as illustrated in the second example.
+
+	The "I" argument indents the code sample.  Omit it if the
+	lines are too long.
+
+	For X/Open, the .Cs with I argument sets up a .DS/.DE
+	display, which forces it to a new page if there isn't room
+	for the entire code sample.  The man page version does
+	not do this.  If you need to keep it all on the same
+	page, precede the .Cs I with:
+
+		.br
+		.ne <# of lines to reserve>
+
+	The C indentation and white-space style we use for examples is
+	as shown in the ANSIfied K&R book:
+
+		myfunc(int x, char *y)
+		{
+			int	a, b;
+			char	*c;
+
+			if (a > b) {
+				/*
+				 * A comment
+				 */
+				foo(a, b, c);
+			} else {
+				bar(a, b, c);
+			}
+		}
+
+TEMPLATES
+---------
+
+Each man page must follow a template of required macro sequences.
+Examples of good pages to copy are given for each type.  Some general
+layout rules are:
+
+	The copyright comments must follow the .TH.
+
+Utilities:	man1/ttsession.1xo
+
+	.TH ttsession 1 "11 May 1994"
+	.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+	.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+	.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+	.\" (c) Copyright 1993, 1994 Novell, Inc.
+	.SH NAME
+	ttsession \- the ToolTalk message server
+	.SH SYNOPSIS
+	.SH DESCRIPTION
+	.SH OPTIONS
+	.SH OPERANDS
+	.SH STDIN
+	.SH "INPUT FILES"
+	.SH "ENVIRONMENT VARIABLES"
+	.SH "RESOURCES"
+	.SH "ASYNCHRONOUS EVENTS"
+	.SH STDOUT
+	.SH STDERR
+	.SH "OUTPUT FILES"
+	.SH "EXTENDED DESCRIPTION"
+	.SH "EXIT STATUS"
+	.SH "CONSEQUENCES OF ERRORS"
+	.SH "APPLICATION USAGE"
+	.SH EXAMPLES
+	.SH "SEE ALSO"
+
+	A lot of these sections have boilerplate contents.  Copy text
+	liberally from ttsession.1xo.  Use .VL's with indentations as
+	shown in that page.  To meet X/Open style, use every one of
+	these headings for utility man pages.  [In contrast, the other
+	types of man pages simply omit unused sections.  Go figure.]
+	A few specific notes follow.
+
+	NAME:  Always use \- as the separator.  The entire text must
+	be on a single line without any font changes.  Despite this
+	ttsession example, try to use imperative mood:
+
+		NO:	open \- function to open a file
+		NO:	open \- file-opening API
+		YES:	open \- open a file
+
+	OPTIONS:  Use imperative mood for the options list:
+
+		.VL 6
+		.LI \f3\-d\fP
+		Enable debugging mode ...
+		.LI \f3\-f\0\f2cmd_file\f1
+		.br
+		Read additional commands from
+		.I cmd_file
+		...
+		.LI \f3\-h\fP
+		Write a help message ...
+		.LE
+
+	OPTIONS:  List them in sorted order.
+
+	ENVIRONMENT VARIABLES:  There are a few I18N-related ones
+	you should include:  LANG, LC_ALL, LC_MESSAGES, NLSPATH.
+	Copy the X/Open boilerplate from ttsession.1xo.
+
+	EXIT STATUS:  We deliberately fuzz up exit status codes,
+	as shown here from ttcp.1xo.  Avoid listing any exit status
+	code that a portable application can't make specific use of.
+	[Most shell scripts just punt on non-zero and pass through
+	the error message to the user.]  Do not use bold for the
+	numbers.
+
+		The following exit values are returned:
+		.VL 4
+		.LI \h"\w'>'u"0
+		All files and ToolTalk objects were copied successfully.
+		.LI >0
+		An error occurred or the invoked
+		.Cm cp 1
+		command exited with a non-zero value.
+		.LE
+
+	APPLICATION USAGE:  Use only to offer *advice* on programming
+	practices, such as "The application should use free() to
+	release memory it allocates..."
+
+Functions:	man3/DtActionInvoke.3xo
+
+	.TH DtActionInvoke 3 "4 April 1994"
+	.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+	.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+	.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+	.\" (c) Copyright 1993, 1994 Novell, Inc.
+	.SH NAME
+	DtActionInvoke \- invoke a Cde action
+	.SH SYNOPSIS
+	.SH DESCRIPTION
+	.SH RESOURCES
+	.SH "RETURN VALUE"
+	.SH "APPLICATION USAGE"
+	.SH EXAMPLES
+	.SH "SEE ALSO"
+
+	SYNOPSIS:  Use the following style unless the combined width
+	of the return type and function name are too long:
+
+		.SH SYNOPSIS
+		.yS
+		#include <Dt/Action.h>
+		.sp 0.5v
+		.ta \w'DtActionStatus DtActionQuit('u
+		DtActionStatus DtActionQuit(DtActionInvocationID \f2id\fP,
+			unsigned long \f2timeout\fP,
+			int \f2silent\fP);
+		.yE
+
+	SYNOPSIS:  Here's what to do if they *are* too long.  Also
+	note treatment of *:
+
+		.SH SYNOPSIS
+		.yS
+		#include <Dt/Action.h>
+		.sp 0.5v
+		.ta \w'DtActionInvoke('u
+		DtActionInvocationID
+		DtActionInvoke(Widget \f2w\fP,
+			char *\f2action\fP,
+			DtActionArg *\f2args\fP,
+			int \f2argCount\fP,
+			char *\f2termOpts\fP,
+			char *\f2execHost\fP,
+			char *\f2contextDir\fP,
+			int \f2useIndicator\fP,
+			DtActionCallbackProc \f2statusUpdateCb\fP,
+			XtPointer \f2client_data\fP);
+		.yE
+
+	DESCRIPTION:  Describe each argument as a separate full
+	sentence, in the same order as shown in the SYNOPSIS.
+	Make each a separate paragraph if any one is reasonably long.
+	[Do not use a tabular organization.]  For example,
+
+		The
+		.I foo
+		argument is ...
+
+	DESCRIPTION:  Do not repeat directly information already in
+	the synopsis.  For example, in DtActionInvoke() above:
+
+		NO:  The action argument is a char * that ...
+		YES: The action argument points to ...
+		NO:  The DtActionInvoke() function takes 10 arguments.
+
+	RESOURCES: This one is rarely used, but DtActionInvoke does have
+	X Windows resource dependencies.
+
+	RETURN VALUE:  This is only used for the function return value,
+	which is the datatype shown as the first word of the function
+	prototype.  Use one of the following forms (the first for void):
+
+		The
+		.Fn dtfoo
+		function returns no value.
+
+		Upon successful completion, the
+		.Fn dtfoo
+		function returns a widget ID;
+		otherwise, it returns
+		.Cn NULL .
+
+	SEE ALSO:  Always include the .Hd header reference from the
+	synopsis.
+
+Headers:	man5/DtDts.5xo
+
+	.TH Dt/Dts.h 5 "13 Jun 1994"
+	.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+	.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+	.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+	.\" (c) Copyright 1993, 1994 Novell, Inc.
+	.SH NAME
+	Dt/Dts.h \- data typing definitions
+	.SH SYNOPSIS
+	.yS
+	#include <Dt/Dts.h>
+	.yE
+	.SH DESCRIPTION
+	.SH "SEE ALSO"
+
+	NAME:  Note the different style than other NAME lines.
+
+	DESCRIPTION:  Include the following:
+
+		Function prototypes [and here's a script that will
+		extract the synopses directly from the .3xo pages:
+
+			cat *.3xo |
+			sed -n '/^\.SH .*SYNOP/,/^\.SH/p' |
+			sed '/^\.SH /d
+			/^#include/d
+			/^\.sp 0/d
+			s/\.yS/.P\
+			.yS/'
+
+		Enums and other constants [and note that you give
+		the names only, generally not the values or their
+		meanings]
+
+			The
+			.Hd Dt/Dnd.h
+			header defines the following enumeration data types,
+			with at least the following members:
+			.VL 6
+			.na
+			.LI \f3DtDndStatus\fP
+			.br
+			.Cn DtDND_SUCCESS ,
+			.Cn DtDND_FAILURE
+			.LI \f3DtDndProtocol\fP
+			.br
+			.Cn DtDND_DATA_TRANSFER ,
+			.Cn DtDND_TEXT_TRANSFER ,
+			.Cn DtDND_FILENAME_TRANSFER
+			.LE
+
+			.P
+			The
+			.Hd Dt/ComboBox.h
+			header declares the following constants:
+			.Cs I
+			DtALIGNMENT_BEGINNING
+			DtALIGNMENT_CENTER
+			DtALIGNMENT_END
+			DtCR_MENU_POST
+			DtCR_SELECT
+			DtDROP_DOWN_COMBO_BOX
+			DtDROP_DOWN_LIST
+			.Ce
+
+		Typedefs, either as code samples or more general
+		[an opaque structure, an integral type, etc.]
+
+		Structures, either as code samples or tables of
+		members.  If a struct is used only by a single
+		function, describe it on that page, not the
+		header page.
+
+	SEE ALSO:  Don't include a SEE ALSO for headers unless there's
+	some specific cross-ref you think is important.  Do not
+	include a function here if it's only mentioned as one of
+	the function prototypes.
+
+Data Formats:	man5/DtStdAppFontNames.5xo
+
+	These are complex because conditional tags are used to
+	make them look like a man page for CDE, but regular text
+	with numeric headings in X/Open.
+
+	.cdes/.cdee is used at the beginning to omit the meaningless
+	front parts from X/Open:
+
+	.cdes
+	.TH DtStdAppFontNames 5 "22 Jun 1994"
+	.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+	.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+	.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+	.\" (c) Copyright 1993, 1994 Novell, Inc.
+	.SH NAME
+	DtStdAppFontNames \- Cde Standard Application Font Names
+	.SH SYNOPSIS
+	 ...
+	.SH DESCRIPTION
+	.cdee
+
+	After that, any headers are dual-coded:
+
+		.cde .HU "Point Sizes"
+		.xo .H 4 "Point Sizes"
+
+	[The choice of .H 4 is specific to this example. Sometimes
+	.H 3 will be used.]
+
+	The SEE ALSO and other trailing .SH's are surrounded
+	by .cdes/.cdee.
+
+	Since we are using numeric headings, we can provide real
+	X/Open cross references, such as:
+
+		(The Cde Standard Application Font Names, described in
+		.xo .cX DtStdAppFontNames ,
+		.cde .BR DtStdAppFontNames (5),
+		provide a similar mechanism ...
+
+FONT USAGE
+----------
+Avoid using inline font changes.  Use .I, .BR, etc. if one of the
+symbol macros [.Fn, .Cm, etc] isn't appropriate.
+
+Never use \fR, \fI, or \fB.  If you *must* use an inline font change
+like this, code roman, italics, and bold as \f1, \f2, and \f3.
+
+TABLES
+------
+See /cde/src/today/doc/cde1/man/man3/DtComboBox.3xo for examples
+of X resource tables.  Here's an excerpt:
+
+	.P
+	.cde .ne 10
+	.DS
+	.S -1
+	.TS
+	.xo expand box tab(@);
+	.cde tab(@);
+	cf3 ssss
+	.xo lf3 1 | lf3 1 | lf3 1 | lf3 1 | lf3
+	.xo lf3 1 | lf3 1 | lf3 1 | l   1 | l .
+	.cde lf3 1 lf3 1 lf3 1 lf3 1 lf3
+	.cde lf3 1 lf3 1 lf3 1 l   1 l .
+	DtComboBox Resource Set
+	_
+	Name@Class@Type@Default@Access
+	_
+	DtNmarginHeight@DtCMarginHeight@Dimension@2@CSG
+	XmNbottom-@XmCBottom-@Pixmap@XmUNSPECIFIED-@CSG
+	   ShadowPixmap@   ShadowPixmap@@   _PIXMAP
+	.TE
+	.S +1
+	.DE
+
+Note the conditionals that use fancy boxes for X/Open, but unboxed
+for CDE.  Also, X/Open prefers tables without actual tabs in them.
+The second entry illustrates hyphenation to reduce column width.
+Use the hyphen at the end and indent the continued symbol with
+3 spaces.  Hyphenate before underscores if possible.
+
+Do not repeat in text information that is already in the table.
+For example, in the text describing DtNmarginHeight [see above],
+do not repeat that the default value is 2.  Describe the default
+only when it requires an explanation more involved than repeating
+a table value.
+
+Here's an example of a structure table from DtActionInvoke.3xo.
+Use this form when you don't want to list an explicit struct
+code sample (because, for instance, you may add new members
+or change their sequence in the future).
+
+	The
+	.B DtActionBuffer
+	structure contains at least the following members:
+	.P
+	.ne 6v
+	.TS
+	center;
+	.xo lf5 lf5 lw(3i) .
+	.cde lf3 lf2 lw(3i) .
+	void    *bp     T{
+	.na
+	location of buffer
+	T}
+	int     size    T{
+	.na
+	size of buffer in bytes
+	T}
+	char    *type   T{
+	.na
+	optional type of buffer
+	T}
+	Boolean writable        T{
+	.na
+	action is allowed to modify and return the buffer
+	T}
+	.TE
+	.P
+
+INDEXING
+--------
+[Note that very few of the man pages are using this indexing facility
+correctly yet, so examples are inappropriate.]
+
+Code index entries as:
+
+	.iX "major entry" "minor entry" [1]
+
+You must use quotes if there are embedded blanks.
+
+The optional "1" as a third argument denotes a principal entry,
+which will have a highlighted page number in the index.
+
+CROSS-REFS
+----------
+The SEE ALSO section is complicated because a lot of interesting
+entries are not in the same X/Open book.  The CDE version can
+use virtually any reference with impunity, but X/Open needs
+the names of the other books.  Example:
+
+	.SH "SEE ALSO"
+	.Hd Dt/Action.h 5,
+	.cdes
+	.Cm xterm 1X,
+	.Fn XtFree 3X,
+	.Fn XtMalloc 3X,
+	.cdee
+	.xos
+	.Fn XtFree 3X,
+	.Fn XtMalloc 3X
+	in the \*(Zt;
+	.xoe
+	.Fn DtDbLoad 3,
+	.Fn DtInitialize 3,
+	.Fn DtActionCallbackProc 3,
+	.cde .BR dtactionfile (4),
+	.cde .BR dtdtfile (4).
+	.xo .cX dtactionfile ,
+	.xo .cX dtdtfile .
+
+All entries in the same book are grouped together.  use only commas
+between entries in one book, semicolons between books.  If there
+is a header entry [.Hd], it goes first.
+
+The \*(Zt is the string definition of the book name.  They are:
+
+	\*(ZC	XPG4 commands and utilities
+	\*(ZK	XPG4 functions and headers
+	\*(Zb	XPG4 definitions [rarely used]
+	\*(Zl	Xlib
+	\*(Zt	Xt
+	\*(Zi	ICCCM
+	\*(Zp	X protocol
+	\*(ZM	Motif toolkit
+	\*(ZY	Motif style guide
+	\*(Zd	XCDI
+	\*(Zs	XCSA
+
+The last four lines of the example show the dichotomy of data formats.
+The .BR's are generic man-page references, but the .cX macro used in
+X/Open is naming a string that also appears in the header man page:
+
+	.xR3 dtactionfile
+
+GENERAL STYLE
+-------------
+
+Never use "print" unless you are describing literal printing
+operations; use "write to standard output [error]."
+
+Be careful not to say "character" when you mean "byte."
+
+Never change the case of a symbol such as a function name.
+If it starts lowercase, you cannot start a sentence with it.
+
+	NO:  fork() creates a new process.
+	YES: The fork() function creates a new process.
+
+Within each section, such as the DESCRIPTION, name the function
+the first time, but don't keep repeating it except to avoid confusion.
+
+	The foo() function allocates a buffer.  The function
+	must be used before any data is stored.
+
+Do not use the second person form of address or imperatives
+when referring to the reader or application [unlike this file,
+which uses second person a lot].
+
+	NO:	Use -v for verbose output.
+	YES:	The application can use -v for verbose output.
+	NO:	You should call init() first...
+	YES:	The application should call init() first...
+	OR:	The application must call init() first...
+
+However, there is an exception to this--utility man pages use
+imperative for the list of OPTIONS.
+
+Avoid passive voice:
+
+	[Passive]	... zero is returned  ...
+
+	[Active]	The
+			.Fn foo
+			function returns zero ...
+
+The verbs 'may' and 'can' are used for optional behavior, but
+mean different things:
+
+	May is always used to describe something the *system*
+	(the function, widget, client, etc.) is allowed to do.
+	The foo() function may return NULL.  The tar utility
+	may rewind the tape.  The negative sense is not "may
+	not," but "need not."
+
+	Can describes application or user options.  The
+	application can use the -r option to rewind the tape.
+	The user can click the box to get the next dialog.  The
+	negative sense is "cannot."
+
+Do not use the names "CDE" or "Common Desktop Environment" directly
+because X/Open may have a different name for it.  Use "Cde"
+(upper/lowercase as shown, no quotes needed) and the script will
+substitute appropriately.
+
+Do not use Latin abbreviations:
+
+	e.g. --> for example
+	i.e. --> in other words
+	etc. --> and so forth
+
+Never refer to "the user" when you really mean "the application" or
+"the application programmer."  Except in unusual cases, refer to the
+application instead of the programmer.
+
+Never say "legal" or "illegal" because of statutory implications: use
+valid or invalid.
+
+Never say:
+
+	vendor
+	platform
+
+Always spell out standard input, output, and error instead of
+stdin, stdout, etc. [except in the headers .SH STDIN, .SH STDOUT]
+
+Use the journalistic style of serial commas unless the meaning
+of the sentence is unclear:
+
+	A, B and C.
+	cursor position, caps lock state and insert char state
+
+Avoid all references to ASCII.  The international standard that
+is identical is ISO/IEC 646:\|1991, but there are cases where
+you can refer just to an octal or hex value directly.
+
+Do not precede or follow a .SH header with .P.
+
+	NO:	.P
+		.SH DESCRIPTION
+		.P
+
+	YES:	.SH DESCRIPTION
+
+Do not have any blank lines in the man page.  Any place you want
+a blank line in the output, use .P or .sp 0.5v.
+
+We rarely use quotation marks for special phrases.  When forced to
+do so, use the form:
+
+	``foo''
+
+[two backquotes, two apostrophes].  Periods and commas go inside the
+quotes.  Generally, use italics for such things:
+
+	.I foo
+
+However, do not use italics [or words in all capital letters] to
+provide emphasis:
+
+	NO:	Do \f2not\fP use negative numbers.
+	YES:	The application must not use negative numbers.
+
+Do not use contractions [don't, can't, etc.].
+
+Use \- instead of ``-'' for ``minus'' (``returns \-1'') or in ranges of
+numbers (``1\-5'').  Use \(em for a dash, such as:
+
+	If an argument is a directory, do not list its contents\(emonly
+	its name.  (Note lack of spaces on either side.)
+
+In places where hyphenation is not desirable, such as within telephone
+numbers, use \(hy, such as:
+
+	+1\ (800)\ 678\(hyIEEE
+
+When you have two characters that can run together, use narrow or half-
+narrow spaces (1/6 em or 1/12 em):
+
+	\-\^\-          (\^)            [\|]
+
+The words "however" and "otherwise" always start a sentence or clause
+[in other words, are preceded by a ';'] and are always followed by
+a comma.
+
+It is good troff coding style to start a new sentence on a new line.
+
+Avoid referring to text "above" or "below."  Either provide a direct
+reference, such as:
+
+	see
+	.B SYNOPSIS
+
+or use the terms "following" or "preceding."
+
+Avoid complex inline code fragments:
+
+	NO:	The use of ``\f3foo -x bar -y bam file1 file2\fP'' is undefined.
+	YES:	The following is undefined:
+		.Cs I
+		foo -x bar -y bam file1 file2
+		.Ce
+
+If you need to show special characters within a sentence and they
+obviously are not a word that would be confusing, code it without
+special punctuation:
+
+	NO:	The ``/*'' and ``*/'' surround comments.
+	YES:	The /* and */ surround comments.
+	NO:	The '=' must be used.
+	YES:	The = must be used.

@@ -1,0 +1,61 @@
+/* @(#)copymove.src	1.2 97/04/29 SMI */
+
+token create token1
+#include "setup.src"
+token set token1 serviceoption messagestorename /tmp/test.mbx
+
+! /usr/bin/rm -f /tmp/test.mbx /tmp/.test.mbx_* /tmp/.test.mbx_dt_index
+! /usr/bin/cp test1.mbx /tmp/test.mbx
+! /usr/bin/chmod 660 /tmp/test.mbx
+
+! /usr/bin/rm -f /tmp/dest.mbx /tmp/.dest.mbx_* /tmp/.dest.mbx_dt_index
+! /usr/bin/touch /tmp/dest.mbx
+! /usr/bin/chmod 660 /tmp/dest.mbx
+
+/**/# Create, startup and open the dataport
+port create port1
+port startup port1
+port open port1 token1
+
+port getstatus port1
+port getstructure port1
+port getheaders port1 3 Subject To From
+
+token create token2
+#ifdef IMAP
+token set token2 servicetype imap
+token set token2 serviceoption hostname kontiki
+token set token2 serviceoption username imaptest
+token set token2 serviceoption password imaptestpassword
+#else
+token set token2 servicetype local
+#endif
+token set token2 serviceoption messagestorename /tmp/dest.mbx
+
+/**/# Copy messages 1, 3 and 5 to the destination mailbox
+port copymessage port1 1,3,5 token2
+/**/# Move messages 2, 4 and 6 to the destination mailbox
+port movemessage port1 2,4,6 token2
+port expungedeleted port1
+
+/**/# The source mailbox should contain 3 messages
+port getstatus port1
+port getstructure port1
+
+/**/# The destination mailbox should contain 6 messages
+port create port2
+port startup port2
+port open port2 token2
+port getstatus port2
+port getstructure port2
+
+/**/# Close the dataports
+port close port1
+port shutdown port1
+port delete port1
+
+port close port2
+port shutdown port2
+port delete port2
+
+quit

@@ -1,0 +1,261 @@
+/*****************************************************************************
+ *
+ *	   CDE-SPECIFIC DEFINITIONS FOR IMAKE.TMPL
+ *                                               
+ * This file is tailored specifically for the Common Desktop Environment.
+ * and is meant to set definitions used by Imake.tmpl and any following 
+ * template, macro and rules files. It is included after vendor.cf 
+ * 
+ * This file is in two parts. The first part is mostly cpp macros needed
+ * by cde to augment the default macros in Imake.tmpl. It is segmented
+ * by the cpp macro BeforeCdeImakeTmpl.
+ * The second part is mostly a listing of the default make macros
+ * augmenting the make macros in Imake.tmpl.
+ *                                         
+ *****************************************************************************/
+
+#ifdef BeforeCdeImakeTmpl
+
+/** use to get correct library and header paths in build trees
+ ** This is here so we can build Version (2-n) in the same tree if
+ ** necessary.
+ **/
+#ifndef CdeVersion
+#define CdeVersion 1
+#endif
+
+/* UseKeepState decides whether or not make Makefile has a dependency
+ * on the imake program. For sun, if .KEEP_STATE is on this is bad
+ * because imake always tries to rebuild when doing make Makefile.
+ * Sun directories using .KEEP_STATE should set the following to
+ * YES in their admindefines file.
+ */
+#ifndef UseKeepState
+#define UseKeepState NO
+#endif
+
+/* Determine whether export lists should be used for creating shared
+ * libraries.
+ */
+#ifndef UseExportLists
+#define UseExportLists YES
+#endif
+
+/* Determine whether the old Build Scheme of linking header files in
+ * $(TOP)/X11 is in place. If not, use 1 macro (UseAltBuildScheme) to 
+ * choose between binstall directories in a build 
+ * tree(UseInstalledBuildInTree) and on a system(UseInstalledBuild).
+ */ 
+#ifndef UseInstalledBuild
+#define UseInstalledBuild NO
+#endif
+#ifndef UseInstalledBuildInTree
+#define UseInstalledBuildInTree NO
+#endif
+
+#if UseInstalledBuild || UseInstalledBuildInTree
+#ifndef UseAltBuildScheme
+#define UseAltBuildScheme YES
+#endif
+#else
+#ifndef UseAltBuildScheme
+#define UseAltBuildScheme NO
+#endif
+#endif
+
+/* step name to use for BuildInstall rules in cde.rules.
+ * The step name can be all or binstall. Default is binstall.
+ * This has the effect of requiring users to "make binstall" to
+ * install built clients, libraries or headers.
+ */
+#ifndef InstStep
+#define InstStep binstall
+#endif
+#ifndef BDestDir
+#define BDestDir binstall
+#endif
+#ifndef BInstallTop
+#define BInstallTop /tmp/binstall
+#endif
+#ifndef BInstallCmd
+#define BInstallCmd /etc/install
+#endif
+#ifndef CloneCmd
+#define CloneCmd /x/cdesrc/admin/bin/fnrclone -n
+#endif
+#ifndef BInstallDate
+#define BInstallDate /**/
+#endif
+
+/** macros for -L paths for libraries **/
+/** Also -I for includes **/
+/** CDELIBPATH and ALLXLIBPATH only have make macro equivalents **/
+#ifndef ExtraLibPath
+#define ExtraLibPath /**/
+#endif
+#ifndef CDELibPath
+#define CDELibPath -L$(BINSTALL_LIBDIR)
+#endif
+#ifndef AllXLibPath
+#define AllXLibPath -L$(USRLIBDIR)
+#endif
+
+
+/* vendors should set library macros in *Lib.tmpl */
+#ifndef UseVendorLibraryDefinitions
+#define UseVendorLibraryDefinitions NO
+#endif
+
+#endif /* BeforeCdeImakeTmpl */
+/***************** END CPP DEFINITION SECTION OF THIS FILE *************/
+
+
+/***************** BEGIN MAKE MACRO SECTION OF THIS FILE *************/
+#ifdef AfterCdeImakeTmpl
+
+CLONE = CloneCmd
+
+/****************************************************************************
+ * Set Macro for default target for *BuildInstall Rules
+ * The cpp macro instep is defined in cde.Imake.tmpl.defs.
+ ****************************************************************************/
+INST_STEP = InstStep
+BDESTDIR = BDestDir
+BINSTALL = BInstallCmd
+BINSTALLTOP = BInstallTop
+BINSTALLDATE = BInstallDate
+/* UseInstalled Build must be given first choice in setting these macros
+ */
+#if UseInstalledBuild /* system binstall */
+BINSTALLPATH = $(BINSTALLTOP)$(BINSTALLDATE)
+BINSTALL_LIBDIR = $(TOP)/lib
+BINSTALL_INCDIR = $(TOP)/include
+BINSTALL_BINDIR = $(TOP)/bin
+BINSTALL_MISCDIR = $(TOP)/misc
+#else  /* UseInstalledBuildInTree */
+BINSTALLPATH = $(TOP)/$(BDESTDIR)
+BINSTALL_LIBDIR = $(BINSTALLPATH)/lib
+BINSTALL_INCDIR = $(BINSTALLPATH)/include
+BINSTALL_BINDIR = $(BINSTALLPATH)/bin
+BINSTALL_MISCDIR = $(BINSTALLPATH)/misc
+#endif /* UseInstalled Build */
+
+/*****************************************************************************
+ *       SET DEFAULT LIBRARY PATHS
+ *
+ * This section sets the default -L paths used(if any) for client linking.
+ * The notion is that developers set but do not check-in FIRST_LIBPATH
+ * on the command line or localmacros. It is a recursive macro that will
+ * propagate to subdirectories. EXTRA_LIBPATH is for Imakefile -L
+ * entries. It does not propagate to subdirectories. CDE_LIBPATH is
+ * set to -L the cde libraries or is NULL if the old scheme of finding
+ * libraries in their build directory is used(UseAltBuildScheme NO).
+ * ALLX_LIBPATH contains -L entries for the standard X libraries.
+ *
+ * FIRST_LIBPATH - User generated -L entries. recursive in subdirectories.
+ * EXTRA_LIBPATH - Imakefile -L entries. non-recursive.
+ * CDE_LIBPATH - Cde library -L paths. non-recursive.
+ * ALLX_LIBPATH - X library -L paths. non-recursive.
+ * ALL_LIBPATH - all -L paths; activated by client link rules.
+ *
+ */
+EXTRA_LIBPATH = ExtraLibPath
+
+/* The following would be null under the old build scheme where
+ * each library path is explicitly listed.
+ */
+#if UseAltBuildScheme
+/* location of cde libraries */
+CDE_LIBPATH = CDELibPath /* may need to be set for each architecture */
+ALLX_LIBPATH = AllXLibPath /* may need to be set for each architecture */
+#endif
+
+ALL_LIBPATH = $(FIRST_LIBPATH) $(EXTRA_LIBPATH) $(CDE_LIBPATH) $(ALLX_LIBPATH)
+
+
+
+
+/*****************************************************************************
+ *       SET DEFAULT INCLUDE PATHS
+ *
+ * This section sets the default includes that will automatically appear
+ * on the compile line. These definitions can be overridden or voided
+ * (by setting MACRONAME = ) inside an individual Imakefile or on the 
+ * make command line.  There are a separate set of macros for C++.
+ *
+ * A description of the include macros:
+ * ALLINCLUDES combines all of the includes below.
+ *
+ * FIRST_INCLUDES are not meant to be checked into Imakefiles.
+ * 	This is for user use so that he can override -I entries
+ *      on the command line or in localmacros.
+ *      e.g make FIRST_INCLUDES="-Ifoobar -Ifoo/foo2"
+ * INCLUDES contains client-specific includes set in Imakefile.
+ * EXTRA_INCLUDES contains architecture client-specific includes set in 
+ *                Imakefile.
+ *
+ * TOP_INCLUDES specifies how to get to generic includes including 
+ *     /usr/include or its build substitute.
+ *     It is built from:
+ *     XINCLUDES - the standard X include paths.
+ *     TREE_INCLUDES - the build tree top and top/X11 headers.
+ *     CDEINCLUDES - the generic cde includes. Usually either 
+ *         $(TOP)/X11/cde1 or $(BINSTALLPATH)/opt/dt/include.
+ * 
+ * STD_INCLUDES contains system-specific includes (Default in Imake.tmpl).
+ *
+ * ALL++INCLUDES combines all of the below. The difference between
+ * ALL++INCLUDES and ALLINCLUDES is that, on RsArchitecture, the
+ * standard X headers have been converted to C++.
+ * 
+ * C++INCLUDES - Usually the default C++ include PATH.
+ * 
+ ****************************************************************************/
+ALLINCLUDES = $(FIRST_INCLUDES) $(INCLUDES) $(EXTRA_INCLUDES) $(TOP_INCLUDES) $(STD_INCLUDES)
+TOP_INCLUDES = $(TREE_INCLUDES) $(CDEINCLUDES) $(XINCLUDES)
+ALL++INCLUDES = $(FIRST_INCLUDES) $(INCLUDES) $(EXTRA_INCLUDES) $(TOP++_INCLUDES) $(STD_INCLUDES)
+TOP++_INCLUDES = $(TREE_INCLUDES) $(CDEINCLUDES) $(C++INCLUDES) $(X++INCLUDES)
+
+CDEINCLUDES = -I$(DTINCLUDESRC)
+
+#if UseAltBuildScheme
+TREE_INCLUDES =  -I$(BINSTALL_INCDIR) -I$(BINSTALL_INCDIR)/Misc
+CDEINCLUDES =
+#else
+TREE_INCLUDES = -I$(TOP) -I$(TOP)/X11 /* Use the build tree headers */
+#endif
+
+/* X include paths differ from architecture to architecture */
+XINCLUDES = -I$(INCROOT) -I$(INCROOT)/X11 -I$(INCROOT)/X11/extensions
+X++INCLUDES = $(XINCLUDES)
+
+#ifdef UXPArchitecture
+XINCLUDES = -I$(INCROOT)/X11 -I$(INCROOT)/X11/extensions
+X++INCLUDES = $(XINCLUDES)
+#endif
+
+#ifdef HPArchitecture
+XINCLUDES = -I$(INCROOT)/$(X11LINKENV) -I$(INCROOT)/$(X11LINKENV)/X11 \
+	       -I$(INCROOT)/$(X11LINKENV)/X11/extensions
+#endif
+#ifdef RsArchitecture
+XINCLUDES = -I$(INCROOT) -I$(INCROOT)/X11 -I$(INCROOT)/X11/ext
+X++INCLUDES = $(C++INCLUDES)/X11 $(C++INCLUDES)/X11/ext
+#endif /* Rs */
+
+/* This should be moved to cdeProject.tmpl when it exists */
+/* Set the local top for directories that build both libraries and
+ * clients. This is so these clients can find local versions of their
+ * libraries and not the exported version.
+ */
+#if UseAltBuildScheme
+LOCAL_TTLIB_DIR = $(BINSTALL_LIBDIR) /* tooltalk */
+LOCAL_DTMAILLIB_DIR = $(BINSTALL_LIBDIR) /* tooltalk */
+LOCAL_MOTIFAPPLIB_DIR = $(BINSTALL_LIBDIR) /* tooltalk */
+#else
+LOCAL_TTLIB_DIR = $(TTSRC)/lib
+LOCAL_DTMAILLIB_DIR = $(DTMAILSRC)/libDtMail /* tooltalk */
+LOCAL_MOTIFAPPLIB_DIR = $(DTMAILSRC)/MotifApp /* tooltalk */
+#endif
+
+#endif /* AfterCdeImakeTmpl */

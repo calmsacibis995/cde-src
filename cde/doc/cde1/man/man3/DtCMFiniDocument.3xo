@@ -1,0 +1,54 @@
+.TH DtCMFiniDocument 3 "17 January 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH "NAME"
+DtCMFiniDocument \- finish access to a Cde container document
+.SH "SYNOPSIS"
+.yS
+#include <Bento/DtCM.h>
+.sp 0.5v
+.ta \w'void DtCMFiniDocument('u
+void DtCMFiniDocument(DtCMDocument \f2document\fP,
+	CMEnv *\f2error\fP);
+.yE
+.SH "DESCRIPTION"
+The
+.Fn DtCMFiniDocument
+function terminates operations on a Cde container document.
+This function does not close the container, but updates any
+document-related information that has changed
+in the root object.
+The application must call this function if the container
+has been updated, but not before
+.Fn CMRCloseContainer .
+.P
+The
+.I document
+argument is a document handle created by the
+.Fn DtCMInitDocument 3
+function.
+The
+.I error
+argument is a pointer to an error return structure.
+.SH "RETURN VALUE"
+The
+.Fn DtCMFiniDocument
+function returns no value.
+If an error occurs,
+.Fn DtCMFiniDocument
+sets the major code in the
+.I error
+structure to
+.Cn USER_EXCEPTION ,
+and the application can use the
+.Fn CMRexception_number
+function to determine the minor code.
+See the Error API Appendix in the \*(ZB.
+.SH "SEE ALSO"
+.Fn DtCMInitDocument 3,
+.Hd Bento/DtCM.h 5;
+.Fn CMRCloseContainer ,
+.Fn CMRexception_number
+in the \*(ZB.

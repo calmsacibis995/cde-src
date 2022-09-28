@@ -1,0 +1,90 @@
+# %%  (c) Copyright 1993, 1994 Hewlett-Packard Company			
+# %%  (c) Copyright 1993, 1994 International Business Machines Corp.	
+# %%  (c) Copyright 1993, 1994 Sun Microsystems, Inc.			
+# %%  (c) Copyright 1993, 1994 Novell, Inc. 				
+# %%  $Revision: $ 			 				
+#ifdef HideFromImake
+ #
+ # IMakeFile 1.5	07 Sep 1993
+ #
+ # This preamble turns this imakefile into a shell script which will
+ # create/update this directory's makefile when invoked as follows:
+ # % sh IMakeFile [[GNU]MakeFile]
+ #
+IMAKEDIR=../imake; export IMAKEDIR
+exec make -f $IMAKEDIR/Boot.mk ${1+"$@"}
+#endif HideFromImake
+
+TT_DIR	= ..
+SUB-DIRS = tttk mp db util api
+
+include $(TT_DIR)/Make.macros
+
+#include "mp/IMakeFile.conf"
+#include "db/IMakeFile.conf"
+#include "util/IMakeFile.conf"
+#include "api/c/IMakeFile.conf"
+#include "api/dnd/IMakeFile.conf"
+#include "tttk/IMakeFile.conf"
+
+mp-DIR	= mp/
+db-DIR	= db/
+util-DIR= util/
+c-DIR	= api/c/
+dnd-DIR	= api/dnd/
+tttk-DIR= tttk/
+
+all: proto_O
+
+DynamicOptimizedObjects(mp)
+DynamicOptimizedObjects(db)
+DynamicOptimizedObjects(util)
+DynamicOptimizedObjects(c)
+DynamicOptimizedObjects(dnd)
+DynamicOptimizedObjects(tttk)
+
+tt_OBJECTS_PIC_O =		\
+	$(mp_OBJECTS_PIC_O)	\
+	$(db_OBJECTS_PIC_O)	\
+	$(util_OBJECTS_PIC_O)	\
+	$(c_OBJECTS_PIC_O)	\
+	$(dnd_OBJECTS_PIC_O)	\
+	$(tttk_OBJECTS_PIC_O)
+
+LDLIBS_glob	=
+LDLIBS_SunOS5	=	-lnsl -lsocket -lintl -ldl -lc
+LDLIBS_loc	=	$(LDLIBS_$(OS))
+LDLIBS		=	$(LDLIBS_glob$(LDLIBS_loc))$(LDLIBS_loc)
+
+LibDynamicOptimized(tt)
+
+proto_O: $(PROTO_DIR)/lib/DynamicOptimizedLib(tt)
+
+install_O:: $(INSTALL_DIR)/lib/libtt.so$(XSO)
+
+$(tt_OBJECTS_PIC_O):
+	@true
+
+All:: $(MAKEFILE)s all
+All subdirs-all install_O clean cleaner clean.mk::
+	for dir in $(SUB-DIRS) ; do \
+		(cd $$dir; $(MAKE) $(MAKE_FLAGS) $(@:subdirs-%=%)) \
+	done
+
+single_colon_subdirs-all: subdirs-all
+
+/**/# 
+/**/# Make the library in a separate invocation, so
+/**/# that we don't relink it even when it's not out of date.
+/**/# 
+/**/# GNU make chokes on the way this rule *should* be done:
+/**/#
+/**/#recursive-%: subdirs-all
+recursive-$(OEUVRE)/pic/O/%: single_colon_subdirs-all
+	$(MAKE) $(MAKE_FLAGS) $(@:recursive-%=%)
+
+$(INSTALL_DIR)/lib/%: recursive-$(OEUVRE)/pic/O/%
+	$(TTINSTALL) $(@D) $(<:recursive-%=%)
+
+$(PROTO_DIR)/lib/%: recursive-%
+	$(TTINSTALL) $(@D) $(<:recursive-%=%)

@@ -1,0 +1,166 @@
+.\" *************************************************************************
+.\" **
+.\" ** (c) Copyright 1993,1994 Hewlett-Packard Company 
+.\" **      All Rights Reserved.
+.\" **
+.\" ** (c) Copyright 1993,1994 International Business Machines Corp. 
+.\" **      All Rights Reserved.
+.\" **  
+.\" ** (c) Copyright 1993,1994 Sun Microsystems, Inc.
+.\" **      All Rights Reserved.
+.\" **
+.\" *************************************************************************
+.\"---  Client man page template
+.\"---  This is a template for doing a client man page.  For further information
+.\"---  about the markup, see the general template from which this was obtained.
+.\"---   It is in file man_template.
+.\"--- 
+.\"---
+.\"----------------------------------------------------------------------------
+.\"----------------------------------------------------------------------------
+.TH dtexec 1X "12 Apr 1994"
+.BH \*(DT
+.\"---
+.\"----------------------------------------------------------------------------
+.SH NAME
+\fBdtexec\fP \(em A "wrapper" program for \fBCOMMAND\fP actions.
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- SYNOPSIS 
+.\"--- This section is a syntax diagram.  
+.\"---
+.SH SYNOPSIS
+.B dtexec
+[
+.B \-open
+.I open_option
+]
+[
+.B \-ttprocid
+.I procid
+]
+[
+.B \-tmp
+.I tmpfile
+]
+.I cmd
+[
+.I cmd_arg ...
+]
+.LP
+.nf
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- DESCRIPTION 
+.\"--- This section tells concisely what the command does 
+.\"---
+.SH DESCRIPTION
+The \fBdtexec\fP utility is used by the action invocation layer within the 
+Common Desktop Environment (CDE) to manage \fBCOMMAND\fP actions.  In normal
+usage \fBdtexec\fP is invoked automatically by CDE when it is needed.  Users
+and administrators of CDE do not need to interact directly with \fBdtexec\fP.
+.PP
+The primary argument for \fBdtexec\fP is the name of a command to execute 
+and any command-line options or arguments for that command.  There are 
+several important services that \fBdtexec\fP provides for the commands 
+that it executes.  These services are controlled via the options that
+are specified below.
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- OPTIONS
+.\"--- This section describes the command line options
+.\"---
+.SH OPTIONS
+.TP
+.\"----------------------------------------------------------------------------
+.BI \-open " open_option" 
+The \fB-open\fP option tells dtexec whether it should continue to run or 
+exit after the command terminates.  This option is used when
+COMMAND actions are executed in a terminal emulator to control
+the lifetime of the terminal window.  The legal values for 
+\fIopen_option\fP are:
+.PP
+\fB-1\fP - (default) continue to execute after \fIcmd\fP terminates, thus
+keeping the terminal window open
+.PP
+\fB0\fP - exit as soon as \fIcmd\fP terminates, thus allowing the terminal
+window to close
+.PP
+\fBn\fP - continue to execute if \fIcmd\fP terminates
+within \fBn\fP seconds of starting. 
+.\"----------------------------------------------------------------------------
+.TP
+.BI \-ttprocid " procid"
+The \fB-ttprocid\fP option is used by dtexec to send ToolTalk messages
+back to the application that invoked the COMMAND action.  These
+messages are used to convey status information (e.g. the command
+has terminated) and support calls such as DtActionQuit().
+.\"----------------------------------------------------------------------------
+.TP
+.BI \-tmp " tmpfile"
+The \fB-tmp\fP option names a temporary file that dtexec will remove after
+\fIcmd\fP terminates if either no -ttprocid option is supplied or contact
+is lost with the specified procid.
+In normal usage this cleanup is performed by the parent process that 
+starts dtexec and not by dtexec.
+ This option can be issued multiple times, once for each tmp file present.
+.PP
+N.B. It is typical that \fItmpfile\fP also appears as a \fIcmd_arg\fP.
+.\"--- ------------------------------------------------------------
+.\"--- Return Value
+.\"---
+.SH RETURN VALUE
+\fBdtexec\fP returns 0 if successful; otherwise it returns 1.
+Successful return from dtexec implies system resources were available
+to fork and exec the requested command, not that the requested command
+itself executed successfully.
+.\"--- ------------------------------------------------------------
+.\"--- Resources
+.\"---
+.SH RESOURCES
+\fBdtexec\fP is not an X client and has no windows or resources of its
+own.  It's behavior can be modified by setting resources in the
+CDE components that invoke actions.  The following component
+resource classes and resource names will effect the behavior of
+Dtexec:
+
+\fBWaitTime\fP or \fBwaitTime\fP -- if a command terminates in less
+than \fBWaitTime\fP seconds then the terminal emulator window will be
+kept open.  The default \fBWaitTime\fP is 3 seconds.
+
+\fBDtexecPath\fP or \fBdtexecPath\fP -- specifies the location of the
+\fBdtexec\fP executable.  The default location is "/opt/dt/bin/dtexec".
+
+\fBLocalTerminal\fP or \fBlocalTerminal\fP -- specifies the name of
+the terminal emulator which will be used when invoking actions that
+require a terminal interface.  The terminal emulator must support
+the following options:
+
+-n icon-name 
+-title window-title
+-geometry <W+H+/-X+/-Y>
+-name resource-name
+-e execute-string
+
+The default value of this resource is "dtterm" the CDE Terminal
+Emulator.  For example, if you want the CDE File Manager to keep
+terminal windows open for actions that complete in less than 5
+seconds, set the following resource:  "Dtfile*WaitTime:  5".  If
+you want all CDE clients to use a custom version of \fBdtexec\fP
+called mydtexec set the following resource:  "*dtexecPath: /foo/mydtexec".
+If you want the \fBdtaction\fP client to use "xterm" instead
+of "dtterm" for the terminal emulator then set the following
+resource:  "dtaction*localTerminal:  xterm".
+.\"--- ------------------------------------------------------------
+.\"--- Notes
+.\"---
+.SH NOTES
+.PP
+This program is not normally invoked directly by application
+programs.  Normally an application program will link with the
+Desktop Services Library (DtSvc) which will then invoke \fBdtexec\fP
+as needed.
+.PP
+As mentioned above, an application program can set its
+\fIwaitTime\fP and \fIDtexecPath\fP resources to affect the behavior
+of DtSvc library invocations of \fIdtexec\fP.

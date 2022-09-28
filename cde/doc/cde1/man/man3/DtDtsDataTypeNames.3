@@ -1,0 +1,279 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+.\"--- Substitute the appropriate text for items beginning and ending with `_'
+.\"--- (for example, _TITLE_ and _name_).  \-option_ items begin with
+.\"--- `\-' (en-dash) and end with `_'.  Do not delete the `\-' characters.
+.\"--- Be sure to use upper or lower case indicated for each item.
+.\"---
+.\"--- You need only use the parts of this template appropriate for your
+.\"--- particular man page.  Delete the parts that aren't pertinent.
+.\"---
+.\"--- If your man page is copyrighted, please preserve the copyright
+.\"--- notice.
+.\"---
+.\"--- For CDE: The following sections are mandatory: Page Heading, NAME
+.\"--- CONFIGURATION (section 7 only), SYNOPSIS, PROTOCOL (section 3R only),
+.\"--- DESCRIPTION, IOCTLS (section 7 only), OPTIONS, RETURN VALUES,
+.\"--- ENVIRONMENT (if applicable), FILES, SEE ALSO
+.\"---
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- The following line is an instruction which insures that any
+.\"--- preprocessors applied to the man page will be invoked in the proper
+.\"--- order.  `t' refers to tbl, `e' refers to eqn and `p' refers to pic.
+.\"--- Only include those necessary for your particular man page.
+.\"--- IF THERE AE NONE DELETE THIS LINE!
+.\"---
+'\" tep
+.\"---
+.\"----------------------------------------------------------------------------
+.\"--- THIS IS NOT NECESSARY FOR CDE:
+.\"--- The next line is the SCCS ID line, which must appear in any file
+.\"--- under the control of SCCS.  It contains extraneous zero-width characters
+.\"--- `\&' to prevent SCCS from interpreting it as the SCCS line for this
+.\"--- template file.  Executing this template will produce a version of the
+.\"--- template with these characters removed, thereby generating a valid
+.\"--- SCCS line ID for your man page.
+.\"---
+.\"--- _source_ is where the page comes from, for example, "UCB 4.3 BSD"
+.\"--- or "S5r3".  For Sun-originated pages, the "from" information may
+.\"--- omitted.
+.\"---
+.\" %\&Z%%\&M% %\&I% %\&E% SMI; from _source_
+.\"---
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- PAGE HEADING
+.\"--- This section provides information for the header and footer of the man
+.\"--- page.  _title_ the name of the man page.  This should correspond to the
+.\"--- first word in the NAME line.  _#S_ specifies the manual section in 
+.\"--- which the page will appear, where # is the number of the section and 
+.\"--- S (if needed) is the letter of the subsection (S should be captalized).
+.\"--- The _Month_ should be abbreviated (Sep.\"--- Oct).
+.\"--- Include the last changed date in both _TH_ and _BH_.
+.\"--- 
+.\"---
+.TH DtDtsDataTypeNames 3 "15 Dec. 1993"
+.BH "15 Dec. -1993"
+.\"---
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- NAME
+.\"--- This section is used by cross-referencing programs.  Hence, do not
+.\"--- use any font changes or troff escape sequences in this section.
+.\"--- The _summary-line_ is brief, all on one line.
+.\"---
+.SH NAME
+DtDtsDataTypeNames \- get a list of available DataTypes.
+.\"---
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- SYNOPSIS 
+.\"--- This section is a syntax diagram.  Use the following lines for pages in
+.\"--- manual Sections 1, 1M, 5 and 8:
+.\"---
+.SH SYNOPSIS
+.\"---
+.\"--- Use the following lines for pages in manual Sections 2, 3, 5 and 7: 
+.\"---
+.LP
+.nf
+.ft 3
+#include <Dt/Dts.h>
+.sp .5v
+.B
+
+
+char		**DtDtsDataTypeNames(void);
+
+
+.ft 1
+.fi
+.\"---
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- DESCRIPTION 
+.\"--- This section tells concisely what the command (function, device or
+.\"--- file format) does.  Do not discuss options or cite examples.
+.\"---
+.SH DESCRIPTION
+.\"---
+.\"--- The _1st_index_term_ and _2nd_index_term_ will appear in the manual
+.\"--- index.  _format_of_1st_ and _format_of_2nd_ specify formatting for
+.\"--- these index entries.
+.\"---
+.IX "_1st_index_term_" "_2nd_index_term_" "_format_of_1st_" "_format_of_2nd_"
+.LP
+
+DtDtsDataTypeNames Returns a list of all available datatypes that is currently loaded into the DataTypes database. Call DtDtsFreeDataTypeNames to release the memory for the returned value
+
+
+.\"---
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- RETURN VALUES
+.\"--- This section appears in pages from Sections 2 and 3 only.
+.\"--- List the _values_ that the function returns and give _explanations_.
+.\"---
+.SH "RETURN VALUES"
+.TP 15
+DtDtsDataTypeNames Returns a NULL terminated array of character
+pointers of DataTypes.
+
+.\"---
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- EXAMPLES
+.\"--- This section gives examples of how to use the command (function
+.\"--- or file format).  Always preface an example with an _introduction_.
+.\"--- If there are multiple examples, use separate subsection headings
+.\"--- for each _example-type_.  Otherwise, omit these headings.
+.\"---
+.SH EXAMPLES
+.SS Simple-FileTyping
+.LP
+This example takes a list of files as arguments and determines the Description
+of that datatype.
+.LP
+.RS
+.ft 3
+.nf
+
+#include <Dt/Dts.h>
+
+#define	ATTRIBUTE	"DESCRIPTION"
+
+main(int argc, char **argv)
+{
+	char	*attribute;
+
+	/* load datatypes database */
+	DtDtsLoadDataTypes();
+
+	argv++;
+	while(*argv) {
+		/* get attribute for file */
+		attribute = DtDtsFileToAttributeValue(*argv, ATTRIBUTE);
+
+		if(attribute) {
+			printf("%s: %s\n", *argv, attribute);
+		}
+		argv++;
+	}
+	DtDtsRelease();
+	exit(0);
+}
+
+.fi
+.ft
+.RE
+.LP
+.SS Simple-DataTyping
+.LP
+This example takes a list of files as arguments and determines the Description
+and Actions of for that file.
+.LP
+.RS
+.ft 3
+.nf
+
+#include <Dt/Dts.h>
+
+#define	ATTRIBUTE1	"DESCRIPTION"
+#define	ATTRIBUTE2	"ACTIONS"
+
+main(int argc, char **argv)
+{
+	char	*attribute;
+	char	*datatype;
+
+	/* load datatypes database */
+	DtDtsLoadDataTypes();
+
+	argv++;
+	while(*argv) {
+		/* get datatype file file */
+		datatype = DtDtsFileToDataType(*argv);
+
+		/* get first attribute for datatype */
+		attribute = DtDtsDataTypeToAttributeValue(datatype,
+					ATTRIBUTE1, *argv);
+		if(attribute) {
+			printf("%s for file %s is %s\n",
+				ATTRIBUTE1, *argv, attribute);
+		}
+
+		/* get second attribute for datatype */
+		attribute = DtDtsDataTypeToAttributeValue(datatype,
+					ATTRIBUTE2, NULL);
+		if(attribute) {
+			printf("%s for file %s is %s\n",
+				ATTRIBUTE2, *argv, attribute);
+		}
+		argv++;
+	}
+	DtDtsRelease();
+	exit(0);
+}
+
+.fi
+.ft
+.RE
+.LP
+.\"---
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- SEE ALSO
+.\"--- This section lists references to other man pages, in-house
+.\"--- documents and other publications.
+.\"---
+.SH "SEE ALSO"
+.BR DtDtsLoadDataTypes (3),
+.BR DtDtsDataToDataType (3),
+.BR DtDtsFileToDataType (3),
+.BR DtDtsFileToAttributeList (3),
+.BR DtDtsFileToAttributeValue  (3),
+.BR DtDtsBufferToDataType (3),
+.BR DtDtsBufferToAttributeList (3),
+.BR DtDtsBufferToAttributeValue (3),
+.BR DtDtsDataTypeToAttributeList (3),
+.BR DtDtsDataTypeToAttributeValue (3),
+.BR DtDtsFreeDataType (3),
+.BR DtDtsFreeAttributeList (3),
+.BR DtDtsFreeAttributeValue (3),
+.BR DtDtsRelease (3),
+.BR DtDtsDataTypeNames (3),
+.BR DtDtsFindAttribute (3),
+.BR DtDtsFreeDataTypeNames (3),
+.BR DtDtsSetDataType (3),
+.BR DtDtsDataTypeIsAction (3),
+.BR DtActionLabel (3),
+.BR DtActionDescription (3),
+.BR DtActionExists (3),
+.BR DtActionInvoke (3),
+.BR dtdtfile (3),
+.BR DtDndDropRegister (3),
+.BR dtcreateaction (1),
+.BR dttypes (1),
+.\"---
+.\"--- >>DO NOT USE TZ MACRO FOR CDE MAN PAGES<< Use _TZ-macro-abbreviations_ 
+.\"--- to list in-house documents
+.\"--- (for example, "SUNDIAG" for "Sundiag User's Guide").
+.\"--- Refer to /usr/doctools/tmac/tz.map or the Man Page Spec. Appendix B
+.\"--- for a list of available arguments.
+.\"---
+.\".LP
+.\".TZ _TZ-macro-abbreviation_
+.\".LP
+.\"---
+.\"--- Use this format for listing publications:
+.\"---
+.\"_Author_,
+.\".I "_Outside-Doc-Title_,"
+.\"_Year-by-Holder_, _Publisher_.
+.\"---
+.\"----------------------------------------------------------------------------
+

@@ -1,0 +1,56 @@
+#!/bin/sh
+
+CAT=/bin/cat
+NAWK=/usr/bin/nawk
+PKGINFO=/bin/pkginfo
+PKGRM=/usr/sbin/pkgrm
+
+
+#
+# Append dtterm info to the end of termcap
+#
+
+FILE=$BASEDIR/share/lib/termcap
+
+#
+# check for existence of "$BASEDIR/share/lib/termcap"
+#
+    if [ ! -f $FILE ]   # highly unlikely
+    then
+        echo "" >$FILE
+    fi
+
+#
+# see if dtterm's entry already exists. Note that if dtterm cap info
+# is embedded in another block in termcap, the new block we add won't
+# override the info in the first block.
+#
+
+$NAWK '{if ($1 == "dtterm:\\")
+            print $0 > "/tmp/dtterm-already-there"
+
+     }' $FILE >/dev/null
+
+if [ ! -f /tmp/dtterm-already-there ]
+    then
+        $CAT $BASEDIR/dt/config/dtterm.tc >> $BASEDIR/share/lib/termcap
+    else
+        rm /tmp/dtterm-already-there
+fi
+
+
+#
+# Run terminfo translater
+#
+
+if  [ -x /usr/bin/tic ]
+then
+	TERMINFO=$BASEDIR/share/lib/terminfo /usr/bin/tic $BASEDIR/dt/config/dtterm.ti
+
+	if [ $? -eq 0 ]
+	then
+                exit 0
+        else
+                exit 1
+        fi
+fi

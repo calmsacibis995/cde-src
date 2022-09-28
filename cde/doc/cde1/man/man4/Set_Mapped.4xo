@@ -1,0 +1,63 @@
+.TH Set_Mapped 4 "13 May 1994"
+.SH NAME
+Set_Mapped request \- set whether a tool is mapped to the screen
+.SH SYNOPSIS
+.yS
+.ta \w@Set_Mapped(@u
+Set_Mapped(in boolean \f2mapped\fP
+	[in messageID \f2commission\fP]);
+.yE
+.SH DESCRIPTION
+The
+.I Set_Mapped
+request
+sets the mapped state of the optionally specified
+window, or of the window primarily associated with the handling
+procid (if no window is specified).
+.P
+The
+.I mapped
+argument
+is a Boolean value indicating whether the specified window is (to be)
+mapped to the screen.
+.P
+The
+.I commission
+argument
+is the ID of the ongoing request, if any, that resulted in the creation
+of the window in question.
+.SH "APPLICATION USAGE"
+The
+.Fn ttdt_session_join 3,
+and
+.Fn ttdt_message_accept 3,
+functions can be used by Xt applications to register for,
+and transparently process, the
+.I Set_Mapped
+request.
+.SH EXAMPLES
+The
+.I Set_Mapped
+request can be sent as in the following example:
+.Cs I
+Tt_message msg = tttk_message_create(0, TT_REQUEST, TT_SESSION,
+			the_recipient_procid, TTDT_SET_MAPPED,
+			my_callback);
+tt_message_iarg_add(msg, TT_IN, Tttk_boolean, 1);
+tt_message_send(msg);
+.Ce
+.cdes 
+.SH WARNINGS
+.I Set_Mapped
+can also be sent as a multicast notice, as an
+.I edict 
+to all tools in the scope of the message.
+The consequences of doing so can be severe and unexpected.
+.cdee
+.SH "SEE ALSO"
+.Fn tt_message_iarg_add 3,
+.Fn tt_message_send 3,
+.Fn ttdt_message_accept 3,
+.Fn ttdt_session_join 3;
+.I Get_Mapped
+request.

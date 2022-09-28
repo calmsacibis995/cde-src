@@ -1,0 +1,184 @@
+.\" *************************************************************************
+.\" **
+.\" ** (c) Copyright 1993,1994 Hewlett-Packard Company 
+.\" **      All Rights Reserved.
+.\" **
+.\" ** (c) Copyright 1993,1994 International Business Machines Corp. 
+.\" **      All Rights Reserved.
+.\" **  
+.\" ** (c) Copyright 1993,1994 Sun Microsystems, Inc.
+.\" **      All Rights Reserved.
+.\" **
+.\" *************************************************************************
+.\"---  Client man page template
+.\"---  This is a template for doing a client man page.  For further information
+.\"---  about the markup, see the general template from which this was obtained.
+.\"---   It is in file man_template.
+.\"--- 
+.\"---
+.\"----------------------------------------------------------------------------
+.\"----------------------------------------------------------------------------
+.TH dtaction 1X "17 Jan 1994"
+.BH \*(DT
+.\"---
+.\"----------------------------------------------------------------------------
+.SH NAME
+\fBdtaction\fP \(em a general purpose tool for allowing arbitrary applications
+or shell scripts to invoke a Common Desktop Environment (CDE) action request.
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- SYNOPSIS 
+.\"--- This section is a syntax diagram.  
+.\"---
+.SH SYNOPSIS
+.B dtaction 
+.\"---
+.\"--- For \-options_ with arguments, use:
+.\"---
+[
+.B \-option
+.I _option_arg_ 
+] ... \fIaction_name\fP [ \fIaction_arg\fP ] ...
+.LP
+.nf
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- DESCRIPTION 
+.\"--- This section tells concisely what the command does 
+.\"---
+.SH DESCRIPTION
+\fBDtaction\fP provides a mechanism by which applications or shell scripts,
+which are otherwise not connected into the communications medium used by the
+unity components, can participate in the invocation of action requests.
+.P
+The action called \fIaction_name\fP will be invoked with the \fIaction_args\fP
+provided on the command line.  A single \fIaction_name\fP is required, 
+any number of \fIaction_args\fP may be provided.  Interpretation of the 
+\fIaction_namefP and \fIaction_args\fP depends on the definition of the
+action in the action database (see dtdtfile(4)).  the action may be
+defined either in one of the system action database files, or in one of
+the user's private action database files.
+.PP
+Typically \fIaction_args\fP
+refer to file names, which may be given using \fI[host:]/path/file\fP
+syntax.or simply as a relative path; a relative path is assumed to be relative
+to the current working directory for the \fBdtaction\fP client. This list of
+files will be passed on to the specified action.
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- OPTIONS
+.\"--- This section describes the command line options
+.\"---
+.SH OPTIONS
+.TP
+.BI \-user " user_name"
+The \fB-user\fP option allows a user name to be specified; if \fBdtaction\fP
+is not currently running as that user, then a prompt dialog will be used to
+collect either the password for the indicated user, or the root user password.
+Once a valid password has been entered, the dtaction client will change so
+that it is running as the requested user, and will then initiate the requested
+action. Anytime the dtaction client changes to run as a different user, it
+will be logged in the file: \fI/usr/adm/sulog\fP.
+.TP
+.BI \-execHost " host_name"
+This option can be used to specify an alternate execution host,
+\fIhost_name\fP, for a command action. If the action is not a command
+action, then this option is ignored. The action will be attempted on
+\fIhost_name\fP before any of the hosts specified in the action's
+\fBEXEC_HOST\fP ( see dtdtfile(4)) specification.
+An error dialog will be posted if it is not possible to invoke the
+specified action on any eligible host.
+.TP
+.BI \-contextHost " context_host"
+For command actions, if the definition of \fIaction_name\fP does not define
+a current-working-directory  (see \fBCWD\fP in dtdtfile(4)) then this option
+can be used to specify a default host context, \fIcontext_host\fP, with respect
+to whose filesystem file arguments (i.e. \fIaction_args\fP ) will be
+interpreted. That is, file names will be modified so as to locate files
+with respect to the root of \fIcontext_host\fP's filesystem.  This is 
+useful for accessing files which are only visible on a particular host.
+.TP
+.BI \-contextDir " context_dir"
+For command actions, if the definition of \fIaction_name\fP does not define
+a current-working-directory (see \fBCWD\fP in dtdtfile(4)) then this option
+can be used to specify a default directory context.
+.TP
+.BI \-termOpts " terminal_parameters"
+This option allows the user to specify parameters intended for the terminal
+emulator provided for command actions which are not of type \fBNO-STDIO\fP.
+If there are white space characters in the terminal_parameters string then
+that string must be quoted to protect it from the shell. These parameters will
+be passed unchanged to the terminal emulator. It is up to the user to insure
+that they are reasonable; in particular the "-e " parameter is disallowed
+in \fIterminal_parameters\fP.
+.TP
+.BI \-timeout " value"
+After the \fBdtaction\fP client invokes the specified action, it will remain
+alive until it no longer detects that any dialogues are posted for the user
+(i.e. error dialogs or prompt dialogues); note that this refers only to 
+dialogues displayed by the \fBdtaction\fP client, not dialogues displayed
+by the action which was invoked. By default, dtaction will check every second
+to see if it is safe to exit. A user can use this parameter to control the
+frequency that this check occurs. \fIvalue\fP is specified in seconds.
+The minimum value is 1 second. The default value is 5 seconds.
+.SH RETURN VALUES
+.TP 15
+0
+successful return.  This indicates that the action was successfully invoked
+not that any command executed by the action was successful.
+.TP 15
+-1
+failure return.  The action was not invoked successfully.
+.\"--- ------------------------------------------------------------
+.\"--- Resources
+.\"---
+.SH RESOURCES
+.PP
+The following resources are recognized by the \fBdtaction\fP client:
+.nf
+.sp
+.TS
+center expand allbox;
+c c c c.
+Name	Class	Type	Default
+=
+contextHost	ContextHost	XmRString	NULL
+contextDir	ContextDir	XmRString	NULL
+timeout	Timeout	XmRInt	5
+user	User	XmRString	NULL
+execHost	ExecHost	XmRString	NULL
+termOpts	termOpts	XmRString	NULL
+.TE
+.fi
+.PP
+Each resources corresponds to a command-line option.  See the OPTIONS
+section above for an explanation of each resource.  
+.\"--- ------------------------------------------------------------
+.\"--- Environment variables . Delete this section if not relevant
+.\"---
+.SH ENVIRONMENT
+.P
+\fBDtaction\fP itself does not deal with environment variables, see
+the CDE documentation for environment variables used by underlying
+libraries.
+.SH "SEE ALSO"
+.BR dtdtfile (4),
+.SH DIAGNOSTICS
+.P
+Error dialogues are posted when the following conditions are detected:
+.TP
+\(bu could not initialize desktop environment.
+.TP
+\(bu invalid user or password.
+.TP
+\(bu unable to change id to the desired user.
+.TP
+\(bu no action name specified.
+.SH NOTES
+.LP
+Buffer and string action arguments are not supported.
+.SH BUGS
+.LP
+Bugs? what Bugs?
+
+

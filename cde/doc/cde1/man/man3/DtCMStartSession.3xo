@@ -1,0 +1,57 @@
+.TH DtCMStartSession 3 "17 January 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+DtCMStartSession \- start the Bento session
+.SH "SYNOPSIS"
+.yS
+#include <Bento/DtCM.h>
+.sp 0.5v
+.ta \w'CMSession DtCMStartSession('u
+CMSession DtCMStartSession(CMEnv *\f2error\fP);
+.yE
+.SH "DESCRIPTION"
+The
+.Fn DtCMStartSession
+function calls
+.Fn CMRStartSession ,
+passing it the default routine metahandler.
+The application must call the
+.Fn DtCMStartSession
+function or
+.Fn CMRStartSession
+function before calling any Cde Bento function or a function
+defined in the \*(ZB.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn DtCMStartSession
+function returns a non-\c
+.Cn NULL
+pointer (a session handle).
+If an error occurs,
+.Fn DtCMStartSession
+returns
+.Cn NULL ,
+sets the major code in the
+.I error
+structure to
+.Cn USER_EXCEPTION ,
+and the application can use the
+.Fn CMRexception_number
+function to determine the minor code.
+See the Error API Appendix in the \*(ZB.
+.SH "APPLICATION USAGE"
+If an application uses a
+set of routine metahandlers other than the default, it should call
+.Fn CMRStartSession
+directly.
+.SH "SEE ALSO"
+.cde .Hd Bento/DtCM.h 5.
+.xo .Hd Bento/DtCM.h ;
+.xos
+.Fn CMRStartSession ,
+.Fn CMRexception_number ,
+and ``Session Handler Operations'' in Appendix B of the \*(ZB.
+.xoe

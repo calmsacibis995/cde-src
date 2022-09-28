@@ -1,0 +1,367 @@
+.\" ** (c) Copyright 1993, 1994 Interleaf, Inc.
+.\" **
+.\" ** Permission to use, copy, modify, and distribute this software and its
+.\" ** documentation for any purpose without fee is granted, provided that
+.\" ** the above copyright notice appear in all copies and that both copyright
+.\" ** notice and this permission notice appear in supporting documentation,
+.\" ** and that the name of Interleaf not be used in advertising or publicly
+.\" ** pertaining to distribution of the software without specific written
+.\" ** prior permission.
+.\" ** 
+.\" ** Interleaf makes no representation about the suitability of this
+.\" ** software for any purpose. It is provided "AS IS" without any express
+.\" ** or implied warranty.
+.\" **
+.\" ** (c) Copyright 1994 Novell, Inc.
+.\" ** (c) Copyright 1994 Hewlett-Packard Company
+.\" ** (c) Copyright 1994 International Business Machines Corp.
+.\" ** (c) Copyright 1994 Sun Microsystems, Inc.
+.TH DtSpinBox 3X ""
+.BH "20 January - 1994"
+.SH NAME
+\fBDtSpinBox(3X) \- the SpinBox widget class.\fP
+.iX "DtSpinBox"
+.iX "widget class" "SpinBox"
+.sp .5
+.SH SYNOPSIS
+\fB#include <Dt/SpinBox.h>\fP
+.sp .5
+.SH DESCRIPTION
+The DtSpinBox widget is convenient user interface control to increment
+and decrement an arbitrary TextField.
+For example, it can be used to cycle through the months of the year or
+days of the month.
+.PP
+This widget was written by Interleaf, Inc.
+.PP
+Widget subclassing is not supported for the DtSpinBox widget class.
+.sp .5
+.SS "Classes"
+DtSpinBox inherits behavior and resources from \fBCore\fP, \fBComposite\fP,
+and \fBXmManager\fP classes.
+.PP
+The class pointer is dtSpinBoxWidgetClass.
+.PP
+The class name is DtSpinBoxWidget.
+.sp .5
+.SS "New Resources"
+The following table defines a set of widget resources used by the programmer
+to specify data.  The programmer can also set the resource values for the
+inherited classes to set attributes for this widget.  To reference a
+resource by name or by class in a .Xdefaults file, remove the \fBXmN\fP or
+\fBXmC\fP prefix and use the remaining letters.  To specify one of the defined
+values for a resource in a .Xdefaults file, remove the \fBXm\fP prefix and use
+the remaining letters (in either lowercase or uppercase, but include any
+underscores between words).
+The codes in the access column indicate if the given resource can be
+set at creation time (\fBC\fP),
+set by using \fBXtSetValues\fP (\fBS\fP),
+retrieved by using \fBXtGetValues\fP (\fBG\fP), or is not applicable (\fBN/A\fP).
+.sp .5
+.sp .5
+.in 0
+.KS
+.sp 1
+.in 0
+.TS
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+DtSpinBox Resource Set
+Name	Class	Type	Default	Access
+_
+DtNarrowLayout	XmCArrowLayout	unsigned char	DtARROWS_END	CSG
+DtNarrowSensitivity	XmCArrowSensitivity	unsigned char	DtARROWS_SENSITIVE	CSG
+XmNdecimalPoints	XmCDecimalPoints	short	0	CSG
+DtNincrementValue	XmCIncrementValue	int	1	CSG
+XmNinitialDelay	XmCInitialDelay	unsigned int	250	CSG
+DtNmaximumValue	XmCMaximumValue	int	10	CSG
+DtNminimumValue	XmCMinimumValue	int	0	CSG
+XmNmodifyVerifyCallback	XmCCallback	XtCallbackList	NULL	C
+DtNnumValues	XmCNumValues	int	0	CSG
+XmNposition	XmCPosition	int	0	CSG
+XmNrepeatDelay	XmCRepeatDelay	unsigned int	200	CSG
+DtNspinBoxChildType	XmCSpinBoxChildType	unsigned char	XmSTRING	CG
+XmNvalueChangedCallback	XmCCallback	XtCallbackList	NULL	C
+DtNvalues	XmCValues	XmStringTable	NULL	CSG
+.TE
+.in
+.sp 1
+.KE
+.in
+.sp .5
+.IP "\fBDtNarrowLayout\fP"
+Specifies the style and position of the SpinBox arrows.
+There are five possible values:
+.wH
+.rS
+.TP
+\(bu
+DtARROWS_FLAT_BEGINNING
+.TP
+\(bu
+DtARROWS_FLAT_END
+.TP
+\(bu
+DtARROWS_SPLIT
+.TP
+\(bu
+DtARROWS_BEGINNING
+.TP
+\(bu
+DtARROWS_END
+.wH
+.rE
+.nL
+.IP "\fBDtNarrowSensitivity\fP"
+This resource specifies the sensitivity of the arrows in the DtSpinBox.
+There are four possible values:
+.wH
+.rS
+.TP
+\(bu
+DtARROWS_SENSITIVE
+.TP
+\(bu
+DtARROWS_DECREMENT_SENSITIVE
+.TP
+\(bu
+DtARROWS_INCREMENT_SENSITIVE
+.TP
+\(bu
+DtARROWS_INSENSITIVE
+.wH
+.rE
+.nL
+.IP "\fBXmNdecimalPoints\fP"
+When DtNspinBoxChildType is DtNUMERIC, the \fIXmNdecimalPoints\fP resource specifies
+the position of the decimal point within the integer value.
+This resource is used to allow for floating point values in the DtSpinBox
+widget.
+.IP "\fBDtNincrementValue\fP"
+This integer resource specifies the amount to increment or decrement the
+\fIXmNposition\fP when the DtNspinBoxChildType is DtNUMERIC.
+When the Up action is activated, the \fIDtNincrementValue\fP is added to the
+\fIXmNposition\fP value; when the Down action is activated, the
+\fIDtNincrementValue\fP is subtracted from the \fIXmNposition\fP value.
+When DtNspinBoxChildType is XmSTRING, this resource is ignored.
+.IP "\fBXmNinitialDelay\fP"
+This resource specifies the amount of time in milliseconds before the Arrow
+buttons will begin to continuously spin.
+.IP "\fBDtNnumValues\fP"
+When the \fIDtNspinBoxChildType\fP resource is XmSTRING, the \fIDtNnumValues\fP resource
+specifies the number of items in the \fIDtNvalues\fP list.
+The value of this resource must be a positive integer.
+The \fIDtNnumValues\fP is maintained by the DtSpinBox widget when items
+are added or deleted from the \fIDtNvalues\fP list.
+When \fIDtNspinBoxChildType\fP is not XmSTRING, this resource is ignored.
+.IP "\fBDtNvalues\fP"
+When the \fIXmNspinButtonChildType\fP resource is XmSTRING, the \fIDtNvalues\fP
+resource supplies the list of strings to cycle through.
+When \fIDtNspinBoxChildType\fP is not XmSTRING, this resource is ignored.
+.IP "\fBDtNmaximumValue\fP"
+\fIDtNmaximumValue\fP specifies the upper bound on the DtSpinBox's range
+when \fIDtNspinBoxChildType\fP is DtNUMERIC.
+.IP "\fBDtNminimumValue\fP"
+\fIDtNminimumValue\fP specifies the lower bound on the DtSpinBox's range
+when \fIDtNspinBoxChildType\fP is DtNUMERIC.
+.IP "\fBXmNmodifyVerifyCallback\fP"
+This callback is called just before the DtSpinBox position changes.
+The application can use this callback to implement new application related
+logic (including setting new position spinning to, or canceling the
+impending action).
+For example, this callback can be used to stop the spinning just before
+wrapping at the upper and lower position boundaries.
+If the application set the doit member to False, nothing happens.
+Otherwise the position changes. Reasons sent by the callback are
+DtCR_SPIN_NEXT, or DtCR_SPIN_PRIOR.
+.IP "\fBXmNposition\fP"
+The \fIXmNposition\fP resource has a different value based on the
+\fIDtNspinBoxChildType\fP resource.
+When \fIDtNspinBoxChildType\fP is XmSTRING, the \fIXmNposition\fP is the index
+into the \fIDtNvalues\fP list for the current item.
+When the \fIDtNspinBoxChildType\fP resource is DtNUMERIC, the \fIXmNposition\fP
+is the integer value of the DtSpinBox that falls within the range of
+\fIDtNmaximumValue\fP and \fIDtNminimumValue\fP.
+.IP "\fBXmNrepeatDelay\fP"
+The \fIXmNrepeatDelay\fP resource is the number of milliseconds between
+repeated calls to the \fIXmNvalueChangedCallback\fP while the user is
+spinning the DtSpinBox.
+.IP "\fBDtNspinBoxChildType\fP"
+This resource specifies the style of the DtSpinBox.
+There are two possible values:
+.wH
+.rS
+.TP
+\(bu
+XmSTRING
+.TP
+\(bu
+DtNUMERIC
+.wH
+.rE
+.nL
+.IP "\fBXmNvalueChangedCallback\fP"
+The \fIXmNvalueChangedCallback\fP is called whenever the value of the
+\fIXmNposition\fP resource is changed through the use of the spinner arrows.
+The \fIXmNvalueChangedCallback\fP passes the DtSpinBoxCallbackStruct
+call_data structure that is described below.
+.sp .5
+.SS "Inherited Resources"
+DtSpinBox inherits behavior and resources from the following named
+superclasses.  For a complete description of each resource, refer to the
+man page for that superclass.
+.P
+.sp 1
+.in 0
+.KS
+.TS
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmManager Resource Set
+Name	Class	Type	Default	Access
+_
+XmNbottomShadowColor	XmCBottomShadowColor	Pixel	dynamic	CSG
+XmNbottomShadowPixmap	XmCBottomShadowPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNforeground	XmCForeground	Pixel	dynamic	CSG
+XmNhelpCallback	XmCCallback	XtCallbackList	NULL	C
+XmNhighlightColor	XmCHighlightColor	Pixel	dynamic	CSG
+XmNhighlightPixmap	XmCHighlightPixmap	Pixmap	dynamic	CSG
+XmNinitialFocus	XmCInitialFocus	Widget	NULL	CSG
+XmNnavigationType	XmCNavigationType	XmNavigationType	dynamic	CSG
+XmNshadowThickness	XmCShadowThickness	Dimension	dynamic	CSG
+XmNstringDirection	XmCStringDirection	XmStringDirection	dynamic	CG
+XmNtopShadowColor	XmCTopShadowColor	Pixel	dynamic	CSG
+XmNtopShadowPixmap	XmCTopShadowPixmap	Pixmap	dynamic	CSG
+XmNtraversalOn	XmCTraversalOn	Boolean	dynamic	CSG
+XmNunitType	XmCUnitType	unsigned char	dynamic	CSG
+XmNuserData	XmCUserData	XtPointer	NULL	CSG
+.TE
+.KE
+.in
+.sp 1
+.P
+.sp 1
+.in 0
+.KS
+.TS
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+Composite Resource Set
+Name	Class	Type	Default	Access
+_
+XmNchildren	XmCReadOnly	WidgetList	NULL	G
+XmNinsertPosition	XmCInsertPosition	XtOrderProc	default procedure	CSG
+XmNnumChildren	XmCReadOnly	Cardinal	0	G
+.TE
+.KE
+.in
+.sp 1
+.P
+.wH
+.in 0
+.sp 1
+.in 0
+.KS
+.TS
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+Core Resource Set
+Name	Class	Type	Default	Access
+_
+XmNaccelerators	XmCAccelerators	XtAccelerators	dynamic	CSG
+XmNancestorSensitive	XmCSensitive	Boolean	dynamic	G
+XmNbackground	XmCBackground	Pixel	dynamic	CSG
+XmNbackgroundPixmap	XmCPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNborderColor	XmCBorderColor	Pixel	XtDefaultForeground	CSG
+XmNborderPixmap	XmCPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNborderWidth	XmCBorderWidth	Dimension	0	CSG
+XmNcolormap	XmCColormap	Colormap	dynamic	CG
+XmNdepth	XmCDepth	int	dynamic	CG
+XmNdestroyCallback	XmCCallback	XtCallbackList	NULL	C
+XmNheight	XmCHeight	Dimension	dynamic	CSG
+XmNinitialResourcesPersistent	XmCInitialResourcesPersistent	Boolean	True	C
+XmNmappedWhenManaged	XmCMappedWhenManaged	Boolean	True	CSG
+XmNscreen	XmCScreen	Screen *	dynamic	CG
+.wH
+.tH
+XmNsensitive	XmCSensitive	Boolean	True	CSG
+XmNtranslations	XmCTranslations	XtTranslations	dynamic	CSG
+XmNwidth	XmCWidth	Dimension	dynamic	CSG
+XmNx	XmCPosition	Position	0	CSG
+XmNy	XmCPosition	Position	0	CSG
+.TE
+.KE
+.in
+.sp 1
+.wH
+.in
+.sp .5
+.SS "Callback Information"
+A pointer to the following structure is passed to each DtSpinBox callback:
+.sp .5
+.nf
+.ta .25i 1.1i
+\fBtypedef struct \fP{
+	\fBint\fP 	\fIreason\fP;
+	\fBXEvent\fP	\fI* event\fP;
+	\fBWidget\fP	\fIwidget\fP;
+	\fBBoolean\fP	\fIdoit\fP;
+	\fBint\fP		\fIposition\fP;
+	\fBXmString\fP	\fIvalue\fP;
+	\fBBoolean\fP	\fIcrossed_boundary\fP;
+} \fBDtSpinBoxCallbackStruct\fP;
+.fi
+.sp .5
+.IP "\fIreason\fP"
+There are three possible reasons for this callback to be issued. 
+XmCR_OK is the reason when this is the first call to the callback at 
+the beginning of a spin or if it is a single activation of the spin 
+arrows.
+If the DtSpinBox is in the process of being continuously 
+spun, then the reason will be DtCR_SPIN_NEXT or 
+Xm_CR_SPIN_PRIOR depending on the arrow that is spinning.
+.IP "\fIevent\fP"
+A pointer to the event that caused this callback to be invoked.
+It can be NULL when the DtSpinBox is continuously spinning.
+.IP "\fIwidget\fP"
+The widget identifier for the text widget that has been affected by 
+the spin.
+.IP "\fIdoit\fP"
+This value is only set when the call_data comes from the
+\fIXmNmodifyVerifyCallback\fP.
+It indicates that the action that caused the callback to be called should
+be performed.
+By setting this field to False, the action is not performed.
+.IP "\fIposition\fP"
+The new value of the \fIXmNposition\fP resource as a result of the spin.
+.IP "\fIvalue\fP"
+The new XmString value displayed in the Text widget as a result of 
+the spin.
+This string must be copied if it is used beyond the scope of 
+the call_data structure.
+.IP "\fIcrossed_boundary\fP"
+This Boolean is True when the spinbox cycles.
+This is the case when a \fIDtNspinBoxChildType\fP of XmSTRING wraps from
+the first item to the last or the last item to the first.
+In the case of the \fIDtNspinBoxChildType\fP of DtNUMERIC, the boundary is
+crossed when the DtSpinBox cycles from the maximum value to the minimum
+or visa versa.
+.SH "SEE ALSO"
+.BR Composite(3X),
+.BR Constraint(3X),
+.BR Core(3X),
+.BR DtCreateSpinButton(3X),
+.BR DtSpinButtonAddItem(3X),
+.BR DtSpinButtonDeletePos(3X),
+.BR DtSpinButtonSetItem(3X),
+.BR XmManager(3X),
+.BR XmText(3X), and
+.BR XmTextField(3X).

@@ -1,0 +1,105 @@
+.TH DtEditorAppendFromFile 3 "30 July 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.\" *************************************************************************
+.SH NAME
+DtEditorAppendFromFile \- append data from a file into a DtEditor widget
+.SH SYNOPSIS
+.yS
+#include <Dt/Editor.h>
+.sp 0.5v
+.ta \w'DtEditorErrorCode DtEditorAppendFromFile('u
+DtEditorErrorCode DtEditorAppendFromFile(Widget \f2widget\fP,
+	char *\f2fileName\fP);
+.yE
+.SH DESCRIPTION
+.The
+.Fn DtEditorAppendFromFile
+function appends data from a file to
+after the last character in a DtEditor widget.
+After the data is appended, the insertion cursor is positioned at the
+new last character.
+.P
+The
+.I widget
+argument specifies the DtEditor widget ID.
+.P
+The
+.I fileName
+argument is the pathname of the file
+relative to the local system.
+.cde .P
+.cde For a complete definition of the DtEditor widget
+.cde and its associated resources, see
+.cde .Fn DtEditor 3.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn DtEditorAppendFromFile
+function returns one of the following values:
+.VL 6
+.Lc DtEDITOR_NO_ERRORS
+.br
+The file is readable and writable.
+.Lc DtEDITOR_READ_ONLY_FILE
+.br
+The file is read only.
+.cdes
+.Lc DtEDITOR_NULLS_REMOVED
+.br
+The file contained embedded
+.Cn NULL
+characters, which were removed.
+.cdee
+.LE
+.P
+Otherwise, if
+the
+.Fn DtEditorAppendFromFile
+function
+cannot append the data into the DtEditor widget,
+it returns one of the following values:
+.VL 6
+.Lc DtEDITOR_NONEXISTENT_FILE
+.br
+The file does not exist.
+.Lc DtEDITOR_DIRECTORY
+.br
+The file is a directory.
+.Lc DtEDITOR_CHAR_SPECIAL_FILE
+.br
+The file is a character-special device.
+.Lc DtEDITOR_BLOCK_MODE_FILE
+.br
+The file is a block-mode device.
+.Lc DtEDITOR_NO_FILE_ACCESS
+.br
+The file cannot be accessed.
+.cdes
+.Lc DtEDITOR_INSUFFICIENT_MEMORY
+.br
+Not enough system memory is available to append the file.
+.cdee
+.Lc DtEDITOR_UNREADABLE_FILE
+.br
+The file is unreadable for an unspecified reason.
+.LE
+.SH "APPLICATION USAGE"
+If the data is in memory, rather than a disk file, the application should
+use
+.Fn DtEditorAppend 3.
+.SH "SEE ALSO"
+.Hd Dt/Editor.h 5,
+.Fn DtEditor 3,
+.Fn DtEditorAppend 3.
+.Fn DtEditorGetContents 3,
+.Fn DtEditorInsert 3,
+.Fn DtEditorInsertFromFile 3,
+.Fn DtEditorReplace 3,
+.Fn DtEditorReplaceFromFile 3,
+.Fn DtEditorSaveContentsToFile 3,
+.Fn DtEditorSetContents 3,
+.Fn DtEditorSetContentsFromFile 3.

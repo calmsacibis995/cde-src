@@ -1,0 +1,142 @@
+#!/bin/sh
+#
+############################################################################
+# Construct shared-library export lists for HP-UX based on standardized CDE
+# export list description file
+#
+# Usage: exportlistgen libfoo.sl libfoo.elist > libfoo.lopt
+#
+#	libfoo.sl    => HP shared library of interest
+#	libfoo.elist => Meta description of necessary export list.
+#
+#    The output file, "libfoo.lopt" may then be passed to the HP linker to 
+#    reconstruct the shared library, libfoo.sl.
+#
+# Author: Aloke Gupta 5/25/94.
+# Copyright 1994, Hewlett Packard Company
+#
+# $XConsortium: exportlistgen /main/cde1_maint/1 1995/07/14 13:50:48 drk $
+#
+############################################################################
+
+############################################################################
+#
+# Utility programs
+FILTER=c++filt			# C++ symbol demangler
+AWK=awk				# Awk
+
+############################################################################
+#
+# Temporary files
+EXPORTSYMS=/tmp/elistgen1.$$	# list of export symbols from "libfoo.elist"
+NMLIST=/tmp/elistgen2.$$	# name list from libfoo.sl
+FILTLIST=/tmp/elistgen3.$$	# demangled (C++) version of NMLIST
+
+############################################################################
+# Input export lists
+EXPORTLIST=$2			# Supplied from command line
+EXTRASYMS=ExtraSyms.hp		# Architecture specific extra symbols -- if any
+if [ ! -f $EXTRASYMS ]
+then
+    EXTRASYMS=
+fi;
+############################################################################
+# Print useful information at the top of the output
+echo "#" `date`
+echo "# This linker options list was produced by" $0
+echo "# Input Export-list description taken from file" $2
+echo "# Target library:" $1
+echo "# Target Operating System: " `uname`
+echo "# "
+
+############################################################################
+#
+# Extract the globally visible symbols from target library
+# The NMLIST generated here is later used to cross-check the symbols in the
+# supplied export-list.
+#
+nm -p $1 | $AWK '
+    /[ cC][ tTdDbBsS] /{print $3}   # Text, Data, BSS, or Secondary symbols
+' > $NMLIST
+
+############################################################################
+# Demangle the global library symbols. This operation is necessary to convert
+# mangled C++ symbols into their C++ notation.
+$FILTER $NMLIST > $FILTLIST
+
+############################################################################
+# Translate export-list description file into a simple list of export symbols
+# The following code also takes care of the fact that C++ symbols may have
+# embedded spaces in them.
+#
+cat $EXPORTLIST $EXTRASYMS | $AWK '
+    BEGIN           {
+	csyms     = 0;		# C   language symbols in libfoo.list
+	cplusplus = 0;		# C++ language symbols in libfoo.list
+	count     = 0;		# Running count of symbols
+    }
+    $1 == "public"  || $1 == "private" {
+	csyms ++;
+	symbol[count++] = $2;
+	next;
+    }
+    $1 == "publicC++"  || $1 == "privateC++"{
+	cplusplus ++;
+	string = $2;
+	for (n=3; n <=NF; n++) {
+	    string = string " " $n;
+	}
+	symbol[count++] = string;
+	next;
+    }
+    $1 == "internal"  || $1 == "internalC++" {
+	# Ignore internal symbols
+    }
+    END  {
+	printf("# Found %d C symbols and %d C++ symbols\n",
+			    csyms,cplusplus) | "cat 1>&2";
+ 	for (i in symbol)
+ 	    print symbol[i];
+    }
+' > $EXPORTSYMS
+
+############################################################################
+# Read in the above files into the final awk script and write result to stdout
+# The contents of NMLIST and FILTLIST are used to construct a symbol lookup
+# table. The contents of EXPORTSYMS are converted with the help of this table.
+# The delimiter ";" is used to identify the entries in the symbol lookup table.
+#
+(pr -m -s";" -t -w1024 $NMLIST $FILTLIST| expand -t 1;cat $EXPORTSYMS ) | $AWK '
+    BEGIN   {
+	     FS = ";";
+	    }
+    NF == 2 {	# This is "pr" output, i.e., symbol translation table
+	     syms[$2] = $1;
+	     next;
+	    }
+    NF == 1 {   # This is a symbol to be mangled, by symbol lookup table, if
+		# necessary
+	     if (length(syms[$1]) > 0 ) {
+		if (donelist[$1]) {
+		 print "# Warning: Duplicate entry for ", $1, " in Export list";
+		}
+		else {
+		    print  "+e", syms[$1];
+		    donelist[$1] = 1;
+		}
+	     }
+	     else { 
+	      print "# Warning: Symbol for", $1,
+		     "was not in the nm list for this library" | "cat 1>&2";
+	      # print "+e", $1;
+	     }
+	     next;
+	    }
+    END     { print "+e errno"; }	# Introduce entry for errno
+'
+
+############################################################################
+# Clean up temporary files
+rm $EXPORTSYMS
+rm $NMLIST
+rm $FILTLIST

@@ -1,0 +1,188 @@
+.\" *************************************************************************
+.\" **
+.\" ** (c) Copyright 1993,1994 Hewlett-Packard Company 
+.\" **      All Rights Reserved.
+.\" **
+.\" ** (c) Copyright 1993,1994 International Business Machines Corp. 
+.\" **      All Rights Reserved.
+.\" **  
+.\" ** (c) Copyright 1993,1994 Sun Microsystems, Inc.
+.\" **      All Rights Reserved.
+.\" **
+.\" ** (c) Copyright 1993,1994 Unix Systems Labs, Inc., a susidiary of Novell, Inc
+.\" **      All Rights Reserved.
+.\" **
+.\" *************************************************************************
+.\"----------------------------------------------------------------------------
+.\" %\&Z%%\&M% %\&I% %\&E% SMI;
+.TH DtCmUpdateEntries 3X "26 January 1994"
+.BH "26 January -_1994"
+.\"---
+.\"----------------------------------------------------------------------------
+.SH NAME
+DtCmUpdateEntries(3X) \- Update entries in the calendar.
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- DESCRIPTION 
+.\"--- This section tells concisely what the command (function, device or
+.\"--- file format) does and includes the parameter list. 
+.\"---
+.SH DESCRIPTION
+\&#include <Dt/DtCm.h>
+.sp .5
+DtCmStatus DtCmUpdateEntries (
+.br
+.ta 0.75i 1.75i
+        DtCmEntry *	\fIentries\fP,
+.br
+        int		\fInum_entries\fP,
+.br
+        DtCmAttributes *	\fIattrs\fP,
+.br
+        int		\fInum_attrs\fP,
+.br
+        DtCmEditScope		\fIscope\fP,
+.br
+        DtCmEntry **		\fInew_entries_r\fP,
+.br
+        DtCmStatus **		\fIstatus_r\fP)
+.fi
+\fP
+.SH
+\fBDtCmUpdateEntries\fP updates the list of entries specified in entries in 
+the associated calendar.  The new attribute values are specified by 
+\fIattrs\fP which is a pointer to an array of \fBDtCmAttribute\fP 
+structures with \fInum_attrs\fP elements. All entries will be updated 
+using the attribute values in \fIattrs\fP. \fIScope\fP specifies the 
+scope of a repeating entry to be affected by the update operation. It 
+is applied to all the repeating entries and one time entries are not 
+affected. Scope specifies one of \fBDT_CM_SCOPE_ALL, DT_CM_SCOPE_ONE\fP, and 
+\fBDT_CM_SCOPE_FORWARD\fP. An array of handles to the updated entries is 
+returned in \fInew_entries_r\fP. Each element in the array contains the 
+handle to the new entry resulted from updating the corresponding entry 
+in \fIentries\fP. If all entries are not updated successfully, 
+\fBDT_CM_ERR_PARTIAL\fP will be returned by the function. And if 
+\fIstatus_r\fP is not \fBNULL\fP, an array of \fBDtCmStatus\fP with 
+\fInum_entries\fP elements will be returned in it.  Each element in 
+the returned \fBDtCmStatus\fP array indicates whether the corresponding 
+entry in \fIentries\fP is updated successfully or an error occurred. 
+In the latter case, the corresponding element in the array returned in 
+\fInew_entries_r\fP will be \fBNULL\fP. The caller is responsible for 
+freeing the returned array in \fInew_entries_r\fP and \fIstatus_r\fP by 
+calling \fBDtCmFreeEntries\fP and \fBfree\fP, respectively.
+ 
+All the entries specified in entries should belong to the same calendar. 
+Since CM servers of version 2 to 4 support a fixed set of attributes, 
+the function fails if attributes not supported by the server are 
+specified. For CM servers of version 5 and beyond, new attributes can 
+be added using this function and existing attributes can be deleted by 
+setting the value part of the \fBDtCmAttribute\fP structure to \fBNULL\fP. 
+If a read only attribute is specified, the function returns an error. If 
+the function returns an error, none of the specified attributes will 
+be updated.
+.sp .5
+.IP "\fIentries\fP" 1.25i
+Specifies the list of entries to update.
+.IP "\fInum_entries\fP" 1.25i
+Specifies the number of elements in \fIentries\fP.
+.IP "\fIattrs\fP" 1.25i
+Specifies the new attribute values.
+.IP "\fInum_attrs\fP" 1.25i
+Specifies the number of elements in \fIattrs\fP.
+.IP "\fIscope\fP" 1.25i
+Specifies the scope of repeating entries to be affected by the update.
+.IP "\fInew_entries_r\fP" 1.25i
+Returns an array of handles to the updated entries.
+.IP "\fIstatus_r\fP" 1.25i
+Returns an array of status values.
+.sp .5
+.PP
+Only users with update permission or the author of an entry can change the entry.
+.sp
+The set of attributes that are supported by all servers is:
+.sp
+The set of read-only attributes is:
+.sp
+If an application wishes to create new attribute anmes, the conventions they should follow are:
+
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- RETURN VALUES
+.\"--- This section appears in pages from Sections 2 and 3 only.
+.\"--- List the _values_ that the function returns and give _explanations_.
+.\"---
+.SH "RETURN VALUES"
+The function returns a status indicating whether the function is 
+completed successfully. If \fBDT_CM_OK\fP or \fBDT_CM_ERR_PARTIAL\fP 
+is returned, an array of handles to the new entries is returned in 
+\fIentries_r\fP. If the function returns \fBDT_CM_ERR_PARTIAL\fP and 
+\fIstatus_r\fP is not \fBNULL\fP, an array of status values for the 
+corresponding entries will be returned in \fIstatus_r\fP.
+
+.\"---
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- ERRORS
+.\"--- This section lists and explains _ERROR-CODES_ that the function may
+.\"--- may generate.  List _ERROR-CODES_ alphabetically.
+.\"---
+.SH ERRORS
+.SH
+One of the following status values may be returned:
+.IP "\fBDT_CM_ERR_AUTH\fP" 2.5i
+The client does not have insert access on the calendar.
+.IP "\fBDT_CM_ERR_MEMORY\fP" 2.5i
+Not enough memory.
+.IP "\fBDT_CM_ERR_OBJECT\fP" 2.5i
+Bad object or wrong object type.
+.IP "\fBDT_CM_ERR_PARAMETER\fP" 2.5i
+Invalid parameter.
+.IP "\fBDT_CM_ERR_PARTIAL\fP" 2.5i
+Only some entries are inserted successfully.
+.IP "\fBDT_CM_ERR_SERVER\fP" 2.5i
+Server problem.
+.IP "\fBDT_CM_OK\fP" 2.5i
+The call is completed successfully.
+.PP
+.sp
+One of the following status values may be stored in the array returned 
+in \fIstatus_r\fP.
+.IP "\fBDT_CM_ERR_DATA_TYPE\fP" 2.5i
+Invalid data type specified for predefined attributes.
+.IP "\fBDT_CM_ERR_MEMORY\fP" 2.5i
+Not enough memory.
+.IP "\fBDT_CM_ERR_NOT_SUPPORTED\fP" 2.5i
+Attributes not supported by the server are specified.
+.IP "\fBDT_CM_ERR_PARAMETER\fP" 2.5i
+Invalid parameter.
+.IP "\fBDT_CM_ERR_READONLY\fP" 2.5i
+Read-only attribute specified.
+.IP "\fBDT_CM_ERR_SPACE\fP" 2.5i
+Not enough space left on device.
+.IP "\fBDT_CM_OK\fP" 2.5i
+The call is completed successfully.
+.PP
+.sp
+.\"---
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- EXAMPLES
+.\"--- This section gives examples of how to use the command (function
+.\"--- or file format).  Always preface an example with an introduction.
+.\"--- If there are multiple examples, use separate subsection headings
+.\"--- for each _example-type_.  Otherwise, omit these headings.
+.\"---
+.SH EXAMPLES
+NEED MARKUP HERE, SIMILAR TO SYNOPSIS
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- SEE ALSO
+.\"--- This section lists references to other man pages, sample files, etc.
+.\"---
+.SH "SEE ALSO"
+.BR DtCmOpenCalendar (3X),
+.BR DtCmCloseCalendar (3X),
+.BR DtCmFreeEntries (3X)
+.BR DtCmInsertEntry (3X)
+.BR DtCmInsertEntries (3X)
+.BR DtCmUpdateEntry (3X)

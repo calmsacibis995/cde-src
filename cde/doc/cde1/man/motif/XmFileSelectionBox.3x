@@ -1,0 +1,993 @@
+'\" t
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Novell, Inc
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+.TH XmFileSelectionBox 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmFileSelectionBox\fP \- The FileSelectionBox widget class
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/FileSB.h>
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+FileSelectionBox traverses
+through directories, views the files and subdirectories in them,
+and then selects files.
+.PP 
+A FileSelectionBox has the following main areas:
+.TP
+\(bu
+A text input field for displaying and editing a directory mask used to
+select the files to be displayed
+.TP
+\(bu
+An optional text input field for displaying and editing a filter mask used
+to select the files to be displayed.
+.TP
+\(bu
+A scrollable list of filenames
+.TP
+\(bu
+A scrollable list of subdirectories
+.TP
+\(bu
+A text input field for displaying and editing a filename
+.TP
+\(bu
+A group of PushButtons,
+labeled \fIOK\fP, \fIFilter\fP, \fICancel\fP, and \fIHelp\fP
+.PP
+Additional children may be added to the FileSelectionBox after
+creation.
+FileSelectionBox inherits the layout functionality provided
+by SelectionBox for any additional children.
+The list of filenames, the list of subdirectories, or both can be
+removed from the FileSelectionBox after creation by unmanaging the
+appropriate widgets and their labels.
+The list and label widgets are obtained by calling the
+.ne 5
+function \fIXmFileSelectionBoxGetChild\fP.
+To remove either the directory list or the file list, unmanage the
+parent of the appropriate list widget and unmanage the corresponding
+label.
+.PP
+The user can specify resources in a resource file for the automatically
+created widgets and gadgets of FileSelectionBox.  The following list
+identifies the names of these widgets (or gadgets) and the associated
+FileSelectionBox areas.
+.PP
+        Filter Label \- "FilterLabel"
+.PP
+        Filter Text \- "Text"
+.PP
+        Directory List \- "DirList"
+.PP
+        Directory List Label \- "Dir"
+.PP 
+The directory mask is a string specifying the base directory to be
+examined and a search pattern.
+Ordinarily, the directory list displays the subdirectories of the base
+directory, as well as the base directory itself and its parent
+directory.
+The file list ordinarily displays all files and/or subdirectories in the
+base directory that match the search pattern.
+.PP
+Optionally, the search pattern mask and the base directory can be 
+displayed in two separate text fields.
+This option is controlled by the \fIpathMode\fP resource.
+Having two text fields for the search pattern mask and the directory makes
+it easier for the end user to edit and understand these two separate concepts.
+Using this alternate display does not change the meaning of resources that
+control the content of these fields: XmNdirectory, XmNdirMask, and XmNpattern.
+.PP 
+A procedure specified by the \fIXmNqualifySearchDataProc\fP resource
+extracts the base directory and search pattern from the directory mask.
+If the directory specification is empty, the current working directory
+is used.
+If the search pattern is empty, a pattern that matches all files is
+used.
+.PP 
+An application can supply its own \fIXmNqualifySearchDataProc\fP as well
+as its own procedures to search for subdirectories and files.
+The default \fIXmNqualifySearchDataProc\fP works as follows:
+The directory mask is a pathname that can contain zero or more
+\fBwildcard\fP characters in its directory portion, its file portion, or
+both.
+The directory components of the directory mask up to, but not
+including, the first component with a wildcard character specify the
+directory to be searched, relative to the current working directory.
+The remaining components specify the search pattern.
+If the directory mask is empty or if its first component contains a
+wildcard character, the current working directory is searched.
+If no component of the directory mask contains a wildcard character, the
+entire directory mask is the directory specification, and all files in
+that directory are matched.
+.PP 
+The user can select a new directory to examine by scrolling through the
+list of directories and selecting the desired directory or by editing
+the directory mask.
+Selecting a new directory from the directory list does not change the
+search pattern.
+A user can select a new search pattern by editing the directory mask
+or, when the FileSelectionBox has the optional \fIpathMode\fP
+XmPATH_MODE_RELATIVE display, the filter text field.
+Double clicking or pressing \fIKActivate\fP on a directory in the
+directory list initiates a search for files and subdirectories in the
+new directory, using the current search pattern.
+.PP 
+The user can select a file by scrolling through the list of filenames
+and selecting the desired file or by entering the filename directly into
+the text edit area.
+Selecting a file from the list causes that filename to appear in the
+file selection text edit area.
+.PP 
+The user may select a new file as many times as desired.
+The application is not notified until the user takes one of these actions:
+.TP
+\(bu
+Selects the \fIOK\fP PushButton
+.TP
+\(bu
+Presses \fIKActivate\fP while the selection text edit area has the
+keyboard focus.
+.TP
+\(bu
+Double clicks or presses \fIKActivate\fP on an item in the file list
+.PP 
+FileSelectionBox initiates a directory and file search when any of the
+following occurs:
+.TP
+\(bu
+The FileSelectionBox is initialized
+.TP
+\(bu
+The function \fIXtSetValues\fP is used to change \fIXmNdirMask\fP,
+\fIXmNdirectory\fP, \fIXmNpattern\fP, or \fIXmNfileTypeMask\fP
+.TP
+\(bu
+The user activates the \fIFilter\fP PushButton
+.TP
+\(bu
+The user double clicks or presses \fIKActivate\fP on an item in the
+directory list
+.TP
+\(bu
+The application calls \fIXmFileSelectionDoSearch\fP
+.TP
+\(bu
+The user presses \fIKActivate\fP while the directory mask text edit area
+has the keyboard focus
+.PP 
+When a file search is initiated, the FileSelectionBox takes the
+following actions:
+.TP
+\(bu
+Constructs an \fIXmFileSelectionBoxCallbackStruct\fP structure with
+values appropriate for the action that initiated the search
+.TP
+\(bu
+Calls the \fIXmNqualifySearchDataProc\fP with the callback structure as
+the data input argument
+.TP
+\(bu
+Sets \fIXmNdirectoryValid\fP and \fIXmNlistUpdated\fP to False
+.TP
+\(bu
+Calls the \fIXmNdirSearchProc\fP with the qualified data returned by the
+\fIXmNqualifySearchDataProc\fP
+.PP 
+If \fIXmNdirectoryValid\fP is True, the FileSelectionBox takes these
+additional actions:
+.TP
+\(bu
+Sets \fIXmNlistUpdated\fP to False
+.TP
+\(bu
+Calls the \fIXmNfileSearchProc\fP with the qualified data returned by
+the \fIXmNqualifySearchDataProc\fP (and possibly modified by the
+\fIXmNdirSearchProc\fP)
+.TP
+\(bu
+If \fIXmNlistUpdated\fP is True and the file list is empty, displays the
+\fIXmNnoMatchString\fP in the file list and clears the selection text
+and \fIXmNdirSpec\fP
+.TP
+\(bu
+If \fIXmNlistUpdated\fP is True and the file list is not empty, sets the
+selection text and \fIXmNdirSpec\fP to the qualified \fBdir\fP returned
+by the \fIXmNqualifySearchDataProc\fP (and possibly modified by the
+\fIXmNdirSearchProc\fP)
+.TP
+\(bu
+Sets the directory mask text and \fIXmNdirMask\fP to the qualified
+\fBmask\fP returned by the \fIXmNqualifySearchDataProc\fP (and possibly
+modified by the \fIXmNdirSearchProc\fP)
+.TP
+\(bu
+Sets \fIXmNdirectory\fP to the qualified \fBdir\fP returned by the
+\fIXmNqualifySearchDataProc\fP (and possibly modified by the
+\fIXmNdirSearchProc\fP)
+.TP
+\(bu
+Sets \fIXmNpattern\fP to the qualified \fBpattern\fP returned by the
+\fIXmNqualifySearchDataProc\fP (and possibly modified by the
+\fIXmNdirSearchProc\fP)
+.SS "Classes"
+FileSelectionBox inherits behavior and
+resources from \fICore\fP, \fIComposite\fP, \fIConstraint\fP, \fIXmManager\fP,
+\fIXmBulletinBoard\fP, and \fIXmSelectionBox\fP.
+.PP 
+The class pointer is \fIxmFileSelectionBoxWidgetClass\fP.
+.PP
+The class name is \fIXmFileSelectionBox\fP.
+.SS "New Resources"
+The following table defines a set of widget resources used by the programmer
+to specify data.  The programmer can also set the resource values for the
+inherited classes to set attributes for this widget.  To reference a
+resource by name or by class in a .Xdefaults file, remove the \fIXmN\fP or
+\fIXmC\fP prefix and use the remaining letters.  To specify one of the defined
+values for a resource in a .Xdefaults file, remove the \fIXm\fP prefix and use
+the remaining letters (in either lowercase or uppercase, but include any
+underscores between words).
+The codes in the access column indicate if the given resource can be
+set at creation time (C),
+set by using \fIXtSetValues\fP (S),
+retrieved by using \fIXtGetValues\fP (G), or is not applicable (N/A).
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmFileSelectionBox Resource Set
+Name	Class	Type	Default	Access
+_
+XmNdirectory	XmCDirectory	XmString	dynamic	CSG
+XmNdirectoryValid	XmCDirectoryValid	Boolean	dynamic	SG
+XmNdirListItems	XmCDirListItems	XmStringTable	dynamic	SG
+XmNdirListItemCount	XmCDirListItemCount	int	dynamic	SG
+XmNdirListLabelString	XmCDirListLabelString	XmString	dynamic	CSG
+XmNdirMask	XmCDirMask	XmString	dynamic	CSG
+XmNdirSearchProc	XmCDirSearchProc	XmSearchProc	default procedure	CSG
+XmNdirSpec	XmCDirSpec	XmString	dynamic	CSG
+XmNfileListItems	XmCItems	XmStringTable	dynamic	SG
+XmNfileListItemCount	XmCItemCount	int	dynamic 	SG
+XmNfileListLabelString	XmCFileListLabelString	XmString	dynamic	CSG
+XmNfileSearchProc	XmCFileSearchProc	XmSearchProc	default procedure	CSG
+XmNfileTypeMask	XmCFileTypeMask	unsigned char	XmFILE_REGULAR	CSG
+XmNfilterLabelString	XmCFilterLabelString	XmString	dynamic	CSG
+.wH
+.tH
+XmNlistUpdated	XmCListUpdated	Boolean	dynamic	SG
+XmNnoMatchString	XmCNoMatchString	XmString	"\0[\0\0\0\0]\0"	CSG
+XmNpattern	XmCPattern	XmString	dynamic	CSG
+XmNqualifySearchDataProc	XmCQualifySearchDataProc	XmQualifyProc	default procedure	CSG
+pathMode	PathMode	XmRPathMode	XmPATH_MODE_FULL	C
+fileFilterStyle	FileFilterStyle	XmRFileFilterStyle	XmFILTER_NONE	C
+dirTextLabelString	DirTextLabelString	XmString	NULL	C
+.TE
+.KE
+.in
+.sp 1
+.IP "\fIXmNdirectory\fP"
+Specifies the base directory used in combination with \fIXmNpattern\fP
+in determining the files and directories to be displayed.
+The default value is determined by the \fIXmNqualifySearchDataProc\fP
+and depends on the initial values of \fIXmNdirMask\fP,
+\fIXmNdirectory\fP, and \fIXmNpattern\fP.
+If the default is NULL or empty, the current working directory is used.
+.IP "\fIXmNdirectoryValid\fP"
+Specifies an attribute that is set only by the directory search
+procedure.
+The value is set to True if the directory passed to the directory search
+procedure can actually be searched.
+If this value is False the file search procedure is not called, and
+\fIXmNdirMask\fP, \fIXmNdirectory\fP, and \fIXmNpattern\fP are not
+changed.
+.IP "\fIXmNdirListItems\fP"
+Specifies the items in the directory list.
+\fIXtGetValues\fP for this resource returns the list items themselves,
+not a copy of the list items.
+The application must not free the returned items.
+.IP "\fIXmNdirListItemCount\fP"
+Specifies the number of items in the directory list.
+The value must not be negative.
+.IP "\fIXmNdirListLabelString\fP"
+Specifies the label string of the directory list.
+The default for this resource depends on the locale.
+In the C locale the default is "Directories".
+.nL
+.ne 2i
+.IP "\fIXmNdirMask\fP"
+Specifies the directory mask used
+in determining the files and directories to be displayed.
+The default value is determined by the
+.ne 5
+\fIXmNqualifySearchDataProc\fP
+and depends on the initial values of \fIXmNdirMask\fP,
+\fIXmNdirectory\fP, and \fIXmNpattern\fP.
+.IP "\fIXmNdirSearchProc\fP"
+Specifies a directory search procedure to replace the default
+directory-search procedure.
+FileSelectionBox's default directory-search procedure fulfills the needs
+of most applications.
+Because it is impossible to cover the requirements of all applications,
+you can replace the default search procedure.
+.IP
+The directory search procedure is called with two arguments:
+the FileSelectionBox widget and a pointer to an
+\fIXmFileSelectionBoxCallbackStruct\fP structure.
+The callback structure is generated by the
+\fIXmNqualifySearchDataProc\fP and contains all information required to
+conduct a directory search, including the directory mask and a qualified
+base directory and search pattern.
+.ne 4
+Once called, it is up to the search routine to generate a new list of
+directories and update the FileSelectionBox widget by using
+\fIXtSetValues\fP.
+.IP
+The search procedure must set \fIXmNdirectoryValid\fP and
+\fIXmNlistUpdated\fP.
+If it generates a new list of directories, it must also set
+\fIXmNdirListItems\fP and \fIXmNdirListItemCount\fP.
+.IP
+If the search procedure cannot search the specified directory, it must
+warn the user and set \fIXmNdirectoryValid\fP and \fIXmNlistUpdated\fP
+to False, unless it prompts and subsequently obtains a valid directory.
+If the directory is valid but is the same as the current
+\fIXmNdirectory\fP, the search procedure must set
+\fIXmNdirectoryValid\fP to True, but it may elect not to generate a new
+list of directories.
+In this case is must set \fIXmNlistUpdated\fP to False.
+.IP
+If the search procedure generates a new list of directories, it must set
+\fIXmNdirListItems\fP to the new list of directories and
+\fIXmNdirListItemCount\fP to the number of items in the list.
+If there are no directories, it sets \fIXmNdirListItems\fP to NULL and
+\fIXmNdirListItemCount\fP to 0.
+In either case it must set \fIXmNdirectoryValid\fP and
+\fIXmNlistUpdated\fP to True.
+.IP
+In constructing the list of directories, the search procedure should 
+consider the value of the resource \fIfileFilterStyle\fP and exclude
+directories the begin with `.' when this resource is set to
+XmFILTER_HIDDEN_FILES.
+.IP
+The search procedure ordinarily should not change the callback struct.
+But if the original directory is not valid, the search procedure may
+obtain a new directory from the user.
+In this case it should set the \fBdir\fP member of the callback struct
+to the new directory, call the \fIXmNqualifySearchDataProc\fP with the
+callback struct as the input argument, and copy the qualified data
+returned by the \fIXmNqualifySearchDataProc\fP into the callback struct.
+.IP "\fIXmNdirSpec\fP"
+Specifies the full file path specification.
+This is the \fIXmNtextString\fP resource in SelectionBox, renamed for
+FileSelectionBox.
+The default value is determined by the FileSelectionBox after conducting
+the initial directory and file search.
+.IP "\fIdirTextLabelString\fP"
+This resource  takes effect when the \fIpathMode\fP is XmPATH_MODE_RELATIVE
+and is ignored when the \fIpathMode\fP is XmPATH_MODE_FULL.
+Specifies the label string of the directory text field.
+The default for this resource is NULL.
+.IP "\fIfileFilterStyle\fP"
+There are two possible values:
+.wH
+.rS 
+.TP
+\(bu
+\fI0 / XmFILTER_NONE\fP - the default \fIXmNdirSearchProc\fP and
+\fIXmNfileSearchProc\fP do not filter any of the directories or files.
+.TP
+\(bu
+\fI1 / XmFILTER_HIDDEN_FILES\fP - the default \fIXmNdirSearchProc\fP and
+\fIXmNfileSearchProc\fP filter any file or directory that begins with `.'.
+There is one exception: the `..' directory is not filtered out of the
+directory search.
+.wH
+.rE
+.nL
+.ne 6
+.IP "\fIXmNfileListItems\fP"
+Specifies the items in the file list.
+This is the \fIXmNlistItems\fP resource in SelectionBox, renamed for
+FileSelectionBox.
+\fIXtGetValues\fP for this resource returns the list items themselves,
+not a copy of the list items.
+The application must not free the returned items.
+.IP "\fIXmNfileListItemCount\fP"
+Specifies the number of items in the file list.
+This is the \fIXmNlistItemCount\fP resource in SelectionBox, renamed for
+FileSelectionBox.
+The value must not be negative.
+.IP "\fIXmNfileListLabelString\fP"
+Specifies the label string of the file list.
+This is the \fIXmNlistLabelString\fP resource in SelectionBox, renamed
+for FileSelectionBox.
+The default for this resource depends on the locale.
+In the C locale the default is "Files".
+.IP "\fIXmNfileSearchProc\fP"
+Specifies a file search procedure to replace the default file-search
+procedure.
+FileSelectionBox's default file-search procedure fulfills the needs of
+most applications.
+Because it is impossible to cover the requirements of all applications,
+you can replace the default search procedure.
+.IP
+The file search procedure is called with two arguments:
+the FileSelectionBox widget and a pointer to an
+\fIXmFileSelectionBoxCallbackStruct\fP structure.
+The callback structure is generated by the
+\fIXmNqualifySearchDataProc\fP (and possibly modified by the
+\fIXmNdirSearchProc\fP).
+It contains all information required to conduct a file search, including
+the directory mask and a qualified base directory and search pattern.
+.ne 4
+Once called, it is up to the search routine to generate a new list of
+files and update the FileSelectionBox widget by using \fIXtSetValues\fP.
+.IP
+The search procedure must set \fIXmNlistUpdated\fP.
+If it generates a new list of files, it must also set
+\fIXmNfileListItems\fP and \fIXmNfileListItemCount\fP.
+.IP
+The search procedure is recommended always to generate a new list of
+files.
+If the \fBmask\fP member of the callback struct is the same as the
+\fBmask\fP member of the callback struct in the preceding call to the
+search procedure, the procedure may elect not to generate a new list of
+files.
+In this case it must set \fIXmNlistUpdated\fP to False.
+.IP
+If the search procedure generates a new list of files, it must set
+\fIXmNfileListItems\fP to the new list of files and
+\fIXmNfileListItemCount\fP to the number of items in the list.
+If there are no files, it sets \fIXmNfileListItems\fP to NULL and
+\fIXmNfileListItemCount\fP to 0.
+In either case it must set \fIXmNlistUpdated\fP to True.
+.IP
+In constructing the list of files, the search procedure should include
+only files of the types specified by the widget's \fIXmNfileTypeMask\fP.
+.IP
+In constructing the list of files, the search procedure should 
+consider the value of the resource \fIfileFilterStyle\fP and exclude
+files the begin with `.' when this resource is set to XmFILTER_HIDDEN_FILES.
+.IP
+Setting \fIXmNdirSpec\fP is optional, but recommended.
+Set this attribute to the full file specification of the directory
+searched.
+The directory specification is displayed below the directory and file
+lists.
+.IP "\fIXmNfileTypeMask\fP"
+Specifies the type of files listed in the file list.
+Following are the possible values:
+.wH
+.rS 
+.TP
+\(bu
+\fIXmFILE_REGULAR\fP restricts the file list to contain only regular
+files.
+.TP
+\(bu
+\fIXmFILE_DIRECTORY\fP restricts the file list to contain only
+directories.
+.TP
+\(bu
+\fIXmFILE_ANY_TYPE\fP allows the list to contain all file types
+including directories.
+.wH
+.rE
+.nL
+.ne 7
+.IP "\fIXmNfilterLabelString\fP"
+Specifies the label string for the text entry field for the directory
+mask.
+When the resource \fIpathMode\fP is XmPATH_MODE_RELATIVE, this string
+labels the text field entry for the pattern.
+The default for this resource depends on the locale.
+In the C locale the default is "Filter".
+.IP "\fIXmNlistUpdated\fP"
+Specifies an attribute that is set only by the directory and file search
+procedures.
+Set to True if the search procedure updated the directory or file list.
+.IP "\fIXmNnoMatchString\fP"
+Specifies a string to be displayed in the file list if the list of files
+is empty.
+.IP "\fIpathMode\fI"
+This resource provides an alternate layout for the FileSelectionBox.
+It has two possible values:
+.wH
+.rS 
+.TP
+\(bu
+\fI0 / XmPATH_MODE_FULL\fP - a single text field to display the XmNdirMask.
+.TP
+\(bu
+\fI1 / XmPATH_MODE_RELATIVE\fP - a text field to display the XmNdirectory and
+a text field to display the XmNpattern.
+.wH
+.rE
+.nL
+.ne 6
+When the \fIpathMode\fP is XmPATH_MODE_RELATIVE, the resource
+\fIXmNfilterLabelString\fP applies to the text field for the \fIXmNpattern\fP,
+and the resource \fIdirTextLabelString\fP applies to the text field for
+the \fIXmNdirectory\fP.
+.IP "\fIXmNpattern\fP"
+Specifies the search pattern used in combination with \fIXmNdirectory\fP
+in determining the files and directories to be displayed.
+The default value is determined by the \fIXmNqualifySearchDataProc\fP
+and depends on the initial values of \fIXmNdirMask\fP,
+\fIXmNdirectory\fP, and \fIXmNpattern\fP.
+If the default is NULL or empty, a pattern that matches all files is
+used.
+.IP "\fIXmNqualifySearchDataProc\fP"
+Specifies a search data qualification procedure to replace the default
+data qualification procedure.
+FileSelectionBox's default data qualification procedure fulfills the
+needs of most applications.
+Because it is impossible to cover the requirements of all applications,
+you can replace the default procedure.
+.IP
+The data qualification procedure is called to generate a qualified
+directory mask, base directory, and search pattern for use by the
+directory and file search procedures.
+It is called with three arguments:
+the FileSelectionBox widget and pointers to two
+\fIXmFileSelectionBoxCallbackStruct\fP structures.
+The first callback struct contains the input data.
+The second callback struct contains the output data, to be filled in by
+the data qualification procedure.
+.IP
+.ne 5
+If the input \fBdir\fP and \fBpattern\fP members are not NULL, the
+procedure must copy them to the corresponding members of the output
+callback struct.
+.IP
+.ne 6
+If the input \fBdir\fP is NULL, the procedure constructs the
+output \fBdir\fP as follows:
+If the input \fBmask\fP member is NULL, the procedure uses the
+widget's \fIXmNdirectory\fP as the output \fBdir\fP; otherwise, it
+extracts the output \fBdir\fP from the input \fBmask\fP.
+If the resulting output \fBdir\fP is empty, the procedure uses
+the current working directory instead.
+.IP
+If the input \fBpattern\fP is NULL, the procedure constructs
+the output \fBpattern\fP as follows:
+If the input \fBmask\fP member is NULL, the procedure uses the
+widget's \fIXmNpattern\fP as the output \fBpattern\fP; otherwise, it
+extracts the output \fBpattern\fP from the input \fBmask\fP.
+If the resulting output \fBpattern\fP is empty, the procedure
+uses a pattern that matches all files instead.
+.IP
+The data qualification procedure constructs the output \fBmask\fP from
+the output \fBdir\fP and \fBpattern\fP.
+The procedure must ensure that the output \fBdir\fP, \fBpattern\fP, and
+\fBmask\fP are fully qualified.
+.IP
+If the input \fBvalue\fP member is not NULL, the procedure must copy it
+to the output \fBvalue\fP member; otherwise, the procedure must copy the
+widget's \fIXmNdirSpec\fP to the output \fBvalue\fP.
+.IP
+The data qualification procedure must calculate the lengths of the
+output \fBvalue\fP, \fBmask\fP, \fBdir\fP, and \fBpattern\fP members and
+must fill in the corresponding length members of the output callback
+struct.
+.IP
+The data qualification procedure must copy the input \fBreason\fP and
+\fBevent\fP members to the corresponding output members.
+.IP
+The values of the \fIXmNdirSearchProc\fP and \fIXmNfileSearchProc\fP
+are procedure pointers of type \fIXmSearchProc\fP, defined as 
+follows:
+.sS
+.iS
+.sp \n(PDu
+void (* XmSearchProc) (\fBw, search_data\fI)
+.ta .5i 1.25i
+.nf
+	Widget	\fBw\fI;
+	XtPointer	\fBsearch_data\fI;
+.fi
+.iE
+.sE
+.IP "\fBw\fP
+The FileSelectionBox widget
+.IP "\fBsearch_data\fP
+Pointer to an \fIXmFileSelectionBoxCallbackStruct\fP containing
+information for conducting a search
+.IP
+.PP
+The value of the \fIXmNqualifySearchDataProc\fP resource
+is a procedure pointer of type \fIXmQualifyProc\fP, defined
+as follows:
+.sS
+.iS
+.sp \n(PDu
+void (* XmQualifyProc) (\fBw, input_data, output_data\fI)
+.ta .5i 1.25i
+.nf
+	Widget	\fBw\fI;
+	XtPointer	\fBinput_data\fI;
+	XtPointer	\fBoutput_data\fI;
+.fi
+.iE
+.sE
+.IP "\fBw\fP
+The FileSelectionBox widget
+.IP "\fBinput_data\fP
+Pointer to an \fIXmFileSelectionBoxCallbackStruct\fP containing
+input data to be qualified
+.IP "\fBoutput_data\fP"
+Pointer to an \fIXmFileSelectionBoxCallbackStruct\fP containing
+output data to be filled in by the qualification procedure.
+.SS "Inherited Resources"
+FileSelectionBox inherits behavior and resources from the following
+superclasses.  For a complete description of each resource, refer to the
+man page for that superclass.
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmSelectionBox Resource Set
+Name	Class	Type	Default	Access
+_
+XmNapplyCallback	XmCCallback	XtCallbackList	NULL	C
+XmNapplyLabelString	XmCApplyLabelString	XmString	dynamic	CSG
+XmNcancelCallback	XmCCallback	XtCallbackList	NULL	C
+XmNcancelLabelString	XmCCancelLabelString	XmString	dynamic 	CSG
+XmNchildPlacement	XmCChildPlacement	unsigned char	XmPLACE_ABOVE_SELECTION	CSG
+XmNdialogType	XmCDialogType	unsigned char	XmDIALOG_FILE_SELECTION 	G
+XmNhelpLabelString	XmCHelpLabelString	XmString	dynamic 	CSG
+XmNlistItemCount	XmCItemCount	int	dynamic 	CSG
+XmNlistItems	XmCItems	XmStringTable	dynamic	CSG
+XmNlistLabelString	XmCListLabelString	XmString	dynamic	CSG
+XmNlistVisibleItemCount	XmCVisibleItemCount	int	dynamic 	CSG
+XmNminimizeButtons	XmCMinimizeButtons	Boolean	False	CSG
+XmNmustMatch	XmCMustMatch	Boolean	False 	CSG
+XmNnoMatchCallback	XmCCallback	XtCallbackList	NULL	C
+.wH
+.tH
+XmNokCallback	XmCCallback	XtCallbackList	NULL	C
+XmNokLabelString	XmCOkLabelString	XmString	dynamic	CSG
+XmNselectionLabelString	XmCSelectionLabelString	XmString	dynamic	CSG
+XmNtextAccelerators	XmCTextAccelerators	XtAccelerators	default	C
+XmNtextColumns	XmCColumns	short	dynamic	CSG
+XmNtextString	XmCTextString	XmString	dynamic	CSG
+.TE
+.KE
+.in
+.sp 1
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmBulletinBoard Resource Set
+Name	Class	Type	Default	Access
+_
+XmNallowOverlap	XmCAllowOverlap	Boolean	True	CSG
+XmNautoUnmanage	XmCAutoUnmanage	Boolean	False	CG
+XmNbuttonFontList	XmCButtonFontList	XmFontList	dynamic	CSG
+XmNcancelButton	XmCWidget	Widget	Cancel button	SG
+XmNdefaultButton	XmCWidget	Widget	OK button	SG
+XmNdefaultPosition	XmCDefaultPosition	Boolean	True	CSG
+XmNdialogStyle	XmCDialogStyle	unsigned char	dynamic	CSG
+XmNdialogTitle	XmCDialogTitle	XmString	NULL	CSG
+XmNfocusCallback	XmCCallback	XtCallbackList	NULL	C
+XmNlabelFontList	XmCLabelFontList	XmFontList	dynamic	CSG
+XmNmapCallback	XmCCallback	XtCallbackList	NULL	C
+XmNmarginHeight	XmCMarginHeight	Dimension	10	CSG
+XmNmarginWidth	XmCMarginWidth	Dimension	10 	CSG
+XmNnoResize	XmCNoResize	Boolean	False	CSG
+.wH
+.tH
+XmNresizePolicy	XmCResizePolicy	unsigned char	XmRESIZE_ANY	CSG
+XmNshadowType	XmCShadowType	unsigned char	XmSHADOW_OUT	CSG
+XmNtextFontList	XmCTextFontList	XmFontList	dynamic	CSG
+XmNtextTranslations	XmCTranslations	XtTranslations	NULL	C
+XmNunmapCallback	XmCCallback	XtCallbackList	NULL	C
+.TE
+.KE
+.in
+.sp 1
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmManager Resource Set
+Name	Class	Type	Default	Access
+_
+XmNbottomShadowColor	XmCBottomShadowColor	Pixel	dynamic	CSG
+XmNbottomShadowPixmap	XmCBottomShadowPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNforeground	XmCForeground	Pixel	dynamic	CSG
+XmNhelpCallback	XmCCallback	XtCallbackList	NULL	C
+XmNhighlightColor	XmCHighlightColor	Pixel	dynamic	CSG
+XmNhighlightPixmap	XmCHighlightPixmap	Pixmap	dynamic	CSG
+XmNinitialFocus	XmCInitialFocus	Widget	dynamic	CSG
+XmNnavigationType	XmCNavigationType	XmNavigationType	XmTAB_GROUP	CSG
+XmNshadowThickness	XmCShadowThickness	Dimension	dynamic	CSG
+XmNstringDirection	XmCStringDirection	XmStringDirection	dynamic	CG
+XmNtopShadowColor	XmCTopShadowColor	Pixel	dynamic	CSG
+XmNtopShadowPixmap	XmCTopShadowPixmap	Pixmap	dynamic	CSG
+XmNtraversalOn	XmCTraversalOn	Boolean	True	CSG
+XmNunitType	XmCUnitType	unsigned char	dynamic	CSG
+XmNuserData	XmCUserData	XtPointer	NULL	CSG
+.TE
+.KE
+.in
+.sp 1
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+Composite Resource Set
+Name	Class	Type	Default	Access
+_
+XmNchildren	XmCReadOnly	WidgetList	NULL	G
+XmNinsertPosition	XmCInsertPosition	XtOrderProc	NULL	CSG
+XmNnumChildren	XmCReadOnly	Cardinal	0	G
+.TE
+.KE
+.in
+.sp 1
+.P 
+.wH
+.in 0 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+Core Resource Set
+Name	Class	Type	Default	Access
+_
+XmNaccelerators	XmCAccelerators	XtAccelerators	dynamic	N/A
+XmNancestorSensitive	XmCSensitive	Boolean	dynamic	G
+XmNbackground	XmCBackground	Pixel	dynamic	CSG
+XmNbackgroundPixmap	XmCPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNborderColor	XmCBorderColor	Pixel	XtDefaultForeground	CSG
+XmNborderPixmap	XmCPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNborderWidth	XmCBorderWidth	Dimension	0	CSG
+XmNcolormap	XmCColormap	Colormap	dynamic	CG
+XmNdepth	XmCDepth	int	dynamic	CG
+XmNdestroyCallback	XmCCallback	XtCallbackList	NULL	C
+XmNheight	XmCHeight	Dimension	dynamic	CSG
+XmNinitialResourcesPersistent	XmCInitialResourcesPersistent	Boolean	True	C
+XmNmappedWhenManaged	XmCMappedWhenManaged	Boolean	True	CSG
+XmNscreen	XmCScreen	Screen *	dynamic	CG
+.wH
+.tH
+XmNsensitive	XmCSensitive	Boolean	True	CSG
+XmNtranslations	XmCTranslations	XtTranslations	dynamic	CSG
+XmNwidth	XmCWidth	Dimension	dynamic	CSG
+XmNx	XmCPosition	Position	0	CSG
+XmNy	XmCPosition	Position	0	CSG
+.TE
+.KE
+.in
+.sp 1
+.wH
+.in  
+.SS "Callback Information"
+A pointer to the following structure is passed to each callback:
+.sS
+.iS
+.ta .25i 1.1i
+.nf
+typedef struct
+{
+	int	\fBreason\fI;
+	\fIXEvent	\fB* event\fI;
+	\fIXmString	\fBvalue\fI;
+	\fIint	\fBlength\fI;
+	\fIXmString	\fBmask\fI;
+	\fIint	\fBmask_length\fI;
+	\fIXmString	\fBdir\fI;
+	\fIint	\fBdir_length\fI;
+	\fIXmString	\fBpattern\fI;
+	\fIint	\fBpattern_length\fI;
+} XmFileSelectionBoxCallbackStruct;
+.iE
+.sE
+.IP "\fBreason\fP"
+Indicates why the callback was invoked
+.IP "\fBevent\fP"
+Points to the \fIXEvent\fP that triggered the callback
+.IP "\fBvalue\fP"
+Specifies the current value of \fIXmNdirSpec\fP
+.IP "\fBlength\fP"
+Specifies the number of bytes in \fBvalue\fP
+.IP "\fBmask\fP"
+Specifies the current value of \fIXmNdirMask\fP
+.IP "\fBmask_length\fP"
+Specifies the number of bytes in \fBmask\fP
+.IP "\fBdir\fP"
+Specifies the current base directory
+.IP "\fBdir_length\fP"
+Specifies the number of bytes in \fBdir\fP
+.IP "\fBpattern\fP"
+Specifies the current search pattern
+.IP "\fBpattern_length\fP"
+Specifies the number of bytes in \fBpattern\fP
+.SS "Translations"
+XmFileSelectionBox inherits translations from XmSelectionBox.
+.SS "Accelerators"
+The \fIXmNtextAccelerators\fP from XmSelectionBox are added to the
+selection and directory mask (filter) Text descendants of
+XmFileSelectionBox.
+.SS "Action Routines"
+The XmFileSelectionBox action routines are described below:
+.IP "\fISelectionBoxUpOrDown(0|1|2|3)\fP:"
+If neither the selection text nor the directory mask (filter) text has
+the focus, this action does nothing.
+.IP 
+.ne 3i
+If the selection text has the focus, the term \fBlist\fP in the
+following description refers to the file list, and the term \fBtext\fP
+refers to the selection text.
+If the directory mask text has the focus, \fBlist\fP refers to the
+directory list, and \fBtext\fP refers to the directory mask text.
+.IP
+When called with a 0 argument, selects the previous item in the
+list and replaces the text with that item.
+.IP
+When called with a 1 argument, selects the next item in the
+list and replaces the text with that item.
+.IP
+When called with a 2 argument, selects the first item in the
+list and replaces the text with that item.
+.IP
+When called with a 3 argument, selects the last item in the
+list and replaces the text with that item.
+.IP "\fISelectionBoxRestore()\fP:"
+If neither the selection text nor the directory mask (filter) text has
+the focus, this action does nothing.
+.IP
+If the selection text has the focus, replaces the selection text with
+the selected item in the file list.
+If no item in the file list is selected, clears the selection text.
+.IP
+If the directory mask text has the focus, replaces the directory mask
+text with a new directory mask constructed from the \fIXmNdirectory\fP
+and \fIXmNpattern\fP resources.
+.SS "Additional Behavior"
+The FileSelectionBox widget has the additional behavior described below:
+.IP "\fIMAny\ KCancel\fP:"
+Calls the activate callbacks for the cancel button if it is sensitive.
+If no cancel button exists and the parent of the FileSelectionBox is a manager,
+passes the event to the parent.
+.IP "\fI<KActivate>\fP\ in\ Selection\ Text:"
+Calls the selection text widget's \fIXmNactivateCallback\fP callbacks.
+If \fIXmNmustMatch\fP is True and the selection text does not match an
+item in the file list, calls the \fIXmNnoMatchCallback\fP
+callbacks with
+reason \fIXmCR_NO_MATCH\fP.
+Otherwise, calls the \fIXmNokCallback\fP callbacks with reason
+\fIXmCR_OK\fP.
+.nL
+.ne 5
+.IP "\fI<KActivate>\fP\ in\ Directory\ Mask\ Text:"
+Calls the directory mask text widget's \fIXmNactivateCallback\fP
+callbacks.
+Initiates a directory and file search.
+Calls the \fIXmNapplyCallback\fP callbacks with reason \fIXmCR_APPLY\fP.
+.IP "\fI<DoubleClick>\fP\ or\ \fI<KActivate>\fP\ in\ Directory\ List:"
+Calls the directory list widget's \fIXmNdefaultActionCallback\fP
+callbacks.
+Initiates a directory and file search.
+Calls the \fIXmNapplyCallback\fP callbacks with reason \fIXmCR_APPLY\fP.
+.IP "\fI<DoubleClick>\fP\ or\ \fI<KActivate>\fP\ in\ File\ List:"
+Calls the file list widget's \fIXmNdefaultActionCallback\fP
+callbacks.
+Calls the \fIXmNokCallback\fP callbacks with reason \fIXmCR_OK\fP.
+.IP "\fI<Single\ Select>\fP\ or\ \fI<Browse\ Select>\fP\ in\ Directory\ List:"
+Generates a new directory mask, using the selected list item as the
+directory and the pattern extracted from the current directory mask text
+as the search pattern.
+If the search pattern is empty, uses a pattern that matches all files in
+the directory.
+Replaces the directory mask text with the new directory mask.
+.IP "\fI<Single\ Select>\fP\ or\ \fI<Browse\ Select>\fP\ in\ File\ List:"
+Replaces the selection text with the selected list item.
+.IP "\fI<BDrag>\fP in File List:"
+Drags the content of one or more selected list items using the drag
+and drop facility.  If \fIBDrag\fP is pressed on an unselected item,
+drags only that item, excluding any other selected items.
+.IP
+The \fIXmNexportTargets\fP resource of the associated DragContext
+is set to target types of COMPOUND_TEXT and FILE_NAME.  The
+\fIXmNclientData\fP resource is set to the index of the item in the list.
+.IP "\fI<BDrag>\fP in Directory List:"
+Drags the content of one or more selected list items using the drag
+and drop facility.  If \fIBDrag\fP is pressed on an unselected item,
+drags only that item, excluding any other selected items.
+.IP
+The \fIXmNexportTargets\fP resource of the associated DragContext
+is set to target types of COMPOUND_TEXT and FILE_NAME.  The
+\fIXmNclientData\fP resource is set to the index of the item in the list.
+.PP
+.IP "\fI<Apply\ Button\ Activated>\fP:"
+Initiates a directory and file search.
+Calls the \fIXmNapplyCallback\fP callbacks with reason \fIXmCR_APPLY\fP.
+.IP "\fI<OK\ Button\ Activated>\fP:"
+If \fIXmNmustMatch\fP is True and the selection text does not match an
+item in the file list, calls the \fIXmNnoMatchCallback\fP callbacks with
+reason \fIXmCR_NO_MATCH\fP.
+Otherwise, calls the \fIXmNokCallback\fP callbacks with reason
+\fIXmCR_OK\fP.
+.P 
+.ne 3i
+.IP "\fI<Cancel\ Button\ Activated>\fP:"
+Calls the \fIXmNcancelCallback\fP callbacks with reason
+\fIXmCR_CANCEL\fP.
+.IP "\fI<Help\ Button\ Activated>\fP:"
+Calls the \fIXmNhelpCallback\fP callbacks with reason \fIXmCR_HELP\fP.
+.nL
+.ne 5
+.IP "\fI<KActivate>\fP:"
+If no button, list widget, or text widget has the keyboard focus:
+If \fIXmNmustMatch\fP is True and the selection text does not match an
+item in the file list, calls the \fIXmNnoMatchCallback\fP callbacks with
+reason \fIXmCR_NO_MATCH\fP.
+Otherwise, calls the \fIXmNokCallback\fP callbacks with reason
+\fIXmCR_OK\fP.
+.SS "Virtual Bindings"
+The bindings for virtual keys are vendor specific.
+For information about bindings for virtual buttons and keys, see \fIVirtualBindings(3X)\fP.
+.SH RELATED INFORMATION
+.na
+\fIComposite(3X)\fP,
+\fIConstraint(3X)\fP,
+\fICore(3X)\fP,
+\fIXmBulletinBoard(3X)\fP,
+\fIXmCreateFileSelectionBox(3X)\fP,
+\fIXmCreateFileSelectionDialog(3X)\fP,
+\fIXmFileSelectionBoxGetChild(3X)\fP,
+\fIXmFileSelectionDoSearch(3X)\fP,
+\fIXmManager(3X)\fP, and
+\fIXmSelectionBox(3X)\fP.
+.ad

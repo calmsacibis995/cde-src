@@ -1,0 +1,1136 @@
+.TH dtterm 1 "21 Apr 1994"
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994 Novell, Inc.
+.\" *************************************************************************
+.SH NAME
+dtterm \- Cde terminal emulator
+.SH SYNOPSIS
+.yS
+dtterm
+[\-options]
+.yE
+.SH DESCRIPTION
+The \f3dtterm\fP
+client provides run time support of legacy applications
+written for \f3ANSI X3.64-1979\fP and \f3ISO 6429:1992(E)\fP 
+conformant character terminals such as the \f3DEC VT220\fP.
+.P
+The \f3dtterm\fP
+client does not provide full \f3DEC VT220\fP terminal functionality.
+The following \f3VT220\fP functionality is
+not supported:
+.VL 6
+.LI \f3DECDWL\fP
+Double-width, single-height text is not supported.
+.LI \f3DECDHL\fP
+Double-width, double-height text is not supported.
+.LE
+.P
+.SH OPTIONS
+The following options are available:
+.VL 6
+.LI \f3\-132\fP
+Normally, \f3dtterm\fP ignores the \f3DECCOLM\fP escape sequence that
+switches between 80 and 132 column mode.
+This option causes \f3dtterm\fP to recognize the \f3DECCOLM\fP
+escape sequence, and the \f3dtterm\fP window resizes appropriately.
+.P
+.LI \f3\+132\fP
+This option causes \f3dterm\fP to ignore the \f3DECCOLM\fP escape sequence.
+This is the default behavior.
+.P
+.LI \f3\-aw\fP
+This option indicates that \f3dtterm\fP allows auto-wraparound.
+This allows the cursor to automatically wrap to the beginning of the next
+line when it is at the right-most position of a line and text is output.
+This is the default behavior.
+.P
+.LI \f3\+aw\fP
+This option indicates that \f3dtterm\fP does not allow auto-wraparound.
+.P
+.LI "\f3\-background\fP \f2background_color\fP"
+This option specifies the background of the
+terminal window as well as the default background \f3dtterm\fP uses for the
+scroll bar and the X11 pointer cursor.
+Under
+.\" !!!! version/config dependent string
+.\" !!!! normal CDE string:
+Cde, 
+.\" !!!! normal VUE string:
+.\" HPVUE
+this option defaults to either the primary colorset
+background
+.\" !!!! version/config dependent string
+.\" !!!! normal CDE string:
+(default) or select
+.\" !!!! version/config dependent string
+.\" !!!! normal CDE string:
+.\" (default)
+pixel (see \f3\-bs\fP).
+Without
+.\" !!!! version/config dependent string
+.\" !!!! normal CDE string:
+Cde,
+.\" !!!! normal VUE string:
+.\" HPVUE
+this option defaults to \f3*background/*Background\fP with an ultimate
+fall back color of black.
+.P
+\f2background_color\fP  -  Describes the background color \f3dtterm\fP uses.
+.P
+.LI "\f3\-bd\fP \f2border_color\fP"
+This option specifies the border color for all windows.
+The shell widget's window border may not be visible when re-parenting window 
+managers such as
+.\" !!!! version/config dependent string
+.\" !!!! normal CDE string:
+.Cm dtwm(1)
+.\" !!!! normal VUE string:
+.\" \f3vuewm(1X)\fP
+and
+.Cm mwm(1X)
+are used.
+The default is the color black.
+.P
+\f2border_color\fP - Describes the border color \f3dtterm\fP uses.
+.P
+.LI "\f3\-bg\fP \f2background_color\fP"
+This option is identical to \f3\-background\fP.
+.P
+\f2background_color\fP - Describes the background color \f3dtterm\fP uses.
+.P
+.LI "\f3\-bordercolor\fP \f2border_color\fP"
+This option is identical to \f3\-bd\fP.
+.P
+\f2border_color\fP - Describes the border color \f3dtterm\fP uses.
+.P
+.LI "\f3\-borderwidth\fP \f2border_width\fP"
+This option specifies the border width of the shell widget's window.
+This value may be overriden by re-parenting window managers such as
+.\" !!!! version/config dependent string
+.\" !!!! normal CDE string:
+.Cm dtwm 1
+and
+.Cm mwm 1X.
+The default is 0.
+.P
+\f2border_width\fP - Specifies the width of the window border in pixels.
+.P
+.LI \f3\-bs\fP
+This option specifies that the terminal window uses the Motif
+select color instead of the background color for the terminal window's
+background color.
+.\" !!!! version/config dependent string
+.\" !!!! normal CDE string:
+.\" This is the default behavior.
+.P
+.LI \f3\+bs\fP
+This option specifies that the terminal window not use the Motif
+select color instead of the background color for the terminal window's
+background color.
+.\" !!!! version/config dependent string
+.\" !!!! normal CDE string:
+This is the default behavior.
+.P
+.LI "\f3\-bw\fP \f2border_width\fP"
+This option is identical to \f3-borderwidth\fP above.
+.P
+\f2border_width\fP - Specifies the width of the window border in pixels.
+.P
+.LI \f3\-C\fP
+This option specifies that output directed at 
+\f3/dev/console\fP
+be directed instead to the terminal window.
+It is provided as a way to prevent output that would normally be displayed on the
+ITE from stepping on the X server's display.
+It is not provided as a general purpose mechanism to direct the output from
+an arbitrary system's \f3/dev/console \fP to an arbitrary X server.
+Ownership of, and read-write permission for, \f3/dev/console \fP
+is required to redirect console output.
+The default is False.
+.P
+.LI "\f3\-display\fP \f2display_name\fP"
+This option specifies the X11 display server \f3dtterm\fP uses.
+This defaults to the \f3DISPLAY\fP environment variable.
+.P
+\f2display_name\fP - Specifies the X11 display \f3dtterm\fP connects to.
+.P
+.LI "\f3\-e \fP \f2program_argument ...\fP"
+This option specifies an executable program and any command line arguments
+\f3dtterm\fP invokes as a subprocess when \f3dtterm\fP is started.
+It must be the last option on the command line.
+.P
+\f2program_argument ...\fP - Specifies the program \f3dtterm\fP executes and any command
+line arguments.
+.P
+.LI "\f3\-fb\fP \f2fontset\fP"
+This option specifies an \f3XFontSet\fP \f3dtterm\fP uses when displaying bold terminal
+text.
+The \f3XFontSet\fP should be specified as a Motif
+.Fn XmFontList 3X.
+The terminal emulator supports only character- or mono-spaced fonts.
+The behavior, when using proportional fonts, is undefined.
+The terminal emulator generates a default bold font based on the \f3XLFD\fP
+name of the \f3userFont\fP.
+If that font is not available, \f3dtterm\fP generates bold text
+by overstriking (with a one pixel offset) the \f3userFont\fP.
+.P
+\f2fontset\fP - Specifies the bold terminal \f3XFontSet\fP \f3dtterm\fP uses.
+.P
+.LI "\f3\-fg\fP \f2foreground_color\fP"
+This option specifies the foreground color of the terminal window as
+well as the default foreground color \f3dtterm\fP uses for the scroll bar and the
+for the X11 pointer cursor.
+Under
+.\" !!!! version/config dependent string
+.\" !!!! normal CDE string:
+Cde,
+.\" !!!! normal VUE string:
+.\" HPVUE,
+this option defaults to the 
+primary color set foreground pixel.
+Without
+.\" !!!! version/config dependent string
+.\" !!!! normal CDE string:
+Cde,
+.\" !!!! normal VUE string:
+.\" HPVUE,
+this option defaults to \f3*foreground\fP/\f3*Foreground\fP 
+with an ultimate fall back color of white.
+.P
+\f2foreground_color\fP - Specifies the foreground color \f3dtterm\fP uses.
+.P
+.LI "\f3\-fn\fP \f2fontset\fP"
+This option specifies an \f3XFontSet\fP to be used when displaying terminal text.
+It should be specified as a Motif
+.Fn XmFontList 3X.
+Only character- or mono-spaced fonts are supported.
+The behavior, when using proportional fonts, is undefined.
+This font is not used to display non-terminal text (such as menu bar, popup menus, 
+or dialogs).
+The default uses the \f3XmNtextFontList\fP value of the parent bulletin 
+board (see
+.Fn XmBulletinBoard 3X)
+in the same manner as the
+.Fn XmText 3X
+widget.
+.P
+\f2fontset\fP - Specifies the terminal \f3XFontSet\fP \f3dtterm\fP uses.
+.P
+.LI "\f3\-font\fP \f2fontset\fP"
+This option is identical to \f3\-fn\fP above.
+.P
+\f2fontset\fP - Specifies the terminal \f3XFontSet\fP \f3dtterm\fP uses.
+.P
+.LI "\f3\-foreground\fP \f2foreground_color\fP"
+This option is identical to \f3\-fg\fP above.
+.P
+\f2foreground_color\fP - Specifies the foreground color \f3dtterm\fP uses.
+.P
+.LI "\f3\-geometry\fP \f2geometry_string\fP"
+This option
+specifies the terminal window's preferred size and position.
+Width and height are expressed in characters.
+The default size is 24 lines of 80 characters each.
+There is no default position.
+.P
+\f2geometry_string\fP - Specifies the terminal geometry \f3dtterm\fP uses.
+.P
+.LI \f3\-help\fP
+Displays a message summarizing \f3dtterm\fP usage.
+.LI \f3\-iconic\fP
+This option specifies that the terminal emulator initially be displayed in an
+iconified state.
+.P
+.LI \f3\+iconic\fP
+This option specifies that the terminal emulator initially be displayed
+as a normal window.
+This is the default behavior.
+.P
+.LI \f3\-j\fP
+This option specifies that \f3dtterm\fP uses jump scrolling.
+Under jump scrolling, the screen may be scrolled more than one line at a time.
+This provides for faster screen updates when multiple lines of text are sent to the terminal.
+The maximum number of lines that may be
+jump scrolled is limited to the number of lines in the terminal window.
+The termminal emulator guarantees that all lines are displayed.
+This is the default behavior.
+.P
+.LI \f3\+j\fP
+This option specifies that \f3dtterm\fP not use jump scrolling.
+.LI \f3\-kshMode\fP
+This option specifies that \f3dtterm\fP enable ksh mode.
+Under ksh
+mode, a key pressed with the extend modifier bit set generates an
+escape character followed by the character generated by the un-extended
+keystroke.
+This option is provided to use with emacs and the emacs
+command line editor mode of
+.Cm ksh 1
+or
+.Cm ied 1.
+This option conflicts with the
+normal meta key use for generating extended single byte
+characters and for generating multi-byte Asian characters.
+.P
+.LI \f3\+kshMode\fP
+This option specifies that \f3dtterm\fP not enable ksh mode.
+This is the default behavior.
+.P
+.LI \f3\-l\fP
+This option enables output logging.
+When \f3dtterm\fP enables logging, all output received from the subprocess is 
+logged either to a file or to a command pipeline (as specified via the \f3\-lf\fP 
+option described below).
+Since data are logged directly from the subprocess, the log file includes
+all escape characters and carriage return/new line pairs the terminal
+line discipline sends.
+The appllication may enable and disable logging via escape sequences.
+.P
+.LI \f3\+l\fP
+This option disables output logging.
+This is the default.
+.P
+.LI "\f3\-lf\fP \f2file_name\fP"
+This option specifies file name to which \f3dtterm\fP writes
+output logging (described above).
+If the filename begins with a pipe symbol
+(``\f3|\fP''), \f3dtterm\fP assumes the rest of the string to be a command
+to be used as the endpoint of a pipe.
+If the filename ends in \f3XXXXX\fP, 
+the last 5 characters will be replaced with the process ID of \f3dtterm\fP.
+The default filename is \f3DttermLogXXXXX\fP
+and is created in the directory
+from which the subprocess was started.
+.P
+\f2file_name\fP - Specifies the log file name \f3dtterm\fP uses for logging.
+.P
+.LI \f3\-ls\fP
+This option indicates that the shell that is started be a login
+shell (that is, the first character of \f3argv[0]\fP
+be a dash), indicating
+to the shell that it read the system's \f3profile\fP
+and the user's \f3.profile\fP
+(for
+.Cm ksh 1
+and
+.Cm sh 1,
+or the system's \f3csh.login\fP and the user's \f3.login\fP 
+(for
+.Cm csh 1.
+.P
+.LI \f3\+ls\fP
+This option specifies that \f3dtterm\fP starts a normal (non-login) shell.
+This is the default behavior.
+.P
+.LI \f3\-map\fP
+This option indicates that \f3dtterm\fP map
+(de-iconify) itself upon subprocess output if it is unmapped (iconified).
+The user may specify, via the \f3mapOnOutputDelay\fP resource (described below),
+an initial period of time during which \f3dtterm\fP does not map itself upon
+subprocess output.
+.P
+.LI \f3\+map\fP
+This option indicates there is no special mapping behavior.
+This is the default.
+.P
+.LI \f3\-mb\fP
+This option specifies that the bell rings
+when the user types at a specified distance from the right margin.
+The distance from the
+right margin is specified by the \f3\-nb\fP option (described below).
+.P
+.LI \f3\+mb\fP
+This option specifies that the bell not ring
+when the user types near the right margin.
+This is the default behavior.
+.P
+.LI "\f3\-ms\fP \f2pointer_color\fP"
+This option specifies the foreground color \f3dtterm\fP uses for the terminal
+window's (X11) pointer cursor.
+The default is the terminal
+window's foreground color (see \f3\-foreground\fP above).
+.P
+\f2pointer_color\fP - This option specifies the pointer foreground color \f3dtterm\fP
+uses.
+.P
+.LI "\f3\-name\fP \f2prog_name\fP"
+Specifies the X11 name of the \f3dtterm\fP window.
+.P
+\f2prog_name\fP - Specifies the name to use.
+.P
+.LI "\f3\-nb\fP \f2number\fP"
+This option specifies the number of characters from the right
+margin at which the margin bell rings, when enabled.
+The default is 10.
+.P
+\f2number\fP - Specifies the number of characters.
+.P
+.LI \f3\-rw\fP
+This option specifies that \f3dtterm\fP enables reverse-wraparound.
+.P
+.LI \+rw
+This option specifies that \f3dtterm\fP does not enable reverse-wraparound.
+This is the default.
+.P
+.LI "\f3\-S\fP \f2ccn\fP"
+This option specifies that the terminal emulator is run against a
+pre-opened pty or STREAMS device.
+The terminal emulator provides this option to use where the pty or STREAMS device
+name is of the form \f3tty??\fP (that is, exactly two characters following the 
+\f3``tty''\fP).
+This option is intended for use when \f3dtterm\fP is invoked
+programatically from within another application.
+.P
+\f2cc\fP - Specifies the last two characters of the pty or STREAMS device's
+slave name where the pty
+slave name is of the form ``\f(CWtty??\fP''.
+This value is ignored, but must be exactly two characters in length.
+.P
+.LI \f3n\fP
+Specifies the number of the file descriptor that corresponds to the pty or STREAMS
+device's already opened master side.
+.P
+.LI "\f3\-S\fP \f2c . n\fP"
+This option is identical to \f3\-S\fP\f2ccn\fP above,
+but is provided for systems with a larger pty or STREAMS device name space.
+.P
+\f2c\fP - Specifies the last component of the pty or STREAMS device slave name.
+The terminal emulator ignores this value and the value may be empty.
+.P
+\f2n\fP - Specifies the number of the file descriptor that corresponds to the pty or STREAMS device's
+already opened master side.
+.P
+.LI \f3\-sb\fP
+This option specifies that \f3dtterm\fP display a scroll bar.
+This is the default.
+.P
+.LI \f3\+sb\fP
+This option specifies that \f3dtterm\fP not display a scroll bar.
+.P
+.LI \f3\-sf\fP
+This option specifies that \f3dtterm\fP generate Sun Function Key escape codes
+instead of standard VT220 escape sequences for the terminal's function keys.
+.P
+.LI \f3\+sf\fP
+This option specifies that \f3dtterm\fP generate standard VT220 escape sequences
+instead of Sun Function Key escape codes for the terminal's function keys.
+This is the default behavior.
+.P
+.LI "\f3\-sl\fP \f2screens\fP[\f3s|l\fP]"
+This option specifies the number of lines in the terminal buffer beyond the
+length of the window.
+The option value consists of a number followed by
+an optional suffix.
+If no suffix is included or the suffix is ``l'' (ell), the
+total length of the terminal buffer is \f2screens\fP plus the length of
+the terminal window.
+If the suffix is ``s'' (ess) the total length of the
+terminal buffer is \f2screens\fP plus one times the length of the
+terminal window.
+The \f3dtterm\fP utility tries to maintain the same buffer-to-window
+ratio when the window is resized larger.
+The default is ``4s''.
+.P
+\f2screens\fP - Specifies the number of screens or lines to save.
+.P
+.LI "\f3\-ti\fP \f2term_id\fP"
+This option supplies the name \f3dtterm\fP uses to select the correct response to
+terminal ID queries.
+Valid values are \f3vt100\fP, \f3vt101\fP,
+\f3vt102\fP, and \f3vt220\fP.
+The default is \f3vt220\fP.
+.P
+\f2term_id\fP - Specifies the terminal ID to use.
+.P
+.LI "\f3\-title\fP \f2title_string\fP"
+This option specifies the window title.
+If the user uses the \f3-e\fP option, the
+default is the last component of the program's path.
+If the user does not use the \f3-e\fP option, the default is the last
+component of the name used to execute \f3dtterm\fP (that is, \f3argv[0]\fP).
+.P
+\f2title_string\fP - Specifies the title \f3dterm\fP uses.
+.P
+.LI "\f3\-tm\fP \f2term_modes\fP"
+This option specifies a string containing terminal-setting keywords
+and the characters to which they are to be bound.
+Allowable keywords
+include:  \f3intr\fP, \f3quit\fP, \f3erase\fP, \f3kill\fP, \f3eof\fP,
+\f3eol\fP, \f3swtch\fP, \f3start\fP, \f3stop\fP, \f3brk\fP,
+\f3susp\fP, \f3dsusp\fP, \f3rprnt\fP, \f3flush\fP, \f3weras\fP,
+and \f3lnext\fP.
+The terminal emulator correctly parses and silently ignores keywords that do not apply
+to a specific architecture.
+Control characters may be specified as \f3^\fP\f2char\fP (two characters, 
+`\f3^\fP'
+followed by \f2char\fP).
+The character \f2char\fP is case insensitive.
+Some examples are: \f3^c\fP, \f3^C\fP, \f3^u\fP, and \f3^U\fP.
+\f3^?\fP may be used to indicate delete.
+This is very useful for overridding the default terminal settings without having to
+do an \f3stty(1)\fP 
+every time a terminal process is started.
+The default is 
+.Cn NULL .
+.P
+\f2term_modes\fP - Specifies the terminal mode string.
+.P
+.LI "\f3\-tn\fP \f2term_name\fP"
+This option specifies a name \f3dtterm\fP uses to set the \f3TERM\fP
+environment variable to.
+The default is \f3vt220\fP.
+.P
+\2term_name\fP - Specifies the terminal name \f3dtterm\fP uses.
+.P
+.LI \f3\-usage\fP
+Prints a usage message on the screen.
+.P
+.LI \f3\-vb\fP
+This option indicates that a visual bell is preferred over an audible one.
+Instead of ringing the
+terminal bell whenever a Control-G is received, the window is flashed.
+.P
+.LI \f3\+vb\fP
+This option indicates that an audio bell is preferred over an visual one.
+This is the default behavior.
+.P
+.LI "\f3\-w\fP \f2border_width\fP"
+This option is identical to \f3\-borderwidth\fP above.
+.P
+\f2border_width\fP - Specifies the width of the window border in pixels.
+.P
+.LI "\f3\-xrm\fP \f2resource_string\fP"
+This option allows the user to specify the X11 Resource Manager-style
+resources on the command line.
+See the X11 documentation for more information.
+.P
+\f2resource_string\fP - Specifies an X11 resource string.
+.LE
+.P
+.SH RESOURCES
+The \f3dtterm\fP client allows the user to specify behavior through X11 resources
+as well as the command line interface.
+Following is a list of the defined resources:
+.HU "The \f3dtterm\fP Client Resource Set"
+.TS
+center, expand;
+cf3	cf3	cf3	cf3
+lf3w(2c) lf3w(2c) lf3w(1c) lf3w(2c) .
+Name	Class	Type	Default
+_
+allowSendEvents	AllowSendEvents	Boolean	False
+appCursorDefault	AppCursorDefault	Boolean	False
+appKeypadDefault	AppKeypadDefault	Boolean	False
+autoWrap	AutoWrap	Boolean	True
+background	Background	String
+.\" !!!! version/config dependent string
+.\" !!!! normal CDE string:
+backgroundIsSelect	BackgroundIsSelect	Boolean	False
+.\" !!!! normal VUE string:
+.\" backgroundIsSelect	BackgroundIsSelect	Boolean	True
+blinkRate	BlinkRate	int	250
+borderColor	BorderColor	String	``\f3black\fP''
+borderWidth	BorderWidth	int	0
+c132	C132	Boolean	True
+charCursorStyle	CharCursorStyle	String	``\f3charcursor_box\fP''
+consoleMode	ConsoleMode	Boolean	False
+foreground	Foreground	String
+geometry	Geometry	String	NULL
+halfBrightInhibit	HalfBrightInhibit	Boolean	False
+iconic	Iconic	Boolean	False
+iconName	IconName	String	``\f3dtterm\fP''
+jumpScroll	JumpScroll	Boolean	True
+kshMode	KshMode	Boolean	False
+logging	Logging	Boolean	False
+logFile	LogFile	String	``\f3DttermLogXXXXX\fP''
+logInhibit	LogInhibit	Boolean	False
+loginShell	LoginShell	Boolean	False
+mapOnOutput	AutoMap	Boolean	False
+mapOnOutputDelay	MapDelay	int	0
+marginBell	MarginBell	Boolean	False
+menu	Menu	Boolean	True
+nMarginBell	NMarginBell	int	10
+pointerBlank	PointerBlank	Boolean	False
+pointerBlankDelay	PointerBlankDelay	int	2
+pointerColor	Foreground	String	foreground color
+pointerColorBackground	Background	String	background color
+pointerShape	PointerShape	String	``\f3xterm\fP''
+reverseWrap	ReverseWrap	Boolean	False
+saveLines	SaveLines	String	``4s''
+scrollBar	ScrollBar	Boolean	True
+sunFunctionKeys	SunFunctionKeys	Boolean	False
+termId	TermId	String	``\f3vt220\fP''
+termName	TermName	String	``\f3vt220\fP''
+title	Title	String	``\f3dtterm\fP''
+ttyModes	TtyModes	String	NULL
+userBoldFont	UserBoldFont	XmFontList	dynamic
+userFont	UserFont	XmFontList	dynamic
+visualBell	VisualBell	Boolean	False
+.TE
+.P
+.VL 6
+.LI \f3allowSendEvents\fP
+This resource specifies that the terminal emulator allow
+synthetic events (generated and sent by another application).
+Enabling this resource opens up a possible security hole.
+The default is False.
+.LI \f3appCursorDefault\fP
+If True, the cursor keys are initially in application mode.
+If False, the cursor keys are initially in cursor mode.
+The default
+is False.
+.LI \f3appKeypadDefault\fP
+If True, the keypad keys are initially in application mode.
+If False, the keypad keys are initially in numeric mode.
+The default
+is False.
+.LI \f3autoWrap\fP
+This resource specifies whether or not auto-wraparound is initially
+enabled.  The default is True.
+.LI \f3background\fP
+This resource specifies the
+background color of the terminal window as well as the default background
+color for the
+scroll bar.
+Under
+.\" !!!! version/config dependent string
+.\" !!!! normal CDE string:
+Cde,
+.\" !!!! normal VUE string:
+.\" HPVUE,
+this resource defaults to either the primary
+color set background
+.\" !!!! version/config dependent string
+.\" !!!! normal CDE string:
+(default)
+or select
+.\" !!!! version/config dependent string
+.\" !!!! normal VUE string:
+.\" (default)
+pixel (see
+\f3backgroundIsSelect\fP).
+Without
+.\" !!!! version/config dependent string
+.\" !!!! normal CDE string:
+Cde,
+.\" !!!! normal VUE string:
+.\" HPVUE,
+this resource defaults to black.
+.LI \f3backgroundIsSelect\fP
+This resource specifies that the terminal window should use the Motif
+select color instead of the background color for the terminal window's
+background color.  The default is False.
+.LI \f3blinkRate\fP
+This resource specifies the number of milliseconds the cursor is in the
+``on'' and ``off'' states while blinking.
+A 250 value blinks the cursor two times per second.
+A 0 value turns blinking off.
+The default is 250.
+.LI \f3borderColor\fP
+This resource specifies the border color for the window.
+The window border
+may not be visible when re-parenting window managers such as
+.\" !!!! version/config dependent string
+.\" !!!! normal CDE string:
+.Cm dtwm 1X
+.\" !!!! normal VUE string:
+.\" \f3vuewm(1X)\fP
+and
+.Cm mwm 1X
+are used.
+The default is black.
+.LI \f3borderWidth\fP
+This resource specifies the border width of the shell widget's window.
+This value may be overridden by re-parenting window managers such as
+.\" !!!! version/config dependent string
+.\" !!!! normal CDE string:
+.Cm dtwm 1X
+.\" !!!! normal VUE string:
+.\" \f3vuewm(1X)\fP
+and 
+.Cm mwm 1X.
+The default is 0.
+.LI \f3c132\fP
+This resource specifies whether or not the \f3DECCOLM\fP escape sequence that
+switches between a 132 and 80 column window is honored.
+The default is False.
+.LI \f3charCursorStyle\fP
+This resource specifies the shape of the text cursor.
+A
+.Cn charcursor_box
+value specifies a cursor the width and height of the base
+font's bounding box.
+A
+.Cn charcursor_bar
+value specifies a cursor the
+width of the base font's bounding box, 2 pixels high, and drawn with its
+top on the baseline.
+.\" DS - do we need to mention charcursor_invisible here????????
+The default is
+.Cn charcursor_box .
+.LI \f3consoleMode\fP
+This resource specifies that output directed at \f3/dev/console\fP
+be directed instead to the terminal window.
+It is provided as a way to
+prevent output that would normally be displayed on the ITE from stepping
+on the X server's display.
+It is not provided as a general mechanism to
+direct the output from an arbitrary system's 
+\f3/dev/console\fP
+to an arbitrary X server.
+Ownership of, and read-write permission for,
+\f3/dev/console\fP
+is required to redirect console output.
+The default is False.
+.LI \f3foreground\fP
+This resource specifies the foreground of the terminal window as well as
+the default \f3dtterm\fP uses for the scroll bar and the color used for the pointer
+cursor.
+Under
+.\" !!!! version/config dependent string
+.\" !!!! normal CDE string:
+Cde,
+.\" !!!! normal VUE string:
+.\" HPVUE,
+this resource defaults to the primary
+color set foreground pixel.
+Without
+.\" !!!! version/config dependent string
+.\" !!!! normal Cde string:
+Cde,
+.\" !!!! normal VUE string:
+.\" HPVUE,
+this resource defaults to
+white.
+.LI \f3geometry\fP
+This resource specifies the terminal window's preferred size and position.
+The default size is 24 lines of 80 characters each.
+There is no default position.
+.LI \f3halfBrightInhibit\fP
+This resource specifies that \f3dtterm\fP not allocate or use half-bright colors
+when displaying characters with the faint graphics rendition set.
+In this mode \f3dtterm\fP allocates fewer read-only cells from the color map.
+The default is False.
+.LI \f3iconGeometry\fP
+This resource specifies the preferred position of the terminal
+emulator's icon.
+Window managers (including
+.\" !!!! version/config dependent string
+.\" !!!! normal CDE string:
+.Cm dtwm 1
+.\" !!!! normal VUE string:
+.\" .Cm vuewm 1X
+and 
+.Cm mwm 1X 
+may ignore this value.
+There is no default.
+.LI \f3iconic\fP
+This resource specifies whether or not the terminal emulator is initially
+displayed in an iconified state.
+The default is False.
+.LI \f3iconName\fP
+This resource specifies the name for the icon.
+If the user uses \f3\-e\fP option, the default
+is the last component of the program's path.
+If the user does not use \f3\-e\fP option, the default is
+the last component of the name
+used to execute \f3dtterm\fP (that is, \f3argv[0]\fP).
+.LI \f3jumpScroll\fP
+This resource specifies that \f3dtterm\fP use jump scrolling.
+Under jump
+scrolling, the screen may be scrolled more than one line at a time.
+This provides for faster screen updates when multiple lines of text are
+sent to the terminal.
+The maximum number of lines that may be
+jump scrolled is limited to the number of lines in the terminal window.
+The terminal emulator guarantees that all lines are displayed.
+The default is True.
+.LI \f3kshMode\fP
+This resource enables ksh mode.
+Under ksh
+mode, a key pressed with the extend modifier bit set generates an
+escape character followed by the character generated by the un-extended
+keystroke.
+This option is provided for use with emacs and the emacs
+command line editor mode of
+.Cm ksh 1 or
+.Cm ied 1.
+It conflicts with the
+normal meta key use for generating extended single byte
+characters and for generating multi-byte Asian characters.
+The default
+is False.
+.LI \f3logging\fP
+This resource enables output logging.
+When logging is enabled, all
+output received from the subprocess is logged either to a file or to a
+command pipeline (as specified via the \f3logFile\fP option
+below).
+Since the data is logged directly from the subprocess, it includes all escape characters
+and carriage return / new line pairs the terminal line discipline sends.
+Logging may be enabled and disabled via escape sequences.
+The default is False.
+.LI \f3logFile\fP
+This resource specifies the filename \f3dtterm\fP uses to write the output logging
+(described above) to.
+If the filename begins with a pipe symbol
+(\f3|\fP), \f3dtterm\fP assumes 
+the rest of the string is a command to be used as the
+endpoint of a pipe.
+If the filename ends in \f3XXXXX\fP , 
+the
+last 5 characters are replaced with the \f3dtterm\fP's process ID.
+The default filename is \f3DttermLogXXXXX\fP
+and is created in the directory from which the subprocess
+was started.
+.LI \f3logInhibit\fP
+This resource indicates that \f3dtterm\fP inhibit device and file logging.
+The default is False.
+.LI \f3loginShell\fP
+This resource indicates that the shell that is started be a login
+shell (that is, the first character of \f3argv[0] \fP
+is a dash, indicating
+that the shell should read the system's \f3profile\fP
+and the user's \f3.profile \fP (for \f3ksh\fP and \f3sh\fP)
+or the system \f3csh.login \fP and the user's \f3.login \fP
+(for \f3csh\fP)).
+The default is False.
+.LI \f3mapOnOutput\fP
+This resource indicates that the terminal emulator map
+(de-iconify) itself upon subprocess output if it is unmapped (iconified).
+The user may specify, via the \f3mapOnOutputDelay\fP resource (described below),
+an initial period of time during which \f3dtterm\fP does not map itself
+upon subprocess output.
+The default is False.
+.LI \f3mapOnOutputDelay\fP
+This resource specifies the number of seconds after start-up that \f3dtterm\fP
+does not honor the \f3mapOnOutput\fP resource (described above).
+This allows the application to send
+initial output (for example, shell prompts) to the terminal without
+auto mapping the window.
+The default is 0 (no delay).
+.LI \f3marginBell\fP
+This resource specifies whether or not the bell rings when the user types near
+the right margin.
+The distance from the right margin is specified by
+the \f3nMarginBell\fP resource (described below).
+The default is False.
+.LI \f3menu\fP
+This resource indicates that \f3dtterm\fP display a pulldown menu bar.
+The
+default is True.
+.LI \f3nMarginBell\fP
+This resource specifies the number of characters from the right margin at which the
+margin bell rings, when enabled.
+The default is 10.
+.LI \f3pointerBlank\fP
+This resource indicates that \f3dtterm\fP put the pointer cursor into
+blanking mode.
+In this mode, the cursor turns on when the pointer
+is moved, and is blanked either after a selectable number of
+seconds or after keyboard input.
+The \f3pointerBlankDelay\fP resource (described below) sets the delay.
+The default is False.
+.LI \f3pointerBlankDelay\fP
+This resource specifies the number of seconds to wait after the pointer
+has stopped moving before blanking the pointer (see \f3pointerBlank\fP above).
+A 0 value delays pointer blanking until a key is pressed.
+The default is 2 seconds.
+.LI \f3pointerColor\fP
+This resource specifies the foreground color \f3dtterm\fP uses for the terminal
+window's pointer (X11) cursor.
+The default is the terminal window's foreground color (see \f3foreground\fP above).
+.LI \f3pointerColorBackground\fP
+This resource specifies the background color \f3dtterm\fP uses for the terminal
+window's pointer (X11) cursor.
+The default is the terminal window's background color (see \f3background\fP above).
+.LI \f3pointerShape\fP
+This resource specifies the X cursor font character \f3dtterm\fP uses as the
+pointer cursor.
+The font character should be specified as a string from the include file \f3<X11/cursorfont.h>\fP
+with the leading \f3\s-1XC_\s0\fP removed.
+The default is \f3xterm\fP.
+.LI \f3reverseWrap\fP
+This resource specifies whether or not reverse-wraparound is
+enabled.
+The default is False.
+.LI \f3saveLines\fP
+This resource specifies the number lines in the terminal buffer beyond the
+length of the window.
+This resource value consists of a number followed by
+an options suffix.
+If no suffix is included or the suffix is ``l'' (ell), the
+total length of the terminal buffer is \f2screens\fP plus the length of
+the terminal window.
+If the suffix is ``s'' (ess) the total length of the
+terminal buffer is (\f2screens\fP plus one) times the length of the
+terminal window.
+The \f3dtterm\fP utility tries to maintain the same buffer-to-window
+ratio when the window is resized larger.
+The default is ``4s''.
+.LI \f3scrollBar\fP
+This resources indicates that \f3dtterm\fP displaya scroll bar.
+The default is False.
+.LI \f3sunFunctionKeys\fP
+This resource specifies whether or not \f3dtterm\fP generates Sun Function Key
+escape codes instead of standard VT220 escape
+sequences for the terminal's function keys.
+The default is False.
+.LI \f3termId\fP
+This resource supplies the name used to select the correct response to
+terminal ID queries.
+Valid values are \f3vt100\fP, \f3vt101\fP, \f3vt102\fP, and
+\f3vt220\fP.
+The default is \f3vt220\fP.
+.LI \f3termName\fP
+This resource specifies a name \f3dtterm\fP sets the \f3TERM\fP environment variable to.
+The default is \f3vt220\fP.
+.LI \f3title\fP
+This resource specifies the window title.
+If the uses uses the \f3\-e\fP option, the
+default is the last component of the program's path.
+If the user does not use the \f3\-e\fP
+option, the default is the last component of the name
+used to execute \f3dtterm\fP (that is, \f3argv[0]\fP).
+.LI \f3ttyModes\fP
+This resource specifies a string containing terminal-setting keywords
+and the characters to which they are to be bound.
+Allowable keywords
+include:  \f3intr\fP, \f3quit\fP, \f3erase\fP, \f3kill\fP, \f3eof\fP, \f3eol\fP, 
+\f3swtch\fP, \f3start\fP, \f3stop\fP, \f3brk\fP,
+\f3susp\fP, \f3dsusp\fP, \f3rprnt\fP, \f3flush\fP, \f3weras\fP, and \f3lnext\fP.
+The terminal emulator correctly parses and silently ignores keywords that
+do not apply to a specific architecture.
+Control characters may be specified as \f3^\fP\f2char\fP (two characters, 
+`\f3^\fP'
+followed by \f2char\fP).
+The character \f2char\fP is case insensitive.
+Some examples are: ``\f3^c\fP'', ``\f3^C\fP'', ``\f3^u\fP'', and ``\f3^U\fP''.
+``\f3^?\fP'' may be used to indicate delete.
+This is useful for overriding the
+default terminal settings without having to do an \f3stty \fP
+every time a terminal process is started.
+The default is
+.Cn NULL .
+.LI \f3userBoldFont\fP
+This resource specifies an \f3XFontSet\fP \f3dtterm\fP uses when displaying bold
+terminal text.
+It should be specified as a Motif
+.Fn XmFontList 3X.
+The terminal emulator supports only character- or mono-spaced fonts.
+When using proportional fonts, the behavior is undefined.
+The terminal emulator generates a default bold font based on the \f3XLFD\fP
+name of the \f3userFont\fP.
+If that font is not available, \f3dtterm\fP generates bold text
+by overstriking (with a one pixel offset) the \f3userFont\fP.
+.LI \f3userFont\fP
+This resource specifies an \f3XFontSet\fP \f3dtterm\fP uses when displaying terminal
+text.
+\f3XFontSet\fP should be specified as a Motif
+.Fn XmFontList 3X.
+The terminal emulator supports only character- or mono-spaced fonts.
+When using proportional fonts, the behavior is undefined.
+This font is not used
+to display non-terminal text (menu bar, popup menu, dialog, etc.).
+The default is
+the \f3XmNtextFontList\fP value of the parent bulletin board (see
+.Fn XmBulletinBoard 3X)
+in the same manner as the
+.Fn XmText 3X
+widget.
+.LI \f3visualBellfP
+This resource indicates that a visual bell is preferred over an audible
+one.
+Instead of ringing the terminal bell whenever a Control-G is
+received, the window is flashed.
+The default is False.
+.LE
+.P
+.HU "Resource/Option Correspondence"
+.P
+Many of the above resources correspond to the command line arguments.
+The following table describes the relationship between the two:
+.HU "dtterm Resource/Option correspondence"
+.TS
+center;
+cf3	cf3
+lf3w(3c)	lf3w(3c) .
+Command line option	Resource Setting
+_
+-132	*c132: True
++132	*c132: False
+-aw	*autoWrap: True
++aw	*autoWrap: False
+-background \f2background_color\fP	*background: \f2background_color\fP
+-bd \f2border_color\fP	*borderColor: \f2border_color\fP
+-bg \f2background_color\fP	*background: \f2background_color\fP
+-bordercolor \f2border_color\fP	*borderColor: \f2border_color\fP
+-borderwidth \f2border_width\fP	.borderWidth: \f2border_width\fP
+-bs	*backgroundIsSelect: True
++bs	*backgroundIsSelect: False
+-bw \f2border_width\fP	.borderWidth: \f2border_width\fP
+-C	*consoleMode: True
+-display \f2display_name\fP	.display: \f2display_name\fP
+-e \f2program_argument...\fP
+-fb \f2fontset\fP	*userBoldFont: \f2fontset\fP
+-fg \f2foreground_color\fP	*foreground: \f2foreground_color\fP
+-fn \f2fontset\fP	*userFont: \f2fontset\fP
+-font \f2fontset\fP	*userFont: \f2fontset\fP
+-foreground \f2foreground_color\fP	*foreground: \f2foreground_color\fP
+-geometry \f2geometry_string\fP	.geometry: \f2geometry_string\fP
+-iconic	.iconic: True
++iconic	.iconic: False
+-j	*jumpScroll: True
++j	*jumpScroll: False
+-kshMode	*kshMode: True
++kshMode	*kshMode: False
+-l	*logging: True
++l	*logging: False
+-lf \f2file_name\fP	*logFile: \f2file_name\fP
+-ls	*loginShell: True
++ls	*loginShell: False
+-map	*mapOnOutput: True
++map	*mapOnOutput: False
+-mb	*marginBell: True
++mb	*marginBell: False
+-ms \f2pointer_color\fP	*pointerColor: \f2pointer_color\fP
+-name \f2prog_name\fP	.name: \f2prog_name\fP
+-nb \f2number\fP	*nMarginBell: \f2number\fP
+-rw	*reverseWrap: True
++rw	*reverseWrap: False
+-sb	*scrollBar: True
++sb	*scrollBar: False
+-sf	*sunFunctionKeys: True
++sf	*sunFunctionKeys: False
+-sl \f2screens\fPs	*saveLines: \f2screens\fP * lines/screen
+-sl \f2lines\fP	*saveLines: \f2lines\fP
+-ti \f2term_id\fP	*termId: \f2term_id\fP
+-title \f2title_string\fP	.title: \f2title_string\fP
+-tm \f2term_modes\fP	*ttyModes: \f2term_modes\fP
+-tn \f2term_name\fP	*termName: \f2term_name\fP
+-vb	*visualBell: True
++vb	*visualBell: False
+-w \f2border_width\fP	.borderWidth: \f2border_width\fP
+.TE
+.P
+.SH ENVIRONMENT
+.P
+The terminal emulator recognizes the following environment variables:
+.VL 6
+.LI \f3XUSERFILESEARCHPATH\fP
+The \f3XUSERFILESEARCHPATH\fP environment variable controls
+where X applications look for their app-defaults resource files.
+The default is located in the directory
+.\" !!!! version/config dependent string
+.\" !!!! normal motif path:
+.\" \f3/usr/lib/X11/app-defaults\fP.
+.\" !!!! normal CDE path:
+\f3/usr/dt/app-defaults\fP.
+You need to set \f3XUSERFILESEARCHPATH\fP if your resource
+files are not in this location.
+.LI \f3XFILESEARCHPATH\fP
+The environment variable \f3XFILESEARCHPATH\fP may define a
+language-dependent location of app-defaults.
+.LI \f3XENVIRONMENT\fP
+The user may specify any user and machine-specific resources by setting the
+\f3XENVIRONMENT\fP environment variable to the name of a resource file
+to be loaded by all applications.
+If this variable is not defined, \f3dtterm\fP looks for a file named 
+\f3$HOME/.Xdefaults-hostname\fP instead,
+where hostname is the name of the host where the application is
+executing.
+.LI \f3XMODIFIER\fP
+This environment variable allows the user to specify which input method to use.
+.LI \f3LANG\fP
+The user must set the \f3LANG\fP environment variable in order to use native
+language support.
+Setting \f3LANG\fP causes X to use the
+language-sensitive routines for character handling.
+.LI \f3NLSPATH\fP
+The \f3NLSPATH\fP environment variable determines the paths
+applications search for NLS message catalogs.
+X clients place NLS message catalogs in the
+.\" !!!! version/config dependent string
+.\" !!!! normal pre-SVR5 path:
+.\" \f3/usr/lib/nls/$LANG\fP
+.\" !!!! normal CDE path:
+\f3/usr/dt/lib/nls/$LANG\fP
+directory.
+The user must set both
+\f3LANG\fP and \f3NLSPATH\fP in order to use
+these message catalogs.
+.LI \f3XAPPLRESDIR\fP
+This environment variable allows the user to name a directory that
+contains application specific resources.
+If this environment variable
+exists, and is set to an existing directory, then it is searched (in
+addition to the standard locations) for files containing application
+specific resource specifications.
+.LI \f3HOME\fP
+The terminal emulator uses this environment variable to
+determine the location of configuration files.
+.LI \f3SHELL\fP
+Default application to run.
+.LI \f3TERM\fP
+The terminal emulator sets the subprocess's \f3TERM\fP environment
+variable to the \f3termName\fP resource value.
+Applications use this variable to determine the type of escape sequences to use
+when driving the terminal emulator.
+.LI \f3LINES\fP
+The terminal emulator sets the subprocess's \f3LINES\fP
+environment variable to the number of lines present in the terminal
+window at creation.
+If the size of the terminal window is subsequently
+changed, the terminal emulator uses the \f3TIOCSWINSZ\fP ioctl to
+inform the applications running against it of the new line count.
+Under normal use, the user's shell updates
+\f3LINES\fP with the updated value.
+.LI \f3COLUMNS\fP
+The terminal emulator sets the subprocess's \f3COLUMNS\fP
+environment variable to the number of columns present in the terminal
+window at creation.
+If the size of the terminal window is subsequently
+changed the terminal emulator will use the \f3TIOCSWINSZ\fP ioctl to
+inform the applications running against it of the new column count.
+Under normal use, the user's shell will update \f3COLUMNS\fP with the
+updated value.
+.LI \f3DISPLAY\fP
+This environment variable specifies the default X11 display to connect
+to (see \f3\-display\fP above).
+The terminal emulator will set the
+subprocess's \f3DISPLAY\fP environment variable to the connected X11
+display name.
+.LI \f3WINDOWID\fP
+The terminal emulator sets the subprocess's \f3WINDOWID\fP
+environment variable to the window number of the window in which text
+will be rendered.
+.LI \f3TERMINAL_EMULATOR\fP
+This environment variable is set to \f3dtterm\fP to indicate that
+the process is running from a terminal emulator.
+.LE
+.P
+.SH "SEE ALSO"
+.Cm dtterm 5,
+.Cm stty 1,
+.Cm X 1,
+.cdes
+.Fn XmFontList 3X,
+.Fn XmText 3X,
+.cdee
+.xos
+.Fn XmFontList 3X,
+in the \*Zt.
+.Fn XmText 3X,
+in the \*Zt.
+.xoe
+.cde .Hd Dt/Term.h 5,
+.xo .Hd Dt/Term.h ,
+.Cm pty 7,
+.Cm tty 7.
+
+
+

@@ -1,0 +1,178 @@
+XCOMM $XConsortium: Imakefile /main/cde1_maint/3 1995/10/04 13:27:59 gtsang $
+/* tt/lib/mp/Imakefile */
+/* The default for the defines NormalLibtt and SharedLibtt are set in
+ * config/Project.tmpl.
+ * If NormalLibtt and ! SharedLibtt, only non-pic code is built in
+ *    current directory.
+ * If NormalLibtt and SharedLibtt, non-pic code is built in the current
+ *    directory and pic code is built in the shared subdirectory.
+ * If !NormalLibtt and SharedLibtt, only pic code is built in the 
+ *    current directory.
+ * The default defines for NormalLibtt and SharedLittt can be overwritten 
+ *    in many places. See the file config/ExtensionsToImake for 
+ *    information.
+ */
+#ifndef DoNormalLib
+#define DoNormalLib NormalLibtt
+#endif
+#ifndef DoSharedLib
+#define DoSharedLib SharedLibtt
+#endif
+
+#include <Library.tmpl>
+
+TT_DIR = ../..
+#include "../../tooltalk.tmpl"
+/* We don't need the local, or CDE includes here (see tooltalk.tmpl) */
+/* We do need XINCLUDES since mp_desktop.C uses X functions. */
+CDEINCLUDES=
+
+/* General case INCLUDES DEFINES
+ * Each individual architecture may have more or less of the above.
+ * Use EXTRA_DEFINES and EXTRA_INCLUDES to add defines and includes
+ * to an individual architecture.
+ */
+DEFINES =
+/* Sure wish we could put mini_isam only on the few files that need	*/
+/* it, but SpecialObjectRule doesn't seem to be defined 		*/
+INCLUDES = -I../../lib -I../../mini_isam 
+
+/* put EXTRA_DEFINES and EXTRA_INCLUDES and anything else below */
+#ifdef HPArchitecture
+EXTRA_CCOPTIONS = $(ESLIT_OPTION) /* set in hp.cf */
+EXTRA_C++OPTIONS = $(ESLIT++_OPTION)
+#endif
+
+#ifdef SunArchitecture
+EXTRA_DEFINES = -D_REENTRANT -DSVR4 -DOS_VERSION=OSMajorVersion -DOS_MINOR_VERSION=OSMinorVersion
+#endif
+
+/* Use BSD-compatible accept() call */
+#ifdef RsArchitecture
+EXTRA_C++OPTIONS = -DCOMPAT_43
+#endif
+
+#ifdef USLArchitecture
+#endif
+
+#ifdef UXPArchitecture
+#endif
+
+
+/*** NOTE!
+ *** Every time a .o is added below it needs to be added to
+ *** the lib/tt/lib Imakefile in MP_OBJS and SHARED_MP_OBJS
+ ***/
+
+
+/* SRCS and OBJS need to be conglomerated for make depend and library build */
+SRCS = \
+mp_session.C \
+mp_procid.C \
+mp_pattern.C \
+mp_c_pattern.C \
+mp_mp.C \
+mp_file.C \
+mp_file_utils.C \
+mp_arg.C \
+mp_arg_utils.C \
+mp_context.C \
+mp_context_utils.C \
+mp_msg_context.C \
+mp_msg_context_utils.C \
+mp_c_msg_context.C \
+mp_c_msg_context_utils.C \
+mp_pat_context.C \
+mp_pat_context_utils.C \
+mp_message.C \
+mp_message_utils.C \
+mp_mp_utils.C \
+mp_rpc_client_utils.C \
+mp_pattern_utils.C \
+mp_procid_utils.C \
+mp_rpc_client.C \
+mp_session_utils.C \
+mp_stream_socket.C \
+mp_stream_socket_utils.C \
+mp_xdr_functions.C \
+mp_rpc_auth.C \
+mp_rpc_auth_utils.C \
+mp_rpc_fns.c \
+mp_desktop.C \
+mp_session_prop.C \
+mp_session_prop_utils.C \
+mp_desktop_utils.C \
+mp_c_message.C \
+mp_trace.C \
+mp_c_procid.C \
+mp_c_procid_utils.C \
+mp_c_file.C \
+mp_c_file_utils.C \
+mp_c_mp.C \
+mp_c_message_utils.C \
+mp_c_session.C \
+mp_c_session_prop.C \
+mp_c_session_utils.C
+
+
+OBJS = \
+mp_session.o \
+mp_procid.o \
+mp_pattern.o \
+mp_c_pattern.o \
+mp_mp.o \
+mp_file.o \
+mp_file_utils.o \
+mp_arg.o \
+mp_arg_utils.o \
+mp_context.o \
+mp_context_utils.o \
+mp_msg_context.o \
+mp_msg_context_utils.o \
+mp_c_msg_context.o \
+mp_c_msg_context_utils.o \
+mp_pat_context.o \
+mp_pat_context_utils.o \
+mp_message.o \
+mp_message_utils.o \
+mp_mp_utils.o \
+mp_rpc_client_utils.o \
+mp_pattern_utils.o \
+mp_procid_utils.o \
+mp_rpc_client.o \
+mp_session_utils.o \
+mp_stream_socket.o \
+mp_stream_socket_utils.o \
+mp_xdr_functions.o \
+mp_rpc_auth.o \
+mp_rpc_auth_utils.o \
+mp_rpc_fns.o \
+mp_desktop.o \
+mp_session_prop.o \
+mp_session_prop_utils.o \
+mp_desktop_utils.o \
+mp_c_message.o \
+mp_trace.o \
+mp_c_procid.o \
+mp_c_procid_utils.o \
+mp_c_file.o \
+mp_c_file_utils.o \
+mp_c_mp.o \
+mp_c_message_utils.o \
+mp_c_session.o \
+mp_c_session_prop.o \
+mp_c_session_utils.o
+
+
+/* Build the .o's */
+LibraryObjectRule()
+
+all:: $(OBJS)
+
+
+/* Library built up one level */
+LintLibraryTarget(tt,$(SRCS))
+
+DependTarget()
+
+includes::

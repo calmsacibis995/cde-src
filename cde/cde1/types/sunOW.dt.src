@@ -1,0 +1,549 @@
+#undef sun
+
+\###############################################################################
+\#
+\#    sunOW.dt
+\#
+\#    Datatypes and Actions for OpenWindow formats and commands
+\#
+\#    (c) Copyright 1995, 1996 Sun Microsystems, Inc.
+\#
+\#    @(#)sunOW.dt.src	1.20 97/06/09 Sun Microsystems, Inc.
+\#
+\###############################################################################
+set DtDbVersion=1.0
+
+\###############################################################################
+\#
+%|nls-10-#\# WARNING:...#|
+\#
+\###############################################################################
+#define STAR *
+\###################################################################
+\#
+\# Data Attributes
+\#
+\###################################################################
+
+ACTION Open
+{
+	LABEL           %|nls-1-Open|
+	ARG_TYPE        experiment
+        TYPE            COMMAND
+        WINDOW_TYPE     NO_STDIO
+        EXEC_STRING     /usr/openwin/bin/textedit "%Arg_1%"
+}
+
+\########################################################
+
+
+DATA_ATTRIBUTES experiment
+{
+        ACTIONS         Open,Print
+        ICON            OWgendoc
+}
+DATA_CRITERIA experiment1
+{
+        DATA_ATTRIBUTES_NAME experiment
+        CONTENT         0 string Jn<-
+}
+ACTION Print
+{
+        LABEL           %|nls-2-Print|
+        ARG_TYPE        experiment
+        TYPE            COMMAND
+        WINDOW_TYPE     NO_STDIO
+        EXEC_STRING     er_export -g
+}
+
+\########################################################
+
+DATA_ATTRIBUTES sun-icon-image
+{
+        ACTIONS         Open,Print
+        ICON            Dtimage
+        NAME_TEMPLATE   icon%s.icon
+	MIME_TYPE       application/x-sun-sun-icon-image
+	SUNV3_TYPE      sun-icon-image
+}
+DATA_CRITERIA sun-icon-image1
+{
+        DATA_ATTRIBUTES_NAME sun-icon-image
+        NAME_PATTERN    *.icon
+	MODE		fr
+}
+DATA_CRITERIA sun-icon-image2
+{
+        DATA_ATTRIBUTES_NAME sun-icon-image
+        CONTENT         0 string /STAR Format_version=
+	MODE		fr
+}
+ACTION Open
+{
+        LABEL 		%|nls-1-Open|
+        ARG_TYPE        sun-icon-image
+        TYPE            COMMAND
+        WINDOW_TYPE     NO_STDIO
+        EXEC_STRING     /usr/openwin/bin/iconedit -Wb 255 225 225 "%Arg_1%"
+}
+ACTION Print
+{
+        LABEL           %|nls-2-Print|
+        ARG_TYPE        sun-icon-image
+        TYPE            COMMAND
+        WINDOW_TYPE     NO_STDIO
+        EXEC_STRING     cat "%Arg_1%" | /usr/openwin/bin/mp -o | lp -Tpostscript
+}
+
+\########################################################
+
+DATA_ATTRIBUTES GUIDE-file
+{
+        ACTIONS         Open,Print
+        ICON            OWgendoc
+        NAME_TEMPLATE   GUIDE%s.G
+		MIME_TYPE       application/x-sun-GUIDE-file
+		SUNV3_TYPE      GUIDE-file    
+}
+DATA_CRITERIA GUIDE-file1
+{
+        DATA_ATTRIBUTES_NAME GUIDE-file
+        NAME_PATTERN    *.G
+	MODE		fr
+}
+ACTION Open
+{
+        LABEL 		%|nls-1-Open|
+        ARG_TYPE        GUIDE-file
+        TYPE            COMMAND
+        WINDOW_TYPE     NO_STDIO
+        EXEC_STRING     guide "%Arg_1%"
+}
+ACTION Print
+{
+        LABEL           %|nls-2-Print|
+        ARG_TYPE        GUIDE-file
+        TYPE            COMMAND
+        WINDOW_TYPE     NO_STDIO
+        EXEC_STRING     cat "%Arg_1%" | /usr/openwin/bin/mp -lo | lp -Tpostscript
+}
+
+\########################################################
+
+ACTION Open
+{
+	ARG_TYPE	MIF,MAKER
+	ARG_COUNT	<2
+	LABEL		%|nls-1-Open|
+	TYPE		COMMAND
+	WINDOW_TYPE	NO_STDIO
+	EXEC_STRING	fmclient -f "%Arg_1%"
+}
+
+ACTION Print
+{
+	ARG_TYPE	MIF,MAKER
+	LABEL		%|nls-2-Print|
+	TYPE		COMMAND
+	WINDOW_TYPE	NO_STDIO
+	EXEC_STRING	FMPRINTER=$PRINTER fmclient -p -P$PRINTER -c$COPIES -f "%Arg_1%"
+}
+
+DATA_ATTRIBUTES MAKER
+{
+	ICON		SDtFrame
+	NAME_TEMPLATE	frame%s.doc
+	ACTIONS		Open,Print
+}
+
+DATA_CRITERIA MAKER0
+{
+	DATA_ATTRIBUTES_NAME MAKER
+	MODE		f
+	NAME_PATTERN	*.doc
+	SUNV3_TYPE      framemaker-document
+}
+
+DATA_CRITERIA MAKER1
+{
+	DATA_ATTRIBUTES_NAME MAKER
+	CONTENT		0 string <MakerFile
+}
+
+DATA_CRITERIA MAKER2
+{
+	DATA_ATTRIBUTES_NAME MAKER
+	CONTENT		0 string <Book
+}
+
+DATA_ATTRIBUTES MIF
+{
+	ICON		SDtFrame
+	NAME_TEMPLATE	frame%s.mif
+	ACTIONS		Open,Print
+	SUNV3_TYPE      framemaker-document
+}
+
+DATA_CRITERIA MIF0
+{
+	DATA_ATTRIBUTES_NAME MIF
+	NAME_PATTERN	*.mif
+}
+
+DATA_CRITERIA MIF1
+{
+	DATA_ATTRIBUTES_NAME MIF
+	CONTENT		0 string <MIFFile
+}
+
+\########################################################
+
+DATA_ATTRIBUTES GUIDE-project-file
+{
+        ACTIONS         Open,Print
+        ICON            OWgendoc
+        NAME_TEMPLATE   GUIDE%s.P
+	MIME_TYPE       application/x-sun-GUIDE-project-file
+	SUNV3_TYPE      GUIDE-project-file
+}
+DATA_CRITERIA GUIDE-project-file1
+{
+        DATA_ATTRIBUTES_NAME GUIDE-project-file
+        NAME_PATTERN    *.P
+	MODE		fr
+}
+ACTION Open
+{
+        LABEL 		%|nls-1-Open|
+        ARG_TYPE        GUIDE-project-file
+        TYPE            COMMAND
+        WINDOW_TYPE     NO_STDIO
+        EXEC_STRING     guide "%Arg_1%"
+}
+ACTION Print
+{
+        LABEL           %|nls-2-Print|
+        ARG_TYPE        GUIDE-project-file
+        TYPE            COMMAND
+        WINDOW_TYPE     NO_STDIO
+        EXEC_STRING     cat "%Arg_1%" | /usr/openwin/bin/mp -lo | lp -Tpostscript
+}
+
+\########################################################
+
+DATA_ATTRIBUTES AnswerBookLib
+{
+        ACTIONS         Open,Print
+        ICON            OWablibrary
+}
+DATA_CRITERIA AnswerBookLib1
+{
+        DATA_ATTRIBUTES_NAME AnswerBookLib
+        CONTENT         0 string #<AnswerBook Library>
+	MODE		fr
+}
+ACTION Open
+{
+        LABEL 		%|nls-1-Open|
+        ARG_TYPE        AnswerBookLib
+        TYPE            COMMAND
+        WINDOW_TYPE     NO_STDIO
+        EXEC_STRING     /usr/openwin/bin/navigator -b "%Arg_1%"
+}
+ACTION Print
+{
+        LABEL           %|nls-2-Print|
+        ARG_TYPE        AnswerBook
+        TYPE            MAP
+        MAP_ACTION      NoPrint
+}
+DATA_ATTRIBUTES OPENWIN_APPGROUP
+{
+	ACTIONS         OpenInPlace,OpenNewView,Print
+	ICON		Dtagen
+	LABEL		%|nls-28009-#OpenWindows#|
+	MEDIA           FILE_NAME
+	MOVE_TO_ACTION  FILESYSTEM_MOVE
+	COPY_TO_ACTION  FILESYSTEM_COPY
+	LINK_TO_ACTION  FILESYSTEM_LINK
+	DESCRIPTION	%|nls-28010-#Double#|
+}
+DATA_CRITERIA OPENWIN_APPGROUP1
+{
+	DATA_ATTRIBUTES_NAME OPENWIN_APPGROUP
+	MODE            d
+	PATH_PATTERN    STAR/appmanager/STAR/OpenWindows
+}
+ACTION Open
+{
+        LABEL 		%|nls-1-Open|
+	ARG_TYPE        OPENWIN_APPGROUP
+	TYPE            MAP
+	MAP_ACTION      OpenAppGroup
+}
+ACTION Print
+{
+        LABEL           %|nls-2-Print|
+	ARG_TYPE        OPENWIN_APPGROUP
+	TYPE            MAP
+	MAP_ACTION      PrintAppGroup
+}
+ACTION OWbinder
+{
+	LABEL           %|nls-28011-#OW Binder#|
+	ICON            OWgenapp
+	TYPE            COMMAND
+	WINDOW_TYPE     NO_STDIO
+	EXEC_STRING 	/usr/openwin/bin/binder
+}
+ACTION OWcalctool
+{
+	LABEL           %|nls-28012-#OW Calculator#|
+	ICON            OWgenapp
+	TYPE            COMMAND
+	WINDOW_TYPE     NO_STDIO
+	EXEC_STRING	 /usr/openwin/bin/calctool
+}
+ACTION OWclock
+{
+	LABEL           %|nls-28014-#OW Clock#|
+	ICON            OWgenapp
+	TYPE            COMMAND
+	WINDOW_TYPE     NO_STDIO
+	EXEC_STRING 	/usr/openwin/bin/clock
+}
+ACTION OWcmdtool
+{
+	LABEL           %|nls-28015-#OW Command Tool#|
+	ICON            OWgenapp
+	TYPE            COMMAND
+	WINDOW_TYPE     NO_STDIO
+	EXEC_STRING 	/usr/openwin/bin/cmdtool
+}
+ACTION OWcm
+{
+	LABEL           %|nls-28017-#OW Calendar Manager#|
+	ICON            OWcm
+	TYPE            COMMAND
+	WINDOW_TYPE     NO_STDIO
+	EXEC_STRING 	/usr/openwin/bin/cm
+}
+ACTION OWfilemgr
+{
+	LABEL           %|nls-28018-#OW File Manager#|
+	ICON            OWfilemgr
+	TYPE            COMMAND
+	WINDOW_TYPE     NO_STDIO
+	EXEC_STRING 	/usr/openwin/bin/filemgr
+}
+ACTION OWiconedit
+{
+	LABEL           %|nls-28019-#OW Icon Editor#|
+	ICON            OWgenapp
+	TYPE            COMMAND
+	WINDOW_TYPE     NO_STDIO
+	EXEC_STRING 	/usr/openwin/bin/iconedit
+}
+ACTION OWiconedit
+{
+	LABEL           %|nls-28019-#OW Icon Editor#|
+	ARG_COUNT       1
+	ICON            OWgenapp
+	TYPE            COMMAND
+	WINDOW_TYPE     NO_STDIO
+	EXEC_STRING 	/usr/openwin/bin/iconedit "%Arg_1%"
+}
+ACTION OWimagetool
+{
+	LABEL           %|nls-28020-#OW Image Tool#|
+	ARG_COUNT       1
+	ICON            OWimagetool
+	TYPE            COMMAND
+	WINDOW_TYPE     NO_STDIO
+	EXEC_STRING 	/usr/openwin/bin/imagetool "%Arg_1%"
+}
+ACTION OWimagetool
+{
+	LABEL           %|nls-28020-#OW Image Tool#|
+	ICON            OWimagetool
+	TYPE            COMMAND
+	WINDOW_TYPE     NO_STDIO
+	EXEC_STRING 	/usr/openwin/bin/imagetool
+}
+ACTION OWmailtool
+{
+	LABEL           %|nls-28021-#OW Mail Tool#|
+	ARG_COUNT	1
+	ICON		OWmailtool
+	TYPE		COMMAND
+	WINDOW_TYPE	NO_STDIO
+	EXEC_STRING	/usr/openwin/bin/mailtool -Mf "%Arg_1%"
+}
+ACTION OWmailtool
+{
+	LABEL           %|nls-28021-#OW Mail Tool#|
+	ICON            OWmailtool
+	TYPE            COMMAND
+	WINDOW_TYPE     NO_STDIO
+	EXEC_STRING 	/usr/openwin/bin/mailtool
+}
+ACTION OWperfmeter
+{
+	LABEL           %|nls-28022-#OW Performance Meter#|
+	ICON            OWperf
+	TYPE            COMMAND
+	WINDOW_TYPE     NO_STDIO
+	EXEC_STRING 	/usr/openwin/bin/perfmeter
+}
+ACTION OWprinttool
+{
+	LABEL           %|nls-28023-#OW Print Tool#|
+	ICON            OWgenapp
+	TYPE            COMMAND
+	WINDOW_TYPE     NO_STDIO
+	EXEC_STRING	/usr/openwin/bin/printtool
+}
+ACTION OWshelltool
+{
+	LABEL           %|nls-28024-#OW Shell Tool#|
+	ICON            OWgenapp
+	TYPE            COMMAND
+	WINDOW_TYPE     NO_STDIO
+	EXEC_STRING 	/usr/openwin/bin/shelltool
+}
+ACTION OWsnapshot
+{
+	LABEL           %|nls-28025-#OW Snapshot#|
+	ICON            OWsnapshot
+	ARG_COUNT       0
+	TYPE            COMMAND
+	WINDOW_TYPE     NO_STDIO
+	EXEC_STRING 	/usr/openwin/bin/snapshot
+}
+ACTION OWtapetool
+{
+	LABEL           %|nls-28026-#OW Tape Tool#|
+	ICON            OWgenapp
+	TYPE            COMMAND
+	WINDOW_TYPE     NO_STDIO
+	EXEC_STRING 	/usr/openwin/bin/tapetool
+}
+ACTION OWtextedit
+{
+	LABEL           %|nls-28027-#OW Text Editor#|
+	ARG_COUNT       1
+	ICON            OWtextedit
+	TYPE            COMMAND
+	WINDOW_TYPE     NO_STDIO
+	EXEC_STRING 	/usr/openwin/bin/textedit "%Arg_1%"
+}
+ACTION OWtextedit
+{
+	LABEL           %|nls-28027-#OW Text Editor#|
+	ICON            OWtextedit
+	TYPE            COMMAND
+	WINDOW_TYPE     NO_STDIO
+	EXEC_STRING 	/usr/openwin/bin/textedit
+}
+ACTION OWaudiotool
+{
+	LABEL           %|nls-28028-#OW Audio Tool#|
+	ARG_COUNT       1
+	ICON            OWaudiotool
+	TYPE            COMMAND
+	WINDOW_TYPE     NO_STDIO
+	EXEC_STRING 	/usr/openwin/bin/audiotool "%Arg_1%"
+}
+ACTION OWaudiotool
+{
+	LABEL           %|nls-28028-#OW Audio Tool#|
+	ICON            OWaudiotool
+	TYPE            COMMAND
+	WINDOW_TYPE     NO_STDIO
+	EXEC_STRING 	/usr/openwin/bin/audiotool
+}
+ACTION OWanswerbook
+{
+	LABEL           %|nls-28029-#OW AnswerBook#|
+	ICON            OWanswerbook
+	TYPE            COMMAND
+	WINDOW_TYPE     NO_STDIO
+	EXEC_STRING 	sh -c '/usr/openwin/bin/answerbook ;\
+			if [ \$? -ne 0 ] ; then \
+			  /usr/dt/bin/dterror.ds \
+			   "%|nls-28030-#Couldn\'t start AnswerBook.#|" \
+			   "%|nls-28031-#AnswerBook Error#|" \
+			   "%|nls-6-#OK#|" ; \
+			fi'
+}
+ACTION OWprops
+{
+	LABEL           %|nls-28013-#OW Properties#|
+	ICON            OWgenapp
+	TYPE            COMMAND
+	WINDOW_TYPE     NO_STDIO
+	EXEC_STRING 	/usr/openwin/bin/props
+}
+ACTION OWwsinfo
+{
+	LABEL           %|nls-28016-#OW Workstation Info#|
+	ICON            OWgenapp
+	TYPE            COMMAND
+	WINDOW_TYPE     NO_STDIO
+	EXEC_STRING 	/usr/openwin/bin/wsinfo
+}
+ACTION SDTaccessx
+{
+	LABEL           %|nls-28032-#AccessX#|
+	ICON          	SDtaccessx
+	TYPE          	COMMAND
+	WINDOW_TYPE   	NO_STDIO
+	EXEC_STRING   	env UIDPATH=/usr/openwin/lib/locale/%L/app-defaults/%U:\
+			/usr/openwin/lib/app-defaults/%U accessx
+	DESCRIPTION	%|nls-28033-#Keyboard#|
+}
+ACTION SDTadmintool
+{
+	LABEL           %|nls-28034-#Admintool#|
+	ICON          	SDtadmintool
+	TYPE          	COMMAND
+	WINDOW_TYPE   	NO_STDIO
+	EXEC_STRING   	/usr/bin/admintool
+	DESCRIPTION	%|nls-28035-#Solaris administration tool#|
+}
+ACTION SDTsuspend
+{
+	LABEL           %|nls-28041-#Suspend#|
+	ICON          	SDtsuspend
+	TYPE          	COMMAND
+	WINDOW_TYPE   	NO_STDIO
+	EXEC_STRING   	/usr/openwin/bin/sys-suspend
+	DESCRIPTION	%|nls-28042-#System Suspend command#|
+}
+ACTION SDTpowermgr
+{
+	LABEL           %|nls-28043-#PowerMgr#|
+	ICON          	SDtpowermgr
+	TYPE          	COMMAND
+	WINDOW_TYPE   	NO_STDIO
+	EXEC_STRING   	/usr/openwin/bin/dtpower
+	DESCRIPTION	%|nls-28044-#Solaris Power Manager#|
+}
+ACTION SDTab2
+{
+	LABEL           %|nls-28048-#Ab2#|
+	ICON          	SDtab2
+	TYPE          	COMMAND
+	WINDOW_TYPE   	NO_STDIO
+	EXEC_STRING   	/usr/dt/bin/answerbook2
+	DESCRIPTION	%|nls-28049-#Answer Book 2#|
+}
+ACTION SDTab2admin
+{
+	LABEL           %|nls-28050-#Ab2Admin#|
+	ICON          	SDtab2admin
+	TYPE          	COMMAND
+	WINDOW_TYPE   	NO_STDIO
+	EXEC_STRING   	/usr/dt/bin/answerbook2_admin
+	DESCRIPTION	%|nls-28051-#Answer Book 2 Admin#|
+}

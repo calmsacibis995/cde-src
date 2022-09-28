@@ -1,0 +1,679 @@
+.cdes
+.TH DtStdInterfaceFontNames 5 "22 Jun 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.SH NAME
+DtStdInterfaceFontNames \- Cde Standard Interface Font Names
+.SH SYNOPSIS
+.cdee
+.xR3 DtStdInterfaceFontNames
+The Cde Standard Interface Font Names are a set of generic X Window
+System font names, needed by the Cde GUI itself, that are used for user
+interface elements such as button labels, window titles and text fields.
+These names, for seven sizes of two typefaces, must exist on all Cde
+.xo systems.
+.cde systems, and they should be provided in any
+.cde X\ server product on which Cde applications are expected to run.
+Seven sizes of a third typeface are recommended.
+They are typically mapped to existing fonts on the system
+using the font alias mechanism, although this method is not required.
+.cdes
+.SH DESCRIPTION
+Cde 1.0 does not come with a common set of fonts on all
+systems, and it must be able to run on X\ servers and X terminals
+from non-Cde vendors if those vendors so desire.
+Therefore, there are
+a standard set of ``generic'' font names and sizes that each Cde vendor
+makes available on their Cde systems and that X\ server vendors may
+make available on their X\ servers and terminals.
+The names map to existing fonts on each vendor's system and may vary
+from vendor to vendor.
+.cdee
+.P
+The Cde Standard Interface Font Names described here allow clients
+making up the Cde desktop, such as
+.Cm dtterm 1
+and
+.xo the window manager,
+.cde .cde dtwm 1, to use
+a single set of default fonts in their
+.I app-defaults
+files, without concern for the system
+.cde or X\ server
+on which Cde is running.
+(The Cde Standard Application Font Names, described in
+.xo .cX DtStdAppFontNames ,
+.cde .BR DtStdAppFontNames (5),
+provide a similar mechanism for applications running on the Cde desktop.)
+.cde .HU "Background"
+.xo .H 4 "Background"
+Interface fonts are designed by user interface experts for the narrow
+purpose of making the menus, labels and fields of a graphical user
+interface highly readable.
+They are usually finely hand-tuned
+bitmapped fonts, intended for use on visual displays only and not on
+printers, and many of the glyphs have been specially modified for this
+purpose.
+Interface fonts can be contrasted with application fonts,
+which are the fonts used within an application running on the Cde
+desktop.
+Interface fonts come in a restricted set of styles and are
+used for short strings of text, whereas application fonts usually come
+in a variety of designs, styles and weights and are used for emphasis,
+cross-references, section headers, and so forth.
+.cde .HU "Rationale"
+.xo .H 4 "Rationale"
+Common font names are required to prevent Cde clients such as
+.Cm dtterm 1
+from needing different
+.I app-defaults
+files on each system.
+.cdes
+In addition, any X\ server or X terminal
+vendor may ensure that the Cde desktop can run on their X\ server by
+mapping these standard names to fonts of the corresponding style on
+their individual X systems.
+.cdee
+.P
+Interface fonts are needed because of user interface and cognitive
+research that has examined the readability of various fonts on the
+display screens in use today and found that many fine adjustments
+(for example, for centering, baseline, height and alignment) must be made to
+characters in a font to make them clear, distinguishable and
+consistent when used for the interface objects of a GUI.
+And by using
+hand-tuned interface fonts for the GUI objects, the desktop can achieve
+a very clean, crisp visual appearance.
+.P
+Interface fonts are broken into 2 categories:
+system and user.
+Cognitive research has shown that this distinction is important for the
+usability and readability of GUIs.
+System fonts are those used when the
+system is presenting information to the user (for example, in buttons).
+User fonts are those used for text that a user enters into the system
+.ne 2
+(for example, for a text field or terminal emulator).
+.cde .HU "XLFD Field Values for the Standard Interface Font Names"
+.xo .H 4 "XLFD Field Values for the Standard Interface Font Names"
+These standard names are available using the X Window System XLFD font
+naming scheme.
+There are three aspects to the standard names:
+.xo .BL
+.cde .VL 2
+.LI \(bu
+The
+.I "underlying font"
+on each system,
+.cde or X\ server platform,
+to which a standard name is mapped,
+typically will be different on each system.
+.LI \(bu
+The
+.I "standard name"
+itself, a full XLFD name mapped to the underlying font,
+may be different on each system in some of the XLFD fields.
+However, most of the fields are the same from system to system,
+allowing the
+.I patterns
+(described next) to be the same.
+.LI \(bu
+The font resource
+.I "pattern"
+containing the * wildcards, used in
+.I app-defaults
+files,
+which will match the full XLFD name of the standard name,
+is the same across all systems, for a given use in an
+.I app-defaults
+file.
+.LE
+.P
+.xo Systems
+.cde Each Cde or X\ server vendor implementing this specification
+must provide full XLFD names for the standard names, mapped to
+system-dependent underlying fonts,
+so that the XLFD patterns used in Cde application
+.I app-defaults
+files will always match one of the full XLFD names provided.
+.P
+The Standard Interface Font Names are identified by the presence of the
+following XLFD field name values:
+.xo .BL
+.cde .VL 2
+.LI \(bu
+.Cn FOUNDRY
+is
+.B dt
+.LI \(bu
+.Cn FAMILY_NAME
+is either
+.B "interface system"
+or
+.B "interface user"
+(there is a single space between the two words in each family name)
+.LE
+.P
+In addition, the other fields of the XLFD names defining the standard
+names are constrained as follows:
+.xo .BL
+.cde .VL 2
+.LI \(bu
+.Cn WEIGHT_NAME
+is either
+.B medium
+or
+.B bold
+.LI \(bu
+.Cn SLANT
+is always
+.B r
+.LI \(bu
+.Cn SETWIDTH_NAME
+is always
+.B normal
+.LI \(bu
+.Cn SPACING
+is
+.B p
+or
+.B m
+(it must be
+.B m
+for
+.B "interface user"
+fonts, and should be
+.B p
+for
+.B "interface system"
+fonts, although
+.B m
+is acceptable)
+.LI \(bu
+.Cn ADD_STYLE_NAME
+contains both a nominal size value in the range
+.B xxs
+to
+.B xxl
+(see
+.xo .cX pointsizes ),
+.cde below),
+as well as either
+.B sans
+for
+sans serif fonts or
+.B serif
+for serif, if appropriate for the
+underlying font
+.LI \(bu
+The numeric fields (\c
+.Cn PIXEL_SIZE ,
+.Cn POINT_SIZE ,
+.Cn RESOLUTION_X ,
+.Cn RESOLUTION_Y ,
+and
+.Cn AVERAGE_WIDTH )
+must contain the same values as the underlying
+font.
+.LI \(bu
+.Cn CHARSET_REGISTRY
+and
+.Cn CHARSET_ENCODING
+are not specified;
+the standard
+names may be implemented for any Cde locale.
+.LE
+.P
+.P
+Although the
+.B sans
+and
+.B serif
+values in the
+.Cn ADD_STYLE_NAME
+field are not required by the XLFD font convention, they are always
+part of the Cde Standard Font Names when the underlying fonts are
+characterized as serif or sans serif.
+However, this document imposes
+no restriction on whether the interface fonts are serif or sans serif.
+The relevant attribute must be coded in the
+.Cn ADD_STYLE_NAME
+field.
+Thus, for example, the standard names for Japanese fonts,
+which are not characterized as being serif or sans serif, would not
+include this designation in the
+.Cn ADD_STYLE_NAME
+field.
+.cde .HU "Restricted Set of Styles Available"
+.xo .H 4 "Restricted Set of Styles Available"
+Unlike the Standard Application Font Names, only a limited set of
+styles is available in the Standard Interface Font Names.
+The styles
+available represent the minimum set currently considered necessary for
+the desktop GUI needs:
+.xo .BL
+.cde .VL 2
+.LI \(bu
+a medium weight of an interface system font, preferably proportionally
+spaced (but mono-spaced is acceptable if appropriate for the locale)
+.LI \(bu
+a medium weight of an interface user font, always mono-spaced
+.LI \(bu
+a bold weight of an interface user font, always mono-spaced (the
+standard font names for this generic typeface are recommended if
+available for the targeted fonts and locale, but are not required)
+.LE
+.cde .HU "Named Set of Point Sizes Available"
+.xo .H 4 "Named Set of Point Sizes Available"
+.xo .xR4 pointsizes
+In addition, the set of seven point sizes for each of the
+three styles that are
+part of this document are ``named'' point sizes, using string
+values in the
+.Cn ADD_STYLE_NAME
+field.
+Thus, XLFD patterns matching these
+names match a size based on the named size, not on a numeric size, even
+though the latter does exist in the XLFD name.
+These named sizes are
+used because the exact size of an interface font is less important than
+its nominal size, and implementation differences for the
+hand-tuned interface fonts do not allow common numeric point sizes to
+be assured across systems.
+The seven nominal sizes are as follows:
+.VL 6
+.LI \f3xxs\fP
+extra extra small
+.LI \f3xs\fP
+extra small
+.LI \f3s\fP
+small
+.LI \f3m\fP
+medium
+.LI \f3l\fP
+large
+.LI \f3xl\fP
+extra large
+.LI \f3xxl\fP
+extra extra large
+.LE
+.P
+The goal of these named sizes is to provide enough fonts so that both
+the variety of display monitor sizes and resolutions that Cde will run
+on, and the range of user preferences for comfortably reading button
+labels, window titles and so forth, can be accommodated in the GUI.
+Thus, both the smallest size,
+.BR xxs ,
+and the largest size,
+.BR xxl ,
+are meant to be reasonable sizes for displaying and
+viewing the Cde desktop on common displays and X terminals;
+they are
+not meant to imply either hard-to-read fine print or headline-sized
+display type.
+.P
+These named size values must occur first in the
+.Cn ADD_STYLE_NAME
+field,
+before any use of the values
+.B serif
+or
+.B sans
+(one of which is
+always required when the underlying font can be so characterized) and
+before any other additional stylistic attribute that might be
+appropriate.
+This is important when specifying wild-carded patterns in
+a resource specification for these fonts, since whether the underlying
+font these names are mapped to is serif or sans serif is not specified
+by Cde, and the match must work for all XLFD names provided
+.xo on Cde systems.
+.cde by Cde system vendors or other X\ server vendors.
+.cde .HU "Example XLFD Patterns for the Standard Names"
+.xo .H 4 "Example XLFD Patterns for the Standard Names"
+Using these values, the XLFD pattern
+.Cs I
+-dt-interface*-*
+.Ce
+.P
+logically matches the full set of \*(Zx Standard Interface Font Names.
+(Note that no specific X server behavior is implied).
+.P
+The full set of 21 Cde Standard Interface Font Names can also be
+represented, in a more meaningful way, as follows:
+.Cs I
+-dt-interface system-medium-r-normal-*-*-*-*-*-*-*-iso8859-1
+-dt-interface user-medium-r-normal-*-*-*-*-*-m-*-iso8859-1
+-dt-interface user-bold-r-normal-*-*-*-*-*-m-*-iso8859-1
+.Ce
+.P
+The full set of patterns, usable in
+.I app-defaults
+files, for all seven sizes for the system font, for example, is:
+.Cs I
+-dt-interface system-medium-r-normal-xxs*-*-*-*-*-*-*-iso8859-1
+-dt-interface system-medium-r-normal-xs*-*-*-*-*-*-*-iso8859-1
+-dt-interface system-medium-r-normal-s*-*-*-*-*-*-*-iso8859-1
+-dt-interface system-medium-r-normal-m*-*-*-*-*-*-*-iso8859-1
+-dt-interface system-medium-r-normal-l*-*-*-*-*-*-*-iso8859-1
+-dt-interface system-medium-r-normal-xl*-*-*-*-*-*-*-iso8859-1
+-dt-interface system-medium-r-normal-xxl*-*-*-*-*-*-*-iso8859-1
+.Ce
+.P
+These patterns could be used in a resource file and will match the full
+Cde Standard Interface Names for Latin-1 locales on all
+.xo systems.
+.cde Cde, or complying X server, systems.
+.P
+Note in these wild-carded XLFD names that the
+.Cn ADD_STYLE_NAME
+field has
+a pattern, such as
+.BR xxs* ,
+and that the pattern is partly a string
+(\c
+.BR xxs )
+and partly the pattern-matching character
+.BR * .
+The
+full XLFD name this pattern matches\(emthe XLFD name implementing the
+Standard Interface name\(emwill often contain
+.B sans
+or
+.B serif
+in the field, after the
+.B xxs
+and a space, and so the
+.B *
+is
+essential to match that
+.B sans
+or
+.B serif
+string (and any
+additional style attribute string that might be in the underlying
+name).
+Note also that the
+.Cn SPACING
+field is wild-carded in the pattern
+for the system font, since either
+.B p
+or
+.B m
+may appear in the
+standard name being matched.
+.cde .HU "Implementation of Font Names"
+.xo .H 4 "Implementation of Font Names"
+Each Cde system
+.cde vendor and X\ server vendor
+provides mappings of
+its own fonts to XLFD names as described by this document.
+The actual XLFD names will vary from system to system, just as the
+fonts they are mapped to, since they contain some of the same values as
+the XLFD name of the underlying font.
+.cdes
+What does not vary is the
+behavior:  the common patterns in which only specified fields are used
+will match each system's standard names.  This is guaranteed by the
+field specifications given earlier.
+.cdee
+.P
+There is no precise specification of how the named sizes
+.B xxs
+to
+.B xxl
+are mapped to sizes of underlying fonts in each
+.xo system,
+.cde system or X\ server product,
+although each size must be equal to or larger than the previous size.
+Nonetheless, some guidelines are appropriate.
+.P
+Interface fonts have been developed because of human factors research
+on visual clarity of text on displays, and this has been done in the
+context of the display technology typically available today, mostly in
+the 100 dots per inch (DPI) range.
+That, and the use of standard point
+sizes (10, 12, 14, 18) in the graphics arts, have resulted in the
+development in the industry of hand-tuned bitmapped fonts for a set of
+``pixel heights'' that are likely to be used for these standard names.
+However, making the Cde desktop usable with a range of point sizes
+effectively means, in addition to legibility for the user, that the
+various Cde applications fit ``appropriately'' on the screen using
+those point sizes.
+This means, for example, that two application
+windows can appear side by side on a typical display or that a certain
+number of buttons can appear across the screen.
+.P
+Thus, these guidelines are expressed not only in pixel sizes, to
+reflect current usage, but also in percentage of monitor height.
+This
+allows them to remain appropriate as technological evolution improves
+display resolution and monitor size (for example, wall-mounted monitors).
+The
+ideal set of sizes would form a linear progression from the smallest
+(\c
+.BR xxs )
+to the largest
+(\c
+.BR xxl ),
+although this is not achievable.
+The basic guideline is that the
+.B xxs
+font should be,
+in pixels, no less than 0.9% of the height of the display resolution,
+in pixels;
+the
+.B xxl
+font should be no more than 2.6% of the
+height.
+.P
+As an approximate example that does not represent any existing mapping
+of fonts to a display, this table shows how the named sizes might map
+to real bitmapped fonts of a given pixel size, and how large those
+sizes are in percentage and point size terms:
+.TS
+center box tab(:);
+cf3 s s s
+cf2 | cf2 | cf2 | cf2
+cf2 | cf2 | cf2 | cf2
+lf3 | n |  n | n.
+.sp .4
+Sample Range of Named Sizes on a 1280\(mu1024 Display
+.sp .4
+_
+named:number:size as %:point size on
+size:of pixels:of 1024 height:100 DPI screen:
+_
+xxs:10:0.98%:7.2
+xs:12:1.12%:8.7
+s:14:1.37%:10.1
+m:17:1.66%:12.3
+l:20:1.95%:14.6
+xl:23:2.25%:16.6
+xxl:26:2.54%:18.8
+.TE
+.P
+Thus, the following requirements are placed on each
+implementation of the Standard Interface Font Names:
+.xo .BL
+.cde .VL 2
+.LI \(bu
+The names must be fully specified XLFD names, without wild cards.
+.LI \(bu
+The
+.Cn WEIGHT_NAME ,
+.Cn SLANT ,
+.Cn SETWIDTH_NAME ,
+.Cn SPACING ,
+.Cn CHARSET_REGISTRY
+and
+.Cn CHARSET_ENCODING
+fields must contain valid values as defined previously
+and must match those in the underlying font.
+.LI \(bu
+The
+.Cn ADD_STYLE_NAME
+field must contain both a named size (for example,
+.BR xxs )
+and, if appropriate, either the
+.B serif
+or
+.B sans
+designation, whichever matches the underlying font;
+any additional
+words about the style of the underlying font, if defined for the
+underlying font, must also be used.
+The named size must be first in the
+field, and must be separated from any following word in the field with
+a blank.
+.LI \(bu
+The named sizes
+.B xxs
+through
+.B xxl
+must be mapped to fonts
+that are progressively larger than or equal to the previous one in the
+list.
+Thus, several standard names with adjacent sizes (for example,
+.B xxs
+and
+.BR xs )
+may be mapped to the same font (for example, if there
+is not enough variety in sizes in the underlying fonts).
+.LI \(bu
+The implemented names should attempt to meet the guidelines discussed
+in the previous paragraph and table.
+.LE
+.P
+For example, system A is assumed to be using the following
+sans serif font for the extra small system font:
+.Cs I
+-bitstream-swiss-medium-r-normal--11-90-85-85-p-81-iso8859-1
+.Ce
+.P
+System B is using the following serif font for the extra small system font:
+.br
+.Cs I
+-vendorb-ersatz-medium-r-normal-Expert-8-80-75-75-m-72-iso8859-1
+.Ce
+.P
+Their respective standard names would
+be implemented on their systems as:
+.Cs
+.S -1
+.\" HLJ Note: the \| spaces in the two following lines are a kludge
+.\" to get the spacing to look right on my system.  They *should*
+.\" appear as a single space.
+-dt-interface\ system-medium-r-normal-xs\|sans-11-90-85-85-p-81-iso8859-1
+-dt-interface\ system-medium-r-normal-xs\|serif\ Expert-8-80-75-75-m-72-iso8859-1
+.S +1
+.Ce
+.P
+Defined this way, both names will match the single XLFD pattern used in
+a common
+.I app-defaults
+file:
+.Cs I
+-dt-interface system-medium-r-normal-xs*-*-*-*-*-*-*-iso8859-1
+.Ce
+.cde .HU "Default Cde Mapping of the Standard Interface Font Names"
+.xo .H 4 "Default Cde Mapping of the Standard Interface Font Names"
+There is no default mapping of these interface names to X11R5 fonts;
+the mapping is implementation-specific.
+.cdes
+.cde .SH "USAGE"
+.xo .H 4 "Usage"
+A Cde desktop client developer will code a single
+.I app-defaults
+file to specify font resources for their client and use it across all
+Cde systems.
+Since the
+.Cn FOUNDRY ,
+.Cn FAMILY_NAME ,
+.Cn WEIGHT_NAME ,
+.Cn SLANT
+and
+.Cn SETWIDTH_NAME
+fields of the standard names are the same across
+different systems, these values can be used in the resource
+specification in the
+.I app-defaults
+file.
+However, other fields
+(\c
+.Cn ADD_STYLE_NAME ,
+.Cn PIXEL_SIZE ,
+.Cn POINT_SIZE ,
+.Cn RESOLUTION_X ,
+.Cn RESOLUTION_Y ,
+.Cn SPACING
+and
+.Cn AVERAGE_WIDTH )
+will vary across systems, and so must be
+wild-carded in the resource specification (\c
+.Cn ADD_STYLE_NAME
+is partially
+wild-carded).
+As was shown in the previous example:
+.Cs I
+-dt-interface system-medium-r-normal-xs*-*-*-*-*-*-*-iso8859-1
+.Ce
+.P
+is an XLFD pattern, used in a single resource specification, that
+matches a single standard name on different
+.xo systems.
+.cde Cde or X\ server platforms.
+(And if the last 2 fields,
+.Cn CHARSET_REGISTRY
+and
+.Cn CHARSET_ENCODING ,
+were wild-carded, then the pattern could work across
+locales as well.)
+Note that the named size (\c
+.B xs
+in this example)
+is part of the pattern, but the
+.BR serif /\c
+.B "sans serif"
+designation is not;
+this is required to obtain the desired nominal size
+(whatever it may be in the mapped font), while still matching either
+.B serif
+or
+.B "sans serif"
+in the standard name.
+.P
+Note that if a Cde desktop application tries to open a font using one
+of these standard names, and the X\ server does not know about these
+names, the application will usually fall back on using the
+.B fixed
+and
+.B variable
+font aliases that are typically provided in all X\ servers.
+When this happens, the Cde desktop will be more difficult
+to use, visually, than if its expected font names were available.
+.SH "SEE ALSO"
+.BR dtstyle (1),
+.BR dtterm (1),
+.BR DtStdAppFontNames (5)
+.SH NOTES
+There is no requirement on a Cde system or X\ server vendor to
+implement these standard names in a particular way.
+Several mechanisms
+are possible:
+duplicate font files with altered naming attributes,
+X11R5 font aliases, or vendor-specific mechanisms.
+The only
+requirement is that an XLFD pattern, written with attributes taken from
+the set that define the standard names, can be successfully used to
+open a font with the Xlib function
+.BR XLoadFont ;
+and, specifically,
+the Xlib function
+.BR XListFonts
+need NOT return the same XLFD name
+for the pattern on different Cde or X\ server systems.
+.cdee

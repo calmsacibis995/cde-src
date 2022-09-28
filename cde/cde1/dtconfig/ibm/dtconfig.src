@@ -1,0 +1,253 @@
+\#!/bin/ksh
+\# *                                                                      *
+\# * (c) Copyright 1993, 1994 Hewlett-Packard Company                     *
+\# * (c) Copyright 1993, 1994 International Business Machines Corp.       *
+\# * (c) Copyright 1993, 1994 Sun Microsystems, Inc.                      *
+\# * (c) Copyright 1993, 1994 Novell, Inc.                                *
+\# *
+
+DTPATH=CDE_INSTALLATION_TOP/bin/dtlogin
+XDMCONF=/usr/lpp/X11/lib/X11/xdm/xdmconf
+#ifdef  _POWER
+GETTY=/usr/sbin/getty
+#else
+GETTY=/etc/getty
+#endif
+
+#ifdef	_POWER
+#define MKITAB	/usr/sbin/mkitab
+#define RMITAB	/usr/sbin/rmitab
+#define LSITAB	/usr/sbin/lsitab
+#define RCDT    "dt:`cat /etc/.init.state`:wait:/etc/rc.dt"
+#else
+#define MKITAB	/etc/mkitab
+#define RMITAB	/etc/rmitab
+#define LSITAB	/etc/lsitab
+#define RCDT    "dt:`cat /etc/.init.state`:wait:/usr/dt/bin/rc.dt"
+#endif
+
+\#
+\# Message text
+\#
+
+msg1='can only be run by the super user. \n'
+
+msg2='The CDE environment is now set as the default user interface. This \
+interface will appear on login for all users of the system. \
+To see this change take effect you must shutdown and restart your system.\n'
+
+msg3='The Command line is now set as the default user interface. This\
+interface will appear on login for all users of the system.\
+To see this change take effect you must shutdown and restart your system.\n'
+
+msg4='The CDE environment is Already set as the default User Interface.\n'
+
+msg5='The Command line is already set as the default User Interface.\n'
+
+msg6='usage: %s \
+  -e (enable auto-start of dtlogin) \
+  -d (disable auto-start of dtlogin) \
+  -kill (kill dtlogin) \
+  -reset (reset dtlogin - reread configuration files)\n'
+
+msg7='Too many arguments \n'
+
+msg8='Needs one argument \n'
+
+msg9='Could not disable xdm, Please refer to xdm man pages to\
+disable xdm and try again.\n'
+
+msg10='Dtlogin is not running \n'
+
+GetLoginServerPid()
+{
+  \# GetLoginServerPid() prints login server pid if found, else nothing
+
+  grep=/usr/bin/grep
+  ps=/usr/bin/ps
+  cut=/usr/bin/cut
+  awk=/usr/bin/awk
+
+  $ps -u 0 -el | $grep dtlogin | $awk '{print $4 " " $5}' |
+  while read -r pid ppid; do
+    if [ "$($ps -p $ppid | $grep dtlogin)" = "" ]; then
+      print "$pid"
+      break
+    fi
+  done
+}
+
+SignalDt()
+{
+  \# SignalDt() - kill or reset login server
+  \# $1 - operation (kill|reset)
+
+  pid=`GetLoginServerPid`
+
+  if [ "$pid" != "" ]; then
+    if [ "$1" = "kill" ]; then
+      /bin/kill $pid       #kill login server
+    else
+      /bin/kill -HUP $pid  #reset login server
+    fi 
+    Exit 0
+  else
+    Exit 1 200 "no login server is running\n"
+  fi
+}
+
+
+
+Message()
+{
+  \# Message() - display message from dtconfig.cat
+  \#   $1 - message id
+  \#   $2 - fallback message text
+  \#   $3 - message insert 1
+  \#   $4 - message insert 2
+  dspmsg -s 10 dtconfig.cat $1 "$2" "$3" "$4"
+}
+
+Exit()
+{
+  \# Exit() - display optional message and exit
+  \#   $1 - exit code
+  \#   $2 - message id (optional)
+  \#   $3 - fallback message text
+  \#   $4 - message insert 1
+  \#   $5 - message insert 2
+
+  if [ "$2" != "" ]; then
+    Message $2 "$3" "$4" "$5"
+  fi
+
+  exit $1
+}
+
+DisableXdm()
+{
+  \# DisableXdm() - disable inittab start of xdm if necessary
+
+  \#
+  \# Check for xdm inittab entry
+  \#
+  egrep "^xdm" /etc/inittab > /dev/null 2>&1
+  rc=$?
+
+  \#
+  \# Check for the existence of xdm Subsystem.
+  \#
+  lssrc -s xdm  > /dev/null 2>&1
+  rc1=$?
+
+  \#
+  \# if either or both of the tests are true unconfigure xdm
+  \# Note that a return code of 0 is true
+  \#
+  if [ "$rc" = "0" ] || [ "$rc1" = "0" ]; then
+    if [ ! -f $XDMCONF ]; then
+      Exit 1 9 "$msg9"
+    fi
+    $XDMCONF -d
+  fi
+}
+
+ConfigureDt()
+{
+  \# ConfigureDt() - enable or disable inittab start of dtlogin
+  \# $1 - operation (enable|disable)
+
+  \#
+  \# Disable xdm if necessary
+  \#
+  DisableXdm
+
+  \#
+  \# Check for the existence of COSE Subsystem and create if
+  \# it's not there are we are enabling dtlogin
+  \#
+  /bin/lssrc -s dtsrc  > /dev/null 2>&1
+  if [ "$?" -ne 0 -a "$1" = "enable" ]; then
+    /bin/mkssys -s dtsrc -p $DTPATH -u 0 > /dev/null 2>&1
+  fi
+
+  \#
+  \# See if 'dt' is in inittab
+  \#
+  LSITAB dt > /dev/null 2>&1
+  if [ "$?" -ne 0 ]; then
+    curstate="disabled"
+  else
+    curstate="enabled"
+  fi
+
+  if [ "$1" = "enable" ]; then
+    if [ "$curstate" = "enabled" ]; then
+      \#
+      \# Already enabled
+      \#
+      Exit 0 4 "$msg4"
+    fi
+
+    \#
+    \# Enable it
+    \#
+    MKITAB RCDT
+    Message 2 "$msg2"
+
+    \#
+    \# move the "cons" record to the end of inittab file,
+    \# and, after the "dt" record to let desktop come up
+    \# before console login.
+    \#
+    consitab=`LSITAB cons`
+    if [ ! -z "$consitab" ]; then
+      RMITAB cons
+      MKITAB -i dt "$consitab"
+    fi
+    Exit 0
+  else # $1 = "disable"
+    if [ "$curstate" = "disabled" ]; then
+      \#
+      \# Already disabled
+      \#
+      Exit 0 5 "$msg5"
+    fi
+
+    \#
+    \# remove the "dt" inittab entry for disabling "dt"
+    \# Note: The "dtsrc" subsystem would remain intact.
+    \# It gets removed only when the super user deletes it
+    \# explicitly by the rmssys command.
+    \#
+    RMITAB "dt"
+    Message 3 "$msg3"
+    Exit 0
+  fi
+}
+
+\#
+\# Check if the user is a super user.
+\#
+if [ "root" != `/usr/bin/whoami` ]; then
+  echo "`basename $0`: \c" 
+  Exit 1 1 "$msg1"
+fi
+
+\#
+\# Check param count
+\#
+if [ $# -ne 1 ]; then
+  Exit 1 6 "$msg6" "`basename $0` -e|-d|-kill|-reset"
+fi
+
+\#
+\# Check options and run command
+\#
+case $1 in
+  -e) ConfigureDt enable;;
+  -d) ConfigureDt disable;;
+  -kill) SignalDt kill;;
+  -reset) SignalDt reset;;
+  *) Exit 1 6 "$msg6" "`basename $0` -e|-d|-kill|-reset"
+esac

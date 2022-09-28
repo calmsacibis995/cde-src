@@ -1,0 +1,79 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1988 by Massachusetts Institute of Technology
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH XmClipboardUnlock 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmClipboardUnlock\fP \- A clipboard function that unlocks the clipboard
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/Xm.h>
+\&#include <Xm/CutPaste.h>
+.sp \n(PDu
+int \fIXmClipboardUnlock\fI (\fBdisplay, window, remove_all_locks\fI)
+.ta .5i 1.5i
+.nf
+	Display	\fB* display\fI;
+	Window	\fBwindow\fI;
+	Boolean	\fBremove_all_locks\fI;
+.wH
+.fi
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+\fIXmClipboardUnlock\fP unlocks the clipboard,
+enabling it to be accessed by other applications.
+.PP 
+If multiple calls to \fIXmClipboardLock\fP have occurred, the same
+number of calls to \fIXmClipboardUnlock\fP is necessary to unlock the clipboard,
+unless \fBremove_all_locks\fP is set to True.
+.IP "\fBdisplay\fP"
+Specifies a pointer to the \fIDisplay\fP structure that was returned in a
+previous call to \fIXOpenDisplay\fP or \fIXtDisplay\fP.
+.nL
+.ne 4
+.IP "\fBwindow\fP"
+Specifies a widget's window ID that relates the application window to the
+clipboard.  The widget's window ID can be obtained by using
+\fIXtWindow\fP.
+The same application instance should pass the same window ID to each of the
+clipboard functions that it calls.
+.IP "\fBremove_all_locks\fP"
+When True, indicates that all nested locks should be removed.  When False,
+indicates that only one level of lock should be removed.
+.SH RETURN VALUE
+.IP "\fIClipboardSuccess\fP"
+The function is successful.
+.IP "\fIClipboardFail\fP"
+The function failed because the clipboard was not locked or was locked
+by another application.
+.SH RELATED INFORMATION
+.na
+\fIXmClipboardCancelCopy(3X)\fP, \fIXmClipboardCopy(3X)\fP,
+\fIXmClipboardEndCopy(3X)\fP, \fIXmClipboardEndRetrieve(3X)\fP,
+\fIXmClipboardInquireCount(3X)\fP, \fIXmClipboardInquireFormat(3X)\fP,
+\fIXmClipboardInquireLength(3X)\fP, \fIXmClipboardInquirePendingItems(3X)\fP,
+\fIXmClipboardLock(3X)\fP, \fIXmClipboardRegisterFormat(3X)\fP,
+\fIXmClipboardRetrieve(3X)\fP, \fIXmClipboardStartCopy(3X)\fP,
+\fIXmClipboardStartRetrieve(3X)\fP, \fIXmClipboardUndoCopy(3X)\fP,
+and \fIXmClipboardWithdrawFormat(3X)\fP.
+.ad

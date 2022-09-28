@@ -1,0 +1,73 @@
+.TH Trace ToolTalk "15 Mar 1994" "SunSoft" "ToolTalk ICCCM"
+.SH NAME
+.PP
+Session_Trace - trace message traffic in a ToolTalk session
+.SH SYNOPSIS
+.PP
+.nf
+.ta 1.2i 2.8i 3.6i 5i
+.ft CW
+[\fIfile\f(CW]	Session_Trace(	in	string	\fIscript\f(CW );
+.ft
+.fi
+.SH DESCRIPTION
+.PP
+Turns on or off message tracing in the scoped-to session.
+.SH REQUIRED ARGUMENTS
+.TP
+\f(CWstring\fR \fIscript\f(CW
+The
+.BR tttracefile (4)
+script of trace settings.  If this argument is not set, and the
+file attribute of the request is set, then the script is contained
+in the file named by the file attribute.  If neither this argument
+nor the file attribute is set, then tracing is turned off in the
+.B ttsession
+of the scoped-to session.
+.IP
+If no trace sink is specified by
+.IR script ,
+trace output in
+.I daemon
+mode goes to the console of the host on which
+.B ttsession
+is running, and in
+.I job-control
+mode goes to
+.BR ttsession 's
+standard error.
+.SH ERRORS
+.PP
+The current session tracing behavior changes if and only if this
+request is not failed.  On failure the \f(CWtt_message_status()\fR
+of the reply is set to one of the following:
+.TP
+.SM TT_ERR_NO_MATCH
+No handler could be found for the request.  This probably means
+that the session is being managed by an instance of
+.B ttsession
+that is older than version 1.2.
+.TP
+.SM TT_DESKTOP_EACCES
+.B ttsession
+does not have permission to open or create the trace or script file.
+.TP
+.SM TT_DESKTOP_EISDIR
+The trace or script file is a directory.
+.TP
+.SM TT_DESKTOP_ENOMEM
+.B ttsession
+ran out of memory try to carry out the request.
+.TP
+.SM TT_DESKTOP_ENOSPC
+There is not enough space in the target filesystem to create the
+trace file.
+.B ttsession
+resets the file attribute of the reply to name the existing trace file.
+To trace to a different file, first turn off tracing to the
+current trace file.
+.SH SEE ALSO
+.PP
+.BR ttsession (1),
+.BR tttrace (1),
+.BR tttracefile

@@ -1,0 +1,32 @@
+# %%  (c) Copyright 1993, 1994 Hewlett-Packard Company			
+# %%  (c) Copyright 1993, 1994 International Business Machines Corp.	
+# %%  (c) Copyright 1993, 1994 Sun Microsystems, Inc.			
+# %%  (c) Copyright 1993, 1994 Novell, Inc. 				
+# %%  $Revision: $ 			 				
+#ifdef HideFromImake
+ #
+ # IMakeFile 1.2	30 Jul 1993
+ #
+ # This preamble turns this imakefile into a shell script which will
+ # create/update this directory's makefile when invoked as follows:
+ # % sh IMakeFile [[GNU]MakeFile]
+ #
+IMAKEDIR=../../imake; export IMAKEDIR
+exec make -f $IMAKEDIR/Boot.mk ${1+"$@"}
+#endif HideFromImake
+
+TT_DIR	= ../..
+
+include $(TT_DIR)/Make.macros
+
+#include "IMakeFile.conf"
+
+default: all
+
+All:: $(MAKEFILE)s
+All all:: DynamicOptimized
+
+DynamicOptimizedObjects(dm)
+SourceHygiene(dm)
+
+.KEEP_STATE:

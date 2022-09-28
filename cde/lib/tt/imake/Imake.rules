@@ -1,0 +1,313 @@
+/*
+ * Imake.rules 1.3	23 Aug 1993
+ *
+ * Imake.rules - preprocessor macros telling how to emit rules into a makefile
+ */
+
+#if defined(gnu)
+#	include <Imake.rules.gnu>
+#else
+#	include <Imake.rules.spro>
+#endif
+
+/*
+ * Source code hygiene for any module
+ */
+#define SourceHygiene(Lib)						@@\
+TildeFiles(Lib)
+
+/*
+ * Static optimized objects for any module
+ */
+#define StaticOptimizedObjects(Mod)					@@\
+									@@\
+Mod/**/_OBJECTS_PDC_O = \						@@\
+$(Mod/**/_SOURCES.C:%.C=$(Mod/**/-DIR)$(OEUVRE)/pdc/O/%.o) \		@@\
+$(Mod/**/_SOURCES.c:%.c=$(Mod/**/-DIR)$(OEUVRE)/pdc/O/%.o)		@@\
+									@@\
+WhenAssign($(Mod/**/_OBJECTS_PDC_O),AppendVal(CPPFLAGS,$(Mod/**/_CPPFLAGS)))@@\
+ 									@@\
+StaticOptimized:: $(Mod/**/_OBJECTS_PDC_O)				@@\
+									@@\
+clean_pdc_O.o::								@@\
+	$(RM) $(Mod/**/_OBJECTS_PDC_O)
+
+/*
+ * Static debug objects for any module
+ */
+#define StaticDebugObjects(Mod)						@@\
+									@@\
+Mod/**/_OBJECTS_PDC_g = \						@@\
+$(Mod/**/_SOURCES.C:%.C=$(Mod/**/-DIR)$(OEUVRE)/pdc/g/%.o) \		@@\
+$(Mod/**/_SOURCES.c:%.c=$(Mod/**/-DIR)$(OEUVRE)/pdc/g/%.o)		@@\
+									@@\
+WhenAssign($(Mod/**/_OBJECTS_PDC_g),AppendVal(CPPFLAGS,$(Mod/**/_CPPFLAGS)))@@\
+ 									@@\
+StaticOptimized:: $(Mod/**/_OBJECTS_PDC_g)				@@\
+									@@\
+clean_pdc_g.o::								@@\
+	$(RM) $(Mod/**/_OBJECTS_PDC_g)
+
+/*
+ * Dynamic optimized objects for any module
+ */
+#define DynamicOptimizedObjects(Mod)					@@\
+									@@\
+Mod/**/_OBJECTS_PIC_O = \						@@\
+$(Mod/**/_SOURCES.C:%.C=$(Mod/**/-DIR)$(OEUVRE)/pic/O/%.o) \		@@\
+$(Mod/**/_SOURCES.c:%.c=$(Mod/**/-DIR)$(OEUVRE)/pic/O/%.o)		@@\
+									@@\
+WhenAssign($(Mod/**/_OBJECTS_PIC_O),AppendVal(CPPFLAGS,$(Mod/**/_CPPFLAGS)))@@\
+ 									@@\
+DynamicOptimized:: $(Mod/**/_OBJECTS_PIC_O)				@@\
+									@@\
+clean_pdc_O.o::								@@\
+	$(RM) $(Mod/**/_OBJECTS_PIC_O)
+
+/*
+ * Dynamic debug objects for any module
+ */
+#define DynamicDebugObjects(Mod)					@@\
+									@@\
+Mod/**/_OBJECTS_PIC_g = \						@@\
+$(Mod/**/_SOURCES.C:%.C=$(Mod/**/-DIR)$(OEUVRE)/pic/g/%.o) \		@@\
+$(Mod/**/_SOURCES.c:%.c=$(Mod/**/-DIR)$(OEUVRE)/pic/g/%.o)		@@\
+									@@\
+WhenAssign($(Mod/**/_OBJECTS_PIC_g),AppendVal(CPPFLAGS,$(Mod/**/_CPPFLAGS)))@@\
+ 									@@\
+DynamicOptimized:: $(Mod/**/_OBJECTS_PIC_g)				@@\
+									@@\
+clean_pdc_g.o::								@@\
+	$(RM) $(Mod/**/_OBJECTS_PIC_g)
+
+/*
+ * Enable Saber to read a module's sources
+ */
+#define SaberSources(Mod)						@@\
+									@@\
+saber/Mod: 	$(Mod/**/_SOURCES.C:%.C=saber/%.o) \			@@\
+	/**/	$(Mod/**/_SOURCES.c:%.c=saber/%.o)
+
+/*
+ * Static optimized libraries
+ */
+#define LibraryStaticOptimized(Lib)					@@\
+ 									@@\
+StaticOptimizedObjects(Lib)						@@\
+LibStaticOptimized(Lib)
+
+/*
+ * Static debug libraries
+ */
+#define LibraryStaticDebug(Lib)						@@\
+ 									@@\
+StaticDebugObjects(Lib)							@@\
+LibStaticDebug(Lib)
+
+/*
+ * The name of the static optimized lib
+ */
+#define StaticOptimizedLib(Lib) $(OEUVRE)/pdc/O/lib/**/Lib/**/.a
+
+/*
+ * The name of the static debug lib
+ */
+#define StaticDebugLib(Lib) $(OEUVRE)/pdc/g/lib/**/Lib/**/.a
+
+/*
+ * The static optimized library, but without its target objects
+ */
+#define LibStaticOptimized(Lib)						@@\
+ 									@@\
+StaticOptimizedLib(Lib): $(OEUVRE)/pdc/O/.dir $(Lib/**/_DEPENDENCIES) \	@@\
+	$(Lib/**/_OBJECTS_PDC_O)					@@\
+	$(RM) $@; $(AR) $(ARFLAGS) $@ $(Lib/**/_OBJECTS_PDC_O); \	@@\
+	$(RANLIB) $@							@@\
+ 									@@\
+StaticOptimized:: StaticOptimizedLib(Lib)				@@\
+All:: StaticOptimizedLib(Lib)						@@\
+clean.goal::								@@\
+	$(RM) StaticOptimizedLib(Lib)
+
+/*
+ * The static debug library, but without its target objects
+ */
+#define LibStaticDebug(Lib)						@@\
+ 									@@\
+StaticDebugLib(Lib): $(OEUVRE)/pdc/g/.dir $(Lib/**/_DEPENDENCIES) \	@@\
+	$(Lib/**/_OBJECTS_PDC_g)					@@\
+	$(RM) $@; $(AR) $(ARFLAGS) $@ $(Lib/**/_OBJECTS_PDC_g); \	@@\
+	$(RANLIB) $@							@@\
+ 									@@\
+StaticDebug:: StaticDebugLib(Lib)					@@\
+All:: StaticDebugLib(Lib)						@@\
+clean.goal::								@@\
+	$(RM) StaticDebugLib(Lib)
+
+/*
+ * Dynamic optimized libraries
+ */
+#define LibraryDynamicOptimized(Lib)					@@\
+ 									@@\
+DynamicOptimizedObjects(Lib)						@@\
+LibDynamicOptimized(Lib)
+
+/*
+ * Dynamic debug libraries
+ */
+#define LibraryDynamicDebug(Lib)					@@\
+ 									@@\
+DynamicDebugObjects(Lib)						@@\
+LibDynamicDebug(Lib)
+
+/*
+ * The name of the dynamic optimized lib
+ */
+#define DynamicOptimizedLib(Lib) $(OEUVRE)/pic/O/lib/**/Lib/**/.so$(XSO)
+
+/*
+ * The name of the dynamic debug lib
+ */
+#define DynamicDebugLib(Lib) $(OEUVRE)/pic/O/lib/**/Lib/**/.so$(XSO)
+
+/*
+ * The dynamic optimized library, but without its target objects
+ */
+#define LibDynamicOptimized(Lib)					@@\
+ 									@@\
+DynamicOptimizedLib(Lib): $(OEUVRE)/pic/O/.dir $(Lib/**/_DEPENDENCIES) \@@\
+	$(Lib/**/_OBJECTS_PIC_O)					@@\
+	$(LINKSO) -o $@ $(Lib/**/_OBJECTS_PIC_O) $(LDLIBS) 2>&1 \	@@\
+		| c++filt						@@\
+ 									@@\
+DynamicOptimized:: DynamicOptimizedLib(Lib)				@@\
+All:: DynamicOptimizedLib(Lib)						@@\
+clean.goal::								@@\
+	$(RM) DynamicOptimizedLib(Lib)
+
+/*
+ * The dynamic debug library, but without its target objects
+ */
+#define LibDynamicDebug(Lib)						@@\
+ 									@@\
+DynamicDebugLib(Lib): $(OEUVRE)/pic/g/.dir $(Lib/**/_DEPENDENCIES) \@@\
+	$(Lib/**/_OBJECTS_PIC_g)					@@\
+	$(LINKSO) -o $@ $(Lib/**/_OBJECTS_PIC_g) $(LDLIBS) 2>&1 \	@@\
+		| c++filt						@@\
+ 									@@\
+DynamicDebug:: DynamicDebugLib(Lib)					@@\
+All:: DynamicDebugLib(Lib)						@@\
+clean.goal::								@@\
+	$(RM) DynamicDebugLib(Lib)
+
+/*
+ * Dynamically-linked optimized programs
+ */
+#define ProgramDynamicOptimized(Prog)					@@\
+ 									@@\
+StaticOptimizedObjects(Prog)						@@\
+ProgDynamicOptimized(Prog)
+
+/*
+ * Dynamically-linked debug programs
+ */
+#define ProgramDynamicDebug(Prog)					@@\
+ 									@@\
+StaticDebugObjects(Prog)						@@\
+ProgDynamicDebug(Prog)
+
+/*
+ * The name of the dynamic optimized program
+ */
+#define DynamicOptimizedProg(Prog) $(OEUVRE)/pic/O/Prog
+
+/*
+ * The name of the dynamic debug program
+ */
+#define DynamicDebugProg(Prog) $(OEUVRE)/pic/g/Prog
+
+/*
+ * The dynamic optimized program, but without its target objects
+ */
+#define ProgDynamicOptimized(Prog)					@@\
+ 									@@\
+DynamicOptimizedProg(Prog): $(OEUVRE)/pic/O/.dir \			@@\
+	$(Prog/**/_DEPENDENCIES) $(Prog/**/_OBJECTS_PDC_O)		@@\
+	$(LINK.cc) $(RUN_PATH) -o $@ $(Prog/**/_OBJECTS_PDC_O) $(LDLIBS)@@\
+ 									@@\
+DynamicOptimized:: DynamicOptimizedProg(Prog)				@@\
+All:: DynamicOptimizedProg(Prog)					@@\
+clean.goal::								@@\
+	$(RM) DynamicOptimizedProg(Prog)
+
+/*
+ * The dynamic debug program, but without its target objects
+ */
+#define ProgDynamicDebug(Prog)						@@\
+ 									@@\
+DynamicDebugProg(Prog): $(OEUVRE)/pic/g/.dir \				@@\
+	$(Prog/**/_DEPENDENCIES) $(Prog/**/_OBJECTS_PDC_g)		@@\
+	$(LINK.cc) $(RUN_PATH) -o $@ $(Prog/**/_OBJECTS_PDC_g) $(LDLIBS)@@\
+ 									@@\
+DynamicDebug:: DynamicDebugProg(Prog)					@@\
+All:: DynamicDebugProg(Prog)						@@\
+clean.goal::								@@\
+	$(RM) DynamicDebugProg(Prog)
+
+/*
+ * Enable Saber to load a program
+ */
+#define SaberProg(Prog)							@@\
+									@@\
+saber/Prog: \								@@\
+	/**/	$(Prog/**/_SOURCES.C:%.C=saber/%.o)			@@\
+	/**/	$(Prog/**/_SOURCES.c:%.c=saber/%.o)			@@\
+	#load $(LDFLAGS) $(LDLIBS)
+
+/*
+ * Define and clean up editor backups.
+ */
+#define TildeFiles(Mod)							@@\
+									@@\
+Mod/**/_SOURCES.C~	= $(Mod/**/_SOURCES.C:%.C=%.C~)		@@\
+Mod/**/_SOURCES.c~	= $(Mod/**/_SOURCES.c:%.c=%.c~)			@@\
+Mod/**/_HEADERS~	= $(Mod/**/_HEADERS:%.h=%.h~)			@@\
+									@@\
+clean~::								@@\
+	$(RM) Mod/**/_SOURCES.C~ Mod/**/_SOURCES.c~ Mod/**/_HEADERS~
+
+/*
+ * Old stuff
+ */
+
+#define LibraryCppFiles(Lib)						@@\
+									@@\
+Lib/**/_i_SOURCES.C	= $(Lib/**/_SOURCES.C:%.C=$(OEUVRE)_i/%.C)	@@\
+Lib/**/_i_SOURCES.c	= $(Lib/**/_SOURCES.c:%.c=$(OEUVRE)_i/%.c)
+
+#define LibraryCfrontFiles(Lib)						@@\
+									@@\
+Lib/**/_c_SOURCES.C = $(Lib/**/_SOURCES.C:%.C=$(OEUVRE)_c/%.c)
+
+#define LibraryGObjectFiles(Lib)					@@\
+									@@\
+Lib/**/_OBJECTS_g = \							@@\
+	$(Lib/**/_SOURCES.C:%.C=$(OEUVRE)_g/%.o) \			@@\
+	$(Lib/**/_SOURCES.c:%.c=$(OEUVRE)_g/%.o)
+
+#define LibraryPicObjectFiles(Lib)					@@\
+									@@\
+Lib/**/_PIC_OBJECTS_O = \						@@\
+	$(Lib/**/_SOURCES.C:%.C=$(OEUVRE)_pic_O/%.o) \		@@\
+	$(Lib/**/_SOURCES.c:%.c=$(OEUVRE)_pic_O/%.o)
+
+#define LibraryPicGObjectFiles(Lib)					@@\
+									@@\
+Lib/**/_PIC_OBJECTS_g = \						@@\
+	$(Lib/**/_SOURCES.C:%.C=$(OEUVRE)_pic_g/%.o) \		@@\
+	$(Lib/**/_SOURCES.c:%.c=$(OEUVRE)_pic_g/%.o)
+
+#define Library(Lib)							@@\
+									@@\
+LibraryTildeFiles(Lib)							@@\
+LibraryObjectFiles(Lib)							@@\

@@ -1,0 +1,366 @@
+.de LI
+.\" simulate -mm .LIs by turning them into .TPs
+.TP \\n()Jn
+\\$1
+..
+.de Lc
+.\" version of .LI that emboldens its argument
+.TP \\n()Jn
+\s-1\f3\\$1\f1\s+1
+..
+.TH SdmString 3 "08/05/96"
+.BH "08/05/96"
+.\" @(#)SdmDataTypeUtility.3	1.4 96/08/05 SMI
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994, 1995, 1996 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994, 1995, 1996 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994, 1995, 1996 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994, 1995, 1996 Novell, Inc.
+.SH NAME
+SdmDataTypeUtility \- data typing utility class
+.SH SYNOPSIS
+.\"
+.SS Includes
+.ft 3
+.nf
+#include <SDtMail/DataTypeUtility.hh>
+.\"
+.SS Creation
+All member methods are static; class cannot be instantiated.
+.\"
+.SS Methods
+.nf
+.sp 0.5v
+.ft 3
+.ta \w'SdmErrorCode Sdm'u
+SdmErrorCode SdmDataTypeUtility::DetermineCdeDataTypeForMessage(
+	SdmError& \f2err\fP,
+	SdmString& \f2r_cdeDataType\fP,
+	SdmMessageBody& \f2messageBody\fP, 
+	SdmMessageBodyStructure* \f2messageBodyStructure\fP = 0,
+	SdmBoolean \f2lowBandwidthRequest\fP = Sdm_False)
+.PP
+.ft 3
+.ta \w'SdmErrorCode Sdm'u
+SdmErrorCode SdmDataTypeUtility::DetermineMimeDataTypesForMessage(
+	SdmError& \f2err\fP,
+	SdmBoolean& \f2r_isText\fP,
+	SdmMsgStrType& \f2r_mimeType\fP,
+	SdmString& \f2r_mimeSubtype\fP,
+	SdmMessageBody& \f2messageBody\fP,
+	SdmMessageBodyStructure* \f2messageBodyStructure\fP = 0)
+.PP
+.ft 3
+.ta \w'SdmErrorCode Sdm'u
+SdmErrorCode SdmDataTypeUtility::GetMimeTypeStringFromMessage(
+	SdmError& \f2err\fP,
+	SdmString& \f2r_mimeType\fP,
+	SdmMessageBody& \f2messageBody\fP,
+	SdmMessageBodyStructure* \f2messageBodyStructure\fP = 0)
+.PP
+.ft 3
+.ta \w'SdmErrorCode Sdm'u
+SdmErrorCode SdmDataTypeUtility::SetContentTypesForMessage(
+	SdmError& \f2err\fP, 
+	SdmMessageBody& \f2messageBody\fP)
+.\"
+.fi
+.ft 1
+.\" end of methods list
+.ta 0.25i 0.50i 0.75i 1.0i 1.25i 1.50i 1.75i 2.0i 2.5i 3.0i
+.SH DESCRIPTION
+The SdmDataTypeUtility class provides methods that help deal with data typing issues. Data
+typing refers to the ability to identify characteristics about data and thereby determine
+the appropriate actions that can be taken on that data.
+.\"
+.SH CREATION
+The SdmDataTypeUtility class is a container for methods that deal with data typing issues;
+as such no SdmDataTypeUtility object can be created or destroyed.
+.\"
+.SH DESTRUCTION
+The SdmDataTypeUtility class is a container for methods that deal with data typing issues;
+as such no SdmDataTypeUtility object can be created or destroyed.
+.\"
+.SH METHODS
+The following static methods are provided:
+.\"
+.SS \f3DetermineCdeDataTypeForMessage\fP
+(\f3err\fP, \f3r_cdeDataType\fP, \f3messageBody\fP, \f3messageBodyStructure\fP, \f3lowBandwidthRequest\fP)
+
+This static method determines the CDE data type for a given message body. The CDE
+data type returned is similar to that returned by \f3DtDtsBufferToDataType\fP(3). This
+method uses a combination of the body part name (e.g. attachment name), message body
+part type (e.g. MIME type/subtype) and an examination of the contents of the message
+body part to determine the CDE type.
+.PP
+This method is typically used when some type of CDE action is to be invoked on a
+message body part, and it is necessary to first determine the CDE type before the
+actions applicable to the message body part can be determined. For example, bringing
+up the action menu on an attachment, or launching an attachment.
+.PP
+CAUTION: This method can cause the contents for the indiciated message body part
+to be retrieved (via the GetContents method of the SdmMessageBody object passed
+in), and may take a long period of time to complete depending on the size of the
+message body part and the speed of the connection to the message store. It
+should therefore only be called when needed to identify the CDE type of the
+object as a prelude to invoking an action or performing some other specific
+function on the message body part, or after the contents of a message body part
+have been set or changed. This can be overridden via the
+\f3lowBandwidthRequest\fP option below.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)\fP"
+.br
+Error container, used to store return result code.
+.LI "\f3r_cdeDataType\fP (\f3SdmString &\fP)"
+.br
+The CDE data type for the message body part is returned in this container. Examples
+of possible types are: TEXTFILE, DTMAIL_FILE, DATA, SHELL, PM, etc.
+.LI "\f3messageBody\fP" (\f3SdmMessageBody&\fP)
+.br
+The object representing the message body part for which the CDE data type is to be
+determined.
+.LI "\f3messageBodyStructure\fP" (\f3SdmMessageBodyStructure*\fP)
+.br
+An optional argument that provides the message body structure for the message body
+part for which the CDE data type is to be determined. 
+
+If this argument is not specified, then the message body structure is fetched by
+invoking the GetStructure method on the SdmMessageBody object provided. If the caller
+already has the message body structure available, passing it in saves the time
+necessary to fetch it again.
+.LI "\f3lowBandwidthRequest\fP" (\f3SdmBoolean\fP)
+.br
+An optional argument that causes this method to NEVER retrieve message body part
+contents to determine the CDE data type. This results in a more primative data
+type evaluation, as only the MIME type and subtype and attachment name (if
+present) can be used to determine a CDE data type.
+
+This option is usually specified Sdm_True only for low bandwidth and other
+operations where it is desired to limit the amount of data that is brought over
+just to display the basic message.
+
+The default is Sdm_False, which can cause the contents for the indicated message
+bodypart to be retrieved.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3DetermineMimeDataTypesForMessage\fP
+(\f3err\fP, \f3r_isText\fP, \f3r_mimeType\fP, \f3r_mimeSubtype\fP, \f3messageBody\fP, \f3messageBodyStructure\fP)
+
+This static method determines the MIME type and subtype for a given message body.
+The MIME type and subtype returned are similar to that contained in a
+SdmMessageBodyStructure object. This method uses a combination of the body part name
+(e.g. attachment name), message body part type (e.g. existing MIME type and subtype),
+CDE data type, and an examination of the contents of the message body part to
+determine the MIME type and subtype.
+.PP
+This method differs from \f3GetMimeTypeStringFromMessage\fP in that this method
+attempts to determine this information by examining the contents of the specified
+message body part, as opposed to just retrieving the information already contained in
+the message body structure for the message body part.
+.PP
+This method differs from \f3SetContentTypesForMessage\fP in that this method only
+determines the MIME type and subtype for the message body part but does not cause the
+content type for the message body part (as recored in the message body structure
+object for the message body part) to be changed.
+.PP
+This method is typically used when the contents of a message body part have been set
+or changed, after which the MIME type and subtype must then be determined based upon
+the new contents of the message body part.
+.PP
+CAUTION: This method can cause the contents for the indiciated message body part to
+be retrieved (via the GetContents method of the SdmMessageBody object passed in), and
+may take a long period of time to complete depending on the size of the message body
+part and the speed of the connection to the message store. It should therefore only
+be called when needed to identify the CDE type of the object as a prelude to invoking
+an action or performing some other specific function on the message body part, or
+after the contents of a message body part have been set or changed.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)\fP"
+.br
+Error container, used to store return result code.
+.LI "\f3r_istext\fP" (\f3SdmBoolean&\fP)
+.br
+This boolean is set to Sdm_True if the contents of the message body part appears to
+be "text", as defined by calling \f3DtDtsDataTypeToAttributeValue\fP with the
+\f2DtDTS_DA_IS_TEXT\fP attribute. Otherwise, it is set to Sdm_False.
+.LI "\f3r_mimeType\fP" (\f3SdmMsgStrType&\fP)
+.br
+The MIME type that the message body part is determined to be is returned in this container.
+.LI "\f3r_mimeSubtype\fP (\f3SdmString &\fP)"
+.br
+The MIME subtype that the message body part is determined to be is returned in this container.
+.LI "\f3messageBody\fP" (\f3SdmMessageBody&\fP)
+.br
+The object representing the message body part for which the MIME type and subtype is to be
+determined.
+.LI "\f3messageBodyStructure\fP" (\f3SdmMessageBodyStructure*\fP)
+.br
+An optional argument that provides the message body structure for the message body
+part for which the MIME type and subtype is to be determined. 
+
+If this argument is not specified, then the message body structure is fetched by
+invoking the GetStructure method on the SdmMessageBody object provided. If the caller
+already has the message body structure available, passing it in saves the time
+necessary to fetch it again.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+
+.SS \f3GetMimeTypeStringForMessage\fP
+(\f3err\fP, \f3r_mimeType\fP, \f3messageBody\fP, \f3messageBodyStructure\fP)
+
+This static method retrieves the MIME type, in the form of a single SdmString object,
+for the given message body. The MIME type is similar to that described in RFC 1521
+(the MIME specifications). This method uses the data present in the message body
+structure object to produce the MIME type string.
+.PP
+This method differs from \f3DetermineMimeDataTypesForMessage\fP in that this method
+does not attempt to determine the MIME types based upon an examination of the contents
+of the message body part, but rather simply returns any MIME content types that are
+currently set in the message body structure object for the message body part.
+.PP
+This method is used when the complete MIME type and subtype presented in a single
+ascii string is required. Some CDE data type methods require this (for example,
+\f3DtDtsDataTypeToAttributeValue\fP(3) using the \f2DtDTS_DA_MIME_TYPE\fP attribute).
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)\fP"
+.br
+Error container, used to store return result code.
+.LI "\f3r_mimeType\fP (\f3SdmString &\fP)"
+.br
+The MIME type for the message body part is returned in this container. Examples of
+possible types are: text/plain, multipart/mixed, application/octet-stream, etc.
+.LI "\f3messageBody\fP" (\f3SdmMessageBody&\fP)
+.br
+The object representing the message body part for which the MIME type is to be
+determined.
+.LI "\f3messageBodyStructure\fP" (\f3SdmMessageBodyStructure*\fP)
+.br
+An optional argument that provides the message body structure for the message body
+part for which the MIME type is to be determined. 
+
+If this argument is not specified, then the message body structure is fetched by
+invoking the GetStructure method on the SdmMessageBody object provided. If the caller
+already has the message body structure available, passing it in saves the time
+necessary to fetch it again.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3SetContentTypesForMessage\fP
+(\f3err\fP, \f3messageBody\fP)
+
+This static method causes the content type for the indicated message body part to be
+determined and set. This method uses a combination of the body part name
+(e.g. attachment name), message body part type (e.g. existing MIME type and subtype),
+CDE data type, and an examination of the contents of the message body part to
+determine the MIME type and subtype.
+.PP
+This method differs from \f3DetermineMimeDataTypesForMessage\fP in that this method
+not only determines the MIME data types for the message body part, but causes the
+content type for the message to be set (in the message body structure object for the
+message body part) to the newly determined types.
+.PP
+This method is typically used when the contents of a message body part have been set
+or changed, after which the content type of the message body part must be determined
+based upon the new contents of the message body part. It must be called before the
+message is committed (saved back to a message store) or submitted (sent) so that
+the MIME data type for the message body part is properly set.
+.PP
+CAUTION: This method can cause the contents for the indiciated message body part to
+be retrieved (via the GetContents method of the SdmMessageBody object passed in), and
+may take a long period of time to complete depending on the size of the message body
+part and the speed of the connection to the message store. It should therefore only
+be called when needed to identify the CDE type of the object as a prelude to invoking
+an action or performing some other specific function on the message body part, or
+after the contents of a message body part have been set or changed.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)\fP"
+.br
+Error container, used to store return result code.
+.LI "\f3r_cdeDataType\fP (\f3SdmString &\fP)"
+.br
+The CDE data type for the message body part is returned in this container.
+.LI "\f3messageBody\fP" (\f3SdmMessageBody&\fP)
+.br
+The object representing the message body part for which the CDE data type is to be
+determined.
+.LI "\f3messageBodyStructure\fP" (\f3SdmMessageBodyStructure*\fP)
+.br
+An optional argument that provides the message body structure for the message body
+part for which the CDE data type is to be determined. 
+
+If this argument is not specified, then the message body structure is fetched by
+invoking the GetStructure method on the SdmMessageBody object provided. If the caller
+already has the message body structure available, passing it in saves the time
+necessary to fetch it again.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+
+.\"
+.RE
+.nr )J 0
+.SH "SEE ALSO"
+.na
+.BR DtDataTyping (3),
+.BR DtDtsBufferToDataType (3),
+.BR DtDtsDataTypeToAttributeValue (3),
+.BR DtDtsFindAttribute (3),
+.BR SdmMessage (3),
+.BR SdmMessageBody (3)

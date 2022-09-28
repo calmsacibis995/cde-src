@@ -1,0 +1,63 @@
+.TH tt_file_join 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+tt_file_join \- register interest in messages involving a file
+.SH SYNOPSIS
+.yS
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'Tt_status tt_file_join('u
+Tt_status tt_file_join(const char *\f2filepath\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn tt_file_join
+function
+informs the ToolTalk service that the process is interested in messages
+that involve the specified file.
+.P
+The ToolTalk service adds this file value to any currently registered patterns.
+The named file becomes the default file.
+.P
+When the process joins a file, the ToolTalk service updates the file field
+of its registered patterns.
+The
+.Fn tt_file_join
+call causes the pattern's ToolTalk
+session to be stored in the database.
+.P
+The
+.I filepath
+argument is a pointer to the pathname of the file in which the
+process is interested.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn tt_file_join
+function returns the status of the operation as one of the following
+.B Tt_status
+values:
+.VL 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_DBAVAIL
+.br
+The ToolTalk service could not access the
+ToolTalk database needed for this operation.
+.Lc TT_ERR_DBEXIST
+.br
+The ToolTalk service could not access the
+specified ToolTalk database in the expected place.
+.Lc TT_ERR_NOMP
+.br
+The
+.Cm ttsession 1
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_PATH
+.br
+The specified pathname included an unsearchable directory.
+.LE
+.SH "SEE ALSO"
+.Hd Tt/tt_c.h 5.

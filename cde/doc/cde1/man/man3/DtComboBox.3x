@@ -1,0 +1,265 @@
+.\" ** (c) Copyright 1993, 1994 Interleaf, Inc.
+.\" **
+.\" ** Permission to use, copy, modify, and distribute this software and its
+.\" ** documentation for any purpose without fee is granted, provided that
+.\" ** the above copyright notice appear in all copies and that both copyright
+.\" ** notice and this permission notice appear in supporting documentation,
+.\" ** and that the name of Interleaf not be used in advertising or publicly
+.\" ** pertaining to distribution of the software without specific written
+.\" ** prior permission.
+.\" ** 
+.\" ** Interleaf makes no representation about the suitability of this
+.\" ** software for any purpose. It is provided "AS IS" without any express
+.\" ** or implied warranty.
+.\" **
+.\" ** (c) Copyright 1994 Novell, Inc.
+.\" ** (c) Copyright 1994 Hewlett-Packard Company
+.\" ** (c) Copyright 1994 International Business Machines Corp.
+.\" ** (c) Copyright 1994 Sun Microsystems, Inc.
+.TH DtComboBox 3X ""
+.BH "20 January - 1994"
+.SH NAME
+\fBDtComboBox(3X) \- the ComboBox widget class.\fP
+.iX "DtComboBox"
+.iX "widget class" "ComboBox"
+.sp .5
+.SH SYNOPSIS
+\fB#include <Dt/ComboBox.h>\fP
+.sp .5
+.SH DESCRIPTION
+The DtComboBox widget is a combination of a TextField and a List widget
+that provides a list of valid choices for the TextField.
+Selecting an item from this list automatically fills in the TextField 
+with that list item.
+This widget was written by Interleaf, Inc.
+.PP
+Widget subclassing is not supported for the DtComboBox widget class.
+.PP
+The resources for the XmList and XmTextField that are created by the
+DtComboBox are accessible by using the XtNameToWidget() function.
+The names of these widgets are "*List" and "Text" respectively.
+.sp .5
+.SS "Classes"
+DtComboBox inherits behavior and resources from \fBCore\fP, \fBComposite\fP,
+and \fBXmManager\fP classes.
+.PP
+The class pointer is dtComboBoxWidgetClass.
+.PP
+The class name is DtComboBoxWidget.
+.sp .5
+.SS "New Resources"
+The following table defines a set of widget resources used by the programmer
+to specify data.  The programmer can also set the resource values for the
+inherited classes to set attributes for this widget.  To reference a
+resource by name or by class in a .Xdefaults file, remove the \fBDtN\fP or
+\fBDtC\fP prefix and use the remaining letters.  To specify one of the defined
+values for a resource in a .Xdefaults file, remove the \fBDt\fP prefix and use
+the remaining letters (in either lowercase or uppercase, but include any
+underscores between words).
+The codes in the access column indicate if the given resource can be
+set at creation time (\fBC\fP),
+set by using \fBXtSetValues\fP (\fBS\fP),
+retrieved by using \fBXtGetValues\fP (\fBG\fP), or is not applicable (\fBN/A\fP).
+.sp .5
+.sp .5
+.in 0
+.KS
+.sp 1
+.in 0
+.TS
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+DtComboBox Resource Set
+Name	Class	Type	Default	Access
+_
+DtNmarginHeight	DtCMarginHeight	Dimension	2	CSG
+DtNmarginWidth	DtCMarginWidth	Dimension	2	CSG
+DtNselectedItem	DtCSelectedItem	XmString	dynamic	CSG
+DtNselectedPosition	DtCSelectedPosition	int	dynamic	CSG
+DtNselectionCallback	DtCCallback	XtCallbackList	NULL	C
+DtNcomboBoxType	DtCComboBoxType	unsigned int	DtDROP_DOWN_LIST	C
+.TE
+.in
+.sp 1
+.KE
+.in
+.sp .5
+.IP "\fBDtNmarginHeight\fP"
+\fIDtNmarginHeight\fP specifies the number of pixels added between the top and
+bottom of the text widget and the start of the shadow.
+.IP "\fBDtNmarginWidth\fP"
+\fIDtNmarginWidth\fP specifies the number of pixels added between the right and
+left sides of the text widget and the start of the shadow.
+.IP "\fBDtNselectedItem\fP"
+This resource is passed through to the XmList to set the
+\fIXmNselectedItemCount\fP and \fIXmNselectedItems\fP as the single item
+in the XmNitems that matches this specified XmString in the List.
+Setting both \fIDtNselectedItem\fP and \fIDtNselectedPosition\fP in the
+same ArgList has undefined behavior.
+.IP "\fBDtNselectedPosition\fP"
+This resource is passed through to the XmList to set the
+\fIXmNselectedItemCount\fP and \fIXmNselectedItems\fP as the single item
+at this specified position in the List.
+Setting both \fIDtNselectedItem\fP and \fIDtNselectedPosition\fP in the
+same ArgList has undefined behavior.
+.IP "\fBDtNselectionCallback\fP"
+This callback list is issued when an item is selected from the DtComboBox
+widget's List.
+The call_data structure contains a DtComboBoxCallbackStruct with the
+reason DtCR_SELECT. 
+This structure is defined below.
+.IP "\fBDtNcomboBoxType\fP"
+This resource determines the style of the DtComboBox.
+There are two choices:
+.wH
+.rS
+.TP
+\(bu
+\fIDtDROP_DOWN_COMBO_BOX\fP
+.TP
+\(bu
+\fIDtDROP_DOWN_LIST\fP
+.wH
+.rE
+.nL
+.IP
+The DtDROP_DOWN_COMBO_BOX style type provides an editable text area, and the 
+DtDROP_DOWN_LIST provides a static text area.
+.sp .5
+.SS "Inherited Resources"
+DtComboBox inherits behavior and resources from the following named
+superclasses.  For a complete description of each resource, refer to the
+man page for that superclass.
+.P
+.sp 1
+.in 0
+.KS
+.TS
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmManager Resource Set
+Name	Class	Type	Default	Access
+_
+XmNbottomShadowColor	XmCBottomShadowColor	Pixel	dynamic	CSG
+XmNbottomShadowPixmap	XmCBottomShadowPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNforeground	XmCForeground	Pixel	dynamic	CSG
+XmNhelpCallback	XmCCallback	XtCallbackList	NULL	C
+XmNhighlightColor	XmCHighlightColor	Pixel	dynamic	CSG
+XmNhighlightPixmap	XmCHighlightPixmap	Pixmap	dynamic	CSG
+XmNinitialFocus	XmCInitialFocus	Widget	NULL	CSG
+XmNnavigationType	XmCNavigationType	XmNavigationType	dynamic	CSG
+XmNshadowThickness	XmCShadowThickness	Dimension	dynamic	CSG
+XmNstringDirection	XmCStringDirection	XmStringDirection	dynamic	CG
+XmNtopShadowColor	XmCTopShadowColor	Pixel	dynamic	CSG
+XmNtopShadowPixmap	XmCTopShadowPixmap	Pixmap	dynamic	CSG
+XmNtraversalOn	XmCTraversalOn	Boolean	dynamic	CSG
+XmNunitType	XmCUnitType	unsigned char	dynamic	CSG
+XmNuserData	XmCUserData	XtPointer	NULL	CSG
+.TE
+.KE
+.in
+.sp 1
+.P
+.sp 1
+.in 0
+.KS
+.TS
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+Composite Resource Set
+Name	Class	Type	Default	Access
+_
+XmNchildren	XmCReadOnly	WidgetList	NULL	G
+XmNinsertPosition	XmCInsertPosition	XtOrderProc	default procedure	CSG
+XmNnumChildren	XmCReadOnly	Cardinal	0	G
+.TE
+.KE
+.in
+.sp 1
+.P
+.wH
+.in 0
+.sp 1
+.in 0
+.KS
+.TS
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+Core Resource Set
+Name	Class	Type	Default	Access
+_
+XmNaccelerators	XmCAccelerators	XtAccelerators	dynamic	CSG
+XmNancestorSensitive	XmCSensitive	Boolean	dynamic	G
+XmNbackground	XmCBackground	Pixel	dynamic	CSG
+XmNbackgroundPixmap	XmCPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNborderColor	XmCBorderColor	Pixel	XtDefaultForeground	CSG
+XmNborderPixmap	XmCPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNborderWidth	XmCBorderWidth	Dimension	0	CSG
+XmNcolormap	XmCColormap	Colormap	dynamic	CG
+XmNdepth	XmCDepth	int	dynamic	CG
+XmNdestroyCallback	XmCCallback	XtCallbackList	NULL	C
+XmNheight	XmCHeight	Dimension	dynamic	CSG
+XmNinitialResourcesPersistent	XmCInitialResourcesPersistent	Boolean	True	C
+XmNmappedWhenManaged	XmCMappedWhenManaged	Boolean	True	CSG
+XmNscreen	XmCScreen	Screen *	dynamic	CG
+.wH
+.tH
+XmNsensitive	XmCSensitive	Boolean	True	CSG
+XmNtranslations	XmCTranslations	XtTranslations	dynamic	CSG
+XmNwidth	XmCWidth	Dimension	dynamic	CSG
+XmNx	XmCPosition	Position	0	CSG
+XmNy	XmCPosition	Position	0	CSG
+.TE
+.KE
+.in
+.sp 1
+.wH
+.in
+.sp .5
+.SS "Callback Information"
+A pointer to the following structure is passed to each DtComboBox callback:
+.sp .5
+.nf
+.ta .25i 1.1i
+\fBtypedef struct \fP{
+	\fBint\fP 	\fIreason\fP;
+	\fBXEvent\fP	\fI* event\fP;
+	\fBXmString\fP	\fIitem_or_text\fP;
+	\fBint\fP	\fIitem_position\fP;
+} \fBDtComboBoxCallbackStruct\fP;
+.fi
+.sp .5
+.IP "\fIreason\fP"
+There is only one possible reason for this callback to be issued, DtCR_SELECT.
+.IP "\fIevent\fP"
+A pointer to the event that caused this callback to be invoked. It can 
+be NULL.
+.IP "\fIitem_or_text\fP"
+The contents of the Text widget at the time the event caused the 
+callback to be invoked.
+This data is only valid within the scope of the call_data structure,
+so it must be copied when it is used outside of this scope.
+.IP "\fIitem_position\fP"
+The new value of the \fIDtNposition\fP resource in the DtComboBox's List.
+If this is 0, it means the user entered a value in the XmTextField widget.
+.SH "SEE ALSO"
+.BR Composite(3X),
+.BR Constraint(3X),
+.BR Core(3X),
+.BR DtComboBoxAddItem(3X),
+.BR DtComboBoxDeletePos(3X),
+.BR DtComboBoxSelectItem(3X),
+.BR DtComboBoxSetItem(3X),
+.BR DtCreateComboBox(3X),
+.BR XmList(3X),
+.BR XmManager(3X),
+.BR XmText(3X), and
+.BR XmTextField(3X).

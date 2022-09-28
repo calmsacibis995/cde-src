@@ -1,0 +1,73 @@
+.TH ttdt_close 3 "1 March 1996" "ToolTalk 1.3" "ToolTalk Functions"
+.BH "1 March 1996"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.IX "ttdt_close.3" "" "ttdt_close.3" "" 
+.SH NAME
+ttdt_close \- destroy a ToolTalk communication endpoint
+.SH SYNOPSIS
+.ft 3
+.nf
+#include <Tt/tttk.h>
+.sp 0.5v
+.ta \w'Tt_status ttdt_close('u
+Tt_status ttdt_close(const char *\f2procid\fP,
+	const char *\f2new_procid\fP,
+	int \f2sendStopped\fP);
+.PP
+.fi
+.SH DESCRIPTION
+The
+.BR ttdt_close (\|)
+function destroys a ToolTalk communication endpoint.
+.PP
+If
+.I sendStopped
+is True, the
+.BR ttdt_close (\|)
+function sends a
+.I Stopped
+notice; otherwise, it sends no notice.
+If
+.I procid
+is not
+.BR \s-1NULL\s+1 ,
+.BR ttdt_close (\|)
+calls
+.BR tt_default_procid_set (\|)
+with a
+.I procid
+argument and then calls
+.BR tt_close (\|);
+otherwise, it closes the current default
+procid.
+If
+.I new_procid
+is not
+.BR \s-1NULL\s+1 ,
+.BR ttdt_close (\|)
+calls
+.BR tt_default_procid_set (\|)
+with a
+.I new_procid
+argument.
+.SH "RETURN VALUE"
+The
+.BR ttdt_close (\|)
+function may return any of the errors returned by
+.BR tt_default_procid_set (3)
+and
+.BR tt_close (3).
+.PP
+No errors are propagated if sending the
+.I Stopped
+notice fails.
+.SH "SEE ALSO"
+.na
+.BR tttk (5),
+.BR ttdt_open (3),
+.BR tt_default_procid_set (3),
+.BR tt_close (3).

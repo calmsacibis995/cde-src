@@ -1,0 +1,50 @@
+design
+    functionally equivalent hierarchies obtained
+    one object not equal to one widget
+import
+    widgets mapped to closest object
+    user needs to work on resulting object hierarchy to minimise the
+      objects, set attachments, etc.
+    connections not imported
+export
+    objects expand into many widgets
+    ab's object names are longer than UIL allows
+
+AppBuilder provides basic OSF/Motif User Interface Language, UIL, import and
+export capabilities.  In the current design, AppBuilder defines this support
+as obtaining a functionally equivalent hierarchy.  One AppBuilder object can
+be comprised of one or more Motif widgets.  i.e., one object node can
+provide the same functionality to a GUI as a hierarchy of widgets.  For
+example, the Text Field object is normally comprised of a Label widget, a
+Text Field widget, and contained in a Row Column widget.  But, if the user
+does not specify a string for the Text Field object's label, the Label
+widget and containing Row Column widget will not be created.  Thus, an
+object hierarchy containing one Text Field can be said to be functionally
+equivalent to either a widget hierarchy containing a Label widget, a Text
+Field widget, and a Row Column widget; or a widget hierarchy containing just
+a Text Field widget.  Since the design concentrated on just obtaining
+functionally equivalent hierarchies, the user is expected to perform an
+amount of work after a UIL import or export operation is executed.
+
+After a UIL file is imported into AppBuilder, the user is expected to
+optimize the resulting object hierarchy, correct positions and attachments,
+and link up the remaining callbacks.  UIL import maps the Motif widgets to
+the closest AppBuilder object.  It does not optimize the resulting object
+tree into AppBuilder's object model.  For example, if a Label widget and a
+Text Field widget are imported they will be converted to a Label object and
+a Text Field object which does not contain a label.  The import process does
+not sense that you have seen a Label widget and a Text Field widget and thus
+should optimize this into a single Text Field object with a label.  The
+optimization of the object hierarchy is left up to the user.  Consequently,
+the positions of objects and attachments may require correction.  Since
+AppBuilder's connections model does not directly map one to one to Motif
+callbacks, only obvious connections will be linked up via the UIL import. It
+is expected that they will have to be integrated after the import operation.
+
+When a module is exported as UIL, AppBuilder object names can become longer
+than UIL allows.  UIL does not allow names to exceed 31 characters.
+AppBuilder does not have such a limit.  On UIL export, the full object names
+are output to preserve the naming conventions of the module.  It is up to
+the user to shorten those names that exceed 31 characters.
+
+

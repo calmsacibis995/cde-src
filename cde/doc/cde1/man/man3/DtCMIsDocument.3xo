@@ -1,0 +1,60 @@
+.TH DtCMIsDocument 3 "17 January 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH "NAME"
+DtCMIsDocument \- determine if a container is a Cde container document
+.SH "SYNOPSIS"
+.yS
+#include <Bento/DtCM.h>
+.sp 0.5v
+.ta \w'CMBoolean DtCMIsDocument('u
+CMBoolean DtCMIsDocument(CMContainer \f2container\fP,
+	CMEnv *\f2error\fP);
+.yE
+.SH "DESCRIPTION"
+The
+.Fn DtCMIsDocument
+function returns
+.Cn CM_TRUE
+if the container is a Cde container document.
+This function determines that a container is a Cde container document by
+looking for a root object.
+It is possible to have an
+.I empty
+container document that is a container with a root object but has no
+body parts.
+.P
+The
+.I container
+argument is an open Cde document container handle.
+The container must be open for update if create is
+.Cn CM_TRUE .
+The
+.I error
+argument is a pointer to an error return structure.
+.SH "RETURN VALUE"
+The
+.Fn DtCMIsDocument
+function returns
+.Cn CM_TRUE
+if the container is a Cde container document;
+otherwise, it returns
+.Cn CM_FALSE .
+If an error occurs,
+.Fn DtCMIsDocument
+sets the major code in the
+.I error
+structure to
+.Cn USER_EXCEPTION ,
+and the application can use the
+.Fn CMRexception_number
+function to determine the minor code.
+See the Error API Appendix in the \*(ZB.
+.SH "SEE ALSO"
+.Fn DtCMFiniDocument 3,
+.Fn DtCMInitDocument 3,
+.Hd Bento/DtCM.h 5;
+.Fn CMRexception_number
+in the \*(ZB.

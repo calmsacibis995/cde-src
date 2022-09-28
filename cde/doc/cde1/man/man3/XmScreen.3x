@@ -1,0 +1,318 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH XmScreen 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmScreen\fP \- The Screen widget class
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/Screen.h>
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+The XmScreen object is used by Motif widgets to store information that
+is specific to a screen.  It also allows the toolkit to store certain
+information on widget hierarchies that would otherwise be unavailable.
+Each client has one XmScreen object for each screen that it accesses.
+.PP
+An XmScreen object is automatically created when the application creates
+the first shell on a screen (usually accomplished by a call to
+\fIXtAppInitialize\fP or \fIXtAppCreateShell\fP).
+It is not necessary to create an XmScreen object by any other means.
+An application can use the function \fIXmGetXmScreen\fP to obtain the
+widget ID of the XmScreen object for a given screen.
+.PP
+An application cannot supply initial values for XmScreen resources as
+arguments to a call to any function that creates widgets.
+The application or user can supply initial values in a resource file.
+After creating the first shell on the screen, the application can use
+\fIXmGetXmScreen\fP to obtain the widget ID of the XmScreen object and
+then call \fIXtSetValues\fP to set the XmScreen resources.
+.SS "Classes"
+Screen inherits behavior and resources from \fICore\fP.
+.PP 
+The class pointer is \fIxmScreenClass\fP.
+.PP 
+The class name is \fIXmScreen\fP.
+.SS "New Resources"
+The following table defines a set of widget resources used by the
+programmer to specify data.  The programmer can also set the resource
+values for the inherited classes to set attributes for this widget.
+To reference a resource by name or by class in an \fI\&.Xdefaults\fP file,
+remove the \fIXmN\fP or \fIXmC\fP prefix and use the remaining letters.
+To specify one of the defined values for a resource in an \fI\&.Xdefaults\fP
+file, remove the \fIXm\fP prefix and use the remaining letters (in
+either lowercase or uppercase, but include any underscores between
+words).  The codes in the access column indicate if the given resource
+can be set at creation time (C), set by using \fIXtSetValues\fP
+(S), retrieved by using \fIXtGetValues\fP (G), or is not
+applicable (N/A).
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmScreen Resource Set
+Name	Class	Type	Default	Access
+_
+XmNdarkThreshold	XmCDarkThreshold	int	dynamic	C
+XmNdefaultCopyCursorIcon	XmCDefaultCopyCursorIcon	Widget	NULL	CSG
+XmNdefaultInvalidCursorIcon	XmCDefaultInvalidCursorIcon	Widget	NULL	CSG
+XmNdefaultLinkCursorIcon	XmCDefaultLinkCursorIcon	Widget	NULL	CSG
+XmNdefaultMoveCursorIcon	XmCDefaultMoveCursorIcon	Widget	NULL	CSG
+XmNdefaultNoneCursorIcon	XmCDefaultNoneCursorIcon	Widget	NULL	CSG
+XmNdefaultSourceCursorIcon	XmCDefaultSourceCursorIcon	Widget	NULL	CSG
+XmNdefaultValidCursorIcon	XmCDefaultValidCursorIcon	Widget	NULL	CSG
+XmNfont	XmCFont	XFontStruct *	NULL	CSG
+XmNforegroundThreshold	XmCForegroundThreshold	int	dynamic	C
+XmNhorizontalFontUnit	XmCHorizontalFontUnit	int	dynamic	CSG
+XmNlightThreshold	XmCLightThreshold	int	dynamic	C
+XmNmenuCursor	XmCCursor	String	arrow	C
+XmNmoveOpaque	XmCMoveOpaque	Boolean	False	CSG
+XmNunpostBehavior	XmCUnpostBehavior	unsigned char	XmUNPOST_AND_REPLAY	CSG
+XmNverticalFontUnit	XmCVerticalFontUnit	int	dynamic	CSG
+.TE
+.KE
+.in
+.sp 1
+.IP "\fIXmNdarkThreshold\fP"
+An integer between 0 and 100, inclusive, that specifies a level
+of perceived brightness for a color.  If the perceived brightness
+of the background color is below this level, Motif treats the background
+as "dark" when computing default shadow and select colors.
+If this resource is specified for a particular screen, it applies to
+widgets created on that screen; otherwise it applies to widgets
+created on all screens.  The default value is implementation
+specific.
+.IP
+Specifies the DragIcon used during a drag operation when
+the operation is a copy and no other pixmap is specified by
+the application.  If NULL, a system default icon is used.
+The system default icon is determined by the XmDisplay resource
+\fIenableDragIcon\fP.
+.IP "\fIXmNdefaultInvalidCursorIcon\fP"
+Specifies the DragIcon used to indicate that the cursor
+is over an invalid drop site during a drag operation when no
+other pixmap symbol is specified by the application.  If NULL, a
+system default icon is used.
+The system default icon is determined by the XmDisplay resource
+\fIenableDragIcon\fP.
+.IP "\fIXmNdefaultLinkCursorIcon\fP"
+Specifies the DragIcon used during a drag operation when
+the operation  is a link and no other pixmap is specified
+by the application.  If NULL, a system default icon is used.
+The system default icon is determined by the XmDisplay resource
+\fIenableDragIcon\fP.
+.IP "\fIXmNdefaultMoveCursorIcon\fP"
+Specifies the DragIcon used during a drag operation when
+the operation  is a move and no other pixmap is specified by
+the application.  If NULL, a system default icon is used.
+The system default icon is determined by the XmDisplay resource
+\fIenableDragIcon\fP.
+.IP "\fIXmNdefaultNoneCursorIcon\fP"
+Specifies the DragIcon used to indicate that the cursor is
+not over a drop site during a drag operation when no other pixmap
+is specified by the application.  If NULL, a system default icon
+is used.
+The system default icon is determined by the XmDisplay resource
+\fIenableDragIcon\fP.
+.IP "\fIXmNdefaultSourceCursorIcon\fP"
+Specifies the depth-1 pixmap used as a cursor when an 
+\fIXmNsourceCursorIcon\fP is not provided by the DragContext, or
+it is not usable.  If NULL, a system default icon is used.
+The system default icon is determined by the XmDisplay resource
+\fIenableDragIcon\fP.
+.IP "\fIXmNdefaultValidCursorIcon\fP"
+Specifies the DragIcon used to indicate that the cursor is
+over a valid drop site during a drag operation when no other pixmap
+is specified by the application.  If NULL, a system default icon
+is used.
+The system default icon is determined by the XmDisplay resource
+\fIenableDragIcon\fP.
+.IP "\fIXmNfont\fP"
+Specifies a font for use in computing values for
+\fIXmNhorizontalFontUnit\fP and \fIXmNverticalFontUnit\fP.
+When an application is initialized, this resource can be supplied in a
+resource file or through the standard command line options \fI\-fn\fP,
+\fI\-font\fP, and \fI\-xrm\fP.
+.IP "\fIXmNforegroundThreshold\fP"
+An integer between 0 and 100, inclusive, that specifies a level of
+perceived brightness for a color.  If the perceived brightness of the
+background color is equal to or below this level, Motif treats the
+background as "dark" when computing the default foreground and highlight
+colors.  If the perceived brightness of the background color is above
+this level, Motif treats the background as "light" when computing the
+default foreground and highlight colors.  When the background is "dark",
+the default foreground and highlight is white; when the background is
+"light", the default foreground and highlight is black.  If this
+resource is specified for a particular screen, it applies to widgets
+created on that screen; otherwise, it applies to widgets created on all
+screens.  The default value is implementation specific.
+.IP "\fIXmNhorizontalFontUnit\fP"
+Specifies the horizontal component of the font units used by
+\fIXmConvertUnits\fP, and is used to interpret the values of geometry
+resources when the \fIXmNshellUnitType\fP resource of VendorShell or the
+\fIXmNunitType\fP resource of Gadget, Manager, or Primitive has the
+value \fIXm100TH_FONT_UNITS\fP.
+If no initial value is supplied for this resource, the default is
+computed from the font specified in \fIXmNfont\fP.
+If no initial value is supplied for this resource or for \fIXmNfont\fP,
+the default is 10.
+.IP
+If a call to \fIXtSetValues\fP specifies a value for
+\fIXmNhorizontalFontUnit\fP, this resource is set to that value.
+If a call to \fIXtSetValues\fP specifies a value for \fIXmNfont\fP but
+not for \fIXmNhorizontalFontUnit\fP, this resource is set to a value
+computed from the new \fIXmNfont\fP.
+.IP
+A horizontal font unit is derived from a font as follows:
+.TP
+\(bu
+If the font has an \fIAVERAGE_WIDTH\fP property, the horizontal font
+unit is the \fIAVERAGE_WIDTH\fP property divided by 10.
+.TP
+\(bu
+If the font has no \fIAVERAGE_WIDTH\fP property but has a
+\fIQUAD_WIDTH\fP property, the horizontal font unit is the
+\fIQUAD_WIDTH\fP property.
+.TP
+\(bu
+If the font has no \fIAVERAGE_WIDTH\fP or \fIQUAD_WIDTH\fP property, the
+horizontal font unit is the sum of the font structure's \fBmin_bounds.width\fP
+and \fBmax_bounds.width\fP divided by 2.3.
+.IP "\fIXmNlightThreshold\fP"
+An integer between 0 and 100, inclusive, that specifies a level of
+perceived brightness for a color.  If the perceived brightness of the
+background color is above this level, Motif treats the background as
+"light" when computing default shadow and select colors.  If this
+resource is specified for a particular screen, it applies to widgets
+created on that screen; otherwise, it applies to widgets created on all
+screens.  The default value is implementation specific.
+.IP "\fIXmNmenuCursor\fP"
+Sets a variable that controls the cursor used whenever this
+application posts a menu.  This resource can be specified
+only once at application
+startup time, either by placing it within a defaults file or by using the
+\fI\-xrm\fP command line argument.  For example  
+.iS
+myProg \-xrm "*menuCursor: arrow"
+.iE
+.ne 7
+.IP
+The menu cursor can also be selected in the program through
+the function \fIXmSetMenuCursor\fP.
+The following is a list of acceptable cursor names.  If the application
+does not specify a cursor or if an invalid name is supplied, the
+default cursor (an arrow pointing up and to the right) is used.
+.IP 
+.sp 1
+.in 0
+.KS
+.TS 
+center, tab (@);
+lb lb lb lb.
+X_cursor@dotbox@man@sizing
+arrow@double_arrow@middlebutton@spider
+based_arrow_down@draft_large@mouse@spraycan
+based_arrow_up@draft_small@pencil@star
+boat@draped_box@pirate@target
+bogosity@exchange@plus@tcross
+bottom_left_corner@fleur@question_arrow@top_left_arrow
+bottom_right_corner@gobbler@right_ptr@top_left_corner
+bottom_side@gumby@right_side@top_right_corner
+bottom_tee@hand1@right_tee@top_side
+box_spiral@hand2@rightbutton@top_tee
+center_ptr@heart@rtl_logo@trek
+circle@icon@sailboat@ul_angle
+clock@iron_cross@sb_down_arrow@umbrella
+coffee_mug@left_ptr@sb_h_double_arrow@ur_angle
+cross@left_side@sb_left_arrow@watch
+cross_reverse@left_tee@sb_right_arrow@xterm
+crosshair@leftbutton@sb_up_arrow@
+diamond_cross@ll_angle@sb_v_double_arrow@
+dot@lr_angle@shuttle@
+.TE
+.KE
+.in
+.sp 1
+.IP "\fIXmNmoveOpaque\fP"
+Specifies whether an interactive operation that moves a window, such as
+tearing off and dragging a tear-off menu or moving a window in MWM,
+displays an outline of the window or a representation of the window
+itself during the move.
+If the value is True, the operation displays a representation of the
+window during the move.
+If the value is False, the operation displays an outline of the window.
+.IP "\fIXmNunpostBehavior\fP"
+Specifies the behavior of an active menu posted in traversal mode when
+a subsequent menu button selection is made outside the posted
+menu.  When the value is \fIXmUNPOST_AND_REPLAY\fP, the resource
+unposts the menu hierarchy and causes the server to replay the event to the 
+window in which the pointer is located.  When the value is
+\fIXmUNPOST\fP, the resource unposts the hierarchy without replaying the
+event.
+.IP "\fIXmNverticalFontUnit\fP"
+Specifies the vertical component of the font units used by
+\fIXmConvertUnits\fP and used to interpret the values of geometry
+resources when the \fIXmNshellUnitType\fP resource of VendorShell or the
+\fIXmNunitType\fP resource of Gadget, Manager, or Primitive has the
+value \fIXm100TH_FONT_UNITS\fP.
+If no initial value is supplied for this resource, the default is
+computed from the font specified in \fIXmNfont\fP.
+If no initial value is supplied for this resource or for \fIXmNfont\fP,
+the default is 10.
+.IP
+If a call to \fIXtSetValues\fP specifies a value for
+\fIXmNverticalFontUnit\fP, this resource is set to that value.
+If a call to \fIXtSetValues\fP specifies a value for \fIXmNfont\fP but
+not for \fIXmNverticalFontUnit\fP, this resource is set to a value
+computed from the new \fIXmNfont\fP.
+.IP
+A vertical font unit is derived from a font as follows:
+.TP
+\(bu
+If the font has a \fIPIXEL_SIZE\fP property, the vertical font unit is
+the \fIPIXEL_SIZE\fP property divided by 1.8.
+.TP
+\(bu
+If the font has no \fIPIXEL_SIZE\fP property but has \fIPOINT_SIZE\fP
+and \fIRESOLUTION_Y\fP properties, the vertical font unit is the product
+of the \fIPOINT_SIZE\fP and \fIRESOLUTION_Y\fP properties divided by
+1400.
+.TP
+\(bu
+If the font has no \fIPIXEL_SIZE\fP, \fIPOINT_SIZE\fP, or
+\fIRESOLUTION_Y\fP properties, the vertical font unit is the sum of the
+font structure's \fBmax_bounds.ascent\fP and 
+\fBmax_bounds.descent\fP divided by 2.2.
+.SS "Inherited Resources"
+All of the superclass resources inherited by XmScreen are
+designated N/A (not applicable).
+.SH RELATED INFORMATION
+.na
+\fICore(3X)\fP,
+\fIXmDisplay(3X)\fP, and
+\fIXmGetXmScreen(3X)\fP.
+.ad

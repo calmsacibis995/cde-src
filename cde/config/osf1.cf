@@ -1,0 +1,252 @@
+XCOMM $XConsortium: osf1.cf /main/cde1_maint/3 1995/12/01 12:20:45 montyb $
+
+XCOMM platform: osf1.cf
+
+#ifndef OSMajorVersion
+#  define OSMajorVersion    3
+#endif
+#ifndef OSMinorVersion
+#  define OSMinorVersion    2
+#endif
+#define OSName                  OSF/1 
+XCOMM Operating system:  OSName OSMajorVersion.OSMinorVersion
+
+VENDOR = dec
+HARDWARE = Alpha
+
+/* --- Information about OSF/1's kernel capabilities --- */
+#define SystemV			YES
+#define HasVoidSignalReturn	YES
+#define HasPutenv		YES
+#define HasShm			YES
+#define HasSia			YES
+#define SetTtyGroup		YES
+#define InstKmemFlags		-g kmem -m 2755
+#define HasSockets		YES
+#define ExecableScripts		YES
+#define HasSaberC		NO
+#define HasSecureRPC		NO
+#define ExpandManNames		YES
+#define BootstrapCFlags		-D__alpha
+
+/* --- Information about the standard commands and libraries --- */
+#define AvoidNullMakeCommand	YES
+#define Malloc0ReturnsNull	YES
+#define	NeedNestedPrototypes	YES
+#define NeedConstPrototypes	YES
+#define NeedVarargsPrototypes	YES
+#define NeedFunctionPrototypes	YES
+#define HasNdbm			YES
+#if OSMajorVersion == 1 && OSMinorVersion == 0
+#  define RanlibCmd		/usr/bin/ar -tsl
+#endif
+#define LintLibFlag		-o
+#define LnCmd			/bin/ln -s
+#define LintOpts		-ax
+#define CppCmd			/usr/lib/cpp
+#define LdCombineFlags		-r
+#define ExtraFilesToClean 	so_locations
+
+/* --- Build Switches --- */
+#define BuildMotif		NO
+#define MotifBC 		NO 	/* fixup Motif assumption in X & Xt */
+#define StandardDefines 	-DDEC -DR5_XLIB SMTDEFINES -DMULTIBYTE -DNLS16 -DAIX_ILS
+#define BuildSMTExt		NO
+#define BuildXInputExt		NO
+#define BuildXInputLib		NO
+#define BuildXTestExt		NO
+#define BuildXTestLib		NO
+
+/* Fonts */
+#define CompressAllFonts	NO
+
+/* xdm defines */
+#define DefaultUserPath /usr/bin:/usr/bin/X11:.
+#define DefaultSystemPath /usr/bin:/usr/bin/X11:.
+#define InstallXdmConfig	YES
+#define XdmUseMotif		YES
+
+/* --- Architecture dependencies --- */
+#define BuildServer 		NO
+#define BuildFontServer         NO
+#define InstallFSConfig		NO	/* install sample fs config */
+#define BuildFonts 		NO
+#define BuildPex 		NO
+#define BuildXsi 		NO
+#define BuildXimp 		NO
+#define BuildDPSExt 		NO
+
+/* link shared by default */
+#ifndef ARCHIVED_LINK 
+#  define ARCHIVED_LINK		NO 
+#endif
+
+#if UseInstalled
+/* use the mit libraries from /usr/lib and not the build tree */
+/* 
+#  ifndef UseMitLibrariesFromSystemOnly
+#    define UseMitLibrariesFromSystemOnly YES
+#  endif
+
+/* define USE_XT_FROM_SYSTEM_ONLY so we build using system libXt.a */
+#  ifndef USE_XT_FROM_SYSTEM_ONLY
+#    define USE_XT_FROM_SYSTEM_ONLY YES
+#  endif
+#endif /* UseInstalled */
+
+/* Forces use of library macros from osfLib.tmpl. Ignores macros
+ * in Project.tmpl.
+ */
+#ifndef UseVendorLibraryDefinitions
+#  define UseVendorLibraryDefinitions YES
+#endif
+
+#ifndef BInstallCmd
+#  define BInstallCmd		install
+#endif
+
+/* adds date to binstall path on system */
+/* Be sure to set BInstallTop in either BuildTree.Name or treedefines */
+#ifndef BInstallDate
+#  define BInstallDate		`date +/%m_%d`
+#endif
+
+/* Forces use of binstall directory in build tree for library and
+ * header search.
+ */
+#ifndef UseInstalledBuildInTree
+#  define UseInstalledBuildInTree YES
+#endif
+
+/* --- Shared Libraries --- */
+#ifndef HasSharedLibraries
+#  define HasSharedLibraries	YES
+#endif
+
+/* clients linking shared */
+#ifdef AlphaArchitecture
+#  if !defined(SharedClientLoadFlags) && !ARCHIVED_LINK
+#    define SharedClientLoadFlags	-call_shared
+#  endif
+#  ifndef ExtraLoadFlags
+#    if ARCHIVED_LINK
+#       define ExtraLoadFlags	-non_shared
+#    else
+#       define ExtraLoadFlags	-Wl,-rpath,$(DTUSRLIBDIR):/usr/shlib:/usr/ccs/lib:/usr/lib/cmplrs/cc:/usr/lib:/usr/local/lib:/var/shlib
+#    endif /* ARCHIVED_LINK */
+#  endif /* ExtraLoadFlags */
+#endif /* Alpha architecture */
+
+#ifdef AlphaArchitecture
+/******************** ALPHA/OSF ***************************************/
+
+#  define PlatformFlag		-D__alpha
+#  define PlatformName		alpha_osf1
+
+#  if BuildServer
+#    define XdecServer 		YES
+#    define HasLoadableServer	YES
+#  endif /* BuildServer */
+
+#  ifndef BuildDPSExt
+#    define BuildDPSExt		YES
+#  endif
+
+#else /* not AlphaArchitecture */
+/******************** MIPS/OSF ***************************************/
+
+#  define PlatformFlag		-D__mips
+#  define PlatformName		mips_osf1
+
+#  if BuildServer
+#    define XdecServer 		YES
+#  endif /* BuildServer */
+
+#endif /* not AlphaArchitecture */
+
+/* --- compiler specific flags --- */
+#ifndef OptimizedCDebugFlags
+#  define OptimizedCDebugFlags    -g0 -O2 -Olimit 2000
+#endif
+
+#define CcCmd 			/usr/bin/cc 
+#define DependFlags		PlatformFlag  -D__osf__
+
+#define ArCmd ar cqls
+#define DoRanlibCmd 0
+
+#if HasGcc
+#  define DefaultCCOptions	-ansi
+#else
+#  define DefaultCCOptions	-std1
+#endif
+#if UseInstalled
+#  define ShLibFlags
+#endif /* UseInstalled */
+
+#ifndef InstallCmd
+#  define InstallCmd ksh $(TOP)/util/scripts/install.sh
+#endif /* InstallCmd */
+
+#if HasSharedLibraries
+#  define SharedLibOldLibX	NO
+#  define SharedLibXTest	NO
+#  undef NormalLibXau		
+#  define NormalLibXau		YES
+#  undef SharedLibXau		
+#  define SharedLibXau		NO
+#  define SharedLibsmt		NO
+#  define SharedLibip		NO
+#  define SharedLibxie		NO
+#  define StripInstalledPrograms	YES
+#  if HasLoadableServer
+#    undef  NormalLibXdmcp
+#    define NormalLibXdmcp	YES
+#    undef  SharedLibXdmcp
+#    define SharedLibXdmcp	YES
+#    undef  SharedLibip
+#    define SharedLibip		YES
+#    define SharedServerLibs	YES
+#    define DoSharedServer	YES
+#  endif 
+#endif
+
+
+#ifndef HasDebuggedLibraries
+#  define HasDebuggedLibraries 	NO
+#endif
+
+#if BuildSMTExt
+#  define ConnectionFlags 	-DTCPCONN -DUNIXCONN -DDNETCONN -DSMT
+#  define SMTDEFINES -DSMT
+#else /* BuildSMTExt */
+#  define ConnectionFlags 	-DTCPCONN -DUNIXCONN -DDNETCONN
+#  define SMTDEFINES 
+#endif /* BuildSMTExt */
+
+/* -- shared library rules special to osf1 -- */
+#include <osfLib.rules>
+
+#define DefineOldLibraryRules /* pull in oldlib.rules */
+ 
+#ifndef CPlusPlusCcCmd
+#  define CPlusPlusCcCmd	/usr/bin/cxx
+#endif
+#ifndef DefaultCPlusPlusIncludes
+#  define DefaultCPlusPlusIncludes	-I/usr/include/cxx
+#endif
+#ifndef DefaultCPlusPlusOptions
+#  define DefaultCPlusPlusOptions	/* nothing */
+#endif
+#ifndef ExtraCPlusPlusOptions
+#  define ExtraCPlusPlusOptions	-nocleanup
+#endif
+
+/* define this as you like for normal library compilation */
+#define LibraryDefines StandardDefines -Wf,-readonly_strings
+
+/* Build libDtMail shared on OSF/1 */
+#ifndef SharedLibDtMail
+#  define SharedLibDtMail	HasSharedLibraries
+#endif
+

@@ -1,0 +1,490 @@
+.de Lc
+.\" version of .LI that emboldens its argument
+.TP \\n()Jn
+\s-1\f3\\$1\f1\s+1
+..
+.TH SdmIntro 3 "07/03/96"
+.BH "07/03/96"
+.\" @(#)SdmIntro.3	1.18 96/07/03 SMI
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994, 1995, 1996 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994, 1995, 1996 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994, 1995, 1996 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994, 1995, 1996 Novell, Inc.
+.ta 0.25i 0.50i 0.75i 1.0i 1.25i 1.50i 1.75i 2.0i 2.5i 3.0i
+.SH NAME
+SdmIntro \- introduction to sdm library (libSDtMail)
+.SH DESCRIPTION
+This is an introduction to the sdm library (libSDtMail), which provides a consistent and
+seamless interface between front end applications (such as dtmail) and one or more back
+end service providers (as sendmail, the mcm project c-client, etc). Multiple service
+providers may be supported, allowing a variety of message stores, message transports,
+address books, and other facilities to be made available to front end applications.
+.PP
+See SdmGlossary(3) for a detailed list of general definitions.
+.SS Programatic Interfaces Provided
+libSDtMail is implemented in C++. The general interface to front end applications is through a
+series of C++ classes. With the exception of a few constructors, no "global" functions are
+provided; however, a number of general purpose functions are provided by static member
+functions of certain utility classes.
+.PP
+There is currently no API provided that implements a C only interface.
+.SS Special CC option required
+libSDtMail makes use of threads; as a result, all code that is linked with
+libSDtMail needs to specify the '-mt' command line option to CC for all
+compilation and link steps. 
+.PP
+Among other things, the '-mt' option causes all compilations to include the
+"-D_REENTRANT" defintion, and causes certain thread safe libraries to be
+substituted for their non thread safe counterparts, and causes the threads
+library to be properly linked in. It is NOT SAFE to substitute these actions
+in place of specifying the '-mt' options.
+.SS External Interfaces Used
+libSDtMail interacts with several system interfaces when necessary (such as sendmail
+for SMTP transmission services). libSDtMail also makes use of a public domain API
+called the c-client provided by the IMAP development group at the University of
+Washington at Seattle, and supplied within Sun by the SunSoft Mission Critical
+Messaging (MCM) group.
+.SS Terminology
+For purposes of discussion and identification, there are at least 5 distinct
+components comprising electronic mail in the Solaris CDE environment:
+.PP
+.RS 3
+.nr )J 6
+.Lc front\ end
+.br
+The desktop mail user agent implementing the interface that the computer system uses
+directly interacts with. Examples include command line interface ("CLI") and graphical
+user interface ("GUI") applications. Examples of CLI interfaces include /bin/mail and
+mh. Examples of GUI interfaces include dtmail and mailtool.
+.Lc mid\ end
+.br
+A library providing a consistent and seamless interface between front end applications and
+one or more back end service providers. Multiple service providers may be supported,
+allowing a variety of message stores, message transports, address books, and other
+facilities to be made available to front end applications.
+.Lc back\ end
+.br
+A provider of some form of e-mail related service, such as message stores, message
+transports, address books, etc. typically provided as both an interface library and
+accompanying server processes implementing the functionality.
+.Lc operating\ system
+.br
+Provides the data access and control process primitives facilitating storage, retrieval
+and sending of messages, and the implementation of user interface applications (Unix,
+MacOS, Windows, etc.)
+.Lc network
+.br
+Provides transport of information between computer systems via network
+connections (TCP/IP, TLI, ACM, NFS, etc.)
+.PP
+.RE
+.nr )J 0
+libSDtMail provides functionality consistent with the definition of a mid end library
+component; it can be divided into two distinct pieces:
+.PP
+.RS 3
+.nr )J 6
+.Lc upper\ half
+.br
+The upper half provides a high level object oriented API interface allowing messaging
+components to be manipulated (e.g. message stores, address books, etc). This is called the
+Front End API. Part of this API is the session object implementing a queued multi threaded
+request management system, allowing multiple synchronous and asynchronous requests to be
+processed concurrently. This allows a front end application to have "outstanding
+requests", allowing it to keep its user interface "alive", so a failure of a back end
+component (such as NFS, a IMAP server, or the network) will not "lock" the entire user
+interface.
+.Lc lower\ half
+.br
+The lower half provides a low level object API interface to various service
+providers implementing specific services (such as message stores, message
+transports, address books, etc). In libSDtMail, this is called the Data Port (see
+SdmDataPort(3) for details.)
+.PP
+.RE
+.nr )J 0
+.SH CALLING CONVENTIONS
+With very few exceptions, all objects and methods implemented by libSDtMail follow a uniform
+set of rules for argument ordering, argument naming, return values, and error handling.
+The general forms of method calls are:
+.PP
+.nf
+	(SDMErrorCode) call(SDMError &err, inputArgs);
+	(SDMErrorCode) call(SDMError &err, outputArgs);
+	(SDMErrorCode) call(SDMError &err, outputArgs, inputArgs);
+	(SDMErrorCode) call_Async(SDMError &err, SDMServiceFunction &svf, 
+						void *userData);
+	(SDMErrorCode) call_Async(SDMError &err, SDMServiceFunction &svf,
+						void *userData, inputArgs);
+.fi
+.PP
+See SdmGlossary(3) for a complete description of calling conventions.
+.SH ERRORS
+A uniform set of error codes are used by libSDtMail. These error codes are of type
+"SdmErrorCode", all begin with the sequence "Sdm_EC_", and are defined in
+Sdtmail.hh. The error code "Sdm_EC_Success" indicates success, and is always
+guaranteed to be ZERO. Any non-zero error code indicates an error has occurred.
+.PP
+By convention, methods that can return an error take as their first argument a "SdmError&"
+reference, and have a return type of "SdmErrorCode". The SdmError object is considered "an
+error container" whose contents are set only if an error occurs; thus, the error container
+must be "clear" (set to Sdm_EC_Success) before use; otherwise, its previous contents will
+be interpreted as an error.
+.PP
+Upon return, the SdmError object passed in will contain the appropriate result
+code, which is also returned as the methods value. Thus, the following is a
+typical way to call a method, check to see if it succeeded, and if not, to
+handle the specific error returned:
+.PP
+.nf
+	SdmError err;
+	if (object.method(err, arguments) != Sdm_EC_Success) {
+		printf("error %u occurred in object.method: %s\\n", 
+			(SdmErrorCode) err, err.ErrorMessage());
+	}
+.fi
+.PP
+.SH REQUEST TYPES
+All operations performed by a front end application on a libSDtMail object object
+are turned into "requests" which are placed in a well known internal
+queue. These requests are then dispatched to appropriate objects to handle the
+requests. The objects handle the requests and create responses which are placed
+on a well known front end queue, notifying the front end application that there
+is an item to be processed.
+.PP
+By providing event/response type interaction between a front end application and
+libSDtMail, the front end is not required to "block" whenever a request is made. It
+is therefore possible for a non-threaded front end application to provide
+apparent concurrency to the end user. Provisions for both synchronous and
+asynchronous access to libSDtMail functionality are provided, so a threaded front
+end (or a front end that does not care to implement apparent concurrency to the
+user) may be more easily implemented.
+.PP
+See SdmGlossary(3) for a complete description of request types.
+.SH CALLBACK HOOKS
+libSDtMail has the ability to generate solicited and unsolicited asynchronous responses. A
+front end application using libSDtMail must include some special code to enable this
+capability to function. These responses are generated by objects created by a session,
+with the responsible session handling the delivery of the responses to the front end
+application. 
+.PP
+See SdmSession(3) for a complete description of the callback hook mechanism.
+.SH FRONT END API
+libSDtMail provides an API for use by front end applications; it consists of a
+number of C++ objects that implement an object oriented way of dealing with
+messaging. 
+.PP
+The primary front end application access to libSDtMail is through the SdmConnection
+object, which provides a single connection between the front end application and
+libSDtMail, and through which configuration objects are created, and then one or
+more sessions are created and configured. The front end application initiates
+requests through a session for services provided by libSDtMail (such as accessing
+message stores or message transports.) Once a SdmConnection object is created,
+the front end application has access to all facilities provided by libSDtMail. Each
+object is briefly described below.
+.SS "SdmConnection"
+The SdmConnection object encapsulates the concept of "the connection" between a
+front end application and libSDtMail, and is the primary interface between them. The
+front end requests that libSDtMail create a SdmConnection object as the first step
+in accessing libSDtMail functionality. This object is then used to access the
+underlying functionality provided by libSDtMail.
+.SS "SdmMailRc"
+The SdmMailRc object encapsulates the concept of "per-user mail properties" and
+allows information to be queried and changed. Mail properties are specific to
+each individual user, although there are some global properties that all users
+inherit by default in /etc/mail/Mail.rc.
+.SS "SdmMessage"
+The SdmMessage object encapsulates the concept of "a message" as a container,
+allowing the retrieval, creation and manipulation of messages which have
+envelope and body components. Existing messages in message stores can be
+accessed, and new messages can be created in both incoming and outgoing message
+stores. A message consists of a message envelope, and one or more message
+bodies.
+.SS "SdmMessageBody"
+The SdmMessageBody object encapsulates the concept of "the body of a message" as
+a container, allowing the creation and manipulation of one or more "body parts",
+which are a component of a SdmMessage, and which contain the actual data
+portions of a message.
+.SS "SdmMessageEnvelope"
+The SdmMessageEnvelope object encapsulates the concept of "the envelope of a
+message" as a container, allowing the creation and manipulation of envelopes,
+which are a component of a SdmMessage, and which have header components which
+are the non-data portions of a message. Each message has a main envelope that
+contains headers that apply to the message in its entirety (for example, Date
+sent, Sender's address, Subject, etc).
+.SS "SdmMessageStore"
+The SdmMessageStore object encapsulates the concept of "a storehouse of
+messages" as a container. A message store is also called a "mailbox" or "mail
+folder". The SdmMessageStore object allows the creation and manipulation of
+message stores, which contain messages. There are two types of message stores
+supported, "incoming" and "outgoing". While the different types of message store
+objects address different types of message stores, all provide the same
+interface to the front end.
+.SS "SdmSession"
+The SdmSession object encapsulates the concept of "a group of activities between
+the front end and libSDtMail" as a container. There are two types of sessions
+currently supported: "incoming" and "outgoing". While the different types of
+session objects have different characteristics and address different needs, all
+provide the same interface to the front end.
+.PP
+The SdmSession object implements a queued multi-threaded processing engine, that
+allows requests on multiple objects to be handled concurrently, providing real
+concurrency among activities under control of the SdmSession object.
+.PP
+.SH UTILITY OBJECTS
+libSDtMail provides a number of secondary utility objects that are used to implement
+the underlying functionality of the various APIs. Each is briefly described
+below.
+.SS "SdmBitMaskL"
+The SdmBitMaskL object implements a vector of SdmBitMask data types.
+.PP
+This is an object (as opposed to pointer) vector; the SdmBitMask objects
+themselves are stored in the vector, and are therefore automatically destroyed
+when the vector itself is destroyed.
+.SS "SdmError"
+The SdmError object encapsulates the concept of an error container. An error
+container is initially empty. By convention, any object that performs an
+operation that can return an error takes an error container as the first
+argument. If any errors occur while the object is performing an operation, the
+error container is updated with that information, and control is returned to the
+caller. The caller can then examine the error container to see if any errors are
+present, and if so, can decide how to handle the errors as it sees fit. Any
+object in the chain could choose to add to or alter the container before
+returning, as might be appropriate.
+.SS "SdmIntStr"
+The SdmIntStr object implements a "pair of values" consisting of a numeric integer part
+and a character SdmString part, each of which can be individually accessed. In most other
+respects it behaves like a basic data type.
+.SS "SdmIntStrL"
+This is a vector of SdmIntStr objects.
+.PP
+This is an object (as opposed to pointer) vector; the SdmIntStr objects
+themselves are stored in the vector, and are therefore automatically destroyed
+when the vector itself is destroyed.
+.SS "SdmIntStrLL"
+This is a vector of pointers to SdmIntStrL objects; that is, a vector of
+pointers to vectors of SdmIntStr objects. It is used to hold a "list of lists of
+SdmIntStr". 
+.PP
+This is a pointer (as opposed to an object) vector; the contents of the vector
+are NOT automatically destroyed when the vector itself is destroyed. The owner
+must make provisions for destroying the contents; otherwise, a memory leak
+will occur when the vector itself is destroyed.
+.SS "SdmLongL"
+The SdmLongL object implements a vector of standard "long" data types. 
+.PP
+This is an object (as opposed to pointer) vector; the long objects themselves
+are stored in the vector, and are therefore automatically destroyed when the
+vector itself is destroyed.
+.SS "SdmPtrSortVector"
+The SdmPtrSortVector object is a template based vector class, derived from
+SdmVector, providing the ability to containerize a sorted list of
+\f3pointers\fP to any type of object. This differs from the SdmVector object
+that containerizes a list of the \f3objects\fP themselves, and differs from
+the SdmPtrVector object that does not maintain a sorted list. The vector
+allocates no memory unless a size has been specified or until an object is
+added to the vector. The vector allocates chunks of memory and then assigns
+elements, only allocating more space when the vector is full.
+.PP
+This is a pointer (as opposed to an object) vector; the contents of the vector
+are NOT automatically destroyed when the vector itself is destroyed. The owner
+must make provisions for destroying the contents; otherwise, a memory leak
+will occur when the vector itself is destroyed.
+.SS "SdmSortVector"
+The SdmSortVector object is a template based vector class, derived from
+SdmVector, providing the ability to containerize a sorted list of any type of
+object. This differs from the SdmVector object that does not maintain a sorted
+list. The actual objects themselves are stored in such a vector; therefore,
+any such object must have copy constructors and assignment operators. The
+vector allocates no memory unless a size has been specified or until an object
+is added to the vector. The vector allocates chunks of memory and then assigns
+elements, only allocating more space when the vector is full.
+.PP
+This is an object (as opposed to pointer) vector; the contents of the vector
+are automatically destroyed when the vector itself is destroyed. The owner
+does not have to make any provisions for destroying the objects themselves to
+prevent a memory leak, as the objects are part of the vector itself.
+.SS "SdmPtrVector"
+The SdmPtrVector object is a template based vector class, derived from
+SdmVector, providing the ability to containerize a list of \f3pointers\fP to any
+type of object. This differs from the SdmVector object that containerizes a list
+of the \f3objects\fP themselves. The vector allocates no memory unless a size
+has been specified or until an object is added to the vector. The vector
+allocates chunks of memory and then assigns elements, only allocating more space
+when the vector is full.
+.PP
+This is a pointer (as opposed to an object) vector; the contents of the vector
+are NOT automatically destroyed when the vector itself is destroyed. The owner
+must make provisions for destroying the contents; otherwise, a memory leak
+will occur when the vector itself is destroyed.
+.SS "SdmServiceFunction"
+The SdmServiceFunction object encapsulates the concept of a "function as a
+service provider". A service function is the combination of a function and
+context that is provided by the front end, and which implements a level of
+service for libSDtMail.
+.PP
+Certain libSDtMail objects allow the front end to "register" service functions for
+the handling of unsolicited service requests. For example, a service function
+that handles "new mail events" could be registered with a SdmMessageStore
+object, which will be invoked by libSDtMail whenever new mail arrives in the message
+store.
+.PP
+libSDtMail objects that implement asynchronous capabilities (e.g. get this body part
+and generate an event when it is retrieved) take a service function as an
+argument to the calls that initiate the requests. That specific service function
+is invoked when the request completes.
+.SS "SdmString"
+The SdmString object implements a "smart string". It maintains one copy of the
+real character data for a string; when copied, only a reference to the real
+data is copied. The actual character data is freed only when all such
+references are destroyed. Assigning a new string or changing the contents of
+the string cause a new copy to be made that is distinct from the original, not
+affecting other copies of the object. This object also provides a number of
+utility operators and methods for comparison, indexing, searching, etc.
+.SS "SdmStringL"
+This is a vector of SdmString objects.
+.PP
+This is an object (as opposed to pointer) vector; the SdmString objects
+themselves are stored in the vector, and are therefore automatically destroyed
+when the vector itself is destroyed.
+.SS "SdmStringLL"
+This is a vector of pointers to SdmStringL objects; that is, a vector of
+pointers to vectors of SdmString objects. It is used to hold a "list of lists of
+SdmString".
+.PP
+This is a pointer (as opposed to an object) vector; the contents of the vector
+are NOT automatically destroyed when the vector itself is destroyed. The owner
+must make provisions for destroying the contents; otherwise, a memory leak
+will occur when the vector itself is destroyed.
+.SS "SdmStrStr"
+The SdmStrStr object implements a "pair of values" consisting of two character SdmString
+parts, each of which can be individually accessed. In most other respects it
+behaves like a basic data type.
+.SS "SdmStrStrL"
+This is a vector of SdmStrStr objects.
+.PP
+This is an object (as opposed to pointer) vector; the SdmStrStr objects
+themselves are stored in the vector, and are therefore automatically destroyed
+when the vector itself is destroyed.
+.SS "SdmStrStrLL"
+This is a vector of pointers to SdmStrStrL objects; that is, a vector of
+pointers to vectors of SdmStrStr objects. It is used to hold a "list of lists of
+SdmStrStr".
+.PP
+This is a pointer (as opposed to an object) vector; the contents of the vector
+are NOT automatically destroyed when the vector itself is destroyed. The owner
+must make provisions for destroying the contents; otherwise, a memory leak
+will occur when the vector itself is destroyed.
+.SS "SdmToken"
+The SdmToken object implements a container that holds a list of distinct values,
+where a "value" can have two or three distinct values contained within it. A
+token is used in a number of methods in libSDtMail, including methods to attach to
+or open resources. The token describes the object to operate on. See
+SdmMessageStore(3) for more information.
+.SS "SdmVector"
+The SdmVector object is a template based vector class, providing the ability
+to containerize a list of any type of object. The actual objects themselves
+are stored in such a vector; therefore, any such object must have copy
+constructors and assignment operators. The vector allocates no memory unless
+a size has been specified or until an object is added to the vector. The
+vector allocates chunks of memory and then assigns elements, only allocating
+more space when the vector is full.
+.PP
+This is an object (as opposed to pointer) vector; the contents of the vector
+are automatically destroyed when the vector itself is destroyed. The owner
+does not have to make any provisions for destroying the objects themselves to
+prevent a memory leak, as the objects are part of the vector itself.
+.PP
+.SH UTILITY TYPES
+libSDtMail defines a number of utility data types that are used to define various
+types of data used by the various APIs. Each is briefly described below.
+.SS "SdmBoolean"
+The SdmBoolean data type defines a boolean result. Only two values may be
+assigned: Sdm_True and Sdm_False. Sdm_False is always guaranteed to be zero,
+while Sdm_True is always guaranteed to be non-zero.
+.SS "SdmBitMask"
+The SdmBitMask data type defines a single value that is made up of one or more
+values, any combination of which can be represented by the single value.
+.SS "SdmErrorCode"
+The SdmErrorCode data type defines "an error code" which is well defined and
+universally used within libSDtMail. The SdmError object is a container for one or
+more SdmErrorCode values.
+.SS "SdmMessageNumber"
+The SdmMessageNumber data type is used to hold a value that represents a single message
+within a message store. Message number values are dependent upon the contents and order of
+contents of the message store. When an expunge deleted messages or any other action occurs
+that causes the number and order of messages in the message store to change, the message
+numbers change to reflect that new number and order. Valid message numbers start with 1
+and range through the last message in a message store. Any number outside of this range is
+invalid.
+.PP
+.SH DATA PORT
+The data port is a private internal object that implements the lower half of
+libSDtMail. It provides two API interfaces: one that allows the upper half to gain
+access to the data port, and one that allows service providers to interface with
+the data port. 
+.PP
+The data port is used to connect libSDtMail with service providers that provide
+access "to the outside world"; that is, the data paths to outside data, both for
+transmission and reception purposes. The individual paths out from the data port
+are referred to as "channels", of which there are many types, each of which
+connect to specific type of service provider.
+.SS Private Object
+The data port is not meant to be called directly by front end applications;
+among other things, it does not provide any concurrency guarantees, does not
+provide any asynchronous call capabilities, and does not provide any
+asynchronous callback capabilities. Its intent is to provide an interface object
+between the front end API and external service providers, so that they may be
+easily integrated into libSDtMail.
+.SS Components
+The data port itself consists of several major components:
+.RS 3
+.nr )J 6
+.Lc data\ port\ API
+.br
+implements the API used by the upper half of libSDtMail to gain access to the data
+port. It is a consistent API that is used to create, configure and manipulate a
+data port object, regardless of the type of underlying service providers that
+may be used to implement the data path.
+.Lc data\ channel\ API
+.br
+implements the API used by channel adapters that allow external service
+providers to be integrated into libSDtMail. It is a consistent API that is provided
+by the data port to allow different services providers to interface their API
+with the data port.
+.Lc channel\ adapter
+.br
+specific code that interfaces the data port channel API onto a specific type of
+service provider; that is, implements a channel between the data port and a
+specific type of service provider.
+.Lc service\ provider
+.br
+a specific type of service provider (e.g. c-client, smtp transmission, etc.)
+.RE
+.nr )J 0
+.PP
+.SH "SEE ALSO"
+.na
+.BR SdmConnection (3),
+.BR SdmDataPort (3),
+.BR SdmError (3),
+.BR SdmGlossary (3),
+.BR SdmIntStr (3),
+.BR SdmIntStrL (3),
+.BR SdmIntStrLL (3),
+.BR SdmMailRc (3),
+.BR SdmMessageBody (3),
+.BR SdmMessageEnvelope (3),
+.BR SdmMessageStore (3),
+.BR SdmPtrSortVector (3),
+.BR SdmPtrVector (3),
+.BR SdmSession (3),
+.BR SdmServiceFunction (3),
+.BR SdmSortVector (3),
+.BR SdmString (3),
+.BR SdmStrStr (3),
+.BR SdmStrStrL (3),
+.BR SdmStrStrLL (3),
+.BR SdmToken (3),
+.BR SdmVector (3)

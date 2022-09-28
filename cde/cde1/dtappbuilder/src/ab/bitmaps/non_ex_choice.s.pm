@@ -1,0 +1,31 @@
+/* XPM */
+static char * non_ex_choice_s_pm[] = {
+/* width height ncolors cpp [x_hot y_hot] */
+"28 20 5 1 0 0",
+/* colors */
+"     s iconGray2     m white c #bdbdbdbdbdbd",
+".    s iconGray5     m black c #737373737373",
+"X    s iconGray4     m white c #949494949494",
+"o	c #4D4D4D4D4D4D",
+"O	c #CECECECECECE",
+/* pixels */
+"                           .",
+" XXXXXXXXXXXXXXXXXXXXXXXXXX.",
+" XXXXXXXXXXXXXXXXXXXXXXXXXX.",
+" XXXXXXXXXXXXXXXXXXXXXXXXXX.",
+" XXXXXXXXXXXXXXXXXXXXXXXXXX.",
+" XXXXXXXXoooooooooooXXXXXXX.",
+" XXXXXXXXooooooooooOXXXXXXX.",
+" XXXXXXXXooXXXXXXXOOXXXXXXX.",
+" XXXXXXXXooXXXXXXXOOXXXXXXX.",
+" XXXXXXXXooXXXXXXXOOXXXXXXX.",
+" XXXXXXXXooXXXXXXXOOXXXXXXX.",
+" XXXXXXXXooXXXXXXXOOXXXXXXX.",
+" XXXXXXXXooXXXXXXXOOXXXXXXX.",
+" XXXXXXXXooXXXXXXXOOXXXXXXX.",
+" XXXXXXXXooOOOOOOOOOXXXXXXX.",
+" XXXXXXXXoOOOOOOOOOOXXXXXXX.",
+" XXXXXXXXXXXXXXXXXXXXXXXXXX.",
+" XXXXXXXXXXXXXXXXXXXXXXXXXX.",
+" XXXXXXXXXXXXXXXXXXXXXXXXXX.",
+" ..........................."};

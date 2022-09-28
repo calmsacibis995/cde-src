@@ -1,0 +1,200 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH Core 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fICore\fP \- The Core widget class
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/Xm.h>
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+Core is the Xt Intrinsic base class for windowed widgets.  The
+\fIObject\fP and \fIRectObj\fP classes provide support for windowless
+widgets.
+.SS "Classes"
+All widgets are built from \fICore\fP.
+.PP
+The class pointer is \fIwidgetClass\fP.
+.PP
+The class name is \fICore\fP.
+.SS "New Resources"
+The following table defines a set of widget resources used by the programmer
+to specify data.  The programmer can also set the resource values for the
+inherited classes to set attributes for this widget.  To reference a
+resource by name or by class in a .Xdefaults file, remove the \fIXmN\fP or
+\fIXmC\fP prefix and use the remaining letters.  To specify one of the defined
+values for a resource in a .Xdefaults file, remove the \fIXm\fP prefix and use
+the remaining letters (in either lowercase or uppercase, but include any
+underscores between words).
+The codes in the access column indicate if the given resource can be
+set at creation time (C),
+set by using \fIXtSetValues\fP (S),
+retrieved by using \fIXtGetValues\fP (G), or is not applicable (N/A).
+.P 
+.wH
+.in 0 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+Core Resource Set
+Name	Class	Type	Default	Access
+_
+XmNaccelerators	XmCAccelerators	XtAccelerators	dynamic	CSG
+XmNancestorSensitive	XmCSensitive	Boolean	dynamic	G
+XmNbackground	XmCBackground	Pixel	dynamic	CSG
+XmNbackgroundPixmap	XmCPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNborderColor	XmCBorderColor	Pixel	XtDefaultForeground	CSG
+XmNborderPixmap	XmCPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNborderWidth	XmCBorderWidth	Dimension	1	CSG
+XmNcolormap	XmCColormap	Colormap	dynamic	CG
+XmNdepth	XmCDepth	int	dynamic	CG
+XmNdestroyCallback	XmCCallback	XtCallbackList	NULL	C
+XmNheight	XmCHeight	Dimension	dynamic	CSG
+XmNinitialResourcesPersistent	XmCInitialResourcesPersistent	Boolean	True	C
+XmNmappedWhenManaged	XmCMappedWhenManaged	Boolean	True	CSG
+XmNscreen	XmCScreen	Screen *	dynamic	CG
+.wH
+.tH
+XmNsensitive	XmCSensitive	Boolean	True	CSG
+XmNtranslations	XmCTranslations	XtTranslations	dynamic	CSG
+XmNwidth	XmCWidth	Dimension	dynamic	CSG
+XmNx	XmCPosition	Position	0	CSG
+XmNy	XmCPosition	Position	0	CSG
+.TE
+.KE
+.in
+.sp 1
+.wH
+.in  
+.IP "\fIXmNaccelerators\fP"
+Specifies a translation table that is bound with its actions in the context
+of a particular widget.  The accelerator table can then be installed on some
+destination widget.
+.IP "\fIXmNancestorSensitive\fP"
+Specifies whether the immediate parent of the widget receives input
+events.  Use the function \fIXtSetSensitive\fP to change the argument
+to preserve data integrity (see \fIXmNsensitive\fP below).
+For shells, the default is copied from the parent's
+\fIXmNancestorSensitive\fP resource if there is a parent; otherwise, it
+is True.
+For other widgets, the default is the bitwise AND of the parent's
+\fIXmNsensitive\fP and \fIXmNancestorSensitive\fP resources.
+.IP "\fIXmNbackground\fP"
+Specifies the background color for the widget.
+.IP "\fIXmNbackgroundPixmap\fP"
+Specifies a pixmap for tiling the background.  The first tile is
+placed at the upper left-hand corner of the widget's window.
+.IP "\fIXmNborderColor\fP"
+Specifies the color of the border in a pixel value.
+.IP "\fIXmNborderPixmap\fP"
+Specifies a pixmap to be used for tiling the border.  The first tile is
+placed at the upper left-hand corner of the border.
+.IP "\fIXmNborderWidth\fP"
+Specifies the width of the border that surrounds the widget's window on all
+four sides.  The width is specified in pixels.  A width of zero means that
+no border shows.
+.IP "\fIXmNcolormap\fP"
+Specifies the colormap that is used for conversions to the type
+\fIPixel\fP for this widget instance.  When changed, previously
+generated pixel values are not affected, but newly generated
+values are in the new colormap.
+For shells without parents, the default is the default colormap of the
+widget's screen.
+Otherwise, the default is copied from the parent.
+.IP "\fIXmNdepth\fP"
+Specifies the number of bits that can be used for each pixel in the
+widget's window.  Applications should not change or set the value of this
+resource as it is set by the Xt Intrinsics when the widget is created.
+For shells without parents, the default is the default depth of the
+widget's screen.
+Otherwise, the default is copied from the parent.
+.IP "\fIXmNdestroyCallback\fP"
+Specifies a list of callbacks that is called when the widget
+is destroyed.
+.IP "\fIXmNheight\fP"
+Specifies the inside height (excluding the border) of the widget's
+window.
+.IP "\fIXmNinitialResourcesPersistent\fP"
+Specifies whether or not resources are reference counted.
+If the value is True when the widget is created, the resources
+referenced by the widget are not reference counted, regardless of how
+the resource type converter is registered.
+An application that expects to destroy the widget and wants to have
+resources deallocated should specify a value of False.
+The default is True, implying an assumption that the widget will not be
+destroyed during the life of the application.
+.nL
+.ne 8
+.IP "\fIXmNmappedWhenManaged\fP"
+If set to True it maps the widget (makes it visible) as soon as it is both
+realized and managed.
+If set to False, the client is responsible for
+mapping and unmapping the widget.  If the value is changed from True to
+False after the widget has been realized and managed, the widget is
+unmapped.
+.IP "\fIXmNscreen\fP"
+Specifies the screen on which a widget instance resides.
+It is read only.
+When the Toolkit is initialized, the top-level widget obtains its
+default value from the default screen of the display.
+Otherwise, the default is copied from the parent.
+.IP "\fIXmNsensitive\fP"
+Determines whether a widget receives input events.  If a widget is
+sensitive, the Xt Intrinsics' Event Manager dispatches to the widget all
+keyboard, mouse button, motion, window enter/leave, and focus events.
+Insensitive widgets do not receive these events.  Use the function
+\fIXtSetSensitive\fP to change the sensitivity argument.  Using
+\fIXtSetSensitive\fP ensures that if a parent widget has
+\fIXmNsensitive\fP set to False, the ancestor-sensitive flag of all its
+children is appropriately set.
+.IP "\fIXmNtranslations\fP"
+Points to a translations list.  A translations list is a list of events and
+actions that are to be performed when the events occur.
+.IP "\fIXmNwidth\fP"
+Specifies the inside width (excluding the border) of the widget's
+window.
+.IP "\fIXmNx\fP"
+Specifies the x-coordinate of the upper left outside corner of the
+widget's window.
+The value is relative to the upper left inside corner of the parent
+window.
+.IP "\fIXmNy\fP"
+Specifies the y-coordinate of the upper left outside corner of the
+widget's window.
+The value is relative to the upper left inside corner of the parent
+window.
+.SS "Translations"
+There are no translations for Core.
+.nL
+.ne 6
+.SH RELATED INFORMATION
+.na
+\fIObject(3X)\fP
+and
+\fIRectObj(3X)\fP.
+.ad

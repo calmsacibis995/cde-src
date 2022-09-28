@@ -1,0 +1,799 @@
+:bil-version	1 0
+:module audio_control
+(
+
+:element main_window
+(
+	:type			:base-window
+	:width			476
+	:height			666
+	:bg-color		"white"
+	:label			"Style Manager - Audio"
+	:resizable		:false
+	:visible		:true
+	:iconic			:false
+	:children		(
+		controlpane2
+		main_pane
+	)
+)
+:element controlpane2
+(
+	:type			:container
+	:container-type		:relative
+	:x			0
+	:y			645
+	:visible		:true
+	:active			:true
+	:border-frame		:none
+	:north-attachment	(:obj main_pane 0)
+	:south-attachment	(:point 0 0)
+	:east-attachment	(:obj main_window 0)
+	:west-attachment	(:point 0 0)
+	:children		(
+		ok_button
+		cancel_button
+		help_button
+	)
+)
+:element ok_button
+(
+	:type			:button
+	:button-type		:push-button
+	:x			57
+	:y			8
+	:label-type		:string
+	:label-alignment	:center
+	:label			"OK"
+	:active			:true
+	:visible		:true
+	:north-attachment	(:point 0 8)
+	:east-attachment	(:grid-line 35 0)
+	:west-attachment	(:grid-line 15 0)
+)
+:element cancel_button
+(
+	:type			:button
+	:button-type		:push-button
+	:x			221
+	:y			8
+	:label-type		:string
+	:label-alignment	:center
+	:label			"Cancel"
+	:active			:true
+	:visible		:true
+	:north-attachment	(:point 0 8)
+	:east-attachment	(:grid-line 58 0)
+	:west-attachment	(:grid-line 40 0)
+)
+:element help_button
+(
+	:type			:button
+	:button-type		:push-button
+	:x			346
+	:y			8
+	:label-type		:string
+	:label-alignment	:center
+	:label			"Help"
+	:active			:true
+	:visible		:true
+	:north-attachment	(:point 0 8)
+	:east-attachment	(:grid-line 85 0)
+	:west-attachment	(:grid-line 64 0)
+)
+:element main_pane
+(
+	:type			:container
+	:container-type		:relative
+	:x			0
+	:y			0
+	:width			476
+	:height			622
+	:visible		:true
+	:active			:true
+	:border-frame		:none
+	:north-attachment	(:point 0 0)
+	:east-attachment	(:obj main_window 0)
+	:west-attachment	(:point 0 0)
+	:children		(
+		sys_vol_label
+		sys_balance_label
+		balance_scale
+		right_vol_label
+		left_vol_label
+		output_device_label
+		system_mute_label
+		mute_rb
+		separator
+		record_vol_label
+		rec_vol_scale
+		rec_balance_label
+		rec_balance_scale
+		left_rec_label
+		right_rec_label
+		input_dev_label
+		channels_label
+		input_dev_rb
+		channels_rb
+		speaker_cbs
+		title_group
+		separator2
+		separator3
+		separator4
+		rec_settings_group
+		separator5
+		separator6
+		separator7
+		separator8
+		sys_vol_scale
+	)
+)
+:element sys_vol_label
+(
+	:type			:label
+	:x			41
+	:y			46
+	:label-type		:string
+	:label			"Volume:"
+	:label-alignment	:center
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj title_group 12)
+	:west-attachment	(:point 0 41)
+)
+:element sys_balance_label
+(
+	:type			:label
+	:x			41
+	:y			95
+	:label-type		:string
+	:label			"Balance Audio Output:"
+	:label-alignment	:center
+	:active			:true
+	:visible		:true
+	:north-attachment	(:point 0 134)
+	:west-attachment	(:point 0 41)
+)
+:element balance_scale
+(
+	:type			:scale
+	:read-only		:false
+	:orientation		:horizontal
+	:direction		:left-to-right
+	:min-value		-100
+	:max-value		100
+	:initial-value		0
+	:increment		1
+	:decimal-points		0
+	:show-value		:false
+	:x			89
+	:y			120
+	:width			298
+	:height			18
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj sys_balance_label 6)
+	:east-attachment	(:point 0 89)
+	:west-attachment	(:point 0 89)
+)
+:element right_vol_label
+(
+	:type			:label
+	:x			328
+	:y			171
+	:label-type		:string
+	:label			"Right"
+	:label-alignment	:center
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj sys_balance_label 6)
+	:west-attachment	(:obj balance_scale 8)
+)
+:element left_vol_label
+(
+	:type			:label
+	:x			47
+	:y			169
+	:label-type		:string
+	:label			"Left"
+	:label-alignment	:center
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj sys_balance_label 6)
+	:west-attachment	(:obj-edge sys_balance_label 0)
+)
+:element output_device_label
+(
+	:type			:label
+	:x			41
+	:y			163
+	:label-type		:string
+	:label			"Output Device:"
+	:label-alignment	:center
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj balance_scale 25)
+	:west-attachment	(:point 0 41)
+)
+:element system_mute_label
+(
+	:type			:label
+	:x			289
+	:y			163
+	:label-type		:string
+	:label			"System Mute:"
+	:label-alignment	:center
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj balance_scale 25)
+	:west-attachment	(:obj output_device_label 130)
+)
+:element mute_rb
+(
+	:type			:choice
+	:choice-type		:exclusive
+	:x			321
+	:y			253
+	:num-columns		1
+	:orientation		:vertical
+	:selection-required	:false
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj system_mute_label 4)
+	:west-attachment	(:obj-edge system_mute_label 0)
+	:children		(
+		mute_rb_On_item
+		mute_rb_Off_item
+	)
+)
+:element mute_rb_On_item
+(
+	:type			:item
+	:item-type		:item-for-choice
+	:label-type		:string
+	:label			"On"
+	:active			:true
+	:selected		:true
+)
+:element mute_rb_Off_item
+(
+	:type			:item
+	:item-type		:item-for-choice
+	:label-type		:string
+	:label			"Off"
+	:active			:true
+	:selected		:false
+)
+:element separator
+(
+	:type			:separator
+	:line-style		:etched-in
+	:orientation		:horizontal
+	:x			0
+	:y			360
+	:height			13
+	:visible		:true
+	:north-attachment	(:obj speaker_cbs 8)
+	:east-attachment	(:point 0 0)
+	:west-attachment	(:point 0 0)
+)
+:element record_vol_label
+(
+	:type			:label
+	:x			29
+	:y			420
+	:label-type		:string
+	:label			"Volume:"
+	:label-alignment	:center
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj rec_settings_group 12)
+	:west-attachment	(:point 0 41)
+)
+:element rec_vol_scale
+(
+	:type			:scale
+	:read-only		:false
+	:orientation		:horizontal
+	:direction		:left-to-right
+	:min-value		0
+	:max-value		100
+	:initial-value		50
+	:increment		1
+	:decimal-points		0
+	:show-value		:true
+	:x			64
+	:y			439
+	:width			298
+	:height			35
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj record_vol_label 6)
+	:east-attachment	(:point 0 89)
+	:west-attachment	(:point 0 89)
+)
+:element rec_balance_label
+(
+	:type			:label
+	:x			33
+	:y			476
+	:label-type		:string
+	:label			"Balance Audio Input:"
+	:label-alignment	:center
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj rec_vol_scale 6)
+	:west-attachment	(:point 0 41)
+)
+:element rec_balance_scale
+(
+	:type			:scale
+	:read-only		:false
+	:orientation		:horizontal
+	:direction		:left-to-right
+	:min-value		-100
+	:max-value		100
+	:initial-value		0
+	:increment		1
+	:decimal-points		0
+	:show-value		:false
+	:x			89
+	:y			448
+	:width			298
+	:height			17
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj rec_balance_label 6)
+	:east-attachment	(:point 0 89)
+	:west-attachment	(:point 0 89)
+)
+:element left_rec_label
+(
+	:type			:label
+	:x			25
+	:y			512
+	:label-type		:string
+	:label			"Left"
+	:label-alignment	:center
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj rec_balance_label 6)
+	:west-attachment	(:obj-edge rec_balance_label 0)
+)
+:element right_rec_label
+(
+	:type			:label
+	:x			417
+	:y			510
+	:label-type		:string
+	:label			"Right"
+	:label-alignment	:center
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj-edge rec_balance_scale 0)
+	:west-attachment	(:obj rec_balance_scale 8)
+)
+:element input_dev_label
+(
+	:type			:label
+	:x			45
+	:y			515
+	:label-type		:string
+	:label			"Input Device:"
+	:label-alignment	:center
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj rec_balance_scale 25)
+	:west-attachment	(:point 0 41)
+)
+:element channels_label
+(
+	:type			:label
+	:x			340
+	:y			553
+	:label-type		:string
+	:label			"Channels:"
+	:label-alignment	:center
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj rec_balance_scale 25)
+	:west-attachment	(:obj-edge system_mute_label 0)
+)
+:element input_dev_rb
+(
+	:type			:choice
+	:choice-type		:exclusive
+	:x			41
+	:y			535
+	:num-columns		1
+	:orientation		:vertical
+	:selection-required	:false
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj input_dev_label 4)
+	:west-attachment	(:point 0 41)
+	:children		(
+		input_dev_rb_Microphone_item
+		input_dev_rb_Line_In_item
+		input_dev_rb_CD_item
+	)
+)
+:element input_dev_rb_Microphone_item
+(
+	:type			:item
+	:item-type		:item-for-choice
+	:label-type		:string
+	:label			"Microphone"
+	:active			:true
+	:selected		:true
+)
+:element input_dev_rb_Line_In_item
+(
+	:type			:item
+	:item-type		:item-for-choice
+	:label-type		:string
+	:label			"Line In"
+	:active			:true
+	:selected		:false
+)
+:element input_dev_rb_CD_item
+(
+	:type			:item
+	:item-type		:item-for-choice
+	:label-type		:string
+	:label			"CD"
+	:active			:false
+	:selected		:false
+)
+:element channels_rb
+(
+	:type			:choice
+	:choice-type		:exclusive
+	:x			348
+	:y			585
+	:num-columns		1
+	:orientation		:vertical
+	:selection-required	:false
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj channels_label 4)
+	:west-attachment	(:obj-edge channels_label 0)
+	:children		(
+		channels_rb_Stereo_item
+		channels_rb_Mono_item
+	)
+)
+:element channels_rb_Stereo_item
+(
+	:type			:item
+	:item-type		:item-for-choice
+	:label-type		:string
+	:label			"Stereo"
+	:active			:true
+	:selected		:true
+)
+:element channels_rb_Mono_item
+(
+	:type			:item
+	:item-type		:item-for-choice
+	:label-type		:string
+	:label			"Mono"
+	:active			:true
+	:selected		:false
+)
+:element speaker_cbs
+(
+	:type			:choice
+	:choice-type		:nonexclusive
+	:x			53
+	:y			241
+	:num-columns		1
+	:orientation		:vertical
+	:selection-required	:false
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj output_device_label 4)
+	:west-attachment	(:point 0 41)
+	:children		(
+		speaker_cbs_Speaker_item
+		speaker_cbs_Headphones_item
+		speaker_cbs_Line_Out_item
+	)
+)
+:element speaker_cbs_Speaker_item
+(
+	:type			:item
+	:item-type		:item-for-choice
+	:label-type		:string
+	:label			"Speaker"
+	:active			:true
+	:selected		:true
+)
+:element speaker_cbs_Headphones_item
+(
+	:type			:item
+	:item-type		:item-for-choice
+	:label-type		:string
+	:label			"Headphones"
+	:active			:true
+	:selected		:false
+)
+:element speaker_cbs_Line_Out_item
+(
+	:type			:item
+	:item-type		:item-for-choice
+	:label-type		:string
+	:label			"Line Out"
+	:active			:true
+	:selected		:false
+)
+:element title_group
+(
+	:type			:container
+	:container-type		:group
+	:active			:true
+	:visible		:true
+	:x			19
+	:y			15
+	:group-type		:ignore
+	:border-frame		:none
+	:north-attachment	(:point 0 15)
+	:west-attachment	(:point 0 19)
+	:children		(
+		sys_title_label
+		hostname1
+	)
+)
+:element sys_title_label
+(
+	:type			:label
+	:x			0
+	:y			0
+	:label-type		:string
+	:label			"System-Wide Play Settings for"
+	:label-alignment	:center
+	:active			:true
+	:visible		:true
+	:north-attachment	(:point 0 0)
+	:west-attachment	(:point 0 0)
+)
+:element hostname1
+(
+	:type			:label
+	:x			219
+	:y			0
+	:label-type		:string
+	:label			"hostname"
+	:label-alignment	:center
+	:active			:true
+	:visible		:true
+	:north-attachment	(:point 0 0)
+	:west-attachment	(:point 0 219)
+)
+:element separator2
+(
+	:type			:separator
+	:line-style		:etched-in
+	:orientation		:vertical
+	:x			316
+	:y			144
+	:width			10
+	:height			10
+	:visible		:true
+	:north-attachment	(:obj balance_scale 3)
+	:east-attachment	(:obj-edge balance_scale -2)
+)
+:element separator3
+(
+	:type			:separator
+	:line-style		:etched-in
+	:orientation		:vertical
+	:x			214
+	:y			144
+	:width			5
+	:height			10
+	:visible		:true
+	:north-attachment	(:obj balance_scale 3)
+	:west-attachment	(:center-grid-line 50 0)
+)
+:element separator4
+(
+	:type			:separator
+	:line-style		:etched-in
+	:orientation		:vertical
+	:x			103
+	:y			144
+	:width			10
+	:height			10
+	:visible		:true
+	:north-attachment	(:obj balance_scale 3)
+	:west-attachment	(:obj-edge balance_scale -2)
+)
+:element rec_settings_group
+(
+	:type			:container
+	:container-type		:group
+	:active			:true
+	:visible		:true
+	:x			41
+	:y			304
+	:group-type		:ignore
+	:border-frame		:none
+	:north-attachment	(:obj separator 15)
+	:west-attachment	(:point 0 19)
+	:children		(
+		record_settings_label
+		hostname2
+	)
+)
+:element record_settings_label
+(
+	:type			:label
+	:x			0
+	:y			0
+	:label-type		:string
+	:label			"System-Wide Record Settings for "
+	:label-alignment	:center
+	:active			:true
+	:visible		:true
+	:north-attachment	(:point 0 0)
+	:west-attachment	(:point 0 0)
+)
+:element hostname2
+(
+	:type			:label
+	:x			240
+	:y			0
+	:label-type		:string
+	:label			"hostname"
+	:label-alignment	:center
+	:active			:true
+	:visible		:true
+	:south-attachment	(:point 0 0)
+	:west-attachment	(:obj record_settings_label 0)
+)
+:element separator5
+(
+	:type			:separator
+	:line-style		:etched-in
+	:orientation		:vertical
+	:x			72
+	:y			442
+	:width			10
+	:height			10
+	:visible		:true
+	:north-attachment	(:obj rec_balance_scale 3)
+	:west-attachment	(:obj-edge rec_balance_scale -2)
+)
+:element separator6
+(
+	:type			:separator
+	:line-style		:etched-in
+	:orientation		:vertical
+	:x			240
+	:y			442
+	:width			10
+	:height			10
+	:visible		:true
+	:north-attachment	(:obj rec_balance_scale 3)
+	:west-attachment	(:center-grid-line 50 0)
+)
+:element separator7
+(
+	:type			:separator
+	:line-style		:etched-in
+	:orientation		:vertical
+	:x			399
+	:y			442
+	:width			10
+	:height			10
+	:visible		:true
+	:north-attachment	(:obj rec_balance_scale 3)
+	:east-attachment	(:obj-edge rec_balance_scale -2)
+)
+:element separator8
+(
+	:type			:separator
+	:line-style		:etched-in
+	:orientation		:horizontal
+	:x			0
+	:y			612
+	:height			10
+	:visible		:true
+	:south-attachment	(:point 0 0)
+	:east-attachment	(:point 0 0)
+	:west-attachment	(:point 0 0)
+)
+:element sys_vol_scale
+(
+	:type			:scale
+	:read-only		:false
+	:orientation		:horizontal
+	:direction		:left-to-right
+	:min-value		0
+	:max-value		100
+	:initial-value		50
+	:increment		1
+	:decimal-points		0
+	:show-value		:true
+	:x			84
+	:y			77
+	:width			298
+	:height			35
+	:active			:true
+	:visible		:true
+	:north-attachment	(:point 0 77)
+	:east-attachment	(:point 0 94)
+	:west-attachment	(:point 0 84)
+)
+:connection
+(
+	:from			rec_vol_scale
+	:when			:value-changed
+	:action-type		:call-function
+	:action			SysRecVolChangeCB
+)
+:connection
+(
+	:from			sys_vol_scale
+	:when			:value-changed
+	:action-type		:call-function
+	:action			SysPlayVolChangeCB
+)
+:connection
+(
+	:from			balance_scale
+	:when			:value-changed
+	:action-type		:call-function
+	:action			SysPlayBalanceChangeCB
+)
+:connection
+(
+	:from			rec_balance_scale
+	:when			:value-changed
+	:action-type		:call-function
+	:action			SysRecBalanceChangeCB
+)
+:connection
+(
+	:from			speaker_cbs_Speaker_item
+	:when			:toggle
+	:action-type		:call-function
+	:action			SysPlayJackCB
+)
+:connection
+(
+	:from			rec_balance_scale
+	:when			:after-create
+	:action-type		:call-function
+	:action			SysPlayBalCreateCB
+)
+:connection
+(
+	:from			sys_vol_scale
+	:when			:after-create
+	:action-type		:call-function
+	:action			SysPlayVolCreateCB
+)
+:connection
+(
+	:from			rec_vol_scale
+	:when			:after-create
+	:action-type		:call-function
+	:action			SysRecordVolCreateCB
+)
+:connection
+(
+	:from			sys_vol_scale
+	:when			:dragged
+	:action-type		:call-function
+	:action			SysPlayVolChangeCB
+)
+:connection
+(
+	:from			rec_vol_scale
+	:when			:dragged
+	:action-type		:call-function
+	:action			SysRecVolChangeCB
+)
+)

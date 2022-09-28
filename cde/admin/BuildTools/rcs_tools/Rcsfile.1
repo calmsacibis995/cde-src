@@ -1,0 +1,166 @@
+.\" $Header: Rcsfile.1,v 1.2 93/09/20 10:56:56 xbuild_hp_cv Exp $
+.TH Rcsfile 4
+.ds )H Hewlett-Packard Company
+.ds ]W HP-UX Release 9.0: August 1992
+.SH NAME
+Rcsfile \- format of \s-1RCS\s0 files
+.SH DESCRIPTION
+An
+.SM RCS
+file is an
+.SM ASCII
+file.
+Its contents are described by the grammar below.
+The text is free format, i.e., spaces, tabs and new-line characters
+have no significance except in strings.
+Strings are enclosed by "@".
+If a string contains the "@" symbol, the symbol must be doubled.
+.PP
+The meta syntax uses the following conventions:  "|" (bar) separates
+alternatives; "{" and "}" enclose optional phrases; "{" and "}\(**" enclose
+phrases that may be repeated zero or more times;
+"{" and "}+" enclose phrases that must appear at least once and may be
+repeated;
+"<" and ">" enclose nonterminals.
+.PP
+.ta 1i 1.5i
+.nf
+<rcstext>	::=	<admin> {<delta>}* <desc> {<deltatext>}*
+.DT
+.PP
+.ta 1i 1.5i 2.5i
+<admin>	::=	\f3head\f1	{<num>};
+		\f3access\f1	{<id>}*;
+		\f3symbols\f1	{<id> : <num>}*;
+		\f3locks\f1	{<id> : <num>}*; {\f3strict\f1 ;}
+		\f3comment\f1	{<string>};
+.PP
+<delta>	::=	<num>
+		\f3date\f1	<num>;
+		\f3author\f1	<id>;
+		\f3state\f1	{<id>};
+		\f3branches\f1	{<num>}*;
+		\f3next\f1	{<num>};
+.PP
+<desc>	::=	\f3desc\f1	<string>
+.PP
+<deltatext>	::=	<num>
+		\f3log\f1	<string>
+		\f3text\f1	<string>
+.DT
+.PP
+.ta 1i 1.5i
+<num>	::=	{<digit>{.}}+
+.PP
+<digit>	::=	0 | 1 | ... | 9
+.PP
+<id>	::=	<letter>{<idchar>}*
+.PP
+<letter>	::=	A | B | ... | Z | a | b | ... | z
+.PP
+<idchar>	::=	Any printing ASCII character except space,
+		tab, carriage return, new line, and <special>.
+.PP
+<special>	::=	; | : | , | @
+.PP
+<string>	::=	@{any ASCII character, with "@" doubled}*@
+.DT
+.fi
+.PP
+Identifiers are case sensitive.  Keywords are in lowercase only.
+The sets of keywords and identifiers may overlap.
+.PP
+The <delta> nodes form a tree.
+All nodes whose numbers consist of a single pair
+(e.g., 2.3, 2.1, 1.3, etc.)
+are on the "trunk", and are linked through the "next"
+field in order of decreasing numbers.
+The "head" field in the <admin> node points to the head of that sequence
+(i.e., contains the highest pair).
+.PP
+All <delta> nodes whose numbers consist of 2n fields (n\(>=2)
+(e.g., 3.1.1.1, 2.1.2.2, etc.)
+are linked as follows.
+All nodes whose first (2n)\-1 number fields are identical
+are linked through the "next" field in order of increasing numbers.
+For each such sequence,
+the <delta> node whose number is identical to the first
+2(n\-1) number fields of the deltas on that sequence
+is called the branchpoint.
+The "branches" field of a node contains a list of the numbers
+of the first nodes of all sequences for which it is a branchpoint.
+This list is ordered in increasing numbers.
+.DS
+Example:
+.nf
+.vs 12pts
+.cs 1 20
+.if \n(LL<=5i .ps 9
+                             Head
+                               |
+                               |
+                               v
+                           ---------
+     / \\          / \\      |       |      / \\           / \\
+    /   \\        /   \\     |  2.1  |     /   \\         /   \\
+   /     \\      /     \\    |       |    /     \\      /       \\
+  /1.2.1.3\\    /1.3.1.1\\   |       |   /1.2.2.2\\   /1.2.2.1.1.1\\
+  ---------    ---------   ---------   ---------   -------------
+      ^            ^           |           ^             ^
+      |            |           |           |             |
+      |            |           v           |             |
+     / \\           |       ---------      / \\            |
+    /   \\          |       \\  1.3  /     /   \\           |
+   /     \\         ---------\\     /     /     \\-----------
+  /1.2.1.1\\                  \\   /     /1.2.2.1\\
+  ---------                   \\ /      ---------
+      ^                        |           ^
+      |                        |           |
+      |                        v           |
+      |                    ---------       |
+      |                    \\  1.2  /       |
+      ----------------------\\     /---------
+                             \\   /
+                              \\ /
+                               |
+                               |
+                               v
+                           ---------
+                           \\  1.1  /
+                            \\     /
+                             \\   /
+                              \\ /
+.cs 1
+.fi
+.sp 1v
+.SH WARNINGS
+.SM RCS
+is designed to be used with
+.SM TEXT
+files only.
+Attempting to use
+.SM RCS
+with non-text (binary) files results in data corruption.
+.SH AUTHOR
+.I Rcsfile
+was developed by Walter F. Tichy, Purdue University, West Lafayette,
+.SM IN\0\047907.
+.br
+Revision Number:  3.0; Release Date: 83/05/11.
+.br
+Copyright 1982 by Walter F. Tichy.
+.SH SEE ALSO
+Ci(1), Co(1),
+Ident(1),
+Rcs(1), Rcsdiff(1),
+Rcsmerge(1), Rlog(1),
+Rls(1), Rcslocks(1),
+Rcsintro(5).
+.\" index	\f4Rcsfile\fP \- format of \s-1RCS\s+1 file 	 \f3Rcsfile(4)\f1
+.\" index	file format: Revision Control System (\s-1RCS\s+1) files 	 \f3Rcsfile(4)\f1
+.\" index	\s-1RCS\s+1: \s-1RCS\s+1 file format 	 \f3Rcsfile(4)\f1
+.\" index	Revision Control System 	 see \s-1RCS\s+1
+.\"
+.\" toc	\f3Rcsfile(4)\f1:\0\0\f4Rcsfile\fP 	 format of \s-1RCS\s+1 file
+.\"
+.\" fileset_database	Rcsfile.4 SRC-CNTL-MAN

@@ -1,0 +1,154 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+.\" *************************************************************************
+.\" **
+.\" ** (c) Copyright 1993,1994 Hewlett-Packard Company 
+.\" **      All Rights Reserved.
+.\" **
+.\" ** (c) Copyright 1993,1994 International Business Machines Corp. 
+.\" **      All Rights Reserved.
+.\" **  
+.\" ** (c) Copyright 1993,1994 Sun Microsystems, Inc.
+.\" **      All Rights Reserved.
+.\" **
+.\" **
+.\" *************************************************************************
+.\"---
+.\".TH _title _#S_ "_dd_ _Month_ _19yy_"
+.TH DtActionQuit 3 "04 April 1994"
+.\".BH "_dd_ _Month_ -_19yy_"
+.BH \*(DT 
+.\"---
+.\"---------------------------------------------------------------------------
+.SH NAME
+DtActionQuit(3) \(em  the API for terminating CDE actions.
+.\"---
+.\"---------------------------------------------------------------------------
+.\"---
+.\"--- SYNOPSIS 
+.\"--- This section is a syntax diagram.  Use the following lines for pages in
+.\"--- manual Sections 1, 1M, 5 and 8:
+.\"---
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <X11/Intrinsic.h> 
+\&#include <Dt/Action.h>
+.sp \n(PDu
+DtActionStatus DtActionQuit (
+.ta .5i 1.75i
+.nf
+	DtActionInvocationID   \fIid\fP,
+	unsigned long          \fItimeout\fP,
+	int                    \fIsilent\fP,
+	int                    \fIforce\fP)
+.wH
+.fi
+.iE
+.sE
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- DESCRIPTION 
+.\"--- This section tells concisely what the command (function, device or
+.\"--- file format) does and includes the parameter list. 
+.\"---
+.SH DESCRIPTION
+\fBDtActionQuit\fP notifies all actions associated with \fIid\fP
+that they should quit as soon as possible.
+
+For \fBCOMMAND\fP actions, a \fBSIGTERM\fP signal is sent to each action
+(via \fBdtexec(1)\fP) if \fIforce\fP is true.   If \fIforce\fP is false,
+the current behavior is to not send a signal.
+
+For \fBTT_MSG\fP actions, a \fBQuit Request\fP as specified in the
+Tooltalk desktop services message set is sent to each action.
+
+.IP \fIid\fP
+Specifies an invocation ID, as returned by \fBDtActionInvoke\fP.  An
+action which has already triggered its \fBDtActionStatusUpdateCallbackProc\fP
+with any termination status will not be quitable.
+.IP \fItimeout\fP
+If \fItimeout\fP is set to 0, then \fBDtActionQuit\fP will asynchronously
+send the appropriate notifications and then exit immediately.   As actions
+receive and process the quit notifications, they can trigger a
+\fBDtActionStatusUpdateCallbackProc\fP with appropriate return status.
+
+Non-zero \fItimeout\fP values are not currently supported.
+.IP \fIsilent\fP
+A boolean that indicates whether the action(s) are allowed to block
+on user input before terminating.   If false, action(s) may choose
+to post dialogs (e.g. for the purpose of dealing with unsaved changes).
+.IP \fIforce\fP
+A boolean that indicates whether the action(s) should terminate
+immediately.  If true, the action(s) may not be given the opportunity
+to engage in a graceful shutdown, and data may be lost.
+.PP
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- RETURN VALUES
+.\"--- This section appears in pages from Sections 2 and 3 only.
+.\"--- List the _values_ that the function returns and give _explanations_.
+.\"---
+.SH "RETURN VALUES"
+.LP
+\fBDtActionQuit\fP will return a DtActionStatus value that describes
+the most probable disposition of the action(s).
+
+\fBDtACTION_INVALID_ID\fP - the specified \fIid\fP is not valid.   It is
+possible that the \fIid\fP was once valid, but that all action(s)
+associated with the \fIid\fP have since completed.
+
+\fBDtACTION_DONE\fP - it is expected that the action(s) will quit
+gracefully and return meaningful data, if any.
+
+\fBDtACTION_DONE_FORCED\fP - it is expected that the action(s) will have
+to be forcefully quit, and that any returned data only reflects the state
+of the data when the action(s) were quit.
+
+\fBDtACTION_DONE_DROPPED\fP - it is expected that the action(s) will have
+to be abandoned.   The action(s) may or may not quit on their own, and any
+returned data only reflects the state of the data when the action(s) were
+abandoned.
+.\"---
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- ERRORS
+.\"--- This section lists and explains _ERROR-CODES_ that the function may
+.\"--- may generate.  List _ERROR-CODES_ alphabetically.
+.\"---
+.SH ERRORS
+.LP
+This function does not return error codes, however the user will be notified
+of severe errors interactively via error dialogs.
+.\"---
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- WARNINGS
+.\"--- This section lists warnings about special conditions.
+.\"---
+.\"--- Warnings are NOT diagnostics.
+.\"---
+.SH WARNINGS
+.LP
+\fBDtActionQuit\fP is not guaranteed to quit all actions.   A \fBCOMMAND\fP
+action for example may choose to block the quit signal it is sent.
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- SEE ALSO
+.\"--- This section lists references to other man pages, sample files, etc.
+.\"---
+.SH "SEE ALSO"
+.BR  DtDbLoad(3),
+.BR  DtActionLabel(3),
+.BR  DtActionDescription(3),
+.BR  DtActionExists(3),
+.BR  DtActionInvoke(3),
+.BR  DtActionQuitType(3),
+.BR  DtActionStatusUpdateCallbackProc(3),
+.BR  dtdtfile(4),
+.BR  dtspcd(1X),
+.BR  ttsession(1)

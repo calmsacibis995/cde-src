@@ -1,0 +1,65 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Novell, Inc
+...\" **
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH XmTranslateKey 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmTranslateKey\fP \- The default keycode-to-keysym translator
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/Xm.h>
+.sp \n(PDu
+void XmTranslateKey (\fBdisplay, keycode, modifiers, modifiers_return, keysym_return\fI)
+.ta .5i 1.5i
+.nf
+	Display		*\fBdisplay\fI;
+	KeyCode		\fBkeycode\fI;
+	Modifiers	\fBmodifiers\fI;
+	Modifiers	*\fBmodifiers_return\fI;
+	KeySym		*\fBkeysym_return\fI;
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+\fIXmTranslateKey\fP is the default \fIXtKeyProc\fP translation
+procedure for Motif applications.  The function takes a keycode
+and modifiers and returns the corresponding keysym.
+.PP
+\fIXmTranslateKey\fP serves two main purposes: new translators
+with expanded functionality can call it to get the default 
+Motif keycode-to-keysym translation in addition to whatever they add,
+and so that the default translator can be reinstalled.  This function enables
+keysyms defined by the Motif virtual bindings to be used when an
+application requires its own XtKeyProc to be installed.
+.IP "\fBdisplay\fP"
+Specifies the display that the keycode is from
+.IP "\fBkeycode\fP"
+Specifies the keycode to translate
+.IP "\fBmodifiers\fP"
+Specifies the modifier keys to be applied to the keycode
+.IP "\fBmodifiers_return\fP"
+Specifies a mask of the modifier keys actually used to generate
+the keysym (an AND of \fBmodifiers\fP and any default modifiers
+applied by the currently registered translator)
+.IP "\fBkeysym_return\fP"
+Specifies a pointer to the resulting keysym
+.SH RELATED INFORMATION
+.na
+\fIVirtualBindings(3X)\fP.
+.ad

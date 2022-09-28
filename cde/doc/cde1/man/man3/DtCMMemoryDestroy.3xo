@@ -1,0 +1,61 @@
+.TH DtCMMemoryDestroy 3 "17 January 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH "NAME"
+DtCMMemoryDestroy \- destroy a Bento memory-container reference constant
+.SH "SYNOPSIS"
+.yS
+#include <Bento/DtCM.h>
+.sp 0.5v
+.ta \w'void DtCMMemoryDestroy('u
+void DtCMMemoryDestroy(CMRefCon \f2ref_con\fP,
+	CMEnv *\f2error\fP);
+.yE
+.SH "DESCRIPTION"
+The
+.Fn DtCMMemoryDestroy
+function destroys any memory associated with a memory reference constant.
+If
+.Fn DtCMMemoryDestroy
+is called to destroy a buffer not created by
+.Fn DtCMMemoryCreate 3
+or if the container associated with the
+reference constant is not open,
+the results are undefined.
+.P
+The
+.I ref_con
+argument is a reference constant created with the
+.Fn DtCMMemoryCreate 3
+function.
+The
+.I error
+argument is a pointer to an error return structure.
+.SH "RETURN VALUE"
+The
+.Fn DtCMMemoryDestroy
+function returns no value.
+If an error occurs,
+.Fn DtCMMemoryDestroy
+sets the major code in the
+.I error
+structure to
+.Cn USER_EXCEPTION ,
+and the application can use the
+.Fn CMRexception_number
+function to determine the minor code.
+See the Error API Appendix in the \*(ZB.
+.SH "APPLICATION USAGE"
+The application should call
+.Fn DtCMMemoryDestroy
+for each container opened with the
+.Fn DtCMMemoryCreate 3
+function.
+.SH "SEE ALSO"
+.Fn DtCMMemoryCreate 3,
+.Fn DtCMMemoryInfo 3,
+.Hd Bento/DtCM.h 5;
+.Fn CMRexception_number
+in the \*(ZB.

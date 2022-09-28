@@ -1,0 +1,95 @@
+.de Lc
+.\" version of .LI that emboldens its argument
+.TP \\n()Jn
+\s-1\f3\\$1\f1\s+1
+..
+.TH ttdt_file_quit 3 "1 March 1996" "ToolTalk 1.3" "ToolTalk Functions"
+.BH "1 March 1996"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.IX "ttdt_file_quit.3" "" "ttdt_file_quit.3" "" 
+.SH NAME
+ttdt_file_quit \- unregister interest in ToolTalk events about a file
+.SH SYNOPSIS
+.ft 3
+.nf
+#include <Tt/tttk.h>
+.sp 0.5v
+.ta \w'Tt_status ttdt_file_quit('u
+Tt_status ttdt_file_quit(Tt_pattern *\f2patterns\fP,
+	int \f2quit\fP);
+.PP
+.fi
+.SH DESCRIPTION
+The
+.BR ttdt_file_quit (\|)
+function
+is used to unregister interest in the
+.I pathname
+that was passed to
+.BR ttdt_file_join (3)
+when
+.I patterns
+was created.
+The
+.BR ttdt_file_quit (\|)
+function destroys
+.I patterns
+and sets the default file to
+.BR \s-1NULL\s+1 .
+.PP
+If
+.I quit
+is True,
+.BR ttdt_file_quit (\|)
+calls
+.BR tt_file_quit (3)
+with a
+.I pathname
+argument; otherwise, it returns without quitting.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.BR ttdt_file_quit (\|)
+function returns the status of the operation as one of the following
+.B Tt_status
+values:
+.PP
+.RS 3
+.nr )J 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_DBAVAIL
+.br
+The ToolTalk service could not access the ToolTalk database
+needed for this operation.
+.Lc TT_ERR_DBEXIST
+.br
+The ToolTalk service could not access the specified ToolTalk database
+in the expected place.
+.Lc TT_ERR_NOMP
+.br
+The
+.BR ttsession (1)
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_POINTER
+.br
+The
+.I patterns
+argument was
+.BR \s-1NULL\s+1
+or otherwise invalid.
+.Lc TT_ERR_PROCID
+.br
+The specified process identifier is out of date or invalid.
+.PP
+.RE
+.nr )J 0
+.SH "SEE ALSO"
+.na
+.BR tttk (5),
+.BR ttdt_file_join (3),
+.BR tt_default_file (3),
+.BR tt_file_quit (3).

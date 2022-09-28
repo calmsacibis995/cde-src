@@ -1,0 +1,65 @@
+.TH DtActionLabel 3 "17 Jan 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.\" *************************************************************************
+.SH NAME
+DtActionLabel \- get the localizable label string for an action
+.SH SYNOPSIS
+.yS
+#include <Dt/Action.h>
+.sp 0.5v
+.ta \w'char *DtActionLabel('u
+char *DtActionLabel(char *\f2actionName\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn DtActionLabel
+function provides access to the localizable label string associated with an
+action named
+.IR actionName .
+The
+.I actionName
+argument is the name of the action.
+The localizable label string is the string that all components
+should display to identify the action.
+If the action definition does not specify a label string,
+the action name itself is returned.
+.P
+The label string associated with an action is localizable, but the
+action name is not.
+.P
+If there are multiple
+.I actionName
+actions, the label string returned
+is the label associated with the most general action.
+The most general action is the one with the lowest precedence,
+as described in
+.cde .BR dtactionfile (4)
+.cde (``Action Selection'').
+.xo .cX actionselection .
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn DtActionLabel
+function returns a newly allocated
+copy of the localizable
+label string associated with the action if an action named
+.I actionName
+is found;
+otherwise, it returns
+.Cn NULL .
+It is up to the caller to free the memory associated with
+this new copy of the label.
+The default value for an action label is the action name itself.
+.SH "APPLICATION USAGE"
+All applications displaying action names should use
+the action label to identify an action.
+.SH "SEE ALSO"
+.Hd Dt/Action.h 5,
+.cde .BR dtactionfile (4),
+.cde .BR dtdtfile (4).
+.xo .cX dtactionfile ,
+.xo .cX dtdtfile .

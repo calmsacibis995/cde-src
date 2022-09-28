@@ -1,0 +1,109 @@
+.TH DtHelpReturnSelectedWidgetId 3 "11 Jan 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.\" *************************************************************************
+.SH NAME
+DtHelpReturnSelectedWidgetId \- select a widget or gadget
+.SH SYNOPSIS
+.yS
+#include <Dt/Help.h>
+.sp 0.5v
+.ta \w' int DtHelpReturnSelectedWidgetId('u
+int DtHelpReturnSelectedWidgetId(Widget \f2parent\fP,
+	String \f2cursor\fP,
+	Widget *\f2widget\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn DtHelpReturnSelectedWidgetId
+function provides an
+interface for users to select a component within an application.
+.P
+This function
+grabs the pointer and returns the widget within which a button press occurs.
+Pressing the escape key (ESC) aborts this function.
+.P
+The
+.I parent
+argument specifies the widget ID to use as the basis
+of the interaction, usually a top level shell.
+.P
+The
+.I cursor
+argument specifies the cursor to be used for the pointer
+during the interaction.
+If a
+.Cn NULL
+value is used,
+.Fn DtHelpReturnSelectedWidgetId
+uses a default cursor value.
+.P
+The
+.I widget
+argument is the return value (for example, the
+selected widget).
+A
+.Cn NULL
+value is returned on error.
+.P
+The
+.Fn DtHelpReturnSelectedWidgetId
+function allows applications to get the widget ID for
+any widget in their user interface that the user has selected via the
+pointer.
+The application can then directly display a
+help topic based on the selected widget, or dynamically
+construct some help information based on the current context of the selected
+item.
+At any point while the question mark cursor is displayed, the user can
+select the escape key to abort the function call, and a
+.Cn NULL
+value is returned.
+If the user selects any
+item outside the current applications windows, an error status is
+returned along with a
+.Cn NULL
+value for the
+.I widget
+argument.
+.cdes
+Refer to the OSF/Motif 1.2
+.Fn XmTrackingLocate 3X
+for a similar function.
+.cdee
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn DtHelpReturnSelectedWidgetId
+function returns one of the following status values:
+.VL 6
+.Lc DtHELP_SELECT_ERROR
+.br
+An error occurred while attempting to process the function.
+.Lc DtHELP_SELECT_INVALID
+.br
+The user selected an invalid component that is not contained
+in the current widget hierarchy.
+.Lc DtHELP_SELECT_ABORT
+.br
+The user aborted the function (for example, pressed the escape key), and a
+.Cn NULL
+widget value is passed back.
+.Lc DtHELP_SELECT_VALID
+.br
+The user selected a valid component within the application, and the
+.I widget
+argument is the ID of the selected component.
+.LE
+.SH "SEE ALSO"
+.Hd Dt/Help.h 5,
+.Fn DtCreateHelpQuickDialog 3,
+.Fn DtCreateHelpDialog 3;
+.cde .Fn XmTrackingLocate 3X,
+.xos
+.Fn XmTrackingLocate
+in the \*(ZM.
+.xoe

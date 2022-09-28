@@ -1,0 +1,92 @@
+.TH DtCMGetBodyPartProperty 3 "17 January 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH "NAME"
+DtCMGetBodyPartProperty \- get a property from a body part
+.SH "SYNOPSIS"
+.yS
+#include <Bento/DtCM.h>
+.sp 0.5v
+.ta \w'void DtCMGetBodyPartProperty('u
+void DtCMGetBodyPartProperty(DtCMBodyPart *\f2body_part\fP,
+	CMEnv *\f2error\fP,
+	CMGlobalName \f2property\fP,
+	CMGlobalName *\f2type_name\fP,
+	CMPtr *\f2data\fP,
+	CMSize *\f2data_size\fP);
+.yE
+.SH "DESCRIPTION"
+The
+.Fn DtCMGetBodyPartProperty
+function retrieves a property value.
+If a
+.I property
+argument does not exist for the object, the pointers are set to
+.Cn NULL .
+This function does not retrieve partial information on a
+property.
+The memory pointed to by the
+.I type_name,
+.I data,
+and
+.I data_size
+arguments must be released using the
+.Fn free 3C
+function.
+.P
+The
+.I body_part
+argument is a body-part structure returned by any of the
+.Fn DtCMGetBodyPart 3,
+.Fn DtCMGetNextBodyPart 3,
+or
+.Fn DtCMNewBodyPart 3
+functions.
+The
+.I error
+argument is a pointer to an error return structure.
+The
+.I property
+argument is the name of the property to set or overwrite.
+If the property already exists, its value is replaced with the new data.
+.P
+The
+.I type_name
+argument is the type of the property value,
+which can be any type string.
+The application can use the
+.BR DtCMTypesString
+value to indicate a null-terminated string of characters.
+The
+.I data
+argument is the value associated with the value.
+The
+.I data_size
+argument is the size of the data value in bytes.
+.SH "RETURN VALUE"
+The
+.Fn DtCMGetBodyPartProperty
+function returns no value.
+If an error occurs,
+.Fn DtCMGetBodyPartProperty
+sets the major code in the
+.I error
+structure to
+.Cn USER_EXCEPTION ,
+and the application can use the
+.Fn CMRexception_number
+function to determine the minor code.
+See the Error API Appendix in the \*(ZB.
+.SH "SEE ALSO"
+.Fn DtCMGetBodyPart 3,
+.Fn DtCMGetNextBodyPart 3,
+.Fn DtCMNewBodyPart 3,
+.Fn DtCMSetBodyPartProperty 3,
+.Hd Bento/DtCM.h 5;
+.Fn CMRexception_number
+in the \*(ZB;
+.cde .Fn free 3C.
+.xo .Fn free
+.xo in the \*(ZK.

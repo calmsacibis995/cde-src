@@ -1,0 +1,521 @@
+#!/usr/local/bin/perl
+
+
+eval "exec /usr/local/bin/perl -S $0 $*"
+    if $running_under_some_shell;
+
+########################################################
+# required files
+########################################################
+# Add the test directory to the locations to search for
+# libraries.
+push(@INC,"/x/cdesrc/admin/BuildTools/rcs_tools");
+require 'RcsSock.pl';
+require 'RcsUtility.pl';
+
+########################################################
+# define variables
+########################################################
+&InitializeVariables();
+$exitValue = 0;
+# don't buffer stderr and stdout
+select(STDERR); $| =1;
+select(STDOUT); $| =1;
+
+#######################################################
+# define local subroutines
+#######################################################
+#
+# If there is an error, we must dump the co output from server
+#
+sub readUntilNoMoreInput {
+	local($tmpExitValue);
+	while (<$SOCK_HANDLE>) {
+		if (m%^>>### END INDIVIDUAL FILE CHECK OUT ###<<$%) {
+			$tmpExitValue = <$SOCK_HANDLE>;
+			&checkForDeadServer($tmpExitValue);
+			last;
+		}
+	}
+}
+
+# Check if file is writable and Co should be aborted
+sub CheckIfWritable {
+	local($currentLocalFile) = @_;
+	local($isWritable);
+	if (( -w $currentLocalFile ) && (! $IsDashPOption)){
+		print STDERR "writable: \"$currentLocalFile\" exists; overwrite? [ny](n): \n";
+		chop($_=<STDIN>);
+		if ( /^[yY]/ ) { #if yes, check it out
+			$isWritable = 0;
+		}
+		else {
+			$isWritable = 1;
+		}
+		return $isWritable;
+	}
+}
+
+#
+# The following are signal handlers for abort due a specific signal
+#
+sub abortHUP {
+        local(@errormessage);
+        @errormessage = ("*** Client terminated with signal 1 -> SIGHUP ***");
+        &Exit(1,@errormessage);
+}
+sub abortINT {
+        local(@errormessage);
+        &Exit(1,@errormessage);
+}
+sub abortQUIT {
+        local(@errormessage);
+        @errormessage = ("*** Client terminated with signal 3 -> SIGQUIT ***");
+        &Exit(1,@errormessage);
+}
+sub abortTERM {
+        local(@errormessage);
+        @errormessage = ("*** Client terminated with signal 15 -> SIGTERM ***");
+        &Exit(1,@errormessage);
+}
+
+
+########################################################
+# Catch signals
+########################################################
+$SIG{'INT'} = 'abortINT';
+$SIG{'HUP'} = 'abortHUP';
+$SIG{'QUIT'} = 'abortQUIT';
+$SIG{'TERM'} = 'abortTERM';
+
+
+
+########################################################
+# argument processing
+########################################################
+$IsDashPOption = 0;
+while ( $ARGV[0] =~ /^-/ ){
+	$_ = shift;
+	if (/^-H(.*)$/){
+		# specify remote host
+		$rhost = ($1 ? $1 : shift);
+	}
+	elsif (/^-P(.*)$/){
+		# specify port
+		$port = ($1 ? $1 : shift);
+	}
+	elsif (/^-D$/){
+		# turn on debugging output
+		$Debug = 1;
+	}
+	elsif (/^(-l)(.*)$/) {
+		$IsDashLOption = 1;
+		#
+		# args which allow associated strings
+		#
+		if ( $2 ) {
+			push(@Rcsargs,$1 . "'" . $2 . "'");
+		} else {
+			push(@Rcsargs,$1);
+		}
+	}
+	elsif (/^(-[rsw])(.*)$/) {
+		#
+		# args which allow associated strings
+		#
+		if ( $2 ) {
+			push(@Rcsargs,$1 . "'" . $2 . "'");
+		} else {
+			push(@Rcsargs,$1);
+		}
+	}
+	elsif (/^(-q)(.*)$/) {
+		$IsDashQOption = 1;
+		#
+		# args which allow associated strings
+		#
+		if ( $2 ) {
+			push(@Rcsargs,$1 . "'" . $2 . "'");
+		} else {
+			push(@Rcsargs,$1);
+		}
+	}
+	elsif (/^(-d)(.*)$/) {
+		#
+		# args which allow associated strings
+		# the extra \" is for the -d option which can have
+		# blanks in its string.
+		if ( $2 ) {
+			push(@Rcsargs,$1 . "'\"" . $2 . "\"'");
+		} else {
+			push(@Rcsargs,$1);
+		}
+	}
+	elsif (/^(-p)(.*)$/) { 
+		$IsDashPOption = 1;
+		#
+		# args which allow associated strings
+		#
+		if ( $2 ) {
+			push(@dashPargs,$1 . "'" . $2 . "'");
+			push(@extraRemoteArgs,"-q" . "'" . $2 . "'");
+		} else {
+			push(@dashPargs,$1);
+			push(@extraRemoteArgs,"-q");
+		}
+	}
+	elsif (/^-j(.*)$/) {
+		@errorMessage = ("	-j option not supported\n");
+		&Exit(1,@errorMessage);
+	}
+	else {
+		@errorMessage = ("	Unrecognized flag: \"$_\"\n");
+		&Exit(1,@errorMessage);
+	}
+}
+
+
+#
+# get the files and do appropriate error checking
+# see if the files are local or remote
+#
+# for some reason while(@ARGV) cannot be in a subroutine
+while ( @ARGV ) {
+	$tstfile=shift;
+	$tmp = `basename $tstfile`;
+	chop $tmp;
+
+	# if there is a wildcard unexpanded for the RCS vault
+	# store for later processing
+	#
+	if (($tstfile =~ m%[\*\?]%) || ($tstfile =~ m%\[.*\]%)) {
+		$tmpdir =`dirname $tstfile`;
+		chop $tmpdir;
+		if (($tmpdir =~ m%^RCS%) || ($tmpdir =~ m%\/RCS%)) {
+			$realtmpdir = &IsRcsDirectoryLocal($tmpdir);
+			$newtstfile = "${realtmpdir}/${tmp}";
+			push(@wildCardFiles,$newtstfile);
+		}
+	}			
+	# don't do RCS dir
+	elsif ("$tmp" ne "RCS")  {
+		push(@allFiles, $tstfile);
+	}
+}
+
+if ((! defined(@allFiles)) && (! defined(@wildCardFiles))) {
+	@errorMessage = ("NO FILES to Process");
+        &Exit(1,@errorMessage);
+}
+
+# do not need a readable file for Co
+$needReadableFile = 0;
+&GetFilePaths($needReadableFile);
+
+
+####################################################################
+# debug argument processing
+####################################################################
+if ( $Debug ) {
+	print "rhost= $rhost\n";
+	print "port= $port\n";
+	print "Top= $Top\n";
+	print "rcsargs= \"@Rcsargs\"\n";
+	print "localExchangeFiles= \"@localExchangeFiles\"\n";
+	print "remoteCommaVFiles= \"@remoteCommaVFiles\"\n";
+	print "allremoteExchangeFiles = \"@allRemoteExchangeFiles\"\n";
+	print "originalFiles = \"@originalFiles\"\n";
+	print "wildCardFiles = \"@wildCardFiles\"\n";
+}
+
+#
+# Check that no two files evaluate to the same basename
+# (This can cause a problem on the server side)
+#
+&CheckBasenames();
+
+
+##################################################################
+# Process the local files
+# Run local Rcs commands
+##################################################################
+if (defined(@localExchangeFiles)) {
+	$tmpExitValue = system "$RcsPrg @Rcsargs @dashPargs @localExchangeFiles";
+	# reset exit value if necessary
+	if ((!$exitValue) && ($tmpExitValue)) {
+		$exitValue = 1;
+	}
+}
+
+##################################################################
+# Process the remote files
+##################################################################
+if ((defined(@allRemoteExchangeFiles)) || (defined(@wildCardFiles))) {
+	#
+	# Open the connection
+	#
+        if (! ($SOCK_HANDLE = &sock'open($rhost,$port))) {
+		@errorMessage = ("Connect to \"$rhost\" failed: $!");
+		&Exit(1,@errorMessage);
+	}
+
+
+	# send username
+	print $SOCK_HANDLE  "USER: $userName\n";
+
+	#
+	# Expand wildcards if there are any.
+	# Pass the basic command string.
+	#
+	if (!defined(@wildCardFiles)) {
+		print $SOCK_HANDLE "$RemoteRcsPrg \n";
+	}
+	else {
+		print $SOCK_HANDLE "$RemoteRcsPrg @wildCardFiles\n";
+		#
+		# get the complete wildcard paths from the server.
+		# Add them to the list of remote exchange files.
+		&getWildCardsFromServer($needReadableFile);
+	}
+
+	if ($Debug) {
+		print "remoteExchangeFiles= \"@remoteExchangeFiles\"\n";
+		print "remoteCommaVFiles= \"@remoteCommaVFiles\"\n";
+		print "allremoteExchangeFiles = \"@allRemoteExchangeFiles\"\n";
+		print "originalFiles = \"@originalFiles\"\n";
+		print "wildCardFiles = \"@wildCardFiles\"\n";
+	}
+
+	#
+	# create encryption directory
+	#
+	$cryptdir = "/tmp/crypt$$";
+	if (! mkdir("$cryptdir",0755)) {
+		undef(@errorMessage);
+		push(@errorMessage,"Cannot create local encryption directory $cryptdir");
+		push(@errorMessage,"This is needed for file encryption.");
+		push(@errorMessage,"Contact your RCS administrator");
+		&Exit(1,@errorMessage);
+	}
+	
+	NEXTFILE:
+	while (@remoteCommaVFiles) {
+		#
+		# do the command for one file
+		#
+		$sendcurrentLocalFile = shift(@remoteExchangeFiles);
+		$currentLocalFile = shift(@originalFiles);
+		$currentRemoteFile = shift(@remoteCommaVFiles);
+
+		#
+		# if the directory that the user wants to deposit the checked out
+		# file is not writable by the user, skip this file
+		#
+		$tmpDirName = `dirname $currentLocalFile`;
+		chop($tmpDirName);
+		if (! -w $tmpDirName) {
+			print STDERR "	ERROR - Directory $tmpDirName not writable.\n\n";
+			$exitValue = 1;
+			next NEXTFILE;
+		}
+
+		# print the file name
+		if ( ! $IsDashQOption) {
+			print STDERR "	<-- $currentLocalFile -->\n";
+		}
+
+		#
+		# signal the begining of individual file check out
+		#
+		print $SOCK_HANDLE ">>### BEGIN INDIVIDUAL FILE CHECK OUT ###<<\n";
+
+		#
+		# send the individual command
+		#
+		print "$RemoteRcsPrg @Rcsargs @extraRemoteArgs $sendcurrentLocalFile $currentRemoteFile\n" if $Debug;
+		print $SOCK_HANDLE "$RemoteRcsPrg @Rcsargs @extraRemoteArgs $sendcurrentLocalFile $currentRemoteFile\n";
+
+
+		#
+		# get the file and uudecode and decrypt if necessary
+		#
+		while( <$SOCK_HANDLE> ) {
+			&checkForDeadServer($_);
+			if (/^>>### BEGIN RCS CO: (.*) ###<<$/) {
+				#
+				# check for local file and its permissions
+				#
+				m%(\d+)\s+(\d+)\s+(\d+)\s+(\S*)% && ($locFile = $4);
+				$lines=$1; $words=$2; $chars=$3;
+				$locFile =~ m%.*/([^/]+)% && ($locFile = $1);
+				$cryptFile = "${cryptdir}/${locFile}.N";
+				$uuFile = "${cryptFile}.uu";
+				$locFile = $currentLocalFile; # reset to correct path
+				#
+				# possibly decrypted uuencoded file
+				#
+				if (!open(UUFILE,"> $uuFile")) {
+					print STDERR "	ERROR - cannot open uuencode file: \"$uuFile\" $! ";
+					print STDERR "	        NOT PROCESSING file $currentLocalFile\n";
+					$exitValue = 1;
+					&readUntilNoMoreInput();
+					next NEXTFILE;
+				}
+
+				while ( <$SOCK_HANDLE> ) {
+					&checkForDeadServer($_);
+					if (/^>>### END RCS CO ###<<$/) {
+						#
+						# get executable designation from server
+						#
+						$IsExecutable = <$SOCK_HANDLE>;
+						&checkForDeadServer($IsExecutable);
+						chop $IsExecutable;
+						close(UUFILE);
+						#
+						# uudecode the file
+						#
+						if (! &uudecodeP($uuFile,$cryptFile)) {
+							print STDERR "	NOT PROCESSING file $currentLocalFile\n";
+							$exitValue = 1;
+							&readUntilNoMoreInput();
+							next NEXTFILE;
+						}
+
+						#
+						# if -p, send file to STDOUT after decrypting
+						#
+						if ($IsDashPOption){
+							if (open(LOCFILE,"|crypt desZthPl")){
+								if (open(CRYPTFILE,"$cryptFile")){
+									while (<CRYPTFILE>) {
+										print LOCFILE $_;
+									}
+									close(LOCFILE);
+									close(CRYPTFILE);
+								}
+								else {
+									print STDERR "cannot open $cryptFile $!\n";
+									print STDERR "	NOT PROCESSING file $currentLocalFile\n";
+									$exitValue = 1;
+									&readUntilNoMoreInput();
+									next NEXTFILE;
+								}
+							}
+							else {
+								print STDERR "ERROR - cannot open $cryptFile $!\n";
+								print STDERR "	NOT PROCESSING file $currentLocalFile\n";
+								$exitValue = 1;
+								&readUntilNoMoreInput();
+								next NEXTFILE;
+							}
+						}
+						else { #NOT -p, check the file out
+							#
+							# if writable and not -p, query to overwrite
+							#
+							if (&CheckIfWritable($currentLocalFile)) {
+								print STDERR "co warning: checkout aborted.\n";
+								&readUntilNoMoreInput();
+								next NEXTFILE;
+							}
+							#
+							# remove the current file before checkout
+							#
+							if ( (-e $locFile && -o $locFile) || -l $locFile ) {
+								unlink($locFile);
+							}
+							#
+							# decrypt the file, and create the new file
+							#
+							if (open(LOCFILE,"|crypt desZthPl >$locFile")){
+								if (open(CRYPTFILE,"$cryptFile")){
+									while (<CRYPTFILE>) {
+										print LOCFILE $_;
+									}
+									close(LOCFILE);
+									close(CRYPTFILE);
+								}
+								else {
+									print STDERR "cannot open $cryptFile $!\n";
+									print STDERR "	NOT PROCESSING file $currentLocalFile\n";
+									$exitValue = 1;
+									&readUntilNoMoreInput();
+									next NEXTFILE;
+								}
+							}
+							else {
+								print "ERROR - could not open encryption stream $!";
+								print STDERR "	NOT PROCESSING file $currentLocalFile\n";
+								&readUntilNoMoreInput();
+								$exitValue = 1;
+								next NEXTFILE;
+							}
+
+							# see if executable file
+							# and then set correct permissions
+							# for -l need writable file
+							if ($IsDashLOption) {
+								if ($IsExecutable) {
+									chmod 0755,$locFile;
+								}
+								else {
+									chmod 0644,$locFile;
+								}
+							}
+							else {
+								if ($IsExecutable) {
+									chmod 0555,$locFile;
+								}
+								else {
+									chmod 0444,$locFile;
+								}
+							}
+							# check size of file
+							chop($wcout=`wc $locFile`);
+							$wcout =~ m%(\d+)\s+(\d+)\s+(\d+)\s+%;
+							($1 == $lines) || print "Warning: \"$locFile\" line count mismatch\nsent: $lines	received: $1\n";
+							($2 == $words) || print "Warning: \"$locFile\" word count mismatch\nsent: $words	received: $2\n";
+							($3 == $chars) || print "Warning: \"$locFile\" char count mismatch\nsent: $chars	received: $3\n";
+						}
+						#
+						# remove old .N file
+						#
+						if ( (-e $cryptFile && -o $cryptFile) || -l $cryptFile ) {
+							unlink($cryptFile);
+						}
+						&readUntilNoMoreInput();
+						next NEXTFILE;
+					}
+					else {
+						# read next line
+						print UUFILE $_;
+					}
+				}
+			}
+	 		else {
+				if (m%^>>### END INDIVIDUAL FILE CHECK OUT ###<<$%) {
+					$tmpExitValue = <$SOCK_HANDLE>;
+					&checkForDeadServer($tmpExitValue);
+					chop $tmpExitValue;
+					#
+					# correct exit value
+					#
+					if ((!$exitValue) && ($tmpExitValue)) {
+						$exitValue = 1;
+					}
+					next NEXTFILE;
+				}
+				print;
+			}
+		}
+	}
+	print $SOCK_HANDLE ">>### CO ALL DONE ###<<\n";
+	# clean up encryption directory
+	if ( -d $cryptdir) {
+		unlink <$cryptdir/*>;
+		rmdir ("$cryptdir");
+	}
+	&sock'close($SOCK_HANDLE);
+}
+&Exit($exitValue,@nullError);

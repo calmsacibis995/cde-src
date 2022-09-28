@@ -1,0 +1,40 @@
+XCOMM RefXaudio @(#)Imakefile	1.2 96/07/15 SMI
+XCOMM Copyright (c) 1996 Sun Microsystems, Inc.
+
+/*
+ * Imakefile for creating binstall links to a reference Xaudio install
+ */
+
+#ifndef UseReferenceXaudio
+#define UseReferenceXaudio	YES
+#endif
+
+REFERENCE_PKGNAME	= RefXaudio
+REFERENCE_PKGBASE	= /usr
+REFERENCE_PKGDIR	= openwin
+
+#include <sun/Reference.tmpl>
+
+XAUDIO_INCDIR		= Xa
+XAUDIO_HEADERS		= Xafuncproto.h Xafuncs.h Xalib.h Xaprotocol.h \
+			  atomdefs.h atomstrings.h cdefines.h errors.h
+
+XAUDIO_LIBRARY		= libXa
+XAUDIO_LIBRARY_VERSION	= 1
+
+ICE_LIBRARY		= libICE
+ICE_LIBRARY_VERSION	= 6
+
+all::
+
+#if UseReferenceXaudio
+
+ReferencePublicHeadersList($(XAUDIO_HEADERS),$(XAUDIO_INCDIR))
+
+ReferenceSharedLibrary($(XAUDIO_LIBRARY),$(XAUDIO_LIBRARY_VERSION))
+
+ReferenceSharedLibrary($(ICE_LIBRARY),$(ICE_LIBRARY_VERSION))
+
+#endif /* UseReferenceXaudio */
+
+depend::

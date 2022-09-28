@@ -1,0 +1,109 @@
+XCOMM 
+XCOMM (c) Copyright 1989, 1990, 1991, 1992, 1993 OPEN SOFTWARE FOUNDATION, INC. 
+XCOMM ALL RIGHTS RESERVED 
+XCOMM 
+XCOMM 
+XCOMM Motif Release 1.2.2
+XCOMM 
+XCOMM   $RCSfile: Imakefile,v $ $Revision: 1.16 $ $Date: 94/04/19 07:42:23 $
+#ifndef DoNormalLib
+#define DoNormalLib NormalLibMrm
+#endif
+#ifndef DoSharedLib
+#define DoSharedLib SharedLibMrm
+#endif
+#define DoDebugLib DebugLibMrm
+#define DoProfileLib ProfileLibMrm
+#include <Library.tmpl>
+
+#ifdef HPArchitecture
+EXTRA_CCOPTIONS = $(ESLIT_OPTION) /* set in hp.cf */
+#endif
+#ifdef RsArchitecture
+REQUIREDLIBS = $(XMLIB) $(XTOOLLIB) $(XLIB)
+#endif
+#if defined(SunArchitecture)
+DEFINES = -DNO_ALLOCA
+EXTRA_DEFINES = -D_TS_ERRNO
+MrmIfile.o := EXTRA_CCOPTIONS = -Xa
+
+REQUIREDLIBS = $(ALL_LIBPATH) $(XMLIB) $(XTOOLLIB) $(XLIB) -lc
+#endif
+
+INSTALLFLAGS = $(INSTINCFLAGS)
+INCLUDES = -I. -I$(INCLUDESRC) -I$(MINCLUDESRC) -I$(MLIBSRC)
+
+
+SRCS =	MrmIbuffer.c	MrmIentry.c	MrmIfile.c	MrmIheader.c \
+	MrmIindex.c	MrmIindexw.c	MrmIrid.c	MrmIswap.c \
+	MrmItop.c  	MrmItopw.c	Mrmappl.c \
+	Mrmcontext.c	Mrmerror.c	Mrmhier.c	Mrmicon.c \
+	Mrminit.c	Mrmlread.c	Mrmlwrite.c	Mrmmodule.c \
+	Mrmptrlist.c	Mrmtable.c	Mrmtime.c	Mrmvm.c \
+	Mrmwci.c	Mrmwcrw.c	Mrmwcrwr.c	Mrmwread.c \
+	Mrmwrefs.c	Mrmwvalues.c	Mrmwwrite.c
+
+OBJS =	MrmIbuffer.o	MrmIentry.o	MrmIfile.o	MrmIheader.o \
+	MrmIindex.o	MrmIindexw.o	MrmIrid.o	MrmIswap.o \
+	MrmItop.o 	MrmItopw.o	Mrmappl.o \
+	Mrmcontext.o	Mrmerror.o	Mrmhier.o	Mrmicon.o \
+	Mrminit.o	Mrmlread.o	Mrmlwrite.o	Mrmmodule.o \
+	Mrmptrlist.o	Mrmtable.o	Mrmtime.o	Mrmvm.o \
+	Mrmwci.o	Mrmwcrw.o	Mrmwcrwr.o	Mrmwread.o \
+	Mrmwrefs.o	Mrmwvalues.o	Mrmwwrite.o
+
+HEADERS = MrmDecls.h	MrmPublic.h	MrmAppl.h
+BUILD_INSTALL_HEADERS = IDB.h Mrm.h MrmWidget.h /* for installed builds */
+
+LibraryObjectRule()
+
+/* For install of developer's build environment */
+LOCAL_BINSTALL_LIBDEST = lib
+LOCAL_BINSTALL_INCLUDEDEST = include/Mrm
+
+#if DoSharedLib
+#if DoNormalLib
+SharedLibraryTarget(Mrm,$(SOMRMREV),$(OBJS),shared,..)
+#else
+SharedLibraryTarget(Mrm,$(SOMRMREV),$(OBJS),.,.)
+#endif
+SharedLibraryBuildInstall(Mrm,$(SOMRMREV),$(LOCAL_BINSTALL_LIBDEST))
+InstallSharedLibrary(Mrm,$(SOMRMREV),$(USRLIBDIR))
+#ifdef DEBUGTREE
+#if DoNormalLib
+SharedLibraryTarget(Mrm_d,$(SOXMREV),$(OBJS),shared,..)
+#else
+SharedLibraryTarget(Mrm_d,$(SOXMREV),$(OBJS),.,.)
+#endif
+SharedLibraryBuildInstall(Mrm_d,$(SOXMREV),$(LOCAL_BINSTALL_LIBDEST))
+InstallSharedLibrary(Mrm_d,$(SOXMREV),$(USRLIBDIR))
+#endif /* DEBUGTREE */
+#endif
+#if DoNormalLib
+NormalLibraryTarget(Mrm,$(OBJS))
+NormalLibraryBuildInstall(Mrm,$(LOCAL_BINSTALL_LIBDEST))
+InstallLibrary(Mrm,$(USRLIBDIR))
+#endif
+#if DoProfileLib
+ProfiledLibraryTarget(Mrm,$(OBJS))
+InstallLibrary(Mrm_p,$(USRLIBDIR))
+#endif
+#if DoDebugLib
+DebuggedLibraryTarget(Mrm,$(OBJS))
+InstallLibrary(Mrm_d,$(USRLIBDIR))
+#endif
+
+LintLibraryTarget(Mrm,$(SRCS))
+InstallLintLibrary(Mrm,$(LINTLIBDIR))
+
+BuildIncludes($(HEADERS),Mrm,..)
+
+BuildMultipleInstall($(HEADERS) $(BUILD_INSTALL_HEADERS),$(LOCAL_BINSTALL_INCLUDEDEST))
+InstallMultiple($(HEADERS),$(USRINCDIR)/Mrm)
+DependTarget()
+
+NormalLintTarget($(SRCS))
+
+#ifdef UseVista
+VistaMapRule(libMrm.M,libMrm.a)
+#endif

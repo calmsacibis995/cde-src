@@ -1,0 +1,34 @@
+XCOMM $XConsortium: Imakefile /main/cde1_maint/4 1995/10/24 07:40:59 mgreess $
+DESKTOP_VERSION_STRING = DesktopVersionString
+
+MODULE=dtprintegrate
+
+OBJS = version.o
+
+SRCS = version.c
+
+MSGPROGRAMS=dtlp
+/*******************************
+#ifdef BandAidCompiler
+#include BandAidCompiler
+#endif
+*******************************/
+CPP_DEFINES = -DCDE_INSTALLATION_TOP=$(CDE_INSTALLATION_TOP) \
+                    -DCDE_CONFIGURATION_TOP=$(CDE_CONFIGURATION_TOP)
+
+#if defined (SunArchitecture)
+LOCAL_CPP_DEFINES = $(CPP_DEFINES) -D__sun
+#elif defined (AlphaArchitecture)
+LOCAL_CPP_DEFINES = $(CPP_DEFINES) -D__osf__
+#else
+LOCAL_CPP_DEFINES = $(CPP_DEFINES)
+#endif
+
+CppTextRule(dtprintegrate,dtprintegrate.src,$(LOCAL_CPP_DEFINES),)
+CppTextRule(dtlp,dtlp.src,$(LOCAL_CPP_DEFINES),)
+CppTextRule(dtlpsetup,dtlpsetup.src,$(LOCAL_CPP_DEFINES),)
+
+all:: dtprintegrate dtlp dtlpsetup
+	chmod +x dtprintegrate
+	chmod +x dtlp
+	chmod +x dtlpsetup

@@ -1,0 +1,83 @@
+(0) Do you realize that solaris_parse() translates V3 into MIME on the fly,
+    and may or maynot keep the translation in a file as a function of what
+    capability the client enables with respect to the IMAP4SUNVERSION
+    capability. Do you know what this is and why this is?
+
+I thought that the translation is only written back to the file if the
+OP_KEEP_MIME flag is provided to the mail_open call.
+
+When the imap4 driver receives an untagged CAPABILITY reply which contains
+the string "SUNVERSION", it just sets stream->sunvset to T.
+
+When stream->sunvset is T, the solaris driver appears to call mm_set_ignore
+(What should this do?) in various error situations, and also some checksum
+stuff.
+
+(1) Please read the rfc before we meet. Bring questions on that. 
+
+Done.
+
+(2) Look very closely at mail.c, mail.h and MailBox.cc.
+
+OK - I deleted the MailBox.cc you sent me as believed a new version of roam
+was imminent, and I thought it better to wait for the new version.
+
+I haven't yet had chance to investigate how searching works.
+
+(3) Look at imap4.c for imap_fetchshort() and be able to tell me how it
+    works.  Notice what sunversion is about, and how it deals with both
+    imap2 and imap4.
+
+If sunversion is set, then we can fetch the short info (Why??).  Ah - it
+looks like the SHORTINFO request is a Sun-specific extension.  Why isn't it
+standard?
+
+imap_fetchshort specifies a lookahead (20 by default) to fetch multiple
+messages at once, eg, a sequence such as "12:31".  The data for each message
+is returned in an untagged reply, which is parsed by imap_parse_unsolicited,
+which eventually calls imap_parse_shortinfo.
+
+* 12 FETCH (SHORTINFO ("28-Nov-1995 11:25:41 -0800" (("Richard Goldstein" NIL "rickg" "lamancha")) "Re: xthread's, my $0.02" "TEXT" "2484") FLAGS (\Seen) UID 13)
+
+The sinfo data is stored in the long cache and also copied to a
+user-supplied data structure, if provided.
+
+
+If a CAPABILITY request returns SUNVERSION, this implies the imapd supports
+IMAP2; if CAPABILITY includes IMAP4SUNVERSION, then the server supports
+IMAP4.  Presumably the imap4 driver sends (and expects to receive) different
+protocol for each case.
+
+(4) Look at namespace considerations.
+
+Namespaces are referred to by a '#' character in the mailbox name,
+eg. #mh/var/mail/jsc
+.. would refer to an MH directory.
+
+A driver flag specifies whether each driver understands namespaces.  The
+imap4 driver does, but the solaris driver does not (presumably because it
+only knows how to read solaris flat file mailboxes?).
+
+(5) Understand how callback mechanisms are used.
+
+It looks like callback functions are assumed to have an "mm_" prefix; these
+seem to be just directly called from the c-client.  I can't find any
+callback registry mechanism.
+
+(6) How does expunge work? Ie, mail_expunge(..)?
+    
+(7) How does mail_check() work?  WHat does GUI code need to do to handle
+    this right. What are the efficiency questions? I'll have more questions
+    for you as we progress.
+
+This can probably be a time-consuming operation (eg. if the status of an
+"early" message has been changed and the majority of the mailbox needs to be
+written out), so I guess the GUI should display an hourglass cursor.
+
+We plan to use multi-threading in our mid-end, so the user will still be
+able to operate on other folders while this folder is being saved to disk.
+
+
+I'm keeping a log of my investigations, eg. how mailboxes are opened, how
+messages are saved, how fetches are done, etc.  This addresses your question
+about mail_check - I'll forward this to you in a separate message.

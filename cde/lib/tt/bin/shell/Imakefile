@@ -1,0 +1,68 @@
+XCOMM $XConsortium: Imakefile /main/cde1_maint/2 1995/10/04 12:58:45 gtsang $
+/* bin/shell/Imakefile */
+
+TT_DIR = ../..
+#include "../../tooltalk.tmpl"
+/* find libtt locally */
+LOCAL_TTLIB_DIR=../../lib  /* reset library top for correct dependencies */
+
+XINCLUDES=
+CDEINCLUDES=
+
+/* General case INCLUDES DEFINES
+ * Each individual architecture may have more or less of the above.
+ * Use EXTRA_DEFINES and EXTRA_INCLUDES to add defines and includes
+ * to an individual architecture.
+ */
+DEFINES = -DTT_VERSION_STRING=\"$(TT_VERSION)\"
+INCLUDES = -I. -I../../lib
+
+/* DEPLIBS contains the list of library depencies for a client.
+ * LOCAL_LIBRARIES contains the list of libraries on the link line.
+ * Generally, the dependency form of a library has DEP as a prefix.
+ * e.g. put $(XLIB) in LOCAL_LIBRARIES and $(DEPXLIB) in DEPLIBS.
+ * NOTE: if DEPLIBS is not set here, it is by default null and there
+ *       are no library dependencies for clients.
+ *       You cannot put -Llibpath into DEPLIBS. You must put actual
+ *       paths to the library.
+ */
+DEPLIBS = $(DEPTTLIB_AND_MAYBE_XLIB)
+LOCAL_LIBRARIES = $(TTLIB_AND_MAYBE_XLIB) ../../lib/util/copyright.o 
+
+/* put EXTRA_DEFINES and EXTRA_INCLUDES and anything else below */
+#ifdef HpArchitecture
+#endif
+
+#ifdef SunArchitecture
+SYS_LIBRARIES = -ldl $(I18NSYSLIB)
+EXTRA_DEFINES = -D_REENTRANT -DSVR4 -DOS_VERSION=OSMajorVersion -DOS_MINOR_VERSION=OSMinorVersion 
+#endif
+
+#ifdef RsArchitecture
+#endif
+
+#ifdef USLArchitecture
+#endif
+
+#ifdef UXPArchitecture
+#endif
+
+SRCS1 = ttmv.C mover.C
+SRCS2 = ttrm.C remover.C
+SRCS3 = ttcp.C copier.C
+
+OBJS1 = ttmv.o mover.o  $(NONSHAREDLIBCOBJ)
+OBJS2 = ttrm.o remover.o $(NONSHAREDLIBCOBJ)
+OBJS3 = ttcp.o copier.o $(NONSHAREDLIBCOBJ)
+
+PROGRAMS = ttmv ttrm ttcp
+
+/* Build the .o's */
+NormalLibraryObjectRule()
+ComplexProgramTarget_1(ttmv,$(LOCAL_LIBRARIES),/**/)
+ComplexProgramTarget_2(ttrm,$(LOCAL_LIBRARIES),/**/)
+ComplexProgramTarget_3(ttcp,$(LOCAL_LIBRARIES),/**/)
+
+ttrmdir:        ttrm
+	rm -f ttrmdir;ln ttrm ttrmdir
+

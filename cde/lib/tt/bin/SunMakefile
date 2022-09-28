@@ -1,0 +1,29 @@
+# %%  (c) Copyright 1993, 1994 Hewlett-Packard Company			
+# %%  (c) Copyright 1993, 1994 International Business Machines Corp.	
+# %%  (c) Copyright 1993, 1994 Sun Microsystems, Inc.			
+# %%  (c) Copyright 1993, 1994 Novell, Inc. 				
+# %%  $Revision: $ 			 				
+# @(#)SunMakefile	1.6 93/07/31
+# The ToolTalk binary directory Makefile
+#
+# Copyright (c) 1991 by Sun Microsystems, Inc.
+#
+
+TT_DIR = ..
+
+THIS_DIR = bin
+
+SUBDIRS = dbck shell scripts tt_type_comp ttdbserverd ttsession tttar tttrace
+
+# I can't decide whether the following is a gross hack or a clever
+# optimization. The effect is to NOT descend into the subdirectories
+# of bin when making the Proto targets, since nothing in the bin directories
+# goes into proto.
+proto-%	:=	SUBDIRS = 
+
+# Similarly, only go into the ttsession directory when bulding backbone
+bb-%	:=	SUBDIRS = ttsession
+
+include $(TT_DIR)/SunMakefile-head.mk
+
+include $(TT_DIR)/SunMakefile-tail.mk

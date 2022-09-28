@@ -1,0 +1,161 @@
+# "@(#)Makefile.sun	1.40 96/05/06 SMI"
+
+.NO_PARALLEL:
+
+# List of subdirectories to be "made" by default when none are specified
+# Make sure 'Init' is the last item in the list
+SUBDIRS	= DataTypes DataStructs Utils TranObjs CtrlObjs DataObjs PortObjs \
+	  DataStore Manager TemplateExpand
+PROGDIRS = TestApps/sdmtest TestApps/sdmporttest
+
+# Hooks to perform removes for make clean
+RM = /bin/rm -f
+RM_CMD = $(RM) *.i *.CKP *.ln *.BAK *.bak *.o core errs ,* *~ *.a .emacs_* \
+	tags TAGS OOBR-FTR make.log make.out MakeOut .make.state
+AR = ar cq
+CC-G = CC -G -ztext
+MAKE:sh = PMAKEPATH=/opt/SUNWspro/ParallelMake/bin/make ; \
+	if [ -x ${PMAKEPATH} -a -z "$PROHIBIT_PMAKE" ] ; then \
+	echo ${PMAKEPATH} ; else echo make; fi
+
+# PMAKE_OFF is ued to force a regular make as opposed to a parallel make
+# set PMAKE_OFF to -R only if pmake is in effect
+PMAKE_OFF:sh = PMAKEPATH=/opt/SUNWspro/ParallelMake/bin/make ; \
+	if [ -x ${PMAKEPATH} -a -z "$PROHIBIT_PMAKE" ] ; then \
+	echo '-R'; else echo ''; fi
+
+LIBSDM.a = ../lib/libSDtMail.a
+LIBSDM.so = ../lib/libSDtMail.so
+
+# Default is to build the shared variant
+VARIANT = shared
+
+shared := VARIANT = shared
+shared := OBJDIR = ../shared_objs
+shared := SDM_LIBRARY = $(LIBSDM.so)
+
+static := VARIANT = static
+static := OBJDIR = ../static_objs
+static := SDM_LIBRARY = $(LIBSDM.a)
+
+shared: all
+
+static: all
+
+all: blurb subdirs $$(SDM_LIBRARY) testapps
+
+world: Makefiles all
+
+World: world
+
+# When using shared (the default), this is all that's required to build
+# the module .so's and the test programs.
+most: blurb subdirs testapps
+
+blurb:
+	@echo '>>>>>>> Top Level Make Activated <<<<<<'
+	@echo
+	@echo "Using $(MAKE)"
+	@echo "Building $(VARIANT) variant"
+	@echo
+
+#build_all:
+#	@echo '>>>>>>> Top Level Make Activated <<<<<<'
+#	@echo
+#	@echo "Using $(MAKE)"
+#	@echo "Building $(VARIANT) variant"
+#	@echo
+#	@(MAKEFLAGS=; export MAKEFLAGS; $(MAKE) $(MFLAGS) subdirs VARIANT=$(VARIANT))
+#	@(MAKEFLAGS=; export MAKEFLAGS; $(MAKE) $(MFLAGS) $(PMAKE_OFF) $(SDM_LIBRARY))
+#	@(MAKEFLAGS=; export MAKEFLAGS; $(MAKE) $(MFLAGS) testapps VARIANT=$(VARIANT))
+
+# Rule for 'subdirs':
+# This rule causes all subdirs (library modules) to be re-made as necessary
+subdirs:
+	@for i in $(SUBDIRS) ; \
+	do \
+	  (MAKEFLAGS=; export MAKEFLAGS; cd $$i ; echo "Making all in module $$i"; \
+	    $(MAKE) $(MFLAGS) $(VARIANT); \
+	  ); \
+	done
+
+# Rule for 'testapps':
+# This rule causes all test applications to be re-made as necessary
+testapps:
+	@for i in $(PROGDIRS) ;\
+	do \
+	( MAKEFLAGS=; export MAKEFLAGS; cd $$i ;  echo "Making all in module $$i"; \
+	   $(MAKE) $(MFLAGS) $(VARIANT) ); \
+	done
+
+Makefiles:
+	@for i in $(SUBDIRS) $(PROGDIRS) ; \
+	do \
+	  (MAKEFLAGS=; export MAKEFLAGS; cd $$i ; echo "Making Makefiles in module $$i"; \
+	    $(MAKE) $(MFLAGS) -f Makefile.sun Makefiles ; \
+	  ); \
+	done
+	ln -s Makefile.sun Makefile
+
+
+# Rule for 'make clean'
+clean:
+	@$(RM) -f .make.state
+	@for i in $(SUBDIRS) $(PROGDIRS) ;\
+	do \
+	  (MAKEFLAGS=; export MAKEFLAGS; cd $$i ; echo "Cleaning all in module $$i"; \
+	  $(MAKE) $(PMAKE_OFF) $(MFLAGS) RM_CMD='$(RM_CMD)' clean); \
+	done
+	@-$(RM) ../shared_objs/*.o ../static_objs/*.o \
+	  $(LIBSDM.a) $(LIBSDM.so) \
+	  */.make.* */*/.make.* */*/*/.make.* \
+	  */Templates.DB/* */Templates.DB/Module.DB/* \
+	  */*/Templates.DB/* */*/Templates.DB/Module.DB/* \
+	  ../*objs/Templates.DB/* \
+	  ../*objs/Templates.DB/Module.DB/* \
+	  ../*objs/Templates/Templates.DB/Module.DB/* > /dev/null 2>&1
+
+# Rule to rebuild tags for use with XEmacs
+etags:
+	if [ -x /sbin/zsh ] ; then \
+	  zsh -c 'setopt extendedglob; \
+	         etags **/*.{cc,hh}~*SCCS/*'; \
+	else \
+	  etags `find . \( -name SCCS -o -name Obsolete \) -prune \
+	         -o \( -name '*.cc' -o -name '*.hh' \) -print`; \
+	fi
+
+# ctags users - add your command here.
+# If we have none, let `make tags' be a synonym for `make etags'
+tags: etags
+
+# Rule to rebuild XEmacs' Object Oriented Browser database.
+# Imperfect, since it requires an intial OOBR specification file.
+oobr:
+	xemacs -batch -q -l br-start.el $(PWD)/OOBR -f br-env-batch-build
+
+# rule for 'make lib'
+# This rule assumes that all of the object files for the library have 
+# been made, and that the library make step is all that is left. Used
+# primarily when developing individual modules when you want to "remake
+# the library" after compiling that module without having to step 
+# through a full make of all the others. It must be invoked when in
+# the top level source directory.
+static_libs: $(LIBSDM.a)
+shared_libs: $(LIBSDM.so)
+
+# Rules for static libraries
+$(LIBSDM.a) := OBJDIR = ../static_objs
+$(LIBSDM.a): $$(OBJDIR)/*.o
+	@echo "Creating $(LIBSDM.a) library..."
+	$(CCC) -xar -ptr$(OBJDIR) $(OBJDIR)/*.o -o $@
+
+# Rules for shared libraries
+$(LIBSDM.so) := OBJDIR = ../shared_objs
+$(LIBSDM.so): $$(OBJDIR)/*.o
+	@echo "Creating $(LIBSDM.so) library..."
+	$(CC-G) -ptr$(OBJDIR) $(OBJDIR)/*.o -o $@
+
+# rule for individual subdirectories - so 'make subdir' will work
+$(SUBDIRS):
+	(MAKEFLAGS=; export MAKEFLAGS; cd $* ; echo "Making all in module $*"; $(MAKE) $(MFLAGS) )

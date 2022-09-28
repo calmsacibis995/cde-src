@@ -1,0 +1,92 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+...\" **
+...\" **
+...\" **  (c) Copyright 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **
+.TH XmGetSecondaryResourceData 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmGetSecondaryResourceData\fP \- A function that provides access to secondary widget resource data
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/Xm.h>
+.sp \n(PDu
+Cardinal XmGetSecondaryResourceData (\fBwidget_class, secondary_data_return\fI)
+.ta .5i 2.5i
+.nf
+	WidgetClass	\fBwidget_class\fI;
+	XmSecondaryResourceData	**\fBsecondary_data_return\fI;
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+Some Motif widget classes (such as Gadget, Text, and VendorShell) have
+resources that are not accessible via the functions
+\fIXtGetResourceList\fP and \fIXtGetConstraintResourceList\fP.
+In order to retrieve the descriptions of these resources, an application
+must use \fIXmGetSecondaryResourceData\fP.
+.PP
+When a widget class has such resources, this function provides
+descriptions of the resources in one or more data structures.
+\fIXmGetSecondaryResourceData\fP takes a widget class argument and
+returns the number of these data structures associated with the widget
+class.
+If the return value is greater than 0, the function allocates and fills
+an array of pointers to the corresponding data structures.
+It returns this array at the address that is the value of the
+\fBsecondary_data_return\fP argument.
+.PP
+The type \fIXmSecondaryResourceData\fP is a pointer to a structure with
+two members that are useful to an application: \fBresources\fP, of type
+\fIXtResourceList\fP, and \fBnum_resources\fP, of type \fICardinal\fP.
+The \fBresources\fP member is a list of the widget resources that are
+not accessible using Xt functions.
+The \fBnum_resources\fP member is the length of the \fBresources\fP
+list.
+.PP
+If the return value is greater than 0, \fIXmGetSecondaryResourceData\fP
+allocates memory that the application must free.
+Use \fIXtFree\fP to free the resource list in each structure (the value
+of the \fBresources\fP member), the structures themselves, and the array
+of pointers to the structures (the array whose address is
+\fBsecondary_data_return\fP).
+.IP "\fBwidget_class\fP"
+Specifies the widget class for which secondary resource data is to be
+retrieved.
+.IP "\fBsecondary_data_return\fP"
+Specifies a pointer to an array of \fIXmSecondaryResourceData\fP
+pointers to be returned by this function.
+If the widget class has no secondary resource data (i.e., if the value
+returned by the function is 0), the function returns no meaningful value
+for this argument.
+.SH RETURN VALUE
+Returns the number of secondary resource data structures associated with
+this widget class.
+.SH EXAMPLE
+The following example uses \fIXmGetSecondaryResourceData\fP to print the
+names of the secondary resources of the Motif Text widget and then frees
+the data allocated by the function:
+.oS
+XmSecondaryResourceData * block_array ;
+Cardinal num_blocks, i, j ;
+if (num_blocks = XmGetSecondaryResourceData (xmTextWidgetClass, 
+                                             &block_array)) {
+  for (i = 0; i < num_blocks; i++) {
+    for (j = 0 ; j < block_array[i]->num_resources; j++) {
+      printf("%s\en", block_array[i]->resources[j].resource_name);
+    }
+    XtFree((char*)block_array[i]->resources);
+    XtFree((char*)block_array[i]);
+  }
+  XtFree((char*)block_array);
+}
+.oE

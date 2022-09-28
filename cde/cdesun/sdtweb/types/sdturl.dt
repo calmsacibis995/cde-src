@@ -1,0 +1,363 @@
+###############################################################################
+#
+#    sdturl.dt
+#
+#    Action and DataType definitions for Uniform Resource Location (URL) support
+#
+#    (c) Copyright 1996 Sun Microsystems, Inc.
+#
+#    @(#)sdturl.dt	1.6 97/03/26 SMI
+#
+###############################################################################
+
+set DtDbVersion=1.0
+
+###############################################################################
+#
+# WARNING:  This file may be overwritten in subsequent installations of
+#     the Common Desktop Environment (CDE).  Consequently, any system wide
+#     changes should be made to an equivalent database file in
+#     /etc/dt/apconfig/types and not in this file.
+#
+###############################################################################
+
+##############################################################################
+#
+#  WEB_URL Datatype for web browser URL's
+#
+
+DATA_ATTRIBUTES WEB_URL
+{
+        ACTIONS         Open,Browse,Edit,Print
+        IS_TEXT         true
+	ICON            SDturlweb
+        NAME_TEMPLATE   %s.url
+        MIME_TYPE       text/x-url
+        DESCRIPTION     This file is a text file containing an Web Browser \
+			Uniform Resource Locator (URL). These include HTTP, \
+			FTP, Gopher, WAIS and NetNews services.\
+			Its datatype is named WEB_URL.
+}
+
+DATA_CRITERIA WEB_URL1
+{
+        DATA_ATTRIBUTES_NAME    WEB_URL
+        MODE                    f&!x
+        CONTENT                 0 string http://|   0 string HTTP://|\
+				0 string ftp://| 0 string FTP://|\
+				0 string gopher://| 0 string GOPHER://|\
+				0 string wais://|   0 string WAIS://|\
+				0 string news:|     0 string NEWS:|\
+				0 string www.
+}
+
+ACTION Open
+{
+	LABEL		Open
+	ARG_TYPE	WEB_URL
+	TYPE		MAP
+	MAP_ACTION	Browse
+}
+
+ACTION Browse
+{
+	LABEL		Browse
+	ARG_TYPE	WEB_URL
+	TYPE		MAP
+	MAP_ACTION	WebBrowser
+}
+
+ACTION Edit
+{
+	LABEL		Edit
+	ARG_TYPE	WEB_URL
+	TYPE		MAP
+	MAP_ACTION	SDtUrlEditor
+}
+
+##############################################################################
+#
+#  FILE_URL Datatype for local file path URL's
+#
+
+DATA_ATTRIBUTES FILE_URL
+{
+        ACTIONS         Open,Edit,Print
+        IS_TEXT         true
+	ICON            SDturlfile
+	NAME_TEMPLATE	%s.url
+        MIME_TYPE       text/x-url
+        DESCRIPTION     This file is a text file containing a local file path \
+			Uniform Resource Locator (URL). \
+			Its datatype is named FILE_URL.
+}
+
+DATA_CRITERIA FILE_URL1
+{
+        DATA_ATTRIBUTES_NAME    FILE_URL
+        MODE                    f&!x
+        CONTENT                 0 string file:/| 0 string FILE:/|\
+				0 string nfs:/| 0 string NFS:/
+}
+
+ACTION Open
+{
+	LABEL		Open
+	ARG_TYPE	FILE_URL
+	TYPE		MAP
+	MAP_ACTION	FileUrl_Open
+}
+
+ACTION Edit
+{
+	LABEL		Edit
+	ARG_TYPE	FILE_URL
+	TYPE		MAP
+	MAP_ACTION	SDtUrlEditor
+}
+
+ACTION Print
+{
+	LABEL		Print
+	ARG_TYPE	FILE_URL
+	TYPE		MAP
+	MAP_ACTION	FileUrl_Print
+}
+
+ACTION FileUrl_Open
+{
+	LABEL		Open File URL
+	ICON		Dtpenpd
+	ARG_TYPE	FILE_URL
+	WINDOW_TYPE	NO_STDIO
+	TYPE		COMMAND
+	EXEC_STRING	sh -c '\
+			URL="`head -1 \\"%Arg_1%\\"`" ; \
+			FILE="`echo \${URL} | cut -f2- -d:`" ; \
+			dtaction Open "\${FILE}" '
+	DESCRIPTION	The Open File URL action takes a file containing \
+			a Uniform Resource Location (URL) and opens it \
+			as appropriate for the type of file referenced.
+}
+
+ACTION FileUrl_Print
+{
+	LABEL		Print File URL
+	ICON		Dtpenpd
+	ARG_TYPE	FILE_URL
+	WINDOW_TYPE	NO_STDIO
+	TYPE		COMMAND
+	EXEC_STRING	sh -c '\
+			URL="`head -1 \\"%Arg_1%\\"`" ; \
+			FILE="`echo \${URL} | cut -f2- -d:`" ; \
+			dtaction Print "\${FILE}" '
+	DESCRIPTION	The Open File URL action takes a file containing \
+			a Uniform Resource Location (URL) and prints it \
+			as appropriate for the type of file referenced.
+}
+
+
+##############################################################################
+#
+#  MAILTO_URL Datatype for mail compose (mailto) service URL's
+#
+
+DATA_ATTRIBUTES MAILTO_URL
+{
+        ACTIONS         Open,Edit
+        IS_TEXT         true
+	ICON            SDturlmailto
+	NAME_TEMPLATE	%s.mailto
+        MIME_TYPE       text/x-url
+        DESCRIPTION     This file is a text file containing a mail compose \
+			(mailto) service Uniform Resource Locator (URL). \
+			Its datatype is named MAILTO_URL.
+}
+
+DATA_CRITERIA MAILTO_URL1
+{
+        DATA_ATTRIBUTES_NAME    MAILTO_URL
+        MODE                    f&!x
+        CONTENT                 0 string mailto:| 0 string MAILTO:
+}
+
+ACTION Open
+{
+	LABEL		Open
+	ARG_TYPE	MAILTO_URL
+	TYPE		MAP
+	MAP_ACTION	MailTo
+}
+
+ACTION Edit
+{
+	LABEL		Edit
+	ARG_TYPE	MAILTO_URL
+	TYPE		MAP
+	MAP_ACTION	SDtUrlEditor
+}
+
+ACTION MailTo
+{
+	LABEL		Mail To
+	ARG_TYPE	MAILTO_URL
+	ARG_COUNT	1
+	TYPE		COMMAND
+	WINDOW_TYPE	NO_STDIO
+	EXEC_STRING	sh -c '\
+			URL="`head -1 \\"%Arg_1%\\"`" ; \
+			ADDR="`echo \${URL} | cut -f2- -d:`" ; \
+			exec dtmail -T "\${ADDR}"'
+}
+
+##############################################################################
+#
+#  RLOGIN_URL Datatype for remote login (rlogin or telnet) service URL's
+#
+
+DATA_ATTRIBUTES RLOGIN_URL
+{
+        ACTIONS         Open,Edit
+        IS_TEXT         true
+	ICON            SDturlrlogin
+	NAME_TEMPLATE	%s.url
+        MIME_TYPE       text/x-url
+        DESCRIPTION     This file is a text file containing a remote \
+			login (rlogin or telnet) service Uniform Resource \
+			Locator (URL).  Its datatype is named RLOGIN_URL. \
+			RLOGIN_URL files contain the characters "rlogin:" \
+			or "telnet:".
+}
+
+DATA_CRITERIA RLOGIN_URL1
+{
+        DATA_ATTRIBUTES_NAME    RLOGIN_URL
+        MODE                    f&!x
+        CONTENT                 0 string rlogin:| 0 string RLOGIN:|\
+				0 string telnet:| 0 string TELNET:
+}
+
+ACTION Open
+{
+	LABEL		Open
+	ARG_TYPE	RLOGIN_URL
+	TYPE		MAP
+	MAP_ACTION	Rlogin_Open
+}
+
+ACTION Edit
+{
+	LABEL		Edit
+	ARG_TYPE	RLOGIN_URL
+	TYPE		MAP
+	MAP_ACTION	SDtUrlEditor
+}
+
+ACTION Rlogin_Open
+{
+	LABEL		Open Rlogin Terminal
+	ICON		Dtterm
+	ARG_TYPE	RLOGIN_URL
+	WINDOW_TYPE	PERM_TERMINAL
+	TERM_OPTS	-title "Remote Login"
+	EXEC_STRING	sh -c '\
+			URL="`head -1 \\"%Arg_1%\\"`" ; \
+			HOST="`echo \${URL} | cut -c10- -`" ; \
+			CMD="`echo \${URL}|cut -f1 -d:|tr '[A-Z]' '[a-z]'`" ; \
+			if [ "\${CMD}" = "rlogin" ] ; then \
+			  CMD=\${RLOGIN:-rlogin} ; \
+			else \
+			  CMD=\${TELNET:-telnet} ; \
+			fi ; \
+			\${CMD} \${HOST}'
+}
+
+
+##############################################################################
+#
+#  SDtUrlEditor placeholder for future UrlEditor command
+#  For now map to TextEditor
+#
+
+ACTION SDtUrlEditor
+{
+	LABEL		URL Editor
+	ICON		Dtpenpd
+	ARG_TYPE	WEB_URL,FILE_URL,MAILTO_URL,RLOGIN_URL
+	ARG_COUNT	1
+	TYPE		MAP
+	MAP_ACTION	TextEditor
+}
+
+##############################################################################
+#
+#  SDtSampleBookmarks action
+#
+
+set samplebookmarks_err=dterror.ds "Sample URL Bookmarks folder unavailable.\\n\\n\$URLDIR does not exist" "No Bookmarks" "OK" 
+
+ACTION SDtSampleBookmarks
+{
+	LABEL		Sample Bookmarks
+	ICON		SDturlfile
+	ARG_COUNT	0
+	WINDOW_TYPE	NO_STDIO
+	TYPE		COMMAND
+	EXEC_STRING	sh -c ' \
+			URLDIR=/usr/dt/share/examples/bookmarks ; \
+			if [ -d \$URLDIR ] ; then \
+			  dtaction Open \$URLDIR ; \
+			else \
+			  $samplebookmarks_err ; \
+			fi'
+	DESCRIPTION	This action opens a folder of sample bookmarks. \
+			The bookmarks are a variety of URL (Uniform \
+			Resource Location) files such as WEB_URL and FILE_URL.
+}
+
+##############################################################################
+#
+#  SDtPersonalBookmarks actions
+#
+
+set personalbookmarksdir=\$HOME/.dt/bookmarks
+
+ACTION SDtPersonalBookmarks
+{
+	LABEL		Personal Bookmarks
+	ICON		SDturlfile
+	ARG_COUNT	0
+	WINDOW_TYPE	NO_STDIO
+	TYPE		COMMAND
+	EXEC_STRING	sh -c ' \
+			BOOKMARKS=$personalbookmarksdir ; \
+			if [ ! -d \$BOOKMARKS ] ; then \
+			  /bin/mkdir -p \$BOOKMARKS ; \
+			  /bin/chmod +w \$BOOKMARKS ; \
+			fi ; \
+			dtaction Open \$BOOKMARKS ; '
+	DESCRIPTION	This action opens a folder of personal bookmarks. \
+			The bookmarks are a variety of URL (Uniform \
+			Resource Location) files such as WEB_URL and FILE_URL.
+}
+
+ACTION SDtPersonalBookmarksAppend
+{
+	LABEL		Append to Personal Bookmarks
+	ICON		SDturlfile
+	ARG_TYPE	WEB_URL,FILE_URL,MAILTO_URL,RLOGIN_URL
+	ARG_COUNT	1
+	WINDOW_TYPE	NO_STDIO
+	TYPE		COMMAND
+	EXEC_STRING	sh -c ' \
+			URLFILE="%Arg_1%" ; \
+			BOOKMARKS=$personalbookmarksdir ; \
+			if [ ! -d \$BOOKMARKS ] ; then \
+			  /bin/mkdir -p \$BOOKMARKS ; \
+			fi ; \
+			/bin/chmod +w "\$URLFILE" ; \
+			/bin/cp "\$URLFILE" "\$BOOKMARKS" ; '
+	DESCRIPTION	This action copies the URL file argument into \
+			the user's personal bookmarks folder. 
+}
+

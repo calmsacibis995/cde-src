@@ -1,0 +1,325 @@
+.TH Tt/tttk.h 5 "17 April 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH "NAME"
+Tt/tttk.h \- ToolTalk definitions
+.SH "SYNOPSIS"
+.yS
+#include <Tt/tttk.h>
+.yE
+.SH "DESCRIPTION"
+.P
+The
+.Hd Tt/tttk.h
+header defines the following enumeration data type,
+with at least the following members:
+.VL 6
+.na
+.LI \f3Tttk_op\fP
+.br
+.Cn TTDT_CREATED ,
+.Cn TTDT_DELETED ,
+.Cn TTDT_DO_COMMAND ,
+.Cn TTDT_GET_ENVIRONMENT ,
+.Cn TTDT_GET_GEOMETRY ,
+.Cn TTDT_GET_ICONIFIED ,
+.Cn TTDT_GET_LOCALE ,
+.Cn TTDT_GET_MAPPED ,
+.Cn TTDT_GET_MODIFIED ,
+.Cn TTDT_GET_SITUATION ,
+.Cn TTDT_GET_STATUS ,
+.Cn TTDT_GET_SYSINFO ,
+.Cn TTDT_GET_XINFO ,
+.Cn TTDT_LOWER ,
+.Cn TTDT_MODIFIED ,
+.Cn TTDT_MOVED ,
+.Cn TTDT_OP_LAST ,
+.Cn TTDT_OP_NONE ,
+.Cn TTDT_PAUSE ,
+.Cn TTDT_QUIT ,
+.Cn TTDT_RAISE ,
+.Cn TTDT_RESUME ,
+.Cn TTDT_REVERT ,
+.Cn TTDT_REVERTED ,
+.Cn TTDT_SAVE ,
+.Cn TTDT_SAVED ,
+.Cn TTDT_SET_ENVIRONMENT ,
+.Cn TTDT_SET_GEOMETRY ,
+.Cn TTDT_SET_ICONIFIED ,
+.Cn TTDT_SET_LOCALE ,
+.Cn TTDT_SET_MAPPED ,
+.Cn TTDT_SET_SITUATION ,
+.Cn TTDT_SET_XINFO ,
+.Cn TTDT_SIGNAL ,
+.Cn TTDT_STARTED ,
+.Cn TTDT_STATUS ,
+.Cn TTDT_STOPPED ,
+.Cn TTME_ABSTRACT ,
+.Cn TTME_COMPOSE ,
+.Cn TTME_DEPOSIT ,
+.Cn TTME_DISPLAY ,
+.Cn TTME_EDIT ,
+.Cn TTME_INTERPRET ,
+.Cn TTME_MAIL ,
+.Cn TTME_MAIL_COMPOSE ,
+.Cn TTME_MAIL_EDIT ,
+.Cn TTME_PRINT ,
+.Cn TTME_TRANSLATE
+.LE
+.P
+.ad
+The header declares the following global
+string constants for some standard vtypes:
+.P
+.yS
+extern const char  *Tttk_boolean:
+extern const char  *Tttk_file:
+extern const char  *Tttk_height:
+extern const char  *Tttk_integer:
+extern const char  *Tttk_message_id:
+extern const char  *Tttk_string:
+extern const char  *Tttk_title:
+extern const char  *Tttk_width:
+extern const char  *Tttk_xoffset:
+extern const char  *Tttk_yoffset:
+.yE
+.P
+The header declares the following as functions:
+.P
+.yS
+.ta \w'int ttdt_Get_Modified('u
+int ttdt_Get_Modified(Tt_message \f2context\fP,
+	const char *\f2pathname\fP,
+	Tt_scope \f2the_scope\fP,
+	XtAppContext \f2app2run\fP,
+	int \f2ms_timeout\fP);
+.yE
+.P
+.yS
+.ta \w'Tt_status ttdt_Revert('u
+Tt_status ttdt_Revert(Tt_message \f2context\fP,
+	const char *\f2pathname\fP,
+	Tt_scope \f2the_scope\fP,
+	XtAppContext \f2app2run\fP,
+	int \f2ms_timeout\fP);
+.yE
+.P
+.yS
+.ta \w'Tt_status ttdt_Save('u
+Tt_status ttdt_Save(Tt_message \f2context\fP,
+	const char *\f2pathname\fP,
+	Tt_scope \f2the_scope\fP,
+	XtAppContext \f2app2run\fP,
+	int \f2ms_timeout\fP);
+.yE
+.P
+.yS
+.ta \w'Tt_status ttdt_close('u
+Tt_status ttdt_close(const char *\f2procid\fP,
+	const char *\f2new_procid\fP,
+	int \f2sendStopped\fP);
+.yE
+.P
+.yS
+.ta \w'Tt_status ttdt_file_event('u
+Tt_status ttdt_file_event(Tt_message \f2context\fP,
+	Tttk_op \f2event\fP,
+	Tt_pattern *\f2patterns\fP,
+	int \f2send\fP);
+.yE
+.P
+.yS
+.ta \w'Tt_pattern *ttdt_file_join('u
+Tt_pattern *ttdt_file_join(const char *\f2pathname\fP,
+	Tt_scope \f2the_scope\fP,
+	int \f2join\fP,
+	Ttdt_file_cb \f2cb\fP,
+	void *\f2clientdata\fP);
+.yE
+.P
+.yS
+.ta \w'Tt_message ttdt_file_notice('u
+Tt_message ttdt_file_notice(Tt_message \f2context\fP,
+	Tttk_op \f2op\fP,
+	Tt_scope \f2scope\fP,
+	const char *\f2pathname\fP,
+	int \f2send_and_destroy\fP);
+.yE
+.P
+.yS
+.ta \w'Tt_status ttdt_file_quit('u
+Tt_status ttdt_file_quit(Tt_pattern *\f2patterns\fP,
+	int \f2quit\fP);
+.yE
+.P
+.yS
+.ta \w'Tt_message ttdt_file_request('u
+Tt_message ttdt_file_request(Tt_message \f2context\fP,
+	Tttk_op \f2op\fP,
+	Tt_scope \f2scope\fP,
+	const char *\f2pathname\fP,
+	Ttdt_file_cb \f2cb\fP,
+	void *\f2client_data\fP,
+	int \f2send_and_destroy\fP);
+.yE
+.P
+.yS
+.ta \w'Tt_pattern *ttdt_message_accept('u
+Tt_pattern *ttdt_message_accept(Tt_message \f2contract\fP,
+	Ttdt_contract_cb \f2cb\fP,
+	void *\f2clientdata\fP,
+	Widget \f2shell\fP,
+	int \f2accept\fP,
+	int \f2sendStatus\fP);
+.yE
+.P
+.yS
+.ta \w'char *ttdt_open('u
+char *ttdt_open(int *\f2ttfd\fP,
+	const char *\f2toolname\fP,
+	const char *\f2vendor\fP,
+	const char *\f2version\fP,
+	int \f2sendStarted\fP);
+.yE
+.P
+.yS
+.ta \w'Tt_status ttdt_sender_imprint_on('u
+Tt_status ttdt_sender_imprint_on(const char *\f2handler\fP,
+	Tt_message \f2contract\fP,
+	char **\f2display\fP,
+	int *\f2width\fP,
+	int *\f2height\fP,
+	int *\f2xoffset\fP,
+	int *\f2yoffset\fP,
+	XtAppContext \f2app2run\fP,
+	int \f2ms_timeout\fP);
+.yE
+.P
+.yS
+.ta \w'Tt_pattern *ttdt_session_join('u
+Tt_pattern *ttdt_session_join(const char *\f2sessid\fP,
+	Ttdt_contract_cb \f2cb\fP,
+	Widget \f2shell\fP,
+	void *\f2clientdata\fP,
+	int \f2join\fP);
+.yE
+.P
+.yS
+.ta \w'Tt_status ttdt_session_quit('u
+Tt_status ttdt_session_quit(const char *\f2sessid\fP,
+	Tt_pattern *\f2sess_pats\fP,
+	int \f2quit\fP);
+.yE
+.P
+.yS
+.ta \w'Tt_pattern *ttdt_subcontract_manage('u
+Tt_pattern *ttdt_subcontract_manage(Tt_message \f2subcontract\fP,
+	Ttdt_contract_cb \f2cb\fP,
+	Widget \f2shell\fP,
+	void *\f2clientdata\fP);
+.yE
+.P
+.yS
+.ta \w'Tt_status ttmedia_Deposit('u
+Tt_status ttmedia_Deposit(Tt_message \f2load_contract\fP,
+	const char *\f2buffer_id\fP,
+	const char *\f2media_type\fP,
+	const unsigned char *\f2new_contents\fP,
+	int \f2new_len\fP,
+	const char *\f2pathname\fP,
+	XtAppContext \f2app2run\fP,
+	int \f2ms_timeout\fP);
+.yE
+.P
+.yS
+.ta \w'Tt_message ttmedia_load('u
+Tt_message ttmedia_load(Tt_message \f2context\fP,
+	Ttmedia_load_msg_cb \f2cb\fP,
+	void *\f2clientdata\fP,
+	Tttk_op \f2op\fP,
+	const char *\f2media_type\fP,
+	const unsigned char *\f2contents\fP,
+	int \f2len\fP,
+	const char *\f2file\fP,
+	const char *\f2docname\fP,
+	int \f2send\fP);
+.yE
+.P
+.yS
+.ta \w'Tt_message ttmedia_load_reply('u
+Tt_message ttmedia_load_reply(Tt_message \f2contract\fP,
+	const unsigned char *\f2new_contents\fP,
+	int \f2new_len\fP,
+	int \f2reply_and_destroy\fP);
+.yE
+.P
+.yS
+.ta \w'Tt_status ttmedia_ptype_declare('u
+Tt_status ttmedia_ptype_declare(const char *\f2ptype\fP,
+	int \f2base_opnum\fP,
+	Ttmedia_load_pat_cb \f2cb\fP,
+	void *\f2clientdata\fP,
+	int \f2declare\fP);
+.yE
+.P
+.yS
+.ta \w'void tttk_Xt_input_handler('u
+void tttk_Xt_input_handler(XtPointer \f2procid\fP,
+	int *\f2source\fP,
+	XtInputId *\f2id\fP);
+.yE
+.P
+.yS
+.ta \w'Tt_status tttk_block_while('u
+Tt_status tttk_block_while(XtAppContext \f2app2run\fP,
+	const int *\f2blocked\fP,
+	int \f2ms_timeout\fP);
+.yE
+.P
+.yS
+.ta \w'Tt_status tttk_message_abandon('u
+Tt_status tttk_message_abandon(Tt_message \f2msg\fP);
+.yE
+.P
+.yS
+.ta \w'Tt_message tttk_message_create('u
+Tt_message tttk_message_create(Tt_message \f2context\fP,
+	Tt_class \f2the_class\fP,
+	Tt_scope \f2the_scope\fP,
+	const char *\f2handler\fP,
+	const char *\f2op\fP,
+	Tt_message_callback \f2callback\fP);
+.yE
+.P
+.yS
+.ta \w'Tt_status tttk_message_destroy('u
+Tt_status tttk_message_destroy(Tt_message \f2msg\fP);
+.yE
+.P
+.yS
+.ta \w'Tt_status tttk_message_fail('u
+Tt_status tttk_message_fail(Tt_message \f2msg\fP,
+	Tt_status \f2status\fP,
+	const char *\f2status_string\fP,
+	int \f2destroy\fP);
+.yE
+.P
+.yS
+.ta \w'Tt_status tttk_message_reject('u
+Tt_status tttk_message_reject(Tt_message \f2msg\fP,
+	Tt_status \f2status\fP,
+	const char *\f2status_string\fP,
+	int \f2destroy\fP);
+.yE
+.P
+.yS
+.ta \w'char *tttk_op_string('u
+char *tttk_op_string(Tttk_op \f2opcode\fP);
+.yE
+.P
+.yS
+.ta \w'Tttk_op tttk_string_op('u
+Tttk_op tttk_string_op(const char *\f2opstring\fP);
+.yE

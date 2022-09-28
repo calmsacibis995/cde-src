@@ -1,0 +1,79 @@
+.TH ttsession_file 4 "1 March 1996" "ToolTalk 1.3" "ToolTalk Commands" 
+.BH "1 March 1996"
+.\" (c) Copyright 1993, 1995 Sun Microsystems, Inc.
+.\"  (c) Copyright 1993, 1995 Hewlett-Packard Company
+.\"  (c) Copyright 1993, 1995 International Business Machines Corp.
+.\"  (c) Copyright 1993, 1995 Novell, Inc.
+.IX "ttsession_file.4" "" "ttsession_file.4" "" 
+.SH NAME
+ttsession_file - tell \fBttsession (1)\fR
+about systemwide defaults.
+.SH SYNOPSIS
+.PP
+.B /etc/default/ttsession
+.SH DESCRIPTION
+.PP
+The file /etc/default/ttsession can be used to control the 
+behavior of ttsession processes on the machine on which this
+file resides. Each line within the file is of the form
+VAR = value.  Currently there are two values which VAR may
+be assigned:
+.nf
+.IP
+AUTH = <security_options> [, lock=yes|no]
+COMPAT = allow_unauth_types_load = yes|no [, lock=yes|no]
+.fi
+.SS Format rules
+.PP
+The format rules for a
+.B ttsesssion_file
+are:
+.HP 3
+1. All lines must be command (VAR = value) lines.
+.HP 3
+2. Words may be delimited by white space.
+.HP 3
+3. A command  line of the form:
+.nf
+.IP
+AUTH = <security_options>
+.fi
+.PP
+follows the same  format fules which are used in the "-a" option to ttsession(1).
+.HP 3
+4. A command  line of the form:
+.nf
+.IP
+COMPAT = allow_unauth_types_load = yes|no
+.fi
+.PP
+means to allow("yes") or disallow("no") users to successfully call the ToolTalk API function
+tt_session_types_load(3). The default is "no".
+.PP
+5. Adding the comma seperated suffix:
+.nf
+.IP
+"lock = yes|no"
+.fi
+.PP
+to either of the format lines allows ("no")
+or disallows ("yes") the value to be overridden by a given instance of ttsession(1) via
+arguments passed to the ttsession process. The default is "no".
+.SH EXAMPLES
+.PP
+This example allows calls to tt_session_types_load(3) systemwide:
+.nf
+.IP
+COMPAT = allow_unauth_types_load = yes
+.fi
+.PP
+This example sets systemwide security to a specified level, and disallows
+per-session override on this host:
+.nf
+.IP
+AUTH  = gss,mechanism=kerberos_v5,qop=GSS_KRB5_CONF_C_QOP_DES, lock = yes
+.fi
+.SH "SEE ALSO"
+.na
+.PP
+.BR ttsession (1)

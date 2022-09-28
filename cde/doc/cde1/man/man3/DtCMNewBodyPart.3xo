@@ -1,0 +1,76 @@
+.TH DtCMNewBodyPart 3 "17 January 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH "NAME"
+DtCMNewBodyPart \- create a new body part with a persistent reference
+.SH "SYNOPSIS"
+.yS
+#include <Bento/DtCM.h>
+.sp 0.5v
+.ta \w'DtCMBodyPart *DtCMNewBodyPart('u
+DtCMBodyPart *DtCMNewBodyPart(DtCMDocument \f2document\fP,
+	CMEnv *\f2error\fP);
+.yE
+.SH "DESCRIPTION"
+The
+.Fn DtCMNewBodyPart
+function creates a new Cde container document body part.
+The body part is
+created at the end of the document, but can be moved to a new
+location with the
+.Fn DtCMInsertBodyPart 3
+function.
+The body part is created with default attributes and format types.
+.P
+The
+.Fn DtCMNewBodyPart
+function returns a pointer to a
+.BR DtCMBodyPart
+structure.
+The
+.I object
+member is an object that can be used to access the body
+part until the container is closed.
+The
+.I reference
+member is a persistent object reference relative to
+the container for the body part.
+.P
+The
+.I document
+argument is a document handle created by the
+.Fn DtCMInitDocument 3
+function.
+The
+.I error
+argument is a pointer to an error return structure.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn DtCMNewBodyPart
+function returns a pointer to a
+.BR DtCMBodyPart
+structure.
+If an error occurs,
+.Fn DtCMNewBodyPart
+sets the major code in the
+.I error
+structure to
+.Cn USER_EXCEPTION ,
+and the application can use the
+.Fn CMRexception_number
+function to determine the minor code.
+See the Error API Appendix in the \*(ZB.
+.SH "APPLICATION USAGE"
+The application can save the
+.I reference
+value and use it to access the object again with the
+.Fn DtCMGetBodyPart 3
+function.
+.SH "SEE ALSO"
+.Fn DtCMDeleteBodyPart 3,
+.Fn DtCMReleaseBodyPart 3,
+.Hd Bento/DtCM.h 5;
+.Fn CMRexception_number
+in the \*(ZB.

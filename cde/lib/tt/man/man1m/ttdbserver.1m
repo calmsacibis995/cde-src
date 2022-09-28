@@ -1,0 +1,138 @@
+.TH ttdbserver 1M "1 March 1996" "ToolTalk 1.3" "ToolTalk Commands" 
+.BH "1 March 1996"
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\"  (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\"  (c) Copyright 1993, 1994 International Business Machines Corp.
+.IX "ttdbserver.1m" "" "ttdbserver.1m" "" 
+.SH NAME
+ttdbserver, rpc.ttdbserverd \- RPC-based ToolTalk database server
+.SH SYNOPSIS
+.B rpc.ttdbserverd
+.RB [ -G ]
+.RB [ -m \ DTMOUNTPOINT_value ]
+.RB [ -n ]
+.\".RB [ -t \ level]
+.RB [ -v ]
+.RB [ -? ]
+.\" This was disabled for release 1.0
+.\" [-a authentication-level]
+.SH DESCRIPTION
+.LP
+.B rpc.ttdbserverd
+manages ToolTalk objects created by
+.BR tt_spec_create (3),
+and handles certain queries related to the netfiles returned by
+.BR tt_file_netfile (3).
+One instance of
+.B rpc.ttdbserverd
+(normally started by 
+.BR inetd )
+runs on each host that has a local filesystem.
+.B rpc.ttdbserverd
+serves four purposes:
+.HP 3
+1. Mapping a spec to its associated file and a file to its associated specs.
+.HP 3
+2. Mapping a spec to its properties.
+.HP 3
+3. Mapping a file to a list of sessions with clients having patterns
+registered in the scope of that file.
+.HP 3
+4. Answering netfile queries; see
+.BR tt_file_netfile (3)
+and
+.BR tt_host_file_netfile (3).
+.LP
+For each filesystem that
+.B rpc.ttdbserverd
+needs to store information about, it creates a directory called
+TT_DB at the mountpoint of that file system.  In that directory
+it creates the databases it needs to store its tables and indices.
+If the partition is not writable, then
+.B rpc.ttdbserverd
+can be told, via
+.BR partition_map (4),
+to create the databases in another local partition.
+If
+.B rpc.ttdbserverd
+is not installed on a particular file server, ToolTalk can be
+told, via
+.BR hostname_map (4),
+to manage that file server's partitions using the
+.B rpc.ttdbserverd
+on a different host.
+.SH OPTIONS
+.TP
+.B \-G
+Perform garbage collection.
+This cleans up the TT_DB directories and the associated internal
+database files.
+.TP
+.B \-m DTMOUNTPOINT_value
+Sets the DTMOUNTPOINT environment variable for
+.BR rpc.ttdbserverd .
+If there is already an environment variable called DTMOUNTPOINT, -m
+will override it.
+.TP
+.B \-S
+Runs rpc.ttdbserverd in the foreground.
+.TP
+.B \-n
+Turn off permission checking.  Normally the protection of the file
+passed to
+.BR tt_spec_create (3)
+determines who may read and write that spec.  This
+option disables this checking and allows anyone to read and write any
+spec.  This option should be used with caution.
+.TP
+.B \-v
+Print out the version number.
+.\".TP
+.\".B \-t level
+.\"Turns on trace level, the valid level is between 1 to 10.
+.TP
+.B \-?
+Prints out the command usage information.
+.\" .TP
+.\" .B \-a authentication-level
+.\" Set the authentication level to either
+.\" .I unix
+.\" (the default), or to
+.\" .I des
+.\" which means to use secure RPC.
+.SH ENVIRONMENT
+.TP
+.BR DTMOUNTPOINT
+If set, the value of this environment variable will be used in place
+of "/net" in pathnames constructed to answer
+.BR tt_host_netfile_file (3)
+queries. This environment variable can also be set by using the -m flag for
+.BR rpc.ttdbserverd .
+.TP
+.BR TT_PARTITION_MAP
+If 
+.B $TT_PARTITION_MAP 
+is set, it is used
+in place of /etc/tt/partition_map.  See
+.BR partition_map (4).
+.SH FILES
+.PD 0
+.TP 20
+.B TT_DB/*
+spec and session database files are kept in the TT_DB directory under each
+disk partition mount point.
+.TP 20
+.B tt/hostname_map
+Host redirection map.  See
+.BR hostname_map (4).
+.TP 20
+.B /etc/tt/partition_map
+Partition redirection map.  See
+.BR partition_map (4).
+.SH SEE ALSO
+.BR ttsession (1)
+.BR tt_file_netfile (3)
+.BR tt_host_file_netfile (3)
+.BR tt_spec_create (3)
+.BR hostname_map (4)
+.BR partition_map (4)

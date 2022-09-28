@@ -1,0 +1,75 @@
+/* $Header: Imakefile,v 1.9 94/01/24 14:27:58 xbuild_hp_cv Exp $ */
+
+PROGRAMS = imageutil
+
+DEFINES = -DXK_MISCELLANY -D_BMS -DMULTIBYTE -D_CMDINV
+INCLUDES = -I. -I$(ILSRC)
+
+SYSTEMBINDFLAGS =  -L /usr/lib/X11R4 -lilefs -lil -lilefs -lil -lX11 -lm
+SYS_LIBRARIES = -lm
+
+#if defined(SunArchitecture)
+   SYS_LIBRARIES = -lm -ldl -lw 
+#endif  /* SunArchitecture */
+
+#if defined(USLArchitecture)
+   SYS_LIBRARIES = -lm -lresolv
+#endif  /* USLArchitecture */
+
+/* DEPLIBS contains the list of library depencies for a client.
+ * LOCAL_LIBRARIES contains the list of libraries on the link line.
+ * Generally, the dependency form of a library has DEP as a prefix.
+ * e.g. put $(XLIB) in LOCAL_LIBRARIES and $(DEPXLIB) in DEPLIBS.
+ * NOTE: if DEPLIBS is not set here, it is by default null and there
+ *       are no library dependencies for clients.
+ *       You cannot put -Llibpath into DEPLIBS. You must put actual
+ *       paths to the library.
+ */
+DEPLIBS =  $(DEPILLIB) libilefs.a $(DEPXLIB) 
+LOCAL_LIBRARIES =  libilefs.a $(ILLIB) libilefs.a $(ILLIB) $(XLIB) 
+
+
+SRCS1 = ilu.c imageutil.c ilucheck.c ilulist.c
+OBJS = ilu.o imageutil.o ilucheck.o ilulist.o
+
+IULIBSRCS = efsgif.c efsinit.c efsjfif.c efsstarbm.c efstiff.c \
+            efsxbm.c efsxpm.c efsxpmcreate.c efsxpmdata.c \
+            efsxpmmisc.c efsxpmparse.c efsxpmparse_color.c \
+            efsxwd.c 
+
+IULIBOBJS = efsgif.o efsinit.o efsjfif.o efsstarbm.o efstiff.o \
+            efsxbm.o efsxpm.o efsxpmcreate.o efsxpmdata.o \
+            efsxpmmisc.o efsxpmparse.o efsxpmparse_color.o \
+            efsxwd.o 
+
+SRCS = $(SRCS1) $(IULIBSRCS) /* for make depend */
+
+
+#ifdef HPArchitecture
+EXTRA_DEFINES = -DMESSAGE_CAT -DMULTIBYTE
+#endif
+
+#if defined(RsArchitecture) 
+#  endif
+
+#ifdef SunArchitecture
+EXTRA_DEFINES=-DNO_REGCOMP
+#endif
+
+#ifdef USLArchitecture
+EXTRA_DEFINES=-DNO_REGCOMP
+#endif
+
+
+HEADERS =  ilxpm.h ilxpmP.h
+
+
+all::
+
+
+NormalLibraryObjectRule()
+NormalLibraryTarget(ilefs,$(IULIBOBJS))
+ComplexProgramTarget($(PROGRAMS))
+
+DependTarget()
+

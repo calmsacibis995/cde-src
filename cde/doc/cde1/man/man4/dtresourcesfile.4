@@ -1,0 +1,85 @@
+.\" *************************************************************************
+.\" **  (c) Copyright 1994 Hewlett-Packard Company
+.\" **  (c) Copyright 1994 International Business Machines Corp.
+.\" **  (c) Copyright 1994 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1994 Novell, Inc.
+.\" *************************************************************************
+.TH dtresourcesfile 4
+.SH NAME
+dtresourcesfile \- format and location of desktop resource files
+.SH DESCRIPTION
+The desktop default resources can be found in
+/usr/dt/config/$LANG/sys.resources. These resources will be
+made available to each user's session via the RESOURCE_MANAGER
+property. This file should not be edited as it will be unconditionally
+overwritten upon subsequent desktop installations.
+.PP
+A system administrator may augment the system default resources
+by creating /etc/dt/config/$LANG/sys.resources. In this file, a
+system administrator may override system default resources or
+specify additional resources. As this file is merged into the
+desktop default resources during session startup, it is preferrable
+that only new or updated resource specifications be placed in this
+file, rather than a copy being made of the desktop default resource
+file. Resources specified in this file will be made available to
+each user's session via the RESOURCE_MANAGER property. Resources
+specified in this file take precedence over those specified in
+the desktop default resource file.
+.PP
+A user may augment the desktop default and system administrator
+resources via their $HOME/.Xdefaults file. Resources specified in
+this file will be made available to only that user's session via
+the RESOURCE_MANAGER property. Resources specified in this file
+take precedence over those specified in the desktop default or
+system administrator resource files.
+.PP
+.B NOTE :
+The X Toolkit Intrinsics specifies that it will load resources
+for an application from either RESOURCE_MANAGER or from
+$HOME/.Xdefaults, but not both. Ordinarily, this would mean that
+the user's $HOME/.Xdefaults file would be ignored. However, the
+session manager accomodates $HOME/.Xdefaults by merging it into
+the RESOURCE_MANAGER at session startup as described above. If
+a user changes their $HOME/.Xdefaults, their changes will not be
+visible to new applications until the user invokes the
+ReloadResources action.
+.PP
+The ReloadResources action will instruct the session manager to
+reload the RESOURCE_MANAGER with the system, system administrator
+and user specified resources. This is useful to make available to
+new applications changes made to system administrator or user
+specified resource files.
+.SH FILE FORMAT
+The desktop resource files use X resource syntax. See X(1) for 
+the precise syntax.
+.SH FILES
+.sp 1
+.PD 0
+.TP 35
+.B /usr/dt/config/$LANG/sys.resources
+The desktop default resources.
+.PD 0
+.TP 35
+.B /etc/dt/config/$LANG/sys.resources
+System administrator specified resources.
+.PD 0
+.TP 35
+.B $HOME/.Xdefaults
+User specified resources.
+.\"---
+.\"--- Related man pages
+.\"---
+.PD
+.SH "SEE ALSO"
+dtsession(1), dtsessionaction(5), X(1), Xlib Resource Manager documentation, 
+Xt resource documentation
+.PD
+.SH COPYRIGHT
+(c) Copyright 1994 Hewlett-Packard Company
+.br
+(c) Copyright 1994 International Business Machines Corp.
+.br
+(c) Copyright 1994 Sun Microsystems, Inc.
+.br
+(c) Copyright 1994 Novell, Inc.
+.sp 1

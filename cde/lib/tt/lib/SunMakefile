@@ -1,0 +1,467 @@
+# %%  (c) Copyright 1993, 1994 Hewlett-Packard Company			
+# %%  (c) Copyright 1993, 1994 International Business Machines Corp.	
+# %%  (c) Copyright 1993, 1994 Sun Microsystems, Inc.			
+# %%  (c) Copyright 1993, 1994 Novell, Inc. 				
+# %%  $Revision: $ 			 				
+
+# @(#)SunMakefile	1.64 93/09/07
+# The ToolTalk library makefile
+#
+# Copyright (c) 1992 by Sun Microsystems, Inc.
+#
+
+TT_DIR = ..
+THIS_DIR = lib
+MV = mv
+
+# Don't set SUBDIRS since we don't do normal subdirectory below here.
+# But we do need a macro contaning the subdirectories for some purposes
+# (like sccs clean)
+
+LIB_SUBDIRS = tttk api/c db dm mp util
+
+# get a list of all header files in the SCCS directories under here.
+# but not directly under, since that's done in the global SunMakefile-head.mk
+
+LIB_SCCS_HEADERS:sh = ls */SCCS/s.*.h api/*/SCCS/s.*.h 2>/dev/null | sed 's:SCCS/s\.::'
+
+# make most real targets (not clean or sccs clean)  also depend on all
+# those header files so make will get them.
+
+HEADER_DEPENDENCIES	= $(LIB_SCCS_HEADERS) Tt/tt_c.h
+
+include $(TT_DIR)/SunMakefile-head.mk
+
+all::		Proto-g
+
+
+CCFLAGS-lib	+= -I${XW_HOME}/include
+LDFLAGS-lib	+= -L${XW_HOME}/lib
+
+Proto-g::	$(PROTO_DIR)/lib/libtt.so.2 \
+		$(PROTO_DIR)/include/Tt/tt_c.h \
+		$(PROTO_DIR)/include/Tt/tttk.h \
+		$(PROTO_DIR)/include/Tt/ttdnd.h
+# Don't build libtt.a in -g variant since it costs too much to build.
+# the dbserver links libtt dynamically in debug mode.
+
+Proto-O::	$(PROTO_DIR)/lib/libtt.a \
+		$(PROTO_DIR)/lib/libtt.so.2 \
+		$(PROTO_DIR)/include/Tt/tt_c.h \
+		$(PROTO_DIR)/include/Tt/tttk.h \
+		$(PROTO_DIR)/include/Tt/ttdnd.h
+
+# Don't build libtt.so in -tcov as it doesn't work.
+Proto-tcov::	$(PROTO_DIR)/lib/libtt.a \
+		$(PROTO_DIR)/include/Tt/tt_c.h \
+		$(PROTO_DIR)/include/Tt/tttk.h \
+		$(PROTO_DIR)/include/Tt/ttdnd.h
+
+Proto-lprof::	$(PROTO_DIR)/lib/libtt.so.2 \
+		$(PROTO_DIR)/lib/libtt.a \
+		$(PROTO_DIR)/include/Tt/tt_c.h \
+		$(PROTO_DIR)/include/Tt/tttk.h \
+		$(PROTO_DIR)/include/Tt/ttdnd.h
+
+# Don't build libtt.so in -pg as it doesn't work.
+Proto-pg::	$(PROTO_DIR)/lib/libtt.a \
+		$(PROTO_DIR)/include/Tt/tt_c.h \
+		$(PROTO_DIR)/include/Tt/tttk.h \
+		$(PROTO_DIR)/include/Tt/ttdnd.h
+
+$(PROTO_DIR)/lib/libtt.so.2:	libtt.so.2
+		$(TTINSTALL) $(PROTO_DIR)/lib $(@F)
+
+$(PROTO_DIR)/lib/libtt.a:	libtt.a
+		$(TTINSTALL) $(PROTO_DIR)/lib $(@F)
+
+$(PROTO_DIR)/include/Tt/tt_c.h:	api/c/tt_c.h
+		$(TTINSTALL) $(PROTO_DIR)/include/Tt api/c/tt_c.h
+
+$(PROTO_DIR)/include/Tt/tttk.h:	tttk/tttk.h
+		$(TTINSTALL) $(PROTO_DIR)/include/Tt tttk/tttk.h
+
+$(PROTO_DIR)/include/Tt/ttdnd.h:	api/dnd/ttdnd.h
+		$(TTINSTALL) $(PROTO_DIR)/include/Tt api/dnd/ttdnd.h
+
+Install-O::	$(INSTALL_DIR)/lib/libtt.so.2 \
+		$(INSTALL_DIR)/lib/libtt.a \
+		$(INSTALL_DIR)/include/Tt/tt_c.h \
+		$(INSTALL_DIR)/include/Tt/ttdnd.h \
+		$(INSTALL_DIR)/lib/locale/templates/LC_MESSAGES/SUNW_TOOLTALK.po
+
+# Don't install libtt-g.a since we don't make it normally.
+Install-g::	$(INSTALL_DIR)/lib/libtt.so.2 \
+		$(INSTALL_DIR)/include/Tt/tt_c.h \
+		$(INSTALL_DIR)/include/Tt/tttk.h \
+		$(INSTALL_DIR)/include/Tt/ttdnd.h \
+		$(INSTALL_DIR)/lib/locale/templates/LC_MESSAGES/SUNW_TOOLTALK.po
+
+
+$(INSTALL_DIR)/lib/libtt.so.2:	libtt.so.2
+		$(TTINSTALL) $(INSTALL_DIR)/lib $(@F)
+
+$(INSTALL_DIR)/lib/libtt.a:	libtt.a
+		$(TTINSTALL) $(INSTALL_DIR)/lib $(@F)
+
+$(INSTALL_DIR)/include/Tt/tt_c.h:	api/c/tt_c.h
+		$(TTINSTALL) $(INSTALL_DIR)/include/Tt api/c/tt_c.h
+
+$(INSTALL_DIR)/include/Tt/tttk.h:	tttk/tttk.h
+		$(TTINSTALL) $(INSTALL_DIR)/include/Tt tttk/tttk.h
+
+$(INSTALL_DIR)/include/Tt/ttdnd.h:	api/dnd/ttdnd.h
+		$(TTINSTALL) $(INSTALL_DIR)/include/Tt api/dnd/ttdnd.h
+
+$(INSTALL_DIR)/lib/locale/templates/LC_MESSAGES/SUNW_TOOLTALK.po: \
+		SUNW_TOOLTALK.po
+		$(TTINSTALL) $(INSTALL_DIR)/lib/locale/templates/LC_MESSAGES \
+		SUNW_TOOLTALK.po
+
+Clean::
+		$(RM) -fr libtt.so.2 libtt.a Mapfile SUNW_TOOLTALK.po
+
+Sccs-clean::	$$(LIB_SUBDIRS:%=sccs-clean-%)
+
+sccs-clean-%:	FRC
+	@cd $(@:sccs-clean-%=%) ; \
+	sccs clean; \
+	cd ..;
+
+# Usually, building a gprof .so is worthless, but some new performance
+# tools make it a useful thing.  If the user explicitly asks for a
+# libtt-pg.so.2, make it for him.
+libtt-pg.so.2	:=	CFLAGS-lib-pg = -K PIC
+libtt-pg.so.2	:=	CCFLAGS-lib-pg = -PIC
+libtt-pg.so.2	:=	LDFLAGS-lib = -z text
+libtt-pg.so.2	:=	VARIANT = -pg
+
+OLD_DB_SERVER_COMPATIBILITY_OBJECTS = \
+old_db_server_functions.o \
+tt_client_isam_file.o \
+tt_client_isam_file_utils.o \
+tt_client_isam_key_descriptor.o \
+tt_client_isam_key_descriptor_utils.o \
+tt_client_isam_record.o \
+tt_client_isam_record_utils.o \
+tt_old_db.o \
+tt_old_db_partition_map_ref.o \
+tt_old_db_utils.o \
+tt_old_db_message_info.o \
+tt_old_db_message_info_utils.o
+
+LIBTT_CONTENTS= \
+api_api.o api_storage.o api_mp_otype.o api_handle.o \
+api_xdr.o api_file.o \
+api_filemap.o \
+api_mp.o \
+api_mp_io.o api_message.o api_utils.o api_spec.o api_default.o \
+tt_status_stub.o api_pattern.o api_session_prop.o api_spec_map_ref.o \
+api_error.o api_objid_spec.o api_typecb.o api_typecb_utils.o ttdnd.o \
+mp_session.o mp_procid.o mp_pattern.o mp_c_pattern.o \
+mp_mp.o mp_file.o mp_file_utils.o \
+mp_arg.o mp_arg_utils.o \
+mp_context.o mp_context_utils.o \
+mp_msg_context.o mp_msg_context_utils.o \
+mp_c_msg_context.o mp_c_msg_context_utils.o \
+mp_pat_context.o mp_pat_context_utils.o \
+mp_message.o mp_message_utils.o mp_mp_utils.o \
+mp_rpc_client_utils.o \
+mp_pattern_utils.o mp_procid_utils.o mp_rpc_client.o \
+mp_session_utils.o \
+mp_stream_socket.o \
+mp_stream_socket_utils.o mp_xdr_functions.o mp_rpc_fns.o \
+mp_desktop.o mp_session_prop.o mp_session_prop_utils.o \
+mp_desktop_utils.o mp_c_message.o mp_trace.o \
+mp_c_procid.o mp_c_procid_utils.o mp_c_file.o \
+mp_c_file_utils.o mp_c_mp.o mp_c_message_utils.o \
+mp_c_session.o mp_c_session_prop.o mp_c_session_utils.o \
+tt_file_system.o tt_file_system_entry_utils.o \
+tt_gettext.o tt_string_match.o copyright.o tt_string.o tt_xdr_utils.o \
+tt_path.o tt_log.o tt_int_rec.o tt_new.o tt_object.o tt_base64.o \
+tt_object_list.o tt_enumname.o tt_ldpath.o  tt_new_ptr.o \
+tt_host.o tt_host_equiv.o tt_host_equiv_utils.o tt_object_table.o \
+tt_host_utils.o tt_global_env.o \
+tt_Xlib.o tt_port.o tt_string_map.o tt_string_map_utils.o \
+tt_map_entry.o tt_map_entry_utils.o \
+tt_tracefile_parse.o tt_trace_parser.o \
+tt_trace_stream.o tt_trace.o tt_audit.o tt_iostream.o \
+db_server_clnt.o \
+db_server_xdr.o \
+tt_db_access_utils.o \
+tt_db_client.o \
+tt_db_client_utils.o \
+tt_db_create_objid.o \
+tt_db_file.o \
+tt_db_file_utils.o \
+tt_db_hostname_global_map_ref.o \
+tt_db_hostname_redirection_map.o \
+tt_db_key.o \
+tt_db_key_utils.o \
+tt_db_network_path.o \
+tt_db_object.o \
+tt_db_object_utils.o \
+tt_db_objid_to_key.o \
+tt_db_property.o \
+tt_db_property_utils.o \
+tt_db_rpc_message_routines.o \
+tt_db_rpc_routines.o \
+tttk.o \
+ttdesktop.o \
+ttmedia.o \
+tttkmessage.o \
+tttkpattern.o \
+ttdtfile.o \
+tttkutils.o \
+tttk2free.o \
+ttdtprocid.o \
+$(OLD_DB_SERVER_COMPATIBILITY_OBJECTS)
+
+MAP_FLAGS_glob	=
+MAP_FLAGS_SunOS_5_=	-MMapfile
+MAP_FLAGS_SunOS_5_cafe =
+MAP_FLAGS_loc	=	$(MAP_FLAGS_$(OS_NAME)_$(OS_VERSION)_$(CAFE_IN_USE))
+MAP_FLAGS	=	$(MAP_FLAGS_glob$(MAP_FLAGS_loc))$(MAP_FLAGS_loc)
+LDFLAGS-O	+=	$(MAP_FLAGS)
+LDFLAGS-g	+=	$(MAP_FLAGS)
+
+MAPFILE_glob	=
+MAPFILE_SunOS_5	=	Mapfile
+MAPFILE_loc	=	$(MAPFILE_$(OS_NAME)_$(OS_VERSION))
+MAPFILE		=	$(MAPFILE_glob$(MAPFILE_loc))$(MAPFILE_loc)
+LIBTTDEPENDENCY-O =	$(MAPFILE)
+LIBTTDEPENDENCY-g =	$(MAPFILE)
+LIBTTDEPENDENCY =	$(LIBTTDEPENDENCY$(VARIANT))
+
+CCFLAGS		+=	$(CCFLAGS-lib)
+CFLAGS		+=	$(CFLAGS-lib)
+LDFLAGS		+=	$(LDFLAGS-lib)
+CPPFLAGS	+=	-D_TS_ERRNO
+
+# Any additional include libraries or other flags
+# needed by just a few modules are handled
+# as special cases with conditional macros.
+
+%/mp_desktop.o			\
+%/tt_Xlib.o			\
+%/tttk.o 			\
+%/ttdesktop.o 			\
+%/ttmedia.o			\
+%/tttkmessage.o			\
+%/tttkpattern.o			\
+%/ttdtfile.o			\
+%/tttkutils.o			\
+%/tttk2free.o			\
+%/ttdtprocid.o			\
+		:=	CPPFLAGS +=	-I$(OPENWINHOME)/include
+%/db_server_xdr.o		\
+%/tt_db_client.o		\
+%/tt_client_isam_file.o		\
+%/tt_client_isam_key_descriptor.o \
+		:= 	CPPFLAGS +=	$(CPPFLAGS-isam)
+%/copyright.o	:=	CPPFLAGS +=	$(CPPFLAGS-version)
+# Since tracing into the string, list, or table package, or the
+# storage allocator is always dull, we compile those -O
+# even when debugging so dbx can't step through them
+#Derived-g/tt_string.o \
+Derived-g/tt_string_match.o \
+Derived-g/tt_new.o \
+Derived-g/tt_new_ptr.o \
+Derived-g/tt_object.o \
+Derived-g/tt_object_list.o \
+Derived-g/tt_object_table.o :=	CCFLAGS-g	= $(CCFLAGS-O)
+
+
+
+OBJECTS	=	$(LIBTT_CONTENTS:%=$(DERIVED)/%)
+
+libtt.so.2:	$$(LIBTTDEPENDENCY) $$(DERIVED) $$(OBJECTS) 
+	$(LD) $(LDFLAGS) -o $@ $(OBJECTS) $(LDLIBS) 2>&1 | c++filt
+
+libtt.a:		$$(DERIVED) $$(OBJECTS)
+	rm -fr $@;$(AR) qc $@ $(OBJECTS); $(RANLIB) $@
+
+# Make the Mapfile, for reordering, by executing a shell script.  
+# Commenting this out for now since Mapfile-measured is so old,
+# replacing with dummy.
+
+#Mapfile:	Mapfile-measured mk_libtt_mapfile $$(DERIVED) $$(OBJECTS)
+#	./mk_libtt_mapfile $(DERIVED)
+
+Mapfile:
+	touch Mapfile
+
+SUNW_TOOLTALK.po:        api/c/api_api.C
+	xgettext -d SUNW_TOOLTALK -n -c STRING_EXTRACTION api/c/api_api.C
+
+# Because we never descend into lib's subdirectories, we must be
+# sure to sccs get subdirectory headers here.
+
+# Rules for making objects from sources.  Note that this depends on the
+# fact that there are no two files in the lib directory tree with
+# the same name (because of the mp/mp_, util/tt_, etc. naming
+# convention.)  If there were a second file with the same name,
+# these rules would never find it (and it would be impossible to
+# put all the objects in one Derived directory anyway.)
+
+# Since the mcs comments for each .o file eventually end up in the .a,
+# strip them off now before any further files are derived from the .o's.
+# The mcs commands are hidden with @ since they double the size of the
+# make log and don't really help the programmer.
+# There must be an easier way to  get a # in a generated command, but
+# I can't find it.
+SHARP:sh	=	/bin/echo \\043\\c
+
+$$(DERIVED)/%.o:	mp/%.C
+	$(COMPILE.cc) -o $@ $<
+	@mcs -d -a "@($(SHARP))ToolTalk $(TT_VERSION)" $(@)
+
+$$(DERIVED)/%.o:	tttk/%.C
+	$(COMPILE.cc) -o $@ $<
+	@mcs -d -a "@($(SHARP))ToolTalk $(TT_VERSION)" $(@)
+
+$$(DERIVED)/%.o:	api/c/%.C
+	$(COMPILE.cc) -o $@ $<
+	@mcs -d -a "@($(SHARP))ToolTalk $(TT_VERSION)" $(@)
+
+$$(DERIVED)/%.o:	dm/%.C
+	$(COMPILE.cc) -o $@ $<
+	@mcs -d -a "@($(SHARP))ToolTalk $(TT_VERSION)" $(@)
+
+$$(DERIVED)/%.o:	db/%.C
+	$(COMPILE.cc) -o $@ $<
+	@mcs -d -a "@($(SHARP))ToolTalk $(TT_VERSION)" $(@)
+
+$$(DERIVED)/%.o:	util/%.C
+	$(COMPILE.cc) -o $@ $<
+	@mcs -d -a "@($(SHARP))ToolTalk $(TT_VERSION)" $(@)
+
+$$(DERIVED)/%.o:	mp/%.c
+	$(COMPILE.c) -o $@ $<
+	@mcs -d -a "@($(SHARP))ToolTalk $(TT_VERSION)" $(@)
+
+$$(DERIVED)/%.o:	api/c/%.c
+	$(COMPILE.c) -o $@ $<
+	@mcs -d -a "@($(SHARP))ToolTalk $(TT_VERSION)" $(@)
+
+$$(DERIVED)/%.o:	api/dnd/%.c
+	$(COMPILE.c) -o $@ $<
+	@mcs -d -a "@($(SHARP))ToolTalk $(TT_VERSION)" $(@)
+
+$$(DERIVED)/%.o:	dm/%.c
+	$(COMPILE.c) -o $@ $<
+	@mcs -d -a "@($(SHARP))ToolTalk $(TT_VERSION)" $(@)
+
+$$(DERIVED)/%.o:	db/%.c
+	$(COMPILE.c) -o $@ $<
+	@mcs -d -a "@($(SHARP))ToolTalk $(TT_VERSION)" $(@)
+
+$$(DERIVED)/%.o:	util/%.c
+	$(COMPILE.c) -o $@ $<
+	@mcs -d -a "@($(SHARP))ToolTalk $(TT_VERSION)" $(@)
+
+# Rules for making .i files (cpp output) from .c or .C files.
+# used for debugging preprocessor problems.
+
+$$(DERIVED)/%.i:	mp/%.C
+	$(PREPROCESS.cc)
+
+$$(DERIVED)/%.i:	api/c/%.C
+	$(PREPROCESS.cc)
+
+$$(DERIVED)/%.i:	dm/%.C
+	$(PREPROCESS.cc)
+
+$$(DERIVED)/%.i:	db/%.C
+	$(PREPROCESS.cc)
+
+$$(DERIVED)/%.i:	util/%.C
+	$(PREPROCESS.cc)
+
+$$(DERIVED)/%.i:	mp/%.c
+	$(PREPROCESS.cc)
+
+$$(DERIVED)/%.i:	api/c/%.c
+	$(PREPROCESS.c)
+
+$$(DERIVED)/%.i:	api/dnd/%.c
+	$(PREPROCESS.c)
+
+$$(DERIVED)/%.i:	dm/%.c
+	$(PREPROCESS.c)
+
+$$(DERIVED)/%.i:	db/%.c
+	$(PREPROCESS.c)
+
+$$(DERIVED)/%.i:	util/%.c
+	$(PREPROCESS.c)
+
+# Rules for making .files files (cpp include bill of materials) from .C files.
+# used for debugging header file and include problems.
+
+$$(DERIVED)/%.files:	mp/%.C
+	$(LISTINCLUDES.cc)
+
+$$(DERIVED)/%.files:	api/c/%.C
+	$(LISTINCLUDES.cc)
+
+$$(DERIVED)/%.files:	dm/%.C
+	$(LISTINCLUDES.cc)
+
+$$(DERIVED)/%.files:	db/%.C
+	$(LISTINCLUDES.cc)
+
+$$(DERIVED)/%.files:	util/%.C
+	$(LISTINCLUDES.cc)
+
+# Rules for making C source from C++ source, on those rare occasions
+# you need to see the output of cfront.
+# Be sure to remove the .c file after looking at it, since its
+# presence seems to confuse make (Make tries to build the .o from
+# the .c)
+
+$$(DERIVED)/%.c:	Derived-source mp/%.C
+	$(CFRONT.cc)
+
+$$(DERIVED)/%.c:	Derived-source api/c/%.C
+	$(CFRONT.cc)
+
+$$(DERIVED)/%.c:	Derived-source dm/%.C
+	$(CFRONT.cc)
+
+$$(DERIVED)/%.c:	Derived-source db/%.C
+	$(CFRONT.cc)
+
+$$(DERIVED)/%.c:	Derived-source util/%.C
+	$(CFRONT.cc)
+
+# Rules for making assembly source from C++ source, on those rare occasions
+# you need to see that..
+# Be sure to remove the .c file after looking at it, since its
+# presence seems to confuse make (Make tries to build the .o from
+# the .c)
+
+$$(DERIVED)/%.s:	Derived-source mp/%.C
+	$(LISTASM.cc)
+
+$$(DERIVED)/%.s:	Derived-source api/c/%.C
+	$(LISTASM.cc)
+
+$$(DERIVED)/%.s:	Derived-source dm/%.C
+	$(LISTASM.cc)
+
+$$(DERIVED)/%.s:	Derived-source db/%.C
+	$(LISTASM.cc)
+
+$$(DERIVED)/%.s:	Derived-source util/%.C
+	$(LISTASM.cc)
+
+# Rules for "making" header files -- just cd into the directory
+# and make them to get SCCS checkout done as necessary.
+
+Tt/tt_c.h:
+	test -d Tt || mkdir Tt ;\
+	$(RM) -f Tt/tt_c.h ; ln -s ../api/c/tt_c.h Tt/tt_c.h
+
+include $(TT_DIR)/SunMakefile-tail.mk
+

@@ -1,0 +1,62 @@
+XCOMM $XConsortium: Imakefile /main/cde1_maint/2 1995/09/06 02:25:32 lehors $
+/* bin/ttsession/Imakefile */
+
+TT_DIR = ../..
+#include "../../tooltalk.tmpl"
+/* find libtt locally */
+LOCAL_TTLIB_DIR=../../lib  /* reset library top for correct dependencies */
+
+/* General case INCLUDES DEFINES
+ * Each individual architecture may have more or less of the above.
+ * Use EXTRA_DEFINES and EXTRA_INCLUDES to add defines and includes
+ * to an individual architecture.
+ */
+#ifdef SunArchitecture
+EXTRA_DEFINES = -D_REENTRANT -DSVR4 -DOS_VERSION=OSMajorVersion -DOS_MINOR_VERSION=OSMinorVersion
+#endif
+
+DEFINES = -DTT_VERSION_STRING=\"$(TT_VERSION)\"
+INCLUDES = -I. -I../../slib -I../../lib
+
+
+/* DEPLIBS contains the list of library depencies for a client.
+ * LOCAL_LIBRARIES contains the list of libraries on the link line.
+ * Generally, the dependency form of a library has DEP as a prefix.
+ * e.g. put $(XLIB) in LOCAL_LIBRARIES and $(DEPXLIB) in DEPLIBS.
+ * NOTE: if DEPLIBS is not set here, it is by default null and there
+ *       are no library dependencies for clients.
+ *       You cannot put -Llibpath into DEPLIBS. You must put actual
+ *       paths to the library.
+ */
+
+DEPLIBS = ../../slib/libstt.a $(DEPTTLIB_AND_MAYBE_XLIB) 
+LOCAL_LIBRARIES = ../../slib/libstt.a ../../lib/util/copyright.o $(TTLIB_AND_MAYBE_XLIB) 
+
+/* put EXTRA_DEFINES and EXTRA_INCLUDES and anything else below */
+#ifdef HpArchitecture
+#endif
+
+#ifdef SunArchitecture
+SYS_LIBRARIES = $(WIDECHARSYSLIB) -lnsl -ldl $(I18NSYSLIB) -lthread
+#endif
+
+#ifdef RsArchitecture
+#endif
+
+#ifdef USLArchitecture
+#endif
+
+#ifdef UXPArchitecture
+#endif
+
+
+SRCS = \
+        mp_server.C
+
+OBJS = \
+        mp_server.o $(NONSHAREDLIBCOBJ)
+
+
+/* Build the .o's */
+NormalLibraryObjectRule()
+ComplexProgramTarget(ttsession)

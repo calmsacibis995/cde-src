@@ -1,0 +1,173 @@
+XCOMM @(#)Imakefile	1.19 97/04/29 SMI
+XCOMM Copyright (c) 1996 Sun Microsystems, Inc.
+
+LIBTOPDIR = ../..
+LIBCURDIR = sdmporttest
+
+#include "../../ImakeSdm.tmpl"
+
+TESTPROG1 = sdmporttest
+TESTPROG2 = sdmporttest0
+TESTPROGS = $(TESTPROG1) $(TESTPROG2)
+
+TESTHEADERS = \
+	porttest.hh \
+	ptcbody.hh \
+	ptcconnection.hh \
+	ptcenvelope.hh \
+	ptchelp.hh \
+	ptclock.hh \
+	ptcmdscan.hh \
+	ptcmessage.hh \
+	ptcoverview.hh \
+	ptcport.hh \
+	ptcquit.hh \
+	ptcresult.hh \
+	ptcsession.hh \
+	ptcstore.hh \
+	ptctoken.hh
+
+TESTSRCS = \
+	porttest.cc \
+	ptcbody.cc \
+	ptcconnection.cc \
+	ptcenvelope.cc \
+	ptchelp.cc \
+	ptclock.cc \
+	ptcmdscan.cc \
+	ptcmessage.cc \
+	ptcoverview.cc \
+	ptcport.cc \
+	ptcquit.cc \
+	ptcresult.cc \
+	ptcsession.cc \
+	ptcstore.cc \
+	ptctoken.cc
+
+TESTOBJS = \
+	porttest.o \
+	ptcbody.o \
+	ptcconnection.o \
+	ptcenvelope.o \
+	ptchelp.o \
+	ptclock.o \
+	ptcmdscan.o \
+	ptcmessage.o \
+	ptcoverview.o \
+	ptcport.o \
+	ptcquit.o \
+	ptcresult.o \
+	ptcsession.o \
+	ptcstore.o \
+	ptctoken.o
+
+DEFINES			= $(SDMTESTDEFINES)
+
+INCLUDES		= -I. $(SDMINCLUDES)
+
+TESTDEPLIBS		= 
+
+TEST_LIBRARIES		= $(SDMTESTLIBS) $(SDMCCLIENTLIBRARY) $(SDMLCLLIBRARY)
+
+SDM_LIBRARIES		= $(SDMLIBRARY) $(SDMCCLIENTLIBRARY)) $(SDMLCLLIBRARY)
+
+
+### The dbx runtime checker cannot grok libdtsvc and libnsl as .sos so this
+### line forces libnsl to the .a but there is no libdtsvc.a so we leave it
+### out and allow the #pragma weaks in the code to handle it
+
+#if OSMajorVersion > 5 || (OSMajorVersion == 5 && OSMinorVersion > 5)
+SYS_LIBRARIES		= /usr/lib/libnsl.a -lintl -lsocket -ldl -mt -ltt 
+#else
+SYS_LIBRARIES		= /usr/lib/libnsl.a -lintl -lsocket -ldl -ltt
+#endif
+
+
+EXTRA_LOAD_FLAGS 	= -L/usr/dt/lib
+
+LINKCC			= $(C++)
+
+OBJS2			= $(TESTOBJS)
+DEPLIBS1		= $(TESTDEPLIBS)
+
+OBJS3			= $(TESTOBJS)
+DEPLIBS2		= $(TESTDEPLIBS)
+
+AllTarget()
+
+SdmTestTarget($(TESTOBJS))
+SdmTestTarget($(TESTPROG1))
+SdmCleanTest($(TESTPROGS))
+
+NormalLibraryObjectRule()
+
+ComplexProgramTarget_2($(TESTPROG1),$(TEST_LIBRARIES),$(SYS_LIBRARIES))
+ComplexProgramTarget_3($(TESTPROG2),$(SDM_LIBRARIES),$(SYS_LIBRARIES))
+
+CPP		= /usr/ccs/lib/cpp -P -B -DLOGNAME=$(LOGNAME) -DHOSTNAME=$(HOSTNAME)
+USERNAME	= $(USER)
+HOSTNAME:sh	= uname -n
+
+TESTSCRIPTSRCS	= \
+	commitpending.src \
+	copymove.src \
+	getattributes.src \
+	getcontents.src \
+	getcontentsV3.src \
+	getflags.src \
+	getheaders.src \
+	scan.src \
+	setup.src \
+	submitaudatt.src \
+	submitaudbdy.src \
+	submitnstatt.src
+
+TESTSCRIPTS = \
+	commitpendingI.tst commitpendingL.tst \
+	copymoveI.tst copymoveL.tst \
+	getattributesI.tst getattributesL.tst \
+	getcontentsI.tst getcontentsL.tst \
+	getcontentsV3I.tst getcontentsV3L.tst \
+	getflagsI.tst getflagsL.tst \
+	getheadersI.tst getheadersL.tst \
+	scanI.tst scanL.tst \
+	submitaudattI.tst submitaudattL.tst \
+	submitaudbdyI.tst submitaudbdyL.tst \
+	submitnstattI.tst submitnstattL.tst
+
+cclient_tests:
+	$(RM) $(TESTSCRIPTS)
+	$(CPP) addresstest.src > addresstestL.tst
+	$(CPP) -DIMAP addresstest.src > addresstestI.tst
+	$(CPP) commitpending.src > commitpendingL.tst
+	$(CPP) -DIMAP commitpending.src > commitpendingI.tst
+	$(CPP) copymove.src > copymoveL.tst
+	$(CPP) -DIMAP copymove.src > copymoveI.tst
+	$(CPP) getattributes.src > getattributesL.tst
+	$(CPP) -DIMAP getattributes.src > getattributesI.tst
+	$(CPP) getcontents.src > getcontentsL.tst
+	$(CPP) -DIMAP getcontents.src > getcontentsI.tst
+	$(CPP) getcontentsV3.src > getcontentsV3L.tst
+	$(CPP) -DIMAP getcontentsV3.src > getcontentsV3I.tst
+	$(CPP) getflags.src > getflagsL.tst
+	$(CPP) -DIMAP getflags.src > getflagsI.tst
+	$(CPP) getheaders.src > getheadersL.tst
+	$(CPP) -DIMAP getheaders.src > getheadersI.tst
+	$(CPP) newmailcheck.src > newmailcheckL.tst
+	$(CPP) -DIMAP newmailcheck.src > newmailcheckI.tst
+	$(CPP) scan.src > scanL.tst
+	$(CPP) -DIMAP scan.src > scanI.tst
+	$(CPP) submitaudatt.src > submitaudattL.tst
+	$(CPP) -DIMAP submitaudatt.src > submitaudattI.tst
+	$(CPP) submitaudbdy.src > submitaudbdyL.tst
+	$(CPP) -DIMAP submitaudbdy.src > submitaudbdyI.tst
+	$(CPP) submitnstatt.src > submitnstattL.tst
+	$(CPP) -DIMAP submitnstatt.src > submitnstattI.tst
+
+# These really don't need to be cleaned.
+#clean::
+#	$(RM) $(TESTSCRIPTS)
+
+includes::
+
+depend::

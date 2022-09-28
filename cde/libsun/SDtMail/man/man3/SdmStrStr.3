@@ -1,0 +1,522 @@
+.de LI
+.\" simulate -mm .LIs by turning them into .TPs
+.TP \\n()Jn
+\\$1
+..
+.de Lc
+.\" version of .LI that emboldens its argument
+.TP \\n()Jn
+\s-1\f3\\$1\f1\s+1
+..
+.TH SdmStrStr 3 "07/03/96"
+.BH "07/03/96"
+.\" @(#)SdmStrStr.3	1.9 96/07/03 SMI
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994, 1995, 1996 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994, 1995, 1996 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994, 1995, 1996 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994, 1995, 1996 Novell, Inc.
+.SH NAME
+SdmStrStr \- Container for a pair of SdmString objects
+.SH SYNOPSIS
+.\"
+.SS Includes
+.ft 3
+.nf
+#include <Sdtmail.hh>
+.\"
+.SS Creation
+.ft 3
+.nf
+.sp 0.5v
+new SdmStrStr();
+.PP
+.fi
+.ft 3
+.nf
+.sp 0.5v
+.ta \w'new SdmStrStr('u
+new SdmStrStr(const SdmString& \f2firstString\fP,
+	const SdmString& \f2secondString\fP);
+.PP
+.ft 3
+.ta \w'new SdmStrStr('u
+new SdmStrStr(const char& \f2firstString\fP,
+	const char* \f2secondString\fP);
+.PP
+.ft 3
+.ta \w'new SdmStrStr('u
+new SdmStrStr(const SdmStrStr& \f2strstr\fP);
+.fi
+.ft 1
+.\"
+.SS Operators
+.PP
+.ft 3
+SdmStrStr& operator= (const SdmStrStr& \f2StrStr\fP);
+.PP
+.ft 3
+int operator< (const SdmStrStr& \f2StrStr\fP) const;
+.PP
+.ft 3
+int operator> (const SdmStrStr& \f2StrStr\fP) const;
+.PP
+.ft 3
+int operator== (const SdmStrStr& \f2StrStr\fP) const;
+.PP
+.ft 3
+int operator!= (const SdmStrStr& \f2StrStr\fP) const;
+.fi
+.ft 1
+.\"
+.SS Methods
+.PP
+.ft 3
+.nf
+.sp 0.5v
+.ta \w'void clear('u
+void clear()
+.PP
+.ft 3
+.ta \w'SdmString GetFirstString('u
+SdmString GetFirstString();
+.PP
+.ft 3
+.ta \w'SdmString GetSecondString('u
+SdmString GetSecondString();
+.PP
+.ft 3
+.ta \w'void SetFirstString('u
+void SetFirstString(const SdmString& \f2string\fP);
+.PP
+.ft 3
+.ta \w'void SetFirstString('u
+void SetFirstString(const char* \f2string\fP);
+.PP
+.ft 3
+.ta \w'void SetBothStrings('u
+void SetBothStrings(const SdmString& \f2firstString\fP,
+	const SdmString& \f2secondString\fP);
+.PP
+.ft 3
+.ta \w'void SetBothStrings('u
+void SetBothStrings(const char* \f2firstString\fP,
+	const SdmString& \f2secondString\fP);
+.PP
+.ft 3
+.ta \w'void SetBothStrings('u
+void SetBothStrings(const SdmString& \f2firstString\fP,
+	const char* \f2secondString\fP);
+.PP
+.ft 3
+.ta \w'void SetBothStrings('u
+void SetBothStrings(const char* \f2firstString\fP,
+	const char* \f2secondString\fP);
+.PP
+.ft 3
+.ta \w'void SetSecondString('u
+void SetSecondString(const SdmString& \f2string\fP);
+.PP
+.ft 3
+.ta \w'void SetSecondString('u
+void SetSecondString(const char* \f2string\fP);
+.fi
+.ft 1
+.\" end of methods list
+.ta 0.25i 0.50i 0.75i 1.0i 1.25i 1.50i 1.75i 2.0i 2.5i 3.0i
+.SH DESCRIPTION
+The SdmStrStr object implements a container (tuple) that holds two SdmString objects,
+referred to as the 'first string' and the 'second string'. The SdmString objects
+themselves are ordinary string objects that are completely independent of each other. 
+.PP
+This object is useful for holding information that is logically a single datum but that is
+physically represented by two separate values (such as a header, which is composed of a
+field name and field value).
+.PP
+Many methods implemented by libSDtMail return data in the form of SdmStrStr objects; for
+example, message headers and message attributes.
+.\"
+.SH CREATION
+There are a number of ways to create an SdmStrStr object.
+.SS Empty Object
+You can call the SdmStrStr constructor with no arguments:
+.PP
+.nf
+		SdmStrStr* strstr = new SdmStrStr();
+		SdmStrStr strstr();
+.fi
+.PP
+This creates a new SdmStrStr object that has a null (zero) pointers
+for strings.
+.SS Existing Char*s
+You can call the SdmStrStr constructor with a constant character pointers:
+.PP
+.nf
+		SdmStrStr* strstr = new SdmStrStr(const char* firstString,
+					 const char* secondString);
+		SdmStrStr strstr(const char* firstString, 
+					const char* secondString);
+
+	For example:
+
+		SdmStrStr* strstr = new SdmStrStr("first", "second");
+		SdmStrStr strstr("third", "fourth");
+.fi
+.PP
+This creates a new SdmStrStr object that has initial values of the character strings
+given as the arguments to the constructor; new storage is allocated and the given null
+terminated character string data is copied into the new string objects.
+.SS Existing SdmStrings
+You can call the SdmStrStr constructor with existing SdmString objects:
+.PP
+.nf
+		SdmStrStr* strstr = new SdmStrStr(const SdmString& firstString, 
+					const SdmString& secondString);
+		SdmStrStr strstr(const SdmString& firstString,
+					const SdmString& secondString);
+.fi
+.PP
+This creates a new SdmStrStr object that has initial values of referenced copies
+of the original SdmString objects; that is, new storage is not allocated, but
+rather another reference to the same data is made.
+.SS Existing SdmStrStr
+You can call the SdmStrStr constructor with an existing SdmStrStr object:
+.PP
+.nf
+		SdmStrStr* strstr = new SdmStrStr(const SdmStrStr& strstr);
+		SdmStrStr strstr(const SdmStrStr& strstr);
+.fi
+.PP
+This creates a new SdmStrStr object that is a copy of the original; while new
+storage is allocated for the SdmStrStr object, the contained strings are
+reference copies to the same underlying data.
+.\"
+.SH DESTRUCTION
+An SdmStrStr object can be destroyed like any other object. Both contained
+SdmString objects are destroyed. If it is the last reference to the underlying
+data, the data itself is released from storage; otherwise, just the string
+reference object is destroyed.
+.\"
+.SH OPERATORS
+Some standard C operators are overloaded to function with SdmStrStr objects:
+.SS Comparison
+(\f3<  >  ==  !=\fP)
+.PP
+SdmStrStr tuples can be can be compared against each other using some standard C
+comparison operators; comparisons are "case sensitive". The operators are successful only
+if the operation succeeds on both parts of the tuple; for example, for equality, both
+first and second strings must match, for inequality, both the first and second strings
+must fail to match.
+.PP
+.nf
+		SdmStrStr s1, s2;
+
+		s1 == s2
+		s1 < s2
+		s1 > s2
+		s1 != s2
+.fi
+.SS Assignment
+(\f3=\fP)
+.PP
+SdmStrStr tuples can be assigned to each other. The following is valid:
+.PP
+.nf
+		SdmStrStr s1, s2;
+
+		s2 = s1;
+.fi
+.\"
+.SH METHODS
+The following methods are provided to operate on the contents of an SdmStrStr tuple object.
+.\"
+.SS \f3Clear\fP
+()
+
+This method causes both strings to be cleared; that is, reset to null
+(zero) pointers.
+.PP
+.nf
+		SdmStrStr s1;
+		SdmStrStr *s2;
+
+		s1.Clear();
+		s2->Clear();
+.fi
+.\"
+.SS \f3GetFirstString\fP
+()
+
+Retrieve the first string component of this SdmStrStr tuple.
+For example:
+.PP
+.nf
+		SdmStrStr s1("this is the first string", "the second string is here");
+
+		printf("%s: %s\\n", (const char *)s1.GetFirstString(),
+				(const char *)s1.GetSecondString());
+
+	would print:
+
+		this is the first string: the second string is here
+.fi
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "none"
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmString)\fP"
+.br
+A SdmString object representing the first string of this SdmStrStr tuple is returned.
+This is NOT a reference copy of the contained SdmString object, but rather the contained
+SdmString object itself. The object must not be deleted. If a copy that can later be 
+deleted is desired, it can be assigned to another SdmString object.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetSecondString\fP
+()
+
+Retrieve the second string component of this SdmStrStr tuple.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "none"
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmString)\fP"
+.br
+A SdmString object representing the second string of this SdmStrStr tuple is returned.
+This is NOT a reference copy of the contained SdmString object, but rather the contained
+SdmString object itself. The object must not be deleted. If a copy that can later be 
+deleted is desired, it can be assigned to another SdmString object.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3SetFirstString\fP
+(\f3string\fP)
+
+This method allows the first string value of this tuple to be set to the string value
+supplied as an argument.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3string\fP (\f3const SdmString&\fP)"
+.br
+The string to set the first string value of this tuple to.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "none"
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3SetFirstString\fP
+(\f3string\fP)
+
+This method allows the first string value of this tuple to be set to the character string
+value supplied as an argument.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3string\fP (\f3const char*\fP)"
+.br
+The character string to set the first string value of this tuple to.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "none"
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3SetBothStrings\fP
+(\f3firststring\fP, \f3secondstring\fP)
+
+This method allows both the first string value and the second string value of this tuple
+to be set to the string values supplied as arguments.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3firststring\fP (\f3const SdmString&\fP)"
+.br
+The string to set the first string value of this tuple to.
+.LI "\f3secondstring\fP (\f3const SdmString&\fP)"
+.br
+The string to set the second string value of this tuple to.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "none"
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3SetBothStrings\fP
+(\f3firststring\fP, \f3secondstring\fP)
+
+This method allows both the first string value and the second string value of this tuple
+to be set to the string values supplied as arguments.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3firststring\fP (\f3const char*\fP)"
+.br
+The character string to set the first string value of this tuple to.
+.LI "\f3secondstring\fP (\f3const SdmString&\fP)"
+.br
+The string to set the second string value of this tuple to.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "none"
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3SetBothStrings\fP
+(\f3firststring\fP, \f3secondstring\fP)
+
+This method allows both the first string value and the second string value of this tuple
+to be set to the string values supplied as arguments.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3firststring\fP (\f3const SdmString&\fP)"
+.br
+The string to set the first string value of this tuple to.
+.LI "\f3secondstring\fP (\f3const char*\fP)"
+.br
+The string to set the second string value of this tuple to.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "none"
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3SetBothStrings\fP
+(\f3firststring\fP, \f3secondstring\fP)
+
+This method allows both the first string value and the second string value of this tuple
+to be set to the string values supplied as arguments.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3firststring\fP (\f3const char*\fP)"
+.br
+The string to set the first string value of this tuple to.
+.LI "\f3secondstring\fP (\f3const char*\fP)"
+.br
+The string to set the second string value of this tuple to.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "none"
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3SetSecondString\fP
+(\f3string\fP)
+
+This method allows the second string value of this tuple to be set to the string value
+supplied as an argument.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3string\fP (\f3const SdmString&\fP)"
+.br
+The string to set the second string value of this tuple to.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "none"
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3SetSecondString\fP
+(\f3string\fP)
+
+This method allows the second string value of this tuple to be set to the character string
+value supplied as an argument.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3string\fP (\f3const char*\fP)"
+.br
+The character string to set the second string value of this tuple to.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "none"
+.PP
+.RE
+.nr )J 0
+.\"
+.PP
+.RE
+.nr )J 0
+.SH "SEE ALSO"
+.na
+.BR SdmString (3),
+.BR SdmStrStrL (3),
+.BR SdmStrStrLL (3)

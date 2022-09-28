@@ -1,0 +1,198 @@
+.TH dtspcd 1m "4 April 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994 Novell, Inc.
+.\" *************************************************************************
+.SH NAME
+dtspcd \- CDE Subprocess Control Service
+.SH SYNOPSIS
+.yS
+dtspcd	[ \-debug ] [ \-log ] [ \-auth_dir \f2directory\f1 ]
+	[ \-timeout \f2num_minutes\f1 ] [ \-mount_point \f2mount_point\f1 ]
+.yE
+.SH DESCRIPTION
+The daemon for the 
+CDE Subprocess Control service,
+.BR dtspcd ,
+is not intended to be started directly by the user,  
+rather it should be started automatically by the inetd 
+daemon (see
+.BR inetd (1M))
+in response to a CDE client 
+requesting a process to be started on the daemon's host.
+.SH OPTIONS
+.VL 15
+.LI "\f3\-auth_dir\f2  directory\f1"
+The default authentication directory is the user's
+$HOME directory.
+This option allows the system
+administrator to use a different directory.
+Note that
+.I directory
+must be exported to hosts wishing
+to use the
+.B dtspc
+service.
+.br
+.I directory
+\- the name of the directory to use for authentication.
+.sp 1
+.LI "\f3\-timeout\f2  minutes\f1"
+By default, the dtspcd process will terminate if it does
+not have any activity (process start or process stop) 
+for 10 minutes and
+.B dtspcd
+has no child processes running.
+To change the timeout, set
+.I minutes
+to the 
+desired number of minutes.  
+To force the daemon to not use a timer, 
+set
+.I minutes
+to \-1.
+.br
+.I "minutes "
+\- the number of minutes for the timer.
+.LI "\f3\-mount_point\f2  mount_point\f1"
+The file system's mount point is named
+.IR mount_point.
+For example,
+.I mount_point
+could
+be "/net" or "/nfs".
+The daemon sets the
+environment variable
+.I DTMOUNTPOINT
+to the
+value of
+.IR mount_point .
+This value
+of
+.I DTMOUNTPOINT
+will override all other 
+definitions of
+.IR DTMOUNTPOINT .
+.LI \f3\-log\f1       
+This option turns on logging of status information
+to the file
+.BR /var/dt/tmp/DTSPCD.log .
+The information logged
+includes the name of the client host, the client's
+username, error messages and the name of the file 
+used for authentication.
+The default is to not do any logging.
+.LI \f3\-debug\f1
+This option turns on logging of dtspc protocol 
+to the file
+.BR /var/dt/tmp/DTSPCD.log.
+The
+protocol information logged includes
+the name of the protocol and number of bytes
+in the request.
+The default is to not log the protocol.
+.LE
+.SH AUTHENTICATION
+When a CDE client attempts to connect to a
+.B dtspcd
+daemon, 
+the client sends the daemon its username.
+The
+daemon uses the username to determine the user's
+home directory on the daemon's host.
+The home 
+directory is used during authentication and it
+must be readable by the daemon and writable by
+the client.
+Therefore, the user's home directory
+on the daemon's host must be mounted to the client 
+host.
+If the user's home directory is not readable
+and the
+.B \-auth_dir
+command line option is not used,
+the directory
+.B /var/dt/tmp
+will be used.
+.P
+To use a directory other than the user's home directory 
+for authentication, use the
+.B \-auth_dir
+command
+line option.
+.SH CONFIGURATION
+The
+.B dtspcd
+daemon is an Internet service that must
+be registered in the file
+.B /etc/services
+as follows:
+.Cs I 
+dtspc      6112/tcp
+.Ce
+.sp 1
+and in the file
+.B /etc/inetd.conf
+as follows:
+.Cs I
+dtspc  stream  tcp  nowait  root  /usr/dt/bin/dtspcd/usr/dt/bin/dtspcd
+.Ce
+.SH "ENVIRONMENT VARIABLE MANAGEMENT"
+.LP
+The CDE Subprocess Control service allows 
+the user and system administrator to
+create files of environment variable
+definitions to be placed in the
+processes environment before a remote
+process is started.
+See
+.BR dtspcdenv (4M)
+for more information.
+.SH "OPERATING SYSTEM DEPENDENCIES"
+On HP-UX, the file
+.B /usr/adm/inetd.sec
+may be used to 
+control access to the
+.B dtspcd
+daemon.
+See
+.BR inetd.sec (4)
+for more information.
+.SH FILES
+.VL 15
+.LI \f3/usr/dt/bin/dtspcd\f1
+The CDE Subprocess Control daemon
+.LI \f3/etc/services\f1
+The Internet service name data base
+.LI \f3/etc/inted.conf\f1
+The inetd configuration file
+.LI \f3/etc/dt/config/dtspcdenv\f1
+System-wide, locally defined environment variable 
+definitions used when a process is executed
+.LI \f3/usr/dt/config/dtspcdenv\f1
+System-wide, installed environment variable definitions 
+used when a process is executed
+.LI \f3$HOME/.dt/dtspcdenv\f1
+User-specific environment variable definitions used 
+when a process is executed
+.LI \f3/var/dt/tmp/DTSPCD.log\f1
+The dtspcd log file
+.LE
+.SH DIAGNOSTICS
+Use the command line options
+.BR \-log
+and
+.BR \-debug
+(described above) to get diagnostic
+information.
+.SH "SEE ALSO"
+.BR inetd (1M),
+.BR services (4),
+.BR inetd.conf (4),
+.BR dtspcdenv (4M).
+
+
+

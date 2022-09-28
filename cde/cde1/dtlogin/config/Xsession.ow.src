@@ -1,0 +1,46 @@
+\#!/bin/ksh 
+\#####################################################################
+\###  File:              Xsession.ow
+\###
+\###  Default Location:  /usr/dt/config/Xsession.ow
+\###
+\###  Purpose:           OpenWindows session start script
+\###
+\###  Invoked by:        Solaris Desktop Login Manager (dtlogin)
+\###
+\###  Revision:          @(#)Xsession.ow.src 1.5 97/05/26 
+\###
+\###  (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+\###
+\#####################################################################
+
+
+DTDSPMSG=/usr/dt/bin/dtdspmsg
+
+if [ -z "$SESSIONTYPE" ]
+then
+	export SESSIONTYPE="altDt"
+fi
+
+if [ -z "$DTSTARTIMS" ]
+then
+	export DTSTARTIMS="False"
+fi
+
+if [ -z "$SDT_ALT_SESSION" ]
+then
+	export SDT_ALT_SESSION="/usr/dt/config/Xsession.ow2"
+fi
+
+if [ -z "$SDT_ALT_HELLO" ]
+then
+  if [ -x $DTDSPMSG ]; then 
+     export SDT_ALT_HELLO="/usr/dt/bin/dthello -string '`$DTDSPMSG -s 37 /usr/dt/lib/nls/msg/$LANG/dthello.cat 1 'Starting the OpenWindows Desktop'`' &"
+  else
+     export SDT_ALT_HELLO="/usr/dt/bin/dthello -string 'Starting the OpenWindows Desktop' &"
+  fi
+fi
+
+export SDT_NO_DSDM=""
+
+/usr/dt/bin/Xsession

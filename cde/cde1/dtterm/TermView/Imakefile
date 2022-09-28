@@ -1,0 +1,102 @@
+XCOMM   $XConsortium: Imakefile /main/cde1_maint/3 1995/09/29 15:06:44 lehors $
+XCOMM
+
+/* this will need to go eventually into the Project.tmpl file... */
+#ifndef	SharedLibDtTerm
+#define	SharedLibDtTerm HasSharedLibraries
+#endif
+
+#ifndef	NormalLibDtTerm
+#define	NormalLibDtTerm (!SharedLibDtTerm | ForceNormalLib)
+#endif
+/*****************************************************************/
+
+#ifndef DoNormalLib
+#define DoNormalLib NormalLibDtTerm
+#endif
+
+#ifndef	DoSharedLib
+#define	DoSharedLib SharedLibDtTerm
+#endif
+
+#ifndef	DoDebugLib
+#define	DoDebugLib DebugLibDtTerm
+#endif
+
+#ifndef	DoProfileLib
+#define	DoProfileLib ProfileLibDtTerm
+#endif
+
+#include <Library.tmpl>
+
+#ifdef	Build_HpVue
+EXTRA_DEFINES = -DBUILD_HPVUE -DHPVUE
+#endif	/* Build_HpVue */
+
+#ifdef  HPArchitecture
+DEFINES = -DHP_ARCHITECTURE
+#endif
+
+#ifdef  IBMArchitecture
+DEFINES = -DIBM_ARCHITECTURE
+#endif
+
+#ifdef  SunArchitecture
+DEFINES = -DSUN_ARCHITECTURE -D_TS_ERRNO
+EXTRA_CCOPTIONS = -dalign 
+#endif
+
+#ifdef  USLArchitecture
+DEFINES = -DUSL_ARCHITECTURE
+#endif
+
+#ifdef  UXPArchitecture
+DEFINES = -DUXP_ARCHITECTURE
+#endif
+
+#ifdef	Build_HpVue
+HELPLIB =
+DEPHELPLIB =
+EXTRA_DEFINES = -DHPVUE
+/* EXTRA_INCLUDES = -I$(XVHSRC) -I$(ENVLIBSRC) */
+/* EXTRA_INCLUDES = -I$(UNITYLIBSRC) */
+/* EXTRA_INCLUDES = -I$(ENVLIBSRC) */
+EXTRA_INCLUDES = -I$(ENVLIBSRC)
+#else	/* Build_HpVue */
+#ifdef  SunArchitecture
+HELPLIB = 
+DEPHELPLIB = 
+#else
+HELPLIB = $(DTHELPLIB)
+DEPHELPLIB = $(DEPDTHELPLIB)
+#endif /* SunArchitecture */
+#endif	/* Build_HpVue */
+LINTLIBS = $(LINTXLIB) $(LINTXTOOL) $(LINTXM)
+
+INCLUDES = -I. -I.. -I$(DTINCLUDESRC) -I../TermPrim -I../Term
+
+SRCS1 = \
+	SunDtHelp.c \
+	TermView.c \
+	TermViewMenu.c \
+	TermViewGlobalDialog.c \
+	TermViewTerminalDialog.c
+
+OBJS1 = \
+	SunDtHelp.o \
+	TermView.o \
+	TermViewMenu.o \
+	TermViewGlobalDialog.o \
+	TermViewTerminalDialog.o
+
+SRCS = $(SRCS1)
+OBJS = $(OBJS1)
+
+LibraryObjectRule()
+all:: $(OBJS)
+
+LintLibraryTarget(DtTerm,$(SRCS))
+
+DependTarget()
+
+includes::

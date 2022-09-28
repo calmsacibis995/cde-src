@@ -1,0 +1,121 @@
+XCOMM $XConsortium: Imakefile /main/cde1_maint/5 1995/10/23 08:51:53 gtsang $
+/*********************************************************************
+*  (c) Copyright 1993, 1994 Hewlett-Packard Company	
+*  (c) Copyright 1993, 1994 International Business Machines Corp.
+*  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+*  (c) Copyright 1993, 1994 Unix System Labs, Inc., a subsidiary of
+*      Novell, Inc.
+**********************************************************************/
+DESKTOP_VERSION_STRING = DesktopVersionString
+
+#
+# Imakefile: for DT Icon Editor
+#
+
+/* General case INCLUDES DEFINES LOCAL_LIBRARIES
+ * Each individual architecture may have more or less of the above.
+ * Use EXTRA_DEFINES and EXTRA_INCLUDES to add defines and includes
+ * to an individual architecture.  There is no equivalent for
+ * LOCAL_LIBRARIES.
+ * USE_libraryname in LOCAL_LIBRARIES is by default empty.
+ * It should be set when necessary to the real library macro name.
+ */
+
+        DEFINES = -DMESSAGE_CAT -D__TOOLTALK
+       INCLUDES = -I.
+#if defined (SunArchitecture)
+DEPLIBS = $(DEPDTWIDGETLIB) $(DEPDTSVCLIB) $(DEPTTLIB)\
+                  $(DEPXMLIB) $(DEPXTOOLLIB) $(DEPXLIB)
+LOCAL_LIBRARIES = $(DTWIDGETLIB) $(DTSVCLIB) $(TTLIB)\
+                  $(XMLIB) $(XTOOLLIB) $(XLIB)
+
+/* Following files need a "long long" for large file system support. Use -Xa */
+fileIO.o := CCOPTIONS = -Xa
+
+#else
+DEPLIBS = $(DEPDTHELPLIB) $(DEPDTWIDGETLIB) $(DEPDTSVCLIB) $(DEPTTLIB)\
+                  $(DEPXMLIB) $(DEPXTOOLLIB) $(DEPXLIB)
+LOCAL_LIBRARIES = $(DTHELPLIB) $(DTWIDGETLIB) $(DTSVCLIB) $(TTLIB)\
+                  $(XMLIB) $(XTOOLLIB) $(XLIB)
+#endif /* SunArchitecture */
+SYS_LIBRARIES = -lm
+
+#ifdef HPArchitecture
+#endif
+
+#ifdef RsArchitecture
+EXTRA_DEFINES = -D_NO_PROTO -D__TOOLTALK
+SYS_LIBRARIES = -lm -liconv
+#endif
+
+#if defined (SunArchitecture)
+SYS_LIBRARIES = -lm -ldl $(WIDECHARSYSLIB)
+EXTRA_CCOPTIONS = -xstrconst -dalign
+#endif /* SunArchitecture */
+
+#if defined (USLArchitecture)
+SYS_LIBRARIES = -lm -ldl $(WIDECHARSYSLIB) -lgen
+#endif /* USLArchitecture */
+
+#if defined (UXPArchitecture)
+EXTRA_DEFINES = -D__TOOLTALK
+SYS_LIBRARIES = -lm -ldl $(WIDECHARSYSLIB) -lgen
+#endif /* UXPArchitecture */
+
+#if defined (AlphaArchitecture)
+EXTRA_DEFINES = -D__TOOLTALK
+#endif
+
+
+SRCS = \
+	main.c          \
+	utils.c		\
+	event.c		\
+	graphics.c	\
+	image.c		\
+	process.c	\
+	fileIO.c	\
+	dtIconShell.c	\
+	newIconDialog.c	\
+	queryDialog.c	\
+	stdErrDialog.c	\
+	fileIODialog.c  \
+	help.c          \
+	globals.c       \
+	version.c
+
+OBJS = \
+	main.o          \
+	utils.o		\
+	event.o		\
+	graphics.o	\
+	image.o		\
+	process.o	\
+	fileIO.o	\
+	dtIconShell.o	\
+	newIconDialog.o	\
+	queryDialog.o	\
+	stdErrDialog.o	\
+	fileIODialog.o  \
+	help.o          \
+	globals.o       \
+	version.o
+
+NormalLibraryObjectRule()
+ComplexProgramTarget(dticon)
+
+/***** For dtge make a client_OBJS.o using client_main.o ******/
+/***** This implies the existence of client_main.c       ******/
+/***** dtge hidden symbols *******/
+#ifdef BuildHugeObject
+#ifdef HPArchitecture
+#ifdef __hp9000s300
+HIDDEN_SYMBOLS = -h _main -h _HelpOnItemCB -h _CreateHelpDialog \
+       -h _DisplayHelpDialog -h _ChangeTitle
+#else
+HIDDEN_SYMBOLS = -h main  -h HelpOnItemCB -h CreateHelpDialog \
+       -h DisplayHelpDialog -h ChangeTitle
+#endif
+#endif
+SpecialRelocatableTarget(dticon,$(HIDDEN_SYMBOLS),$(OBJS))
+#endif

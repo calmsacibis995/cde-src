@@ -1,0 +1,187 @@
+#ifdef HPArchitecture  
+VENDOR_ARG = -h
+#endif
+
+#ifdef RsArchitecture
+VENDOR_ARG = -i
+#endif
+
+#ifdef SunArchitecture
+VENDOR_ARG = -s
+#endif
+
+#ifdef USLArchitecture
+VENDOR_ARG = -u
+#endif
+
+
+SRCS_ACTION = \
+	dtaction.1xo\
+	dtexec.1xo
+
+SRCS_CM = \
+	dtcm.1xo \
+	dtcm_admin.1xo \
+	dtcm_delete.1xo \
+	dtcm_insert.1xo \
+	dtcm_lookup.1xo
+
+SRCS_EDITOR = \
+	dtpad.1xo
+
+SRCS_HELP = \
+	dthelpgen.1xo\
+	dthelpprint.1xo\
+	dthelptag.1xo\
+	dthelpview.1xo \
+	dthelp_ctag1xo \
+	dthelp_htag1xo \
+	dthelp_htag2xo
+
+SRCS_TERM = \
+	dtterm.1xo
+
+SRCS_MISC = \
+	dtappgather.1xo \
+	dtcalc.1xo \
+	dtconvertvf.1xo \
+	dtfplist.1xo \
+	dtlp.1xo \
+	dtsearchpath.1xo \
+	dtwm.1xo \
+	dtappintegrate.1xo \
+	dtcodegen.1xo \
+	dtprintinfo.1xo \
+	dtksh.1xo
+
+SRCS = $(SRCS_ACTION) \
+	$(SRCS_CM) \
+	$(SRCS_EDITOR) \
+	$(SRCS_HELP) \
+	$(SRCS_TERM) \
+	$(SRCS_MISC)
+
+
+OBJS_ACTION = \
+	dtaction.1\
+	dtexec.1
+
+OBJS_CM = \
+	dtcm.1 \
+	dtcm_admin.1 \
+	dtcm_delete.1 \
+	dtcm_insert.1 \
+	dtcm_lookup.1
+
+OBJS_EDITOR = \
+	dtpad.1
+
+OBJS_HELP = \
+	dthelpgen.1\
+	dthelpprint.1\
+	dthelptag.1\
+	dthelpview.1 \
+	dthelp_ctag1.1 \
+	dthelp_htag1.1 \
+	dthelp_htag2.1
+
+OBJS_TERM = \
+	dtterm.1
+
+OBJS_MISC = \
+	dtappgather.1 \
+	dtcalc.1 \
+	dtconvertvf.1 \
+	dtfplist.1 \
+	dtlp.1 \
+	dtsearchpath.1 \
+	dtwm.1 \
+	dtappintegrate.1 \
+	dtcodegen.1 \
+	dtprintinfo.1 \
+	dtksh.1
+
+OBJS = $(OBJS_ACTION) \
+	$(OBJS_CM) \
+	$(OBJS_EDITOR) \
+	$(OBJS_HELP) \
+	$(OBJS_TERM) \
+	$(OBJS_MISC)
+
+
+DT2MAN = ../tools/dt2man
+
+MANROFF = /usr/bin/troff -man
+
+
+all:: $(OBJS)
+
+actionall:: $(OBJS_ACTION)
+
+cmall:: $(OBJS_CM)
+
+editorall:: $(OBJS_EDITOR)
+
+helpall:: $(OBJS_HELP)
+
+termall:: $(OBJS_TERM)
+
+miscall:: $(OBJS_MISC)
+
+dtsearchpath.1:dtsearchpath.1xo
+	sccs get -k dtsearchpath.1xo
+	chmod 444 dtsearchpath.1xo
+	$(RM) $@
+	$(DT2MAN) $(VENDOR_ARG) dtsearchpath.1xo >$@
+
+.SUFFIXES: .1xo .1
+
+.1xo.1:
+	$(RM) $@
+	$(DT2MAN) $(VENDOR_ARG) $? >$@
+
+clean::
+	$(RM) $(OBJS)
+
+actionclean::
+	$(RM) $(OBJS_ACTION)
+
+cmclean::
+	$(RM) $(OBJS_CM)
+
+editorclean::
+	$(RM) $(OBJS_EDITOR)
+
+helpclean::
+	$(RM) $(OBJS_HELP)
+
+termclean::
+	$(RM) $(OBJS_TERM)
+
+miscclean::
+	$(RM) $(OBJS_MISC)
+
+
+depend::
+
+includes::
+
+
+actionprint::	actionall
+	$(TBL) $(OBJS_ACTION) | $(MANROFF)
+
+cmprint::	cmall
+	$(TBL) $(OBJS_CM) | $(MANROFF)
+
+editorprint::	editorall
+	$(TBL) $(OBJS_EDITOR) | $(MANROFF)
+
+helpprint::	helpall
+	$(TBL) $(OBJS_HELP) | $(MANROFF)
+
+termprint::	termall
+	$(TBL) $(OBJS_TERM) | $(MANROFF)
+
+miscprint::	miscall
+	$(TBL) $(OBJS_MISC) | $(MANROFF)
+

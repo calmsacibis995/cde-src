@@ -1,0 +1,645 @@
+.de LI
+.\" simulate -mm .LIs by turning them into .TPs
+.TP \\n()Jn
+\\$1
+..
+.de Lc
+.\" version of .LI that emboldens its argument
+.TP \\n()Jn
+\s-1\f3\\$1\f1\s+1
+..
+.TH SdmSearch 3 "07/26/96"
+.BH "07/26/96"
+.\" @(#)SdmSearch.3	1.10 96/07/26 SMI
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994, 1995, 1996 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994, 1995, 1996 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994, 1995, 1996 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994, 1995, 1996 Novell, Inc.
+.SH NAME
+SdmSearch \- Standard search criteria
+.SH SYNOPSIS
+.\"
+.SS Includes
+.ft 3
+.nf
+#include <Sdtmail.hh>
+#include <Search.hh>
+.\"
+.SS Creation
+.ft 3
+.nf
+.sp 0.5v
+.ta \w'new SdmSearch('u
+new SdmSearch();
+.fi
+.ft 1
+.\"
+.SS Methods
+.ft 3
+.nf
+.sp 0.5v
+.ta \w'SdmErrorCode GetSearchString('u
+SdmErrorCode GetSearchString(SdmError \f2&err\fP,
+	SdmString& \f2r_searchString\fP) const
+.PP
+.ft 3
+.ta \w'SdmErrorCode SetSearchString('u
+SdmErrorCode SetSearchString(SdmError \f2&err\fP,
+	const SdmString& \f2searchString\fP)
+.PP
+.ft 3
+.ta \w'SdmErrorCode ParseSearch('u
+SdmErrorCode ParseSearch(SdmError \f2&err\fP,
+	SdmSearchLeaf*& \f2r_leaf\fP,
+	const SdmBoolean \f2createLeafList\fP)
+.PP
+.ft 3
+.ta \w'static void FreeLeaf('u
+static void FreeLeaf(SdmLeaf \f2*leaf\fP)
+.PP
+.ft 3
+.ta \w'static void PrintLeaf('u
+static void PrintLeaf(SdmLeaf \f2*leaf\fP)
+.fi
+.ft 1
+.\" end of methods list
+.ta 0.25i 0.50i 0.75i 1.0i 1.25i 1.50i 1.75i 2.0i 2.5i 3.0i
+.SH DESCRIPTION
+The SdmSearch object encapsulates the concept of a search criteria.  
+The criteria is initially empty.  Typically the user sets the criteria 
+and passes the search object to the message store to execute a search on the store, 
+thus retrieving the messages in the store that meet the criteria.
+.SH SEARCH CRITERIA 
+The search criteria for the search object is a string which contains one 
+or more expressions.  An expression defines a condition which 
+a message must match in order to meet the search criteria.  An expression
+consists of a token followed by an optional field.  For example:
+.nf
+
+   From "John"  - searches for all messages from John.
+   Unread         - searches for all unread messages.
+
+.fi
+The token and field are both case insensitive.  Therefore "From John", 
+"FROM John" and "From JOHN" would all return the same results.
+.SS Logical Operators
+Multiple expressions may be combined using the logical operators AND or OR.
+For example:
+.nf
+
+   From "John" AND Unread   - searches for all unread messages from John 
+			
+   From "John" OR Unread      - searches for all messages from John and all 
+                                             unread messages.
+.fi
+.PP
+The inverse of an expression may be specified using the negation operator ( ~ ).
+Using this operator specifies that messages NOT matching the criteria are
+to be returned.  For example:
+.nf
+ 
+       ~ From "John"
+.fi
+.PP
+This search returns all messages that are not from John.
+.SS Parenthesis Usage
+.PP
+Multiple expressions can be grouped further using parenthesis.  Only a 
+single level of parenthesis is permitted.  Expressions with nested parenthesis 
+will result in a parsing error.
+.nf
+ 
+       (From "John" AND Unread) or (From "Mary" AND Read)
+.fi
+.PP
+This search returns all unread messages from John and all
+read messages from Mary.
+.PP
+The negation operator can be specified before the parenthesis to 
+indicate that all messages that do not match the criteria 
+within the parenthesis are to be returned.  
+.nf
+ 
+       ~ (From "John" AND Unread)
+.fi
+.PP
+This search returns all messages that are not unread messages from John.
+.SH Search Tokens
+Search tokens are used in the expression to define what condition to match 
+in the search.  Some tokens require fields to be specified after them and
+others do not.  The tokens are defined in SdmSearch as string constants.
+One can obtain the actual string value for a token by removing the 
+"Sdm_STK_" prefix and converting the result to upper case.  For example,
+the actual value of the token Sdm_STK_Subject is "SUBJECT". 
+.PP
+The following tokens do not require a field.  Most of these
+tokens refer to the message flags for a message.  See SdmGlossary(3) for 
+a detailed list of the message flags.
+.SS All
+(Sdm_STK_All)
+ 
+include all messages.
+.SS New
+(Sdm_STK_New)
+ 
+message is new.  this means the message is recent 
+(ie. arrived since the last time message store was closed) and has
+not been read.
+.SS Old
+(Sdm_STK_Old)
+ 
+message is old.
+.SS Deleted
+(Sdm_STK_Deleted)
+ 
+message has been deleted.
+.SS Undeleted
+(Sdm_STK_Undeleted)
+ 
+message is not deleted.
+.SS Read
+(Sdm_STK_Read)
+ 
+message has been read.
+.SS Unread
+(Sdm_STK_Unread)
+ 
+message is not read.
+.SS Recent
+(Sdm_STK_Recent)
+ 
+message arrived since last time message store was closed.
+.SS Flagged
+(Sdm_STK_Flagged)
+ 
+message is marked urgent/special attention.
+.SS Unflagged
+(Sdm_STK_Unflagged)
+ 
+message is not marked urgent/special attention.
+.SS Seen
+(Sdm_STK_Seen)
+ 
+message is read.  This is the same as the Read token.
+.SS Unseen
+(Sdm_STK_Unseen)
+ 
+message is not read.  This is the same as the Unread token.
+.SS Draft
+(Sdm_STK_Draft)
+ 
+message is an uncompleted composition.
+.SS Undraft
+(Sdm_STK_Undraft)
+ 
+message is not an uncompleted composition.
+
+.PP
+The following tokens require a text field:
+.SS To
+(Sdm_STK_To)
+ 
+text field found in "To" header of message.
+.SS From
+(Sdm_STK_From)
+ 
+text field found in "From" header of message.
+.SS CC
+(Sdm_STK_CC)
+ 
+text field found in "CC" header of message.
+.SS BCC
+(Sdm_STK_BCC)
+ 
+text field found in "BCC" header of message.
+.SS Subject
+(Sdm_STK_Subject)
+ 
+text field found in "Subject" header of message.
+.SS Body
+(Sdm_STK_Body)
+ 
+text field found in body of message.
+.SS Text
+(Sdm_STK_Text)
+ 
+text field found in header or body of message.
+.SS Header
+(Sdm_STK_Header)
+ 
+This is a special token that takes two text fields.
+The first field specifies the header to search and 
+the second specifies the value to match.  For example:
+.nf
+
+  Header "X-Sun-Charset" "US-ASCII"
+
+This expression searches for messages that has "US-ASCII" for 
+the value of the X-Sun-Charset header.
+
+.fi
+.SS Keyword
+(Sdm_STK_Keyword)
+ 
+text field found in "Keyword" header of message.
+.SS Unkeyword
+(Sdm_STK_Unkeyword)
+ 
+text field not found in "Keyword" header of message.
+
+.PP
+The following tokens require a numeric field.  The number must
+be a positive integer.
+.SS Smaller
+(Sdm_STK_Smaller)
+ 
+size of message is smaller than numeric field value.
+.SS Larger
+(Sdm_STK_Larger)
+ 
+size of message is larger than numeric field value.
+
+.PP
+The following tokens require a date field.  The format for the date 
+field is: 
+.nf
+
+     "DD-MMM-YYYY"
+
+.fi
+where DD is the day in the month, MMM is the
+first three characters of the month, and YYYY is the year.
+.SS Before
+(Sdm_STK_Before)
+ 
+message received before the date.  
+messages received on the 
+date itself will not be included in the search.
+.SS Since
+(Sdm_STK_Since)
+ 
+message received since the date.
+messages received on the 
+date itself will be included in the search.
+.SS On
+(Sdm_STK_On)
+ 
+message received on the date.
+.SS During
+(Sdm_STK_During)
+ 
+message received during the date.  The "During" token
+is mostly used in a search macro such as "During ThisMonth"
+(see Search Macro section below).  If a single date is
+given with the token (ie. "During 01-DEC-1996") then 
+the "During" token works like the "On" token.  messages
+received on this date will be returned.
+.SS SentSince
+(Sdm_STK_SentSince)
+ 
+message sent since the date.
+messages sent on the 
+date itself will be included in the search.
+.SS SentBefore
+(Sdm_STK_SentBefore)
+ 
+message sent before the date.
+messages sent on the 
+date itself will not be included in the search.
+.SS SentOn
+(Sdm_STK_SentOn)
+ 
+message sent on the date.
+messages sent on the 
+date itself will be included in the search.
+
+.\"
+.SH Dynamic Date Constants
+The search mechanism provides a way to specify date fields that 
+will be determined dynamically when the search is executed.  A set
+of constants prefixed with "Sdm_DDF_" are defined in SdmSearch 
+that define these dates.  These
+constants may be used in place of the a date field for the tokens that
+require a date.  For example:
+.nf
+
+  ON Today	  	- searches for all messages received today.
+
+  SINCE Monday   	- searches for all messages received since 
+						Monday this week.
+
+  DURING March  	- searches for all messages received in the 
+						month of March this year.
+  
+  SENTBEFORE ThisMonth - searches for all messages sent before 
+								this month.
+  
+.PP
+The dynamic date constants are listed below.  Note that the week begins
+with Sunday.
+.SS Today
+(Sdm_DDF_Today)
+ 
+Date for current day.
+.SS Yesterday
+(Sdm_DDF_Yesterday)
+ 
+Date for yesterday.
+.SS ThisMonth
+(Sdm_DDF_ThisMonth)
+ 
+First day of the current month.
+.SS LastMonth
+(Sdm_DDF_LastMonth)
+ 
+First day of last month.
+.SS LastWeek
+(Sdm_DDF_LastWeek)
+ 
+Sunday of last week.
+.SS January
+(Sdm_DDF_January)
+ 
+January 1 of the current year.
+.SS February
+(Sdm_DDF_February)
+ 
+February 1 of the current year.
+.SS March
+(Sdm_DDF_March)
+ 
+March 1 of the current year.
+.SS April
+(Sdm_DDF_April)
+ 
+April 1 of the current year.
+.SS May
+(Sdm_DDF_May)
+ 
+May 1 of the current year.
+.SS June
+(Sdm_DDF_June)
+ 
+June 1 of the current year.
+.SS July
+(Sdm_DDF_July)
+ 
+July 1 of the current year.
+.SS August
+(Sdm_DDF_August)
+ 
+August 1 of the current year.
+.SS September
+(Sdm_DDF_September)
+ 
+September 1 of the current year.
+.SS October
+(Sdm_DDF_October)
+ 
+October 1 of the current year.
+.SS November
+(Sdm_DDF_November)
+ 
+November 1 of the current year.
+.SS December
+(Sdm_DDF_December)
+ 
+December 1 of the current year.
+.SS Sunday
+(Sdm_DDF_Sunday)
+ 
+Sunday of the current week.
+.SS Monday
+(Sdm_DDF_Monday)
+ 
+Monday of the current week.
+.SS Tuesday
+(Sdm_DDF_Tuesday)
+ 
+Tuesday of the current week.
+.SS Wednesday
+(Sdm_DDF_Wednesday)
+ 
+Wednesday of the current week.
+.SS Thursday
+(Sdm_DDF_Thursday)
+ 
+Thursday of the current week.
+.SS Friday
+(Sdm_DDF_Friday)
+ 
+Friday of the current week.
+.SS Saturday
+(Sdm_DDF_Saturday)
+ 
+Saturday of the current week.
+
+.\"
+.SH Search Macro 
+Search macros are defined to allow users to specify a single 
+expression in place of one or more other expressions.  These
+macros get expanded when the search criteria is parsed.  
+The following expressions are represented by macros in search:
+.PP
+.RS 3
+.nr )J 6
+.Lc "\f2During\fP <<month>>"
+.br
+Indicates message received since the first day of the given month 
+and before the month after it.  For example, the "During February" 
+macro expands to the expression "Since February AND Before March".
+.Lc "\f2During LastWeek\fP" 
+.br
+Indicates message received since Sunday of last week and before 
+Sunday of this week.  The "During LastWeek" macro expands to the 
+expression "Since LastWeek AND Before Sunday".
+.Lc "\f2During LastMonth\fP" 
+.br
+Indicates message received since the first day of last month and 
+before this month.  The "During LastMonth" macro expands to 
+the expression "Since LastMonth AND Before ThisMonth".
+.Lc "\f2Read\fP" 
+.br
+Indicates message received that are Read.
+The "Read" macro expands to the expression "Seen".
+.Lc "\f2Unread\fP"
+.br
+Indicates message received that are unread.
+The "Unread" macro expands to the expression "Unseen".
+.\"
+.SH CREATION
+The only way to create an SdmSearch object is by calling the constructor directly
+with no arguments:
+.PP
+.nf
+        SdmSearch search;
+        SdmSearch *search = new SdmSearch;
+.fi
+.PP
+This creates a new SdmSearch object; the default value of the criteria is set to
+an empty string (indicating that all messages match the search).
+.PP
+.\"
+.SH DESTRUCTION
+An SdmSearch object can be destroyed like any other object. It releases any storage that
+may have been accumulated in holding the search criteria.
+.\"
+.SH METHODS
+The following methods are provided by search.
+.\"
+.SS \f3GetSearchString\fP
+(\f3err\fP, \f3r_searchString\fP)
+.PP
+Get the search criteria defined for this search object.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_searchString\fP (\f3SdmString&\fP)"
+.br
+Retrieve the search criteria defined in this object; upon 
+successful completion this string is filled in with the value 
+of the search criteria.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3SetSearchString\fP
+(\f3err\fP, \f3searchString\fP)
+.PP
+Sets the search criteria for this search object.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3searchString\fP (\f3const SdmString&\fP)"
+.br
+A string representing the search criteria to be set.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3ParseSearch\fP
+(\f3err\fP, \f3r_leaf\fP, \f3createLeafList\fP)
+.PP
+Parses the search string.  Returns a list of leaves representing
+the search if createLeafList is true.  Otherwise, ParseSearch only
+parses the search.  In either case, it returns an error code 
+indicating whether the parse was successful.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_leaf\fP (\f3SdmSearchLeaf*&\fP)"
+.br
+The list of leaves representing the parsed search string.
+See SdmGlossary(3) for a definition of a search leaf structure.
+.LI "\f3createLeafList\fP (\f3const SdmBoolean&\fP)"
+.br
+Boolean indicating whether leaf list should be created for the
+parsed string.  If value is true and the parse is successful,
+r_leaf will be set to the leaf list representing the parsed
+search string.  If false, r_leaf is unchanged.  In either case,
+the error will be returned indicating whether the parse for the
+search was successful.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3FreeLeaf\fP
+(\f3leaf\fP)
+.PP
+Frees memory allocated for the given leaf.  After this
+call, the pointer to leaf is no longer valid.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3leaf\fP (\f3SdmSearchLeaf*\fP)"
+.br
+Pointer to leaf which will be freed.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "none."
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3PrintLeaf\fP
+(\f3leaf\fP)
+.PP
+Prints contents of leaf to standard output.  PrintLeaf recursively calls itself
+to print out the next leaf in the list.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3leaf\fP (\f3SdmSearchLeaf*\fP)"
+.br
+Leaf to be printed.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "none."
+.PP
+.RE
+.nr )J 0
+.\"
+.PP
+.RE
+.nr )J 0
+.\"
+.SH "SEE ALSO"
+.na
+.BR SdmError (3),
+.BR SdmGlossary (3),
+.BR SdmMessageStore (3).

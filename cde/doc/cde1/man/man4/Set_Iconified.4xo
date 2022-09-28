@@ -1,0 +1,95 @@
+.TH Set_Iconified 4 "13 May 1994"
+.SH NAME
+Set_Iconified request \- set a tool's iconic state
+.SH SYNOPSIS
+.yS
+.ta \w@Get_Iconified(@u
+Get_Iconified(out boolean \f2iconic\fP
+	[in messageID \f2commission\fP]);
+.yE
+.SH DESCRIPTION
+The
+.I Set_Iconified
+request
+sets the iconic state of the optionally specified
+window, or of the window primarily associated with the handling
+procid (if no window is specified).
+.P
+The
+.I iconic
+argument
+is a Boolean value indicating whether the specified window is (to be)
+iconified.
+.P
+The
+.I commission
+argument
+is the ID of the ongoing request, if any, that resulted in the creation
+of the window(s) in question.
+.SH "APPLICATION USAGE"
+The
+.Fn ttdt_session_join 3,
+and
+.Fn ttdt_message_accept 3,
+functions can be used by Xt applications to register for,
+and transparently process, the
+.I Set_Iconified
+request.
+.P
+If the handler does not map window-system windows one-to-one to
+commissions or procids, then it may interpret ``iconic state'' liberally.
+For example, consider a
+.I Display
+request on an
+.B ISO_Latin_1
+file, handled by a
+.Cm gnuemacs
+instance that then devotes an
+.Cm emacs
+``window'' to the file.
+``Windows'' in
+.Cm gnuemacs
+are not separate X11 windows, and are not separately iconifiable.
+However, a
+.I Set_Iconified
+request issued with respect to the ongoing
+.I Display
+request could be liberally interpreted by
+.Cm gnuemacs
+to mean it should
+minimize the screen real estate devoted to the operation, perhaps by
+``burying'' the buffer or dividing its window's real estate among
+neighboring windows.
+And, if the
+.I Display
+request happens to be the only thing
+.Cm emacs
+is working on at the
+moment, it could instead take a literal interpretation, and actually
+iconify itself.
+.SH EXAMPLES
+The
+.I Set_Iconified
+request can be sent as in the following example:
+.Cs I
+Tt_message msg = tttk_message_create(0, TT_REQUEST, TT_SESSION,
+			the_recipient_procid, TTDT_SET_ICONIFIED,
+			my_callback);
+tt_message_iarg_add(msg, TT_IN, Tttk_boolean, 1);
+tt_message_send(msg);
+.Ce
+.cdes 
+.SH WARNINGS
+.I Set_Iconified
+can also be sent as a multicast notice, as an
+.I edict 
+to all tools in the scope of the message.
+The consequences of doing so can be severe and unexpected.
+.cdee
+.SH "SEE ALSO"
+.Fn tt_message_iarg_add 3,
+.Fn tt_message_send 3,
+.Fn ttdt_message_accept 3,
+.Fn ttdt_session_join 3;
+.I Get_Iconified
+request.

@@ -1,0 +1,92 @@
+.\" **
+.\" **
+.\" ** (c) Copyright 1994 Hewlett-Packard Company
+.\" ** (c) Copyright 1994 International Business Machines Corp.
+.\" ** (c) Copyright 1994 Sun Microsystems, Inc.
+.\" ** (c) Copyright 1994 Unix Systems Labs, Inc., a subsidiary of Novell, Inc.
+.\" **
+.\" **
+.\" **
+.TH DtHelpReturnSelectedWidgetId 3 "11 Jan 1994"
+.BH "11 Jan 1994"
+.SH NAME
+DtHelpReturnSelectedWidgetId  \- a convenience function for end user 
+selection of a widget or gadget.
+.iX "DtHelpReturnSelectedWidgetId"
+.iX "select object function" "DtHelpReturnSelectedWidgetId"
+.SH SYNOPSIS
+\fB
+\&#include <Dt/Help.h>
+.br
+.sp .5
+int DtHelpReturnSelectedWidgetId (\fIparent, cursor, widget\fP)
+.br
+.ta .5i 1.5i
+        Widget   \fIparent\fP;
+.br
+        String   \fIcursor\fP;
+.br
+        Widget   \fIwidget\fP;
+.fi
+\fP
+.SH DESCRIPTION
+\fBDtHelpReturnSelectedWidgetId\fP is a utility function that provides an
+interface for selection of a component within an application. This function 
+grabs the pointer and returns the widget within which a button press occurs. 
+Pressing the ESC key will abort this function.
+.IP "\fIparent\fP" .75i
+Specifies the widget ID to use as the basis of the interaction, usually a top
+level shell.
+.IP "\fIcursor\fP" .75i
+Specifies the cursor to be used for the pointer during the interaction. If a 
+value of NULL is used, this function will use a default cursor value.
+.IP "\fIwidget\fP" .75i
+This is the return value (e.g. selected widget). A value of NULL is returned 
+on error.
+.SH "RETURN VALUES"
+.PP
+The function returns a status value of:
+.IP "\fBDtHELP_SELECT_ERROR\fP"
+A return status of \fBDtHELP_SELECT_ERROR\fP informs the calling routine that
+an error occurred while attempting to process the function.
+.IP "\fBDtHELP_SELECT_INVALID\fP"
+A return status of \fBDtHELP_SELECT_INVALID\fP informs the calling routine 
+that the user selected an invalid component that is not contained 
+in the current widget hierarchy. 
+.IP "\fBDtHELP_SELECT_ABORT\fP"
+A return status of \fBDtHELP_SELECT_ABORT\fP informs the calling routine that
+the user aborted the function (e.g. press'ed the `esc' key), and a null 
+`widget' value is passed back.
+.IP "\fBDtHELP_SELECT_VALID\fP"
+A return status of \fBDtHELP_SELECT_VALID\fP informs the calling routine that
+the user selected a valid component within the application, and the `widget' 
+parameter is the ID of the selected component.
+.PP
+.SH USAGE
+\fBDtHelpReturnSelectedWidgetId\fP allows developers to get the widget ID for 
+any widget in their user interface that the user has selected via the 
+pointer. The application then has the opportunity to directly display a 
+help topic based on the selected widget or dynamically 
+construct some help information based on the current context of the selected
+item. At any point while the question mark cursor is displayed the user can
+select the escape key (ESC) to abort the function call. If the user selects any
+item outside the current applications window(s) an error status will be 
+returned along with a null value for the widget parameter.
+Refer to the OSF/Motif 1.2 XmTrackingLocate() for a similar function.
+.SH ERRORS
+.PP
+See \fBRETURN VALUES\fP above for a description of possible error return
+conditions.
+.SH "SEE ALSO"
+.BR DtCreateQuickHelpDialog(3),
+.BR DtCreateHelpDialog(3)
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,83 @@
+.\"--- 
+.\"    (c) Copyright 1996 Sun Microsystems, Inc.
+.\"--- 
+.TH sdtvolcheck 1 "4 Jun 1996"
+.BH "4 Jun 1996"
+.\"---
+.SH NAME
+sdtvolcheck \- check for media and open media found
+.SH SYNOPSIS
+.B sdtvolcheck 
+.RB [ \-z
+.IR nsecs ]
+.RB [ \-fdD ]
+.RI [ media_spec
+.RI [ cmd
+.RI [ arg... ]]]
+.SH DESCRIPTION
+Check for removable media and (by default) open the media found.
+.B sdtvolcheck
+watches continuously for media insertions while the user is
+logged into CDE, and is also run when the user explicitly
+asks to open a removable volume.
+.SH OPTIONS
+.TP
+.B \-d
+Monitor the specified media continuously.
+.TP
+.BI \-z \ nsecs
+Sleep
+.I nsecs
+seconds before doing anything.  Useful for preventing race conditions
+at startup.
+.TP
+.B \-D
+Pass device path (e.g. /vol/dev/rdiskette0/volname) as well as
+mount point (e.g. /floppy/volname) to
+.I cmd.
+By default, only the device path is passed.
+.TP
+.B \-f
+Do not format unreadable floppies found.  By default, floppies that
+are unlabeled or unformatted are first formatted before
+.I cmd
+is run.
+.SH OPERANDS
+.TP
+.I media_spec
+The media for which to check, e.g. floppy0, cdrom, *.  Default: floppy.
+.B sdtvolcheck
+opens all volumes described by /tmp/.removable/media_spec*.
+.TP
+.I cmd arg...
+The command to run on any media found.  The command is passed
+the mount point and optionally the device path.  The default
+command is dtaction Open.  Except when the
+.I -d
+option is given,
+.B sdtvolcheck
+waits synchronously for each invoked command to exit.
+.SH RETURN VALUES
+.TP 15
+0
+Successful completion
+.TP
+1
+Invalid command line options.
+.TP
+2
+/tmp/.removable does not exist and could not be created.
+.TP
+3
+Notification pipe /tmp/.removable/notifyNNN could not be created.
+.SH FILES
+.PD 0
+.TP 20
+.B /tmp/.removable/notifyNNN 		volmgt notification pipe
+.TP 20
+.B /tmp/.removable/media_spec* 		volmgt media descriptions
+.PD
+.SH "SEE ALSO"
+.BR volcheck (1),
+.BR format_floppy (1),
+.BR dtaction (1)

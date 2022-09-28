@@ -1,0 +1,75 @@
+MTest -- C client test program
+Debug protocol (y/n)?y
+Mailbox ('?' for help): /tmp/inboxExisting
+MM_NOTIFY:%Read index file
+ solaris mailbox: /tmp/inboxExisting,  511 messages,  0 recent
+MTest>S
+To: abcde12345
+cc: abcde12345
+Subject: Testing SMTP
+ Msg (end with a line with only a '.'):
+Ignore Testing SMTP.
+.
+Sending...
+MM_DLOG:HELO localhost
+MM_DLOG:RSET
+MM_DLOG:250 Reset state
+MM_DLOG:MAIL FROM:<testuser@localhost>
+MM_DLOG:250 <testuser@localhost>... Sender ok
+MM_DLOG:RCPT TO:<abcde12345@localhost>
+MM_DLOG:250 <abcde12345@localhost>... Recipient ok
+MM_DLOG:RCPT TO:<abcde12345@localhost>
+MM_DLOG:250 <abcde12345@localhost>... Recipient ok
+MM_DLOG:DATA
+MM_DLOG:354 Enter mail, end with "." on a line by itself
+MM_DLOG:.
+[Ok]
+MM_DLOG:QUIT
+MM_DLOG:221 Eng.Sun.COM closing connection
+MTest>! sleep 10
+MTest>N localhost:INBOX
+MM_DLOG:* OK localhost IMAP4rev1 v10.173 server ready
+MM_NOTIFY:[localhost IMAP4rev1 v10.173 server ready]
+MM_DLOG:A00000 CAPABILITY
+MM_DLOG:* CAPABILITY IMAP4 IMAP4REV1 SCAN SORT AUTH=LOGIN
+MM_DLOG:A00000 OK CAPABILITY completed
+MM_DLOG:A00001 AUTHENTICATE LOGIN
+MM_DLOG:+ VXNlciBOYW1lAA==
+localhost:username abcde12345
+localhost:password 12345abcde
+MM_DLOG:YWJjZGUxMjM0NQ==
+MM_DLOG:+ UGFzc3dvcmQA
+MM_DLOG:MTIzNDVhYmNkZQ==
+MM_DLOG:A00001 OK AUTHENTICATE completed
+MM_DLOG:A00002 SELECT INBOX
+MM_DLOG:* 1 EXISTS
+MM_DLOG:* OK [UIDVALIDITY 865639925] UID validity status
+MM_DLOG:* FLAGS (\Answered \Flagged \Deleted \Draft \Seen)
+MM_DLOG:* OK [PERMANENTFLAGS (\Answered \Flagged \Deleted \Draft \Seen)] Permanent flags
+MM_DLOG:* OK [UNSEEN 1] 1 is first unseen
+MM_NOTIFY:[[UNSEEN 1] 1 is first unseen]
+MM_DLOG:* 1 RECENT
+MM_DLOG:A00002 OK [READ-WRITE] SELECT completed
+ imap4 mailbox: {localhost}INBOX,  1 messages,  1 recent
+MTest>T 1
+MM_DLOG:A00003 FETCH 1 RFC822.HEADER.LINES (X-Unix-From Date From To Subject Content-Type)
+MM_DLOG:* 1 FETCH (RFC822.HEADER {177}
+MM_DLOG:)
+MM_DLOG:A00003 OK FETCH completed
+Date: Fri, 6 Jun 1997 16:31:54 -0700 (PDT)
+From: "Doug Royer [N6AAW]" <testuser@localhost>
+Subject: Testing SMTP
+To: abcde12345@localhost
+Content-Type: TEXT/PLAIN; CHARSET=US-ASCII
+
+MM_DLOG:A00004 FETCH 1 RFC822.TEXT
+MM_DLOG:* 1 FETCH (RFC822.TEXT {24}
+MM_DLOG: FLAGS (\Recent \Seen))
+MM_DLOG:A00004 OK FETCH completed
+Ignore Testing SMTP.
+
+
+MTest>Q
+MM_DLOG:A00005 LOGOUT
+MM_DLOG:* BYE localhost IMAP4rev1 server terminating connection
+MM_NOTIFY:MM_DLOG:A00005 OK LOGOUT completed

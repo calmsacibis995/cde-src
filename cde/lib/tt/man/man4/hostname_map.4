@@ -1,0 +1,82 @@
+.TH hostname_map 4 "1 March 1996" "ToolTalk 1.3" "ToolTalk Commands" 
+.BH "1 March 1996"
+.\" (c) Copyright 1993, 1995 Sun Microsystems, Inc.
+.\"  (c) Copyright 1993, 1995 Hewlett-Packard Company
+.\"  (c) Copyright 1993, 1995 International Business Machines Corp.
+.\"  (c) Copyright 1993, 1995 Novell, Inc.
+.IX "hostname_map.4" "" "hostname_map.4" "" 
+.SH NAME
+hostname_map - tell ToolTalk clients to use a per-host alternative 
+.BR rpc.ttdbserverd (1M)
+.SH SYNOPSIS
+.PP
+.B hostname_map
+.SH DESCRIPTION
+.PP
+A ToolTalk
+.B hostname_map
+tells ToolTalk clients to use host A's
+.BR rpc.ttdbserverd (1M)
+as a proxy for host B.  In this way, ToolTalk databases can
+be created for filesystems exported from hosts (like host B) that
+for whatever reason do not run
+.BR rpc.ttdbserverd (1M).
+.PP
+The
+.B hostname_map
+file is called "hostname_map" and resides in the same directories
+as the ToolTalk types databases; see
+.BR tt_type_comp (1).
+If $TT_HOSTNAME_MAP is set, it is used
+in place of $HOME/.tt/hostname_map.
+.PP
+ToolTalk clients read the hostname maps when the ToolTalk client
+library is initialized in e.g.
+.BR tt_open (3).
+.BR ttsession
+reads the hostname maps upon startup and rereads them if it
+receives signal USR2.
+.SS Format rules
+.PP
+The format rules for a
+.B hostname_map
+are:
+.HP 3
+1. Any line beginning with a "#" or white-space and a "#" is a comment.
+.HP 3
+2. Blank lines are comments.
+.HP 3
+3. Words are delimited by white space.
+.HP 3
+4. The first word in a non-comment line is the host name from which
+to map.
+.HP 3
+5. The second word in a non-comment line is the host name to which
+to map.
+.SH ENVIRONMENT
+.TP
+.SM TT_HOSTNAME_MAP
+If $TT_HOSTNAME_MAP is set, it is used
+in place of $HOME/.tt/hostname_map.
+.TP
+.SM TTPATH
+A colon-separated list of directories in which to seek hostname_maps.
+See
+.BR tt_type_comp (1).
+.SH EXAMPLES
+.PP
+This example maps "mainframe1" to "sparcstorage":
+.IP
+.nf
+# rpc.ttdbserverd cannot run on filesystems
+# exported from mainframe
+mainframe1 sparcstorage
+.fi
+.SH "SEE ALSO"
+.na
+.PP
+.BR rpc.ttdbserverd (1M),
+.BR ttsession (1),
+.BR tt_type_comp (1),
+.BR tt_open (3),
+.BR partition_map (4)

@@ -1,0 +1,46 @@
+#!/usr/bin/sh 
+
+date
+if test "${BUILD_TREE}" = ""
+then
+	echo ""
+	echo "Exiting.. BUILD_TREE environment variable not set"
+	echo ""
+	exit
+fi
+
+if test "${BUILD_ARCH}" = ""
+then
+	echo ""
+	echo "Exiting.. BUILD_ARCH (sparc/i386) environment variable not set"
+	echo ""
+	exit 
+fi
+
+if test "${CDE_PACK_VER}" = ""
+then
+	CDE_PACK_VER=10
+	export CDE_PACK_VER
+fi
+
+if test "${CDE_PACK_DATE}" = ""
+then
+        CDE_PACK_DATE=`date '+%y.%m.%d'`
+        export CDE_PACK_DATE
+fi
+
+if test "${CDE_PACK_DIR}" = ""
+then
+	echo "Please set the CDE_PACK_DIR variable to the directory"
+	echo "where you want the packages to be built........"
+	exit
+fi
+
+for i in `ls | grep -v MAKE | grep -v Install | grep -v copyright | grep -v SCCS`
+do
+cd $i
+chmod 555 MAKE_SunOS_PACKAGES
+./MAKE_SunOS_PACKAGES
+cd ..
+done
+date

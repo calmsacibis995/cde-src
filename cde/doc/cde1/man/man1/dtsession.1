@@ -1,0 +1,538 @@
+'\" t
+.de LI
+.\" simulate -mm .LIs by turning them into .TPs
+.TP \\n()Jn
+\\$1
+..
+.\"--- 
+.\"    (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\"    (c) Copyright 1993, 1994 International Business Machines Corp.
+.\"    (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\"    (c) Copyright 1993, 1994 Novell, Inc.
+.\"--- 
+.TH dtsession 1X "26 Nov 1996"
+
+.BH "26 Jul 1994""
+
+.SH NAME
+dtsession - the CDE Session Manager
+.SH SYNOPSIS
+dtsession [options]
+.P
+.B NOTE
+: The dtsession client is automatically invoked by the DT
+Login Manager (dtlogin(1X)) via the Xsession script. If desired,
+dtsession may be started via the Xsession script on an existing
+X server. 
+.P
+.B NOTE
+: dtsession automatically starts a window manager.
+.SH DESCRIPTION
+The dtsession client provides ICCCM 1.1 compliant session management
+functionality during a user's session, the time from login to logout.
+It launches a window manager and allows for saving a session,
+restoring a session, locking a session, launching screen savers and
+allocating colors for desktop compatible clients.
+.sp .5
+.SS Key Supported Tasks
+The dtsession client supports the following key tasks:
+.RS
+.P
+- Initializing a session.
+.P
+- Launching a window manager.
+.P
+- Restoring a `home' or `current' session.
+.P
+- Providing session locking on command or timeout.
+.P
+- Providing session screen saving on command or timeout.
+.P
+- Acting as a color allocation server for other DT clients.
+.P
+- Saving a `home' or `current' session.
+.P
+- Displaying confirmation dialog at logout.
+.P
+- Displaying session selection dialog at logout.
+.P
+- Terminating a session.
+.RE
+.sp .5
+.SS A Session
+A session is the collection of applications, settings and resources
+that are present on the user's desktop. Session management is a set of
+conventions and protocols that allow a special session manager such as
+dtsession to save and restore a user's session. A user is able to log
+into their system and be presented with the same set of running
+applications, settings and resources as were present when the user
+logged off. When a user logs into the desktop for the first time, a
+default initial session is loaded. Afterward, dtsession supports the
+notion of a current and a home session.
+.sp .5
+.SS The Initial Session
+When a user logs into the desktop for the first time, dtsession will
+generate the user's initial session using system default values.
+Refer to Session Resource Management and Session Application Management
+for more information.
+.sp .5
+.SS The Current Session
+The user's running session is always considered the current session,
+whether restored upon login from a saved home session, a saved current
+session or the system default initial session. Based on the user's 
+Style Manager Startup settings, when the user exits the session, the
+current session is automatically saved. When the user next logs into 
+the desktop, the previously saved current session is restarted. This
+means that the desktop will be restored to same state as it was when
+the user last logged out.
+.sp .5
+.SS The Home Session
+Another option is having the desktop be restored to the same state
+every time the user logs in, regardless of its state when the user
+logged out. The user may save the state of the current session, then
+via the Style Manager Startup settings, have the desktop start that
+session every time the user logs in. 
+.sp .5
+.SS Display-specific Sessions
+To run a specific session for a specific display, a user may create a
+display-specific session. To do this, the user can copy the
+$HOME/.dt/sessions directory to $HOME/.dt/display where display is the
+real, unqualified hostname (for example, pablo:0 is valid,
+pablo.gato.com:0 or local:0 is not). When the user logs in on display
+pablo:0, that display specific session will take precedence.
+This display specific session file is limited in length to 14 characters.
+For a long display like "this-is-a-long-display-name:0" the 
+directory name created should be "this-is-a-lo:0". 
+.sp .5
+.SS Executing Additional Commands at Session Startup
+To execute commands at startup, user can create the file 
+$HOME/.dt/sessions/sessionetc containing the commands. This file is a
+script and must have execute permission. Processes started in sessionetc
+should be run in the background. This file should not be used to start
+clients that are automatically restored by Session Manager. Doing so can
+cause multiple copies of the application to be started.
+.sp .5
+.SS Executing Additional Commands at Logout
+To execute commands at logout,  user can create the file 
+$HOME/.dt/sessions/sessionexit containing the commands. This file is a 
+script and must have execute permission.
+.sp .5
+.SS The ICCCM Session Management Protocol
+For an application to be saved upon logout and restarted upon login,
+it must participate in a simple session management protocol. Dtsession
+supports the ICCCM 1.1 Session Management Protocol.
+.PP
+Applications that wish to save their state can take part in the
+WM_SAVE_YOURSELF protocol. To do this, an application needs to set the
+WM_SAVE_YOURSELF property on one and only one of its top-level
+windows. When a session is saved, dtsession will send the
+application's top-level window a WM_SAVE_YOURSELF client message. At
+this point the application can proceed to quietly save its state. The
+application cannot interact with the user in any way as it is saving
+its state. As an application will likely save its state into a file,
+the session manager provides a convenience function
+DtSessionSavePath() which returns a full pathname of a file in which
+an application can save its state. While the application is saving its
+state, dtsession is awaiting notice from the application that it is
+done. To tell dtsession that the state save is complete, the
+application needs to update the WM_COMMAND property on its top-level
+window.
+.PP
+The WM_COMMAND property on an application's top-level window serves
+two purposes. First, a change of this property is the indication to
+dtsession that an application is done saving its state and dtsession
+can proceed to the next application. Second, the WM_COMMAND property
+value is expected to contain the command line that dtsession will use
+to restart the application at session startup. If an application is
+launched with a full pathname, then it should use the full pathname
+when setting WM_COMMAND. Applications that do not need to save their
+state, but wish to be restarted, can simply set WM_COMMAND during
+application startup and forget about it.
+.PP
+Refer to the XmAddWmProtocols(), XmAddWMProtocolCallback() and
+XSetCommand() API's for more information.
+.sp .5
+.SS Restoring A Session
+At session startup time, dtsession will determine which session to
+restore. The following describes the precedence:
+.P
+- Display-specific Current or Home Session -OR-
+.P 
+- Current or Home Session -OR-
+.P
+- Initial Session
+.sp .5
+.SS Session Resource Management
+The session manager uses the X Server RESOURCE_MANAGER property on
+which to make available desktop resources to all applications.
+The session manager will load the RESOURCE_MANAGER in the following 
+manner:
+.P
+- load the system default resources -AND-
+.P
+- merge any system administrator specified resources -AND-
+.P
+- merge any user specified resources
+.PP
+The desktop default resources can be found in 
+/usr/dt/config/$LANG/sys.resources. These resources will be
+made available to each user's session via the RESOURCE_MANAGER 
+property. This file should not be edited as it will be unconditionally
+overwritten upon subsequent desktop installations.
+.PP
+A system administrator may augment the system default resources
+by creating /etc/dt/config/$LANG/sys.resources. In this file, a 
+system administrator may override system default resources or 
+specify additional resources. As this file is merged into the
+desktop default resources during session startup, it is preferrable
+that only new or updated resource specifications be placed in this
+file, rather than a copy being made of the desktop default resource
+file. Resources specified in this file will be made available to
+each user's session via the RESOURCE_MANAGER property. Resources
+specified in this file take precedence over those specified in 
+the desktop default resource file.
+.PP
+A user may augment the desktop default and system administrator 
+resources via their $HOME/.Xdefaults file. Resources specified in
+this file will be made available to only that user's session via
+the RESOURCE_MANAGER property. Resources specified in this file
+take precedence over those specified in the desktop default or
+system administrator resource files.
+.PP
+.B NOTE :
+The X Toolkit Intrinsics specifies that it will load resources
+for an application from either RESOURCE_MANAGER or from
+$HOME/.Xdefaults, but not both. Ordinarily, this would mean that
+the user's $HOME/.Xdefaults file would be ignored. However, the
+session manager accomodates $HOME/.Xdefaults by merging it into
+the RESOURCE_MANAGER at session startup as described above. If 
+a user changes their $HOME/.Xdefaults, their changes will not be
+visible to new applications until the user invokes the
+ReloadResources action.
+.PP
+The ReloadResources action will instruct the session manager to 
+reload the RESOURCE_MANAGER with the system, system administrator 
+and user specified resources. This is useful to make available to
+new applications changes made to system administrator or user
+specified resource files.
+.PP
+See also dtresourcesfile(4) and dtsessionactions(5).
+.P
+.SS Session Application Management
+At session startup, the session manager will restart any applications
+that were saved as part of the session. The system default set of
+applications to be
+restored as part of the user's Initial Session can be found in
+/usr/dt/config/$LANG/sys.session. This file should not be edited as
+it will be unconditionally overwritten upon subsequent desktop
+installations.
+.PP
+See also dtsessionfile(4).
+.PP
+A system administrator may replace the set of applications that
+are restored as part of the user's Initial Session by creating
+a file named /etc/dt/config/$LANG/sys.session. Unlike the resource
+files, this file will be used as a complete replacement for the 
+desktop default file, so it is valid to make a copy of the system
+default file and make any necessary modifications.
+.sp .5
+.SS The Window Manager
+Dtsession is responsible for starting the window manager. By default
+/usr/dt/bin/dtwm is started. An alternate window manager can be
+specified with the wmStartupCommand resource. Refer to the Workspace
+Manager specification for more information.
+.sp .5
+.SS The Style Manager
+The style manager provides the interface by which a user can change
+various desktop and X server settings for the current session. Refer
+to the Style Manager specification for more information.
+.sp .5
+.SS The Color Server
+Dtsession serves as the color server for the desktop and provides a
+set of resources that can be used to configure it. The
+.B foregroundColor
+resource controls whether a pixel is allocated
+for the foreground color. The 
+.B dynamicColor
+resource specifies
+whether read-only colors are allocated. The 
+.B shadowPixmaps
+resource specifies whether colors are allocated for top shadow or
+bottom shadow. The 
+.B colorUse
+resource limits color allocation.
+Finally, the 
+.B writeXrdbColors
+resource specifies whether the
+*background and *foreground resources are placed in the resource
+database. See the Color Server Resources section and the Color Model
+specification for more information.
+.RE
+.sp .5
+.SS Session Lock
+Dtsession provides session locking. The current session can be locked
+directly by pressing the lock icon on the front panel. If supported by
+the X server, the current session can be locked after a specified
+period of inactivity. To unlock the session, the user must enter their
+login password.
+.PP
+By default, dtsession supports traditional local UNIX authentication
+for unlocking the session.  Additional re-authentication function such
+as that required by DCE may be added by individual vendors.
+.sp .5
+.SS Screen Savers
+Dtsession provides support for the launching of external screen savers
+as a part of session locking from the front panel or, if supported by
+the X server, after a specified period of inactivity. Refer to the
+Screen Saver specification for information as to how screen savers are
+integrated into the desktop.
+.sp .5
+.SS X Server Screen Saver Extensions
+Dtsession's ability to provide session lock or screen saver launch
+after a specified period of inactivity depends upon the availability
+of an X server screen saver extension. Dtsession supports two such
+extensions:
+.RS
+.P
+- X Consortium Sample X11 Screen Saver Extension 1.0
+.P
+- HP X Screen Saver Extension
+.RE
+.PP
+The ability of dtsession to recognize both, either or none of these
+extensions is vendor specific.
+.sp .5
+.SS Launching The Session Manager
+Dtsession should be launched from the Xsession script. Xsession is
+described in the login manager specification. It is recommended that
+Xsession be launched from dtlogin as part of the login sequence as is
+the default but there are alternative methods of starting Xsession:
+.IP "\fBdtlogin\fP" 1.5i
+the default dtlogin configuration launches Xsession when a user logs in
+.IP "\fBproxy\fP" 1.5i
+some systems will allow programs such as xinit, x11start or startx to
+start Xsession 
+.sp .5
+.SH OPTIONS
+The dtsession client is automatically invoked by the DT Login Manager
+(dtlogin(1X)). If desired, dtsession may also be started on an
+existing X server. Note that dtsession automatically starts a window
+manager.
+.sp .5
+.SS -norestore
+This option instructs dtsession not to restore a previous session nor
+save the session upon logout.
+.SH RETURN VALUE
+ Exit values are:
+.IP "\fB0\fP" 1.5i
+Successful completion.
+.IP "\fB>1\fP" 1.5i
+Error condition occurred.
+.SH EXAMPLES
+.sp .5
+.SS dtsession -norestore
+To start session manager without restoring the previous session for a 
+particular user, add the following line to the user's $HOME/.dtprofile file:
+
+    dtstart_session[0]="$DT_BINPATH/dtsession -norestore" 
+
+This will override the default dtsession startup command defined in the
+system's /usr/dt/bin/Xsession start script.
+
+.SH RESOURCES
+.sp .5
+.SS Color Server
+.DS
+.LP
+.TS
+center;
+cf3 cf3 cf3 cf3
+l l l l .
+
+Name	Class	Value Type	Default
+_
+colorUse	ColorUse	String	DEFAULT
+dynamicColor	DynamicColor	Boolean	True
+foregroundColor	ForegroundColor	String	DYNAMIC
+shadowPixmaps	ShadowPixmaps	String	DEFAULT
+writeXrdbColors	WriteXrdbColors	Boolean	True
+.TE
+.PP
+.sp .5
+.SS Screen Lock/Screen Save
+.LP
+.TS
+center;
+cf3 cf3 cf3 cf3
+l l l l .
+
+Name	Class	Value Type	Default
+_
+keys	Keys	unsigned char	NULL
+passwordTimeout	passwordTimeout	unsigned int	10
+.TE
+.PP
+.sp .5
+.SS Miscellaneous
+.LP
+.TS
+center;
+cf3 cf3 cf3 cf3
+l l l l .
+
+Name	Class	Value Type	Default
+_
+queryServerSettings	QueryServerSettings	Boolean	False
+saveFontPath	SaveFontPath	Boolean	False
+wmStartupCommand	WmStartupCommand	executable path	NULL
+.TE
+.SS colorUse - DEFAULT 
+This resource specifies the number of colors to use for the user
+interface. Valid types are: 
+Color server will determine type of monitor based upon number of
+display planes of the screen as follows:
+.IP 1,2 or 3 planes 1.5i
+B_W
+.IP 4 or 5 planes1.5i
+LOW_COLOR
+.IP 6 planes1.5i
+MEDIUM_COLOR
+.IP 7+ planes1.5i
+HIGH_COLOR
+.PP
+.B B_W
+- Specifies a black and white system. The color palettes
+will use two color cells for the user interface. In this configuration
+only two color palettes are available: BlackWhite and WhiteBlack.
+These palettes cannot dynamically change. To change a palette, all
+applications using that color palette must be restarted. This resource
+value forces ShadowPixmaps to True, and ForegroundColor to either
+black or white depending on the palette chosen.
+.PP
+.B LOW_COLOR
+- Specifies a low color system. The color palettes
+will have two color sets and use a maximum of 12 color cells for the
+user interface, including black and white (color cells 0 and 1). The
+number of co ShadowPixmaps and ForegroundColor.
+.PP
+.B MEDIUM_COLOR
+- Specifies a medium color system. The color
+palettes will have 4 color sets and use a maximum of 22 color cells
+for the user interface, including black and white (color cells 0 and
+1). The number of color cells can be reduced by using the resources
+ShadowPixmaps and ForegroundColor.
+.PP
+.B HIGH_COLOR
+- Specifies a high color system. The color palettes
+will have 8 color sets and use a maximum of 42 color cells for the
+user interface. including black and white (color cells 0 and 1). The
+number of color cells can be reduced by using the resources
+ShadowPixmaps and ForegroundColor.
+.sp .5
+.SS dynamicColor
+This resource can have values of True or False. dynamicColor is used
+to reduce the number of color cells being used. Once a palette has
+been selected and it is not likely to be changed, dynamicColor can be
+set to False. If set to False colors cannot be dynamically changed
+using the DT style manager. A selected palette will take effect the
+next session. The next time the session comes up, the color server
+uses Read Only color cells that can be shared by all clients, thus
+reducing the number of color cells used.
+.sp .5
+.SS foregroundColor
+This resource can have values of White, Black or Dynamic.
+ForegroundColor causes all text (foreground) to use either pixel 0 or
+1 (Black or White) or to have a color cell dedicated to foreground and
+changes in response to the background color (Dynamic) for each
+ColorSet. If set to White or Black, the number of color cells used per
+ColorSet is reduced by 1.
+.sp .5
+.SS keys
+This resource is a list of keyholders who have the ability to unlock
+the screen any time it is locked by the user. The list is a list of
+user id's separated by commas. For example if user kim has the
+following resource active during a session:
+.IP "\fBDtsession*keys: fred,keith\fP"
+.P
+Users fred and keith have the ability to unlock the display when kim
+locks it. 
+.sp .5
+.SS passwordTimeout
+This resource specifies (in seconds) the amount of time before the
+password dialog is removed from the screen. When the display is
+locked, the pointer shows a lock cursor, and a dialog appears which
+asks for the user password. If no activity from the pointer or
+keyboard is detected for passwordTimeout seconds, the dialog is
+removed from the screen. The dialog is redisplayed as soon as a
+pointer or keyboard event is detected. An passwordTimeout of 0 leaves
+the password dialog in place for the entire time the display is
+locked. The default value is 10 seconds.
+.sp .5
+.SS queryServerSettings
+This resource specifies whether dtsession queries the server at logout
+for all its settings or saves only those settings set by using the DT
+Style Manager. Querying the server ensures that all settings are
+saved; however, there is a degradation in performance when a full
+query is done. The default value is False, which means that the server
+will not be queried.
+.sp .5
+.SS shadowPixmaps
+For color systems, this resource can have a value of True or False. If
+True, topShadowColor and bottomShadowColor use the same pixel as
+background and topShadowPixmap and bottomShadowPixmap are specified
+instead of solid color to create the 3D look. This reduces the number
+of color cells per ColorSet by 2.  ShadowPixmaps defaults to True for
+systems with 4 or less color planes (16 or less color cells), and
+False for systems with more than 4 color planes.
+.sp .5
+.SS wmStartupCommand
+This resource allows for an alternate window manager to be started at
+login. If this resource is 
+.B NULL
+, dtsession starts
+.B /usr/dt/bin/dtwm.
+An alternate startup might look like:
+.B Dtsession*wmStartupCommand: /usr/bin/X11/mwm
+.P
+.B NOTE
+: that the command should not have any commands to a shell
+in it, and that it should not be surrounded by quotes. Also, if any
+other window manager other than dtwm is used, clients will be
+restored, but may not be restored to the correct position. By default,
+this resource contains a NULL value.
+.SH FILES
+.IP "\f3/usr/dt/config/$LANG/sys.session\fP" 1.5i
+The desktop default set of applications for the
+user's Initial Session.
+.IP "\f3/etc/dt/config/$LANG/sys.session\fP" 1.5i
+System Administrator specified set of applications for the
+user's Initial Session.
+.IP "\f3/usr/dt/config/$LANG/sys.resources\fP" 1.5i
+The desktop default resources.
+.IP "\f3/etc/dt/config/$LANG/sys.resources\fP" 1.5i
+System administrator specified resources.
+.IP "\f3$HOME/.Xdefaults\fP" 1.5i
+User specified resources.
+.PP
+Dtsession stores session information in $HOME/.dt/display or
+$HOME/.dt/sessions. The content of these directories should not
+be directly edited by the user.
+.PP
+.IP "\f3/usr/dt/app-defaults/$LANG/Dtsession\fP" 1.5i
+Default dtsession resources.
+.SH SEE ALSO
+See related specifications:
+.IP "\f3dtstyle\fP" 1.5i
+Customization of many session properties
+.IP "\f3dtscreen\fP" 1.5i
+Desktop screen savers
+.IP "\f3dtwm\fP" 1.5i
+Window manager
+.IP "\f3dtlogin\fP" 1.5i
+Login manager
+.IP "\f3dtsessionaction\fP" 1.5i
+Session manager actions
+.IP "\f3dtsessionfile\fP" 1.5i
+Format and location of desktop session files
+.IP "\f3dtresourcesfile\fP" 1.5i
+Format and location of desktop resource files

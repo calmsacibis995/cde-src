@@ -1,0 +1,748 @@
+#!/usr/local/bin/perl
+
+eval "exec /usr/local/bin/perl -S $0 $*"
+    if $running_under_some_shell;
+
+#### PLACE REMOTELY
+########################################################
+# required files
+########################################################
+# Add the test directory to the locations to search for
+# libraries.
+push(@INC,"/x/cdesrc/admin/BuildTools/rcs_tools");
+#
+# The following .pl file contains many of the subroutines 
+# accessed here.
+#
+require 'RcsUTest.pl';
+require 'RcsSock.pl';
+
+########################################################
+# define variables
+########################################################
+&InitializeVariables();
+$exitValue = 0;
+# don't buffer stderr and stdout
+select(STDERR); $| =1;
+select(STDOUT); $| =1;
+
+#######################################################
+# define local subroutines
+#######################################################
+#
+# The following are signal handlers for abort due a specific signal
+#
+sub abortHUP {
+        local(@errormessage);
+        @errormessage = ("*** Client terminated with signal 1 -> SIGHUP ***");
+        &Exit(1,@errormessage);
+}
+sub abortINT {
+        local(@errormessage);
+        &Exit(1,@errormessage);
+}
+sub abortQUIT {
+        local(@errormessage);
+        @errormessage = ("*** Client terminated with signal 3 -> SIGQUIT ***");
+        &Exit(1,@errormessage);
+}
+sub abortTERM {
+        local(@errormessage);
+        @errormessage = ("*** Client terminated with signal 15 -> SIGTERM ***");
+        &Exit(1,@errormessage);
+}
+
+
+#########################################################################
+# subroutine checkForBadMifFiles
+#
+# Searches for checkins of .mif files that are really .doc files
+# in Framemaker. The .doc files are pseudo binary and cannot use RCS.
+#
+# Inputs - none
+#
+# Outputs - none
+# 
+#########################################################################
+sub checkForBadRemoteMifFiles {
+	local($currentRemoteFile,$sendcurrentLocalFile,$currentLocalFile);
+	local(@tmpremoteExchangeFiles,$file,$basefile);
+	local(@tmpremoteCommaVFiles,@tmporiginalFiles,@tmpallRemoteExchangeFiles);
+	local($firstLine);
+
+
+	$isABadMif = 0;
+   foreach $file (@originalFiles){
+		$basefile = `basename $file`;
+		chop $basefile;
+		if ($basefile =~ m%\.mif$%) {
+			if (open(LFILE,$file)) {
+				$firstLine = <LFILE>;
+				chop $firstLine;
+				if ($firstLine =~ m%MakerFile%) { # oops its a .doc file
+					print STDERR "	ERROR - The file $file is a Framemaker .doc file\n";
+					print STDERR "	It must be converted to a .mif file before processing\n";
+				$isABadMif = 1;
+				push(@badMifFiles,$file);
+				}
+				close(LFILE);
+			}
+			else {
+				print STDERR "	ERROR - cannot open file $file\n";
+				$isABadMif = 1;
+				push(@badMifFiles,$file);
+			}
+		}
+	}
+
+	#
+	# if a bad miff file remove it from files
+	#
+   foreach $file (@originalFiles){
+		push(@tmpremoteExchangeFiles, shift(@remoteExchangeFiles));
+		push(@tmpremoteCommaVFiles, shift(@remoteCommaVFiles));
+		push(@tmporiginalFiles, $file);
+		push(@tmpallRemoteExchangeFiles, shift(@allRemoteExchangeFiles));
+		push(@tmpallRemoteExchangeFiles, shift(@allRemoteExchangeFiles));
+		if ($isABadMif) {
+			$exitValue = 1;
+			if ($file =~ m%\.mif$%) {
+				foreach $mifFile (@badMifFiles) {
+					if ("$file" eq "$mifFile") { # remove the file
+						pop(@tmpremoteExchangeFiles);
+						pop(@tmpremoteCommaVFiles);
+						pop(@tmporiginalFiles);
+						pop(@tmpallRemoteExchangeFiles);
+						pop(@tmpallRemoteExchangeFiles);
+					}
+				}
+			}
+		}
+	}
+	@remoteExchangeFiles = (@tmpremoteExchangeFiles);
+	@remoteCommaVFiles = (@tmpremoteCommaVFiles);
+	@originalFiles = (@tmporiginalFiles);
+	@allRemoteExchangeFiles = (@tmpallRemoteExchangeFiles);
+}
+						
+#########################################################################
+# subroutine GetLogMsg
+#
+# Prompts user for rcs log message and returns the message.
+#
+# Inputs - none
+#
+# Outputs - log message
+# 
+#########################################################################
+sub GetLogMsg {
+	local($file,$inputType) = @_;
+	local($holder, @newMessage);
+
+	print "	<-- $file -->\n"; 
+	print "enter ${inputType}:\n";
+	print "(terminate with ^D or single '.')\n";
+	if ($inputType =~ m%^description%) {
+			print "NOTE: This is NOT the log message!\n";
+	}
+	print ">> ";
+	while (<STDIN>) {
+		$holder = $_;
+		if ($holder =~ m%^\.%) {
+			last;
+		}
+		else {
+			if (($holder =~ m%\"%) && ($holder !~ m%\\\"%)){
+				$holder =~ s%\"%\\\"%g;
+			}
+			push(@newMessage, $holder);
+			print ">> ";
+		}
+	}
+	print "\n";
+	if (defined(@newMessage)) {
+		return @newMessage;
+	}
+	else {
+		return "*** empty $inputType ***";
+	}
+}
+
+
+########################################################
+# Catch signals
+########################################################
+$SIG{'INT'} = 'abortINT';
+$SIG{'HUP'} = 'abortHUP';
+$SIG{'QUIT'} = 'abortQUIT';
+$SIG{'TERM'} = 'abortTERM';
+
+
+##############################################################
+# argument processing - this must be specific for each command
+##############################################################
+$IsDashMOption = 0;
+$IsDashTOption = 0;
+$IsDashUOption = 0;
+$IsDashLOption = 0;
+$IsDashEOption = 0;
+$descriptionFile="tmpDesc";
+$messagefile="tmpMsg";
+$stdinFile="tmpStdinMsg";
+# assume -f for remote arguments
+push(@extraRemoteArgs,"-f");
+while ( $ARGV[0] =~ /^-/ ){
+	$_ = shift;
+	if (/^-H(.*)$/){
+		# specify remote host
+		$rhost = ($1 ? $1 : shift);
+	}
+	elsif (/^-P(.*)$/){
+		# specify port
+		$port = ($1 ? $1 : shift);
+	}
+	elsif (/^-D$/){
+		# turn on debugging output
+		$Debug = 1;
+	}
+	elsif (/^-E$/){
+		# make the files executable in the RCS vault
+		# this option is remote only.
+		push(@extraRemoteArgs,"-E");
+		$IsDashEOption = 1;
+	}
+	elsif (/^(-l)(.*)$/) {
+		$IsDashLOption = 1;
+		#
+		# args which allow associated strings
+		#
+		if ( "$2" ) {
+			push(@RcsArgs, $1 . "'" . $2 . "'" );
+		} else {
+			push(@RcsArgs, $1 );
+		}
+	}
+	elsif (/^(-u)(.*)$/) {
+		$IsDashUOption = 1;
+		#
+		# args which allow associated strings
+		#
+		if ( "$2" ) {
+			push(@RcsArgs, $1 . "'" . $2 . "'" );
+		} else {
+			push(@RcsArgs, $1 );
+		}
+	}
+	elsif (/^(-[nNsrfkuq])(.*)$/) {
+		#
+		# args which allow associated strings
+		#
+		if ( "$2" ) {
+			push(@RcsArgs, $1 . "'" . $2 . "'" );
+		} else {
+			push(@RcsArgs, $1 );
+		}
+	}
+	elsif (/^(-m)(.*)/) {
+		#
+		# args which allow associated strings
+		#
+		$IsDashMOption = 1;
+		$tmpdashMMessage = ($_);
+		if ( "$2" ) {
+			$tmpdashMMessage =~ s%(-m)(.*)%\2%;
+			@dashMMessage = ($tmpdashMMessage);
+		} else {
+			print "Ci warning: Missing message for -m option\n";
+			$IsDashMOption = 0;
+		}
+	}
+	elsif (/^(-t)(.*)$/) {
+		$IsDashTOption = 1;
+		#
+		# ci args which take file names (other than the names
+		# of files to be checked in.)
+		#
+		if ( "$2" ) {
+			$txtFile = $2;
+			#push(@extraLocalRcsArgs,$1 . $2);
+			#
+			# stuff the contents of the text file into an array
+			#
+			if (! -T $txtFile) {
+				$IsDashTOption = 0;
+				print "Ci error:  Not a text file: \"$txtFile\"\n";
+			}
+			elsif (open(TXT,$txtFile)){
+				@txtDesc=<TXT>;
+				close(TXT);
+			}
+			else {
+				$IsDashTOption = 0;
+				print "Ci error: Can't open file with description $txtfile\n";
+			}
+		}
+		else { # no text file given, print warning
+			push(@extraLocalRcsArgs, $1);
+			print "Ci warning: Missing text file for -t option\n";
+		}
+	} 
+	elsif (/^-$/) {
+		#
+		# read log message or descriptive text from stdin
+		#
+		print STDERR "\n	WARNING - \"-\" option is obsolete and unnecessary\n";
+	}
+	else {
+		@errorMessage = ("Unrecognized flag: \"$_\"\n");
+		&Exit(1,@errorMessage);
+	}
+} # END argument processing
+
+#
+# If this is not a terminal (usually piped input), get the messages
+# from STDIN
+#
+# Here are the cases:
+#    -m             !terminal                Description(RCS -t)
+# messge (new file text description is prompted for)
+# message(old file only)
+# message           text description (for new file only)
+# message           no effect  (for old file only)                  
+# message					               		text description
+#                   message                  text description
+#                   text description (new file only)
+# 
+if (! -t) { # not a terminal
+	@stdinMsg = <STDIN>;
+}
+	
+#
+# get the files and do appropriate error checking
+# see if the files are local or remote
+#
+# for some reason while(@ARGV) cannot be in a subroutine
+while ( @ARGV ) {
+	$tstfile=shift;
+	$tmp = `basename $tstfile`;
+	chop $tmp;
+
+	# if there is a wildcard unexpanded for the RCS vault
+	# store for later processing
+	#
+	if (($tstfile =~ m%[\*\?]%) || ($tstfile =~ m%\[.*\]%)) {
+		$tmpdir =`dirname $tstfile`;
+		chop $tmpdir;
+		if (($tmpdir =~ m%^RCS%) || ($tmpdir =~ m%\/RCS%)) {
+			$realtmpdir = &IsRcsDirectoryLocal($tmpdir);
+			$newtstfile = "${realtmpdir}/${tmp}";
+			push(@wildCardFiles,$newtstfile);
+		}
+	}			
+	# don't do RCS dir
+	elsif ("$tmp" ne "RCS")  {
+		push(@allFiles, $tstfile);
+	}
+}
+
+if ((! defined(@allFiles)) && (! defined(@wildCardFiles))) {
+	@errorMessage = ("NO FILES to Process");
+        &Exit(1,@errorMessage);
+}
+
+
+
+# must be a readable file or exit, can be writable file
+$needReadableFile = 1;
+# get the correct localpath, Rcs path pairs
+&GetFilePaths($needReadableFile);
+
+####################################################################
+# debug argument processing
+####################################################################
+if ( $Debug ) {
+	print "rhost= $rhost\n";
+	print "port= $port\n";
+	print "RcsArgs= \"@RcsArgs\"\n";
+	print "stdinMsg= \"@stdinMsg\"\n";
+	print "localExchangeFiles= \"@localExchangeFiles\"\n";
+	print "remoteExchangeFiles= \"@remoteExchangeFiles\"\n";
+	print "remoteCommaVFiles = \"@remoteCommaVFiles\"\n";
+	print "allremoteExchangeFiles = \"@allRemoteExchangeFiles\"\n";
+	print "originalFiles = \"@originalFiles\"\n";
+	print "wildCardFiles = \"@wildCardFiles\"\n";
+	print "txtFile= \"$txtFile\"\n";
+	print "-------- contents ---------\n@txtDesc\n------- end --------\n";
+}
+
+
+#
+# Check that no two remote files evaluate to the same basename
+# (This can cause a problem on the server side)
+#
+&CheckBasenames();
+
+##################################################################
+# Process the local files
+# Run local Rcs commands
+##################################################################
+if (defined(@localExchangeFiles)) {
+	# add -m if necessary
+	if (defined(@dashMMessage)) {
+		push(@RcsArgs,"\'-m@dashMMessage\'");
+	}
+	# add -t if necessary
+	if (defined(@txtDesc)) {
+		push(@RcsArgs,"-t${txtFile}");
+	}
+	# 
+	# check for piped message input
+	#
+	if (defined(@stdinMsg)) {
+		print "LOCAL echo \"@stdinMsg\" | $RcsPrg @RcsArgs @localExchangeFiles" if $Debug;
+		$tmpExitValue = system "echo \"@stdinMsg\" | $RcsPrg @RcsArgs @localExchangeFiles";
+	}
+	else {
+		print "LOCAL $RcsPrg @RcsArgs @localExchangeFiles" if $Debug;
+		$tmpExitValue = system "$RcsPrg @RcsArgs @localExchangeFiles";
+	}
+
+	if ((!$exitValue) && ($tmpExitValue)) {
+		$exitValue = 1;
+	}
+}
+	
+##################################################################
+# Process the remote files
+##################################################################
+if ((defined(@allRemoteExchangeFiles)) || (defined(@wildCardFiles))) {
+	#
+	# Open the connection
+	#
+	if (! ($SOCK_HANDLE = &sock'open($rhost,$port))) {
+		@errorMessage = ("Connect to \"$rhost\" failed: $!");
+		&Exit(1,@errorMessage);	
+	}
+	
+	# send username
+	print $SOCK_HANDLE  "USER: $userName\n";
+
+	#
+	# Expand wildcards if there are any.
+	# Pass the basic command string.
+	#
+	if (!defined(@wildCardFiles)) {
+		print $SOCK_HANDLE "$RemoteRcsPrg \n";
+	}
+	else {
+		print $SOCK_HANDLE "$RemoteRcsPrg @wildCardFiles\n";
+		#
+		# get the complete wildcard paths from the server.
+		# Add them to the list of remote exchange files.
+		&getWildCardsFromServer($needReadableFile);
+	}
+
+
+	# 
+	# check for .doc files disguised as .mif files
+	#
+	&checkForBadRemoteMifFiles();
+
+	#
+	# retransmit command with new file parameters(expanded wildcards)
+	#
+	print $SOCK_HANDLE "$RemoteRcsPrg @allRemoteExchangeFiles\n";
+	print "$RemoteRcsPrg @allRemoteExchangeFiles\n" if $Debug;
+	
+	# get information about the files existence, whether it was executable
+	# on the destination and whether it is locked by the user.
+	while (<$SOCK_HANDLE>) {
+		&checkForDeadServer($_);
+		if (/^>>### BEGIN FILE STATS ###<<$/) {
+			NEXTSTAT:
+			while( <$SOCK_HANDLE> ) {
+				&checkForDeadServer($_);
+				if (/^>>### END FILE STATS ###<<$/) {	
+					last;
+				}
+				$holder = $_;
+				chop($holder);
+				push(@FileExistsRemotely,$holder);
+				$holder = <$SOCK_HANDLE>;
+				&checkForDeadServer($holder);
+				chop($holder);
+				push(@FileIsExecutableRemotely,$holder);
+				$holder = <$SOCK_HANDLE>;
+				&checkForDeadServer($holder);
+				chop($holder);
+				push(@FileIsLockedByUser,$holder);
+			}
+			last;
+		}
+		else {
+			print ;
+		}
+	}
+	
+	
+	if (! defined(@FileExistsRemotely) ||
+		! defined(@FileIsExecutableRemotely) ||
+		! defined(@FileIsLockedByUser)) {
+		undef(@errorMessage);
+		push(@errorMessage,"	ERROR - Cannot stat remote source server.");
+		push(@errorMessage,"	        Either the server is down");
+		push(@errorMessage,"	        or your RCS directory is a symlink to nowhere.");
+		&Exit(1,@errorMessage);
+	}
+	
+	print "FileExist = @FileExistsRemotely\n" if $Debug;
+	print "FileIsExecutable = @FileIsExecutableRemotely\n" if $Debug;
+	print "FileIsLockedByUser = @FileIsLockedByUser\n" if $Debug;
+	
+	
+	#cycle through files, ask for input if necessary and check in
+	$firstLog = 1;
+	$cryptdir = "/tmp/crypt$$";
+	if ( $needEncryption) { #default that is set in RcsUtility.pl
+		if (! mkdir("$cryptdir",0755)) {
+			undef(@errorMessage);
+			push(@errorMessage,"Cannot create local encryption directory $cryptdir");
+			push(@errorMessage,"This is needed for file encryption.");
+			push(@errorMessage,"Contact your RCS administrator");
+			&Exit(1,@errorMessage);
+		}
+	}
+	
+	NEXTFILE:
+	while (@remoteCommaVFiles) {
+		$currentRemoteFile = shift(@remoteCommaVFiles);
+		$sendcurrentLocalFile = shift(@remoteExchangeFiles);
+		$currentLocalFile = shift(@originalFiles);
+		$doesExist = shift(@FileExistsRemotely);
+		$isExecutable = shift(@FileIsExecutableRemotely);
+		$isLocked = shift(@FileIsLockedByUser);
+		print "doesExist = $doesExist\n" if $Debug;
+		print "isExecutable = $isExecutable\n" if $Debug;
+		print "isLocked = $isLocked\n" if $Debug;
+
+		#
+		# set to determine whether RCS vault file should be made
+		# executable. This will happen in 2 cases;
+		# 1) -E specified.
+		# 2) new file and local version is executable
+		#
+		$remoteFileMustBeExecutable = 0;
+		if ($IsDashEOption) {
+			$remoteFileMustBeExecutable = 1;
+		}
+	
+		#
+		# remoteRcsArgs is reset for each file and each file may have
+		# slightly different options (e.g. -E added for executable new files)
+		# extraRemoteArgs will apply to every file checked in
+		#
+		@remoteRcsArgs = (@RcsArgs);
+		print "IsDashMOption = $IsDashMOption\n" if $Debug;
+		$UseInputDashTOption = 0;
+		if ($doesExist) {
+			if (! $isLocked) {
+				print STDERR "	File $currentLocalFile is not locked by user $userName\n";
+				$exitValue = 1;
+				next NEXTFILE;
+			}
+			else { # user has the lock
+				# if file exists ignore -t option
+				# get the message
+				if ((! $IsDashMOption) && (!defined(@stdinMsg))) {
+					if ($firstLog) { # if first time, prompt for log
+						$firstLog = 0;
+						@logStdinMsg = &GetLogMsg($currentLocalFile, "log message");
+					}
+					else { # after first time, ask for log message reuse
+						print "	<-- $currentLocalFile -->\n"; 
+						print "reuse log message of previous file? [yn](y):";
+						chop($_=<STDIN>);	
+						if ( /^[nN]/ ) { # prompt
+							@logStdinMsg = &GetLogMsg($currentLocalFile, "log message");
+						}
+					}
+					@dashMMessage = (@logStdinMsg);
+				}
+			}
+		}
+		else { #file is a new file
+			#
+			# if no -t option and not piped input, prompt for description
+			# if input is piped, you have to assume this is not at terminal
+			# and input cannot be entered, even though usually it can.
+			#
+			if ((!$IsDashTOption) && (!defined(@stdinMsg))){ #prompt for descriptive text
+				@txtDesc = &GetLogMsg($currentLocalFile, "description");
+			}
+			#
+			# if the new file is executable, need to chmod +x the
+			# file on the server side before checking in.
+			#
+			if (-x $currentLocalFile) {
+				push(@remoteRcsArgs,"-E");
+				$remoteFileMustBeExecutable = 1;
+			}
+		}
+		print "RcsArgs = @RcsArgs\n" if $Debug;
+		print "RemoteRcsArgs = @remoteRcsArgs\n" if $Debug;
+		print "extraRemoteArgs = @extraRemoteArgs\n" if $Debug;
+		print "TextDesc = @txtDesc\n" if $Debug;
+		print "dashMMessage = @dashMMessage\n" if $Debug;
+	
+	
+		# send the ci file
+		# encrypt if necessary
+		if ($needEncryption) {
+			# open the local file
+			if (! open(TMPCIFILE,$currentLocalFile)) {
+				print STDERR "	ERROR: Cannot open: \"$currentLocalFile\" $! \n";
+				$exitValue = 1;
+				next NEXTFILE;
+			}
+			$cryptfile = "${sendcurrentLocalFile}.N";
+			$uufile = "${cryptdir}/${sendcurrentLocalFile}.N.uu";
+			if (! open(CRYPTFILE,"|crypt desZthPl |uuencode $cryptfile >$uufile")) {
+				print STDERR "	ERROR: Cannot open: \"$uufile\" $! \n";
+				$exitValue = 1;
+				next NEXTFILE;
+			}
+			while (<TMPCIFILE>){
+				print CRYPTFILE $_;
+			}
+			close TMPCIFILE;
+			close CRYPTFILE;
+
+			if ((! -s $uufile) || (! open(CIFILE,$uufile))) {
+				print STDERR "	ERROR: Cannot open: encryption file \"$uufile\" $! \n";
+				$exitValue = 1;
+				next NEXTFILE;
+			}
+		}
+		else { # no encryption
+			if (! open(CIFILE,$currentLocalFile)) {
+				print STDERR "	ERROR: Cannot open: \"$currentLocalFile\" $! \n";
+				$exitValue = 1;
+				next NEXTFILE;
+			}
+		}
+
+		# signal beginning of individual file check in
+		print $SOCK_HANDLE ">>### BEGIN INDIVIDUAL FILE CHECK IN ###<<\n";
+			
+		#
+		# push the command for this particular file (3rd times a charm)
+		#
+		print "$RemoteRcsPrg @remoteRcsArgs @extraRemoteArgs $currentLocalFile $sendcurrentRemoteFile\n" if $Debug;
+		print $SOCK_HANDLE "$RemoteRcsPrg @remoteRcsArgs @extraRemoteArgs $sendcurrentLocalFile $currentRemoteFile\n";
+	
+		print $SOCK_HANDLE ">>### BEGIN FILE SEND: ###<<\n";
+		
+		if ($needEncryption) {
+			print "Sending \"$cryptfile\"\n" if $Debug;
+			print $SOCK_HANDLE "$cryptfile\n";
+		}
+		else {
+			print "Sending \"$currentLocalFile\"\n" if $Debug;
+			print $SOCK_HANDLE "$sendcurrentLocalFile\n";
+		}
+
+		while (<CIFILE>) {
+			print $SOCK_HANDLE $_;
+		}
+		close(CIFILE);
+		print $SOCK_HANDLE ">>### END FILE SEND: ###<<\n";
+	
+		# send the message
+		if ( defined(@dashMMessage) ) {
+			print $SOCK_HANDLE ">>### BEGIN FILE SEND: ###<<\n";
+			print $SOCK_HANDLE "$messagefile\n";
+			print $SOCK_HANDLE "@dashMMessage\n";
+			print $SOCK_HANDLE ">>### END FILE SEND: ###<<\n";
+		}
+	
+		# send the stdin message if any
+		if ( defined(@stdinMsg) ) {
+			print $SOCK_HANDLE ">>### BEGIN FILE SEND: ###<<\n";
+			print $SOCK_HANDLE "$stdinFile\n";
+			print $SOCK_HANDLE "@stdinMsg\n";
+			print $SOCK_HANDLE ">>### END FILE SEND: ###<<\n";
+		}
+	
+		# send the text description if there is one
+		if ( defined(@txtDesc) ) {
+			print $SOCK_HANDLE ">>### BEGIN FILE SEND: ###<<\n";
+			print $SOCK_HANDLE "$descriptionFile\n";
+			print $SOCK_HANDLE "@txtDesc\n";
+			print $SOCK_HANDLE ">>### END FILE SEND: ###<<\n";
+		}
+		# send signal that all files have been sent
+		print $SOCK_HANDLE ">>### END ALL FILE SEND: ###<<\n";
+	
+		# wait for signal that previous check in is done
+		$tmpExitValue = 1; # anticipate the worst
+		while (<$SOCK_HANDLE>) {
+			&checkForDeadServer($_);
+			if (m%^>>### END INDIVIDUAL FILE CHECK IN ###<<$%) { 
+				# if ci failed don't do unlinks and chmods below
+				$tmpExitValue = <$SOCK_HANDLE>;
+				&checkForDeadServer($tmpExitValue);
+				chop $tmpExitValue;
+				last;
+			}
+			else {
+				print;
+			}
+		}
+
+		#
+		# put ci status into exit value if error.
+		# don't change exit Value if it already shows error
+		#
+		if ((! $exitValue) && ($tmpExitValue)) {
+			$exitValue = 1;
+		}
+
+		# if not -l or -u remove local file
+		if ((! $IsDashUOption) && ! ($IsDashLOption) && (! $tmpExitValue)) {
+			unlink $currentLocalFile;
+		}
+		# if -u chmod local file -w
+		# currently assume not setuid or setgid files
+		if (($IsDashUOption) && (! $tmpExitValue)){
+			if (($isExecutable) || ($remoteFileMustBeExecutable)){		
+				if (! chmod(0555, $currentLocalFile)){
+					print STDERR "	Warning - could not chmod 0555 $currentLocalFile\n";
+				}
+			}
+			else { 
+				chmod(0444, $currentLocalFile);
+				if (! chmod(0444, $currentLocalFile)){
+					print STDERR "	Warning - could not chmod 0444 $currentLocalFile\n";
+				}
+			}
+		}
+		if (($IsDashLOption) && (! $tmpExitValue)){
+			if ($remoteFileMustBeExecutable){		
+				if (! chmod(0755, $currentLocalFile)){
+					print STDERR "	Warning - could not chmod 0755 $currentLocalFile\n";
+				}
+			}
+		}
+	}
+		# signal remotely that all information has been sent for this file
+		print $SOCK_HANDLE ">>### CI ALL DONE ###<<\n";
+	#
+	# clean up encryption directory
+	#
+	if ( -d $cryptdir) {
+		unlink <$cryptdir/*>;
+		rmdir ("$cryptdir");
+	}
+	&sock'close($SOCK_HANDLE);
+}
+&Exit($exitValue,@nullError);

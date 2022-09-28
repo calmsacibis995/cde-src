@@ -1,0 +1,182 @@
+<chapter id=config>Configuring dtterm
+
+<list bullet>
+* <xref setresources>
+* <xref XTUsingScrollbarsTA>
+* <xref XTSettingTTYResourceTA>
+<\list>
+
+<s1 id=setresources>To Set dtterm Resources
+A resource is a variable whose value affects some attribute of
+``dtterm''.  Examples of resources are foreground color, background
+color, height, and width.  Resources are found in a resource database.
+Some ``dtterm'' resources are:
+
+<ex>
+Dtterm*saveLines:  4s
+Dtterm*scrollBar: True
+<\ex>
+
+There are three methods you can use to edit resources.  The first uses a
+hyperlink to execute the "EditResources" action for you.  (In some cases,
+this hyperlink may not work, depending on how your system is configured.)
+The second method uses the utility ``xrdb''.  The third method accesses the
+"EditResources" action using the Application Manager instead
+of a hyperlink.  Use the method that you're most comfortable with.
+<list bullet>
+*<procedure>Method 1 
+Click <link hyperlink="/usr/dt/bin/dtaction EditResources &" Execute>``EditResources''<\link>.  
+The ``EditResources'' window appears (it may take a moment or two) within which
+you can add, change or
+modify resources.  Note that all the resources associated with your system
+appear, not just the ``dtterm'' resources.  The window automatically uses the
+default editor (Text Editor, vi, Emacs, etc.) for your system.  Make the changes and
+save them in the normal manner for your editor.
+
+<note>
+You won't see the changes you make to the resources on existing ``dtterm''
+windows; you must start a new ``dtterm'' window to see the changes.  (You
+won't see the changes if you start ``dtterm'' by choosing New from an
+existing ``dtterm'' Window menu; a ``dtterm'' started in this manner is an
+exact clone of the original.)
+<\note>
+
+*<procedure>Method 2 
+See <xref xrdb>.
+
+*<procedure>Method 3
+To access the ``EditResources'' action from the 
+Application Manager:
+<list order tight>
+*Click the Application Manager control 
+on the Front Panel.
+
+
+<figure nonumber entity=appmgrfp>
+<\figure>
+
+The Application Manager window appears.
+
+<figure nonumber entity=appmgr>
+<\figure>
+
+*Double-click the DtTools icon.
+Icons for various system functions appear in the Application Manager
+window.
+*Double-click the EditResources icon (you may have to scroll down
+to find it).
+
+*An ``EditResources'' window appears within which you can add, change or
+modify resources.  Note that all resources associated with your system
+appear, not just ``dtterm'' resources.
+The window automatically uses the
+default editor (vi, Emacs, etc.) for your system.
+
+<note>
+You won't see the changes you make to the resources on existing ``dtterm''
+windows; you must start a new ``dtterm'' window to see the changes.  (You
+won't see the changes if you start ``dtterm'' by choosing New from an
+existing ``dtterm'' Window menu; a ``dtterm'' started in this manner is an
+exact clone of the original.)
+<\note>
+<\list>
+<\list>
+
+<s1 id=xrdb>To Edit Resources Using xrdb 
+
+The utility ``xrdb'' is a resource database tool that you can use to edit
+resources.  Follow the steps below.
+<list order tight>
+*Execute ``xrdb'' from a terminal window (you must have write permission in
+the current directory):
+<ex>
+xrdb -query > old_resources
+<\ex>
+This creates a file called ``old_resources'' into which ``xrdb'' writes your
+current resources.  You'll save the changes in a different file, so
+``old_resources'' will have your original resources.
+*Copy ``old_resources'' into a file called ``new_resources'':
+<ex>
+cp old_resources new_resources
+<\ex>
+*Edit the file ``new_resources'' using your normal editor.
+Save the file when you are through making changes.
+*Reload the resource database using ``xrdb'':
+<ex>
+xrdb -load new_resources
+<\ex>
+<note>
+You won't see the changes you make to the resources on existing ``dtterm''
+windows; you must start a new ``dtterm'' window to see the changes.  (You
+won't see the changes if you start ``dtterm'' by choosing New from an
+existing ``dtterm'' Window menu; a ``dtterm'' started in this manner is an
+exact clone of the original.)
+<\note>
+<\list>
+
+<!-- MODULE XTUsingScrollbarsTA xt405.TAe -->
+<s1 id=XTUsingScrollbarsTA>To Specify Scrollbars
+<list order>
+*Use the EditResources action to specify a ``scrollBar'' resource for
+the terminal emulator.
+If the value of ``scrollBar'' is True, ``dtterm'' will
+have scrollbars.  If the value is False, it will not have scrollbars.
+
+*Log out, then log back in for the current session.  (For home session,
+set home session, log out, then log back in.)
+<\list>
+
+<procedure>Examples
+To set scrollbars in all ``dtterm'' windows:
+<ex smaller>
+Dtterm*scrollBar:     True
+<\ex>
+
+To set scrollbars only for ``dtterm'' windows named
+"localTerminal":
+<ex smaller>
+localTerminal*scrollBar:   True
+<\ex>
+
+<s1 id=XTSettingTTYResourceTA>To Set Terminal Control Characters
+
+<list bullet>
+*Edit the ``ttyModes'' resource using one of the methods described in
+<link setresources>Setting dtterm Resources<\link>.
+<\list>
+
+The syntax for this resource is:
+<ex smaller>
+ttyModes:  %%^C%%  %%name%%
+<\ex>
+
+where %%name%% is the control, and %153% is the character.  For example,
+the default value of ``ttyModes'' is:
+<ex smaller>
+ttyModes:	erase ^H intr ^C kill ^U start ^Q stop ^S swtch ^@
+<\ex>
+Because ``dtterm'' only !!emulates!! a terminal, your
+control characters might not be what you are used to on a physical
+terminal.  The ``ttyModes'' resource enables you to set control characters
+for your terminal emulator.
+
+<need begin>
+By default, Login Manager sets the following control characters.
+<lablist>
+<labheads>\Control name\   Character (Effect)
+\erase\		^H (Backspace erases characters)
+\intr\		^C (Interrupt - cancel the current operation and redisplay the
+		command line prompt)
+\kill\		^U (Clear the input line)
+\start\		^Q (Start subprocess output)
+\swtch\		^@ (Switch between layers in a shell)
+<\lablist>
+<need end>
+
+<note>
+The "``^''" character stands for the [[CTRL]] key, so to interrupt an
+operation in progress you press [[CTRL]] [[C]].  When setting
+``ttyModes'', use the [[^]]
+key instead of the [[CTRL]] key.
+<\note>
+

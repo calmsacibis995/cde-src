@@ -1,0 +1,189 @@
+.de Lc
+.\" version of .LI that emboldens its argument
+.TP \\n()Jn
+\s-1\f3\\$1\f1\s+1
+..
+.TH ttdt_sender_imprint_on 3 "1 March 1996" "ToolTalk 1.3" "ToolTalk Functions"
+.BH "1 March 1996"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.IX "ttdt_sender_imprint_on.3" "" "ttdt_sender_imprint_on.3" "" 
+.SH NAME
+ttdt_sender_imprint_on \- act like a child of the specified tool
+.SH SYNOPSIS
+.ft 3
+.nf
+#include <Tt/tttk.h>
+.sp 0.5v
+.ta \w'Tt_status ttdt_sender_imprint_on('u
+Tt_status ttdt_sender_imprint_on(const char *\f2handler\fP,
+	Tt_message \f2contract\fP,
+	char **\f2display\fP,
+	int *\f2width\fP,
+	int *\f2height\fP,
+	int *\f2xoffset\fP,
+	int *\f2yoffset\fP,
+	XtAppContext \f2app2run\fP,
+	int \f2ms_timeout\fP);
+.PP
+.fi
+.SH DESCRIPTION
+The
+.BR ttdt_sender_imprint_on (\|)
+function
+is used to make the calling tool act equivalently to a child of
+another specified tool.
+The calling tool adopts the other
+tool's X11 display, locale, and current working directory.
+It also learns the other tool's X11 geometry, so that it may
+position itself appropriately.
+.PP
+If the
+.I handler
+argument is non-\c
+.BR \s-1NULL\s+1 ,
+the requests are addressed to that procid using
+.BR \s-1TT_HANDLER\s+1 .
+If
+.I handler
+is
+.BR \s-1NULL\s+1
+and the
+.I contract
+argument is non-\c
+.BR \s-1NULL\s+1 ,
+the requests are addressed to the
+.BR tt_message_sender (3)
+of the contract, using
+.BR \s-1TT_HANDLER\s+1 .
+.PP
+The
+.I contract
+argument is passed to
+.BR tttk_message_create (3)
+as the
+.I context
+argument.
+.PP
+If the
+.I display
+argument is not
+.BR \s-1NULL\s+1 ,
+.BR ttdt_sender_imprint_on (\|)
+returns the other tool's display in
+.IR *display .
+If
+.I display
+is
+.BR \s-1NULL\s+1 ,
+.BR ttdt_sender_imprint_on (\|)
+sets the
+.I DISPLAY
+environment variable to the other tool's display.
+.PP
+If each of the
+.IR width ,
+.IR height ,
+.IR xoffset ,
+and
+.I yoffset
+arguments are
+.BR \s-1NULL\s+1 ,
+then
+.BR ttdt_sender_imprint_on (\|)
+does not send the other tool a
+.IR Get_Geometry
+request.
+.PP
+The
+.BR ttdt_sender_imprint_on (\|)
+function
+passes the
+.I app2run
+and
+.I ms_timeout
+arguments to
+.BR tttk_block_while (3),
+blocking on the replies to the requests it sends.
+.PP
+If the
+.I display
+argument is not
+.BR \s-1NULL\s+1 ,
+.BR ttdt_sender_imprint_on (\|)
+sets
+.I *display
+to a string that can be freed with
+.BR tt_free (\|).
+.PP
+If for some reason no width or height is returned by the other tool,
+.BR ttdt_sender_imprint_on (\|)
+sets
+.IR *width
+or
+.IR *height
+to \(mi1.
+If no positional information is returned,
+.BR ttdt_sender_imprint_on (\|)
+sets
+.IR *xoffset
+and
+.IR *yoffset
+to {INT_MAX}.
+.br
+.SH "RETURN VALUE"
+Upon successful completion, the
+.BR ttdt_sender_imprint_on (\|)
+function returns the status of the operation as one of the following
+.B Tt_status
+values:
+.PP
+.RS 3
+.nr )J 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_DESKTOP_ETIMEDOUT
+.br
+One or more of the sent requests did not complete within
+.I ms_timeout
+milliseconds.
+.Lc TT_ERR_NOMEM
+.br
+There is insufficient memory available to perform the function.
+.Lc TT_ERR_NOMP
+.br
+The
+.BR ttsession (1)
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_OVERFLOW
+.br
+The ToolTalk service has more active messages than it can handle.
+(The maximum number of active messages is
+.ne 2
+implementation specific, but is at least 2000.)
+.Lc TT_ERR_PROCID
+.br
+The specified process identifier is out of date or invalid.
+.PP
+.RE
+.nr )J 0
+.SH "APPLICATION USAGE"
+If both the
+.I handler
+and
+.I contract
+are zero, the requests are addressed to no tool in
+particular, using
+.BR \s-1TT_PROCEDURE\s+1 ;
+this is not recommended.
+.br
+.SH "SEE ALSO"
+.na
+.BR tttk (5),
+.BR tt_free (3),
+.BR tt_message_sender (3),
+.BR tttk_block_while (3),
+.BR tttk_message_create (3).

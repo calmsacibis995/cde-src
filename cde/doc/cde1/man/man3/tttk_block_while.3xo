@@ -1,0 +1,161 @@
+.TH tttk_block_while 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+tttk_block_while \- block while a counter is greater than zero
+.SH SYNOPSIS
+.yS
+#include <Tt/tttk.h>
+.sp 0.5v
+.ta \w'Tt_status tttk_block_while('u
+Tt_status tttk_block_while(XtAppContext \f2app2run\fP,
+	const int *\f2blocked\fP,
+	int \f2ms_timeout\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn tttk_block_while
+function
+is used to process asynchronous events, such as ToolTalk messages
+or window system events, while waiting for a condition or timeout.
+.P
+If
+.I app2run
+is not zero, then an event loop is run for that application context,
+by repeatedly calling
+.Fn XtAppProcessEvent 3X
+with
+.I ms_timeout
+being effected using
+.Fn XtAppAddTimeOut 3X.
+If
+.I app2run
+is zero, then the file descriptor (as returned by
+.Fn tt_fd 3)
+of the default procid is polled (using the
+.Fn poll 2
+function) and
+.Fn tttk_Xt_input_handler 3
+is called whenever the file descriptor is active.
+.P
+If
+.I blocked
+is zero, then
+.Fn tttk_block_while
+runs until
+.I ms_timeout
+occurs.
+If
+.I blocked
+is non-zero, then the loop is run until either
+.I ms_timeout
+occurs, or
+.I *blocked
+is less than 1.
+.P
+If
+.I ms_timeout
+is zero,
+.Fn tttk_block_while
+checks once for events, processes the first one, and then returns.
+If
+.I ms_timeout
+is negative,
+no timeout is in effect.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn tttk_block_while
+function returns the status of the operation as one of the following
+.B Tt_status
+values:
+.VL 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_DESKTOP_ETIMEDOUT
+.br
+The timeout occurred within
+.I ms_timeout
+milliseconds, or
+.I ms_timeout
+was zero and no input was available.
+.Lc TT_DESKTOP_EINTR
+.br
+The
+.I app2run
+argument was zero, and
+.Fn poll 2
+was interrupted by a signal.
+.Lc TT_DESKTOP_EAGAIN
+.br
+The
+.I app2run
+argument was zero, and
+.Fn poll 2
+returned
+.Cn EAGAIN .
+.LE
+.P
+If
+.I app2run
+is not zero and
+.I ms_timeout
+is negative, then
+.Fn tttk_block_while
+will only return when
+.I *blocked
+is less than 1, with
+.Cn TT_OK
+being returned.
+.P
+If
+.I app2run
+is not zero,
+.I ms_timeout
+is negative, and
+.I blocked
+is zero, then
+.Fn tttk_block_while
+behaves equivalent to
+.Fn XtAppMainLoop 3X,
+and will never return.
+.SH "APPLICATION USAGE"
+If
+.I app2run
+is zero, then only messaging events for the default procid will be serviced.
+Events for other procids will be blocked, as will window
+system events, so that the graphical user interface of the application
+will not update itself even, for example, after expose events.
+.P
+On the other hand, if the application passes its Xt context in as
+.IR app2run ,
+then window system events will continue to be handled, as will message
+activity for all procids for which an
+.Fn XtAppAddInput 3X
+has been done.
+Since the window system event loop is fully operational
+in this case, the application should take care to disable any
+user interface controls that the user should not operate while
+the application is waiting for
+.Fn tttk_block_while
+to return.
+.SH "SEE ALSO"
+.Hd Tt/tttk.h 5,
+.Fn tttk_Xt_input_handler 3;
+.cdes
+.Fn poll 2,
+.Fn XtAppPending 3X,
+.Fn XtAppAddTimeOut 3X,
+.Fn XtAppNextEvent 3X,
+.Fn XtDispatchEvent 3X.
+.cdee
+.xos
+.Fn poll
+in the \*(ZK;
+.Fn XtAppPending ,
+.Fn XtAppAddTimeOut ,
+.Fn XtAppNextEvent ,
+.Fn XtDispatchEvent
+in the \*(Zt.
+.xoe

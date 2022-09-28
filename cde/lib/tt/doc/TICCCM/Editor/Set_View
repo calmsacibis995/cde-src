@@ -1,0 +1,70 @@
+.TH Set_View Editor "07 Sep 1993" "SunSoft" "ToolTalk ICCCM"
+.SH NAME
+.PP
+Set_View - load a document into the specified view
+.SH SYNOPSIS
+.so ../.synopsis
+[\fIfile\f(CW]	Set_View(	in	\fImediaType	contents\f(CW,	
+		in	viewID	\fIdocView\f(CW,	
+		in	boolean	\fIreadOnly\f(CW	
+		[in	integer	\fIshareLevel\f(CW]	
+		[in	locator	\fIinitialPos\f(CW] );
+.ft
+.fi
+.SH DESCRIPTION
+.PP
+Load a document into the specified view.
+.SH REQUIRED ARGUMENTS
+.so ../Media/.contents
+.TP
+\f(CWviewID\fR \fIdocView\fR
+The ID of the view to load the
+.I contents
+into.
+.TP
+\f(CWboolean\fR \fIreadOnly\fR
+Boolean value indicated whether the user should be allowed to
+edit the document.
+.SH OPTIONAL ARGUMENTS
+.TP
+\f(CWinteger\fR \fIshareLevel\fR
+An integer bitflag indicating the extent to which the
+handler may re-use an existing buffer to satisfy
+this request.
+.PD 0
+.RS 8
+.HP 2
+\(bu 2 The handler may re-use an existing but unmodified buffer, if
+the document is already loaded into it.
+.HP 2
+\(bu 4 The handler may re-use an existing, modified buffer, if the
+document is already loaded into it.
+.RE
+.PD
+.IP
+The handler is responsible for deciding when two documents are the
+same document.  Usually, two documents are the same document only if
+their
+.I contents
+come from the same
+.IR file .
+.TP
+\f(CWlocator\fR \fIinitialPos\fR
+The initial insertion point for the buffer, or the initial position
+scrolled to in the view.
+.SH ERRORS
+.so ../Media/.errors
+.TP
+\f(BITT_EDITOR_ERR_LOCATOR\fR
+.I initialPos
+is not a valid locator in
+.IR contents .
+If the request succeeds with this status, then the initial location
+of the buffer or view is chosen by the handler.
+.SH SEE ALSO
+.PP
+.BR Intro (TICCCM),
+.BR Intro (Desktop),
+.BR Intro (Media),
+.BR Intro (Editor),
+.BR Open (Editor)

@@ -1,0 +1,177 @@
+Here is a listing of hp's extensions to imake.
+
+config/localtree.tmpl:
+	One of our goals is to build different types of trees
+	(debuggable, optimized, w/shared libraries, wo/shared libraries)
+	using a single source.  Mit uses the philosophy of building
+	everything in one tree(building debug at the same time as
+	optimized). You can customize a tree only by changing a basic
+	configuration file such as vendor.cf or Imake.tmpl, etc..
+	We have Imake.tmpl include a file -> localtree.tmpl before it
+	begins to set defines and make macros.  In localtree.tmpl we set
+	defines for the level of optimization, Version information(what
+	string), plus defines that may determine how much of the tree is
+	built (DEBUGTREE, BUILD_UNITY_1_ONLY), where you find headers
+	and libraries (UseInstalled, UseMitLibrariesFromSystemOnly),
+	whether you link against shared libraries (ARCHIVED_LINK) or
+	build shared libraries (HasSharedLibraries).
+	or any other cpp define you may want to preset before processing
+	the mit configuration files and Imakefiles.
+
+	The default localtree.tmpl in /x/r5src_usl contains the
+	following:
+	/* use the mit libraries from /usr/X/lib and not the build tree */
+	#ifndef UseMitLibrariesFromSystemOnly
+	#define UseMitLibrariesFromSystemOnly YES
+	#endif
+
+	/* build the bms in this tree */
+	#ifndef BUILD_BMS
+	#define BUILD_BMS YES
+	#endif
+
+	/* build only the cose bits */
+	#ifndef BUILD_UNITY_1_ONLY
+	#define BUILD_UNITY_1_ONLY YES
+	#endif
+
+	/* build archived libraries in this tree */
+	#ifndef ForceNormalLib
+	#define ForceNormalLib YES
+	#endif
+
+	/* do not build shared libraries in this tree */
+	#ifndef HasSharedLibraries
+	#define HasSharedLibraries NO
+	#endif
+
+	/* optimized tree */
+	#ifndef OptimizedCDebugFlags
+	#define OptimizedCDebugFlags    /**/
+	#endif
+
+	A tree built with this localtree.tmpl will look for the standard 
+	mit headers and libraries in /usr/X and not in the build tree.
+	It will build the bms instead of using libraries and headers
+	supplied by hp.  It will not build shared libraries but will
+	build archived libraries.  Optimization has been turned off.
+	The actual template files reside in the
+	config/localtemplates/architecture/release directories.  When a
+	build tree is created, one of the templates is symbolically
+	linked to localtree.tmpl.  Look in the localtemplates/hpux
+	directories for examples of things you can do in localtree.tmpl.
+	THIS FILE IS REQUIRED.  If you create an empty version of this
+	file you will get the standard -O tree with shared libraries.
+
+config/OSVersion.tmpl:
+	On hp we build for multiple releases for the same source. This
+	is a problem because the .cf can only effectively contain 1
+	definition of OSMajorVersion and OSMinorVersion. We do not want
+	to have to change the .cf file for every tree built on a
+	different release. So we changed imake.c to look for a file
+	OSVersion.tmpl and use it to set OSMajor and MinorVersion.  If
+	the file does not exist, make Makefile gives you a warning.
+	OSVersion.tmpl is included before localtree.tmpl and is usually
+	a link to a file in the OSVersiontemplates directory.  THIS FILE
+	IS NOT REQUIRED BUT SHOULD BE USED.  If this is not used, you
+	will not be able to the definitions of OSMajor and MinorVersion
+	in other hp enhancement files such as localtree.tmpl and others
+	to be described below.
+
+config/desktopversion.tmpl:
+	Included by Imake.tmpl after the .cf and site.def include.
+	This file defines a version string for cose code. Mostly used by
+	hp.
+
+config/local.rules:
+	This file is for new make rules created for our source code.
+	The rules in this file (since they are cpp macros) overwrite any
+	rules in Imake.rules.
+
+config/local.rules:
+	While this is a standard mit file, it is usually empty. We have
+	our r4 rules in this file, but they are superseded by the rules
+	in local.rules and Imake.rules.
+
+anydirectory/localdefines:
+	Imake.c includes this file, when making a Makefile, 
+	immediately after OSVersion.tmpl.  This file is used by
+	engineers to temporarily alter cpp macros defined in the config
+	directory and Imakefile.  Since all cpp macros are of the form:
+	#ifndef macroname 
+	#define macroname 
+	#endif 
+	the cpp macros in
+	this file will override any cpp macros in the config directory
+	or Imakefile.  This file may stay in a local directory for an
+	indefinite period of time but is NOT put under version control
+	and is NOT in the master builds.  It is for use in a local
+	copy(clone) of a build directory by an ordinary engineer.  An
+	engineer can accomplish the same task on the command line for
+	make Makefile but putting the define change in a localdefines
+	file is easier for multiple invocations.  The engineer must do a
+	make Makefile after modifying or creating localdefines.  Because
+	these are intended to be of a temporary nature, imake gives a
+	warning when doing a make Makefile using a localdefines file.
+
+anydirectory/admindefines:
+	Imake.c includes this file immediately after localdefines.
+	This file is used by the build administrator to alter cpp macros
+	defined in the config directory and Imakefile.  This file is put
+	under version control and generally is edited by the build
+	administrator.  In our trees this file is used for the
+	following:  turn off ansi in particular directories, turn on
+	cplusplus in particular directories, switch including and
+	linking between R4 and R5 for a particular directory , choosing
+	which version of vue you are creating, etc.  A make Makefile
+	must be done after modifying or creating admindefines.  Imake
+	gives a warning when doing a make Makefile using an admindefines
+	file.
+
+anydirectory/adminmacros:
+	This file is the second-to-the-last file included by imake.c.
+	It is used by the system administrator to override make macros
+	(FOO = something) in the config directory and Imakefile.  With
+	make macros, the last definition wins.  This file is put under
+	source control and should be created and modified by the build
+	administrator.  A make Makefile must be done after modifying or
+	creating adminmacros.  Imake gives a warning when doing a make
+	Makefile using an adminmacros file.
+
+anydirectory/localmacros:
+	This file is the last file included by imake.c.
+	It serves the same function as adminmacros for make macros.
+	This file is used frequently by engineers to decide which
+	options they compile with (resetting CDEBUGFLAGS) and which
+	libraries they link against (resetting macros such as $(XLIB)
+	etc.).  Since it is the last file included, it overwrites any
+	make macros.  This file is NOT put under source control.  A make
+	Makefile must be done after modifying or creating localmacros.
+	Imake gives a warning when doing a make Makefile using an
+	localmacros file.
+
+
+The order of inclusion of files when creating a Makefile:
+
+	OSVersion.tmpl      (through imake.c)
+	localdefines        (through imake.c)
+	admindefines        (through imake.c)
+	Imake.tmpl          (through imake.c)
+	localtree.tmpl      (through Imake.tmpl)
+	site.def (pre)      (through Imake.tmpl)
+	vendor.cf           (through Imake.tmpl)
+	vendorLib.rules     (through vendor.cf)
+	site.def (post)     (through Imake.tmpl)
+	desktopversion.tmpl (through Imake.tmpl)
+	Project.tmpl        (through Imake.tmpl)
+	vendorLib.tmpl      (through Project.tmpl)
+	Motif.tmpl          (through Imake.tmpl)
+	local.rules         (through Imake.tmpl)
+	Imake.rules         (through Imake.tmpl)
+	oldlib.rules        (through Imake.rules)
+	Motif.rules         (through Imake.tmpl)
+	Imakefile           (through imake.c)
+	adminmacros         (through imake.c)
+	localmacros         (through imake.c)
+
+

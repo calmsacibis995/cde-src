@@ -1,0 +1,61 @@
+#ifdef HPArchitecture  
+VENDOR_ARG = -h
+#endif
+
+#ifdef RsArchitecture
+VENDOR_ARG = -i
+#endif
+
+#ifdef SunArchitecture
+VENDOR_ARG = -s
+#endif
+
+#ifdef USLArchitecture
+VENDOR_ARG = -u
+#endif
+
+
+SRCS_MISC = \
+	dtspcd.1mxo
+
+SRCS = \
+	$(SRCS_MISC)
+
+OBJS_MISC = \
+	dtspcd.1m
+
+OBJS = \
+	$(OBJS_MISC)
+
+
+DT2MAN = ../tools/dt2man
+
+MANROFF = /usr/bin/troff -man
+
+
+all:: $(OBJS)
+
+miscall:: $(OBJS_MISC)
+
+
+.SUFFIXES: .1mxo .1m
+
+.1mxo.1m:
+	$(RM) $@
+	$(DT2MAN) $(VENDOR_ARG) $? >$@
+
+clean::
+	$(RM) $(OBJS)
+
+miscclean::
+	$(RM) $(OBJS_MISC)
+
+
+depend::
+
+includes::
+
+
+miscprint::	miscall
+	$(TBL) $(OBJS_MISC) | $(MANROFF)
+

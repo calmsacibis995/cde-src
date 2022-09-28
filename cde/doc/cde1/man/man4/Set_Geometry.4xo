@@ -1,0 +1,75 @@
+.TH Set_Geometry 4 "13 May 1994"
+.SH NAME
+Set_Geometry request \- set a tool's on-screen geometry
+.SH SYNOPSIS
+.yS
+.ta \w@Set_Geometry(@u
+Set_Geometry(inout width \f2w\fP,
+	inout height \f2h\fP,
+	inout xOffset \f2x\fP,
+	inout yOffset \f2y\fP
+	[in messageID \f2commission\fP]);
+.yE
+.SH DESCRIPTION
+The
+.I Set_Geometry
+request
+sets the on-screen geometry of the optionally specified
+window, or of the window primarily associated with the recipient
+procid (if no window is specified).
+.P
+The
+.IR w ,
+.IR h ,
+.I x
+and
+.I y
+arguments are integer geometry values, in pixels,
+representing width, height, x-coordinate and y-coordinate,
+respectively.
+Negative offset values
+are interpreted according to the
+.cde .BR X11 (7)
+.cde man page.
+.xo \*(Zl.
+If any of these arguments are unset, that part of the geometry need
+not be changed.
+The return values are the actual
+new values, in case they differ from the requested new values.
+.P
+The
+.I commission
+argument
+is the ID of the ongoing request, if any, that resulted in the creation
+of the window in question.
+.SH "APPLICATION USAGE"
+The
+.Fn ttdt_session_join 3,
+and
+.Fn ttdt_message_accept 3,
+functions can be used by Xt applications to register for,
+and transparently process, the
+.I Set_Geometry
+request.
+.SH EXAMPLES
+The
+.I Set_Geometry
+request can be sent as in the following example:
+.Cs I
+Tt_message msg = tttk_message_create(0, TT_REQUEST, TT_SESSION,
+			the_recipient_procid, TTDT_SET_GEOMETRY,
+			my_callback);
+tt_message_iarg_add(msg, TT_INOUT, Tttk_width, 500);
+tt_message_iarg_add(msg, TT_INOUT, Tttk_height, 500);
+tt_message_arg_add(msg, TT_INOUT, Tttk_xoffset, 0); /* no value */
+tt_message_arg_add(msg, TT_INOUT, Tttk_yoffset, 0); /* no value */
+tt_message_send(msg);
+.Ce
+.SH "SEE ALSO"
+.Fn tt_message_arg_add 3,
+.Fn tt_message_iarg_add 3,
+.Fn tt_message_send 3,
+.Fn ttdt_message_accept 3,
+.Fn ttdt_session_join 3;
+.I Get_Geometry
+request.

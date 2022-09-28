@@ -1,0 +1,340 @@
+.de LI
+.\" simulate -mm .LIs by turning them into .TPs
+.TP \\n()Jn
+\\$1
+..
+.TH sdtcm_convert 1 "14 March 1995"
+.BH "14 March 1995"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.SH NAME
+sdtcm_convert \- calendar data conversion utility
+.SH SYNOPSIS
+.ft 3
+.fi
+.na
+sdtcm_convert
+[\(miv\0\f2output-version\fP]
+[\(mis\0\f2<mm/dd/yy>\fP]
+[\(mic\0\f2locale-info\fP]
+[\(mid\0\f2backup-directory\fP]
+\f2calendar\fP
+.PP
+.fi
+.SH DESCRIPTION
+.BR sdtcm_convert 
+is a calendar data conversion utility which
+converts version 3 (OpenWindows calendar data format)
+calendar data format to version 4, the extensible
+calendar data format, and vice versa.  If the
+.B \(mis
+option is specified, it also prunes the calendar while doing the
+conversion.  The utility can also prune a calendar without
+doing data conversion.
+.PP
+If no option is specified,
+.BR sdtcm_convert
+will check the calendar file for data integrity.
+.PP
+.BR sdtcm_convert
+must be run by the super-user or the owner of the calendar.
+The super-user can run
+.BR sdtcm_convert
+on any calendar.  A regular user can only run
+.BR sdtcm_convert
+on his/her own calendar.
+The program will look for the specified
+calendar in the /var/spool/calendar directory.  When the conversion is
+done, the original calendar
+file will be saved in the file
+"calorig.\f2calendar\fP"
+which will be placed
+in the specified backup directory or /var/spool/calendar by default.
+The new data will be saved in the calendar file
+"callog.\f2calendar\fP"
+in the /var/spool/calendar directory.
+.PP
+If the calendar server,
+.BR rpc.cmsd (1),
+is running,
+.BR sdtcm_convert
+will send a
+.BR SIGHUP
+signal to the server and wait until it quits
+before doing any data conversion.  This is to ensure the data
+integrity of the calendar.
+.PP
+The version 3 data format is fixed and limited.  In order to
+take advantage of the new features supported by the calendar
+API, version 3 calendars should be converted to the version 4 data format.
+.PP
+Note: The OpenWindows calendar server does not support the
+version 4 data format.  If you need to switch back to the
+OpenWindows calendar server and you have a version 4 calendar,
+you should convert your calendar to the version 3 data
+format before switching the server.  However, data not
+supported in the version 3 data format will be lost during the
+conversion.  For example, all calendar attributes except the access list,
+entry attributes such as date of creation, date of last update, etc.
+will be lost.
+.SH OPTIONS
+The following options are available:
+.PP
+.RS 3
+.nr )J 6
+.LI \f3\(miv\0\f2output-version\f1
+.br
+Specifies the version of the output.  Valid values are
+3 (OW calendar data format) and 4 (the extensible data
+format).  If this option is not specified, the output
+version will be the same as that of the specified
+calendar and no data conversion will be done.
+The data version of the calendar is displayed in
+the About Calendar dialog box of
+.BR dtcm(1).
+.LI \f3\(mis\0\f2<mm/dd/yy>\f1
+.br
+Specifies the date to prune the calendar.
+Appointments starting before the specified date will be
+pruned.  One-time appointments with start date on or
+after the specified date will be included in the conversion.
+Repeating appointments will be truncated such that the
+first appointment in the sequence will happen on or after
+the specified date and those sequences that end before the
+specified date will be removed.  If this option is not specified,
+no appointments will be pruned.
+.LI \f3\(mic\0\f2locale-info\f1
+.br
+Specifies the value to be used in the character set
+calendar attribute.  The value should be a valid
+Sun-specific locale name (e.g. "C" or "de").  The CDE
+platform-independent equivalent of it will be
+stored in the calendar.  If this option is not specified,
+the CDE platform-independent name of the current locale
+associated with the process will be used.
+This option is used when converting version 3 data to
+version 4 data and will be ignored otherwise.
+.LI \f3\(mid\0\f2backup-directory\f1
+.br
+Specifies the directory in which to place the original
+calendar file.  The original file will be
+backed up in a file called
+"calorig.\f2calendar\fP"
+where
+.I calendar
+is the name of the calendar.
+.PP
+.RE
+.nr )J 6
+.PP
+.RE
+.nr )J 0
+.SH OPERANDS
+The following operand is supported:
+.PP
+.RS 3
+.nr )J 6
+.LI \f2calendar\fP
+.br
+The name of the calendar to be converted.  The format is
+calendar-name[@host-name].  If the host name is specified,
+it must be the name of the local host.
+.PP
+.RE
+.nr )J 0
+.SH "ENVIRONMENT VARIABLES"
+The following environment variables affect the execution of
+.BR sdtcm_convert :
+.PP
+.RS 3
+.nr )J 15
+.LI \f2LANG\fP
+Provide a default value for the internationalization variables
+that are unset or null.
+If
+.I LANG
+is unset or null, the corresponding value from the
+implementation-specific default locale will be used.
+If any of the internationalization variables contains an invalid setting, the
+utility behaves as if none of the variables had been defined.
+.LI \f2LC_ALL\fP
+If set to a non-empty string value,
+override the values of all the other internationalization variables.
+.LI \f2LC_MESSAGES\fP
+Determine the locale that is used to affect
+the format and contents of diagnostic
+messages written to standard error
+and informative messages written to standard output.
+.LI \f2NLSPATH\fP
+Determine the location of message catalogs
+for the processing of
+.IR LC_MESSAGES .
+.PP
+.RE
+.nr )J 0
+.SH STDIN
+The standard input is used to receive user
+replies in case user confirmation is needed.
+.SH STDOUT
+Used for informative messages to the user.
+.SH STDERR
+Used for diagnostic and error messages.
+.SH "INPUT FILES"
+.PD 0
+.TP 20
+.B /var/spool/calendar/callog.\f4calendar\fP
+The calendar file of the specified calendar.
+.PD
+.SH "OUTPUT FILES"
+.PD 0
+.TP 20
+.B /var/spool/calendar/calorig.\f4calendar\fP
+The default backup file of the original calendar file.
+.TP 20
+.B backup-directory/calorig.\f4calendar\fP
+The backup file of the original calendar file if the
+.B \(mid
+option is specified.
+.PD
+.SH "EXIT STATUS"
+The following exit values are returned:
+.PP
+.RS 3
+.nr )J 4
+.LI \h"\w'>'u"0
+Successful completion.
+.LI >0
+An error occurred.
+.PP
+.RE
+.nr )J 0
+.SH "CONSEQUENCES OF ERRORS"
+If error occurs, the original calendar file will not be changed.
+.SH EXAMPLES
+To convert the calendar "user1" to version 4 data format:
+.PP
+.sp -1
+.RS 5
+.ta 4m +4m +4m +4m +4m +4m +4m
+.nf
+.ft 3
+example% sdtcm_convert -v 4 user1
+Loading the calendar ...
+Doing conversion ...
+Writing out new file ...
+Conversion done successfully.
+Total number of appointments			= 709
+Number of one-time appointments converted		= 670
+Number of repeating appointments converted		= 39
+Number of one-time appointments pruned		= 0
+Number of repeating appointments pruned		= 0
+The original file is saved in /var/spool/calendar/calorig.user1
+example%
+.PP
+.ft 1
+.fi
+.RE
+.PP
+To convert the calendar "user1" to version 4 data format starting from
+1/1/94:
+.PP
+.sp -1
+.RS 5
+.ta 4m +4m +4m +4m +4m +4m +4m
+.nf
+.ft 3
+example% sdtcm_convert -v 4 -s 1/1/94 user1
+Loading the calendar ...
+Doing conversion ...
+Writing out new file ...
+Conversion done successfully.
+Total number of appointments			= 709
+Number of one-time appointments converted		= 233
+Number of repeating appointments converted		= 19
+Number of one-time appointments pruned		= 437
+Number of repeating appointments pruned		= 20
+The original file is saved in /var/spool/calendar/calorig.user1
+example%
+.PP
+.ft 1
+.fi
+.RE
+.PP
+To prune the calendar "user1" retaining appointments starting
+from 7/1/94 and put the backup of the original calendar file in the
+directory /export/backup:
+.PP
+.sp -1
+.RS 5
+.ta 4m +4m +4m +4m +4m +4m +4m
+.nf
+.ft 3
+example% sdtcm_convert -s 7/1/94 -d /export/backup user1
+Loading the calendar ...
+Doing conversion ...
+Writing out new file ...
+Conversion done successfully.
+Total number of appointments			= 252
+Number of one-time appointments converted		= 190
+Number of repeating appointments converted		= 19
+Number of one-time appointments pruned		= 43
+Number of repeating appointments pruned		= 0
+The original file is saved in /export/backup/calorig.user1
+example%
+.PP
+.ft 1
+.fi
+.RE
+.PP
+To convert the calendar "user1" from version 4 to version 3 data format:
+.PP
+.sp -1
+.RS 5
+.ta 4m +4m +4m +4m +4m +4m +4m
+.nf
+.ft 3
+example% sdtcm_convert -v 3 user1
+Loading the calendar ...
+.sp 0.5v
+WARNING!! Data will be lost when converting version 4 data format
+back to version 3 data format.
+.sp 0.5v
+Do you want to continue? (Y/N) [Y] 
+.sp 0.5v
+Doing conversion ...
+Writing out new file ...
+Conversion done successfully.
+Total number of appointments			= 209
+Number of one-time appointments converted		= 190
+Number of repeating appointments converted		= 19
+Number of one-time appointments pruned		= 0
+Number of repeating appointments pruned		= 0
+The original file is saved in /var/spool/calendar/calorig.user1
+example%
+.PP
+.ft 1
+.fi
+.RE
+.PP
+To do sanity check on calendar "user1":
+.PP
+.sp -1
+.RS 5
+.ta 4m +4m +4m +4m +4m +4m +4m
+.nf
+.ft 3
+example% sdtcm_convert user1
+Loading the calendar ...
+The calendar file is ok.
+Total number of appointments		= 209
+Number of one-time appointments		= 190
+Number of repeating appointments		= 19
+example%
+.PP
+.ft 1
+.fi
+.RE
+.SH "SEE ALSO"
+.na
+.BR rpc.cmsd (1),
+.BR dtcm (1).

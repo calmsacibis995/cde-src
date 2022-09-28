@@ -1,0 +1,366 @@
+#!/usr/local/bin/perl
+
+eval "exec /usr/local/bin/perl -S $0 $*"
+    if $running_under_some_shell;
+
+#### PLACE REMOTELY
+########################################################
+# required files
+########################################################
+# Add the test directory to the locations to search for
+# libraries.
+push(@INC,"/x/cdesrc/admin/BuildTools/rcs_tools");
+require 'RcsUtility.pl';
+require 'RcsSock.pl';
+
+########################################################
+# define variables
+########################################################
+&InitializeVariables();
+$exitValue = 0;
+# don't buffer
+select(STDERR); $| =1;
+select(STDOUT); $| =1;
+
+
+#######################################################
+# define local subroutines
+#######################################################
+#
+# The following are signal handlers for abort due a specific signal
+#
+sub abortHUP {
+        local(@errormessage);
+        @errormessage = ("*** Client terminated with signal 1 -> SIGHUP ***");
+        &Exit(1,@errormessage);
+}
+sub abortINT {
+        local(@errormessage);
+        &Exit(1,@errormessage);
+}
+sub abortQUIT {
+        local(@errormessage);
+        @errormessage = ("*** Client terminated with signal 3 -> SIGQUIT ***");
+        &Exit(1,@errormessage);
+}
+sub abortTERM {
+        local(@errormessage);
+        @errormessage = ("*** Client terminated with signal 15 -> SIGTERM ***");
+        &Exit(1,@errormessage);
+}
+
+########################################################
+# Catch signals
+########################################################
+$SIG{'INT'} = 'abortINT';
+$SIG{'HUP'} = 'abortHUP';
+$SIG{'QUIT'} = 'abortQUIT';
+$SIG{'TERM'} = 'abortTERM';
+
+
+##############################################################
+# argument processing - this must be specific for each command
+##############################################################
+
+$isDashBOption = 0;
+while ( $ARGV[0] =~ /^-/ ){
+	$_ = shift;
+	if (/^-D$/){
+	       # turn on debugging output
+	       $Debug = 1;
+	}
+	# just -B
+	elsif (/^-B$/){
+		$isDashBOption = 1;
+	}
+	# -B mixed in with others
+	elsif (/B/){
+		$tmpOption = $_;
+		$isDashBOption = 1;
+		$tmpOption =~ s%B%%;
+		push(@options,$tmpOption);
+	}
+	else {
+		push(@options,$_);
+	}
+}
+
+#
+# if this is a terminal and a column output specifying option is not present
+# use -C to set multi-column output for remote options.
+# List -C first so it can be overridden.
+#
+if (-t STDOUT) {
+	push(@remoteOptions,"-C");
+	push(@remoteOptions,@options);
+}
+else {
+	push(@remoteOptions,@options);
+}
+
+#
+# The -R option will require special treatment. Let's flag it.
+$isDashROption = 0;
+foreach $option (@options) {
+	$_ = $option;
+	if (m%R%) {
+		$isDashROption = 1;
+	}
+}
+
+
+
+#
+# get the files and do appropriate error checking
+# see if the files are local or remote
+#
+# for some reason while(@ARGV) cannot be in a subroutine
+while ( @ARGV ) {
+	$_ = shift;
+	$tstfile = $_;
+	#
+	# if the file is an RCS vault, store it
+	# We will add it later if it was really meant to be a parameter
+	# 
+	if ((m%\/RCS$%) || (m%^RCS$%)) {
+		push(@rcsEntries, $tstfile);
+		$tmpParentRcsDir = `dirname $tstfile`;
+		chop($tmpParentRcsDir);
+		push(@rcsParentDirs, $tmpParentRcsDir);
+	}
+	else {
+		push(@allFiles, $tstfile);
+	}
+}
+
+#
+# When doing Rls *, the RCS subdirectory will inadvertently be
+# one of the parameters. Remove it. This is why we stored the RCS 
+# directories separately above.
+# This check is done by checking the list of parent directories for
+# each parameter that ends in RCS against the parent directory of each
+# file. If a file's parent directory matches an RCS parent directory, we
+# do not want the RCS path for that directory as a parameter because the
+# user is asking for individual files, not the whole directory which is
+# what including the RCS path as a parameter will give you (Rls somepath/RCS)
+#
+foreach $tmpParentRcsDir (@rcsParentDirs) {
+	$rcsEntry = shift(@rcsEntries);
+	$keepRcsParameter = 1;
+	foreach $file (@allFiles) {
+		$tmpParentDir = `dirname $file`;
+		chop $tmpParentDir;
+		if ("$tmpParentDir" eq "$tmpParentRcsDir") {
+			# parent directory of file is the same as the RCS parameter
+			# don't do Rls RCS in this situation
+			#
+			$keepRcsParameter = 0;
+		}
+	}
+	if ($keepRcsParameter) {
+		push(@allFiles,$rcsEntry);
+	}
+}
+
+print "@allFiles\n" if $Debug;
+#
+# determine what the real path will be on the remote machine
+# If there are no files do entire RCS dir.
+#
+if (defined(@allFiles)) {
+	foreach $file (@allFiles) {
+		# is it the entire RCS directory? Or a ,v file?
+		if (($file =~ m%\/RCS\/%) || ($file =~ m%^RCS\/%) || ($file =~ m%^RCS$%) || ($file =~ m%\/RCS$%)) {
+			#
+			# check for files first
+			if ($file =~  m%RCS\/.*$%) {
+				$tmpFile = $file;
+				$tmpFileBasename = `basename $file`;
+				chop($tmpFileBasename);
+				$tmpFile =~ s%RCS\/.*$%RCS%; 
+				#get the RCS directory path on remote server
+				$realRcsDir = &IsRcsDirectoryLocal($tmpFile);
+				$realRcsDir = "${realRcsDir}/${tmpFileBasename}";
+			}
+			else { # just an RCS directory
+
+				#get the RCS directory path on remote server
+				$realRcsDir = &IsRcsDirectoryLocal($file);
+			}
+
+			if ($rcsDirIsLocal) {
+				push(@localExchangeFiles,$realRcsDir);
+			}
+			else {
+				push(@remoteExchangeFiles,$realRcsDir);
+			}
+		}
+		#
+		# if RCS is not in the path, is it a directory?
+		# if it is and it is not recursive (-R) then add the RCS
+		# component to the path and give it the true path to RCS.
+		# if it is recursive, don't add the RCS component but give it the
+		# true path to the parent of the RCS directory inside the RCS
+		# vault. -R will recurse you all the way down the RCS vault in
+		# that case.
+		# Also, check if -B option is given. If it is then do not
+		# put RCS in path but add correct parent directory path
+		# to the RCS vault. This means there is no ,v file.
+		#
+		elsif (-d $file) {
+			$tmpFile = "${file}/RCS";
+			#get the RCS directory path on remote server
+			$realRcsDir = &IsRcsDirectoryLocal($tmpFile);
+			if (($isDashROption) || ($isDashBOption)){ # -R,-B strip RCS from path
+				$realRcsDir =~ s%\/RCS$%%;
+			}
+			if ($rcsDirIsLocal) {
+					push(@localExchangeFiles,$realRcsDir);
+			}
+			else {
+				push(@remoteExchangeFiles,$realRcsDir);
+			}
+		}
+		#
+		# The target is really a file, find its correct ,v Path
+		# in the real RCS vault.
+		#
+		elsif (-f $file) {
+			$tmpFile = `dirname $file`;
+			chop($tmpFile);
+			$tmpFile	= "${tmpFile}/RCS";
+			$tmpFileBasename = `basename $file`;
+			chop($tmpFileBasename);
+
+			#
+			# get the correct RCS directory path in RCS vault
+			# compose ,v path
+			# 
+			$realRcsDir = &IsRcsDirectoryLocal($tmpFile);
+			$realRcsFile = "${realRcsDir}/${tmpFileBasename},v";
+			#
+			# for -B option give file path to parent of RCS dir
+			#
+			if ($isDashBOption){ # -B strip RCS from path
+				$realRcsDir =~ s%\/RCS$%%;
+				$realRcsFile = "${realRcsDir}/${tmpFileBasename}";
+			}
+			if ($rcsDirIsLocal) {
+					push(@localExchangeFiles,$realRcsFile);
+			}
+			else {
+				push(@remoteExchangeFiles,$realRcsFile);
+			}
+		}
+		else {
+			printf STDERR "	ERROR - $file is an incorrect path\n";
+			printf STDERR "	It must be a directory, a file, or have RCS in it's path\n";
+			$exitValue = 1;
+		}
+	}
+}
+#
+# no files or directories given, assume just the local RCS vault.
+# If there isn't any it is an error.
+else { 
+	if ((-d "RCS") || (-l "RCS")) {
+		#
+		# get the correct RCS directory path in RCS vault
+		#
+		$tmpFile = "RCS";
+		#get the RCS directory path in the RCS vault
+		$realRcsDir = &IsRcsDirectoryLocal($tmpFile);
+		#
+		# for -B and -R remove RCS from path
+		#
+		if (($isDashROption) || ($isDashBOption)){
+			$realRcsDir =~ s%\/RCS$%%;
+		}
+		if ($rcsDirIsLocal) {
+				push(@localExchangeFiles,$realRcsDir);
+		}
+		else {
+			push(@remoteExchangeFiles,$realRcsDir);
+		}
+	}
+	else {
+		printf STDERR "	ERROR - an RCS directory must be present\n";
+		$exitValue = 1;
+	}
+}
+
+
+####################################################################
+# debug argument processing
+####################################################################
+if ( $Debug ) {
+	print "rhost= $rhost\n";
+	print "port= $port\n";
+	print "localExchangeFiles= \"@localExchangeFiles\"\n";
+	print "remoteExchangeFiles = \"@remoteExchangeFiles\"\n";
+	print "originalFiles = \"@allFiles\"\n";
+}
+
+##################################################################
+# Process the local files
+# Run local Rcs commands
+##################################################################
+if (defined(@localExchangeFiles)) {
+    print "ls @options @localExchangeFiles\n" if $Debug; 
+    $tmpExitValue = system "ls @options @localExchangeFiles";
+
+	# reset exit value if necessary
+	if ((!$exitValue) && ($tmpExitValue)) {
+		$exitValue = 1;
+	}
+}
+
+if (defined(@remoteExchangeFiles)) {
+	##################################################################
+	# Open the connection
+	##################################################################
+        if (! ($SOCK_HANDLE = &sock'open($rhost,$port))) {
+		@errorMessage = ("Connect to \"$rhost\" failed: $!");
+		&Exit(1,@errorMessage);
+	}
+	
+	#
+	# Pass the basic rls command string
+	#
+	print $SOCK_HANDLE  "USER: $userName\n";
+	#
+	# neutralize mechanism for receiving wildcard pathnames from 
+	# Server RCS vaults. They are not needed in this command. The
+	# wildcard is simply passed with the command and gets resolved
+	# at the server.
+	# This is done by passing empty args.
+	#
+	print $SOCK_HANDLE "$RemoteRcsPrg \n";
+
+	# pass the real command
+	print $SOCK_HANDLE "$RemoteRcsPrg @remoteOptions @remoteExchangeFiles\n";
+	
+	#
+	# Read rls info from the socket
+	#
+	while( <$SOCK_HANDLE> ) {
+		&checkForDeadServer($_);
+		if (m%^>>### RLS ALL DONE ###<<$%) {
+			$tmpExitValue = <$SOCK_HANDLE>;
+			&checkForDeadServer($tmpExitValue);
+			chop $tmpExitValue;
+			#
+			# reset the exit value if appropriate
+			# 
+			if (($exitValue) && ($tmpExitValue)) {
+				$exitValue = 1;
+			}
+		}
+		else {
+			print;
+		}
+	}
+	print STDOUT "Closing socket\n" if $Debug;
+	&sock'close($SOCK_HANDLE);
+}
+&Exit($exitValue,@nullMessage);

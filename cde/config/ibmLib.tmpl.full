@@ -1,0 +1,270 @@
+XCOMM $XConsortium: ibmLib.tmpl,v 1.2 91/05/04 11:49:00 rws Exp $
+
+/*
+ * AIX shared library template
+ */
+
+SHLIBLDFLAGS = SharedLibraryLoadFlags
+
+/* The following macro sets the location of the unity libs */
+UNITY_LIB_INSTALL_DEST = /usr/vue/lib
+/* give explicit path to /usr/lib for shared libraries */
+SYSX11SRC = /usr/lib
+
+/*
+ * give explict path to /usr/lpp/xlC/lib/libC.a the C++ lib for shared
+ * libraries
+ */
+#if defined(RsArchitecture) && (OSMajorVersion == 3)
+CPLUSLIB = /usr/lpp/xlC/lib/libCns.a
+#else
+CPLUSLIB = /usr/lpp/xlC/lib/libC.a
+#endif
+
+
+/* reset paths to X libraries depending on whether binstall is used */
+#if UseAltBuildScheme
+LOCAL_XLIBPATH=
+#else
+LOCAL_XLIBPATH=-L$(USRLIBDIR)
+#endif
+LOCAL_XLIBDIR=$(USRLIBDIR)
+
+
+/******* XEXT ******/
+     EXTENSIONLIB = $(LOCAL_XLIBPATH) -lXext
+  DEPEXTENSIONLIB = $(LOCAL_XLIBDIR)/libXext.a
+
+
+/******* X ******/
+             XLIB = $(EXTENSIONLIB) $(XIMPLIB) $(LOCAL_XLIBPATH) -lX11
+          DEPXLIB = $(DEPEXTENSIONLIB) $(DEPXIMPLIB) $(LOCAL_XLIBDIR)/libX11.a
+
+/******* XMU ******/
+           XMULIB = $(LOCAL_XLIBPATH) -lXmu
+        DEPXMULIB = $(LOCAL_XLIBDIR)/libXmu.a
+
+/******* XT ******/
+         XTOOLLIB = $(LOCAL_XLIBPATH) -lXt
+#if USE_XT_FROM_SYSTEM_ONLY
+      DEPXTOOLLIB = $(LOCAL_XLIBDIR)/libXt.a
+#else /* Xt from tree */
+#if UseAltBuildScheme
+      DEPXTOOLLIB = $(BINSTALL_LIBDIR)/libXt.a
+#else
+      DEPXTOOLLIB = $(TOOLKITSRC)/libXt.a
+#endif
+#endif
+
+/******* XAW ******/
+           XAWLIB = $(LOCAL_XLIBPATH) -lXaw
+        DEPXAWLIB = $(LOCAL_XLIBDIR)/libXaw.a
+
+
+/******* XI ******/
+           XILIB = $(LOCAL_XLIBPATH) -lXi
+        DEPXILIB = $(LOCAL_XLIBDIR)/libXi.a
+
+/******* XAU ******/
+           XAUTHLIB = $(LOCAL_XLIBPATH) -lXau
+        DEPXAUTHLIB = $(LOCAL_XLIBDIR)/libXau.a
+
+/******* XDMCP ******/
+           XDMCPLIB = $(LOCAL_XLIBPATH) -lXdmcp
+        DEPXDMCPLIB = $(LOCAL_XLIBDIR)/libXdmcp.a
+
+/******* XTEST LIBRARY ******/
+           XTESTLIB = $(LOCAL_XLIBPATH) -lXtst
+        DEPXTESTLIB = $(LOCAL_XLIBDIR)/libXtst.a
+
+/******* XM ******/
+#if UseAltBuildScheme
+           XMLIB = -L$(BINSTALL_LIBDIR) -lXm
+        DEPXMLIB = $(BINSTALL_LIBDIR)/libXm.a
+#else
+           XMLIB = -L$(XMSRC) -lXm
+        DEPXMLIB = $(XMSRC)/libXm.a
+#endif
+
+
+/******* MRM ******/
+#if UseAltBuildScheme
+           MRMLIB = -L$(BINSTALL_LIBDIR) -lMrm
+        DEPMRMLIB = $(BINSTALL_LIBDIR)/libMrm.a
+#else
+           MRMLIB = -L$(MRMSRC) -lMrm
+        DEPMRMLIB = $(MRMSRC)/libMrm.a
+#endif
+
+/******* UIL ******/
+#if UseAltBuildScheme
+           UILLIB = -L$(BINSTALL_LIBDIR) -lUil
+        DEPUILLIB = $(BINSTALL_LIBDIR)/libUil.a
+#else
+           UILLIB = -L$(UILSRC) -lUil
+        DEPUILLIB = $(UILSRC)/libUil.a
+#endif
+
+/******* XPM ******/
+#if UseAltBuildScheme
+           XPMLIB = -L$(BINSTALL_LIBDIR) -lXpm
+        DEPXPMLIB = $(BINSTALL_LIBDIR)/libXpm.a
+#else
+           XPMLIB = -L$(XPMSRC) -lXpm
+        DEPXPMLIB = $(XPMSRC)/libXpm.a
+#endif
+
+
+/******* DTHELP ******/
+#if UseAltBuildScheme
+           DTHELPLIB = -L$(BINSTALL_LIBDIR) -l DtHelp
+        DEPDTHELPLIB = $(BINSTALL_LIBDIR)/libDtHelp.a
+#else
+           DTHELPLIB = -L$(DTHELPSRC) -l DtHelp
+        DEPDTHELPLIB = $(DTHELPSRC)/libDtHelp.a
+#endif
+
+
+/******* DTSVC ******/
+#if UseAltBuildScheme
+           DTSVCLIB = -L$(BINSTALL_LIBDIR) -lDtSvc $(TTLIB)
+        DEPDTSVCLIB = $(BINSTALL_LIBDIR)/libDtSvc.a $(DEPTTLIB)
+#else
+           DTSVCLIB = -L$(DTSVCSRC) -lDtSvc $(TTLIB)
+        DEPDTSVCLIB = $(DTSVCSRC)/libDtSvc.a $(DEPTTLIB)
+#endif
+
+/******* DTCM ******/
+#if UseAltBuildScheme
+           DTCMLIB = -L$(BINSTALL_LIBDIR) -lDtCm
+        DEPDTCMLIB = $(BINSTALL_LIBDIR)/libDtCm.a
+#else
+           DTCMLIB = -L$(DTCMLIBSRC) -lDtCm
+        DEPDTCMLIB = $(DTCMLIBSRC)/libDtCm.a
+#endif
+
+
+/******* DTWIDGET ******/
+/* debug DtWidget needs bento */
+#if UseAltBuildScheme
+#ifdef DEBUGTREE
+           DTWIDGETLIB = -L$(BINSTALL_LIBDIR) -lDtWidget $(BENTOLIB)
+        DEPDTWIDGETLIB = $(BINSTALL_LIBDIR)/libDtWidget.a $(DEPBENTOLIB)
+#else
+           DTWIDGETLIB = -L$(BINSTALL_LIBDIR) -lDtWidget
+        DEPDTWIDGETLIB = $(BINSTALL_LIBDIR)/libDtWidget.a
+#endif
+#else
+#ifdef DEBUGTREE
+           DTWIDGETLIB = -L$(DTWIDGETSRC) -lDtWidget $(BENTOLIB)
+        DEPDTWIDGETLIB = $(DTWIDGETSRC)/libDtWidget.a $(DEPBENTOLIB)
+#else
+           DTWIDGETLIB = -L$(DTWIDGETSRC) -lDtWidget
+        DEPDTWIDGETLIB = $(DTWIDGETSRC)/libDtWidget.a
+#endif
+#endif
+
+
+/******* BENTO ******/
+#if UseAltBuildScheme
+           BENTOLIB = -L$(BINSTALL_LIBDIR) -lbento
+        DEPBENTOLIB = $(BINSTALL_LIBDIR)/libbento.a
+#else
+           BENTOLIB = -L$(BENTOSRC) -lbento
+        DEPBENTOLIB = $(BENTOSRC)/libbento.a
+#endif
+
+
+/******* TOOLTALK ******/
+#if UseAltBuildScheme
+           TTLIB = -L$(BINSTALL_LIBDIR) -ltt
+        DEPTTLIB = $(BINSTALL_LIBDIR)/libtt.a
+#else
+           TTLIB = -L$(TTSRC)/lib -ltt
+        DEPTTLIB = $(TTSRC)/lib/libtt.a
+#endif
+
+
+/******* DTMAIL ******/
+#if UseAltBuildScheme
+           DTMAILLIB = -L$(BINSTALL_LIBDIR) -lDtMail
+        DEPDTMAILLIB = $(BINSTALL_LIBDIR)/libDtMail.a
+#else
+           DTMAILLIB = -L$(DTMAILSRC)/libDtMail -lDtMail
+        DEPDTMAILLIB = $(DTMAILSRC)/libDtMail/libDtMail.a
+#endif
+
+/******* DT PRINT LIBRARY ******/
+#if UseAltBuildScheme
+           DTPRINTLIB = -L$(BINSTALL_LIBDIR) -lDtPrint
+        DEPDTPRINTLIB = $(BINSTALL_LIBDIR)/libDtPrint.a
+#else
+           DTPRINTLIB = -L$(DTPRINTSRC) -lDtPrint
+        DEPDTPRINTLIB = $(DTPRINTSRC)/libDtPrint.a
+#endif
+
+/******* DTTERM LIBRARY ******/
+#if UseAltBuildScheme
+    DTTERMLIB = -L$(BINSTALL_LIBDIR) -lDtTerm
+ DEPDTTERMLIB = $(BINSTALL_LIBDIR)/libDtTerm.a
+#else 
+    DTTERMLIB = -L$(CDESRC)/dtterm -lDtTerm
+ DEPDTTERMLIB = $(CDESRC)/dtterm/libDtTerm.a
+#endif
+
+/* The following section is for archived only libraries */
+/******* IMAGE LIBRARY ******/
+#if UseAltBuildScheme
+          ILLIB = -L$(BINSTALL_LIBDIR)  -lil 
+       DEPILLIB = $(BINSTALL_LIBDIR)/libil.a
+#else
+          ILLIB = -L$(ILSRC)  -lil 
+       DEPILLIB = $(ILSRC)/libil.a
+#endif
+
+/******* SYNLIB LIBRARY ******/
+#if UseAltBuildScheme
+         SYNLIB = -L$(BINSTALL_LIBDIR)  -lsynlib 
+      DEPSYNLIB = $(BINSTALL_LIBDIR)/libsynlib.a
+#else
+         SYNLIB = -L$(SYNLIBSRC)  -lsynlib 
+      DEPSYNLIB = $(SYNLIBSRC)/libsynlib.a
+#endif
+
+
+/******* SYNLIBTST LIBRARY ******/
+#if UseAltBuildScheme
+      SYNLIBTST = -L$(BINSTALL_LIBDIR)  -lsynlibTst 
+   DEPSYNLIBTST = $(BINSTALL_LIBDIR)/libsynlibTst.a
+#else
+      SYNLIBTST = -L$(SYNLIBSRC)  -lsynlibTst 
+   DEPSYNLIBTST = $(SYNLIBSRC)/libsynlibTst.a
+#endif
+
+/******* VFA LIBRARY ******/
+#if UseAltBuildScheme
+         VFA_LIB = -L$(BINSTALL_LIBDIR)  -lvfa 
+       DEPVFA_LIB= $(BINSTALL_LIBDIR)/libvfa.a
+#else
+          VFA_LIB= -L$(VFA_LIBSRC)  -lvfa 
+       DEPVFA_LIB= $(VFA_LIBSRC)/libvfa.a
+#endif
+
+/******* TET LIBRARY ******/
+#if UseAltBuildScheme
+      TETAPILIB = -L$(BINSTALL_LIBDIR)  -lapi 
+   DEPTETAPILIB = $(BINSTALL_LIBDIR)/libapi.a
+#else
+      TETAPILIB = -L$(TETSRC)  -lapi 
+   DEPTETAPILIB = $(TETSRC)/tet/src/posix_c/api/libapi.a
+#endif
+
+/******* CDE TET LIBRARY ******/
+#if UseAltBuildScheme
+   CDETETAPILIB = -L$(BINSTALL_LIBDIR)  -lcde_tet 
+DEPCDETETAPILIB = $(BINSTALL_LIBDIR)/libcde_tet.a
+#else
+   CDETETAPILIB = -L$(TETSRC)/cde_tet/src  -lcde_tet 
+DEPCDETETAPILIB = $(TETSRC)/cde_tet/src/libcde_tet.a
+#endif
+

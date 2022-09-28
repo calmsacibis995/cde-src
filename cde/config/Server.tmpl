@@ -1,0 +1,87 @@
+/*
+ * Server imakefile info  - this contains any special redefinitions, etc.
+ * that Imakefiles in the server subtree will need.
+ */
+
+XCOMM $XConsortium: Server.tmpl,v 1.5 91/05/06 19:00:26 rws Exp $
+
+#define PassCDebugFlags 'CDEBUGFLAGS=$(CDEBUGFLAGS)' 'CC=$(CC)' 'CCOPTIONS=$(CCOPTIONS)'
+
+#ifndef ServerCcCmd
+#define ServerCcCmd CcCmd
+#endif
+#ifndef ServerCCOptions
+#define ServerCCOptions DefaultCCOptions
+#endif
+#ifndef ServerDefines
+#define ServerDefines StandardDefines
+#endif
+#ifndef ServerCDebugFlags
+#define ServerCDebugFlags OptimizedCDebugFlags
+#endif
+
+         CC = ServerCcCmd $(BBAFLAGS)
+  CCOPTIONS = ServerCCOptions
+
+STD_DEFINES = ServerDefines
+CDEBUGFLAGS = ServerCDebugFlags
+EXT_DEFINES = ExtensionDefines
+
+/***************** BEGIN HP MODIFICATIONS *******************************/
+#if ! Build1_0_Server /** HP define for turning on off 1.0 server **/
+EXTRA_CCOPTIONS =
+#endif
+
+SERVERLDOPTIONS = ServerLoadOptions
+
+#if defined(XhpServer) || defined(XapolloServer) || defined(XhpOsfServer)
+      OTHEREXTS = $(XINPUTEXT) $(HPEXT)
+#else
+      OTHEREXTS = /* nothing */
+#endif
+           FONT = $(FONTSRC)/lib/font/libfont.a
+     EXTENSIONS = $(OTHEREXTS) $(EXT)
+#if defined(__hp9000s700)
+          XVDIR = $(EXTENSIONSRC)/xv/server
+#else
+          XVDIR = 
+#endif
+      XINPUTEXT = $(EXTENSIONSRC)/server/xinput/libxinput.a
+          HPEXT = $(EXTENSIONSRC)/server/hp/libhpext.a
+            EXT = $(EXTENSIONSRC)/server/libext.a
+         EXTDIR = $(EXTENSIONSRC)/server $(XVDIR)
+    FONTUTILDIR = $(FONTSRC)/clients/mkfontdir
+       FONTUTIL = $(FONTUTILDIR)/fontdir.o
+            BSD = $(SERVERSRC)/os/libos.a $(XAULIB) $(XDMCPLIB)
+        BSDEMUL = 
+           SYSV = $(SERVERSRC)/os/sysV/libos.a
+            MFB = $(SERVERSRC)/ddx/mfb/libmfb.a
+            CFB = $(SERVERSRC)/ddx/cfb/libcfb.a
+             MI = $(SERVERSRC)/ddx/mi/libmi.a
+            DIX = $(SERVERSRC)/dix/libdix.a
+            SNF = 
+         APOLLO = $(SERVERSRC)/ddx/hp/apollo/apolloxdl.o
+            APC = $(SERVERSRC)/ddx/apollo/apc/libapc.a
+            SUN = $(SERVERSRC)/ddx/sun/libsun.a
+          MACII = $(SERVERSRC)/ddx/macII/libmacII.a
+            TEK = $(SERVERSRC)/ddx/tek/libtek.a
+#ifdef HPArchitecture
+        SYSLIBS = -lm /usr/lib/libdbm.a -ldld
+#else
+        SYSLIBS = -lm -ldbm -ldld
+#endif
+             HP = $(SERVERSRC)/ddx/hp/hp/libhp.a
+        HPMERGE = $(SERVERSRC)/ddx/hp/merge/libxos.a
+     HPHOOLIGAN = $(SERVERSRC)/ddx/hp/hooligan/hooligan.o
+            GRM = $(HPSRC)/grm/libgrm/libgrm.a
+   XOSINIT2_OBJ = $(SERVERSRC)/ddx/hp/merge/xosInit2.o
+#if defined(__hp9000s700)
+          HPROP = $(EXTENSIONSRC)/xv/server/ddx/hprop/libhprop.a
+          XVLIB = $(EXTENSIONSRC)/xv/server/libxv.a
+       XVLIBDIR = $(EXTENSIONSRC)/xv/server
+#else 
+          HPROP =
+          XVLIB =
+       XVLIBDIR =
+#endif 
+/***************** END HP MODIFICATIONS *******************************/

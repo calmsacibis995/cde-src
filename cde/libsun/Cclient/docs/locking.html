@@ -1,0 +1,619 @@
+<HTML>
+<HEAD>
+<TITLE>MCM Technical Backgrounder -- Berkeley Mailbox Locking</TITLE>
+</HEAD>
+<BODY>
+<IMG SRC="/graphics/navbar2s.gif">
+<H2>MCM Technical Backgrounder:<BR>Locking Berkeley Mailbox Files</H2>
+<P>
+This paper explains the locking mechanisms used on Berkeley
+<I>Cap Mail</I>-style mailbox files.
+This information is of greatest value to administrators and users who
+use several different mail clients on the same server,
+for example, <I>Mailtool</I> in the office and <I>Roam</I> at home.
+<P>
+The details of how Sun's mail clients perform locking were taken
+from the paper
+<A HREF="locking.txt">
+"An Overview Of the Mail Locking Protocols Used By Sun and
+Other CDE Parters"</A>
+written by Neil Katin and updated by
+<A HREF="mailto:ggere@basilisk.eng.sun.com">Gary M. Gere</A>.
+Additional information was supplied by
+<A HREF="mailto:satish@glob.eng.sun.com">Satish Ramachandran</A>.
+<P>
+<IMG SRC="/graphics/lineblue.gif">
+<P>
+
+<H2>Locking Basics</H2>
+<P>
+Two layers of locking are applied to Berkeley mailbox files.
+The first, called an <I>update lock</I> or <I>short term lock</I>, is used
+to guaranty exclusive access to the mailbox file while it is being written,
+or to guaranty that the mailbox does not change while it is being read.
+The lock is held only for the time needed to read or write the mailbox file,
+usually a fraction of a second.
+The second layer lock, called a <I>session lock</I> or <I>long term lock</I>,
+is used to ensure that only one mail client at a time has general write
+access to the mailbox.
+Other clients may read the mailbox (usually) or append new messages,
+but only the holder of the session lock may modify or delete existing messages.
+It is held for as long as the mail client has the mailbox open,
+which can mean days or weeks for a user's ``inbox.''
+<P>
+The update lock is the most important, as it prevents the corruption that
+will occur if two clients try to modify the mailbox at the same time,
+or if one is reading while another is modying the file.
+All mail clients implement the update lock,
+and for many mail clients it is the only lock that they use.
+
+<P>
+The session lock is arguably a matter of user friendliness,
+ensuring graceful behavior if the user invokes two mail clients on the
+same mailbox at the same time.
+The exact meaning of ``graceful'' varies tremendously among client
+implementations,
+but is broadly understood to mean that the changes and updates performed by
+one mail client will not interact in unexpected ways with another.
+Networked workstations and nomadic computers greatly
+increase the chance of a user invoking two clients at once;
+hence session locking is more important now than
+it was in the era of timesharing terminals.
+
+<P>
+<H3>Mailbox Operations and Locking</H3>
+<P>
+There are three general kinds of operations that a client can perform
+on a Berkeley mailbox:
+
+<P>
+<UL>
+<LI><B>Append messages.</B>
+The client applies the update lock to the mailbox,
+appends the message or messages, and then releases the lock.
+The existing contents of the mailbox are not changed,
+hence no session lock is used.
+<P>
+
+<LI><B>Read.</B>
+The original way to read a mailbox
+(from Version 7 UNIX) was to apply the update lock,
+make a complete copy of the mailbox, release the lock,
+and then read and make modifications to the copy.
+Session locking did not exist.
+This mechanism has a number of problems,
+not the least of which is scalability.
+<P>
+Modern mail clients use a combination strategies that allow them to
+safely read a mailbox directly.
+These include session locking (to prevent other clients from changing
+the mailbox while it is open),
+caching of parts of the mailbox,
+and detection and semaphoring mechanisms that note when other clients have
+modified the mailbox (or would like to modify it).
+<P>
+
+<LI><B>Modify.</B>
+To change the existing contents of a mailbox (which can range
+from simply updating header fields to deleting all the messages),
+the client must obtain and hold the session lock for the mailbox file,
+and then obtain the update lock.
+The update lock is released as soon as the update of the file is complete;
+the session lock remains as long as the client has the mailbox open.
+</UL>
+<P>
+
+These basic operations apply to both the user's ``inbox''
+(<TT>/var/mail/<I>user</I></TT>) and to private mailboxes (folders)
+that follow the Berkeley mailbox format.
+Note, however, that while any mail client can append to a private mailbox
+("foldering" a message),
+only the system mail client <I>/bin/mail</I> (or <I>mail.local</I>) can
+append to the ``inbox''.
+
+<P>
+<H3>Things That Go Bump In the Mailbox</H3>
+<P>
+
+When everyone uses the same mail client all the time <I>and</I> no
+clients are trying to read the mailbox file via NFS,
+locking behaves as expected.
+But when different mail clients or NFS access are involved, things
+can go awry:
+<P>
+
+<UL>
+<LI>Different UNIX operating system versions specify different update lock
+    methods.
+    Mail clients targeted to different UNIX versions -- for example, 4.3BSD vs.
+    <I>Solaris</I> -- will ignore each other's locks.
+    The effect of this is as if there was no locking at all.
+    Usually this will occur only when users obtain and compile their own
+    copies of freeware mail clients.
+    <P>
+
+<LI>Nearly every mail client implements session locking in a different way,
+    even clients from the same vendor on the same operating system.
+    Older clients that follow the UNIX Version 7 behavior (descibed above)
+    have no session locking at all.
+    When using two or more different mail clients, session locking must
+    be considered effectively non-existant.
+    <P>
+
+<LI>Some mail clients, in particular <I>Mailtool</I> and <I>Dtmail</I>,
+    are quite naïve in their reliance on session locking.
+    If another client fails to respect their session lock and changes the
+    mailbox,
+    these clients fail catastrophically.
+    It the worst case of <I>Dtmail</I>, it dumps core.
+    In the worst case of <I>Mailtool</I>, it corrupts the mailbox file
+    and <I>then</I> dumps core.
+    <P>
+
+<LI>The session locking of some clients is known to interfere with the
+    update locking of others.
+    The most common symptom of this is that one or both of the clients hang.
+    Killing one allows the other to run normally.
+    Usually this class of problems does not cause damage to the mailbox.
+    <P>
+
+<LI>Many of the locking mechanisms -- update and session -- do not work
+    when the mailbox is mounted on a remote file system, particularly NFS.
+    This usually has the effect of having no locking at all.
+</UL>
+
+<P>
+The remainder of this document will detail the various locking methods used,
+describe how locking is done by many common clients,
+and recommend strategies for dealing with problems.
+<P>
+
+<H2>Update Locking</H2>
+<P>
+The purpose of the update lock is to prevent two mail clients from
+modifying a mailbox file simultaneously.
+When locking fails,
+the most common effect is for one or more messages to disappear.
+If the mailbox is the user's ``inbox,'' this can go unnoticed for some time,
+or be blamed to the transport (e.g., <I>Sendmail</I>).
+Other effects include messages being inserted into other messages,
+messages interleaved with each other,
+and the mailbox being truncated in the middle of a message.
+<P>
+Locking a file is problematic in UNIX
+since file locking is a relatively recent addition to the O.S.,
+and many implementations are incomplete.
+Hence different methods are used in different UNIX flavors.
+The three most common methods used to implement update locking are
+the creation of a <B>lock file</B> (which is the method used by <I>Solaris</I>),
+the <B>flock() system call</B>,
+and the <B>lockf() system call</B>.
+Each is described in detail below.
+<P>
+These methods do not interoperate, and in most implemetations
+they are <I>voluntary</I>.
+This means that if two mail clients use different update locking
+methods, the effect will be as if there was no locking at all.
+Fortunately,
+about the only way for this to happen is for a user to obtain and compile
+his own ``freeware'' mail clients and configure them incorrectly.
+Mail clients provided by commercial vendors use the update locking
+method that is correct for the operating system.
+<P>
+Incompatability <I>can</I> arise when the mailbox is on a remotely mounted
+file system.
+Here you have the possibility for, say, a <I>Solaris</I> system and an
+<I>HP-UX</I> system to open the same mailbox via NFS.
+
+<H3>The Lock File Method</H3>
+
+Lock file creation is the original update locking method
+from Version 7 UNIX.
+Despite a lack of elegance and number of obvious weaknesses,
+it has proven itself to be the most reliable of all mechanisms.
+It is used in <I>Solaris</I>, all Berkeley releases except 4.3BSD,
+and by all System V releases except Release 3.2.
+The basic idea is to create a file <B><I>mailboxname</I>.lock</B> in the
+same directory as the mailbox.
+If the file does not exist, it is created;
+the client now has exclusive access to the mailbox file.
+When the client is finished with the mailbox,
+it deletes the lock file,
+thereby allowing access to other clients.
+If the lock file already exists,
+it means that another mail client is busy updating the mailbox.
+The new client can wait a few seconds, then try again.
+<P>
+The creation of the lock file must be done atomically,
+that is, a single indivisible system call must be used
+to test for the existance of the lock file
+and then create it if it does not exist.
+Recent UNIX flavors have the flag <TT>O_EXCL</TT> on the
+<I>open</I>(2) system call to achieve this.
+But because of portability concerns,
+most implementations use the following idiom from Version 7 UNIX:
+the client creates a temporary file,
+and then attempts to link the temporary file to <B><I>mailboxname</I>.lock</B>.
+The link succeeds only if the lock file does not exist.
+The temporary file is then unlinked.
+This is the technique implemented by <I>Solaris</I> <B>libmail.a</I>
+library, and used by all SunSoft mail clients.
+
+<P>
+The lock file method has the extremely useful characteristic that,
+of the three common update lock methods,
+it is the only method that works reliably on remote mounted file systems.
+Its biggest weakness is that if the mail client faults while the lock is
+in effect, a ``stale'' lock file remains.
+<P>
+Several mechanisms are used to combat this problem.
+The most important is a timeout on lock file retries that are attempted
+by a client.
+If a client finds that a lock file already exists, and it is has been a
+``long time'' since it was created (typically more than 5 minutes),
+then the client assumes that the process that created the lock file has died,
+and it deletes the stale lock file.
+<P>
+<I>Solaris</I> implementations use the <I>lockf</I> system call to place
+an exclusive lock on the lock file.
+This allows a new client to determine reliably that another process is still
+holding the lock.
+This corrects a problem that can occur if <I>two</I> clients are waiting to
+obtain the lock,
+and both decide simultaneously that the original holder has died. 
+<P>
+In a few implementations (not <I>Solaris</I>), the client writes its
+process ID of into the lock file as an ASCII decimal number.
+This allows a new client to test whether the process holding the lock is
+still alive.
+<P>
+There is one notable interoperability problem with the lock file method:
+the name of the lock file varies on different operating systems.
+For example, System V Release 2 puts the lock file in a subdirectory of
+the one containing the mailbox.
+
+<H3>The <I>flock</I> System Call Method</H2>
+<P>
+4.3BSD mail clients use the Berkeley <I>flock</I>(2) system call to directly
+lock the mailbox.
+This method has the advantage that the lock is automatically released if
+the client faults (dumps core) while holding the lock.
+It has the serious disadvantage that is does not work across any known
+network file system.
+<P>
+Later Berkeley releases have reverted to the lock file method described
+above.
+
+<H3>The <I>lockf</I> System Call Method</H3>
+<P>
+Clients for UNIX System V Release 3.2 and its derivitives
+(including Hewlett-Packard <I>HP-UX</I>, IBM <I>AIX</I>,
+and Sequent <I>Dynix</I>)
+use the <I>lockf</I>(2) system call to directly lock the mailbox.
+(Some clients use the semantically equivalent options to the
+<I>fcntl</I>(2) system call.)
+This method has the advantage that the lock is automatically released if
+the client faults (dumps core) while holding the lock.
+The <I>lockf</I> call also has the potential to make the lock mandatory,
+so that even clients that use a different (incorrect) mechanism will be
+denied access to the mailbox.
+Not all vendors take advantage of this capability, however.
+<P>
+The <I>lockf</I> call is specified to operate correctly across NFS remote
+mounted file systems.
+In practice, many vendors have not implemented NFS locking, or have
+not implemented it correctly.
+(Even the <I>Solaris</I> implementation has conditions that are known to
+cause a mail client to hang indefinitely.)
+The <I>lockf</I> call does not work at all across many other remote file
+systems, including the Andrew File System and Microsoft SMB (LAN Manager).
+<P>
+It is critical to remember that clients that are ported to multiple
+operating systems use the operating system's native locking mechanism.
+For example, the CDE <I>Dtmail</I> client is available on <I>Solaris</I>,
+<I>HP-UX</I>, and <I>AIX</I>.
+But the <I>Solaris</I> <I>Dtmail</I> uses the lock file method,
+while the <I>HP-UX</I> and <I>AIX</I> <I>Dtmail</I> use the <I>lockf</I>
+method.
+
+<H3>Using Multiple Update Lock Methods</H3>
+
+Some freeware mail clients, for example <I>MH</I>, attempt to improve
+the reliability of locking by using several methods simultaneously.
+For example, the standard <I>MH</I> configuration for <I>Solaris</I>
+uses both the lock file and the <I>lockf</I> system call.
+The problem with this is that other clients, including CDE <I>Dtmail</I>,
+use the <I>lockf</I> system call to implement session locking.
+This causes <I>MH</I> to lock up until the <I>Dtmail</I> session exits.
+Users might consider this desirable or undesirable,
+depending on how they typically use <I>MH</I>.
+
+
+<H2>Session Locking</H2>
+
+<P>
+Session Locking is used to prevent multiple mail clients from having general
+write access to the same mailbox concurrently.
+The session lock is held as long
+as the client has the mailbox open for Read or Modify;
+the session lock is not applied when simply appending to the mailbox.
+The holder of a session lock generally expects that the mailbox
+will not decrease in size (that is, messages will not be deleted),
+and that existing messages will not be changed.
+To actually read or modify the mailbox,
+the holder of the session lock still must obtain the update lock.
+<P>
+As noted, the key problem with session locking is that almost every client
+implements a different method.
+When session locking fails,
+as it almost always does between different clients,
+the effects fall into three broad catagories:
+<P>
+
+<UL>
+<LI>Clients that make a private copy of the mailbox while reading it
+    (like the Berkeley <I>Cap Mail</I> or System V <I>mailx</I>) generally
+    lose changes that were made.
+    Most commonly, messages that were deleted by one of the concurrently
+    running clients reappear when the last client updates the mailbox.
+    Rarely, a fragment of a message will reappear, possibly corrupting the
+    mailbox.<P>
+<LI>Clients that blatantly assume that session locking works tend to die
+    horribly when another client modifies the mailbox from underneath them.
+    If they attempt to update the mailbox, it is usually badly corrupted.
+    The most notable example is <I>OW Mailtool</I>.<P>
+<LI>Clients that maintain a cache or index of the mailbox
+    notice when another client modifies the mailbox,
+    and attempt to resolve the differences.
+    Often they are forced to discard pending modifications and just reread
+    the mailbox.
+    Good examples include
+    <A HREF="/mcm/vendor/hal/ishmail.html">HalSoft <I>Ishmail</I></A>
+    or the University of Washington IMAP Server.
+    CDE <I>Dtmail</I> attempts to work in this way,
+    but occasionally gets confused and dumps core.
+</UL>
+<P>
+
+Different clients also interpret the exact usage of the session lock
+differently.
+For example, the <I>Solaris</I> version of <I>mailx</I> restricts all
+clients after the first to ``read only'' mode.
+<I>Mailtool</I> and <I>Dtmail</I> lock out all clients after the first;
+they aren't even allowed read access.
+IMAP clients, <I>Roam</I> for example, do exactly the opposite,
+handing off control to the most recently invoked client.
+
+<P>
+<H2>Per-Client Locking Details</H2>
+<P>
+The remainder of this document describes how a specific mailbox
+clients perform locking.
+The mechanisms used for session locking are detailed,
+and interoperability problems are noted.
+<P>
+
+<H3>Sendmail</H3>
+<P>
+<I>Sendmail</I> does not formally write messages to mailbox files.
+When performing local delivery, it invokes the <I>/bin/mail</I>
+or <I>/usr/lib/mail.local</I> (Solaris 2.5) utility, which functions as
+described below.
+<P>
+<I>Sendmail</I> can be configured to append directly to a file,
+by specifying a pathname as the recipient in an alias or <TT>.forward</TT>
+file.
+This mechanism must never be used for mailbox files,
+since <I>Sendmail</I> does no locking of the destination file.
+<P>
+
+
+<H3><I>/bin/mail</I> and <I>mail.local</I></H3>
+<P>
+The <I>/bin/mail</I> utility dates from UNIX Version 7, and has changed
+little since that time.
+It was originally used for delivery, retrieval, and composition.
+Since the introduction of the <I>Cap Mail</I> utility in UNIX 4BSD,
+<I>/bin/mail</I> has been almost entirely relagated to the sole
+task of appending new mail to a users inbox at the behest of the
+mail router <I>Sendmail</I>.
+In <I>Solaris</I> 2.5, <I>/bin/mail</I> is finally eliminated, and replaced
+by <I>mail.local</I>, a utility that explicitly does only new mail delivery.
+<P>
+<I>/bin/mail</I> uses locking only on the user's "inbox," which is normally
+located at <TT>/var/mail/<I>user</I></TT>.
+
+When appending new messages to the inbox, <I>/bin/mail</I> applies the
+update lock, opens the file in append mode, and writes the new message. 
+It then releases the update lock.
+<P>
+When reading the "inbox," <I>/bin/mail</I> applies the update lock,
+opens the "inbox" file, and copies the entire "inbox" to another file.
+It then closes the "inbox" and releases the update lock.
+All subsequent read, delete, and save operations made by the user
+are performed on the copy.
+When the user exits, <I>/bin/mail</I> applies the update lock,
+appends any new messages in the "inbox" to the copy, and then replaces the
+original "inbox" file with the (possibly modified) copy.
+<P>
+Note the lack of session locking.
+When multiple clients are running simultaneously, each client will write back
+its own impression of the inbox when it exits.
+<P>
+
+<P><B><I>The remainder of this document is....</I></B><BR>
+<IMG SRC="/graphics/undercon.gif"><BR>
+
+applies the appropriate update lock immediately
+upon startup, and makes a private copy of the mailbox.
+<P>
+<P>
+The Berkeley <I>Cap Mail</I> client and its poor stepchild, <I>mailx</I>,
+follow the original UNIX Version 7 locking model.
+<P>
+Only locks things in /var/mail.  No locking outside that dir.
+<P>
+<I>Solaris</I> introduces two variations.
+First,
+uses fcntl(fd, F_SETLKW, F_RDLCK or F_WRLCK), which blocks
+until the lock is released.  However, since mailx makes a temporary
+copy of the folder, this lock is in use only as long as the
+copy of the file is being made.
+<P>
+In addition, the file $HOME/.Maillock is made whenever any
+the spool file is opened.  This is used as a per-user semaphore
+allowing only one folder per user to be locked (but it doesn't
+help when two different users are editing the same folder.
+<P>
+<H3>OpenLook Version 3 <I>Mailtool</I></H3>
+<P>
+mailtool (uses mmap for reading file, so it really is reading for
+the entire session...):
+<P>
+Tries to create ${mailfilename}.lock; if that works then
+the lock is owned.
+<P>
+If the create fails then loop, trying to relock every
+5 seconds.  If the lock file is over 5 minutes old then
+ignore it.
+<P>
+--Session
+<P>
+OpenWindows mailtool uses one of two types of methods for
+establishing a long term lock: tooltalk or lockf. If
+tooltalk locking is enabled, it uses tooltalk. If tooltalk
+locking is not enabled, it uses lockf only if the mailbox
+is mounted on a local file system. If the mailbox is not
+mounted on a local file system, NO LONG TERM LOCKING IS USED.
+<P>
+Mailtool, using tooltalk, applied to all folders:
+<P>
+Tooltalk locking within mailtool is disabled by default. The
+.mailrc variable 'ttlock' must be set for tooltalk locking
+to be used. If the variable is not set, lockf locking is
+used.
+<P>
+send a tooltalk REQUEST, file scoped to the mail folder,
+with an message operation of "tlock".
+<P>
+If it is "handled" (that is, if there is someone listening for
+that message), then the file assumed to be currently being
+used by another process.  If there was no handler, then the
+file is unused.
+<P>
+If unused, register a pattern on the file (so we will be able
+to see requests from other processes).
+<P>
+If the file is locked, optionally send a tooltalk NOTICE,
+file scoped to the mail folder, with a message operation of
+"rulock".  Sleep 5 seconds, and retry the lock.
+<P>
+When using tooltalk as a locking mechanism, there is a
+procedure whereby one process can ask another process that
+is holding a long term lock to "release" the lock.
+<P>
+<H3>Mailtool, using <I>lockf</I> (no tooltalk)</H3>
+<P>
+Mailtool will use lockf() to lock the mailbox only if the
+mailbox is on a locally mounted file system. This is due to
+problems with the lockf() protocol and the lockd() network
+lock daemon which can result in indefinite hangs. The work
+around, regrettably, is to do no locking at all on mailboxes
+residing on network file system when tooltalk locking is not
+available.
+<P>
+use lockf(fd, F_TLOCK,...) to lock the mail folder.  If
+currently locked, use fcntl(fd, F_GETLK,...) to get the pid of
+the process (if the locking process is local to the machine).
+Optionally send that process a SIGUSR1 signal, which will
+cause a mailtool process to do a "done" action.
+<P>
+<H3>CDE <I>Dtmail</I></H3>
+<P>
+The CDE <I>Dtmail</I> client works identical to <I>Mailtool</I>,
+except that update locking varies based on the native locking
+<P>
+Dtmail, overview
+<P>
+Similar to mailtool but complicated because of differences
+in partners (HP and IBM) implementations. It does mmap()
+mailboxes for the purposes of reading, which means the
+mailbox is "read" for the entire time Dtmail has a long
+lock on the mailbox. 
+
+Dtmail, Overview
+<P>
+Dtmail uses a similar scheme to that of OpenWindows
+mailtool.  This is complicated somewhat in that the CDE
+partners (HP and IBM) have changed the locking machinery
+used by sendmail, and thus locking is done differently on
+those systems.
+<P>
+On all systems, Dtmail will first attempt to perform
+tooltalk locking to establish a long term lock. This
+behavior is enabled by default. If it is disabled <<how??>>
+then lockf() locking is performed on Solaris systems only.
+<P>
+If the mailbox is not mounted on a local file system (on
+Solaris systems) or the system is either HP or IBM, NO LONG
+TERM LOCKING IS USED if tooltalk locking is disabled.
+<P>
+Dtmail, using tooltalk:
+<P>
+Tooltalk locking within Dtmail is enabled by default. The
+.mailrc variable 'cdenotooltalklock' must be set for tooltalk
+locking to be disabled.
+<P>
+Dtmail uses standard Desktop Messaging Set to perform file
+locking. Dtmail will first express interest in a particular
+file by calling ttdt_file_join() and then try to determine
+whether other user mail agent is using this file by calling
+ttdt_Get_Modified(). If this file is available, Dtmail will
+complete the locking process by sending out a TTDT_MODIFIED
+event. Otherwise, if the file is being used by another user
+mail agent, Dtmail will send out a TTDT_SAVE event to request
+the other process to save changes and release the lock.
+<P>
+After Dtmail has done with the file, it will release the lock
+by calling ttdt_file_quit() to unregister interest in the file.
+<P>
+In order to be backward compatible with OpenWindow's mailtool,
+Dtmail also sends out messages using mailtool's protocol.
+Those messages are identical to mailtool's own execept that
+they contain an extra user argument so Dtmail can determine
+the message's origin.
+<P>
+Dtmail, using lockf()
+<P>
+Identical to mailtool, in that lockf(F_LOCK) is used to
+lock the mailbox. If this fails (the lock is held by another
+process), the lock is denied and Dtmail refuses to access
+the mailbox.
+
+
+<H3>IMAP c-client ``Bezerk'' Driver</H3>
+<P>
+Uses mailbox.lock protocol, waiting for 5 minutes.  The
+algorithm is subtly different (it looks at link counts (!)
+to see if the lock succeeds, with some comments about NFS
+brain damage causing these crimes.
+<P>
+Roam, berkeley driver (I didn't see the solaris one):
+<P>
+Uses flock(fd, LOCK_EX|LOCK_NB) to lock the mailbox.
+If this exclusive lock cannot be gotten, read the existing lock file
+for the pid of the "holding" process (which is assumed to be
+on the same machine).  Send this process a SIGUSR2.  Then
+try and get the flock() to work once a second for 15 more
+seconds.
+<P>
+The lock is held while the mailbox is open.
+<P>
+If imapd receives a SIGUSR2, and the stream's driver (only
+one stream supported? Its a global) is "bezerk", "mbox", or
+"mmdf", the stream is turned into readonly (what happens
+to pending changes?)
+
+<P>
+<I>Written by <A HREF="mailto:csg@clavinova.eng.sun.com">Carl S. Gutekunst</A>, 95/11/17</I><BR>
+<IMG SRC="/graphics/lineblue.gif">

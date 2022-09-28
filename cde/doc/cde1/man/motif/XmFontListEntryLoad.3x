@@ -1,0 +1,84 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Novell, Inc
+...\" **
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH XmFontListEntryLoad 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmFontListEntryLoad\fP \- A font list function that loads
+a font or creates a font set and creates an accompanying font list entry
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/Xm.h>
+.sp \n(PDu
+XmFontListEntry XmFontListEntryLoad (\fBdisplay, font_name, type, tag\fI)
+.ta .5i 1.5i
+.nf
+	Display	*\fBdisplay\fI;
+	char	*\fBfont_name\fI;
+	XmFontType	\fBtype\fI;
+	char	*\fBtag\fI;
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+\fIXmFontListEntryLoad\fP loads a font or creates a font set 
+based on the value of the \fBtype\fP argument.  It creates and returns
+a font list entry that contains the font or font set and the
+specified tag.
+.PP
+If the value of \fBtype\fP is \fIXmFONT_IS_FONT\fP, the function uses
+the \fIXtCvtStringToFontStruct\fP routine to convert the value of
+\fBfont_name\fP to a font struct.
+If the value of \fBtype\fP is \fIXmFONT_IS_FONTSET\fP, the function uses
+the \fIXtCvtStringToFontSet\fP converter to create a font set in the
+current locale.
+\fIXmFontListEntryLoad\fP creates a font list entry that contains the
+font or font set derived from the converter.
+For more information about \fIXtCvtStringToFontStruct\fP and
+\fIXtCvtStringToFontSet\fP, see \*EX Toolkit Intrinsics \- C Language
+Interface.\fP
+.IP "\fBdisplay\fP"
+Specifies the display where the font list will be used.
+.IP "\fBfont_name\fP"
+Specifies an X Logical Font Description (XLFD) string,
+which is interpreted either as a font name or as a base font name
+list. 
+A base font name list is a comma-separated and NULL-terminated string.
+.IP "\fBtype\fP"
+Specifies whether the \fBfont_name\fP argument refers to a font name or
+to a base font name list.
+Valid values are \fIXmFONT_IS_FONT\fP and \fIXmFONT_IS_FONTSET\fP.
+.IP "\fBtag\fP"
+Specifies the tag of the font list entry to be created.
+The tag may be specified as \fIXmFONTLIST_DEFAULT_TAG\fP.
+\fIXmFONTLIST_DEFAULT_TAG\fP is used to identify the default font list
+element in a font list when specified as part of a resource.
+.SH RETURN VALUE
+If the specified font is not found, or the specified font set can 
+not be created, returns NULL; otherwise, returns a font list entry.
+.SH RELATED INFORMATION
+.na
+\fIXmFontList(3X)\fP,
+\fIXmFontListAppendEntry(3X)\fP,
+\fIXmFontListEntryCreate(3X)\fP,
+\fIXmFontListEntryFree(3X)\fP,
+\fIXmFontListEntryGetFont(3X)\fP,
+\fIXmFontListEntryGetTag(3X)\fP, and
+\fIXmFontListRemoveEntry(3X)\fP.
+.ad

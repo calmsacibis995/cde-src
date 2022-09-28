@@ -1,0 +1,55 @@
+.TH tt_message_destroy 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+tt_message_destroy \- destroy a message
+.SH SYNOPSIS
+.yS
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'Tt_status tt_message_destroy('u
+Tt_status tt_message_destroy(Tt_message \f2m\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn tt_message_destroy
+function
+destroys the message.
+.P
+Destroying a message has no effect on the delivery of a message already sent.
+.P
+The
+.I m
+argument is the opaque handle for the message involved in this operation.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn tt_message_destroy
+function returns the status of the operation as one of the following
+.B Tt_status
+values:
+.VL 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_NOMP
+.br
+The
+.Cm ttsession 1
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_POINTER
+.br
+The pointer passed does not point to an object of
+the correct type for this operation.
+.LE
+.SH "APPLICATION USAGE"
+If the application
+sent a request and is expecting a reply with return values,
+the application should destroy the
+message after it have received the reply.
+If the application sends a notice, the application can destroy
+the message immediately after it sends the notice.
+.SH "SEE ALSO"
+.Hd Tt/tt_c.h 5,
+.Fn tt_message_create 3,
+.Fn tt_message_create_super 3.

@@ -1,0 +1,120 @@
+XCOMM libSDtSpell @(#)Imakefile	1.13 96/08/01 SMI
+XCOMM Copyright (c) 1996 Sun Microsystems, Inc.
+
+#ifndef DoNormalLib
+#define DoNormalLib NormalLibSDtSpell
+#endif
+#ifndef DoSharedLib
+#define DoSharedLib SharedLibSDtSpell
+#endif
+#if ! DoNormalLib && ! DoSharedLib
+#undef  DoSharedLib
+#define DoSharedLib YES
+#endif
+#ifndef SharedSDtSpellRev
+#define SharedSDtSpellRev 1
+#endif
+
+#include <Library.tmpl>
+
+PUBLIC_HEADERS  = \
+	Spell.h \
+	SpellP.h
+
+LOCAL_HEADERS  = \
+	engine.h \
+	list.h \
+	misc_spell.h \
+	spellLib.h \
+	spelldefs.h \
+	spelltypes.h	\
+	options.h	\
+	defaults.h	\
+	help.h
+
+HEADERS  = $(PUBLIC_HEADERS) $(LOCAL_HEADERS)
+	
+SRCS     = \
+	Spell.c \
+	engine.c \
+	list.c \
+	misc_spell.c \
+	spellLib.c \
+	options.c \
+	SpellOpt.c	\
+	defaults.c	\
+	help.c
+	
+OBJS     = \
+	Spell.o \
+	engine.o \
+	list.o \
+	misc_spell.o \
+	spellLib.o \
+	options.o \
+	SpellOpt.o	\
+	defaults.o	\
+	help.o
+
+LIB_NAME = SDtSpell
+LIB_REV	 = SharedSDtSpellRev
+
+INCLUDES = -I.
+DEFINES  = -D_REENTRANT
+
+#ifdef SunArchitecture
+EXTRA_REQUIREDLIBS = -ldl
+#endif
+
+REQUIREDLIBS = $(ALL_LIBPATH) $(DTSVCLIB) $(XMLIB) $(XTOOLLIB) $(XLIB) $(EXTRA_REQUIREDLIBS) -lc
+
+/*
+** setup supplied targets
+*/
+
+PLATFORM:sh	= uname -p
+
+all::fixsupp
+fixsupp:
+	${RM} libSDtSpell.so.1 libSDtSpell.so
+	@if [ '${CDEBUGFLAGS}' = "-g" ]; \
+	then \
+	   echo "Setting up supplied targets for a ${PLATFORM} debug build:"; \
+	   (set -x; \
+	   cp -p libSDtSpell.so.1.${PLATFORM}.debug libSDtSpell.so.1;) \
+	else \
+	   echo "Setting up supplied targets for a ${PLATFORM} optimized build:"; \
+	   (set -x; \
+	   cp -p libSDtSpell.so.1.${PLATFORM}.opt libSDtSpell.so.1;) \
+	fi; \
+	(set -x; ln -s libSDtSpell.so.1 libSDtSpell.so)
+
+
+all::
+
+LibraryObjectRule()
+
+/* For install of developer's build environment */
+LOCAL_BINSTALL_LIBDEST = lib
+LOCAL_BINSTALL_INCLUDEDEST = include/SDt
+
+#if DoSharedLib
+#if DoNormalLib
+/* SharedLibraryTarget($(LIB_NAME),$(LIB_REV),$(OBJS),shared,..) */
+#else
+/* SharedLibraryTarget($(LIB_NAME),$(LIB_REV),$(OBJS),.,.) */
+#endif /* DoNormalLib */
+SharedLibraryBuildInstall($(LIB_NAME),$(LIB_REV),$(LOCAL_BINSTALL_LIBDEST))
+InstallSharedLibrary($(LIB_NAME),$(LIB_REV),$(USRLIBDIR))
+#endif /* DoSharedLib */
+
+#if DoNormalLib
+/* NormalLibraryTarget($(LIB_NAME),$(OBJS)) */
+NormalLibraryBuildInstall($(LIB_NAME),$(LOCAL_BINSTALL_LIBDEST))
+InstallLibrary($(LIB_NAME),$(USRLIBDIR))
+#endif
+
+BuildMultipleInstall($(PUBLIC_HEADERS),$(LOCAL_BINSTALL_INCLUDEDEST))
+
+DependTarget()
+

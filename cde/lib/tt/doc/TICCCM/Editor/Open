@@ -1,0 +1,114 @@
+.TH Open Editor "07 Sep 1993" "SunSoft" "ToolTalk ICCCM"
+.SH NAME
+.PP
+Open - open a buffer or view onto a document
+.SH SYNOPSIS
+.so ../.synopsis
+[\fIfile\f(CW]	Open(	in	\fImediaType	contents\f(CW,	
+		out	bufferID	\fIdocBuf\f(CW,	
+		in	boolean	\fIreadOnly\f(CW	
+		[in	boolean	\fImapped\f(CW]	
+		[in	integer	\fIshareLevel\f(CW]	
+		[in	locator	\fIinitialPos\f(CW] );	
+[\fIfile\f(CW]	Open(	in	\fImediaType	contents\f(CW,	
+		out	viewID	\fIdocView\f(CW,	
+		in	boolean	\fIreadOnly\f(CW	
+		[in	boolean	\fImapped\f(CW]	
+		[in	integer	\fIshareLevel\f(CW]	
+		[in	locator	\fIinitialPos\f(CW] );
+.ft
+.fi
+.SH DESCRIPTION
+.PP
+Open a buffer or view onto a document.
+.PP
+Before replying, the handler should register patterns to handle
+any operations it will support on the returned buffer (e.g.,
+.BR Seek ,
+.BR Goto ,
+.BR Copy ,
+.BR Paste ,
+.BR Close )
+or view (e.g.,
+.BR Set_View ,
+.BR Seek ,
+.BR Goto ,
+.BR Close ).
+.SH REQUIRED ARGUMENTS
+.so ../Media/.contents
+.PP
+.HP 5
+.PD 0
+\f(CWbufferID\fR \fIdocBuf\fR
+.TP
+\f(CWviewID\fR \fIdocView\fR
+.PD
+The ID of the opened buffer or view.
+.TP
+\f(CWboolean\fR \fIreadOnly\fR
+Boolean value indicated whether the user should be allowed to
+edit the document in the buffer or view.
+.SH OPTIONAL ARGUMENTS
+.TP
+\f(CWboolean\fR \fImapped\fR
+Boolean value indicating whether the buffer or view should be mapped
+to the screen.  This allows the sender to, e.g., set the screen
+geometry or insertion point of the handler before mapping it, thus
+keeping the handler from blinking.
+.IP
+When this argument is ommitted, its value is assumed to be true.
+.TP
+\f(CWinteger\fR \fIshareLevel\fR
+An integer bitflag indicating the extent to which the
+handler may re-use an existing view and/or buffer to satisfy
+this request.
+.PD 0
+.RS 8
+.HP 2
+\(bu 1 The handler should create a new view. (This flag is
+not applicable when returning a \f(CWbufferID\fR.)
+.HP 2
+\(bu 2 The handler may re-use an existing but unmodified buffer, if
+the document is already loaded into it.
+.HP 2
+\(bu 4 The handler may re-use an existing, modified buffer, if the
+document is already loaded into it.
+.RE
+.PD
+.IP
+The handler is responsible for deciding when two documents are the
+same document.  Usually, two documents are the same document only if
+their
+.I contents
+come from the same
+.IR file .
+.TP
+\f(CWlocator\fR \fIinitialPos\fR
+The initial insertion point for the buffer, or the initial position
+scrolled to in the view.
+.SH ERRORS
+.so ../Media/.errors
+.TP
+\f(BITT_DESKTOP_EINVAL\fR
+.I initialPos
+is not a legal \f(CWlocator\fR for
+.IR mediaType .
+.IP
+If the request succeeds with this status, then the initial location
+of the buffer or view is chosen by the handler.
+.TP
+\f(BITT_DESKTOP_EFAULT\fR
+.I initialPos
+is not a valid \f(CWlocator\fR in
+.IR contents .
+.IP
+If the request succeeds with this status, then the initial location
+of the buffer or view is chosen by the handler.
+.SH SEE ALSO
+.PP
+.BR Intro (TICCCM),
+.BR Intro (Desktop),
+.BR Intro (Media),
+.BR Edit (Media),
+.BR Intro (Editor),
+.BR Close (Editor)

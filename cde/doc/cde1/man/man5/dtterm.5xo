@@ -1,0 +1,1658 @@
+.cdes
+.TH dtterm 5 "25 Apr 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.\" *************************************************************************
+.SH NAME
+dtterm \- escape sequences recognized by dtterm and the DtTerm widget
+.SH DESCRIPTION
+.cdee
+.xR2 dtterm.5
+.cde .HU "Received Escape Sequences"
+.xo .H 3 "Received Escape Sequences"
+The
+.Cm dtterm 1
+utility and the DtTerm widget support the following list of
+received escape sequences.
+Spaces have been added for readability and are not part of the escape sequence.
+The following indicate parameters:
+.IR pi ,
+.IR p1 ,
+.IR label ,
+.IR file
+and
+.IR text .
+.I Space
+indicates a required space, hexadecimal code 0x20.
+A <control>\(hy\c
+.I char
+indicates a control code (such as <control>\(hyG,
+which is hexadecimal code 0x07).
+.I Esc
+indicates hexadecimal code 0x1b.
+.I Backslash
+indicates hexadecimal code 0x5c.
+Literals are indicated as
+.B literal
+and must be included exactly
+as specified.
+All references to the
+.Cm dtterm 1
+utility in this
+.cde man page
+.xo section
+also apply to the DtTerm widget.
+.VL 8
+.LI <control>\(hyG
+.br
+(\c
+.Cn BEL )
+Bell.
+The terminal either issues an audible bell,
+or flashes the text window depending on the state of the visual bell
+flag.
+.LI <control>\(hyH
+.br
+(\c
+.Cn BS )
+Backspace.
+The cursor moves one cursor position to the left.
+If reverse-wrap mode is disabled and the cursor is at the left-most column
+of the line when a backspace character is received, the cursor remains
+at its current position.
+If reverse-wrap mode is enabled and the cursor is at the left-most column
+of the line when a backspace character is received, the cursor
+moves to the right-most column of the previous line.
+If the cursor is also
+in the top-most row, the cursor moves to the right-most column of
+the bottom-most row.
+.LI <control>\(hyI
+.br
+(\c
+.Cn HT )
+Horizontal Tab.
+The cursor moves right to the next tab stop.
+If there are no further tab stops set to the right of the cursor, the cursor
+moves to the right-most column of the current line.
+.LI <control>\(hyJ
+.br
+(\c
+.Cn LF )
+Line Feed or New Line.
+The cursor moves
+to the same column of the next line.
+If the cursor is in the bottom-most line of the scrolling region,
+the scrolling region scrolls up one line.
+Lines scrolled off the top of the scrolling region are lost.
+Blank lines with no visible character attributes
+are added at the bottom of the scrolling region.
+.LI <control>\(hyK
+.br
+(\c
+.Cn VT )
+Vertical Tab.
+Same as Line Feed.
+.LI <control>\(hyL
+.br
+(\c
+.Cn FF )
+Form Feed or New Page.
+Same as Line Feed.
+.LI <control>\(hyM
+.br
+(\c
+.Cn CR )
+Carriage Return.
+The cursor moves to the left-most column of the current line.
+.LI "\f2Esc\f3\ (\ B\f1"
+.br
+(\c
+.Cn SCS )
+Designate
+.cde ASCII
+.xo \*(Z8
+(base font) as G0.
+.LI "\f2Esc\f3\ (\ 0\f1"
+.br
+(\c
+.Cn SCS )
+Designate DEC Special Graphic (line draw) as G0.
+.LI "\f2Esc\f3\ )\ B\f1"
+.br
+(\c
+.Cn SCS )
+Designate
+.cde ASCII
+.xo \*(Z8
+(base font) as G1.
+.LI "\f2Esc\f3\ )\ 0\f1"
+.br
+(\c
+.Cn SCS )
+Designate DEC Special Graphic (line draw) as G1.
+.LI "\f2Esc\f3\ *\ B\f1"
+.br
+(\c
+.Cn SCS )
+Designate
+.cde ASCII
+.xo \*(Z8
+(base font) as G2.
+.LI "\f2Esc\f3\ *\ 0\f1"
+.br
+(\c
+.Cn SCS )
+Designate DEC Special Graphic (line draw) as G2.
+.LI "\f2Esc\f3\ +\ B\f1"
+.br
+(\c
+.Cn SCS )
+Designate
+.cde ASCII
+.xo \*(Z8
+(base font) as G3.
+.LI "\f2Esc\f3\ +\ 0\f1"
+.br
+(\c
+.Cn SCS )
+Designate DEC Special Graphic (line draw) as G3.
+.LI <control>\(hyN
+.br
+(\c
+.Cn LS1 )
+Map G1 into GL.
+.LI <control>\(hyO
+.br
+(\c
+.Cn LS0 )
+Map G0 into GL.
+.LI "\f2Esc\f3\ n\f1"
+(\c
+.Cn LS2 )
+Map G2 into GL.
+.LI "\f2Esc\f3\ o\f1"
+(\c
+.Cn LS3 )
+Map G3 into GL.
+.LI "\f2Esc\f3\ N\f1"
+(\c
+.Cn SS2 )
+Map G2 into GL for the next character.
+.LI "\f2Esc\f3\ O\f1"
+(\c
+.Cn SS3 )
+Map G3 into GL for the next character.
+.LI "\f2Esc\ Space\f3\ F\f1"
+.br
+(\c
+.Cn S7C1T )
+Select 7-bit C1 Control Characters.
+In this mode, the
+.B dtterm
+utility
+sends all C1 Control Characters
+to the host as 7-bit escape sequences.
+That is,
+.Cn CSI
+is sent to the host as ``\f2Esc\fP [''.
+.LI "\f2Esc\ Space\f3\ G\f1"
+.br
+(\c
+.Cn C8C1T )
+Select 8-bit C1 Control Characters.
+In this mode, the
+.Cm dtterm
+utility
+sends all C1 Control Characters
+to the host as 8-bit control codes.
+That is,
+.Cn CSI
+is sent back as the hexadecimal value 0x9B.
+.\" Dtterm1.1 .LI
+.\" Dtterm1.1 .I Ctrl-N
+.\" Dtterm1.1 (\f3 Ctrl-N\fP) Shift Out
+.\" Dtterm1.1 .LI
+.\" Dtterm1.1 .I Ctrl-O
+.\" Dtterm1.1 (\f3 Ctrl-O\fP) Shift In
+.LI "\f2Esc\fP\ \f3#\ 8\fP"
+.br
+(\c
+.Cn DECALN )
+DEC Screen Align Test.
+The screen is filled with the character ``E''.
+.\" Dtterm1.1 .LI
+.\" Dtterm1.1 \f2Esc \f3 ( C
+.\" Dtterm1.1 (\f3ISO2022\fP) Designate G0 character set
+.\" Dtterm1.1 .LI
+.\" Dtterm1.1 \f2Esc \f3 ) C
+.\" Dtterm1.1 (\f3ISO2022\fP) Designate G1 character set
+.\" Dtterm1.1 .LI
+.\" Dtterm1.1 \f2Esc \f3 * C
+.\" Dtterm1.1 (\f3ISO2022\fP) Designate G2 character set
+.\" Dtterm1.1 .LI
+.\" Dtterm1.1 \f2Esc \f3 + C
+.\" Dtterm1.1 (\f3ISO2022\fP) Designate G3 character set
+.LI "\f2Esc\fP\ \f37\fP"
+(\c
+.Cn DECSC )
+Save cursor.
+The following is saved:
+.xo .BL
+.cde .VL 2
+.LI \(bu
+Cursor position
+.LI \(bu
+Character attributes set by the
+.Cn SGR
+command
+.LI \(bu
+Any pending single shift 2 or 3 (\c
+.Cn SS2
+or
+.Cn SS3 )
+.LI \(bu
+State of the autowrap flag
+.LI \(bu
+State of the reverse wrap flag
+.LI \(bu
+State of origin mode (\c
+.Cn DECOM )
+.LI \(bu
+State of selective erase
+.LE
+.LI "\f2Esc\fP\ \f38\fP"
+(\c
+.Cn DECRC )
+Restore cursor.
+The terminal emulator is restored to the state saved by the save
+cursor (\
+.Cn DECSC )
+function.
+If nothing was saved by
+.Cn DECSC ,
+then the following actions are
+performed:
+.xo .BL
+.cde .VL 2
+.LI \(bu
+Moves the cursor to the home position
+.LI \(bu
+Resets the origin mode (\c
+.Cn DECOM )
+.LI \(bu
+Turns off all character attributes (\c
+.Cn SGR )
+.LI \(bu
+Maps the
+.cde ASCII
+.xo \*(Z8
+character set into GL
+.LE
+.LI "\f2Esc\fP\ \f3=\fP"
+(\c
+.Cn DECPAM )
+Application keypad.
+In this mode, the numeric keypad sends application sequences.
+.cde (See the ``Transmitted Escape Sequences'' section later in this
+.cde document for additional information.)
+.xo (See
+.xo .cX xmitesc ).
+.LI "\f2Esc\fP\ \f3>\fP"
+(\c
+.Cn DECPNM )
+Normal keypad.
+In this mode, the numeric keypad sends the characters shown on
+the keypad.
+Keys
+.Cn PF1
+to
+.Cn PF4 ,
+inclusive,
+send application sequences.
+.cde (See the ``Transmitted Escape Sequences'' section later in this
+.cde document for additional information.)
+.xo (See
+.xo .cX xmitesc ).
+.LI "\f2Esc\fP\ \f3D\fP"
+(\c
+.Cn IND )
+Index.
+The cursor moves down to the same column of the next line.
+If the cursor is in the bottom-most line of the scrolling region,
+the scrolling region is scrolled up one line.
+The line scrolled off the top of the scrolling
+region is lost.
+A blank line with no visible character attributes is added at the
+bottom of the scrolling region.
+.LI "\f2Esc\fP\ \f3E\fP"
+(\c
+.Cn NEL )
+Next line.
+The cursor moves down to the
+first column of the next line.
+If the cursor is
+in the bottom-most line of the scrolling region,
+the scrolling region is scrolled up one line.
+The line scrolled off the top of the scrolling
+region is lost.
+A blank line with no visible
+character attributes is added at the bottom of
+the scrolling region.
+.LI "\f2Esc\fP\ \f3H\fP"
+(\c
+.Cn HTS )
+Tab set.
+This function sets a horizontal
+tab stop at the column where the cursor is located.
+.LI "\f2Esc\fP\ \f3M\fP"
+(\c
+.Cn RI )
+Reverse index.
+The cursor moves up to the
+same column of the previous line.
+If the cursor
+is in the top-most line of the scrolling region,
+the scrolling region is scrolled down one line.
+The line scrolled off the bottom of the scrolling
+region is lost.
+A blank line with no visible
+character attributes is added at the top of the
+scrolling region.
+.\" Dtterm1.1 .LI
+.\" Dtterm1.1 \f2 Esc \f3 N
+.\" Dtterm1.1 (\f3SS2\fP) Single shift select of G2 character set
+.\" Dtterm1.1 .LI
+.\" Dtterm1.1 \f2 Esc \f3 O
+.\" Dtterm1.1 (\f3SS3\fP) Single shift select of G3 character set
+.LI "\f2Esc\fP\f3\ P\fP\f2\ p1\fP\f3\ ;\fP\f2\ p2\fP\f3\ |\fP\f2\ p3\ Esc\ Backslash\fP"
+.br
+(\c
+.Cn DECUDK )
+User defined keys
+.LI "\f2Esc\fP\ \f3Z\fP"
+(\c
+.Cn DECID )
+Return terminal ID.
+This function is similar to a primary device attributes (\c
+.Cn DA )
+request.
+(See ``\f2Esc\fP \f3[ c \fP'' (\c
+.Cn DA )
+described later in this document.)
+.LI "\f2Esc\fP\ \f3c\fP"
+(\c
+.Cn RIS )
+Full reset.
+This function performs a full (hard) reset.
+For additional information, see
+.cde the ``Reset'' section in this man page.
+.xo .cX Reset .
+.\" Dtterm1.1 .LI
+.\" Dtterm1.1 \f2 Esc \f3 n
+.\" Dtterm1.1 (\f3LS2\fP) Select the G2 character set
+.\" Dtterm1.1 .LI
+.\" Dtterm1.1 \f2 Esc \f3 o
+.\" Dtterm1.1 (\f3LS3\fP) Select the G3 character set
+.\" Dtterm1.1 .LI
+.\" Dtterm1.1 \f2Esc \f3 |
+.\" Dtterm1.1 (\f3LS3R\fP) Invoke the G3 character set
+.\" Dtterm1.1 .LI
+.\" Dtterm1.1 \f2Esc \f3 }
+.\" Dtterm1.1 (\f3LS2R\fP) Invoke the G2 character set
+.LI "\f2Esc\fP\ \f3[\fP\ \f2pi\fP\ \f3q\fP"
+.br
+(\c
+.Cn DECSCA )
+Select character protection attribute.
+The default value is 0.
+This escape sequence defines the characters that come after it as
+erasable or not erasable from the screen.
+The selective erase escape sequences, (\c
+.Cn DECSED
+and
+.Cn DECSEL ),
+can only
+erase characters defined as erasable.
+Valid supported values of
+.I pi
+are:
+.VL 6
+.LI \f30\fP
+.Cn DECSED
+and
+.Cn DECSEL
+can erase characters.
+.LI \f31\fP
+.Cn DECSED
+and
+.Cn DECSEL
+cannot erase characters.
+.LI \f32\fP
+Same as \f30\fP.
+.LE
+.LI "\f2\ Esc\fP\ \f3[\fP\ \f2pi\fP\ \f3@\fP"
+.br
+(\c
+.Cn ICH )
+Insert
+.I pi
+blank characters.
+The default value is 1.
+A parameter value of 0 or 1 inserts a single blank character.
+A parameter value of
+.I N
+inserts
+.I N
+blank characters.
+Blank characters with normal character attributes are inserted at the
+cursor position.
+Characters to the right of the cursor move to the right.
+Characters scrolled past the end of the line are lost.
+.LI "\f2\ Esc\fP\ \f3[\ \fP\f2pi\ \fP\f3A\fP"
+.br
+(\c
+.Cn CUU )
+Cursor up
+.I pi
+lines.
+The default value is 1.
+A parameter value 0 or 1 moves the cursor up one line.
+A parameter value of
+.I N
+moves the cursor up
+.I N
+lines.
+The cursor stops at the top margin.
+If the cursor is already above the top margin, the cursor stops at the top line.
+.LI "\f2Esc\fP\ \f3[\ \fP\f2pi\ \fP\f3B\fP"
+.br
+(\c
+.Cn CUD )
+Cursor down
+.I pi
+lines.
+The default value is 1.
+A parameter value 0 or 1 moves the cursor down one line.
+A parameter value of
+.I N
+moves the cursor down
+.I N
+lines.
+The cursor stops at the bottom margin.
+If the cursor is already below the bottom margin,
+the cursor stops at the bottom line.
+.LI "\f2Esc\fP\ \f3[\ \fP\f2pi\ \fP\f3C\fP"
+.br
+(\c
+.Cn CUF )
+Cursor forward
+.I pi
+characters.
+The default value is 1.
+A parameter value 0 or 1 moves the cursor forward one character.
+A parameter value of
+.I N
+moves the cursor forward
+.I N
+characters.
+The cursor stops at the right-most column of the line.
+.LI "\f2Esc\fP\ \f3[\fP\ \f2pi\fP\ \f3D\fP"
+.br
+(\c
+.Cn CUB )
+Cursor backward
+.I pi
+characters.
+The default value is 1.
+A parameter value 0 or 1 moves the cursor backward one character.
+A parameter value of
+.I N
+moves the cursor backward
+.I N
+characters.
+The cursor stops at the left-most column of the line.
+.LI "\f2Esc\fP\ \f3[\fP\ \f2pi\fP\ \f3F\fP"
+.br
+(\c
+.Cn CPL )
+Cursor to the first column of the
+.IR pi\fPth preceding line.
+The default value is 1.
+A parameter value 0 or 1 moves the cursor to the preceding line.
+A parameter value of
+.I N
+moves the cursor to the
+.IR N th
+preceding line.
+If the cursor is below the top margin, the cursor stops at the top margin.
+If the cursor is already above the top margin, the cursor stops at the top line.
+.LI "\f2Esc\fP\ \f3[\ \fP\f2pi\fP\ \f3G\fP"
+.br
+(\c
+.Cn CHA )
+Cursor to column
+.IR pi .
+The default value is 1.
+A parameter value 0 or 1 moves the cursor to the first column of the
+current line.
+A parameter value of
+.I N
+moves the cursor to the
+.IR N th
+column of the current line.
+.LI "\f2Esc\fP\ \f3[\fP\ \f2p1\ \fP\f3;\ \fP\f2p2\ \fP\f3H\fP"
+.br
+(\c
+.Cn CUP )
+Cursor position.
+The default value is 1.
+A
+.I p1
+value 0 or 1 moves the cursor to row one.
+A
+.I p1
+value of
+.I N
+moves the cursor to row N.
+A
+.I p2
+value 0 or 1 moves the cursor to column one.
+A
+.I p2
+value of
+.I N
+moves the cursor to column N.
+The starting point for lines and columns depends on the setting of the origin
+mode (\c
+.Cn DECOM ).
+.LI "\f2Esc\fP\ \f3[\fP\ \f2pi\ \fP\f3J\fP"
+.br
+(\c
+.Cn ED )
+Erase in display.
+The default value is 0.
+A parameter value of 0 erases from the cursor to the end of the display.
+A parameter value of 1 erases from the beginning of the display to the
+cursor position, inclusive.
+A parameter value of 2 erases the complete display.
+.LI "\f2Esc\fP\ \f3[\fP\ \f2pi\fP\ \f3K\fP"
+.br
+(\c
+.Cn EL )
+Erase in line.
+The default value is 0.
+A parameter value of 0 erases from the cursor to the end of the line.
+A parameter value of 1 erases from the beginning of the line to the
+cursor position, inclusive.
+A parameter value of 2 erases the complete line.
+.LI "\f2Esc\fP\ \f3[\ \fP\f2pi\fP\ \f3L\fP"
+.br
+(\c
+.Cn IL )
+Insert lines.
+The default value is 1.
+A parameter value 0 or 1 inserts one line at the cursor.
+A parameter value of
+.I N
+inserts
+.I N
+lines at the cursor.
+As lines are inserted, lines below the cursor and in the scrolling region
+move down.
+Lines scrolled off the page are lost.
+There is no effect outside the scrolling region.
+.LI "\f2Esc\fP\ \f3[\fP\ \f2pi\fP\ \f3M\fP"
+.br
+(\c
+.Cn DL )
+Delete lines.
+The default value is 1.
+A parameter value 0 or 1 deletes one line at the cursor.
+A parameter value of
+.I N
+deletes
+.I N
+lines at the cursor.
+As lines are deleted, lines below the cursor and in the scrolling region
+move up.
+Blank lines with no visible character attributes
+are added at the bottom of the scrolling region.
+There is no effect outside the scrolling region.
+.LI "\f2Esc\fP\ \f3[\ \fP\f2pi\ \fP\f3P\fP"
+.br
+(\c
+.Cn DCH )
+Delete characters.
+The default value is 1.
+A parameter value 0 or 1 deletes one character at the cursor position.
+A parameter value of
+.I N
+deletes
+.I N
+characters at the cursor position.
+An parameter greater than the number of characters between the cursor and
+the right margin only deletes the remaining characters on the line.
+As characters are deleted, the remaining characters move left and are
+replaced by blank spaces with no visual character attributes.
+.LI "\f2Esc\fP\ \f3[\ \fP\f2pi\ \fP\f3S\fP"
+.br
+(\c
+.Cn SU )
+Scroll up
+.I pi
+lines.
+The default value is 1.
+A parameter value 0 or 1 scrolls the display up one line.
+A parameter value of
+.I N
+scrolls the display up
+.I N
+lines.
+The scrolling region scrolls up.
+Lines scrolled off the top of the scrolling region are lost.
+Blank lines with no visible character attributes
+are added at the bottom of the scrolling region.
+.LI "\f2Esc\fP\ \f3[\fP\ \f2pi\fP\ \f3T\fP"
+.br
+(\c
+.Cn SD )
+Scroll down
+.I pi
+lines.
+The default value is 1.
+A parameter value 0 or 1 scrolls the display down one line.
+A parameter value of
+.I N
+scrolls the display down
+.I N
+lines.
+The scrolling region scrolls down.
+Lines scrolled off the bottom of the scrolling region are lost.
+Blank lines with no visible character attributes
+are added at the top of the scrolling region.
+.LI "\f2Esc\fP\ \f3[\fP\ \f2pi\fP\ \f3X\fP"
+.br
+(\c
+.Cn ECH )
+Erase
+.I pi
+characters.
+The default value is 1.
+A parameter value 0 or 1 erases a single character.
+A parameter value of
+.I N
+erases
+.I N
+characters.
+The character attributes of erased characters are cleared.
+This escape sequences works inside or outside the scrolling margins.
+.LI "\f2Esc\fP\ \f3[\ \fP\f2pi\fP\ \f3c\fP"
+.br
+(\c
+.Cn DA )
+Send device attributes.
+The default is 0.
+A parameter value 0 or 1 causes
+the terminal emulator to respond with
+``\f2Esc \fP\f3[ ? 1 ; 2 c\fP''.
+.cdes
+This is the standard response for the DEC VT100 Terminal and
+.Cm xterm 1X.
+.cdee
+.LI "\f2Esc\fP\ \f3[\fP\ \f2p1\ \fP\f3\ ;\ \fP\f2p2\fP\ \f3f\fP"
+.br
+(\c
+.Cn HVP )
+Horizontal and vertical position.
+This escape sequence has been replaced by
+.Cn CUP
+and offers identical
+functionality.
+It is provided to maintain backward compatibility.
+.LI "\f2Esc\fP\ \f3[\fP\ \f2pi\fP\ \f3g\fP"
+.br
+(\c
+.Cn TBC )
+Tab clear.
+The default is 0.
+A parameter value of 0 clears the tab stop at the current cursor column.
+A parameter value of 3 clears all tab stops.
+.LI "\f2Esc\fP\ \f3[\fP\ \f2pi\fP\ \f3h\fP"
+.br
+(\c
+.Cn SM )
+Set mode.
+This escape sequence sets ANSI modes.
+Valid supported values of
+.I pi
+are:
+.VL 6
+.LI \f32\fP
+(\c
+.Cn KAM )
+Keyboard lock.
+In this mode,
+.Cm dtterm 1
+ignores all keystrokes from the keyboard.
+.LI \f34\fP
+(\c
+.Cn IRM )
+Insert mode.
+In this mode, new characters move characters in display memory to the right.
+Characters moved past the end of the line are lost.
+.LI \f312\fP
+(\c
+.Cn SRM )
+Local echo off.
+In this mode,
+.Cm dtterm 1
+sends keyboard characters to the host only.
+The host must echo back characters for them to be displayed.
+.LI \f320\fP
+(\c
+.Cn LNM )
+New line.
+In this mode, the cursor moves to the
+first column on the next line when
+.Cm dtterm 1
+receives an
+.Cn LF ,
+.Cn FF
+or
+.Cn VT
+character.
+When the Return key is pressed,
+.Cm dtterm 1
+sends a carriage-return (\c
+.Cn CR )
+followed by a newline
+(\c
+.Cn NL ).
+.LE
+.LI "\f2Esc\fP\ \f3[\ \fP\f2pi\fP\ \f3l\fP"
+.br
+(\c
+.Cn RM )
+Reset mode.
+This escape sequences resets ANSI modes.
+Valid supported values of
+.I pi
+are:
+.VL 6
+.LI \f32\fP
+(\c
+.Cn KAM )
+Keyboard unlock.
+In this mode,
+.Cm dtterm 1
+processes all keystrokes from the keyboard.
+.LI \f34\fP
+(\c
+.Cn IRM )
+Replace mode.
+In this mode, new characters replace
+the character at the cursor position.
+.LI \f312\fP
+(\c
+.Cn SRM )
+Local echo on.
+In this mode,
+.Cm dtterm 1
+sends keyboard characters to both the host and the
+display.
+The host does not have to echo back
+characters for them to be displayed.
+.LI \f320\fP
+(\c
+.Cn LNM )
+New line.
+In this mode, the cursor moves to the same
+column on the next line when
+.Cm dtterm 1
+receives an
+.Cn LF ,
+.Cn FF
+or
+.Cn VT
+character.
+When the Return key is pressed,
+.Cm dtterm 1
+sends a carriage-return (\c
+.Cn CR ).
+.LE
+.LI "\f2Esc\fP\ \f3[\ \fP\f2\ pi\fP\ \f3\ ;\ .\|.\|.\ m\fP"
+.br
+(\c
+.Cn SG )
+Graphics rendition.
+The default value is 0.
+This escape sequence selects one or more character attributes.
+Valid supported values for
+.I pi
+are:
+.VL 6
+.\" ?? .LI \f3\fP
+.\" ?? Faint
+.LI \f30\fP
+All attributes off
+.LI \f31\fP
+Bold
+.LI \f32\fP
+Faint
+.LI \f34\fP
+Underline
+.LI \f35\fP
+Blinking.
+This attribute appears as bold text
+.LI \f37\fP
+Negative image
+.LI \f38\fP
+Invisible image
+.LI \f322\fP
+Bold and Faint off
+.LI \f324\fP
+Underline off
+.LI \f325\fP
+Blinking off
+.LI \f327\fP
+Negative image off
+.LI \f328\fP
+Invisible image off
+.LI \f330\fP
+Black display (text)
+.LI \f331\fP
+Red display (text)
+.LI \f332\fP
+Green display (text)
+.LI \f333\fP
+Yellow display (text)
+.LI \f334\fP
+Blue display (text)
+.LI \f335\fP
+Magenta display (text)
+.LI \f336\fP
+Cyan display (text)
+.LI \f337\fP
+White display (text)
+.LI \f339\fP
+Default display (text)
+.LI \f340\fP
+Black background
+.LI \f341\fP
+Red background
+.LI \f342\fP
+Green background
+.LI \f343\fP
+Yellow background
+.LI \f344\fP
+Blue background
+.LI \f345\fP
+Magenta background
+.LI \f346\fP
+Cyan background
+.LI \f347\fP
+White background
+.LI \f349\fP
+Default background
+.LE
+.LI "\f2Esc\fP\ \f3[\fP\ \f2pi\fP\ \f3n\fP"
+.br
+(\c
+.Cn DSR )
+Device status report.
+Valid supported values for
+.I pi
+are:
+.VL 6
+.LI \f35\fP
+Operating status.
+The
+.Cm dtterm 1
+utility responds with an
+.I OK
+message of ``\f2Esc \fP\f3[ 0 n\fP''.
+.LI \f36\fP
+(\c
+.Cn CPR )
+Cursor position report.
+The
+.Cm dtterm 1
+utility responds with the current cursor position in the form
+``\f2Esc\fP \f3[\fP \f2p1 \fP\f3; \fP\f2p2 \fP\f3R\fP'' where
+.I p1
+is the
+current cursor line and
+.I p2
+is the current cursor row.
+.LE
+.LI "\f2Esc\fP\ \f3[\fP\ ?\ \f2pi\fP\ \f3n\fP
+.br
+(\c
+.Cn DSR )
+DEC
+private device status report.
+Valid supported values for
+.I pi
+are:
+.VL 6
+.LI\f315\fP
+Printer port status.
+The
+.Cm dtterm 1
+utility responds with a ``no printer available'' message of
+``\f2Esc\fP \f3[\fP ? \f313 n\fP''.
+.LI \f325\fP
+User-defined key status.
+The
+.Cm dtterm 1
+utility responds with either a message of ``\f2Esc\fP \f3[\fP ? \f320 n\fP''
+if UDKs are
+unlocked, or ``\f2Esc\fP \f3[\fP ? \f321 n\fP'' if UDKs are locked.
+.LI \f326\fP
+Keyboard status.
+The
+.Cm dtterm 1
+utility responds with a message of ``\f2Esc\fP \f3[\fP ? \f327 ; 1 n\fP'',
+which indicates a North American keyboard.
+.LE
+.LI "\f2Esc\fP\ \f3[\ \fP\f2p1\ \fP\f3;\ \fP\ \f2p2\ \fP\f3r\fP"
+.br
+(\c
+.Cn DECSTBM )
+Set top and bottom margins.
+The default value for
+.I p1
+is 1.
+The default value for
+.I p2
+is the current number of lines in the terminal
+window.
+The top and bottom margins are set to
+.I p1
+and
+.I p2
+respectively.
+Scrolling is not performed outside the margins.
+.LI "\f2Esc\ \f3[\ \f2p1\ \f3;\ \f2p2\ \f3;\ \f2p3\f3\ t\f1"
+.br
+Window manipulation.
+Valid values for
+.I p1
+(and any additional parameters) are:
+.VL 6
+.LI \f31\fP
+Restore (de-iconify) window.
+.LI \f32\fP
+Minimize (iconify) window.
+.LI "\f33\ ;\fP\ \f2x\ \fP\ \f3;\fP\ \f2y\fP"
+.br
+Move window to [\f2x\fP, \f2y\fP].
+.LI "\f34\ ;\fP\ \f2height\ \fP\f3;\fP\ \f2width\fP"
+.br
+Resize the
+.Cm dtterm 1
+window to
+.I height
+and
+.I width
+in pixels.
+.LI \f35\fP
+Raise the
+.Cm dtterm 1
+window to the front of the stacking order.
+.LI \f36\fP
+Lower the
+.Cm dtterm 1
+window to the bottom of the stacking order.
+.LI \f37\fP
+Refresh the
+.Cm dtterm 1
+window.
+.LI "\f38\fP\ ;\ \f2height\ \fP\f3;\ \fP\f2width\fP"
+.br
+Resize the text area to
+.I height
+and
+.I width
+in characters.
+.LI \f311\fP
+Report
+.Cm dtterm 1
+window state.
+If the
+.Cm dtterm 1
+window is open (non-iconified), it returns ``\f2Esc\fP\f3 [ 1 t\fP''.
+If the
+.Cm dtterm 1
+window is iconified, it returns ``\f2Esc \fP\f3[ 2 t\fP''.
+.LI \f313\fP
+Report the
+.Cm dtterm 1
+window position.
+The terminal emulator
+returns ``\f2Esc\fP\f3 [ 3 ; \fP\f2x\fP\f3 ;\fP\f2 y\fP\f3 t\fP''.
+.LI \f314\fP
+Report the
+.Cm dtterm 1
+window in pixels.
+The terminal emulator
+returns ``\f2Esc\fP\f3 [ 4 ;\fP\f2 height\fP\f3 ;\fP\f2 width\fP\f3 t\fP''.
+.LI \f318\fP
+Report the size of the area in characters.
+The terminal emulator
+returns ``\f2Esc\fP\f3 [ 8 ; \fP\f2height\fP\f3 ;\fP\f2 width\fP\f3 t\fP''.
+.LI \f320\fP
+Report the
+.Cm dtterm 1
+window's icon label.
+The terminal emulator
+returns ``\f2Esc\fP ] L\f2 label Esc Backslash\fP''.
+.LI \f321\fP
+Report the
+.Cm dtterm 1
+window's title.
+The terminal emulator
+returns ``\f2Esc\fP\f3 ] l\fP\f2 title Esc Backslash\fP''.
+.LE
+.LI "\f2\ Esc\fP\ \f3[\fP\ \f2pi\fP\ \f3x\fP"
+.br
+Request terminal modes.
+The default value is 0.
+Valid values are 0 or 1.
+If
+.I pi
+is 0,
+.Cm dtterm 1
+responds with the message of
+``\f2Esc\fP\f3 [ 2 ; 1 ; 1 ; 112 ; 112 ; 1 ; 0 x\fP''.
+If
+.I pi
+is 1,
+.Cm dtterm 1
+responds with the message of
+``\f2Esc\fP\f3 [ 3 ; 1 ; 1 ; 112 ; 112 ; 1 ; 0x\fP''.
+.cdes
+This escape sequence is supported for backward
+compatibility for
+.Cm xterm 1X
+only.
+.cdee
+.LI "\f2\ Esc\fP\ \f3[\ \fP?\ \f2pi\ \fP\f3h\fP"
+.br
+(\c
+.Cn SM )
+DEC private set mode.
+This escape sequences sets DEC private modes.
+Valid supported values of
+.I pi
+are:
+.VL 6
+.LI \f31\fP
+(\c
+.Cn DECCKM )
+Enable cursor keys mode.
+When cursor keys
+mode is enabled, the arrow keys send application sequences to
+the host.
+.LI \f33\fP
+(\c
+.Cn DECCOLM )
+Enable 132-column mode.
+When 132-column
+mode is enabled, the number of columns is the terminal window changed to 132.
+When entering into 132-column mode,
+the left, right, top, and bottom margins are reset to their
+default positions and the display is cleared.
+.LI \f34\fP
+(\c
+.Cn DECSCLM )
+Enable smooth scrolling.
+When smooth scrolling is enabled, lines are added and the screen
+is scrolled a single line at a time.
+.LI \f35\fP
+(\c
+.Cn DECSCNM )
+Enable reverse video.
+When reverse video mode is enabled, the foreground and background
+colors of the terminal window are reversed.
+.LI \f36\fP
+(\c
+.Cn DECOM )
+Enable origin mode.
+When origin mode is
+enabled, the home cursor position is the upper-left corner of
+the screen, within the margins.
+The starting point for line
+numbers depends on the current top margin.
+The cursor cannot be moved outside the top and bottom margins.
+.LI \f37\fP
+(\c
+.Cn DECAWM )
+Enable autowrap.
+When autowrap mode is
+enabled, characters received when the cursor is at the right-most column
+of the page are inserted at the beginning of the next line.
+If the cursor is at the bottom line of the scrolling
+region, the page is scrolled up 1 line.
+.LI \f38\fP
+(\c
+.Cn DECARM )
+Enable auto-repeat keys.
+This option is ignored.
+.LI \f325\fP
+(\c
+.Cn DECTCEM )
+Enable cursor visible.
+In this mode, the text cursor is visible.
+.LI \f340\fP
+Enable
+.Cn DECCOLM
+escape sequence.
+When the
+.Cn DECCOLM
+escape sequence is enabled, the terminal emulator switches
+into either an 80- or 132-column window when it receives a
+.Cn DECCOLM
+escape sequence.
+.LI \f344\fP
+Enable margin bell.
+When the margin bell is enabled, the
+.Cm dtterm
+utility's bell (either audible or visible) is invoked when the cursor is a
+predefined distance from the right margin and a key is pressed.
+.LI \f345\fP
+Enable reverse-autowrap mode.
+When reverse-autowrap mode is enabled, and a backspace is received
+when the cursor is at the left-most column of the page, the cursor is
+wrapped to the right-most column of the previous line.
+If the cursor is at the top line of the scrolling region, the cursor is
+wrapped to the right-most column of the bottom line of the
+scrolling region.
+If the cursor is at the top line of terminal
+window, the cursor is wrapped to the right-most
+column of the bottom line of the terminal window.
+.LI \f346\fP
+Enable logging.
+When logging is enabled, all text received
+from the child process is logged to a file.
+.LE
+.LI "\f2Esc\fP\ \f3[\ \fP?\ \f2pi\fP\ \f3l\fP"
+.br
+(\c
+.Cn RM )
+DEC private mode reset.
+This escape sequence sets DEC private
+modes.
+Valid supported values of
+.I pi
+are:
+.VL 6
+.LI \f31\fP
+(\c
+.Cn DECCKM )
+Disable cursor keys mode.
+When cursor keys
+mode is disabled, the arrow keys send ANSI cursor sequences
+to the host.
+.LI \f33\fP
+(\c
+.Cn DECCOLM )
+Disable 132-column mode.
+When 132-column
+mode is disabled, the number of columns is the terminal window changed to 80.
+When entering into 80-column mode, the
+left, right, top, and bottom margins are reset to their default
+positions and the display is cleared.
+.LI \f34\fP
+(\c
+.Cn DECSCLM )
+Disable smooth scrolling.
+When smooth scrolling is disabled, lines are added and the screen is
+scrolled up to
+a full screen at a time depending on how fast text is received
+from the child process.
+.LI \f35\fP
+(\c
+.Cn DECSCNM )
+Disable reverse video.
+When reverse video
+mode is disabled, the foreground and background colors of the
+terminal window are not reversed.
+.LI \f36\fP
+(\c
+.Cn DECOM )
+Disable origin mode.
+When origin mode is disabled, the home cursor position is the
+upper-left corner of the screen.
+The starting point for line numbers is independent of
+the current top margin.
+The cursor can be moved outside the
+top and bottom margins.
+.LI \f37\fP
+(\c
+.Cn DECAWM )
+Disable autowrap.
+When autowrap mode is
+enabled, characters received when the cursor is at the right-most
+column of the page, replace the character already on the line.
+.LI \f38\fP
+(\c
+.Cn DECARM )
+Disable auto-repeat keys.
+This option is ignored.
+.LI \f325\fP
+(\c
+.Cn DECTCEM )
+Disable cursor visible.
+In this mode, the text cursor is invisible.
+.LI \f340\fP
+Disable
+.Cn DECCOLM
+escape sequence.
+When the
+.Cn DECCOLM
+escape sequence is disabled, the terminal emulator
+ignores the
+.Cn DECCOLM
+escape sequence and does not switch
+into either an 80- or 132-column window when it is received.
+.LI \f344\fP
+Disable margin bell.
+When the margin bell is disabled, the
+.Cm dtterm
+utility's bell is not invoked when the cursor is
+a pre-defined distance from the right margin and a key is
+pressed.
+.LI \f345\fP
+Disable reverse-autowrap mode.
+When reverse-autowrap
+mode is disabled, and a backspace is received when the cursor
+is at the left-most column of the page, the cursor remains at
+that position.
+.LI \f346\fP
+Disable logging.
+When logging is disabled, text received from
+the child process is not logged to a file.
+.LE
+.LI "\f2Esc\fP\ \f3[\ ?\ \fP\f2pi\ \fP\f3r\fP"
+.br
+Restore DEC private mode values.
+The value corresponding to mode
+.I pi
+previously saved is restored.
+Valid values for
+.I pi
+are the same as the DEC private modes supported by
+.Cn SM .
+.cdes
+It is provided to maintain backward compatibility with
+.Cm xterm 1X.
+.cdee
+Using this escape sequence is discouraged.
+.LI "\f2Esc\fP\ \f3[\ ?\fP\ \f2pi\fP\ \f3s\fP"
+.br
+Save DEC private mode values.
+The value corresponding to mode
+.I pi
+is saved.
+Valid values for
+.I pi
+are the same as the DEC private modes supported
+by
+.Cn SM .
+.cdes
+This escape sequence is provided to maintain backward compatibility with
+.Cm xterm 1X.
+.cdee
+Using this escape sequence is discouraged.
+.LI "\f2\ Esc\fP\ \f3]\ \fP\f2p1\fP\ \f3;\fP\ \f2\ p2\ <control>\(hyG\fP"
+.br
+Set text parameters.
+This escape sequence allows various terminal emulator text values to be set.
+Valid supported values of
+.I p1
+are:
+.VL 6
+.LI \f30\fP
+Change the icon name and window title to
+the string
+.IR p2 .
+.LI \f31\fP
+Change the icon name to
+the string
+.IR p2 .
+.LI \f32\fP
+Change the window title to
+the string
+.IR p2 .
+.LI \f33\fP
+Set the current working directory to
+the string
+.IR p2 .
+The terminal emulator
+tries to restart in this directory when it is restarted in a new session.
+.LE
+.LI "\f2Esc\fP\ \f3\ ^\ \fP\f2\ \ message\ Esc\ Backslash\fP"
+.br
+(\c
+.Cn PM )
+Privacy message.
+The data received in a privacy message is ignored and is not displayed.
+.LI "\f2Esc\fP\ \f3_\ \fP\f2pi\ Esc\ Backslash\fP"
+.br
+(\c
+.Cn APC )
+Application program command.
+The terminal emulator implements no
+.Cn APC
+functions.
+The data is ignored and is not displayed.
+.LI "\f2\ Esc\fP\ \f3[\ ?\fP\ \f2pi\fP\ \f3K\fP"
+.br
+(\c
+.Cn DECSEL )
+Selective erase in line.
+The default value is 0.
+This escape sequence only erases erasable characters in a single line
+of text.
+Only those characters defined as erasable by the
+.Cn DECSCA
+escape sequence are erased.
+A parameter value of 0 erases from the cursor to the end of the line.
+A parameter value of 1 erases from the beginning of the line to the
+cursor position, inclusive.
+A parameter value of 2 erases the complete line.
+.LI "\f2Esc\fP\ \f3\ [\ ?\ \fP\f2pi\fP\ \f3J\fP"
+.br
+(\c
+.Cn DECSED )
+Selective erase in display.
+The default value is 0.
+This escape sequence only erases erasable characters in the display.
+Only those characters defined as erasable by the
+.Cn DECSCA
+escape sequence are erased.
+A parameter value of 0 erases from the cursor to the end of the display.
+A parameter value of 1 erases from the beginning of the display to the
+cursor position, inclusive.
+A parameter value of 2 erases the complete display.
+.LI "\f2Esc\fP\ \f3]\ l\fP\ \f2text\ Esc\ Backslash\fP"
+.br
+Set the window title to
+.IR text .
+.LI "\f2Esc\fP\ \f3]\ I\ \fP\f2file\ Esc\ Backslash\fP"
+.br
+Set the icon to the icon found in file.
+.LI "\f2Esc\fP\ \f3]\ L\ \fP\f2label\ Esc\ Backslash\fP"
+.br
+Set the icon name to
+.IR label .
+.LI "\f2Esc\fP\ \f3[\ !\ p\fP"
+.br
+(\c
+.Cn DECSTR )
+Soft terminal reset.
+This function performs a soft reset.
+For additional information, see
+.cde the ``Reset'' section in this man page.
+.xo .cX Reset .
+.LE
+.cde .HU Reset
+.xo .H 3 Reset
+.xo .xR3 Reset
+The
+.Cm dtterm 1
+utility supports two levels of reset: full reset and soft
+reset.
+Reset can be invoked by menu buttons, the keyboard
+or by escape sequences.
+Soft reset performs the following actions:
+.xo .BL
+.cde .VL 2
+.LI \(bu
+Turns on the text cursor (\c
+.Cn DECTCEM )
+.LI \(bu
+Enables replace mode (\c
+.Cn IRM )
+.LI \(bu
+Turns off origin mode (\c
+.Cn DECOM )
+.LI \(bu
+Turns on autowrap (\c
+.Cn DECAWM )
+.LI \(bu
+Turns off reverse wrap
+.LI \(bu
+Unlocks the keyboard (\c
+.Cn KAM )
+.LI \(bu
+Sets the cursor keypad mode to normal (\c
+.Cn DECCKM )
+.LI \(bu
+Sets the numeric keypad mode to numeric (\c
+.Cn DECNKM )
+.LI \(bu
+Sets the top and bottom margins to the first and last lines of the window (\c
+.Cn DECSTBM )
+.LI \(bu
+Sets all character sets (\c
+.Cn GL ,
+.Cn G0 ,
+.Cn G1 ,
+.Cn G2
+and
+.Cn G3 )
+to
+.cde ASCII
+.xo \*(Z8
+.LI \(bu
+Turns off all character attributes (\c
+.Cn SGR )
+.LI \(bu
+Sets selective erase mode off (\c
+.Cn DECSCA )
+.LI \(bu
+Clears any cursor state information saved with save cursor (\c
+.Cn DECSC )
+.LE
+.P
+Full reset performs the same functions as soft reset along
+with the following actions:
+.xo .BL
+.cde .VL 2
+.LI \(bu
+Cursor is moved to the home position
+.LI \(bu
+Clears the screen
+.LI \(bu
+Clears user defined keys (\c
+.Cn DECUDK )
+.LI \(bu
+Turns off reverse video (\c
+.Cn DECSCNM )
+.LI \(bu
+Turns off auto linefeed mode (\c
+.Cn LNM )
+.LI \(bu
+Turns on jump scroll (\c
+.Cn DECSCLM )
+.LE
+.ne 16v
+.cde .HU "Transmitted Escape Sequences"
+.xo .H 3 "Transmitted Escape Sequences"
+.xo .xR3 xmitesc
+.cde .HU "Cursor Key Mode"
+.xo .H 3 "Cursor Key Mode"
+The cursor keys transmit the following escape sequences depending on the
+setting of the mode specified, either via the
+.B appCursorDefault
+resource, or the mode specified via the
+.Cn DECCKM
+escape sequence.
+.TS
+center;
+cf3	cf3	cf3
+.cde lf3w(2c)	lf3w(2c)	lf3w(2c) .
+.xo lf5 lf5 lf5 .
+Key	Normal	Application
+_
+Cursor Up	Esc \f3 [ A\fP	Esc \f3 O A\fP
+Cursor Down	Esc \f3 [ B\fP	Esc \f3 O B\fP
+Cursor Right	Esc \f3 [ C\fP	Esc \f3 O C\fP
+Cursor Left	Esc \f3 [ D\fP	Esc \f3 O D\fP
+.TE
+.cde .HU "Application Keypad Mode"
+.xo .H 3 "Application Keypad Mode"
+The application keypad transmits the following escape sequences depending on the
+setting of the mode specified, either via the
+.B appKeypadDefault
+resource, or the mode specified via the
+.Cn DECPNM
+escape sequence.
+.TS
+center;
+cf3	cf3	cf3
+.cde lf3w(2c)	lf3w(2c)	lf3w(2c) .
+.xo lf5 lf5 lf5 .
+Key	Numeric	Application
+_
+Space	Space	\f2 Esc\fP \f3 O A\fP
+Tab	Tab	\f2 Esc\fP \f3 O I\fP
+Enter	CR	\f2 Esc\fP \f3 O M\fP
+PF1	\f2 Esc\fP \f3 O P\fP	\f2 Esc\fP \f3 O P\fP
+PF2	\f2 Esc\fP \f3 O Q\fP	\f2 Esc\fP \f3 O Q\fP
+PF3	\f2 Esc\fP \f3 O R\fP	\f2 Esc\fP \f3 O R\fP
+PF4	\f2 Esc\fP \f3 O S\fP	\f2 Esc\fP \f3 O S\fP
+* \f1(multiply)\fP	*	\f2 Esc\fP \f3 O j\fP
++ \f1(add)\fP	+	\f2 Esc\fP \f3 O k\fP
+, \f1(comma)\fP	,	\f2 Esc\fP \f3 O l\fP
+- \f1(minus)\fP	-	\f2 Esc\fP \f3 O m\fP
+. \f1(period)\fP	.	\f2 Esc\fP \f3 O n\fP
+/ \f1(divide)\fP	/	\f2 Esc\fP \f3 O o\fP
+0	0	\f2 Esc\fP \f3 O p\fP
+1	1	\f2 Esc\fP \f3 O q\fP
+2	2	\f2 Esc\fP \f3 O r\fP
+3	3	\f2 Esc\fP \f3 O s\fP
+4	4	\f2 Esc\fP \f3 O t\fP
+5	5	\f2 Esc\fP \f3 O u\fP
+6	6	\f2 Esc\fP \f3 O v\fP
+7	7	\f2 Esc\fP \f3 O w\fP
+8	8	\f2 Esc\fP \f3 O x\fP
+9	9	\f2 Esc\fP \f3 O y\fP
+= (equal)	\&=	\f2 Esc\fP \f3 O X\fP
+.TE
+.cde .HU "ANSI Function Keys"
+.xo .H 3 "Standard Function Keys"
+The function keys transmit the following escape sequences unless
+Sun function keys mode has been selected, either via the
+.Cm dtterm
+.B \-sk
+option, or the
+.B sunFunctionKeys
+resource in
+.Cm dtterm 1
+or the DtTerm widget.
+.TS
+center;
+cf3	cf3
+.cde lf3w(2c)	lf3w(2c) .
+.xo lf5 lf5 .
+Key	Escape Sequence
+_
+F1	\f2 Esc\fP \f3 [ 1 1 ~\fP
+F2	\f2 Esc\fP \f3 [ 1 2 ~\fP
+F3	\f2 Esc\fP \f3 [ 1 3 ~\fP
+F4	\f2 Esc\fP \f3 [ 1 4 ~\fP
+F5	\f2 Esc\fP \f3 [ 1 5 ~\fP
+F6	\f2 Esc\fP \f3 [ 1 7 ~\fP
+F7	\f2 Esc\fP \f3 [ 1 8 ~\fP
+F8	\f2 Esc\fP \f3 [ 1 9 ~\fP
+F9	\f2 Esc\fP \f3 [ 2 0 ~\fP
+F10	\f2 Esc\fP \f3 [ 2 1 ~\fP
+F11	\f2 Esc\fP \f3 [ 2 3 ~\fP
+F12	\f2 Esc\fP \f3 [ 2 4 ~\fP
+F13	\f2 Esc\fP \f3 [ 2 5 ~\fP
+F14	\f2 Esc\fP \f3 [ 2 6 ~\fP
+F15	\f2 Esc\fP \f3 [ 2 8 ~\fP
+F16	\f2 Esc\fP \f3 [ 2 9 ~\fP
+F17	\f2 Esc\fP \f3 [ 3 1 ~\fP
+F18	\f2 Esc\fP \f3 [ 3 2 ~\fP
+F19	\f2 Esc\fP \f3 [ 3 3 ~\fP
+F20	\f2 Esc\fP \f3 [ 3 4 ~\fP
+Help	\f2 Esc\fP \f3 [ 2 8 ~\fP
+Menu	\f2 Esc\fP \f3 [ 2 9 ~\fP
+Find	\f2 Esc\fP \f3 [ 1 ~\fP
+Insert	\f2 Esc\fP \f3 [ 2 ~\fP
+Delete	\f2 Esc\fP \f3 [ 3 ~\fP
+Remove	\f2 Esc\fP \f3 [ 3 ~\fP
+Select	\f2 Esc\fP \f3 [ 4 ~\fP
+Prior	\f2 Esc\fP \f3 [ 5 ~\fP
+Next	\f2 Esc\fP \f3 [ 6 ~\fP
+.TE
+.cde .HU "Sun Function Keys"
+.xo .H 3 "Sun Function Keys"
+.xR3 sunfunckeys
+.TS
+center;
+cf3	cf3
+.cde lf3w(2c)	lf3w(2c) .
+.xo lf5 lf5 .
+Key	Escape Sequence
+_
+F1	\f2 Esc\fP \f3 [ 2 2 4 z\fP
+F2	\f2 Esc\fP \f3 [ 2 2 5 z\fP
+F3	\f2 Esc\fP \f3 [ 2 2 6 z\fP
+F4	\f2 Esc\fP \f3 [ 2 2 7 z\fP
+F5	\f2 Esc\fP \f3 [ 2 2 8 z\fP
+F6	\f2 Esc\fP \f3 [ 2 2 9 z\fP
+F7	\f2 Esc\fP \f3 [ 2 3 0 z\fP
+F8	\f2 Esc\fP \f3 [ 2 3 1 z\fP
+F9	\f2 Esc\fP \f3 [ 2 3 2 z\fP
+F10	\f2 Esc\fP \f3 [ 2 3 3 z\fP
+F11	\f2 Esc\fP \f3 [ 1 9 2 z\fP
+F12	\f2 Esc\fP \f3 [ 1 9 3 z\fP
+F13	\f2 Esc\fP \f3 [ 1 9 4 z\fP
+F14	\f2 Esc\fP \f3 [ 1 9 5 z\fP
+F15	\f2 Esc\fP \f3 [ 1 9 6 z\fP
+F16	\f2 Esc\fP \f3 [ 1 9 7 z\fP
+F17	\f2 Esc\fP \f3 [ 1 9 8 z\fP
+F18	\f2 Esc\fP \f3 [ 1 9 9 z\fP
+F19	\f2 Esc\fP \f3 [ 2 0 0 z\fP
+F20  	\f2 Esc\fP \f3 [ 2 0 1 z\fP
+F21 (R1) 	\f2 Esc\fP \f3 [ 2 0 8 z\fP
+F22 (R2) 	\f2 Esc\fP \f3 [ 2 0 9 z\fP
+F23 (R3) 	\f2 Esc\fP \f3 [ 2 1 0 z\fP
+F24 (R4) 	\f2 Esc\fP \f3 [ 2 1 1 z\fP
+F25 (R5) 	\f2 Esc\fP \f3 [ 2 1 2 z\fP
+F26 (R6) 	\f2 Esc\fP \f3 [ 2 1 3 z\fP
+F27 (R7) 	\f2 Esc\fP \f3 [ 2 1 4 z\fP
+F28 (R8) 	\f2 Esc\fP \f3 [ 2 1 5 z\fP
+F29 (R9) 	\f2 Esc\fP \f3 [ 2 1 6 z\fP
+F30 (R10) 	\f2 Esc\fP \f3 [ 2 1 7 z\fP
+F31 (R11) 	\f2 Esc\fP \f3 [ 2 1 8 z\fP
+F32 (R12) 	\f2 Esc\fP \f3 [ 2 1 9 z\fP
+F33 (R13) 	\f2 Esc\fP \f3 [ 2 2 0 z\fP
+F34 (R14) 	\f2 Esc\fP \f3 [ 1 2 1 z\fP
+F35 (R15) 	\f2 Esc\fP \f3 [ 1 2 2 z\fP
+Help	\f2 Esc\fP \f3 [ 1 9 6 z\fP
+Menu	\f2 Esc\fP \f3 [ 1 9 7 z\fP
+Find	\f2 Esc\fP \f3 [ 1 z\fP
+Insert	\f2 Esc\fP \f3 [ 2 z\fP
+Delete	\f2 Esc\fP \f3 [ 3 z\fP
+Remove	\f2 Esc\fP \f3 [ 3 z\fP
+Select	\f2 Esc\fP \f3 [ 4 z\fP
+Prior	\f2 Esc\fP \f3 [ 5 z\fP
+Next	\f2 Esc\fP \f3 [ 6 z\fP
+.TE
+.cdes
+.SH "SEE ALSO"
+.Cm dtterm 1,
+.Fn DtCreateTerm 3,
+.cde .Cm xterm 1X,
+.IR DtTerm (3).
+.cdee

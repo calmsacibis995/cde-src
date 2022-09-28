@@ -1,0 +1,26 @@
+#! /bin/ksh
+
+
+while [ $# -gt 0 ]
+do
+	fullfile=$1
+	file=${fullfile##*/}
+	shift
+
+        ERROR=FALSE
+	if [ -f ${fullfile} ];then
+		echo "	Removing file $fullfile"
+		rm -f ${fullfile} || ERROR=TRUE
+		if [ "$ERROR" = "TRUE" ];then
+			echo "	Cannot remove file ${fullfile}"
+			shift
+			continue
+		fi
+	fi
+	cp $file ${fullfile} || ERROR=TRUE
+	if [ "$ERROR" = "TRUE" ];then
+		echo "	Cannot copy file $file to ${fullfile}"
+		shift
+		continue
+	fi
+done

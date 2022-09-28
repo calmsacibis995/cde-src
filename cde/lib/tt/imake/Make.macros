@@ -1,0 +1,82 @@
+#/*
+#
+# Make.macros 1.5	07 Sep 1993
+#
+# Make.macros - useful make(1) macros
+#
+#*/
+
+TOOLS_DEFAULT		= spro
+TOOLS_gnumake		= gnu
+#
+# Override TOOLS_DEFAULT with the tools suggested by $(MAKE)...
+#
+TOOLS_MAKE		= $(TOOLS_DEFAULT$(TOOLS_$(MAKE)))$(TOOLS_$(MAKE))
+#
+# ...but override even that if the user has set $TOOLS
+#
+Tools			= $(TOOLS_MAKE$(TOOLS))$(TOOLS)
+
+TOOL_MACROS_glob	= /dev/null
+TOOL_MACROS_gnu		= $(ImakeDir)/Make.macros.gnu
+TOOL_MACROS_loc		= $(TOOL_MACROS_$(Tools))
+TOOL_MACROS		= $(TOOL_MACROS_glob$(TOOL_MACROS_loc))$(TOOL_MACROS_loc)
+
+include $(TOOL_MACROS)
+
+OS			= $(OSName)$(OSVersion)
+
+PLATFORM		= $(InstrSet)/$(OS)
+
+OEUVRE			= $(PLATFORM)/$(Tools)
+
+ARCH = $(TARGET_ARCH:-%=%)
+
+LINKSO_glob		= $(LD) $(LDFLAGS)
+LINKSO_SunOS5		= $(LD) -G -z defs -z text -h $(@F) $(LDFLAGS)
+LINKSO_SunOS4		= $(LD) -assert pure-text $(LDFLAGS)
+LINKSO_loc		= $(LINKSO_$(OS))
+LINKSO			= $(LINKSO_glob$(LINKSO_loc))$(LINKSO_loc)
+
+XSO_glob		= .1
+XSO_SunOS4		= .1.1
+XSO_loc			= $(XSO_$(OS))
+XSO			= $(XSO_glob$(XSO_loc))$(XSO_loc)
+
+RANLIB_glob		= ranlib
+RANLIB_SunOS5		= true
+RANLIB_loc		= $(RANLIB_$(OS))
+RANLIB			= $(RANLIB_glob$(RANLIB_loc))$(RANLIB_loc)
+
+INDENT			= indent -st -bap
+
+CPP_4			= cpp
+CPP_5			= acpp
+CPP			= $(CPP_$(OS_VERSION))
+
+CC_glob			= gcc
+CC_SunOS4_spro		= acc
+CC_SunOS5_spro		= cc
+CC_loc			= $(CC_$(OS)_$(Tools))
+CC			= $(CC_glob$(CC_loc))$(CC_loc)
+
+CCC_glob		= $(C++)
+CCC_spro		= CC
+CCC_loc			= $(CCC_$(Tools))
+CCC			= $(CCC_glob$(CCC_loc))$(CCC_loc)
+
+CPP			= cpp
+
+PIC_glob		= -pic
+PIC_gnu			= -fPIC
+PIC_loc			= $(PIC_$(Tools))
+PIC			= $(PIC_glob$(PIC_loc))$(PIC_loc)
+
+CCC_PIC			= $(PIC)
+
+CC_PIC_glob		= $(PIC)
+CC_PIC_spro_SunOS5	= -K pic
+CC_PIC_loc		= $(CC_PIC_$(Tools)_$(OS))
+CC_PIC			= $(CC_PIC_glob$(CC_PIC_loc))$(CC_PIC_loc)
+
+OUTPUT_OPTION		= -o $@

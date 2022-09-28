@@ -1,0 +1,48 @@
+/* This file is a special .tmpl file that is included by Imake.tmpl
+ * It is used to overwrite defines in hp.cf for a specific tree 
+ * To make a tree use these defaults simply link localtree.tmpl to this
+ * file.
+ */
+/* NOTE!!! This file should not be used for building 700 bits on 800's
+ * or vice-versa. Use the 800on700 or 700on800 template files.
+ */
+
+#define OSRev 8.0
+#define OSName HP-UX DAILY +O1
+#define HP_BUILD_ENV
+#define BITS
+#define BUILD_R4_RIVERS
+#define BUILD_R4_LIBS
+/*  #define BUILD_BMS YES turn on to build and link against BMS */
+
+/* NOTE this is now preset in OSVersion.tmpl */
+#ifndef OSMajorVersion
+#define OSMajorVersion         8
+#endif
+#ifndef OSMinorVersion
+#define OSMinorVersion         0
+#endif
+
+#define HASANSIC
+#define SHLIB
+
+/* used to link against archived libraries in a shlib tree */
+#ifndef ARCHIVED_LINK
+#define ARCHIVED_LINK YES
+#endif
+
+#ifdef __hp9000s700
+    /* turn on ESlit for 700s by setting the following to +ESlit */
+    SPECIAL_CC_OPTIONS =
+    /* turn on DA1.0 option for non-server pieces of build */
+#   ifndef ExtraCCOptions
+#       define ExtraCCOptions +DA1.0
+#   endif
+#   define OptimizedCDebugFlags +O1 -z +DS1.1
+#else /* 300 & 800 */
+#   ifdef __hp9000s300
+#      define OptimizedCDebugFlags +O1
+#   else
+#      define OptimizedCDebugFlags +O1 -z
+#   endif /* 300 */
+#endif /* 700 */

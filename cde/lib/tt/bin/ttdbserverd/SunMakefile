@@ -1,0 +1,95 @@
+# %%  (c) Copyright 1993, 1994 Hewlett-Packard Company			
+# %%  (c) Copyright 1993, 1994 International Business Machines Corp.	
+# %%  (c) Copyright 1993, 1994 Sun Microsystems, Inc.			
+# %%  (c) Copyright 1993, 1994 Novell, Inc. 				
+# %%  $Revision: $ 			 				
+#
+#
+# @(#)SunMakefile	1.28 31 Jul 1993
+#
+# The ToolTalk rpc.ttdbserverd server makefile
+#
+# Copyright (c) 1992 by Sun Microsystems, Inc.
+#
+
+TT_DIR = ../..
+THIS_DIR = bin/ttdbserverd
+
+include $(TT_DIR)/SunMakefile-head.mk
+
+all::		Bin-g
+
+$(BIN_TARGETS)::	rpc.ttdbserverd
+
+$(INSTALL_TARGETS)::	$(INSTALL_DIR)/bin/rpc.ttdbserverd
+
+Clean::
+	$(RM) rpc.ttdbserverd
+
+TTDBSERVER_CONTENTS = \
+	db_server_functions.o \
+        db_server_svc.o \
+	dm_access_cache.o \
+	dm_server.o \
+	tt_db_message_info_utils.o \
+	tt_db_msg_q_lock.o \
+	tt_db_msg_q_lock_entry_utils.o \
+	tt_db_partition_global_map_ref.o \
+	tt_db_partition_redirection_map.o \
+	tt_db_server_db.o \
+	tt_db_server_db_utils.o \
+	tt_isam_file.o \
+	tt_isam_file_utils.o \
+	tt_isam_key_descriptor.o \
+	tt_isam_key_descriptor_utils.o \
+	tt_isam_record.o \
+	tt_isam_record_utils.o
+
+CPPFLAGS	+=	$(CPPFLAGS-bin) -I$(TT_DIR)/slib
+CCFLAGS		+=	$(CCFLAGS-bin)
+CFLAGS		+=	$(CFLAGS-bin)
+LDFLAGS		+=	$(LDFLAGS-bin)
+
+MAP_CCFLAGS_glob=
+MAP_CCFLAGS_SunOS_5=	-Qoption ld -MMapfile
+MAP_CCFLAGS_loc	=	$(MAP_CCFLAGS_$(OS_NAME)_$(OS_VERSION))
+MAP_CCFLAGS	=	$(MAP_CCFLAGS_glob$(MAP_CCFLAGS_loc))$(MAP_CCFLAGS_loc)
+
+LDFLAGS-O	+=	$(MAP_CCFLAGS)
+LDFLAGS-g	+=	$(MAP_CCFLAGS)
+
+MYLDLIBS_SunOS_4=	-lX -lI18N
+LDLIBS		+=	$(MYLDLIBS_$(OS_NAME)_$(OS_VERSION))
+
+ISAM_USERS = \
+%/db_server_functions.o \
+%/db_server_svc.o \
+%/dm_access_cache.o \
+%/dm_server.o \
+%/tt_db_partition_global_map_ref.o \
+%/tt_db_server_db.o \
+%/tt_db_server_db_utils.o \
+%/tt_isam_file.o \
+%/tt_isam_file_utils.o \
+%/tt_isam_key_descriptor.o \
+%/tt_isam_key_descriptor_utils.o \
+%/tt_isam_record.o \
+%/tt_isam_record_utils.o
+
+$(ISAM_USERS)	\
+$(ISAM_USERS:%.o=%.s) :=	CPPFLAGS += $(CPPFLAGS-isam)
+
+%/db_server_svc.o \
+%/db_server_svc.s \
+	:=	CPPFLAGS += $(CPPFLAGS-version)
+
+OBJECTS =	$(TTDBSERVER_CONTENTS:%=$(DERIVED)/%)
+
+# Trailing -Bstatic ensures libC is linked statically -- that could
+# go away in the future when libC is bundled.
+
+rpc.ttdbserverd:	$$(DERIVED) $$(OBJECTS) $$(LIBDEPENDENCY) Mapfile
+	$(LINK.cc) -o $@ $(OBJECTS) \
+	-ltt -lisam $(LDLIBS) -Bstatic
+
+include $(TT_DIR)/SunMakefile-tail.mk

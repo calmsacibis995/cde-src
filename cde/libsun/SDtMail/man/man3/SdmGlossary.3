@@ -1,0 +1,981 @@
+.de LI
+.\" simulate -mm .LIs by turning them into .TPs
+.TP \\n()Jn
+\\$1
+..
+.de Lc
+.\" version of .LI that emboldens its argument
+.TP \\n()Jn
+\s-1\f3\\$1\f1\s+1
+..
+.TH SdmGlossary 3 "11/19/96"
+.BH "11/19/96"
+.\" @(#)SdmGlossary.3	1.17 96/11/19 SMI
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994, 1995, 1996 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994, 1995, 1996 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994, 1995, 1996 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994, 1995, 1996 Novell, Inc.
+.SH "NAME"
+SdmGlossary \- libSDtMail terms and definitions
+.SH "DESCRIPTION"
+This document provides a list of general terms and definitions that are applicable to
+libSDtMail in general.
+.\" end of methods list
+.ta 0.25i 0.50i 0.75i 1.0i 1.25i 1.50i 1.75i 2.0i 2.5i 3.0i
+.\"
+.SH "Attach vs Open"
+The SdmMessageStore and Data Port objects can either be attached to a message store
+service, or opened on a specific message store. You attach to a message store service to
+perform operations outside of a message store, and you open a specific message store to
+perform operations on the store itself.
+.PP
+When attached to a message store service, the regular and subscribed namespaces
+can be scanned and manipulated, and message stores can be created or opened.
+.PP
+When opened on a message store, in addition to the operations that can be
+performed when attached, you can retrieve and manipulate the contents of the
+message store, as well as rename or delete the store itself.
+.SH "Calling Conventions"
+With very few exceptions, all objects and methods implemented by libSDtMail follow a uniform
+set of rules for argument ordering, argument naming, return values, and error handling.
+.SS Constructors
+There are two type of classes provided by libSDtMail: those created directly by the front end
+application using normal C++ operators, and those created by libSDtMail via a call to a method
+ending in the word 'Factory'.
+.SS Direct Constructors
+All classes that can be directly created by the front end application succeed in being
+constructed. They take no error return arguments, and since they are constructors they
+cannot return error codes. The simple data types and other similar classes may take
+arguments providing information about size and other characteristics for object creation.
+.SS Indirect Constructors
+All classes that cannot be directly created by the front end application are created by
+object methods ending in the word 'Factory', e.g. SdmMessageStoreFactory(). These creation
+methods take an SdmError argument and return an error code if the creation fails. In
+general, creation is always successful. More complicated objects provide StartUp() and
+ShutDown() methods to perform complex initialization and finalization functions, and these
+methods take an SdmError argument and return an error code on failure.
+.SS Calling Sequences
+To provide a consistent interface to clients of this library, most methods, functions,
+etc. have a common calling sequence implementation form:
+.PP
+.nf
+	(SDMErrorCode) call(SDMError &err, inputArgs);
+	(SDMErrorCode) call(SDMError &err, outputArgs);
+	(SDMErrorCode) call(SDMError &err, outputArgs, inputArgs);
+	(SDMErrorCode) call_Async(SDMError &err, SDMServiceFunction &svf, 
+						void *userData);
+	(SDMErrorCode) call_Async(SDMError &err, SDMServiceFunction &svf,
+						void *userData, inputArgs);
+.fi
+.SS Common Return Value
+The return code is always of type "SdmErrorCode" and can be used to determine whether or
+not there was an error in the call. The only value indicating success is Sdm_EC_Success,
+so one can code a test for success or failure of the call inline as:
+.PP
+.nf
+		if (call(args) != Sdm_EC_Success)
+		{
+			errorProcessing;
+		}
+.fi
+.SS First Argument Always SdmError&
+The first argument is always of type "SDMError &" requiring that a previously created
+SdmError object be passed in by reference. The preferred paradigm is the highest level
+caller of a series of calls creates an SdmError object, which is then passed down the call
+hierarchy. At any point where an error occurs, the error object is "set", and the error
+code is returned, causing all calls in the hierarchy to return the same code, unwrapping
+all the way back up to the highest level caller. For example:
+.PP
+.nf
+		SdmErrorCode lowerFunction(SdmError& err)
+		{
+			if (call(err) != Sdm_EC_Success) {
+				return(err);
+			}
+			otherProcessing();
+			return(err);
+		}
+.fi
+.SS Return Value References
+If a method returns values, it is done so by filling in values of variables or objects
+that are next passed by reference to the method. By convention, these arguments are
+prefixed with "r_" to indicate they are modified on return from the method. For example:
+.PP
+.nf
+	SdmErrorCode divideNumbers(SdmError& err, int& r_result, int v1, int v2)
+	{
+		if (v2 == 0)
+			return(err = divideByZeroError);
+		r_result = v1/v2;
+		return(err = Sdm_EC_Success);
+	}
+.fi
+.PP
+By convention, a method returning a complex data type holding objects that are not
+automatically destroyed when the object is destroyed (for example, a vector of pointers to
+objects created for the caller), uses the prefix "r_copiesof_" to indicate the caller must
+make provisions for deallocating the contents before destroying the object itself.
+.SS Input Argument Values
+Remaining arguments are constant input arguments for the method. Simple data types are
+passed by value, with other types passed by reference.
+.SS Asynchronous Call Conventions
+If the call issues an asynchronous request, the second and third arguments are always of
+types "SdmServiceFunction &*" and "void *", which provide linkage facilities for providing
+the service function that can handle the result of the asynchronous call, and allowing a
+single context value to be passed to that call. Typically, there are no output or return
+values from asynchronous request calls, as the results of the call are not known until the
+request is completed and the appropriate service function is called with those results.
+.SS Basic Data Types
+libSDtMail implements several objects that can be considered basic data types (such as
+SdmString). These basic data types are the "exceptions to the rules". Since they implement
+data types that are expected to function with standard C operators, and in many cases have
+values that can be operated on, they are defined and used differently than other more
+complicated objects.
+.PP
+libSDtMail basic data types do not take an SdmError argument; rather, they take arguments that
+are appropriate for the construction and duplication of the data type.
+.PP
+libSDtMail basic data types do not return an SdmErrorCode return result; rather, they have
+values appropriate for the data type, allowing them to be operated on using the standard C
+operators.
+.\"
+.SH "Dual State Objects"
+Many objects implemented by libSDtMail have a dual state mode, where the object may either be
+"shutdown" or "started up". Such an object is initially in the shutdown state when it is
+first created. These objects currently are: SdmConnection, SdmSession and SdmMessageStore.
+.SS ShutDown
+The "shutdown" state is the only state where such an object can be successfully
+destroyed. It is an error for a front end to attempt to destroy an object not in the
+shutdown state. It is a programming error to call any object method except "startup" when
+an object is in the shutdown state. An error is returned indicating the object is shutdown
+and cannot perform any operations.
+.SS StartUp
+The "startup" method is used to initialize such an object and make it ready for action. It
+is the only method that may be called when an object is in the shutdown state. Once an
+object is successfully started, all other methods provided by the object may be
+appropriately called. Initialization takes a form appropriate for the object. It may read
+in configuration information, locate drivers, or perform any other similar operations
+necessary as a prelude to making the object functional.
+.PP
+A shutdown of an object that is started causes the object to revert to a state identical
+to that before it was started; any objects it may have created are implicitly shutdown and
+possibly automatically destroyed. Any cached information is saved or destroyed (as
+appropriate) and any other steps are taken as necessary to achieve the shutdown state.
+.\"
+.SH "Message Components"
+A message is referenced in a message store by a message number. A message consists of a
+message envelope and one or more message body parts. A message envelope contains a
+series of message headers that are necessary to provide general information, and to
+accomplish transmission and delivery. The message envelope also contains a series of
+"message flags" that indicate the general status of the message in the message
+store. Message body parts contain the actual contents of a message, each of which is a
+self contained object.
+.\"
+.SH "Message Attributes"
+Each message body may have one or more "attributes" associated with it. Each attribute
+consists of a field name and a field body. These attributes provide certain information
+about the nature of the body part, and can be referred to either by an "abstract" type or
+by the actual character string name of the attribute. They include:
+.SS boundary
+The MIME interpart boundary. Probably not useful to a front end application.
+.SS charset
+The ISO character set that this body part is encoded in.
+.SS id
+For message/partial: unique identifier for this message.
+.SS name
+The name of the body part (e.g. attachment file name). Note that this is only one way in
+which the name of a body part may be presented; the message body part structure object
+provides a data member that is used to obtain the attachment name of a body part in a more
+general way.
+.SS number
+For message/partial: part number indicating where this part fits into the sequence.
+.SS total
+For message/partial: total number of parts (only required on final part but may be in
+intermediate parts).
+.SS x-unix-mode
+The 'Unix mode' to use when saving this file (unofficial but used by other mailers). Note
+that this is only one way in which the Unix mode a body part may be presented; the message
+body part structure object provides a data member that is used to obtain the Unix mode in
+a more general way.
+.\"
+.SH "Message Body"
+A message body can be considered integral (or "inline") with the message, meaning that it
+should be displayed all in one viewing area (if possible) automatically when the message
+is presented to the user. A message body can also be considered separate (or an
+"attachment"), meaning that it should be represented as a separate unit not normally
+automatically displayed when the message is viewed. Typically a message body is considered
+an attachment if it is either directly given that attribute when sent
+(e.g. content-disposition header field specifies body part is an attachment) or it is
+provided with a "file name" indicating it is an individual component (which may be done by
+the sender in a number of ways).
+.PP
+Each message body in a message is referenced by its sequential position within the
+message. Message bodies start at 1, so if there are 10 message bodies in a message, they
+are numbered 1 through 10.
+.\"
+.SH "Message Body Structure"
+A message body has an underlying structure that defines the characteristics of the
+contents. Some of these characteristics can be set when a message body is being created or
+edited, others are automatically calculated and can only be retrieved. They are part of
+the "SdmMessageBodyStructure" which can be retrieved for any message body object. The
+contents includes:
+.SS mbs_attachment_name
+An "attachment name" for the body part. If this information is available, it means that
+the sender included a file name for this body part, which indicates it is probably not
+meant to be displayed "in line" (see mbs_disposition).
+.SS mbs_bytes
+Size of this body part in bytes.
+.SS mbs_description
+An optional description of the body part. Probably of no real use to a front end
+application other than in providing the user with extended information on the body part if
+asked for.
+.SS mbs_disposition
+The disposition for the body part. The sender may have given a hint as to how to handle
+this body part. One of:
+.PP
+.nf
+		Sdm_MSDISP_not_specified	- disposition of component not specified
+		Sdm_MSDISP_inline		- component should be handled "in line" if possible
+		Sdm_MSDISP_attachment		- component should be handled as "attachment" 
+.fi
+.SS mbs_encoding
+Message encoding: transport encoding used for this body part. Probably of no real use
+to a front end application other than in providing the user with extended information
+on the body part if asked for. One of:
+.PP
+.nf
+		Sdm_MSENC_none (indicates no encoding used)
+		Sdm_MSENC_7bit
+		Sdm_MSENC_8bit
+		Sdm_MSENC_binary
+		Sdm_MSENC_base64
+		Sdm_MSENC_quoted_printable
+		Sdm_MSENC_other (indicates unknown encoding used)
+.fi
+.SS mbs_id
+Message identification: message/content id. Probably of no real use to a front end
+application other than in providing the user with extended information on the body part if
+asked for.
+.SS mbs_is_nested_message
+Message is nested: this body part represents the top of a nested message. The
+SdmMessageFactory() method can be invoked on the body part to produce a SdmMessage object
+that can be used to access the nested message.
+.SS mbs_lines
+Size of this body part in lines.
+.SS mbs_md5
+MD5 checksum for the body part. Needed if a front end application decides to implement MD5
+checksum verification.
+.SS mbs_mime_content_type
+Message content type: the concatenation of the message type and subtype 
+(eg. text/plain, multipart/mixed).
+.SS mbs_subtype
+Message subtype: secondary MIME type (e.g. plain, mixed).
+.SS mbs_type
+Message type: primary type of message body. Of use in determining the overall nature of
+the body part (e.g. is it text, a multi part message, etc.) One of:
+.PP
+.nf
+		Sdm_MSTYPE_none (indicates no type present)
+		Sdm_MSTYPE_text
+		Sdm_MSTYPE_multipart
+		Sdm_MSTYPE_message
+		Sdm_MSTYPE_application
+		Sdm_MSTYPE_audio
+		Sdm_MSTYPE_image
+		Sdm_MSTYPE_video
+		Sdm_MSTYPE_other (indicates unknown type present)
+.fi
+.SS mbs_unix_mode
+The "Unix mode" hint for saving this body part to a file. If non-zero the sender has given
+a hint of the original mode of this file when sent.
+.\"
+.SH "Message Contents"
+The contents of an object; in the case of a message object, the "contents" refer to the
+complete raw data that the entire message consists of, including all unparsed headers
+and body parts. Typically used for drag and drop purposes where the raw data is being
+transmitted between applications. 
+.PP
+In the case of a message envelope, the "contents" refer to the complete raw unprocessed
+data for the envelope.
+.PP
+In the case of a message body, the "contents" refer to the complete processed data for
+this part of the message; the body part is completely parsed and processed (what about
+charset conversion?). Typically used when displaying the body part, when saving the body
+part or passing it off to an action.
+.\"
+.SH "Message Flags"
+Each message has one or more "flags" associated with it. These flags indicate a
+general status of the entire message.
+.PP
+Message flags are the \f2only\fP guaranteed components of a message that can be
+modified on incoming message stores. The ability to modify any other components
+(e.g. "editable messages") may be severely restricted or not possible. 
+.PP
+The setting of some flags may be automagically changed when operations are
+performed; for example, the retrieval of a body part from a message may cause
+the "seen" flag to be set on the message. In general it is best to not
+anticipate this behavior, but to instead explicitly set or clear flags when it
+is appropriate to do so. 
+.PP
+In calls to methods, message flags are referenced by an "abstract" type designator
+beginning with "Sdm_MFA_", which is composed of one or more of the following definitions
+of type "SdmMessageFlagAbstractFlag":
+.PP
+The flags include:
+.SS Answered
+(Sdm_MFA_Answered)
+
+message has been answered.
+.SS Deleted
+(Sdm_MFA_Deleted)
+
+message is marked for deletion.
+.PP
+Setting the deleted flag merely marks the message for deletion; the
+message is removed from the message store only when deleted messages are
+explicitly expunged via a call to ExpungeDeletedMessages(). 
+.SS Draft
+(Sdm_MFA_Draft)
+
+not completed composition.
+.SS Flagged
+(Sdm_MFA_Flagged)
+
+urgent/special attention.
+.SS Recent
+(Sdm_MFA_Recent)
+
+message arrived since last time message store closed.
+
+.SS Seen
+(Sdm_MFA_Seen)
+
+message has been read.
+.\"
+.SH "Message Headers"
+Each message has one or more "headers" associated with it. Headers are a component of the
+message envelope. Each header consists of a field name and a field body. In general,
+headers provide information necessary to accomplish transmission and delivery. This may
+include who the message is addressed to, who the message is from, informational data such
+as "Subject", date received, etc. and information about the structure of the message (such
+as encoded using the MIME specification, type of contents, etc.)
+.PP
+In calls to methods, message headers can either be referred to by the actual
+text that makes up the field name (for example, "subject", "to", "cc", etc.)  or
+they can be referenced by an "abstract" type designator, that allows multiple
+message headers to be specified in a single simple data type called
+"SdmMessageHeaderAbstractFlag".
+.PP
+Any type of header can be present multiple times; for example, multiple "To:"
+headers each specifying a recipient. For this reason, when fetching headers from
+a message, even if a single message header is requested, multiple entries may be
+returned if there are multiple headers with that field name.
+.\"
+.SH "Message Number"
+Each message in a message store is referenced by its sequential position within the
+store. Message numbers start at 1, so if there are 10 messages in a message store, they
+are numbered 1 through 10. Message numbers are not unique among multiple message stores;
+that is, two separate non-empty message stores will each have a message number 1.
+.PP
+A situation to look out for is that message numbers change when deleted messages are
+expunged from the message store. For example, if messages 5-6 are deleted and the store
+expunged, the old messages 7-10 would now have numbers 5-8. 
+.\"
+.SH "Message Store Status"
+Each message store maintains a current status which can be selectively queried. In calls
+to methods, message status flags are referenced by an "abstract" type designator, which is
+composed of one or more "Sdm_MSS_" flags of type SdmMessageStoreStatusFlag.
+.PP
+Message store status is contained in a SdmMessageStoreStatus object, which has the
+following members:
+.SS flags
+A bit mask of SdmMessageStoreStatusFlag bits indicating which members of the
+status object contain valid information.
+.SS messages
+(Sdm_MSS_Messages)
+
+The total number of messages in the message store.
+.SS recent
+(Sdm_MSS_Recent)
+
+The total number of messages in the message store that have arrived since
+the last time the message store was opened.
+.SS unseen
+(Sdm_MSS_Unseen)
+
+The total number of messages in the message store that have not yet had some
+part of their contents retrieved or their status changed since the message was
+placed in the message store.
+.SS uidnext 
+(Sdm_MSS_UidNext)
+
+The Universal Identifier that will be assigned to the next message appended to
+the message store. This is of no use to a front end application.
+.SS uidvalidity 
+(Sdm_MSS_Uidvalidity)
+
+A checksum on the universal identifier values in the message store. This is of
+no use to a front end application.
+.SS checksum 
+(Sdm_MSS_Checksum)
+
+A checksum of the contents of the message store up through the number of bytes
+indicated by checksum_bytes. This is of no use to a front end application.
+.SS checksum_bytes 
+The number of bytes that the returned checksum applies to. This is of no use
+to a front end application.
+.\"
+.SH "Namespaces"
+A namespace is somewhat analogous to a Unix directory structure, and a message store is
+somewhat analogous to a Unix file. 
+.PP
+The Unix directory structure organizes files into a hierarchical system where directories
+are the nodes in the hierarchy. A directory is a file that catalogues the list of files,
+including directories (sub-directories), that are directly beneath it in the hierarchy.
+.PP
+A namespace organizes message stores into a hierarchical system in a similar manner; a
+node in the namespace hierarchy can be a message store, another node in the hierarchy, or
+an object other than a message store or another node that is not directly accessible via
+libSDtMail.
+.SS namespace types
+There are two types of namespaces supported: the regular namespace and the subscribed
+namespace. The regular namespace is where message stores are kept, while the subscribed
+namespace is a list of namespaces or message stores that is manipulated solely by users
+through front end applications.
+.PP
+For e-mail servers (local, imap, pop), the regular namespace is a list of
+namespaces or message stores available, while the subscribed namespace is a list
+of namespaces or message stores the user has indicated they are interested in
+and a front end has requested libSDtMail to place in the subscribed namespace.
+.PP
+For network news servers, the regular namespace is a list of all of the news
+groups available, while the subscribed namespace is a list of all of the news
+groups the user has indicated they want to subscribed to and a front end
+has requested libSDtMail place in the subscribed namespace.
+.PP
+.\"
+.SH "Namespace Scanning"
+The regular and subscribed namespaces can be searched (scanned) to determine
+what is in them. Methods that scan namespaces take two arguments to control what
+names are searched for: \f2reference\fP and \f2pattern\fP.
+.SS reference
+The \f2reference\fP is the starting point for the search. For example, a reference of "/"
+causes the search to commence at the top of the directory structure. If an empty reference
+is specified (e.g. "") then the scan starts from the "logical top" of the namespace. If
+connected to a message store service that has a file system (e.g. imap connection), the
+top is the users home directory. If connected to a strict data base service (e.g. nntp
+connection to a network news server), the top is the top level newsgroups (e.g. comp, sci,
+alt, etc.)
+.SS pattern
+The \f2pattern\fP is a matching pattern that is used to wildcard match one or
+more levels of names starting with the location indicated by the \f2reference\fP.
+There are two wild card characters supported and they differ from traditional
+Unix wild card implementations: "%" and "*".
+.PP
+Both wild card characters have similar matching qualities in that they can stand
+alone or be combined with other characters. For example, "%" matches any characters,
+"a%" matches any string beginning with "a", "%b" matches any string ending with "b",
+and "a%b" matches any string beginning with "a" and ending with "b". The same results
+hold true if "*" is used in place of "%"
+.PP
+The "%" character is a non-recursive matching character. If used at the end of a
+pattern (e.g. "a%") or by itself (e.g. "%") it only matches names in that level
+of the namespace hierarchy.
+.PP
+The "*" character is a recursive matching character. If used at the end of a
+pattern (e.g. "a*") or by itself (e.g. "*") it not only matches names in that 
+level of the namespace hierarchy, but all names in lower levels of the tree,
+regardless of how deep the tree may get.
+.PP
+A scan with a reference of "" and a pattern of "%" returns all entries in the users
+home directory. A scan with a reference of "" and a pattern of "*" returns all
+entries in all directories in the users home directory. Similarly, a scan with a
+reference of "/" and a pattern of "*" returns all entries in all directories on the
+system.
+.PP
+The reference and pattern machinery is meant to be used successively. For example,
+the first call uses a reference of "" and a pattern of "%" to retrieve all entries
+in the users home directory. To go to a next level down (say the directory 'Mail')
+a reference of "Mail/" with a pattern of "%" returns all entries in that directory.
+.\"
+.SH "Namespace Attributes"
+Each entry returned from a namespace scan is represented by an integer part of type
+SdmNamespaceFlag and a string part that is the full name of the entry. The
+definition of the namespace flags are provided below:
+.SS noInferiors
+(Sdm_NSA_noInferiors)
+
+This entry is not a container; cannot scan below this name (e.g. not a directory). If
+this attribute is not set, it indicates that this entry may itself contain entries
+that can be scanned into by adding this entry to the reference name.
+.SS cannotOpen
+(Sdm_NSA_cannotOpen)
+
+This entry is not a message store; cannot be opened (e.g. not a mailbox file). If this
+attribute is set it means that the entry cannot be opened via the Open() method. It is
+most probably another node in the namespace hierarchy. 
+
+Even if this attribute is not set, the Open() method may still fail when called for other
+reasons (e.g. format not recognized, corrupted contents, etc.)
+.SS changed
+(Sdm_NSA_changed)
+
+This entry is marked as changed in some way (e.g. new messages since last access).
+.SS unChanged
+(Sdm_NSA_unChanged)
+This entry is marked as "not changed" since last access.
+.PP
+The "changed" and "unChanged" flags can seem confusing. If neither flag is set, the state
+of the entry could not be determined. If changed is set, the entry has changed since last
+access: the unchanged flag setting is irrelevant. If changed is not set and unchanged is
+set, the entry has not changed since last access.
+.\"
+.SH "Request Types"
+All operations performed by a front end application on a libSDtMail object object
+are turned into "requests" which are placed in a well known internal
+queue. These requests are then dispatched to appropriate objects to handle the
+requests. The objects handle the requests and create responses which are placed
+on a well known front end queue, notifying the front end application that there
+is an item to be processed.
+.PP
+By providing event/response type interaction between a front end application and
+libSDtMail, the front end is not required to "block" whenever a request is made. It
+is therefore possible for a non-threaded front end application to provide
+apparent concurrency to the end user. Provisions for both synchronous and
+asynchronous access to libSDtMail functionality are provided, so a threaded front
+end (or a front end that does not care to implement apparent concurrency to the
+user) may be more easily implemented.
+.SS Synchronous requests
+Many manipulations on libSDtMail objects are "synchronous" in nature. This is also
+referred to as a "blocking" interface because control is not returned to the
+caller until the requested operation is complete. A non-threaded front end
+application would block indefinitely whenever a synchronous operation is
+requested, and so would tend to use asynchronous calls wherever possible. A
+threaded front end would use blocking calls because they are easier to use than
+asynchronous calls.
+.SS Asynchronous requests and solicited events
+Some manipulations on libSDtMail objects are "asynchronous" in nature. This is also
+referred to as a "non-blocking" interface because control is immediately
+returned to the caller. When the requested operation completes sometime in the
+future, a response event (also referred to as a "solicited asynchronous event")
+is generated which the front end application must then be prepared to accept to
+handle the result of the requested operation. A non-threaded front end can
+implement concurrency by making requests and handling the results when the
+operations complete. A threaded front end would use blocking calls. The names of
+all methods that are asynchronous in nature are by convention ended with the
+string "_Async".
+.SS Asynchronous unsolicited events
+libSDtMail is also capable of generating events that are not the direct result of a
+call made by the front end application (such as 'new mail is available on a
+message store'). These are referred to as "unsolicited asynchronous events". The
+front end application can register a service function which is capable of
+receiving and handling such events.
+.\"
+.SH "Search Leaf Structure"
+When a search object is called to parse the search string, it returns a list of
+leaves that represent the search criteria.  The "SdmSearchLeaf" structure defines
+a leaf in this list.  It defines the characteristics of a single expression in 
+the search criteria.  The contents include:
+.SS sl_predicate
+A string that contains the search predicate which includes the token and
+field (if applicable).
+.SS sl_logic_op
+The logical operator preceding this expression.  The possible values are:
+.PP
+.nf
+
+    Search Example: To Henry AND (From John OR From Mary)
+
+    Sdm_BOP_None - no logical operator.
+					  In the example, the leaf representing "To Henry"
+					  would have the value Sdm_BOP_None.
+
+    Sdm_BOP_And	- AND operator.
+					  In the example, the leaf representing "From John"
+					  would have the value Sdm_BOP_And.
+
+    Sdm_BOP_Or	- OR operator.
+					  In the example, the leaf representing "From Mary"
+					  would have the value Sdm_BOP_Or.
+
+.fi
+.SS sl_expression
+The expression type which defines where the expression is located 
+syntactically in the search string.  The possible values are:
+.PP
+.nf
+
+    Search Example: To Henry AND (From John OR From Mary OR From Tom)
+
+    Sdm_SLE_Simple 	 - no parenthesis influence around the expression.
+						   In the example, the leaf representing "To Henry" 
+						   would have the value Sdm_SLE_Simple.
+
+    Sdm_SLE_Start  	       - left parenthesis influence.
+						   In the example, the leaf representing "From John" 
+						   would have the value Sdm_SLE_Start.
+
+    Sdm_SLE_Intermediate - expression is between start and end expressions.
+						   In the example, the leaf representing "From Mary" 
+						   would have the value Sdm_SLE_Intermediate.
+
+    Sdm_SLE_End		 - right parenthesis influence.
+						   In the example, the leaf representing "From Tom" 
+						   would have the value Sdm_SLE_End.
+
+.fi
+.SS sl_atomic_not
+Indicates whether the NOT operator is specified before the expression.
+The possible values are:
+.nf
+
+    Search Example:  ~ To Henry OR From John 
+
+    Sdm_NOB_NoBinding	- NOT operator is not bound to expression.
+				In the example, the leaf representing "To John" 
+				would have the value Sdm_NOB_NoBinding.
+
+    Sdm_NOB_BindAtom	- NOT operator is bound to expression
+				In the example, the leaf representing "To Henry" 
+				would have the value Sdm_NOB_BindAtom.
+
+.fi
+.SS sl_expression_not
+Indicates whether the NOT operator is specified before the left parenthesis
+for an expression (e.g. ~(<expression>) ).  
+For example:
+.nf
+
+    Search Example: ~(From John OR From Henry) AND (To Mary OR To Susan)
+
+    Sdm_NOB_NoBinding	- NOT operator is not bound to expression.
+				In the example, the leaf representing 
+				"From Henry", "To Mary, and "To Susan"
+				would have the value Sdm_NOB_NoBinding.
+
+    Sdm_NOB_BindExpression - NOT operator is bound to expression.
+				In the example, the leaf representing "From John" 
+				would have the value Sdm_NOB_BindExpression.
+
+.fi
+Note that sl_expression_not has the value Sdm_NOB_BindExpression  only for 
+expression to the left of the parenthesis.  The leaf representing "From Henry"
+is Sdm_NOB_Binding even though it is within the parenthesis.
+.SS sl_predicate_type
+Indicates the type of field in the predicate.  The possible values are:
+.nf
+
+    Search Example:  Unread AND From John AND Since Yesterday
+
+    Sdm_PRED_Simple - predicate does not contain a field.  
+			In the example, the leaf representing "Unread" 
+			would have the value Sdm_PRED_Simple.
+
+    Sdm_PRED_Field  - predicate contains a non-dynamic field.  
+			In the example, the leaf representing "From John" 
+			would have the value Sdm_PRED_Field.
+
+    Sdm_PRED_Dynamic - predicate contains dynamic field.  
+			In the example, the leaf representing "Since Yesterday" 
+			would have the value Sdm_PRED_Dynamic.
+
+.fi
+.SS sl_leaf_macro
+Pointer to SdmLeafMacro that is equivalent to the predicate.  
+.SS sl_new_root
+Pointer to a new leaf list that contains the leaves which are expanded from
+leaf macros.
+.SS sl_uses_macros
+A boolean indicating whether the root node contains leaves that uses macros.
+.SS sl_next
+Pointer to next leaf in list.
+.\"
+.SH "Search Leaf Macro"
+The search leaf structure contains a field that points to an optional leaf
+macro.  The "SdmSearchLeafMacro" structure defines a search macro that is 
+used to expand a single leaf into a set of leaves representing the
+same expression.  This is mainly an internal structure used to expand the
+search macros when the search criteria is parsed.
+.PP
+.SS slm_macro_name
+The name of the macro.
+.SS slm_leaves
+An array of SdmSearchLeaf structures which defines this macro.  Each
+leaf in the array represents an expression in the macro.
+.SS slm_leaf_count
+The number of leaves in the slm_leaves array.
+.\"
+.SH "Service Provider Naming Conventions"
+libSDtMail may use more than one type of service provider to implement message
+store access and other functionality. These different service providers may
+implement their own "pseudo" naming conventions for the services they provide,
+and it is desired not to require front end applications to know these
+implementation specific details.
+.SS The Token
+To facilitate this, libSDtMail provides a generic naming mechanism called a "token"
+which is used to supply individual components of message store and other object
+identities in a service provider independent way. A token can be used to specify
+many different characteristics of a desired message store, which are then
+properly fed to the underlying service providers when an attempt is made to open
+a message store or provide other services.
+.PP
+The types of information provided include:
+.PP
+.nf
+	- message store name (e.g. INBOX, test)
+	- message store location (e.g. local, remote)
+	- message store remote host (i.e. host name and port number)
+	- service type used to access remote host (e.g. pop3, imap4, nntp)
+	- namespace (type or format) of the mailbox (e.g. mh, news)
+.fi
+.PP
+The token is a smart container that maintains a list of value "associations",
+where an association is composed of two or three distinct string values. For
+example, a two string value association might be:
+.PP
+.nf
+	 \f2serviceclass , messagestore\fP
+.fi
+.PP
+while a three string value association might be:
+.PP
+.nf
+	 \f2serviceoption , messagestorename , INBOX\fP
+.fi
+.PP
+The following associations are currently supported:
+.SS servicechannel
+.RS 3
+.nr )J 6
+.Lc "\f2servicechannel\fP , <<service channel specification>>"
+.br
+The service channel association allows a specific service provider to be
+required. Normally this is not necessary as the type of service requested is
+automatically routed to a service provider that can handle the type of service
+requested.
+.br
+
+This might be used to connect directly to a known type of service provider for
+configuration purposes, where the configuration methods are specific to a single
+service provider.
+.Lc "\f2servicechannel\fP , \f2cclient\fP"
+.br
+Indicates that the service provider must use the c-client API and library to
+access the message store. The c-client is a message store access library
+provided by the Mission Critical Message (MCM) group within SunSoft. 
+.br
+
+This should only be specified if the c-client is the only service provider that
+can be used.
+.Lc "\f2servicechannel\fP , \f2tclient\fP"
+.br
+Indicates that the service provider must use the t-client API and library to access the
+message store. The t-client is a special "test" service provider that implements a static
+in-memory message store that mimics much of the functionality of a fully implemented real
+live message store.
+.br
+
+This should only be used during development and testing of front end
+applications.
+.SS serviceclass
+.Lc "\f2serviceclass\fP, <<service class specification>>"
+.br
+The service class association defines the specific services that are required in
+order to access and manipulate the desired data. Service classes might include
+"message stores", "answer books", etc.
+.Lc "\f2serviceclass\fP , \f2messagestore\fP"
+.br
+Indicates that the class of service desired is the support of message
+stores.
+.br
+
+This should be specified if a message store is to be accessed or manipulated.
+.SS servicetype
+.Lc "\f2servicetype\fP , <<service type specification>>"
+.br
+The service type association defines the manner in which the service is accessed
+or provided.
+.Lc "\f2servicetype\fP , \f2imap\fP"
+.br
+Indicates that the type of service desired requires the use of the Internet
+Messaging Access Protocol (IMAP); in the case of a message store, this means
+that the message store is located on a remote system that has an IMAP server
+daemon running.
+.br
+
+This should be specified to access a remote message store using the IMAP
+protocol.
+.Lc "\f2servicetype\fP , \f2local\fP"
+.br
+Indicates that the type of service desired is local to the current system; in the
+case of a message store, this means the store is to be accessed locally.
+.br
+
+This should be specified when the message store or other service deals with
+information that is local to the system where the application is running.
+.Lc "\f2servicetype\fP , \f2test\fP"
+.br
+Indicates that the type of service desired is a "testing" service; in the case
+of a message store, this means that the store itself is static in nature and
+operations on it are simulated. 
+.br
+
+This should be specified during development and testing of front end
+applications.
+.SS serviceoption
+.Lc "\f2serviceoption\fP , <<service option specification>>"
+.br
+The service option association defines options that are specific to the type of
+service being requested. Not all service options are required by all types of
+service; they are ignored if not applicable (for example, a local message store
+service ignores hostname, username, and password service options).
+.Lc "\f2serviceoption\fP , \f2debug\fP, \f2true\fP"
+.br
+Indicates that debugging information (if available) should be generated by the
+service provider. 
+.br
+
+This should be specified only during development of front end applications, or
+only if special user interface capabilities are provided which allow this
+feature to be turned on at the user's request.
+.Lc "\f2serviceoption\fP , \f2disconnected\fP, \f2true\fP"
+.br
+Indicates that the service should be opened in a "disconnected" (as opposed to a
+"connected") state. For a message store that is not local (on a remote service) this means
+to NOT initially connect to the remote server, but rather to run off of a locally stored
+cache of information on that message store. The "Reconnect()" method can then be used to
+reconnect to the server when the user desires to do so.
+.br
+
+This should be specified when the intent is to open a message store in the "disconnected"
+state; any data that is cached on the local system for the message store is used until
+such time as the "Reconnect()" method is used.
+.Lc "\f2serviceoption\fP , \f2grabsessionlock\fP, \f2true\fP"
+.br
+Indicates that if the object to be opened is "session locked" by another
+process, then an attempt should be made to contact the owner of the lock and
+have the owner release it. If the owner refuses to release the lock a specific
+error return occurs (Sdm_EC_MBL_OtherMailerOwnsWriteAccess); otherwise, the
+session lock is aquired.
+
+This should be specified if the user has been notified that, on request to open
+a mailbox, a session lock could not be obtained because another mailer already
+has a session lock on the mailbox, and the user requested that the session lock
+be taken away from the other process.
+.Lc "\f2serviceoption\fP , \f2hostname\fP , <<remoteHostName>>"
+.br
+Provides a hostname parameter for those services that require one. This should
+be specified when it is known that a hostname parameter is required (e.g. remote
+connection). Services that require this parameter return a
+"Sdm_EC_HostnameRequired" error if it is not present.
+.Lc "\f2serviceiotion\fP , \f2ignoresessionlock\fP, \f2true\fP"
+.br
+Indicates that if the object to be opened is "session locked" by another
+process, then the lock should be ignored and the operation should proceed as
+though a lock on the object could be obtained. 
+
+This is a very dangerous thing to do as it might open a window to two processes
+attempting to modify the same object at the same time. It should only be
+specified when, on request to open a mailbox, the locking system is detected as
+not functioning properly (Sdm_EC_MBL_TooltalkNotResponding), and it is therefore
+appropriate to proceed without obtaining the session lock.
+.Lc "\f2serviceoption\fP , \f2messagestorename\fP , <<messageStoreName>>"
+.br
+Provides a message store name parameter for those services that require
+one. This should be specified when it is known that a message store name is
+required (e.g. with a serviceclass of messagestore). Services that require
+this parameter return a "Sdm_EC_MessageStoreNameRequired" error if it is
+not present.
+.Lc "\f2serviceoption\fP , \f2nosessionlocking\fP , \f2true\fP"
+Indicates that no session locking is to be performed on the object in
+question; in the case of opening a mailbox, no tooltalk locking will be
+performed. Note that system required locking may not be disabled; in 
+this case, the c-client will always acquire a private lock on the mailbox
+unless the mailbox is opened in read only mode.
+
+This option should be used when opening a mailbox in read only mode,
+or when opening a temporary mailbox and the overhead of session
+locking is not desired, such as opening a mailbox attachment.
+.Lc "\f2serviceoption\fP , \f2password\fP , <<password>>"
+.br
+Provides a password parameter for those services that require one. This should
+be specified when it is known that a password parameter is required (e.g. remote
+connection). Services that require this parameter return a
+"Sdm_EC_PasswordRequired" error if it is not present.
+.Lc "\f2serviceoption\fP , \f2preservev3messages\fP, \f2true\fP"
+.br
+By default, any Sun V3 format messages in a mailbox are converted to MIME
+and saved back to the mailbox in MIME format.  If this option is set, then
+all V3 messages are preserved as such and not rewritten as MIME.
+.Lc "\f2serviceoption\fP , \f2readonly\fP, \f2true\fP"
+.br
+Indicates that the service should be provided in a "read only" mode, not allowing any
+modifications or additions. For a message store, read only implies that messages can only
+be looked at, but that their state and existence cannot be changed.
+
+The default is to provide the service in "read write" mode, allowing modifications and
+additions. For a message store, read write implies that messages can be possibly modified
+or deleted, and that looking at them changes their state in the message store.
+.Lc "\f2serviceoption\fP , \f2username\fP , <<username>>"
+.br
+Provides a user name parameter for those services that require one. This should
+be specified when it is known that a user name parameter is required
+(e.g. remote connection). Services that require this parameter return a
+"Sdm_EC_UsernameRequired" error if it is not present.
+.PP
+.RE
+.nr (J 0
+To open a local message store "test.mbox", the following value associations
+could be used:
+.PP
+.nf
+		serviceclass , messagestore
+		servicetype , local
+		serviceoption , messagestorename, test.mbox
+.fi
+.PP
+To open a remote message store "remote.mbox" on host "testhost" with username
+"theuser" password "secret", the following value associations could be used:
+.PP
+.nf
+		serviceclass , messagestore
+		servicetype , imap
+		serviceoption , messagestorename , remote.mbox
+		serviceoption , hostname , testhost
+		serviceoption , username , theuser
+		serviceoption , password , secret
+.fi
+.PP
+If it is desired to open the remote message store in disconnected mode, the
+following value association would be added to the previous list:
+.PP
+.nf
+		serviceoption , disconnected, true
+.fi
+.PP
+To open a connection to a network news service using nntp on host "newshost",
+the following value associations could be used:
+.PP
+.nf
+		serviceclass , messagestore
+		servicetype , nntp
+		serviceoption , hostname , newshost
+.fi
+.PP
+.\"
+.SH "Session Types"
+There are two types of sessions that can currently be created: an "incoming"
+session, and an "outgoing" session.
+.PP
+The incoming session is used to create and startup one or more incoming
+SdmMessageStore objects, which are used to access message stores and their
+contents. This type of message store object is only allowed to access message
+stores for the purposes of message and data retrieval, and may not be used to
+access outgoing message stores or message transport services.
+.PP
+The outgoing session is used to create and startup one or more outgoing SdmMessageStore
+object, which are used to access the outgoing message store, new message creation
+and message transport services. It may not be used to access incoming message
+stores.
+.\"

@@ -1,0 +1,93 @@
+.TH tt_default_session_set 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+tt_default_session_set \- set the current default session identifier
+.SH SYNOPSIS
+.yS
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'Tt_status tt_default_session_set('u
+Tt_status tt_default_session_set(const char *\f2sessid\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn tt_default_session_set
+function
+sets the current default session identifier.
+.P
+The ToolTalk service uses the initial user session as the default session and
+supports one session per
+procid.
+The application can make this call before it
+calls
+.Fn tt_open 3
+to specify the session to which it wants to connect.
+.P
+The
+.I sessid
+argument is a pointer to the unique identifier
+for the session in which the procid is interested.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn tt_default_session_set
+function returns the status of the operation as one of the following
+.B Tt_status
+values:
+.VL 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_NOMP
+.br
+The
+.Cm ttsession 1
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_PROCID
+.br
+The current default process identifier is out of date or invalid.
+.Lc TT_ERR_SESSION
+.br
+The specified ToolTalk session is out of date or invalid.
+.LE
+.SH "APPLICATION USAGE"
+To change to another opened session, the application must use the
+.Fn tt_default_procid_set
+function.
+.P
+To join other sessions, the procid must first set the new session as the
+default session, and then initialize and register with the ToolTalk service.
+The calls required must be in the following order:
+.Cs I
+.Fn tt_default_session_set
+.Fn tt_open 3
+.Ce
+.P
+The
+.Fn tt_open 3
+may create another ToolTalk procid, the connection to which is
+identified by a procid.
+Only one ToolTalk session per procid is allowed.
+(However, multiple procids are allowed in a client.)
+There are no API calls to determine to which session a particular
+procid
+is connected.
+If it is important for the application to know the session
+to which it is connected, it must make the following calls in the indicated
+order:
+.Cs I
+.Fn tt_open 3
+.Fn tt_default_session 3
+.Ce
+.P
+The application can then store the information by indexing it by the
+procid
+returned by the
+.Fn tt_open 3
+call.
+.SH "SEE ALSO"
+.Hd Tt/tt_c.h 5,
+.Fn tt_open 3,
+.Fn tt_default_procid 3,
+.Fn tt_default_session 3.

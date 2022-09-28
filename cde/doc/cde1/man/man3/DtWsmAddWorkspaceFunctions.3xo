@@ -1,0 +1,96 @@
+.TH DtWsmAddWorkspaceFunctions 3 "19 Apr 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.\" *************************************************************************
+.SH NAME
+DtWsmAddWorkspaceFunctions \- add workspace functions for a window
+.SH SYNOPSIS
+.yS
+#include <Dt/Wsm.h>
+.sp 0.5v
+.ta \w'void DtWsmAddWorkspaceFunctions('u
+void DtWsmAddWorkspaceFunctions(Display *\f2display\fP,
+	Window \f2window\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn DtWsmAddWorkspaceFunctions
+function enables workspace functions for a
+window.
+When workspace functions are enabled, the default window menu for the
+window displayed by the
+.xos
+workspace manager
+.xoe
+.cdes
+Cde
+workspace manager,
+.Cm dtwm 1,
+.cdee
+shows entries that allow the window to occupy a different
+set of workspaces, occupy all workspaces, or be removed from the current
+workspace.
+.P
+The
+.I display
+argument is the X display.
+.P
+The
+.I window
+argument is the window to have its workspace functions enabled.
+.SH "RETURN VALUE"
+The
+.Fn DtWsmAddWorkspaceFunctions
+function returns no value.
+.SH "APPLICATION USAGE"
+The application must call the
+.Fn DtWsmAddWorkspaceFunctions
+function before mapping the window.
+The
+.xos
+workspace manager
+.xoe
+.cdes
+Cde
+workspace manager,
+.Cm dtwm 1,
+.cdee
+only looks at the workspace function information at the time the workspace
+manager manages the window.
+If the
+.xos
+workspace manager
+.xoe
+.cdes
+Cde
+workspace manager,
+.Cm dtwm 1,
+.cdee
+is currently managing the window, the application must withdraw
+the window
+(see
+.Fn XWithdrawWindow 3X),
+add the workspace functions, and map the window once again.
+.P
+By default, the workspace manager enables workspace functions.
+.P
+The application should call
+.Fn DtWsmAddWorkspaceFunctions
+to restore the workspace functions removed by the
+.Fn DtWsmRemoveWorkspaceFunctions 3
+function.
+.SH "SEE ALSO"
+.Hd Dt/Wsm.h 5,
+.cde .Fn XWithdrawWindow 3X,
+.xos
+.Fn XWithdrawWindow 3X
+in the \*(Zl;
+.xoe
+.cdes
+.Cm dtwm 1,
+.cdee
+.Fn DtWsmRemoveWorkspaceFunctions 3.

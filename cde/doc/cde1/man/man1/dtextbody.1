@@ -1,0 +1,362 @@
+.\"(c) Copyright 1994 Hewlett-Packard Company
+.\"(c) Copyright 1994 International Business Machines Corp.
+.\"(c) Copyright 1994 Sun Microsystems, Inc.
+.\"(c) Copyright 1994 Unix Systems Labs, Inc., a subsidiary of Novell, Inc.
+.\" @(#)dtextbody.1	1.1 12 Aug 1994
+.TH DTEXTBODY 1X "" "" "" ""
+.ds ]W CDE 1.0 (8/94)
+.na
+.SH NAME
+\fBdtextbody \(em utility to access external MIME body parts\fP
+.sp 1
+.SH SYNOPSIS
+.B dtextbody
+.I body-part-as-file
+.sp 1
+.SH DESCRIPTION
+The \fIdtextbody\fP program is a tool used by dtmail to access
+remote MIME body parts.
+It provides an easy-to-use interface for transfering the data from
+a remote system to the local system.
+.P
+.SH FILE FORMAT
+The \fBbody-part-as-file\fP is the contents of a
+\fBContent-Type: Message/External-Body\fP body part as described in RFC-1521.
+The following is an excerpt from RFC-1521 covering the external message:
+.sp 1
+.nf
+7.3.3.     The Message/External-Body subtype
+
+   The external-body subtype indicates that the actual body data are not
+   included, but merely referenced.  In this case, the parameters
+   describe a mechanism for accessing the external data.
+
+   When an entity is of type "message/external-body", it consists of a
+   header, two consecutive CRLFs, and the message header for the
+   encapsulated message.  If another pair of consecutive CRLFs appears,
+   this of course ends the message header for the encapsulated message.
+   However, since the encapsulated message's body is itself external, it
+   does NOT appear in the area that follows.  For example, consider the
+   following message:
+
+      Content-type: message/external-body;
+	  access-type=local-file;
+          name="/u/nsb/Me.gif"
+      Content-type:  image/gif
+      Content-ID: <id42@guppylake.bellcore.com>
+      Content-Transfer-Encoding: binary
+
+      THIS IS NOT REALLY THE BODY!
+
+   The area at the end, which might be called the "phantom body", is
+   ignored for most external-body messages.  However, it may be used to
+   contain auxiliary information for some such messages, as indeed it is
+   when the access-type is "mail-server".  Of the access-types defined
+   by this document, the phantom body is used only when the access-type
+   is "mail-server".  In all other cases, the phantom body is ignored.
+
+   The only always-mandatory parameter for message/external-body is
+   "access-type"; all of the other parameters may be mandatory or
+   optional depending on the value of access-type.
+
+      ACCESS-TYPE -- A case-insensitive word, indicating the supported
+      access mechanism by which the file or data may be obtained.
+      Values include, but are not limited to, "FTP", "ANON-FTP", "TFTP",
+      "AFS", "LOCAL-FILE", and "MAIL-SERVER".  Future values, except for
+      experimental values beginning with "X-" must be registered with
+      IANA, as described in Appendix E .
+
+   In addition, the following three parameters are optional for ALL
+   access-types:
+
+      EXPIRATION -- The date (in the RFC 822 "date-time" syntax, as
+      extended by RFC 1123 to permit 4 digits in the year field) after
+      which the existence of the external data is not guaranteed.
+
+      SIZE -- The size (in octets) of the data.  The intent of this
+      parameter is to help the recipient decide whether or not to expend
+      the necessary resources to retrieve the external data.  Note that
+      this describes the size of the data in its canonical form, that
+      is, before any Content- Transfer-Encoding has been applied or
+      after the data have been decoded.
+
+      PERMISSION -- A case-insensitive field that indicates whether or
+      not it is expected that clients might also attempt to overwrite
+      the data.  By default, or if permission is "read", the assumption
+      is that they are not, and that if the data is retrieved once, it
+      is never needed again.  If PERMISSION is "read-write", this
+      assumption is invalid, and any local copy must be considered no
+      more than a cache.  "Read" and "Read-write" are the only defined
+      values of permission.
+
+   The precise semantics of the access-types defined here are described
+   in the sections that follow.
+
+   The encapsulated headers in ALL message/external-body entities MUST
+   include a Content-ID header field to give a unique identifier by
+   which to reference the data.  This identifier may be used for
+   cacheing mechanisms, and for recognizing the receipt of the data when
+   the access-type is "mail-server".
+
+   Note that, as specified here, the tokens that describe external-body
+   data, such as file names and mail server commands, are required to be
+   in the US-ASCII character set.  If this proves problematic in
+   practice, a new mechanism may be required as a future extension to
+   MIME, either as newly defined access-types for message/external-body
+   or by some other mechanism.
+
+   As with message/partial, it is specified that MIME entities of type
+   message/external-body must always have a content-transfer-encoding of
+   7-bit (the default).  In particular, even in environments that
+   support binary or 8-bit transport, the use of a content-transfer-
+   encoding of "8bit" or "binary" is explicitly prohibited for entities
+   of type message/external-body.
+   An access-type of FTP or TFTP indicates that the message body is
+   accessible as a file using the FTP [RFC-959] or TFTP [RFC-783]
+   protocols, respectively.  For these access-types, the following
+   additional parameters are mandatory:
+
+      NAME -- The name of the file that contains the actual body data.
+
+      SITE -- A machine from which the file may be obtained, using the
+      given protocol. This must be a fully qualified domain name, not a
+      nickname.
+
+   Before any data are retrieved, using FTP, the user will generally
+   need to be asked to provide a login id and a password for the machine
+   named by the site parameter.  For security reasons, such an id and
+   password are not specified as content-type parameters, but must be
+   obtained from the user.
+
+   In addition, the following parameters are optional:
+
+      DIRECTORY -- A directory from which the data named by NAME should
+      be retrieved.
+
+      MODE -- A case-insensitive string indicating the mode to be used
+      when retrieving the information.  The legal values for access-type
+      "TFTP" are "NETASCII", "OCTET", and "MAIL", as specified by the
+      TFTP protocol [RFC-783].  The legal values for access-type "FTP"
+      are "ASCII", "EBCDIC", "IMAGE", and "LOCALn" where "n" is a
+      decimal integer, typically 8.  These correspond to the
+      representation types "A" "E" "I" and "L n" as specified by the FTP
+      protocol [RFC-959].  Note that "BINARY" and "TENEX" are not valid
+      values for MODE, but that "OCTET" or "IMAGE" or "LOCAL8" should be
+      used instead.  IF MODE is not specified, the default value is
+      "NETASCII" for TFTP and "ASCII" otherwise.
+
+7.3.3.2.  The "anon-ftp" access-type
+
+   The "anon-ftp" access-type is identical to the "ftp" access type,
+   except that the user need not be asked to provide a name and password
+   for the specified site.  Instead, the ftp protocol will be used with
+   login "anonymous" and a password that corresponds to the user's email
+   address.
+
+7.3.3.3.  The "local-file" and "afs" access-types
+
+   An access-type of "local-file" indicates that the actual body is
+   accessible as a file on the local machine.  An access-type of "afs"
+   indicates that the file is accessible via the global AFS file system.
+   In both cases, only a single parameter is required:
+
+      NAME -- The name of the file that contains the actual body data.
+
+   The following optional parameter may be used to describe the locality
+   of reference for the data, that is, the site or sites at which the
+   file is expected to be visible:
+
+      SITE -- A domain specifier for a machine or set of machines that
+      are known to have access to the data file.  Asterisks may be used
+      for wildcard matching to a part of a domain name, such as
+      "*.bellcore.com", to indicate a set of machines on which the data
+      should be directly visible, while a single asterisk may be used to
+      indicate a file that is expected to be universally available,
+      e.g., via a global file system.
+
+7.3.3.4.  The "mail-server" access-type
+
+   The "mail-server" access-type indicates that the actual body is
+   available from a mail server.  The mandatory parameter for this
+   access-type is:
+
+      SERVER -- The email address of the mail server from which the
+      actual body data can be obtained.
+
+   Because mail servers accept a variety of syntaxes, some of which is
+   multiline, the full command to be sent to a mail server is not
+   included as a parameter on the content-type line.  Instead, it is
+   provided as the "phantom body" when the content-type is
+   message/external-body and the access- type is mail-server.
+
+   An optional parameter for this access-type is:
+
+      SUBJECT -- The subject that is to be used in the mail that is sent
+      to obtain the data. Note that keying mail servers on Subject lines
+      is NOT recommended, but such mail servers are known to exist.
+
+   Note that MIME does not define a mail server syntax.  Rather, it
+   allows the inclusion of arbitrary mail server commands in the phantom
+   body.  Implementations must include the phantom body in the body of
+   the message it sends to the mail server address to retrieve the
+   relevant data.
+
+   It is worth noting that, unlike other access-types, mail-server
+   access is asynchronous and will happen at an unpredictable time in
+   the future.  For this reason, it is important that there be a
+   mechanism by which the returned data can be matched up with the
+   original message/external-body entity.  MIME mailservers must use the
+   same Content-ID field on the returned message that was used in the
+   original message/external-body entity, to facilitate such matching.
+
+7.3.3.5.  Examples and Further Explanations
+
+   With the emerging possibility of very wide-area file systems, it
+   becomes very hard to know in advance the set of machines where a file
+   will and will not be accessible directly from the file system.
+   Therefore it may make sense to provide both a file name, to be tried
+   directly, and the name of one or more sites from which the file is
+   known to be accessible.  An implementation can try to retrieve remote
+   files using FTP or any other protocol, using anonymous file retrieval
+   or prompting the user for the necessary name and password.  If an
+   external body is accessible via multiple mechanisms, the sender may
+   include multiple parts of type message/external-body within an entity
+   of type multipart/alternative.
+
+   However, the external-body mechanism is not intended to be limited to
+   file retrieval, as shown by the mail-server access-type.  Beyond
+   this, one can imagine, for example, using a video server for external
+   references to video clips.
+
+   If an entity is of type "message/external-body", then the body of the
+   entity will contain the header fields of the encapsulated message.
+   The body itself is to be found in the external location.  This means
+   that if the body of the "message/external-body" message contains two
+   consecutive CRLFs, everything after those pairs is NOT part of the
+   message itself.  For most message/external-body messages, this
+   trailing area must simply be ignored.  However, it is a convenient
+   place for additional data that cannot be included in the content-type
+   header field.  In particular, if the "access-type" value is "mail-
+   server", then the trailing area must contain commands to be sent to
+   the mail server at the address given by the value of the SERVER
+   parameter.
+
+   The embedded message header fields which appear in the body of the
+   message/external-body data must be used to declare the Content-type
+   of the external body if it is anything other than plain ASCII text,
+   since the external body does not have a header section to declare its
+   type.  Similarly, any Content-transfer-encoding other than "7bit"
+   must also be declared here.  Thus a complete message/external-body
+   message, referring to a document in PostScript format, might look
+   like this:
+
+      From: Whomever
+      To: Someone
+      Subject: whatever
+      MIME-Version: 1.0
+      Message-ID: <id1@host.com>
+      Content-Type: multipart/alternative; boundary=42
+      Content-ID: <id001@guppylake.bellcore.com>
+
+      --42
+      Content-Type: message/external-body;
+           name="BodyFormats.ps";
+           site="thumper.bellcore.com";
+           access-type=ANON-FTP;
+           directory="pub";
+           mode="image";
+           expiration="Fri, 14 Jun 1991 19:13:14 -0400 (EDT)"
+
+      Content-type: application/postscript
+      Content-ID: <id42@guppylake.bellcore.com>
+
+      --42
+      Content-Type: message/external-body;
+           name="/u/nsb/writing/rfcs/RFC-MIME.ps";
+           site="thumper.bellcore.com";
+           access-type=AFS
+           expiration="Fri, 14 Jun 1991 19:13:14 -0400 (EDT)"
+
+      Content-type: application/postscript
+      Content-ID: <id42@guppylake.bellcore.com>
+
+      --42
+      Content-Type: message/external-body;
+           access-type=mail-server
+           server="listserv@bogus.bitnet";
+           expiration="Fri, 14 Jun 1991 19:13:14 -0400 (EDT)"
+
+      Content-type: application/postscript
+      Content-ID: <id42@guppylake.bellcore.com>
+
+      get RFC-MIME.DOC
+
+      --42--
+
+   Note that in the above examples, the default Content-transfer-
+   encoding of "7bit" is assumed for the external postscript data.
+
+   Like the message/partial type, the message/external-body type is
+   intended to be transparent, that is, to convey the data type in the
+   external body rather than to convey a message with a body of that
+   type.  Thus the headers on the outer and inner parts must be merged
+   using the same rules as for message/partial.  In particular, this
+   means that the Content-type header is overridden, but the From and
+   Subject headers are preserved.
+
+   Note that since the external bodies are not transported as mail, they
+   need not conform to the 7-bit and line length requirements, but might
+   in fact be binary files.  Thus a Content-Transfer-Encoding is not
+   generally necessary, though it is permitted.
+
+   Note that the body of a message of type "message/external-body" is
+   governed by the basic syntax for an RFC 822 message.  In particular,
+   anything before the first consecutive pair of CRLFs is header
+   information, while anything after it is body information, which is
+   ignored for most access-types.
+
+   The formal grammar for content-type header fields for data of type
+   message is given by:
+
+   message-type := "message" "/" message-subtype
+
+   message-subtype := "rfc822"
+                   / "partial" 2#3partial-param
+                   / "external-body" 1*external-param
+                   / extension-token
+
+   partial-param :=     (";" "id" "=" value)
+              /  (";" "number" "=" 1*DIGIT)
+              /  (";" "total" "=" 1*DIGIT)
+         ; id & number required; total  required  for  last part
+
+   external-param :=   (";" "access-type" "=" atype)
+              / (";" "expiration" "=" date-time)
+                   ; Note that date-time is quoted
+              / (";" "size" "=" 1*DIGIT)
+              / (";"  "permission"  "="  ("read"  /  "read-write"))
+                   ; Permission is case-insensitive
+              / (";" "name" "="  value)
+              / (";" "site" "=" value)
+              / (";" "dir" "=" value)
+              / (";" "mode" "=" value)
+              / (";" "server" "=" value)
+              / (";" "subject" "=" value)
+          ; access-type required;others required based on access-type
+
+   atype := "ftp" / "anon-ftp" / "tftp" / "local-file"
+                  / "afs" / "mail-server" / extension-token
+                  ; Case-insensitive
+
+.fi
+-----
+
+.sp 1
+.SH FILES
+.PD 0
+.TP 20
+.B /usr/dt/bin/dtextbody
+This is the executable file transfer tool.
+.PD
+.sp 1
+

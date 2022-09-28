@@ -1,0 +1,142 @@
+.TH DtEditorFormat 3 "8 August 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.\" ***********************************************************************
+.SH NAME
+DtEditorFormat \- format all or part of the contents of a DtEditor widget
+.SH SYNOPSIS
+.yS
+#include <Dt/Editor.h>
+.sp 0.5v
+.ta \w'DtEditorErrorCode DtEditorFormat('u
+DtEditorErrorCode DtEditorFormat(Widget \f2widget\fP,
+	DtEditorFormatSettings *\f2formatSettings\fP,
+	unsigned int \f2amountToFormat\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn DtEditorFormat
+function formats all or part of the contents of the DtEditor widget according
+to the current text format settings in the Format
+Settings dialog.
+These options specify which margins and
+alignments (left aligned, right aligned, justified or centered)
+are used.
+Optionally, alternative settings can be passed as an argument to
+.Fn DtEditorFormat
+in a
+.Br DtEditorFormatSettings
+data structure.
+This function
+formats either the paragraph containing the insertion cursor
+or the entire contents of the DtEditor widget, depending on the value of the
+.I amountToFormat
+argument.
+.P
+The Format Settings dialog is displayed with
+.Fn DtEditorInvokeFormatDialog 3.
+For a complete description of formatting and the Format Settings
+dialog, see
+.IR DtEditor .
+.P
+The
+.I widget
+argument specifies the editor widget ID.
+.P
+The
+.I formatSettings
+argument specifies left margin value, right margin value and the
+justification style.
+The LeftMargin and RightMargin fields of
+.BR DtEditorFormatSettings
+must be zero or larger.
+The Alignment field can have a value of
+.Cn DtEDITOR_ALIGN_CENTER ,
+.Cn DtEDITOR_ALIGN_JUSTIFY ,
+.Cn DtEDITOR_ALIGN_LEFT
+or
+.Cn DtEDITOR_ALIGN_RIGHT .
+If the
+.I formatSettings
+argument is
+.Cn NULL ,
+.Fn DtEditorFormat
+uses the last format settings specified in the Format Settings dialog.
+.P
+When the
+.I amountToFormat
+argument is set to
+.Cn DtEDITOR_FORMAT_ALL ,
+it reformats all the text in the edit window.
+When this argument is set to
+.Cn DtEDITOR_PARAGRAPH ,
+only the paragraph
+containing the insertion cursor is formatted.
+.cde .P
+.cde For a complete definition of the DtEditor widget
+.cde and its associated resources, see
+.cde .Fn DtEditor 3.
+.P
+For a complete definition of
+.BR DtEditorFormatSettings ,
+see
+.Hd Dt/Editor.h 5.
+.cdes
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn DtEditorFormat
+function returns
+.Cn DtEDITOR_\%NO_ERRORS ;
+otherwise, it returns one of the following values:
+.VL 6
+.Lc DtEDITOR_NO_TMP_FILE
+.br
+The
+.Fn DtEditorFormat
+function cannot create two temporary files in the directory returned by
+.Fn tmpnam 3S.
+.Lc DtEDITOR_ILLEGAL_SIZE
+.br
+The left or right margin values are negative.
+.Lc DtEDITOR_INVALID_RANGE
+.br
+The
+.I amountToFormat
+argument is not recognized.
+.Lc DtEDITOR_INVALID_TYPE
+.br
+The Alignment field is not recognized.
+.LE
+.cdee
+.xos
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn DtEditorFormat
+function returns
+.Cn DtEDITOR_\%NO_ERRORS ;
+otherwise, it returns one of the following values:
+.VL 6
+.Lc DtEDITOR_ILLEGAL_SIZE
+.br
+The left or right margin values are negative.
+.Lc DtEDITOR_INVALID_RANGE
+.br
+The
+.I amountToFormat
+argument is not recognized.
+.Lc DtEDITOR_INVALID_TYPE
+.br
+The Alignment field is not recognized.
+.LE
+.xoe
+.SH "SEE ALSO"
+.Hd Dt/Editor.h 5,
+.Fn DtEditor 3,
+.Fn DtEditorInvokeFormatDialog 3;
+.cde .Fn tmpnam 3S.
+.xo .Fn tmpnam
+.xo in the \*(ZK.

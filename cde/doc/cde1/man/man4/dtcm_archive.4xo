@@ -1,0 +1,208 @@
+.cdes
+.TH dtcm_archive 4 "15 Jun 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.SH NAME
+dtcm_archive \- format of calendar archive file
+.SH DESCRIPTION
+The calendar archive file format is not documented
+in the Cde 1.0 Sample Implementation (because there
+is no API offered to read or write it).
+.cdee
+.xos
+.xo .H 3 "Calendar Archive File Format"
+.xo .xR3 calarchive
+The calendar archive file format is
+a container with a series of packages of
+attribute value triples embedded within it.
+Each package of attribute/value triples is
+the definition of an entry or the definition of calendar attributes.
+A grammar for the archive file is:
+.P
+.S -1
+.TS
+center;
+.xo lf5 1 cf5 1 lf5w(3i) .
+.cde lf3 1 cf3 1 lf3w(3i) .
+archive_file	::=	\f6header_string\fP \f6content_list\fP
+header_string	::=	`DTCM Archive 1.0\en'
+content_list	::=	\f6package\fP \f6content_list\fP | \f6package\fP
+package	::=	\f6appt_def\fP | \f6calendar_attr_def\fP
+appt_def	::=	\f6appt_start_marker\fP \f6attr_list\fP \f6appt_end_marker\fP
+calendar_attr_def	::=	\f6cal_start_marker\fP \f6attr_list\fP \f6cal_end_marker\fP
+attr_list	::=	\f6attr_def\fP \f6att_list\fP | \f6attr_def\fP
+appt_start_marker	::=	\f6appt_marker\fP `:string:begin\en'
+appt_end_marker	::=	\f6appt_marker\fP `:string:end\en'
+appt_marker	::=	`-//CDE_XAPIA_PRIVATE/CS/API/ENTRYATTR//NONSGML ApptDelimiter//EN'
+cal_start_marker	::=	\f6cal_marker\fP `:string:begin\en'
+cal_end_marker	::=	\f6cal_marker\fP `:string:end\en'
+cal_marker	::=	`-//CDE_XAPIA_PRIVATE/CS/API/CALATTR//NONSGML CalDelimiter//EN'
+attr_def	::=	\f6attr_name\fP `:' \f6attr_type\fP `:' \f6attr_value\fP `\en'
+attr_type	::=	`string' | `integer' | `reminder' | `accesslist'
+	|	`repeatdefinition' | `custom'
+attr_value	::=	T{
+.na
+.ft 1
+The data associated with the attribute
+T}
+attr_name	::=	T{
+.na
+.ft 1
+XAPIA string.
+The span of characters that can be used in
+the definition of an attribute name is specified in the \*(Za.
+T}
+.TE
+.S +1
+.P
+An example calendar file with two entries is as follows.
+.Cs
+.S -1
+DTCM Archive 1.0
+-//CDE_XAPIA_PRIVATE/CS/API/ENTRYATTR//NONSGML ApptDelimiter//EN:string:begin
+\f6attr_name0\fP:\f6type\fP:\f6value\fP
+\f6attr_name1\fP:\f6type\fP:\f6value\fP
+	...
+-//CDE_XAPIA_PRIVATE/CS/API/ENTRYATTR//NONSGML ApptDelimiter//EN:string:end
+	.
+	.
+	.
+-//CDE_XAPIA_PRIVATE/CS/API/ENTRYATTR//NONSGML ApptDelimiter//EN:string:begin
+\f6attr_name0\fP:\f6type\fP:\f6value\fP
+\f6attr_name1\fP:\f6type\fP:\f6value\fP
+	...
+-//CDE_XAPIA_PRIVATE/CS/API/ENTRYATTR//NONSGML ApptDelimiter//EN:string:end
+.S +1
+.Ce
+.xo .H 4 "Attribute Definition"
+.cde .SS "Attribute Definition"
+Each entry in a calendar is represented by a series of triples.
+These triples are constructed of three objects:
+the attribute name,
+the type of the attribute
+and the actual value of the attribute.
+The attribute name is the same name used to store the attribute
+in the database and is constructed out of
+printable characters within the \*(Z7 character set.
+The set of valid characters does not include NUL,
+.tK tab ,
+.tK newline ,
+.tK "carriage return" ,
+.tK space
+or colon.
+The attribute type describes the type of the data
+associated with the attribute name.
+This is a limited set of types that
+includes integer, string, reminder and access list, and buffer.
+The value is the actual value associated with the attribute name,
+and is interpreted according to the type value associated with it.
+Within a calendar archive file,
+an individual attribute is written with
+the members of the triple separated by colons:
+.Cs I
+\f6attrname\fP:\f6type\fP:\f6value\fP
+.Ce
+.P
+An example attribute is:
+.Cs
+.S -1
+-//XAPIA/CS/API/CALATTR//NONSGML Calendar Name//EN:string:fred@host.Company.COM
+.S +1
+.Ce
+.P
+Attribute types can have the following values.
+The ``integer/string pairs'' used frequently in this list
+refer to an
+.B integer
+value followed by a colon and a
+.B string
+value.
+.VL 16 5
+.LI \f3string\fP
+A null-terminated sequence of characters.
+The bytes in an attribute of this type
+are interpreted relative to the character set attribute for the same entry.
+.LI \f3integer\fP
+A decimal integer, expressed as digits from the \*(Z7.
+.LI \f3reminder\fP
+An integer/string pair representation of the reminder structure
+defined in the \*(Za.
+The integer is the advance on the reminder,
+expressed as a number of seconds, with negative
+numbers indicating time prior to the event.
+The string describes
+additional data that may relate to the reminder.
+The \*(Zx calendar and appointment services
+use this string as a list of e-mail addresses
+for e-mail reminders, but ignore it for other
+reminder types.
+An example entry is:
+.Cs
+.S -1
+-//XAPIA/CS/API/ENTRYATTR//NONSGML Mail Reminder//EN:
+	reminder:-1800:hseldon@trantor
+.S +1
+.Ce
+.LI \f3accesslist\fP
+A string that describes the individuals who have specific
+access permissions set on a calendar.
+This attribute type applies only to a calendar, not an entry,
+where it is ignored.
+An access list value is formatted across a series of lines,
+each line containing one logical access list entry.
+The first entry starts a line and is indented with a
+.tK tab
+character.
+Each line is an integer/string pair.
+The integer represents the access granted to the user,
+as defined by the \*(Za.
+The string describes the user who gains that access.
+An example entry is:
+.Cs
+.S -1
+-//XAPIA/CS/API/CALATTR//NONSGML Access List//EN:accesslist:
+	11:fred
+	7:joanne
+.S +1
+.Ce
+.LI \f3repeatdefinition\fP
+.xo .br
+A string representation of a data structure that describes
+how an event repeats indefinitely.
+This structure is defined by the \*(Za.
+.LI \f3custom\fP
+Custom entries are for attributes values that
+do not conform to the constraints of a string data type
+because they can have embedded NUL characters within them.
+It is the responsibility of the application
+to ensure that these values are portable between systems
+because the \*(Zx calendar and appointment services
+do not perform any transformation on the characters.
+.LE
+.xo .H 4 "Long Values"
+.cde .SS "Long Values"
+When an attribute value is long,
+or contains embedded
+.tK newline s
+or
+.tK "carriage return" s,
+the values for attributes are broken out across a number of lines,
+using a subset of the MIME RFC rules for long/binary headers.
+The \*(Zx calendar and appointment services
+support unbroken lines of at least 256 bytes.
+All continuation lines begin with a
+.tK tab .
+Lines that are too long are broken with a
+.tK newline /\c
+.tK tab
+pair.
+Thus, abcd becomes ab\en\etcd.
+Embedded
+.tK newline
+are suffixed with a
+.tK tab .
+Thus, ab\encd becomes ab\en\etcd.
+.xoe

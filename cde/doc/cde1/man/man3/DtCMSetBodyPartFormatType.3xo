@@ -1,0 +1,78 @@
+.TH DtCMSetBodyPartFormatType 3 "17 January 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH "NAME"
+DtCMSetBodyPartFormatType \- set the type and format for the body-part content
+.SH "SYNOPSIS"
+.yS
+#include <Bento/DtCM.h>
+.sp 0.5v
+.ta \w'void DtCMSetBodyPartFormatType('u
+void DtCMSetBodyPartFormatType(DtCMBodyPart *\f2body_part\fP,
+	CMEnv *\f2error\fP,
+	CMGlobalName \f2type_name\fP,
+	CMMetaHandler \f2meta_handler\fP,
+	...);
+.yE
+.SH "DESCRIPTION"
+The
+.Fn DtCMSetBodyPartFormatType
+function changes the current format type for the body-part content.
+For example, if a text body part is being stored as a simple stream
+of bytes, this function
+could be used to change the format to a compressed byte stream.
+The application must provide a type name, a dynamic value metahandler, and any
+optional arguments required by the dynamic value handler's new operation.
+The current content of the body part is read and then replaced in the
+new storage format.
+This is done as a simple read, delete, and write operation.
+If more complex algorithms are required, the application should not use this
+function.
+A list of supported format type names is provided in the
+.B <Bento/DtCM.h>
+entry.
+.P
+The
+.I body_part
+argument is a body-part structure returned by any of the
+.Fn DtCMGetBodyPart 3,
+.Fn DtCMGetNextBodyPart 3,
+or
+.Fn DtCMNewBodyPart 3
+functions.
+The
+.I error
+argument is a pointer to an error return structure.
+The
+.I type_name
+argument is the new format type name.
+The meta handler is registered with the type name for the container.
+The
+.I meta_handler
+argument is the metahandler for the new dynamic value handler.
+.SH "RETURN VALUE"
+The
+.Fn DtCMSetBodyPartFormatType
+function returns no value.
+If an error occurs,
+.Fn DtCMSetBodyPartFormatType
+sets the major code in the
+.I error
+structure to
+.Cn USER_EXCEPTION ,
+and the application can use the
+.Fn CMRexception_number
+function to determine the minor code.
+See the Error API Appendix in the \*(ZB.
+.SH "SEE ALSO"
+.Fn DtCMGetBodyPart 3,
+.Fn DtCMGetBodyPartFormatType 3,
+.Fn DtCMGetNextBodyPart 3,
+.Fn DtCMNewBodyPart 3,
+.Hd Bento/DtCM.h 5;
+Chapter 5, ``Types and Dynamic Values,''
+and
+.Fn CMRexception_number
+in the \*(ZB.

@@ -1,0 +1,79 @@
+\#! CDE_INSTALLATION_TOP/bin/dtksh
+
+\##########################################################################
+\#  (c) Copyright 1993, 1994 Hewlett-Packard Company	
+\#  (c) Copyright 1993, 1994 International Business Machines Corp.
+\#  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+\#  (c) Copyright 1993, 1994 Unix System Labs, Inc., a subsidiary of
+\#      Novell, Inc.
+\##########################################################################
+
+
+\#
+\# This sample shell script verifies that the augment and override
+\# capabilities for translations work as expected.  Since augmenting
+\# a translation does not replace an existing translation, the first
+\# pushbutton should only use our button3 translation.  Since overriding
+\# a translation replaces an existing translation, the second pushbutton
+\# should use both our Enter and button1 translations.
+\#
+\# It also demonstrates access to the TRANSLATION_EVENT convenience
+\# environment variable.
+\#
+
+\# EnterNotify handler
+Enter()
+{
+   echo EnterNotify
+   echo "Event = "${TRANSLATION_EVENT}
+   echo "Event.type = "${TRANSLATION_EVENT.TYPE}
+   echo "Event.xany.window = "${TRANSLATION_EVENT.XANY.WINDOW}
+}
+
+\# ButtonDown handler; $1 indicates which button
+BtnDown()
+{
+   echo "ButtonDown ("$1")"
+   echo "Event = "${TRANSLATION_EVENT}
+   echo "Event.type = "${TRANSLATION_EVENT.TYPE}
+   echo "Event.xany.window = "${TRANSLATION_EVENT.XANY.WINDOW}
+   echo "Event.xbutton.x = "${TRANSLATION_EVENT.XBUTTON.X}
+   echo "Event.xbutton.y = "${TRANSLATION_EVENT.XBUTTON.Y}
+}
+
+\# Default activate callback for the pushbuttons; should only get called
+\# for the first pushbutton (augmented one).
+Activate()
+{
+   echo "Activate ("$1")"
+}
+
+
+\######################### Create the Main UI #################################
+
+XtInitialize TOPLEVEL transEventTest TransEventTest "$0" "$@"
+XtSetValues $TOPLEVEL allowShellResize:True
+
+XtCreateManagedWidget RC rc XmRowColumn $TOPLEVEL \
+         orientation:HORIZONTAL \
+         numColumns:2 \
+         packing:PACK_COLUMN 
+
+XtCreateManagedWidget PB1 pb1 XmPushButton $RC \
+	labelString:"Augmented Button" \
+	translations:'#augment
+	 	<EnterNotify>:ksh_eval("Enter") 
+ 		<Btn1Down>:ksh_eval("BtnDown 1")
+ 		<Btn3Down>:ksh_eval("BtnDown 3")'
+XtAddCallback $PB1 activateCallback "Activate 1"
+
+XtCreateManagedWidget PB2 pb2 XmPushButton $RC \
+	labelString:"Overridden Button" \
+	translations:'#override
+	 	<EnterNotify>:ksh_eval("Enter") 
+		<Btn1Down>:ksh_eval("BtnDown 1")'
+XtAddCallback $PB2 activateCallback "Activate 2"
+
+XtRealizeWidget $TOPLEVEL
+
+XtMainLoop

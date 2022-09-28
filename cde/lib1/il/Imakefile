@@ -1,0 +1,178 @@
+XCOMM $XConsortium: Imakefile /main/cde1_maint/1 1995/07/17 10:37:01 drk $
+MODULE=il
+
+#ifndef DoNormalLib
+#define DoNormalLib NormalLibil
+#endif
+#ifndef DoSharedLib
+#define DoSharedLib SharedLibil
+#endif
+
+#include <Library.tmpl>
+
+
+#if defined(RsArchitecture)
+/* This is totally bogus.
+ * The .c and .h files should be using _NO_PROTO not NeedFunctionPrototypes
+ */
+DEFINES=-DNeedFunctionPrototypes
+#if SharedLibil
+REQUIREDLIBS = $(XLIB)
+#endif
+#endif
+
+INCLUDES = -I.
+HEADERS = \
+	il.h           ildecomp.h         ilint.h            iljpgencodeint.h \
+	ilX.h          ildecompg4.h       iljpg.h            iljpgint.h \
+	ilXint.h       ildecompg4table.h  iljpgdecode.h      ilpipeint.h \
+	ilcodec.h      ilefs.h            iljpgdecodedefs.h  ilpipelem.h \
+	ilcompress.h   ilerrors.h         iljpgdecodeint.h   ilscaleint.h \
+	ilcontext.h    ilfile.h           iljpgencode.h      iltiffint.h \
+	ilconvert.h    ilimage.h          iljpgencodedefs.h  ilutiljpeg.h
+
+SRCS = \
+	ilX.c \
+	ilbigray.c \
+	ilcodec.c \
+	ilcompg3g4.c \
+	ilcomplzw.c \
+	ilcomppackbits.c \
+	ilcompress.c \
+	ilcompressjpeg.c \
+	ilcontext.c \
+	ilconvert.c \
+	ilcrop.c \
+	ildata.c \
+	ildecompg3.c \
+	ildecompg4.c \
+	ildecompjpeg.c \
+	ildecomplzw.c \
+	ildecomppackbits.c \
+	ildecompress.c \
+	ildither.c \
+	ilefs.c \
+	ilformat.c \
+	ilgraybi.c \
+	ilimage.c \
+	ilinvert.c \
+	iljpgdecode.c \
+	iljpgdecodejif.c \
+	iljpgdedct.c \
+	iljpgdehuff.c \
+	iljpgencode.c \
+	iljpgencodedata.c \
+	iljpgencodejif.c \
+	iljpgendct.c \
+	iljpgenhuff.c \
+	iljpgutil.c \
+	ilmap.c \
+	ilmirror.c \
+	ilobject.c \
+	ilpalette.c \
+	ilpipe.c \
+	ilreadX.c \
+	ilreadimage.c \
+	ilrotate.c \
+	ilrwimage.c \
+	ilscale.c \
+	ilscalesample.c \
+	iltapfeed.c \
+	iltiff.c \
+	iltiffread.c \
+	iltiffwrite.c \
+	iltruegray.c \
+	ilupsample.c \
+	ilutiljpeg.c \
+	ilversion.c \
+	ilwriteimage.c \
+	ilycbcr.c
+
+OBJS = \
+	ilX.o \
+	ilbigray.o \
+	ilcodec.o \
+	ilcompg3g4.o \
+	ilcomplzw.o \
+	ilcomppackbits.o \
+	ilcompress.o \
+	ilcompressjpeg.o \
+	ilcontext.o \
+	ilconvert.o \
+	ilcrop.o \
+	ildata.o \
+	ildecompg3.o \
+	ildecompg4.o \
+	ildecompjpeg.o \
+	ildecomplzw.o \
+	ildecomppackbits.o \
+	ildecompress.o \
+	ildither.o \
+	ilefs.o \
+	ilformat.o \
+	ilgraybi.o \
+	ilimage.o \
+	ilinvert.o \
+	iljpgdecode.o \
+	iljpgdecodejif.o \
+	iljpgdedct.o \
+	iljpgdehuff.o \
+	iljpgencode.o \
+	iljpgencodedata.o \
+	iljpgencodejif.o \
+	iljpgendct.o \
+	iljpgenhuff.o \
+	iljpgutil.o \
+	ilmap.o \
+	ilmirror.o \
+	ilobject.o \
+	ilpalette.o \
+	ilpipe.o \
+	ilreadX.o \
+	ilreadimage.o \
+	ilrotate.o \
+	ilrwimage.o \
+	ilscale.o \
+	ilscalesample.o \
+	iltapfeed.o \
+	iltiff.o \
+	iltiffread.o \
+	iltiffwrite.o \
+	iltruegray.o \
+	ilupsample.o \
+	ilutiljpeg.o \
+	ilversion.o \
+	ilwriteimage.o \
+	ilycbcr.o
+
+
+all::
+
+/* For install of developer's build environment */
+LOCAL_BINSTALL_LIBDEST = lib
+LOCAL_BINSTALL_INCLUDEDEST = include/Misc
+
+LibraryObjectRule()
+#if DoSharedLib
+#if DoNormalLib
+SharedLibraryTarget(il,/**/,$(OBJS),shared,..)
+#else
+SharedLibraryTarget(il,/**/,$(OBJS),.,.)
+#endif
+SharedLibraryBuildInstall(il,/**/,$(LOCAL_BINSTALL_LIBDEST))
+InstallSharedLibrary(il,/**/,$(USRLIBDIR))
+#endif
+#if DoNormalLib
+NormalLibraryTarget(il,$(OBJS))
+NormalLibraryBuildInstall(il,$(LOCAL_BINSTALL_LIBDEST))
+InstallLibrary(il,$(USRLIBDIR))
+#endif
+
+/* MS Compiler bug, remove when we go to USL compiler */
+#ifdef SCOArchitecture
+SpecialFlagsObjectRule(iltiff, -Oi -DUSE_INLINE_CODE)
+#endif
+
+BuildMultipleInstall($(HEADERS),$(LOCAL_BINSTALL_INCLUDEDEST))
+
+DependTarget()

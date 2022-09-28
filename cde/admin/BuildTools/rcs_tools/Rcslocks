@@ -1,0 +1,349 @@
+#!/usr/local/bin/perl
+
+eval "exec /usr/local/bin/perl -S $0 $*"
+    if $running_under_some_shell;
+
+########################################################
+# remote rcslocks utility
+
+########################################################
+# required files
+########################################################
+# Add the test directory to the locations to search for
+# libraries.
+push(@INC,"/x/cdesrc/admin/BuildTools/rcs_tools");
+require 'RcsUtility.pl';
+require 'RcsSock.pl';
+
+########################################################
+# define variables
+########################################################
+&InitializeVariables();
+$exitValue = 0;
+# don't buffer
+select(STDERR); $| =1;
+select(STDOUT); $| =1;
+
+#######################################################
+# define local subroutines
+#######################################################
+#
+# The following are signal handlers for abort due a specific signal
+#
+sub abortHUP {
+        local(@errormessage);
+        @errormessage = ("*** Client terminated with signal 1 -> SIGHUP ***");
+        &Exit(1,@errormessage);
+}
+sub abortINT {
+        local(@errormessage);
+        &Exit(1,@errormessage);
+}
+sub abortQUIT {
+        local(@errormessage);
+        @errormessage = ("*** Client terminated with signal 3 -> SIGQUIT ***");
+        &Exit(1,@errormessage);
+}
+sub abortTERM {
+        local(@errormessage);
+        @errormessage = ("*** Client terminated with signal 15 -> SIGTERM ***");
+        &Exit(1,@errormessage);
+}
+########################################################
+# Catch signals
+########################################################
+$SIG{'INT'} = 'abortINT';
+$SIG{'HUP'} = 'abortHUP';
+$SIG{'QUIT'} = 'abortQUIT';
+$SIG{'TERM'} = 'abortTERM';
+
+##############################################################
+# argument processing - this must be specific for each command
+##############################################################
+$isDashU = 0;
+$isDashD = 0;
+$isDashQ = 0;
+while ($ARGV[0] =~ /^-/){
+	$_ = shift;
+	if (/^-D$/){
+		# turn on debugging output
+		$Debug = 1;
+	}
+	elsif (/^-u$/){# with spaces get next arg as user name
+		$isDashU = 1;
+		if ($tmpUserName = shift) { 
+			push(@remoteRcslockargs,"-u${tmpUserName}");
+			push(@localRcslockargs,"-u $tmpUserName");
+		}
+		else {
+			@errorMessage = ("ERROR - -u needs an argument");
+			&Exit(1,@errorMessage);
+		}
+	}
+	elsif (/^-u(.*)$/){ # without spaces
+		$isDashU = 1;
+		# add space to local arg, add space on server for remote
+		push(@remoteRcslockargs,$_);
+		push(@localRcslockargs,"-u $1");
+	}
+	#
+	# -d can come with and without spaces
+	# we will process it either way. This is not a real rcslocks option.
+	#
+	elsif (/^-d$/){# with spaces get next arg as user name
+		$isDashD = 1;
+		if ($tmpDirName = shift) { 
+			push(@DashDDirs,$tmpDirName);
+		}
+		else {
+			@errorMessage = ("ERROR - -d needs an argument");
+			&Exit(1,@errorMessage);
+		}
+	}
+	elsif (/^-d(.*)$/){ # without spaces
+		$isDashD = 1;
+			push(@DashDDirs,$1);
+	}
+	elsif (/^-v$/){
+		push(@localRcslockargs,$_);
+		push(@remoteRcslockargs,$_);
+	}
+	elsif (/^-q$/){ # suppresses printing of directory name
+		$isDashQ = 1;
+		push(@remoteRcslockargs,$_);
+	}
+	elsif (/^-help$/){
+		@errorMessage = ("Rcslocks [-v] [-u username] [-d directory] [-q] [filename1 ...]");
+		&Exit(0,@errorMessage);
+	}
+	else { # bad arg
+		@errorMessage = ("      Unrecognized flag: \"$_\"\n");
+		&Exit(1,@errorMessage);
+	}
+} # END argument processing
+
+
+#
+# if -d is set and there are files, this is an error
+#
+if (($#ARGV >= 0) && ($isDashD)) {
+	@errorMessage = ("ERROR - The -d option can only be used if no files are listed.");
+	&Exit(1,@errorMessage);
+}
+
+#
+# get the files and do appropriate error checking
+# see if the files are local or remote
+#
+# for some reason while(@ARGV) cannot be in a subroutine
+while ( @ARGV ) {
+	$tstfile=shift;
+	$tmp = `basename $tstfile`;
+	chop $tmp;
+
+	# if there is a wildcard unexpanded for the RCS vault
+	# store for later processing
+	#
+	if (($tstfile =~ m%[\*\?]%) || ($tstfile =~ m%\[.*\]%)) {
+		$tmpdir =`dirname $tstfile`;
+		chop $tmpdir;
+		if (($tmpdir =~ m%^RCS%) || ($tmpdir =~ m%\/RCS%)) {
+			$realtmpdir = &IsRcsDirectoryLocal($tmpdir);
+			$newtstfile = "${realtmpdir}/${tmp}";
+			push(@wildCardFiles,$newtstfile);
+		}
+	}			
+	# don't do RCS dir
+	elsif ("$tmp" ne "RCS")  {
+		push(@allFiles, $tstfile);
+	}
+}
+
+# get the correct localpath, Rcs path pairs
+$needReadableFile = 0;
+&GetFilePaths($needReadableFile);
+
+#
+# Get the real rcs path for the current directory if -d not set.
+# This is only necessary if the current RCS directory is remote.
+# don't bother if -d is set.
+#
+if ((! defined(@allFiles)) && (! defined(@wildCardFiles))) {
+	if (!$isDashD) {
+		#
+		# get true path if RCS is remote or, nothing if local RCS
+		#
+		$realRcsDir = &IsRcsDirectoryLocal("RCS");
+		if (!$rcsDirIsLocal) {
+			$realRemoteDir = `dirname $realRcsDir`;
+			chop $realRemoteDir;
+			#
+			# Pass the -q option if the no -d option is specified 
+			# for the case where RCS is remote. This allows us to pass the
+			# current remote RCS directory as a -d option. If -q is set
+			# we will not print the directory name on the server as
+			# the original rcslocks would not print the directory name.
+			#
+			push(@remoteRcslockargs,"-q");
+			push(@remoteRcsDashDargs,"-d${realRemoteDir}");
+		}
+	}
+}
+
+
+#
+# cycle through -d options and separate local and remote directories
+# if local, store it so that we can cd to it later.
+# if remote add to remote args as a -d option.
+#
+foreach $dir (@DashDDirs) {
+	$realRcsDir = &IsRcsDirectoryLocal("$dir/RCS");
+	if ($rcsDirIsLocal) {
+		push(@localDirs,$dir);
+	}
+	else {
+		$realRemoteDir = `dirname $realRcsDir`;
+		chop $realRemoteDir;
+		push(@remoteRcsDashDargs,"-d${realRemoteDir}");
+	}
+}
+			
+####################################################################
+# debug argument processing
+####################################################################
+if ( $Debug ) {
+	print "LocalRcsArgs= \"@localRcslockargs\"\n";
+	print "remoteRcslockargs= \"@remoteRcslockargs\"\n";
+	print "remoteRcsDashDargs= \"@remoteRcsDashDargs\"\n";
+	print "localExchangeFiles= \"@localExchangeFiles\"\n";
+	print "originalFiles= \"@originalFiles\"\n";
+	print "remoteCommaVFiles = \"@remoteCommaVFiles\"\n";
+	print "allRemoteExchangeFiles= \"@allRemoteExchangeFiles\"\n";
+	print "localDirs= \"@localDirs\"\n";
+}
+
+##################################################################
+# Process the local files.
+# Run local Rcs commands.
+# if no local files listed, you still might run the command
+# for the entire RCS vault listing.
+##################################################################
+
+#
+# 3 situations:
+# 1) local files were listed, process them.
+# 2) local directories were listed, cd to them an run command
+# 3) Nothing listed at all local or remote, run command in curdir.
+# 
+if (defined(@localExchangeFiles)) { #1
+	print "$prgName @localRcslockargs @localExchangeFiles\n" if $Debug;
+	$tmpexitValue = system "$prgName @localRcslockargs @localExchangeFiles";
+	#
+	# reset the exit value if necessary
+	#
+	if ((!$exitValue) && ($tmpexitValue)){
+		$exitValue = 1;
+	}
+}
+elsif (defined(@localDirs)) { #2
+	foreach $dir (@localDirs) {
+		$saveDir = `pwd`;
+		chop $saveDir;
+		if (chdir($dir)) {
+		   if (! $isDashQ) { # suppress directory print name if -q
+				print STDERR "Directory $dir\n";
+			}
+			$tmpexitValue = system "$prgName @localRcslockargs";
+			if (!chdir($saveDir)) {
+				@errorMessage = ("ERROR - cannot change directory back to $saveDir");
+				&Exit(1,@errorMessage);
+			}
+		}
+		else { 
+			print STDERR "	ERROR - cannot change directory to $dir\n";
+			print STDERR "	        Not processing directory $dir\n";
+			$exitValue = 1;
+		}
+		#
+		# reset the exit value if necessary
+		#
+		if ((!$exitValue) && ($tmpexitValue)){
+			$exitValue = 1;
+		}
+	}
+}
+#
+# no remote -d args either, process local directory
+#
+elsif (! defined(@remoteRcsDashDargs)) {  #3
+	$tmpexitValue = system "$prgName @localRcslockargs";
+	#
+	# reset the exit value if necessary
+	#
+	if ((!$exitValue) && ($tmpexitValue)){
+		$exitValue = 1;
+	}
+}
+
+#
+# process remote stuff
+#
+if ((defined(@remoteCommaVFiles)) || (defined(@remoteRcsDashDargs)) || (defined(@wildCardFiles))) {
+
+	##################################################################
+	# Open the connection
+	##################################################################
+	if (! ($SOCK_HANDLE = &sock'open($rhost,$port))) {
+		@errorMessage = ("Connect to \"$rhost\" failed: $!");
+		&Exit(1,@errorMessage);
+	}
+
+	# pass the user name
+	print $SOCK_HANDLE  "USER: $userName\n";
+
+	#
+	# Expand wildcards if there are any.
+	# Pass the basic command string.
+	#
+	if (!defined(@wildCardFiles)) { # do nothing on server
+		print $SOCK_HANDLE "$RemoteRcsPrg \n";
+	}
+	else {
+		print $SOCK_HANDLE "$RemoteRcsPrg @wildCardFiles\n";
+		#
+		# get the complete wildcard paths from the server.
+		# Add them to the list of remote exchange files.
+		&getWildCardsFromServer($needReadableFile);
+	}
+
+	#
+	# pass the revitalized command w\wildcards,etc.
+	#
+	print "$RemoteRcsPrg @remoteRcslockargs @remoteRcsDashDargs @remoteCommaVFiles\n" if $Debug;
+	print $SOCK_HANDLE "$RemoteRcsPrg @remoteRcslockargs @remoteRcsDashDargs @remoteCommaVFiles\n";
+	
+	#
+	# Read rcslocks info from the socket
+	#
+	while( <$SOCK_HANDLE> ) {
+		&checkForDeadServer($_);
+		if (m%^>>### RCSLOCKS ALL DONE ###<<$%) {
+			$tmpExitValue = <$SOCK_HANDLE>;
+			&checkForDeadServer($tmpExitValue);
+			chop $tmpExitValue;
+			#
+			# reset the exit value if necessary
+			#
+			if ((!$exitValue) && ($tmpexitValue)){
+				$exitValue = 1;
+			}
+		}
+		else {
+			print;
+		}
+	}
+	print STDOUT "Closing socket\n" if $Debug;
+	&sock'close($SOCK_HANDLE);
+}
+&Exit($exitValue,@nullErrorMessage);
+

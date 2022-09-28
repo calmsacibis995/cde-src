@@ -1,0 +1,106 @@
+.\"----------------------------------------------------------------------------
+.\" **
+.\" **
+.\" ** (c) Copyright 1994 Hewlett-Packard Company
+.\" ** (c) Copyright 1994 International Business Machines Corp.
+.\" ** (c) Copyright 1994 Sun Microsystems, Inc.
+.\" ** (c) Copyright 1994 Unix Systems Labs, Inc., a subsidiary of Novell, Inc.
+.\" **
+.\" **
+.\" **
+.\"----------------------------------------------------------------------------
+.TH dtsdlfile 4 "11 Jan 1994"
+.BH "11 Jan 1994"
+.\"----------------------------------------------------------------------------
+.\"--- NAME
+.SH NAME
+dtsdlfile \- Cde runtime help volume files
+.\"--- --------------------------------------------------------
+.\"--- DESCRIPTION 
+.SH DESCRIPTION
+.LP
+Semantic Delivery Language (sdl) files are used for presenting online 
+information or application specific contextual help information in Cde. They
+are refered to as Help Volumes, and contain the equivalent of a runtime 
+version of the original authored help information.  Help Volumes can be
+viewed via one of the two Cde help dialog widgets provided as part of the Cde
+Development Environment.
+.SS FILE FORMAT
+See dtsdldtd(4)
+.SS FILE GENERATION
+Refer to the
+.IR dthelptag(1)
+man page for detailed information on the creation of *.sdl files within Cde.
+.SH ENVIRONMENT VARIABLES
+The Cde help system utilizes two environment variables for locating 
+help volumes and family files within the desktop environment:
+.TP 10
+.SM \fBDTHELPSEARCHPATH\fP
+\fISystem\fP search path environment variable for locating
+help volumes on local and/or remote nfs mounted systems.
+.TP 10
+.SM \fBDTHELPUSERSEARCHPATH\fP
+\fIUsers\fP search path environment variable for locating user
+specific help volumes on local and/or remote nfs mounted systems.
+.P
+.sp 1
+The environment variables  contain colon-separated lists of directory paths.
+Each directory path can contain both environment variable names as well as
+special field descriptors that are expanded at runtime via each help component
+that uses these environment variables.
+.P
+Field descriptors consist of a
+.B %
+followed by a single character.
+Field descriptors and their substitution values are:
+.RS
+.TP 8
+.B %H
+This value is replaced with the current volume or family name being searched 
+for.
+.PD 0
+.TP
+.B %L
+Replaced with the current value of the $LANG environment variable.
+.SM .
+.TP
+.B %%
+Replaced with a single
+.BR % .
+.PD
+.RE
+.sp1
+The default value for DTHELPUSERSEARCH path is: NULL.
+.sp1
+If the DTHELPUSERSEARCH is set, its searched for the requested volume. If
+the volume is not found, the DTHELPSEARCHPATH value is searched.
+.P
+The default value for DTHELPSEARCHPATH path is:
+.ta li
+\fB
+.br
+$HOME/.dt/help/%H:
+.br
+$HOME/.dt/help/%H.hv:
+.br
+/etc/dt/appconfig/help/%L/%H:
+.br
+/etc/dt/appconfig/help/%L/%H.sdl:
+.br
+/etc/dt/appconfig/help/%L/%H.hv:
+.br
+/usr/dt/appconfig/help/%L/%H:
+.br
+/usr/dt/appconfig/help/%L/%H.sdl:
+.br
+/usr/dt/appconfig/help/%L/%H.hv
+.fi
+\fP
+.sp 1
+.\"----------------------------------------------------------------------------
+.\"--- SEE ALSO
+.\"---
+.SH "SEE ALSO"
+.BR DtCreateHelpDialog (3),
+.BR DtCreateQuickHelpDialog (3),
+.BR dtsdldtd (1)

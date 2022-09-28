@@ -1,0 +1,105 @@
+.TH dtresourcesfile 4 "23 Nov 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" *************************************************************************
+.\" **  (c) Copyright 1994 Hewlett-Packard Company
+.\" **  (c) Copyright 1994 International Business Machines Corp.
+.\" **  (c) Copyright 1994 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1994 Novell, Inc.
+.\" *************************************************************************
+.SH NAME
+dtresourcesfile \- format and location of desktop resource files
+.SH DESCRIPTION
+The desktop default resources can be found in
+/usr/dt/config/$LANG/sys.resources.
+These resources will be
+made available to each user's session via the
+.I RESOURCE_MANAGER
+property.
+This file should not be edited as it will be unconditionally
+overwritten upon subsequent desktop installations.
+.P
+A system administrator may augment the system default resources
+by creating
+.BR /etc/dt/config/$LANG/sys.resources .
+In this file, a
+system administrator may override system default resources or
+specify additional resources.
+As this file is merged into the
+desktop default resources during session startup, it is preferrable
+that only new or updated resource specifications be placed in this
+file, rather than a copy being made of the desktop default resource
+file.
+Resources specified in this file will be made available to
+each user's session via the
+.I RESOURCE_MANAGER
+property.
+Resources
+specified in this file take precedence over those specified in
+the desktop default resource file.
+.P
+A user may augment the desktop default and system administrator
+resources via their $HOME/.Xdefaults file.
+Resources specified in
+this file will be made available to only that user's session via
+the RESOURCE_MANAGER property.
+Resources specified in this file
+take precedence over those specified in the desktop default or
+system administrator resource files.
+.P
+.B NOTE :
+The X Toolkit Intrinsics specifies that it will load resources
+for an application from either
+.I RESOURCE_MANAGER
+or from
+.BR $HOME/.Xdefaults ,
+but not both.
+Ordinarily, this would mean that
+the user's
+.B $HOME/.Xdefaults
+file would be ignored.
+However, the
+session manager accomodates
+.B $HOME/.Xdefaults
+by merging it into
+the
+.I RESOURCE_MANAGER
+at session startup as described above.
+If
+a user changes the
+.IR $HOME/.Xdefaults ,
+the changes will not be
+visible to new applications until the user invokes the
+ReloadResources action.
+.P
+The ReloadResources action will instruct the session manager to
+reload the
+.I RESOURCE_MANAGER
+with the system, system administrator
+and user specified resources.
+This is useful to make available to
+new applications changes made to system administrator or user
+specified resource files.
+.SH FILE FORMAT
+The desktop resource files use X resource syntax.
+See
+.BR X (1)
+for 
+the precise syntax.
+.SH FILES
+.VL 15
+.LI \f3/usr/dt/config/$LANG/sys.resources\f1
+The desktop default resources.
+.LI \f3/etc/dt/config/$LANG/sys.resources\f1
+System administrator specified resources.
+.LI \f3$HOME/.Xdefaults\f1
+User specified resources.
+.LE
+.SH "SEE ALSO"
+.Cm dtsession 1,
+.BR dtsessionaction (5),
+.BR X (1),
+\f3Xlib Resource Manager documentation\f1, 
+\f3Xt resource documentation\f1.
+
+
+

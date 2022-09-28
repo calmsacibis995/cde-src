@@ -1,0 +1,71 @@
+/*
+ * File:         Imakefile $XConsortium: Imakefile /main/cde1_maint/2 1995/10/23 12:15:31 gtsang $
+ *
+ * Imakefile for the sub-process control daemon.
+ *
+ * (c) Copyright 1993, 1994 Hewlett-Packard Company			*
+ * (c) Copyright 1993, 1994 International Business Machines Corp.	*
+ * (c) Copyright 1993, 1994 Sun Microsystems, Inc.			*
+ * (c) Copyright 1993, 1994 Novell, Inc.				*
+ */
+
+/* General case INCLUDES DEFINE
+ * Each individual architecture may have more or less of the above.
+ * Use EXTRA_DEFINES and EXTRA_INCLUDES to add defines and includes
+ * to an individual architecture.
+ */
+DEFINES = -DCDE_CONFIGURATION_TOP=\"$(CDE_CONFIGURATION_TOP)\"	\
+	  -DCDE_INSTALLATION_TOP=\"$(CDE_INSTALLATION_TOP)\"
+INCLUDES = -I. -I$(DTENCAPSRC)
+
+#ifdef HPArchitecture
+EXTRA_DEFINES = -D_XOPEN_SOURCE -D__hpux_8_0 -DFUNCPROTO -DMESSAGE_CAT
+#endif
+
+/* DEPLIBS contains the list of library depencies for a client.
+ * LOCAL_LIBRARIES contains the list of libraries on the link line.
+ * Generally, the dependency form of a library has DEP as a prefix.
+ * e.g. put $(XLIB) in LOCAL_LIBRARIES and $(DEPXLIB) in DEPLIBS.
+ * NOTE: if DEPLIBS is not set here, it is by default null and there
+ *       are no library dependencies for clients.
+ *       You cannot put -Llibpath into DEPLIBS. You must put actual
+ *       paths to the library.
+ */
+DEPLIBS = $(DEPDTSVCLIB) $(DEPTTLIB)
+LOCAL_LIBRARIES = $(DTSVCLIB) $(TTLIB) $(XLIB)
+
+#if defined(SunArchitecture)
+LOCAL_LIBRARIES = $(DTSVCLIB) $(TTLIB)
+#SYS_LIBRARIES = -lm -ldl -lw -lgen
+EXTRA_CCOPTIONS = -dalign -xstrconst
+#endif
+
+#if defined(USLArchitecture)
+LOCAL_LIBRARIES = $(DTSVCLIB) $(TTLIB) $(XMLIB) $(XTOOLLIB) $(XLIB)
+SYS_LIBRARIES = -lm -lgen 
+#endif
+
+#if defined(UXPArchitecture)
+LOCAL_LIBRARIES = $(DTSVCLIB) $(TTLIB) $(XMLIB) $(XTOOLLIB) $(XLIB)
+SYS_LIBRARIES = -lm -lgen 
+#endif
+
+
+PROGRAMS=dtspcd
+
+SRCS = main.c \
+	spcd_event.c
+
+OBJS = main.o \
+	spcd_event.o
+
+all::
+NormalLibraryObjectRule()
+
+ComplexProgramTarget($(PROGRAMS))
+
+LOCAL_CPP_DEFINES = -DCDE_CONFIGURATION_TOP=$(CDE_CONFIGURATION_TOP) \
+                    -DCDE_INSTALLATION_TOP=$(CDE_INSTALLATION_TOP) \
+                    -DCDE_LOGFILES_TOP=$(CDE_LOGFILES_TOP)
+
+CppTextRule(dtspcdenv,dtspcdenv.src,$(LOCAL_CPP_DEFINES),)

@@ -1,0 +1,409 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH XmCommand 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmCommand\fP \- The Command widget class
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/Command.h>
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+Command is a special-purpose composite widget for command
+entry that provides a built-in command-history mechanism.
+Command includes a command-line text-input field, a command-line prompt,
+and a command-history list region.
+.PP 
+One additional \fIWorkArea\fP child may be added to the Command after
+creation.
+.PP 
+Whenever a command is entered, it is
+automatically added to the end of the command-history list and made visible.
+This does not change the selected item in the list, if there is one.
+.PP 
+Many of the new resources specified for Command are actually SelectionBox
+resources that have been renamed for clarity and ease of use.
+.nL
+.ne 10
+.SS "Classes"
+Command inherits behavior and resources from \fICore\fP,
+\fIComposite\fP, \fIConstraint\fP, \fIXmManager\fP,
+\fIXmBulletinBoard\fP, and \fIXmSelectionBox\fP classes.
+.PP 
+The class pointer is \fIxmCommandWidgetClass\fP.
+.PP 
+The class name is \fIXmCommand\fP.
+.SS "New Resources"
+The following table defines a set of widget resources used by the programmer
+to specify data.  The programmer can also set the resource values for the
+inherited classes to set attributes for this widget.  To reference a
+resource by name or by class in a .Xdefaults file, remove the \fIXmN\fP or
+\fIXmC\fP prefix and use the remaining letters.  To specify one of the defined
+values for a resource in a .Xdefaults file, remove the \fIXm\fP prefix and use
+the remaining letters (in either lowercase or uppercase, but include any
+underscores between words).
+The codes in the access column indicate if the given resource can be
+set at creation time (C),
+set by using \fIXtSetValues\fP (S),
+retrieved by using \fIXtGetValues\fP (G), or is not applicable (N/A).
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmCommand Resource Set
+Name	Class	Type	Default	Access
+_
+XmNcommand	XmCTextString	XmString	""	CSG
+XmNcommandChangedCallback	XmCCallback	XtCallbackList	NULL	C
+XmNcommandEnteredCallback	XmCCallback	XtCallbackList	NULL	C
+XmNhistoryItems	XmCItems	XmStringTable	NULL	CSG
+XmNhistoryItemCount	XmCItemCount	int	0	CSG
+XmNhistoryMaxItems	XmCMaxItems	int	100	CSG
+XmNhistoryVisibleItemCount	XmCVisibleItemCount	int	dynamic	CSG
+XmNpromptString	XmCPromptString	XmString	dynamic	CSG
+.TE
+.KE
+.in
+.sp 1
+.IP "\fIXmNcommand\fP"
+Contains the current command-line text.  This is the \fIXmNtextString\fP
+resource in SelectionBox, renamed for Command.
+This resource can also be modified via
+\fIXmCommandSetValue\fP and \fIXmCommandAppendValue\fP functions.
+The command area is a Text widget.
+.IP "\fIXmNcommandChangedCallback\fP"
+Specifies the list of callbacks that is called
+when the value of the command changes.
+The callback reason is \fIXmCR_COMMAND_CHANGED\fP.
+This is equivalent to the \fIXmNvalueChangedCallback\fP of the Text
+widget, except that a pointer to an \fIXmCommandCallbackStructure\fP is
+passed, and the structure's \fBvalue\fP member contains the
+\fIXmString\fP.
+.nL
+.ne 8
+.IP "\fIXmNcommandEnteredCallback\fP"
+Specifies the list of callbacks that is called
+when a command is entered in the Command.
+The callback reason is \fIXmCR_COMMAND_ENTERED\fP.  A pointer to an
+\fIXmCommandCallback\fP structure is passed.
+.IP "\fIXmNhistoryItems\fP"
+Lists \fIXmString\fP items that make up the contents
+of the history list.  This is the \fIXmNlistItems\fP resource in
+SelectionBox, renamed for Command.
+\fIXtGetValues\fP for this resource returns the list items themselves,
+not a copy of the list items.
+The application must not free the returned items.
+.IP "\fIXmNhistoryItemCount\fP"
+Specifies the number of \fIXmStrings\fP in \fIXmNhistoryItems\fP.  This is
+the \fIXmNlistItemCount\fP resource in SelectionBox, renamed for Command.
+The value must not be negative.
+.IP "\fIXmNhistoryMaxItems\fP"
+Specifies the maximum number of items allowed in the history list.  Once
+this number is reached, an existing list item must be removed before
+a new item can be added to the list.  For each command entered, the first list
+item is removed from the list, so the new command can be added to the list.
+The value must be greater than 0.
+.IP "\fIXmNhistoryVisibleItemCount\fP"
+Specifies the number of items in the history list that should be visible at
+one time.  In effect, it sets the height (in lines) of the history list
+window.  This is the \fIXmNlistVisibleItemCount\fP resource in SelectionBox,
+renamed for Command.
+The value must be greater than 0.
+The default is dynamic based on the height of the list.
+.IP "\fIXmNpromptString\fP"
+Specifies a prompt for the command line.
+This is the \fIXmNselectionLabelString\fP
+resource in SelectionBox, renamed for Command.
+The default may vary depending on the value of the
+\fIXmNstringDirection\fP resource and the locale.
+In the C locale the default is ">".
+.SS "Inherited Resources"
+Command inherits behavior and resources from the following
+superclasses.  For a complete description of each resource, refer to the
+man page for that superclass.
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmSelectionBox Resource Set
+Name	Class	Type	Default	Access
+_
+XmNapplyCallback	XmCCallback	XtCallbackList	NULL	N/A
+XmNapplyLabelString	XmCApplyLabelString	XmString	dynamic	N/A
+XmNcancelCallback	XmCCallback	XtCallbackList	NULL	N/A
+XmNcancelLabelString	XmCCancelLabelString	XmString	dynamic 	N/A
+XmNchildPlacement	XmCChildPlacement	unsigned char	XmPLACE_ABOVE_SELECTION	CSG
+XmNdialogType	XmCDialogType	unsigned char	XmDIALOG_COMMAND 	G
+XmNhelpLabelString	XmCHelpLabelString	XmString	dynamic 	N/A
+XmNlistItemCount	XmCItemCount	int	0 	CSG
+XmNlistItems	XmCItems	XmStringTable	NULL	CSG
+XmNlistLabelString	XmCListLabelString	XmString	NULL	N/A
+XmNlistVisibleItemCount	XmCVisibleItemCount	int	dynamic 	CSG
+XmNminimizeButtons	XmCMinimizeButtons	Boolean	False	N/A
+XmNmustMatch	XmCMustMatch	Boolean	False 	N/A
+XmNnoMatchCallback	XmCCallback	XtCallbackList	NULL	N/A
+.wH
+.tH
+XmNokCallback	XmCCallback	XtCallbackList	NULL	N/A
+XmNokLabelString	XmCOkLabelString	XmString	dynamic	N/A
+XmNselectionLabelString	XmCSelectionLabelString	XmString	dynamic	CSG
+XmNtextAccelerators	XmCTextAccelerators	XtAccelerators	default	C
+XmNtextColumns	XmCColumns	short	dynamic	CSG
+XmNtextString	XmCTextString	XmString	""	CSG
+.TE
+.KE
+.in
+.sp 1
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmBulletinBoard Resource Set
+Name	Class	Type	Default	Access
+_
+XmNallowOverlap	XmCAllowOverlap	Boolean	True	CSG
+XmNautoUnmanage	XmCAutoUnmanage	Boolean	False	N/A
+XmNbuttonFontList	XmCButtonFontList	XmFontList	dynamic	N/A
+XmNcancelButton	XmCWidget	Widget	NULL	N/A
+XmNdefaultButton	XmCWidget	Widget	NULL	N/A
+XmNdefaultPosition	XmCDefaultPosition	Boolean	False	CSG
+XmNdialogStyle	XmCDialogStyle	unsigned char	dynamic	CSG
+XmNdialogTitle	XmCDialogTitle	XmString	NULL	CSG
+XmNfocusCallback	XmCCallback	XtCallbackList	NULL	C
+XmNlabelFontList	XmCLabelFontList	XmFontList	dynamic	CSG
+XmNmapCallback	XmCCallback	XtCallbackList	NULL	C
+XmNmarginHeight	XmCMarginHeight	Dimension	10	CSG
+XmNmarginWidth	XmCMarginWidth	Dimension	10 	CSG
+XmNnoResize	XmCNoResize	Boolean	False	CSG
+.wH
+.tH
+XmNresizePolicy	XmCResizePolicy	unsigned char	XmRESIZE_NONE	CSG
+XmNshadowType	XmCShadowType	unsigned char	XmSHADOW_OUT	CSG
+XmNtextFontList	XmCTextFontList	XmFontList	dynamic	CSG
+XmNtextTranslations	XmCTranslations	XtTranslations	NULL	C
+XmNunmapCallback	XmCCallback	XtCallbackList	NULL	C
+.TE
+.KE
+.in
+.sp 1
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmManager Resource Set
+Name	Class	Type	Default	Access
+_
+XmNbottomShadowColor	XmCBottomShadowColor	Pixel	dynamic	CSG
+XmNbottomShadowPixmap	XmCBottomShadowPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNforeground	XmCForeground	Pixel	dynamic	CSG
+XmNhelpCallback	XmCCallback	XtCallbackList	NULL	C
+XmNhighlightColor	XmCHighlightColor	Pixel	dynamic	CSG
+XmNhighlightPixmap	XmCHighlightPixmap	Pixmap	dynamic	CSG
+XmNinitialFocus	XmCInitialFocus	Widget	dynamic	CSG
+XmNnavigationType	XmCNavigationType	XmNavigationType	XmTAB_GROUP	CSG
+XmNshadowThickness	XmCShadowThickness	Dimension	dynamic	CSG
+XmNstringDirection	XmCStringDirection	XmStringDirection	dynamic	CG
+XmNtopShadowColor	XmCTopShadowColor	Pixel	dynamic	CSG
+XmNtopShadowPixmap	XmCTopShadowPixmap	Pixmap	dynamic	CSG
+XmNtraversalOn	XmCTraversalOn	Boolean	True	CSG
+XmNunitType	XmCUnitType	unsigned char	dynamic	CSG
+XmNuserData	XmCUserData	XtPointer	NULL	CSG
+.TE
+.KE
+.in
+.sp 1
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+Composite Resource Set
+Name	Class	Type	Default	Access
+_
+XmNchildren	XmCReadOnly	WidgetList	NULL	G
+XmNinsertPosition	XmCInsertPosition	XtOrderProc	NULL	CSG
+XmNnumChildren	XmCReadOnly	Cardinal	0	G
+.TE
+.KE
+.in
+.sp 1
+.P 
+.wH
+.in 0 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+Core Resource Set
+Name	Class	Type	Default	Access
+_
+XmNaccelerators	XmCAccelerators	XtAccelerators	dynamic	N/A
+XmNancestorSensitive	XmCSensitive	Boolean	dynamic	G
+XmNbackground	XmCBackground	Pixel	dynamic	CSG
+XmNbackgroundPixmap	XmCPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNborderColor	XmCBorderColor	Pixel	XtDefaultForeground	CSG
+XmNborderPixmap	XmCPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNborderWidth	XmCBorderWidth	Dimension	0	CSG
+XmNcolormap	XmCColormap	Colormap	dynamic	CG
+XmNdepth	XmCDepth	int	dynamic	CG
+XmNdestroyCallback	XmCCallback	XtCallbackList	NULL	C
+XmNheight	XmCHeight	Dimension	dynamic	CSG
+XmNinitialResourcesPersistent	XmCInitialResourcesPersistent	Boolean	True	C
+XmNmappedWhenManaged	XmCMappedWhenManaged	Boolean	True	CSG
+XmNscreen	XmCScreen	Screen *	dynamic	CG
+.wH
+.tH
+XmNsensitive	XmCSensitive	Boolean	True	CSG
+XmNtranslations	XmCTranslations	XtTranslations	dynamic	CSG
+XmNwidth	XmCWidth	Dimension	dynamic	CSG
+XmNx	XmCPosition	Position	0	CSG
+XmNy	XmCPosition	Position	0	CSG
+.TE
+.KE
+.in
+.sp 1
+.wH
+.in  
+.SS "Callback Information"
+.P 
+A pointer to the following structure is passed to each callback:
+.sS
+.iS
+.ta .25i 1.1i
+.nf
+typedef struct
+{
+	int	\fBreason\fI;
+	XEvent	\fB* event\fI;
+	XmString	\fBvalue\fI;
+	int	\fBlength\fI;
+} XmCommandCallbackStruct;
+.iE
+.sE
+.wH
+.fi
+.IP "\fBreason\fP"
+Indicates why the callback was invoked
+.IP "\fBevent\fP"
+Points to the \fIXEvent\fP that triggered the callback
+.IP "\fBvalue\fP"
+Specifies the \fIXmString\fP in the CommandArea
+.IP "\fBlength\fP"
+Specifies the size of the command in \fIXmString\fP
+.SS "Translations"
+XmCommand inherits translations from XmSelectionBox.
+.SS "Accelerators"
+The \fIXmNtextAccelerators\fP from XmSelectionBox are added to the Text
+descendant of XmCommand.
+.SS "Action Routines"
+The XmCommand action routines are described below:
+.IP "\fISelectionBoxUpOrDown(0|1|2|3)\fP:"
+When called with a 0 argument, selects the previous item in the history
+list and replaces the text with that item.
+.P
+When called with a 1 argument, selects the next item in the history
+list and replaces the text with that item.
+.P
+When called with a 2 argument, selects the first item in the history
+list and replaces the text with that item.
+.P
+When called with a 3 argument, selects the last item in the history
+list and replaces the text with that item.
+.P
+Calls the callbacks for \fIXmNcommandChangedCallback\fP.
+.SS "Additional Behavior"
+The Command widget has the additional behavior described below:
+.IP "\fIMAny KCancel\fP:"
+If the parent of the Command is a manager, the event is passed to the parent.
+.IP "\fIKActivate\fP\ in\ Text:"
+Calls the Text widget's \fIXmNactivateCallback\fP callbacks.
+If the text is empty, this action then returns.
+Otherwise, if the history list has \fIXmNhistoryMaxItems\fP items, it
+removes the first item in
+the list.
+.ne 6
+It adds the text to the history list as the last item, clears the text,
+and calls the \fIXmNcommandEnteredCallback\fP callbacks.
+.IP "\fI<Key>\fP\ in\ Text:"
+When any change is made to the text edit widget, this action
+calls the callbacks for
+\fIXmNcommandChangedCallback\fP.
+.IP "\fI<DoubleClick>\fP\ or\ \fI<KActivate>\fP\ in\ List:"
+Calls the List widget's \fIXmNdefaultActionCallback\fP callbacks.
+If the history list has \fIXmNhistoryMaxItems\fP items, this action
+removes the first item in the list.
+It adds the selected List item to the history list as the last item,
+clears the text, and calls the \fIXmNcommandEnteredCallback\fP
+callbacks.
+.IP "\fI<FocusIn>\fP:"
+Calls the callbacks for \fIXmNfocusCallback\fP.
+.IP "\fI<MapWindow>\fP:"
+When a Command that is the child of a DialogShell is mapped, this action
+calls the callbacks for \fIXmNmapCallback\fP.
+.IP "\fI<UnmapWindow>\fP:"
+When a Command that is the child of a DialogShell is unmapped, this
+action calls the
+callbacks for \fIXmNunmapCallback\fP.
+.SS "Virtual Bindings"
+The bindings for virtual keys are vendor specific.
+For information about bindings for virtual buttons and keys, see \fIVirtualBindings(3X)\fP.
+.SH RELATED INFORMATION
+.na
+\fIComposite(3X)\fP, \fIConstraint(3X)\fP,
+\fICore(3X)\fP,
+\fIXmBulletinBoard(3X)\fP,
+\fIXmCommandAppendValue(3X)\fP,
+\fIXmCommandError(3X)\fP,
+\fIXmCommandGetChild(3X)\fP,
+\fIXmCommandSetValue(3X)\fP,
+\fIXmCreateCommand(3X)\fP,
+\fIXmManager(3X)\fP, and
+\fIXmSelectionBox(3X)\fP.
+.ad

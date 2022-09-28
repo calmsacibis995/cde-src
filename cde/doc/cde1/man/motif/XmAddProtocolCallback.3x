@@ -1,0 +1,77 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Novell, Inc
+...\" **
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH XmAddProtocolCallback 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmAddProtocolCallback\fP \- A VendorShell function that adds client callbacks for a protocol
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/Xm.h>
+\&#include <Xm/Protocols.h>
+.sp \n(PDu
+void XmAddProtocolCallback (\fBshell, property, protocol, callback, closure\fI)
+.ta .5i 1.75i
+.nf
+	Widget	\fBshell\fI;
+	Atom	\fBproperty\fI;
+	Atom	\fBprotocol\fI;
+	XtCallbackProc	\fBcallback\fI;
+	XtPointer	\fBclosure\fI;
+.sp \n(PDu
+void XmAddWMProtocolCallback (\fBshell, protocol, callback, closure\fI)
+	Widget	\fBshell\fI;
+	Atom	\fBprotocol\fI;
+	XtCallbackProc	\fBcallback\fI;
+	XtPointer	\fBclosure\fI;
+.wH
+.fi
+.ne 10
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+\fIXmAddProtocolCallback\fP adds client callbacks for a protocol.  It
+checks if the protocol is registered, and if it is not,
+calls \fIXmAddProtocols\fP.  It then adds the callback to
+the internal list.  These callbacks are called when
+the corresponding client message is received.
+.PP 
+\fIXmAddWMProtocolCallback\fP is a convenience interface.
+It calls \fIXmAddProtocolCallback\fP
+with the property value set to the atom returned by
+interning \fIWM_PROTOCOLS\fP.
+.IP "\fBshell\fP"
+Specifies the widget with which the protocol property is associated.
+.IP "\fBproperty\fP"
+Specifies the protocol property.
+.IP "\fBprotocol\fP"
+Specifies the protocol \fIAtom\fP (or an \fIint\fP type cast to \fIAtom\fP).
+.IP "\fBcallback\fP"
+Specifies the procedure to call when a protocol message is received.
+.IP "\fBclosure\fP"
+Specifies the client data to be passed to the callback when it is invoked.
+.PP 
+For a complete definition of VendorShell and its associated resources, see
+\fIVendorShell(3X)\fP.
+.SH RELATED INFORMATION
+.na
+\fIVendorShell(3X)\fP, \fIXmAddProtocols(3X)\fP,
+\fIXmAddWMProtocolCallback(3X)\fP, and \fIXmInternAtom(3X)\fP.
+.ad

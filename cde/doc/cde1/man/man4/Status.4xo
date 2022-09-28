@@ -1,0 +1,71 @@
+.TH Status 4 "13 May 1994"
+.SH NAME
+Status notice \- a tool has some status information to announce
+.SH SYNOPSIS
+.yS
+.ta \w@Status(@u
+Status(in string \f2status\fP,
+	in string \f2vendor\fP,
+	in string \f2toolName\fP,
+	in string \f2toolVersion\fP
+	[in messageID \f2commission\fP]);
+.yE
+.SH DESCRIPTION
+The
+.I Status
+notice
+indicates that
+a tool has status information to announce.
+.P
+The
+.I status
+argument
+is the status being announced.
+.P
+The
+.I vendor
+argument
+is the vendor of the sending tool.
+.P
+The
+.I toolName
+argument
+is the name of the sending tool.
+.P
+The
+.I toolVersion
+argument
+is the version of the sending tool.
+.P
+The
+.I commission
+argument
+is the ID of the request, if any, that initiated the operation
+the status of which is being announced.
+.SH "APPLICATION USAGE"
+The
+.Fn ttdt_subcontract_manage 3,
+function can be used to register for,
+and help process, the
+.I Status
+request.
+.P
+The
+.I Status
+request can be sent with
+.Fn ttdt_message_accept 3.
+.P
+The
+.I Status
+notice can be used by handlers of requests invoking protracted
+operations to provide periodic point-to-point status reports to the
+requester.
+Doing so has the nice side effect of identifying the handler to
+the requester, so that the requester can issue a
+.I Quit
+request if it wants to.
+.SH "SEE ALSO"
+.Fn ttdt_message_accept 3,
+.Fn ttdt_subcontract_manage 3;
+.I Quit
+request.

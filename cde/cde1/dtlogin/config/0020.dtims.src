@@ -1,0 +1,175 @@
+\#!/bin/ksh
+\#####################################################################
+\###  File:              0020.dtims
+\###
+\###  Default Location:  CDE_INSTALLATION_TOP/config/Xsession.d/
+\###
+\###  Purpose:           Start desktop input method server if required
+\###                     
+\###  Description:
+\###                     This script is invoked by means of the Xsession file
+\###                     at user login. It starts an input method server as
+\###                     required for selected locales.
+\###
+\###  Invoked by:        CDE_INSTALLATION_TOP/bin/Xsession
+\###
+\###  Product:           @(#)Common Desktop Environment 1.0          
+\###
+\###  Note:              
+\###
+\###    The CDE_INSTALLATION_TOP/config/Xsession.d/0020.dtims file is a
+\###    factory-default file and will be unconditionally overwritten upon
+\###    subsequent installation. To customize input method server startup
+\###    behavior, copy this file to the configuration directory,
+\###    CDE_CONFIGURATION_TOP/config/Xsession.d and customize that version
+\###    of the file.
+\###    
+\###    The value of DTSTARTIMS determines whether this file,
+\###    CDE_INSTALLATION_TOP/config/Xsession.d/0020.dtims, will start
+\###    the specified input method server. Should an input method server
+\###    be started from CDE_CONFIGURATION_TOP/config/Xsession.d/0020.dtims
+\###    or should an input method server not be desired, unset DTSTARTIMS
+\###    to prevent this file from starting one.
+\###
+\###    The general logic of this file is:
+\###
+\###    if [ "$DTSTARTIMS" = "True" ]
+\###    then
+\###      <start input method server>
+\###      unset DTSTARTIMS
+\###    fi
+\###
+\###  Revision:          $XConsortium: 0020.dtims.src /main/cde1_maint/3 1995/10/03 17:39:03 gtsang $
+\###
+\###  (c) Copyright 1993, 1994 Hewlett-Packard Company
+\###  (c) Copyright 1993, 1994 International Business Machines Corp.
+\###  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+\###  (c) Copyright 1993, 1994 Novell, Inc.
+\###
+\#####################################################################
+
+
+#if defined(__uxp__)
+if [ "$DTSTARTIMS" = "True" ]
+then
+	if [ "$LANG" = "japan" ]
+	then
+		export XOAKGUI="mtf"
+		if [ -f $HOME/.MTFXdefaults ]
+		then
+			xrdb $HOME/.MTFXdefaults
+		fi
+		if [ -f $HOME/.Xdefaults ]
+		then
+			xrdb -merge $HOME/.Xdefaults
+		fi
+		/usr/bin/X11/xfeoak2 -mtf -silent
+	fi
+fi
+#endif
+
+
+#if defined(sun)
+if [ "$DTSTARTIMS" = "True" ]
+then
+\#
+\#  Start Sun platform IM (Input Method) server for Asian locales
+\#
+  if [ ! -z "$LANG" ]
+  then
+      if [ -x /usr/dt/config/$LANG/0020.dtims ]; then
+                /usr/dt/config/$LANG/0020.dtims
+      else
+          case $LANG in
+                ja    | japanese | \
+                zh    | chinese  | \
+                zh_TW | tchinese | \
+                ko    | korean   | \
+		ko.UTF-8 )
+
+                if [ -x /usr/openwin/bin/htt ]; then
+			echo "htt.basiclocale: $LANG" | /usr/openwin/bin/xrdb -m
+                        /usr/openwin/bin/htt -nosm &
+                        unset DTSTARTIMS
+                fi;;
+
+                ja_JP.SJIS | ja_JP.PCK )
+                if [ -x /usr/openwin/bin/htt ]; then
+			echo "htt.basiclocale: ja" | /usr/openwin/bin/xrdb -m
+                        LANG=ja /usr/openwin/bin/htt -nosm &
+                        unset DTSTARTIMS
+                fi;;
+	
+                BIG5 | zh_TW.BIG5 )
+                if [ -x /usr/openwin/bin/htt ]; then
+			echo "htt.basiclocale: zh_TW" | /usr/openwin/bin/xrdb -m
+                        LANG=zh_TW /usr/openwin/bin/htt -nosm &
+                        unset DTSTARTIMS
+                fi;;
+
+             *);;
+         esac
+      fi
+  fi
+fi
+#endif
+
+#ifdef	_AIX
+if [ "$DTSTARTIMS" = "True" ]
+then
+\#
+\# The below if-fi statement is the example to launch AIX Input Method
+\# Server(aixims). Please see the appropriate manuals or documents in detail.
+\#
+  if [ -x /usr/bin/X11/aixims ]; then
+	/usr/bin/X11/aixims &
+	unset DTSTARTIMS
+  fi
+fi
+
+#endif
+
+#if defined (__hpux)
+if [ "$DTSTARTIMS" = "True" ]
+then
+\#
+\# Start HP platform IM (Input Method) server for Asian locales, as needed
+\# Need to add lines for Korea and China, too.
+\#
+   if [ ! -z "$LANG" ]
+   then
+      case $LANG in
+         japanese | ja_JP.SJIS ) 
+	    if [ -x /usr/lib/nlio/bin/kks ] && [ -x /usr/lib/nlio/bin/xjim ]
+	    then
+	       unset XJINPUT
+	       export XMODIFIERS="@im=_XIMP_japanese#xjim.0"
+	       /usr/lib/nlio/bin/kks >/dev/null 2>&1
+	       sleep 5
+	       /usr/lib/nlio/bin/xjim &
+	       sleep 10
+	    else [ -x /usr/lib/nlio/serv/X11/xj0input.8.2 ]
+	       export XJINPUT="/usr/lib/nlio/serv/X11/xj0input.8.2"
+	       export XMODIFIERS="@im=_HPNLIO"
+	    fi 
+            unset DTSTARTIMS ;;
+	 japanese.euc | ja_JP.eucJP ) 
+	    if [ -x /usr/lib/nlio/bin/kks ] && [ -x /usr/lib/nlio/bin/xjim ]
+	    then
+	       unset XJINPUT
+	       export XMODIFIERS="@im=_XIMP_japanese.euc#xjim.0"
+	       /usr/lib/nlio/bin/kks >/dev/null 2>&1
+	       sleep 5
+	       /usr/lib/nlio/bin/xjim &
+	       sleep 10
+	    else [ -x /usr/lib/nlio/serv/X11/xj0input.8.2 ]
+	       export XJINPUT="/usr/lib/nlio/serv/X11/xj0input.8.2"
+	       export XMODIFIERS="@im=_HPNLIO"
+	    fi 
+            unset DTSTARTIMS ;;
+      esac
+   fi
+fi
+#endif
+
+\##########################         eof       #####################

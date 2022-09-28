@@ -1,0 +1,159 @@
+##
+## This tests the cclient and smtp interfaces through the data port api interface
+##
+
+# create the token that names a test message store object
+
+token create token1
+
+token set token1 serviceprovider cclient
+token set token1 servicetype local
+token set token1 serviceoption messagestorename /tmp/test.mbx
+
+# create the token that names the smtp transport service
+
+token create token2
+
+token set token2 servicetype smtp
+token set token2 serviceclass messagetransport
+
+###
+### Test address resolution
+###
+
+# copy the test mailbox to /tmp
+
+! /usr/bin/rm -f /tmp/test.mbx
+! /usr/bin/cp test1.mbx /tmp/test.mbx
+! /usr/bin/chmod 666 /tmp/test.mbx
+
+# create and open a data port on the message store
+
+port create port1
+port startup port1
+port open port1 token1
+
+# create and open a data port on the message transport
+
+port create port2
+port startup port2
+port open port2 token2
+
+port getstatus port1
+
+# Do resolve on message 1 which should not require any address rewriting
+# which should not cause any headers to be changed so the message should
+# not be rewritten during the commit
+
+port getstructure port1 1
+port getheaders port1 1
+port resolve port2 port1 1
+port getheaders port1 1
+port commit port1 1
+port checkfornewmessages port1
+port getstatus port1
+port getflags port1 1
+
+# Do a resolve after adding a to header; addresses will be rewritten and the
+# message should be rewritten during the commit
+
+port getstructure port1 1
+port getheaders port1 1
+port addheader port1 1 To foobar@humbux
+port commit port1 1
+port getflags port1 1
+port checkfornewmessages port1
+port getstatus port1
+port getstructure port1 1,7
+port getheaders port1 1,7
+
+port resolve port2 port1 7
+port getheaders port1 7
+port commit port1 7
+port checkfornewmessages port1
+port getstatus port1
+port getstructure port1 *
+port getheaders port1 8
+port getflags port1 7,8
+
+# close the ports
+
+port close port1
+port shutdown port1
+port delete port1
+
+port close port2
+port shutdown port2
+port delete port2
+
+###
+### Test message filing and message sending
+###
+
+# copy the test mailbox to /tmp
+
+! /usr/bin/rm -f /tmp/test.mbx
+! /usr/bin/cp test1.mbx /tmp/test.mbx
+! /usr/bin/chmod 666 /tmp/test.mbx
+
+# create and open a data port on the message store
+
+port create port1
+port startup port1
+port open port1 token1
+
+# create and open a data port on the message transport
+
+port create port2
+port startup port2
+port open port2 token2
+
+port getstatus port1
+
+! rm -f /tmp/mail.to.out
+! rm -f /tmp/mail.cc.out
+! rm -f /tmp/mail.bcc.out
+
+port newmessage port1 
+port addheader port1 -1 To /tmp/mail.to.out
+port addheader port1 -1 Cc /tmp/mail.cc.out
+port addheader port1 -1 Bcc /tmp/mail.bcc.out
+port addheader port1 -1 Subject test
+port addmessagebodytomessage port1 -1 text plain
+port setcontents port1 -1 0.1 This is the contents of the message
+port getstructure port1 -1 
+port resolve port2 port1 -1 -f
+port submit port2 port1 -1 mime
+
+! /usr/bin/ls -l /tmp/mail.to.out /tmp/mail.cc.out /tmp/mail.bcc.out
+! /usr/bin/sum /tmp/mail.to.out /tmp/mail.cc.out /tmp/mail.bcc.out
+! /bin/cat /tmp/mail.to.out
+
+port newmessage port1 
+port addheader port1 -2 To /tmp/mail.to.out
+port addheader port1 -2 Cc /tmp/mail.cc.out
+port addheader port1 -2 Bcc /tmp/mail.bcc.out
+port addheader port1 -2 Subject test
+port addmessagebodytomessage port1 -2 text plain
+port setcontents port1 -2 0.1 This is the contents of the second message
+port getstructure port1 -2 
+port resolve port2 port1 -2 -f
+port submit port2 port1 -2 mime
+
+! /usr/bin/ls -l /tmp/mail.to.out /tmp/mail.cc.out /tmp/mail.bcc.out
+! /usr/bin/sum /tmp/mail.to.out /tmp/mail.cc.out /tmp/mail.bcc.out
+! /bin/cat /tmp/mail.to.out
+
+###
+### ALL DONE
+###
+
+# close the ports
+
+port close port1
+port shutdown port1
+port delete port1
+
+port close port2
+port shutdown port2
+port delete port2

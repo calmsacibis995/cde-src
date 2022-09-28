@@ -1,0 +1,327 @@
+<!--
+/*
+ *	$XConsortium: AppBuilder /main/cde1_maint/1 1995/07/14 21:49:07 drk $
+ *
+ *	@(#)AppBuilder	1.4 03 Mar 1994	
+ *
+ * 	RESTRICTED CONFIDENTIAL INFORMATION:
+ *	
+ *	The information in this document is subject to special
+ *	restrictions in a confidential disclosure agreement between
+ *	HP, IBM, Sun, USL, SCO and Univel.  Do not distribute this
+ *	document outside HP, IBM, Sun, USL, SCO, or Univel without
+ *	Sun's specific written approval.  This document and all copies
+ *	and derivative works thereof must be returned or destroyed at
+ *	Sun's request.
+ *
+ *	Copyright 1993 Sun Microsystems, Inc.  All rights reserved.
+ *
+ */ -->
+<hometopic>  CDE Application Builder
+
+The CDE Application Builder provides an interactive, graphical environment 
+that facilitates the development of CDE applications.
+
+
+The Application Builder is designed to make it easier for developers to
+construct applications that integrate well into the Common Desktop
+Environment. It provides two basic services - aid in assembling Motif
+objects into the desired application user interface, and generation of
+appropriate calls to the routines that support desktop integration
+services (e.g., ToolTalk messaging, drag and drop, etc.).
+
+Key supported tasks include:
+<list bullet>
+ * Interactive layout of the user interface for an application,
+constructing it piece-by-piece from a collection of objects from the
+CDE Motif toolkit.
+ * Definition of connections between objects to provide elements
+of application interface behavior, and a limited test mode that allows
+connections to be exercised.
+ * Interactive specification of the interconnections desired
+between the application and CDE desktop services.
+ * Editing of applications previously created using the Application Builder
+ * Generation of C language source code and associated project
+files (e.g., Imakefile, message catalog) for the application
+ * Generation (compilation) and invocation of the application from
+within the Application Builder, allowing the developer to execute the
+build/run/debug cycle all from a common environment (and without having
+to exit and restart the Application Builder)
+<\list>
+
+<s1 id=MainPalette> CDE Application Builder Main Palette
+				<idx|palette, main|
+
+
+<figure entity=MainPaletteFig>
+<\figure>
+
+The Main Palette is the starting point for building a Graphical User
+Interface (GUI) by dragging objects from the AppBuilder to the Desktop -
+and for generating code after you have created an interface.  The Main
+Palette consists of the following:
+
+<list bullet>
+ * <xref MenuBar>
+ * <xref ToolBar>
+ * <xref ObjectPalettes>
+ * <xref ObjectInfoArea>
+<\list>
+
+<s2 id=MenuBar> Menu Bar
+				<idx|menu bar|
+The Menu Bar includes the following menus:
+<list bullet tight>
+* File
+* Edit
+* View
+* Layout
+* Editors
+* Help
+<\list>
+
+<procedure> File Menu
+The File menu includes the following:
+<lablist tight>
+\New Project...\ to begin creation of a new Project
+\Open Project...\ to load an existing Project in to the AppBuilder
+\Rename Project...\ to change the name of the current Project
+\Save Project...\ to save the current Project
+\Save Project As...\ to save the current Project using a different name
+\Encapsulate Project...\ to create a single file containing the Project and
+all its modules
+\New Module...\ to create a new module within the current Project
+\Import Module...\ to bring into the current Project an existing module saved 
+elsewhere, using any of a variety of supported formats
+\Export Module\ to save a module in the current project in a separate file,
+using any of a variety of supported formats
+\Code Generator...\ to bring up the Code Generator Tool
+\Project Organizer...\ to display the Project Organizer
+\Close Project\ to unload the currently Project
+<\lablist>
+
+<procedure> Edit Menu
+The Edit menu includes the following:
+<lablist tight>
+\Undo\ to undo the last action in AppBuilder
+\Cut\ to cut the selected object and place it in buffer
+\Copy\ to copy the selected object and place it in buffer
+\Paste\ to paste the object in the buffer in the current window
+\Delete\ to delete the selected object; not placed in buffer
+<\lablist>
+
+<procedure> View Menu
+The View menu includes the following:
+<lablist tight>
+\Browser...\ to bring up the Browser and view the entire project or
+individual modules
+<\lablist>
+
+<procedure> Layout Menu
+The Layout menu includes the following:
+<lablist tight>
+\Align...\ to align objects in an interface
+<\lablist>
+
+<procedure> Editors Menu
+The Editors menu includes the following:
+<lablist tight>
+\Properties...\ to change properties of objects
+\Layout...\ to lay out the objects in a window in an organized way
+\Help...\ to write help for an object in an interface
+\Menus...\ to construct a menu
+\Groups...\ to group objects for the purpose of layout organization
+\Connections...\ to establish connections between objects in an interface
+\ToolTalk...\ to define and configure the application's ToolTalk features
+<\lablist>
+
+<procedure> Help Menu
+The Help menu includes the following:
+<lablist tight>
+\On AppBuilder...\ to display the help volume for the Application Builder
+<\lablist>
+
+<s2 id=ToolBar> Tool Bar
+				<idx|tool bar|
+
+The Tool Bar includes the following buttons:
+<lablist>
+\Build\ the build mode of AppBuilder, for designing and building an interface
+\Test\ the <location id=TestMode>test<\location> mode of AppBuilder, for testing the functions of an interface
+<\lablist>
+
+<s2 id=ObjectPalettes> Object Palettes
+				<idx|object palettes|
+AppBuilder includes four object palettes (object types in parentheses):
+
+<lablist>
+<labheads> \PALETTE \CONTENTS
+\<xref WindowsPalette>\ (Main Window, Custom Dialog, Message Dialog, 
+File Selection Dialog) -- the basic AppBuilder object; other objects are 
+placed in a Main Window or Custom Dialog when building a user 
+interface.  Message Dialogs and File Selection Dialogs are specialized
+for particular application purposes.
+\<xref ContainersPalette>\ (Control Panel, Paned Container)
+\<xref PanesPalette>\ (Text Pane, Draw Area Pane, Term Pane)
+-- depending on what the
+interface is going to do, one of the panes or containers
+must be dragged to a window before Controls can be
+placed in the window.
+\<xref ControlsPalette>\ (Menu Button, Button, Radio Box, Combo Box,
+Check Box, Text Field, Spin Box, Option Menu, Menu Bar, List, Gauge,
+Label, Separator, Slider) -- the functional 
+objects which comprise the user interface.
+<\lablist>
+
+<s3 id=WindowsPalette> Windows
+				<idx|palette, windows|
+The Windows Palette includes the following objects:
+
+<list bullet>
+* Main Window
+* Custom Dialog
+* Message Dialog
+* File Selection Dialog
+<\list>
+
+<procedure> Main Window
+<p gentity=BaseWindowFig gposition=right> A <location id=BaseWindow>main 
+window<\location> is the basic 
+AppBuilder object; a user interface is built in a main window.  The basic 
+process of building an interface is outlined below: 
+
+<list order tight>
+* Drag a Main Window to the Desktop to start an interface.
+* Drag one of the Panes or Containers objects to the main window.
+* Resize the pane or container object to fill the main window.
+* Drag one or more Controls to the pane and/or container to build the interface.
+<\list>
+
+<procedure> Custom Dialog
+<p gentity=PopupWinFig gposition=right> A <location id=CustomDialog>custom 
+dialog<\location> is a 
+window for displaying information or providing a
+popup for a specific task within an interface.  A custom dialog might
+be "connected" to a button in the main window, causing the popup
+dialog to be displayed when the button is selected in the interface.
+
+<procedure> Message Dialog
+<p gentity=MessageBoxFig gposition=right> A message dialog
+is a particular type of popup for displaying
+information or providing a prompt for a user.  There are six types of
+message dialogs:
+
+<list order tight>
+* Error (for application error messages)
+* Information (for providing general info about the application)
+* Prompt (for providing a prompt for user to respond to)
+* Question (for providing a question for user to answer)
+* Warning (for providing a warning about a user action)
+* Working (for telling a user that an activity is going on)
+<\list>
+
+<procedure> File Selection Dialog
+<p gentity=FileSelBoxFig gposition=right> A file selection dialog
+is a particular type of popup used to allow users to specify a file
+to be used as part of an Open or Save operation.
+
+<s3 id=ContainersPalette> Containers
+				<idx|palette, choosers|
+The Containers Palette includes the following objects:
+
+<p gentity=ContainerFig gposition=left> Control Panel
+<p gentity=PanedWinFig gposition=left> Paned Container
+
+A Container object is placed in any of the Window objects.
+
+<s3 id=PanesPalette> Panes
+				<idx|palette, panes|
+				<idx|palette, containers|
+
+The <location id=Panes>Panes<\location> Palette includes the following objects:
+
+<p gentity=TextPaneFig gposition=left> Text Pane
+<p gentity=TermPaneFig gposition=left> Term Pane
+<p gentity=DrawAreaFig gposition=left> Draw Area Pane
+
+<s3 id=ControlsPalette> Controls
+The <location id=Controls>Controls<\location> Palette includes the following objects:
+
+<p gentity=ButtonObjFig gposition=left>  Button
+<p gentity=ComboBoxObjFig gposition=left>  Combo Box
+<p gentity=CheckboxObjFig gposition=left>  Check Box
+<p gentity=GaugeObjFig gposition=left>  Gauge
+<p gentity=LabelObjFig gposition=left>  Label
+<p gentity=SListObjFig gposition=left>  List
+<p gentity=MenubarObjFig gposition=left>  Menu Bar
+<p gentity=MenuButtonObjFig gposition=left>  Menu Button
+<p gentity=OptionMenuObjFig gposition=left>  Options Menu
+<p gentity=ExclObjFig gposition=left>  Radio Box
+<p gentity=SeparatorObjFig gposition=left>  Separator
+<p gentity=SliderObjFig gposition=left>  Slider
+<p gentity=SpinBtnObjFig gposition=left>  Spin Button
+<p gentity=TextFieldObjFig gposition=left>  Text Field
+
+<s2 id=ObjectInfoArea> Object Information Area
+				<idx|object information|
+The Object Information Area includes the following information fields:
+<lablist tight>
+\Object Type\ the type of the object that lies directly under the cursor (e.g., Main Window, Text Field)
+\Object Name\ the name of the object under the cursor
+\Position\ the (x,y) coordinates of the object under the cursor, measured
+in the coordinate system of the object that contains it
+\Size\ the size of the object under the cursor, in the form "width X height"
+\Cursor Position\ the (x,y) coordinates of the cursor, measured in the
+coordinate system of the object that contains it
+\Editing Module\ the name of the Module currently being edited
+<\lablist>
+
+This information is continuously updated as you move the mouse cursor around on
+your screen, and as you create/select Modules to be built and edited as
+part of your Project.  This also works as you move the cursor around on the
+object palettes, making it easy for you to learn the names of the various
+objects on the palettes simply by pointing at them with the mouse.
+
+<s1 id=Example> Example: Creating a User Interface
+			<idx|example|
+
+Do the following to create an simple interface:
+
+<list order>
+ * Drag a <link BaseWindow>MainWindow<\link> from the Windows area to the 
+Desktop.  This begins the process of creating your application and the first
+module in it, so you'll be asked to give the new module a name.  Do that
+and click 'Apply'
+ * Drag a <link Panes>Control Panel<\link> from the Containers area to the Main
+Window; drop it in the top-left corner of the Main Window and 
+resize the Control Area (using the grab handles in the corner or along the
+sides) to fill the Main Window.
+ * Drag a <link Controls>Button<\link> and some other objects to the 
+Control Area.
+ * Drag a <link CustomDialog>Custom Dialog<\link> from the Windows area to the Desktop.
+ * Double-click on the button in the Control Area to display the Revolving Property Editor.
+ * Customize the interface objects by adding labels, changing colors, etc.
+You might find it useful to give the button a unique Object Name that you'd 
+recognize (e.g., exit_button)  You can bring up the Property Editor for the
+Custom Dialog by double clicking on it.  Give it a recognizable Object Name
+as well.
+ * Review your work by bringing up the Browser via the View menu on the main
+menu bar.  The Browser will let you examine each module you create, bring up
+Property sheets for objects as you select them, and supports many object 
+editing functions such as cut/copy/paste.
+ * Click on Connections... at bottom of Property Editor to pop up 
+the Connections Editor.
+ * Select the Button in the Source list and the Custom Dialog in the
+Target list.   Select "Click Select" from the When option menu and "Show"
+from the Predefined Action option menu, then click the Connect at the bottom
+of the Connections Editor to make the connection. 
+ * Click on Test in the Tool Bar to change to Test Mode;  Click the button
+on the main window and the custom dialog will appear.  Click on Build in the
+Tool Bar and go back to Build Mode.
+ * Bring up the File menu from the main menu bar and select "Save Project".
+A file selection dialog will let you specify the directory and file in which
+you want to save your work.
+ * Once you've saved the project you can generate code.  Bring up the File
+menu and select "Generate Code...".  Code Generator Tool will appear.  Use
+the Build All button to generate your application code, then make and run it.
+<\list>

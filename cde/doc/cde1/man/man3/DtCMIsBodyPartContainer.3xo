@@ -1,0 +1,63 @@
+.TH DtCMIsBodyPartContainer 3 "17 January 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH "NAME"
+DtCMIsBodyPartContainer \- determine if the body-part content is a container
+.SH "SYNOPSIS"
+.yS
+#include <Bento/DtCM.h>
+.sp 0.5v
+.ta \w'CMBoolean DtCMIsBodyPartContainer('u
+CMBoolean DtCMIsBodyPartContainer(DtCMBodyPart *\f2body_part\fP,
+	CMEnv *\f2error\fP);
+.yE
+.SH "DESCRIPTION"
+The
+.Fn DtCMIsBodyPartContainer
+function determines that the body-part content is an embedded container.
+This is done by inspecting the handlers associated with the content type.
+If the application has special container types, it must register the
+metahandlers for these types prior to calling this function.
+Applications can also inspect the type name to determine if the content is
+a container.
+.P
+The
+.I body_part
+argument is a body-part structure returned by any of the
+.Fn DtCMGetBodyPart 3,
+.Fn DtCMGetNextBodyPart 3,
+or
+.Fn DtCMNewBodyPart 3
+functions.
+The
+.I error
+argument is a pointer to an error return structure.
+.SH "RETURN VALUE"
+The
+.Fn DtCMIsBodyPartContainer
+function returns
+.Cn CM_TRUE
+if the body-part content is a container;
+otherwise, it returns
+.Cn CM_FALSE .
+If an error occurs,
+.Fn DtCMIsBodyPartContainer
+sets the major code in the
+.I error
+structure to
+.Cn USER_EXCEPTION ,
+and the application can use the
+.Fn CMRexception_number
+function to determine the minor code.
+See the Error API Appendix in the \*(ZB.
+.SH "SEE ALSO"
+.Fn DtCMGetBodyPart 3,
+.Fn DtCMGetBodyPartContainer 3,
+.Fn DtCMGetNextBodyPart 3,
+.Fn DtCMNewBodyPart 3,
+.Fn DtCMSetBodyPartContainer 3,
+.Hd Bento/DtCM.h 5;
+.Fn CMRexception_number
+in the \*(ZB.

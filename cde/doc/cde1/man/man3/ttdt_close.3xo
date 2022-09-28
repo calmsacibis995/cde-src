@@ -1,0 +1,67 @@
+.TH ttdt_close 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+ttdt_close \- destroy a ToolTalk communication endpoint
+.SH SYNOPSIS
+.yS
+#include <Tt/tttk.h>
+.sp 0.5v
+.ta \w'Tt_status ttdt_close('u
+Tt_status ttdt_close(const char *\f2procid\fP,
+	const char *\f2new_procid\fP,
+	int \f2sendStopped\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn ttdt_close
+function destroys a ToolTalk communication endpoint.
+.P
+If
+.I sendStopped
+is True, the
+.Fn ttdt_close
+function sends a
+.I Stopped
+notice; otherwise, it sends no notice.
+If
+.I procid
+is not
+.Cn NULL ,
+.Fn ttdt_close
+calls
+.Fn tt_default_procid_set
+with a
+.I procid
+argument and then calls
+.Fn tt_close ;
+otherwise, it closes the current default
+procid.
+If
+.I new_procid
+is not
+.Cn NULL ,
+.Fn ttdt_close
+calls
+.Fn tt_default_procid_set
+with a
+.I new_procid
+argument.
+.SH "RETURN VALUE"
+The
+.Fn ttdt_close
+function may return any of the errors returned by
+.Fn tt_default_procid_set 3
+and
+.Fn tt_close 3.
+.P
+No errors are propagated if sending the
+.I Stopped
+notice fails.
+.SH "SEE ALSO"
+.Hd Tt/tttk.h 5,
+.Fn ttdt_open 3,
+.Fn tt_default_procid_set 3,
+.Fn tt_close 3.

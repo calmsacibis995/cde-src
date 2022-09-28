@@ -1,0 +1,110 @@
+.TH Pause Desktop "05 Apr 1994" "SunSoft" "ToolTalk Policy"
+.SH NAME
+.PP
+Pause, Resume - pause/resume a tool, operation, or data performance
+.SH SYNOPSIS
+.so ../.synopsis
+	Pause(	[in	messageID	\fIoperation\f(CW] );	
+.\"	Pause(	in	bufferID	\fIdocBuf\f(CW );	
+	Resume(	[in	messageID	\fIoperation\f(CW] );	
+.\"	Resume(	in	bufferID	\fIdocBuf\f(CW	
+.\"		[in	locator	\fIwhither\f(CW	
+.\"		|in	vector	\fIduration\f(CW] );
+.ft
+.fi
+.SH DESCRIPTION
+.PP
+Pause or resume the specified tool, operation, or data performance.
+.PP
+If the optional
+.I operation
+argument is included, the handler should pause or resume the operation
+that was invoked by the specified request.
+.\"If the optional
+.\".I docBuf
+.\"argument is included, then performance of the data in the specified
+.\"buffer should be paused or resumed.  If neither argument is included,
+.\"the handling procid should pause or resume its operations.
+.\".PP
+.\"The buffer form of the request
+.\"should be sent with a \f(CWTt_address\fR of \f(BITT_PROCEDURE\fR; the
+.\"other two forms should be \f(BITT_HANDLER\fR.
+.SH OPTIONAL ARGUMENTS
+.TP
+\f(CWmessageID\fR \fIoperation\fR
+The request that should be paused.  For a request to be
+pausable, the handler shall have
+sent a \f(CWStatus()\fR notice back to the requester (thus
+identifying itself to the requester).
+.\".TP
+.\"\f(CWbufferID\fR \fIdocBuf\fR
+.\"The buffer in which data performance is to be paused or resume.
+.\".TP
+.\"\f(CWlocator\fR \fIwhither\fR
+.\"The buffer location to which performance should be resumed.
+.\".TP
+.\"\f(CWvector\fR \fIduration\fR
+.\"The duration for which performance should be resumed.  If neither the
+.\".I whither
+.\"nor
+.\".I duration
+.\"argument is included in
+.\".BR Resume (),
+.\"the performance should be resumed indefinitely.
+.SH ERRORS
+.\".TP
+.\"\f(BITT_ERR_NOMATCH\fR
+.\"No editor has a pattern handling this request for
+.\".IR docBuf ,
+.\"and so it may not be a valid \f(CWbufferID\fR.
+.TP
+.\"\f(BITT_DESKTOP_EINVAL\fR
+.\".I whither
+.\"is not a legal \f(CWlocator\fR for the media type of the document in
+.\".RI docBuf .
+.\".TP
+.\"\f(BITT_DESKTOP_EINVAL\fR
+.\".I destination
+.\"is not a legal \f(CWvector\fR for the media type of the document in
+.\".RI docBuf .
+.\".TP
+.\"\f(BITT_DESKTOP_EFAULT\fR
+.\".I whither
+.\"is not a valid \f(CWlocator\fR for the document in
+.\".IR docBuf .
+.\".TP
+.\"\f(BITT_DESKTOP_EFAULT\fR
+.\".I duration
+.\"is not a valid \f(CWvector\fR for the document in
+.\".IR docBuf .
+.TP
+\f(BITT_DESKTOP_ENOMSG\fR
+.I operation
+does not refer to any message currently known by the handler.
+.SH EXAMPLES
+.PP
+.BR ttdt_session_join ()
+and
+.BR ttdt_message_accept ()
+can be used to register for and help process these messages.
+.PP
+These messages can be sent like so:
+.nf
+.ft CW
+.ps -2
+Tt_message msg = tttk_message_create( 0, TT_REQUEST, TT_SESSION,
+			the_recipient_procid, TTDT_PAUSE,
+			my_callback );
+tt_message_send( msg );
+.ps
+.ft
+.fi
+.SH WARNINGS
+.PP
+.BR Pause ()
+.so .edict
+.SH SEE ALSO
+.PP
+.BR Intro (TT Policy),
+.BR Intro (Desktop),
+.BR Open (Editor)

@@ -1,0 +1,378 @@
+.TH tt_type_comp 1 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+tt_type_comp \- compile ToolTalk otypes and ptypes
+.SH SYNOPSIS
+.yS
+tt_type_comp
+[\-mMs]
+[\-d\0\f2db\fP]
+\f2source_file\fP
+.yE
+.yS
+tt_type_comp
+\-r
+[\-s]
+[\-d\0\f2db\fP]
+\f2type\fP
+\&.\|.\|.
+.yE
+.yS
+tt_type_comp
+\-p
+|
+\-O
+|
+\-P
+.cde [\-sE]
+.xo [\-s]
+[\-d\0\f2db\fP]
+.yE
+.yS
+tt_type_comp
+\-p
+|
+\-O
+|
+\-P
+[\-s]
+\f2source_file\fP
+.yE
+.yS
+tt_type_comp
+\-x
+[\-s]
+[\-o\0\f2compiled_file\fP]
+\f2source_file\fP
+.yE
+.yS
+tt_type_comp
+[\-hv]
+.yE
+.SH DESCRIPTION
+The
+.Cm tt_type_comp
+utility processes otypes and ptypes.
+The default action of
+.Cm tt_type_comp
+is to compile types from source form into compiled form and then
+merge the compiled types into the standard ToolTalk types databases.
+The
+.Cm tt_type_comp
+utility preprocesses the source types with
+.Cm cpp 1,
+and can optionally write out the compiled types instead of merging
+them into the standard databases.
+The
+.Cm tt_type_comp
+utility can also remove types from the standard databases
+or write out the contents of these databases.
+.cdes
+.P
+The
+.Cm tt_type_comp
+utility operates in two fundamental modes: XDR and Classing Engine.
+XDR mode is the default.
+In XDR mode, the standard databases are
+simply serialized ToolTalk data structures,
+and the format of
+.Cm tt_type_comp
+output files is the same as that of the databases.
+In Classing Engine mode,
+the standard databases are in fact the Classing Engine's
+own databases, and the format of
+.Cm tt_type_comp
+output files is that expected for input to
+.Cm ce_db_build 1
+and
+.Cm ce_db_merge 1.
+.cdee
+.SH OPTIONS
+.xos
+The
+.Cm tt_type_comp
+utility supports the \*(Zu.
+.xoe
+The following options are available:
+.VL 6
+.LI \f3\-d\f1
+Specify the database to work on, which must be one of
+.BR user ,
+.B system
+or
+.BR network .
+.cdes
+For Classing Engine mode these are defined as:
+.VL 10
+.LI \f3user\fP
+.B $HOME/.cetables/cetables
+.LI \f3system\fP
+.B /etc/cetables/cetables
+.LI \f3network\fP
+.B $OPENWINHOME/lib/cetables/cetables
+.LE
+.P
+For the XDR format these are defined as:
+.cdee
+.xo They are defined as follows:
+.VL 10
+.LI \f3user\fP
+.B $HOME/.tt/types.xdr
+.LI \f3system\fP
+.cde .B /etc/tt/types.xdr
+.xo Implementation specific
+.LI \f3network\fP
+.cde .B $OPENWINHOME/etc/tt/types.xdr
+.xo Implementation specific
+.LE
+.P
+These three databases form a hierarchy in which the definition of a
+type in the user database overrides the definition in the system
+database, and so on.
+For the merge and remove options, the default database is
+.BR user .
+For the
+.BR \-p ,
+.B \-O
+and
+.B \-P
+options, the default is all three databases.
+.cde .LI \f3\-E\f1
+.cde Use Classing Engine mode, instead of the default XDR mode.
+.LI \f3\-h\f1
+Write a help message for invoking
+.Cm tt_type_comp
+and then exit.
+.LI \f3\-m\f1
+Merge types into specified database, updating any existing type with
+the new definition given.
+This is the default action.
+.cde This action is not supported for Classing Engine mode.
+.LI \f3\-M\f1
+Merge types into specified database, but only if they do not already
+exist in that database.
+.cde This action is not supported for Classing Engine mode.
+.LI \f3\-O\f1
+Write the names of all otypes read.
+.LI \f3\-p\f1
+Write the ToolTalk types read
+in a source format suitable for recompilation with
+.Cm tt_type_comp .
+.LI \f3\-P\f1
+Write the names of all ptypes read.
+.LI \f3\-o\0\f2compiled_file\f1
+.br
+Write the compiled types into the specified file,
+or to standard output if
+.I compiled_file
+is \-.
+.LI \f3\-r\f1
+Remove the given ptypes or otypes
+from the specified database, as indicated by the
+.I type
+operands.
+.LI \f3\-s\f1
+Silent mode.
+Write nothing to standard output.
+.LI \f3\-v\f1
+Write the version number of
+.Cm tt_type_comp
+and then exit.
+.LI \f3\-x\f1
+Compile source types into a compiled types file, instead of merging
+them into the standard types databases.
+.LE
+.SH OPERANDS
+The following operands are supported:
+.VL 6
+.LI \f2source_file\fP
+.br
+A pathname of a text file containing ToolTalk source code.
+If
+.I source_file
+is \-, standard input is used.
+.LI \f2type\fP
+.br
+A name of a type to be removed by the
+.B \-r
+option.
+.LE
+.SH STDIN
+The standard input is used only if a
+.I source_file
+operand is \-.
+.SH "INPUT FILES"
+The input file named by
+.I source_file
+is a text file containing ToolTalk source
+.cde code.
+.xos
+code, which must conform to the format described in
+.xo .cX msgdatafmts .
+.xoe
+.SH "ENVIRONMENT VARIABLES"
+The following environment variables affect the execution of
+.Cm tt_type_comp :
+.VL 15
+.cdes
+.LI \f2CEPATH\fP
+In Classing Engine mode, a colon-separated list of directories that
+tells the Classing Engine where to find the databases that
+contain (among other things) ToolTalk types.
+See
+.Cm ce_db_build 1.
+.cdee
+.LI \f2LANG\fP
+Provide a default value for the internationalization variables
+that are unset or null.
+If
+.I LANG
+is unset or null, the corresponding value from the
+implementation-specific default locale will be used.
+If any of the internationalization variables contains an invalid setting, the
+utility behaves as if none of the variables had been defined.
+.LI \f2LC_ALL\fP
+If set to a non-empty string value,
+override the values of all the other internationalization variables.
+.LI \f2LC_MESSAGES\fP
+Determine the locale that is used to affect
+the format and contents of diagnostic
+messages written to standard error
+and informative messages written to standard output.
+.LI \f2NLSPATH\fP
+Determine the location of message catalogues
+for the processing of
+.IR LC_MESSAGES .
+.LI \f2TTPATH\fP
+.cde In XDR mode, a
+.xo A
+colon-separated list of directories that tells the ToolTalk service
+where to find the ToolTalk types databases.
+The format of this variable is
+.Cs I
+\f2userDir\f1[:\f2systemDir\f1[:\f2networkDir\f1]]
+.Ce
+.LE
+.SH "RESOURCES"
+None.
+.SH "ASYNCHRONOUS EVENTS"
+Default.
+.SH STDOUT
+When the
+.B \-h
+option is used,
+.Cm tt_type_comp
+writes to standard output a help message
+in an unspecified format.
+.P
+When the
+.B \-o
+option is used,
+.Cm tt_type_comp
+writes to standard output a listing of all
+otypes
+read.
+.P
+When the
+.B \-p
+option is used,
+.Cm tt_type_comp
+writes to standard output a listing of
+all the ToolTalk types read,
+in a source format suitable for recompilation with
+.Cm tt_type_comp .
+.P
+When the
+.B \-P
+option is used,
+.Cm tt_type_comp
+writes to standard output a listing of all
+ptypes
+read.
+.P
+When the
+.B \-v
+option is used,
+.Cm tt_type_comp
+writes to standard output a version number
+in an unspecified format.
+.SH STDERR
+Used only for diagnostic messages.
+.SH "OUTPUT FILES"
+When the
+.B \-x
+or
+.B \-d\0user
+option is used,
+.Cm tt_type_comp
+writes the compiled types in an unspecified format
+into a user-specified file.
+Otherwise, it writes the compiled types into the
+databases described under
+.BR \-d .
+.SH "EXTENDED DESCRIPTION"
+None.
+.SH "EXIT STATUS"
+The following exit values are returned:
+.VL 4
+.LI 0
+Successful completion.
+.LI 1
+Usage;
+.Cm tt_type_comp
+was given invalid command line options.
+.LI 2
+A syntax error was found in the source types given to
+.Cm tt_type_comp .
+.LI 3
+System error;
+.Cm tt_type_comp
+was interrupted by
+.Cn SIGINT ,
+or encountered some system or internal error.
+.LE
+.SH "CONSEQUENCES OF ERRORS"
+Default.
+.cdes
+.SH FILES
+.VL 8
+.LI \f3$HOME/.tt/types.xdr\f1
+.br
+User's ToolTalk types database for XDR mode
+.LI \f3/etc/tt/types.xdr\f1
+.br
+System ToolTalk types database for XDR mode
+.LI \f3/usr/dt/appconfig/tttypes/types.xdr\f1
+.br
+Network ToolTalk types database for XDR mode
+.LI \f3$OPENWINHOME/etc/tt/types.xdr\f1
+.br
+Network ToolTalk types database for XDR mode
+.LI \f3$HOME/.cetables/cetables\f1
+.sp -0.4v
+.LI \f3/etc/cetables/cetables\f1
+.sp -0.4v
+.LI \f3$OPENWINHOME/lib/cetables/cetables\f1
+.br
+Classing Engine databases containing ToolTalk types for CE mode.
+See
+.Cm ce_db_build 1.
+.LE
+.cdee
+.SH "APPLICATION USAGE"
+None.
+.SH EXAMPLES
+None.
+.SH "SEE ALSO"
+.Cm ttsession 1,
+.cde .Cm ce_db_build 1,
+.cde .Cm ce_db_merge 1,
+.Cm cpp 1.
+.iN
+All references to the Classing Engine mode of the ToolTalk
+product have been omitted from the \*(Zx specification;
+all operations are in ``XDR mode.''
+.sA

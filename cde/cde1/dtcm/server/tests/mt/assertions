@@ -1,0 +1,174 @@
+Test Assertions for rpc.cmsd APIs
+
+List Calendars Test - list_test
+ * Test1 - Verify that cms_list_calendars() is thread safe when called by 
+ *         multiple threads.
+ *	 - Check to make sure the right data is returned.
+Calendar Test - calendar_test
+ * Test1 - Verify that cms_create_calendar() is thread safe when multiple
+ * 	   threads add the same or different calendars at the same time.
+ *	 - For each set of three calendars, check that only 1 thread returns
+ *         CSA_SUCCESS and all other threads return CSA_E_CALENDAR_EXISTS.
+ * Test2 - Verify that cms_open_calendar() is thread safe when multiple 
+ *	   threads open the same or different calendars at the same time.
+ *	 - Check to make sure all threads succeed.
+ * Test3 - Verify that cms_remove_calendar() is thread safe when multiple 
+ *         threads try to delete the same calendar and multiple threads delete 
+ *         different calendars.
+ *	 - For each set of three calendars, check that only 1 thread returns
+ *         CSA_SUCCESS and all other threads return CSA_E_CALENDAR_NOT_EXIST.
+ * Test4 - Verify that _DtCm_rtable_create() is thread safe when multiple 
+ *         threads add the same or different calendars at the same time. 
+ *	 - For each set of three calendars, check that only 1 thread returns
+ *         CSA_SUCCESS and all other threads return CSA_E_CALENDAR_EXISTS.
+ * Test5 - Verify that cms_create_calendar(), cms_open_calendar(), 
+ *         cms_remove_calendar(), and _DtCm_rtable_create() are thread safe 
+ *         when all four are called on the same calendars.
+ *       - Check that create returns CSA_SUCCESS or CSA_E_CALENDAR_EXISTS,
+ *         open returns CSA_SUCCESS or CSA_E_CALENDAR_NOT_EXIST, and remove 
+ *         returns CSA_SUCCESS or CSA_E_CALENDAR_NOT_EXIST.
+Registration Test - register_test
+ * Test1 - Verify that cms_register() is thread safe when multiple threads
+ *         register the same and different callbacks.
+ *       - Check that each thread has the callback registered.  Use 
+ *         cms_unregister to verify.
+ * Test2 - Verify that _DtCm_register_callback() is thread safe when multiple 
+ *         threads register the same and different callbacks.
+ *       - Check that each thread has the callback registered.  Use 
+ *         _DtCm_deregister_callback to verify.
+ * Test3 - Verify that cms_unregister() is thread safe when multiple threads 
+ *         unregister the same and different callbacks.
+ *	 - Check that only 1 thread for each client gets CSA_SUCCESS  All 
+ *         others should get CSA_E_CALLBACK_NOT_REGISTERED.
+ * Test4 - Verify that _DtCm_deregister_callback() is thread safe  when 
+ *         multiple threads unregister the same and different callbacks.
+ *	 - Check that only 1 thread for each client gets CSA_SUCCESS. All 
+ *         others should get CSA_E_CALLBACK_NOT_REGISTERED.
+ * Test5 - Verify that cms_register(), _DtCm_register_callback(), 
+ *         cms_unregister(), and _DtCm_deregister_callback() are thread safe
+ *         when called concurrently.
+ *       - Check that all return valid results.
+Calendar Attribute Test - attribute_test
+ * Test1 - Verify that cms_set_calendar_attr() and are thread safe when 
+ *         multiple threads update different attributes with different values 
+ *         in both the same and different calendars.
+ *       - Check that the updated attributes match one of the sets of values 
+ *         used to do the update.  Use cms_get_calendar_attr() to verify.
+ * Test2 - Verify that _DtCm_rtable_set_access() and are thread safe when 
+ *         multiple threads update different attributes with different values 
+ *         in both the same and different calendars.
+ *       - Check that the updated attributes match one of the sets of values 
+ *         used to do the update.  Use _DtCm_rtable_get_access() to verify.
+ * Test3 - Verify that cms_set_calendar_attr() and _DtCm_rtable_set_access() 
+ *         are thread safe when multiple threads update different attributes
+ *         with different values in both the same and different calendars.
+ *       - Check that the updated attributes match one of the sets of values 
+ *         used to do the update.  Use cms_get_calendar_attr() and 
+ *         _DtCm_rtable_get_access() to verify.
+ * Test4 - Verify that cms_get_calendar_attr() and are thread safe when 
+ *         multiple threads call them with different attributes in both the 
+ *         same and different calendars.
+ *       - Check that each thread gets back the correct value for the 
+ *         attribute it requested.
+ * Test5 - Verify that _DtCm_rtable_get_access() and are thread safe when 
+ *         multiple threads call them with different attributes in both the 
+ *         same and different calendars.
+ *       - Check that each thread gets back the correct value for the 
+ *         attribute it requested.
+ * Test6 - Verify that cms_get_calendar_attr() and _DtCm_rtable_get_access() 
+ *         are thread safe when multiple threads call them with different 
+ *         attributes in both the same and different calendars.
+ *       - Check that each thread gets back the correct value for the 
+ *         attribute it requested.
+ * Test7 - Verify that cms_set_calendar_attr(), _DtCm_rtable_set_access(), 
+ *         cms_get_calendar_attr(), _DtCm_rtable_get_access() are thread safe
+ *         when all are called on the same attribute of the same calendar.
+ *       - Check that the "get" results are consistent with a set of values 
+ *         passed to "set."
+Lookup Test - lookup_test
+ * Test1 - Verify that cms_lookup_reminder() is thread safe when multiple 
+ *         threads call it with the same and different calendars and 
+ *         different matching criteria.
+ *       - Check that each thread gets back the same reminders for a givin
+ *         calendar and criteria.
+ * Test2 - Verify that _DtCm_rtable_lookup_range() is thread safe when 
+ *         multiple threads call it with the same and different calendars and 
+ *         different matching criteria.
+ *       - Check that each thread gets back the appointments in the time range.
+ * Test3 - Verify that cms_lookup_entries() is thread safe when multiple 
+ *         threads call it with the same and different calendars and 
+ *         different matching criteria.
+ *       - Check that each thread gets back the right entries with the correct
+ *         data.
+ * Test4 - Verify that _DtCm_rtable_lookup() is thread safe when multiple 
+ *         threads call it with the same and different calendars and different 
+ *         matching criteria.
+ *       - Check that each thread gets back the appointment associated with
+ *         the key.
+ * Test5 - Verify that _DtCm_rtable_abbreviated_lookup_range() is thread safe 
+ *         when multiple threads call it with the same and different calendars
+ *         and different matching criteria.
+ *       - Check that each thread gets back the same appointment in the time
+ *         range.
+ * Test6 - Verify that cms_lookup_entries(), cms_lookup_reminder(), and
+ *	   _DtCm_rtable_lookup_range() are thread safe when multiple threads 
+ *         lookup entries in the same and different calendars with different
+ *         matching criteria.
+ *	 - Check that each thread gets back appropriate entries from the 
+ *         corresponding calendar.
+Entry Attribute Test - entry_test
+ * Test1 - Verify that cms_insert_entry() is thread safe when multiple threads 
+ *         call it with the same and different entries and the same and 
+ *         different calendars.
+ *       - Check that each insert returns a valid result.
+ * Test2 - Verify that cms_get_entry_attr() is thread safe when multiple 
+ *         threads get the same entry in the same and different calendars.
+ *       - Check that all threads return the same entry.
+ * Test3 - Verify that cms_update_entry() is thread safe when multiple threads 
+ *         call to update an entry in the same and different calendars.
+ *       - Check that all threads get CSA_SUCCESS and that the entry is
+ *         updated correctly.
+ * Test4 - Verify that cms_delete_entry() is thread safe when multiple threads 
+ *         call it with the same entry handles referring to the same and
+ *         different calendars.
+ *       - Check that only 1 thread gets CSA_SUCCESS for each calendar and 
+ *         that all others get CSA_X_DT_E_ENTRY_NOT_FOUND.
+ * Test5 - Verify that _DtCm_rtable_insert() is thread safe when multiple 
+ *         threads call it with the same entry and the same and different 
+ *         calendars.
+ *       - Check that each insert returns a valid result.
+ * Test6 - Verify that _DtCm_rtable_change() is thread safe when multiple 
+ *         threads call to update an entry in the same and different calendars.
+ *       - Check that all threads get access_ok_4 and that the entry is
+ *         updated correctly.
+ * Test7 - Verify that _DtCm_rtable_delete() is thread safe when multiple 
+ *         threads call it with the same entry handles referring to the same 
+ *         and different calendars.
+ *       - Check that only 1 thread gets access_ok_4 for each calendar and 
+ *         that all others get access_other_4.
+ * Test8 - Verify that cms_get_entry_attr(), cms_insert_entry(), 
+ *         cms_update_entry(), cms_delete_entry(), _DtCm_rtable_insert(),
+ *         _DtCm_rtable_change(), and _DtCm_rtable_delete() are thread safe 
+ *         when called at the same time with the same entry and the same and
+ *         different calendars.
+ *       - Check that all threads get CSA_SUCCESS, CSA_X_DT_E_ENTRY_NOT_FOUND,
+ *         access_other_4, or access_ok_4.
+
+APIs not tested by this test suite:
+
+cms_ping
+cms_archive_5_svc
+cms_restore_5_svc
+cms_enumerate_sequence
+cms_enumerate_calendar_attr
+_DtCm_rtable_ping
+_DtCm_rtable_lookup_next_larger
+_DtCm_rtable_lookup_next_smaller
+_DtCm_rtable_delete_instance
+_DtCm_rtable_change_instance
+_DtCm_rtable_check
+_DtCm_rtable_flush_table
+_DtCm_rtable_size
+_DtCm_rtable_abbreviated_lookup_key_range
+_DtCm_rtable_gmtoff
+_DtCm_rtable_rename

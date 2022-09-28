@@ -1,0 +1,219 @@
+XCOMM $XConsortium: Imakefile /main/cde1_maint/6 1995/11/20 17:40:46 mgreess $
+DESKTOP_VERSION_STRING = DesktopVersionString
+
+DTPRINTINFO=dtprintinfo
+MODULE=dtprintinfo
+
+LOCAL_CPP_DEFINES = -DCDE_INSTALLATION_TOP=$(CDE_INSTALLATION_TOP) \
+                    -DCDE_CONFIGURATION_TOP=$(CDE_CONFIGURATION_TOP)
+
+#define IHaveSubdirs
+#define PassCDebugFlags 'CDEBUGFLAGS=$(CDEBUGFLAGS)'
+
+DTPRINTINFO_GEN = \
+ $(DTPRINTINFO)_cat.h \
+ $(DTPRINTINFO)_msg.h \
+ $(DTPRINTINFO).msg
+
+all:: $(DTPRINTINFO_GEN)
+
+/* ensure that the sym2num script is executable */
+includes::
+	chmod a+x sym2num
+
+#ifdef SunArchitecture
+.NO_PARALLEL:
+#endif
+
+SUBDIRS = util libUI objects UI
+
+MakeSubdirs($(SUBDIRS))
+DependSubdirs($(SUBDIRS))
+
+INCLUDES = -I. -I./UI -I./libUI -I./util -I./libUI/MotifUI \
+	   -I./objects -I./objects/PrintObj
+
+/* DEPLIBS contains the list of library depencies for a client
+ * LOCAL_LIBRARIES contains the list of libraries on the link line
+ * Generally, the dependency form of a library has DEP as a prefix
+ * e.g. put $(XLIB) in LOCAL_LIBRARIES and $(DEPXLIB) in DEPLIBS
+ * NOTE: if DEPLIBS is not set here, it is by default null and there
+ *       are no library dependencies for clients
+ *       You cannot put -Llibpath into DEPLIBS. You must put actual
+ *       paths to the library
+ */
+
+DEPLIBS =       ./libUI/MotifUI/libMotifUI.a \
+		./util/libUtil.a \
+		./UI/libDtPrintinfo.a \
+		./objects/PrintObj/libPrintObj.a
+
+AWK = awk
+GENCAT = gencat
+
+/* put EXTRA_DEFINES and EXTRA_INCLUDES and anything else below */
+#ifdef HPArchitecture
+/* on hp-ux, archiving libDtHelp requires the math library */
+#if ((!SharedLibDtHelp) || (ARCHIVED_LINK) || (LinkArchivedDtHelp))
+SYS_LIBRARIES = -lm
+#endif
+#endif
+
+#ifdef SunArchitecture
+SYS_LIBRARIES = -lgen -lsocket -lnsl -lC
+LAST_LOAD_FLAGS = 
+AWK = nawk
+EXTRA_DEFINES = -DOSMAJORVERSION=$(OSMAJORVERSION) -DOSMINORVERSION=$(OSMINORVERSION)
+#endif
+
+#ifdef RsArchitecture
+NONSHAREDLIBCOBJ = nonsharelibC.o
+EXTRA_DEFINES = -DHAS_EXCEPTIONS
+#endif
+
+#ifdef USLArchitecture
+SYS_LIBRARIES = -lm
+AWK = nawk
+GENCAT = gencat -m
+#endif
+
+#ifdef UXPArchitecture
+SYS_LIBRARIES = -lm
+AWK = nawk
+GENCAT = gencat -m
+#endif
+
+#ifdef AlphaArchitecture
+EXTRA_DEFINES = -DMESSAGE_CAT -D_TOOLTALK -DXT_HAS_TRANS_FIX
+#endif
+
+#ifdef SunArchitecture
+LOCAL_LIBRARIES = ./UI/libDtPrintinfo.a \
+		./util/libUtil.a \
+		./libUI/MotifUI/libMotifUI.a \
+		./objects/PrintObj/libPrintObj.a \
+		$(DTWIDGETLIB) $(DTSVCLIB) \
+		$(XMLIB) $(XTOOLLIB) $(XLIB)
+#else
+LOCAL_LIBRARIES = ./UI/libDtPrintinfo.a \
+		./util/libUtil.a \
+		./libUI/MotifUI/libMotifUI.a \
+		./objects/PrintObj/libPrintObj.a \
+		$(DTHELPLIB) $(DTWIDGETLIB) $(DTSVCLIB) \
+		$(XMLIB) $(XTOOLLIB) $(XLIB)
+#endif /* SunArchitecture */
+
+HEADERS= \
+	UI/DtActions.h \
+	UI/DtMainW.h \
+	UI/DtProps.h \
+	UI/DtSetPref.h \
+	UI/DtWorkArea.h \
+	libUI/BaseUI.h \
+	libUI/MotifUI/Application.h \
+	libUI/MotifUI/Button.h \
+	libUI/MotifUI/Container.h \
+	libUI/MotifUI/Dialog.h \
+	libUI/MotifUI/Group.h \
+	libUI/MotifUI/IconObj.h \
+	libUI/MotifUI/LabelObj.h \
+	libUI/MotifUI/ListObj.h \
+	libUI/MotifUI/MainWindow.h \
+	libUI/MotifUI/Menu.h \
+	libUI/MotifUI/MenuBar.h \
+	libUI/MotifUI/MotifUI.h \
+	libUI/MotifUI/Prompt.h \
+	libUI/MotifUI/Sep.h \
+	objects/BaseObj.h \
+	objects/PrintObj/PrintJob.h \
+	objects/PrintObj/PrintSubSys.h \
+	objects/PrintObj/Queue.h \
+	util/Invoke.h
+
+/* special processing for message files */
+SYM2NUM_CMD = ./sym2num
+
+SRCS = DtPrintinfo.C
+OBJS = libUI/BaseUI.o objects/BaseObj.o DtPrintinfo.o $(NONSHAREDLIBCOBJ)
+PROGRAM = $(DTPRINTINFO)
+
+NormalLibraryObjectRule()
+
+ComplexProgramTarget($(DTPRINTINFO))
+
+includes:: $(DTPRINTINFO)_cat.h $(DTPRINTINFO)_msg.h
+
+$(DTPRINTINFO)_msg.h $(DTPRINTINFO).msg: $(DTPRINTINFO).msg.src
+	rm -f $(DTPRINTINFO)_msg.h $(DTPRINTINFO).msg
+	$(SYM2NUM_CMD) $(DTPRINTINFO) $(DTPRINTINFO).msg.src> $(DTPRINTINFO).msg
+
+$(DTPRINTINFO)_cat.h: $(DTPRINTINFO).msg.src
+	rm -f $(DTPRINTINFO)_cat.h
+	${AWK} -f msg.awk $(DTPRINTINFO).msg.src > $(DTPRINTINFO)_cat.h
+
+clean::
+	$(RM) *.map $(DTPRINTINFO_GEN)
+
+/* SENTINEL stuff is used to check memory leaks, etc... */
+
+SENTINEL = /usr/lpp/sentinel/sentinel
+SENTINEL_LINK_DIR = /tmp/dtprintinfo
+
+memchk: $(OBJS)
+	$(RM) $(DTPRINTINFO)
+	rm -rf $(SENTINEL_LINK_DIR)
+	mkdir $(SENTINEL_LINK_DIR)
+	ln -s $(PWD)/libUI/MotifUI/Application.o $(SENTINEL_LINK_DIR)
+	ln -s $(PWD)/libUI/MotifUI/Button.o $(SENTINEL_LINK_DIR)
+	ln -s $(PWD)/libUI/MotifUI/Container.o $(SENTINEL_LINK_DIR)
+	ln -s $(PWD)/libUI/MotifUI/ComboBoxObj.o $(SENTINEL_LINK_DIR)
+	ln -s $(PWD)/libUI/MotifUI/Dialog.o $(SENTINEL_LINK_DIR)
+	ln -s $(PWD)/libUI/MotifUI/DtDND.o $(SENTINEL_LINK_DIR)
+	ln -s $(PWD)/libUI/MotifUI/Group.o $(SENTINEL_LINK_DIR)
+	ln -s $(PWD)/libUI/MotifUI/HelpSystem.o $(SENTINEL_LINK_DIR)
+	ln -s $(PWD)/libUI/MotifUI/MotifThread.o $(SENTINEL_LINK_DIR)
+	ln -s $(PWD)/libUI/MotifUI/MotifUI.o $(SENTINEL_LINK_DIR)
+	ln -s $(PWD)/libUI/MotifUI/Icon.o $(SENTINEL_LINK_DIR)
+	ln -s $(PWD)/libUI/MotifUI/IconObj.o $(SENTINEL_LINK_DIR)
+	ln -s $(PWD)/libUI/MotifUI/Menu.o $(SENTINEL_LINK_DIR)
+	ln -s $(PWD)/libUI/MotifUI/LabelObj.o $(SENTINEL_LINK_DIR)
+	ln -s $(PWD)/libUI/MotifUI/MainWindow.o $(SENTINEL_LINK_DIR)
+	ln -s $(PWD)/libUI/MotifUI/MenuBar.o $(SENTINEL_LINK_DIR)
+	ln -s $(PWD)/libUI/MotifUI/Prompt.o $(SENTINEL_LINK_DIR)
+	ln -s $(PWD)/libUI/MotifUI/Sep.o $(SENTINEL_LINK_DIR)
+	ln -s $(PWD)/libUI/MotifUI/ScaleObj.o $(SENTINEL_LINK_DIR)
+	ln -s $(PWD)/libUI/MotifUI/WorkArea.o $(SENTINEL_LINK_DIR)
+	ln -s $(PWD)/libUI/BaseUI.o $(SENTINEL_LINK_DIR)
+	ln -s $(PWD)/util/Invoke.o $(SENTINEL_LINK_DIR)
+	ln -s $(PWD)/util/Process.o $(SENTINEL_LINK_DIR)
+	ln -s $(PWD)/objects/PrintObj/PrintJob.o $(SENTINEL_LINK_DIR)
+	ln -s $(PWD)/objects/PrintObj/PrintSubSys.o $(SENTINEL_LINK_DIR)
+	ln -s $(PWD)/objects/PrintObj/Queue.o $(SENTINEL_LINK_DIR)
+	ln -s $(PWD)/objects/PrintObj/ParseJobs.o $(SENTINEL_LINK_DIR)
+	ln -s $(PWD)/objects/BaseObj.o $(SENTINEL_LINK_DIR)
+	ln -s $(PWD)/UI/DtActions.o $(SENTINEL_LINK_DIR)
+	ln -s $(PWD)/UI/DtApp.o $(SENTINEL_LINK_DIR)
+	ln -s $(PWD)/UI/DtDetailsLabel.o $(SENTINEL_LINK_DIR)
+	ln -s $(PWD)/UI/DtFindD.o $(SENTINEL_LINK_DIR)
+	ln -s $(PWD)/UI/DtFindSet.o $(SENTINEL_LINK_DIR)
+	ln -s $(PWD)/UI/DtPrinterIcon.o $(SENTINEL_LINK_DIR)
+	ln -s $(PWD)/UI/DtPrtJobIcon.o $(SENTINEL_LINK_DIR)
+	ln -s $(PWD)/UI/DtPrtProps.o $(SENTINEL_LINK_DIR)
+	ln -s $(PWD)/UI/DtMainW.o $(SENTINEL_LINK_DIR)
+	ln -s $(PWD)/UI/DtProps.o $(SENTINEL_LINK_DIR)
+	ln -s $(PWD)/UI/DtSetModList.o $(SENTINEL_LINK_DIR)
+	ln -s $(PWD)/UI/DtSetPref.o $(SENTINEL_LINK_DIR)
+	ln -s $(PWD)/UI/DtWorkArea.o $(SENTINEL_LINK_DIR)
+	ln -s $(PWD)/DtPrintinfo.o $(SENTINEL_LINK_DIR)
+	ln -s $(PWD)/nonsharelibC.o $(SENTINEL_LINK_DIR)
+	(cd $(SENTINEL_LINK_DIR) ; \
+	 $(SENTINEL) $(LINKCC) -o $(DTPRINTINFO) \
+	 $(HP_VERSION_OBJ) *.o $(LDOPTIONS) \
+#ifdef SunArchitecture
+	 $(DTWIDGETLIB) $(DTSVCLIB) \
+#else
+	 $(DTHELPLIB) $(DTWIDGETLIB) $(DTSVCLIB) \
+#endif /* SunArchitecture */
+	 $(TTLIB) $(XMLIB) $(XTOOLLIB) $(XLIB) \
+	 $(EXTRA_LOAD_FLAGS) $(LDLIBS) $(C++LIBPATH) \
+	)

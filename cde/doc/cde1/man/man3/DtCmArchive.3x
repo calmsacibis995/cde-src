@@ -1,0 +1,151 @@
+.\" *************************************************************************
+.\" **
+.\" ** (c) Copyright 1993,1994 Hewlett-Packard Company 
+.\" **      All Rights Reserved.
+.\" **
+.\" ** (c) Copyright 1993,1994 International Business Machines Corp. 
+.\" **      All Rights Reserved.
+.\" **  
+.\" ** (c) Copyright 1993,1994 Sun Microsystems, Inc.
+.\" **      All Rights Reserved.
+.\" **
+.\" ** (c) Copyright 1993,1994 Unix Systems Labs, Inc., a susidiary of Novell, Inc
+.\" **      All Rights Reserved.
+.\" **
+.\" *************************************************************************
+.\"----------------------------------------------------------------------------
+.\" %\&Z%%\&M% %\&I% %\&E% SMI;
+.TH DtCmArchive 3X "26 January 1994"
+.BH "26 January -_1994"
+.\"---
+.\"----------------------------------------------------------------------------
+.SH NAME
+DtCmArchive(3X) \- Archive entries in the calendar to a file.
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- DESCRIPTION 
+.\"--- This section tells concisely what the command (function, device or
+.\"--- file format) does and includes the parameter list. 
+.\"---
+.SH DESCRIPTION
+\&#include <Dt/DtCm.h>
+.sp .5
+DtCmStatus DtCmArchive (
+.br
+.ta 0.75i 1.75i
+        DtCmCalendar	\fIcal\fP,
+.br
+        const char *	\fIpath_name\fP,
+.br
+        DtCmAttributes	\fIattrs\fP,
+.br
+        DtCmOperator *	\fIoperators\fP,
+.br
+        int		\fIsize\fP,
+.br
+        boolean_t	\fIdelete_entry\fP)
+.fi
+\fP
+.SH
+\fBDtCmArchive\fP archives entries that matches all the given criteria to 
+a file. The path name specified is local to the machine where the 
+application runs. If \fIdelete_entry\fP is \fBB_TRUE\fP, the archived 
+entries are also deleted from the calendar. If \fIattrs\fP is set 
+to \fBNULL\fP, the whole calendar is archived. If the file specified 
+by \fIpath_name\fP exists, it is not overwritten and the function 
+returns an error status.  Only the owner of the calendar can do an archive.
+.sp
+The matching criteria are specified by the array of attributes and the 
+array of operators. Each operator in \fIoperators\fP specifies how the 
+corresponding attribute value is to be matched. The following operators 
+are supported: \fBDT_CM_MATCH_ANY, DT_CM_MATCH_EQUAL_TO, 
+DT_CM_MATCH_NOT_EQUAL_TO, DT_CM_MATCH_LESS_THAN, 
+DT_CM_MATCH_LESS_THAN_OR_EQUAL_TO, DT_CM_MATCH_GREATER_THAN, 
+DT_CM_MATCH_GREATER_THAN_OR_EQUAL_TO, and DT_CM_MATCH_CONTAIN\fP. The 
+operator \fBDT_CM_MATCH_ANY\fP matches an entry that contains the 
+corresponding attribute regardless of the value. The operator 
+\fBDT_CM_MATCH_CONTAIN\fP applies to character strings only. The 
+only operators supported for reminder type attributes are 
+\fBDT_CM_MATCH_ANY\fP and \fBDT_CM_MATCH_EQUAL_TO\fP.
+.sp
+Searching of attributes with opaque type data is not supported.
+
+.sp .5
+.IP "\fIcal\fP" 1.25i
+Specifies the calendar to be archived.
+.IP "\fIpath_name\fP" 1.25i
+Specifies the name of the archive.
+.IP "\fIattrs\fP" 1.25i
+Specifies the matching criteria.
+.IP "\fIoperators\fP" 1.25i
+Specifies the matching operator for the corresponding attributes in \fIattrs\fP.
+.IP "\fIsize\fP" 1.25i
+Specifies the size of the array pointed to by \fIattrs\fP and \fIoperators\fP.
+.IP "\fIdelete_entry\fP" 1.25i
+Specifies whether the archived entries are to be deleted from the calendar.
+.sp .5
+.PP
+
+
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- RETURN VALUES
+.\"--- This section appears in pages from Sections 2 and 3 only.
+.\"--- List the _values_ that the function returns and give _explanations_.
+.\"---
+.SH "RETURN VALUES"
+The function returns a status indicating whether the function is completed successfully.
+
+.\"---
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- ERRORS
+.\"--- This section lists and explains _ERROR-CODES_ that the function may
+.\"--- may generate.  List _ERROR-CODES_ alphabetically.
+.\"---
+.SH ERRORS
+.SH
+.IP "\fBDT_CM_ERR_DATA_TYPE\fP" 2.5i
+Invalid data type specified for predefined attributes.
+.IP "\fBDT_CM_ERR_EXIST\fP" 2.5i
+The file already exists.
+.IP "\fBDT_CM_ERR_MEMORY\fP" 2.5i
+Not enough memory.
+.IP "\fBDT_CM_ERR_NOT_OWNER\fP" 2.5i
+The client is not the owner of the calendar.
+.IP "\fBDT_CM_ERR_NOT_SUPPORTED\fP" 2.5i
+Functionality not supported by the server.
+.IP "\fBDT_CM_ERR_OBJECT\fP" 2.5i
+Bad object or wrong object type.
+.IP "\fBDT_CM_ERR_OPERATOR\fP" 2.5i
+Invalid matching operator specified.
+.IP "\fBDT_CM_ERR_PARAMETER\fP" 2.5i
+Invalid parameter.
+.IP "\fBDT_CM_ERR_SERVER\fP" 2.5i
+Server problem.
+.IP "\fBDT_CM_ERR_SPACE\fP" 2.5i
+Not enough space left on the device.
+.IP "\fBDT_CM_OK\fP" 2.5i
+The call is completed successfully.
+.PP
+.sp
+.\"---
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- EXAMPLES
+.\"--- This section gives examples of how to use the command (function
+.\"--- or file format).  Always preface an example with an introduction.
+.\"--- If there are multiple examples, use separate subsection headings
+.\"--- for each _example-type_.  Otherwise, omit these headings.
+.\"---
+.SH EXAMPLES
+NEED MARKUP HERE, SIMILAR TO SYNOPSIS
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- SEE ALSO
+.\"--- This section lists references to other man pages, sample files, etc.
+.\"---
+.SH "SEE ALSO"
+.BR DtCmOpenCalendar (3X),
+.BR DtCmCloseCalendar (3X),
+.BR DtCmRestore (3X)

@@ -1,0 +1,415 @@
+/* @(#)addresstest.src	1.9 97/06/05 SMI */
+
+/**/# Thie script tests addresses to make sure that the various address forms
+/**/# are acceptable, and that the insertion of ghost commas works properly 
+
+token create token1
+#include "setup.src"
+token set token1 serviceoption messagestorename /tmp/test.mbx
+
+! /bin/rm /tmp/test.mbx
+! /bin/touch /tmp/test.mbx
+
+/**/# create the token that names the smtp transport service
+token create token2
+token set token2 servicetype smtp
+token set token2 serviceclass messagetransport
+
+/**/# Create, startup and open the 2 dataports
+port create port1
+port startup port1
+port open port1 token1
+
+port create port2
+port startup port2
+port open port2 token2
+
+/**/# Create a new message on which we can test the various addressing forms
+
+port newmessage port1 
+
+/**/# All of the following address tests should succeed
+
+port addheader port1 -1 To LOGNAME
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To ´¶¤¸
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To /tmp/mail.out
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To +mailbox
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To ~user/mailbox
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To ~/mailbox
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To /PN=x400.address/PRMD=ibmmail/ADMD=ibmx400/C=us/@mhs-mci.ebay
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To ´¶¤¸ ´Á»ú¤Î ´Á´Á ´Á»ú¤Î´±¤Å ´±´±´±´±¤Î ´±´±´±´±´±´± ´Á»ú¤Î´± ´±´±´±´± ´Á»ú
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To ´¶¤¸, ´Á»ú¤Î, ´Á´Á, ´Á»ú¤Î´±¤Å, ´±´±´±´±¤Î, ´±´±´±´±´±´±, ´Á»ú¤Î´±, ´±´±´±´±, ´Á»ú
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To LOGNAME, /tmp/mail.out, +mailbox, ~user/mailbox, ~/mailbox, /PN=x400.address/PRMD=ibmmail/ADMD=ibmx400/C=us/@mhs-mci.ebay, ´¶¤¸, ´Á»ú¤Î, ´Á´Á, ´Á»ú¤Î´±¤Å, ´±´±´±´±¤Î, ´±´±´±´±´±´±, ´Á»ú¤Î´±, ´±´±´±´±, ´Á»ú
+port resolve port2 port1 -1 
+port removeheader port1 -1 To
+
+port addheader port1 -1 To LOGNAME /tmp/mail.out +mailbox ~user/mailbox ~/mailbox /PN=x400.address/PRMD=ibmmail/ADMD=ibmx400/C=us/@mhs-mci.ebay ´¶¤¸ ´Á»ú¤Î ´Á´Á ´Á»ú¤Î´±¤Å ´±´±´±´±¤Î ´±´±´±´±´±´± ´Á»ú¤Î´± ´±´±´±´± ´Á»ú
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To ´¶¤¸´Á»ú¤Î´Á´Á´Á»ú¤Î´±¤Å´±´±´±´±¤Î´±´±´±´±´±´±´Á»ú¤Î´±´±´±´±´±´Á»ú <insane@vf>
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To Mad Genius <george@boole>
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To "C'est bien moche" <paris@france>
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To "know, any, famous" <french@physicists>
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To laborious (But Bug Free)
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To (Just an) archane@case
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To (I, (just, could, not), remember) the@reason
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To confused (about, being, french)
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To it (takes, no (time, at), all)
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To two@weeks (It Will Take)
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To it@is (brilliant (genius, and) superb)
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To if@you (could, see (almost, as, (badly, you), would) agree)
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To cannot@waste (My, Intellectual, Cycles)
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To users:get,what,they,deserve;
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To (I (had, a) good) reason which I <cannot@think> (of (right, now))
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To merde@[1.2.3.4]
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To "C'est bien moche" <paris@france>, Mad Genius <george@boole>, two@weeks (It Will Take), /tmp/mail.out, laborious (But Bug Free), (Just an) archane@case, cannot@waste (My, Intellectual, Cycles), users:get,what,they,deserve;, it (takes, no (time, at), all), if@you (could, see (almost, as, (badly, you), would) agree), "know, any, famous" <French@physicists>, it@is (brilliant (genius, and) superb), (I, (just, could, not), remember) the@reason, confused (about, being, french), (I (had, a) good) reason which I <cannot@think> (of (right, now)), merde@[1.2.3.4]
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To LOGNAME, /tmp/mail.out, +mailbox, ~user/mailbox, ~/mailbox, /PN=x400.address/PRMD=ibmmail/ADMD=ibmx400/C=us/@mhs-mci.ebay, "C'est bien moche" <paris@france>, Mad Genius <george@boole>, two@weeks (It Will Take), /tmp/mail.out, laborious (But Bug Free), (Just an) archane@case, cannot@waste (My, Intellectual, Cycles), users:get,what,they,deserve;, it (takes, no (time, at), all), if@you (could, see (almost, as, (badly, you), would) agree), "know, any, famous" <French@physicists>, it@is (brilliant (genius, and) superb), (I, (just, could, not), remember) the@reason, confused (about, being, french), (I (had, a) good) reason which I <cannot@think> (of (right, now)), merde@[1.2.3.4]
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To testa testb testc /tmp/mail.out ~LOGNAME/mail.out testd teste
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To testa, testb , testc /tmp/mail.out ,~LOGNAME/mail.out, ,testd,teste,,,
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To testa testb <testc@testd>
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To a b, c d, e f, g h, i j, k l
+port addheader port1 -1 Cc m n, o p, q r, s t, u v, w x
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+port removeheader port1 -1 Cc
+
+port addheader port1 -1 To a, b, c, d, e, f, g, h, i, j, k, l
+port addheader port1 -1 Cc m, n, o, p, q, r, s, t, u, v, w, x
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+port removeheader port1 -1 Cc
+
+port addheader port1 -1 To a b c d e f g h i j k l
+port addheader port1 -1 Cc m n o p q r s t u v w x
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+port removeheader port1 -1 Cc
+
+/**/# All of the following address tests should FAIL
+
+port addheader port1 -1 To ,
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To "C'est bien moche <paris@france>
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To "C'est bien moche" <paris@france
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To "C'est bien moche" paris@france>
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To "C'est bien moche" <paris@>
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To laborious but (Bug Free)
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To confused (about, being, french
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To it@is (brilliant (genius, and superb)
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To it@is (brilliant (genius), and superb
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To if@you (could, see (almost, as, (badly, you would) agree)
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To if@you (could, see (almost, as, (badly, you) would) agree
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To cannot@waste (My, Intellectual, Cycles)
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To two@ (It Will Take)
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To two@
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To two@weeks (It Will Take
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To <paris@france
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To paris@france>
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To @france
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To @
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To <
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To >
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To (
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To )
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To "
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To [
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To ]
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To merde@[1.2.3.4
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+/**/#
+/**/# These check the ability of the address resolver to handle combinations of addresses
+/**/#
+
+/**/# these should work
+
+port addheader port1 -1 To testuser
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 To /tmp/testfile
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+
+port addheader port1 -1 Cc testuser
+port resolve port2 port1 -1
+port removeheader port1 -1 Cc
+
+port addheader port1 -1 Cc /tmp/testfile
+port resolve port2 port1 -1
+port removeheader port1 -1 Cc
+
+port addheader port1 -1 To testuser
+port addheader port1 -1 Cc testuser1
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+port removeheader port1 -1 Cc
+
+port addheader port1 -1 To /tmp/testfile
+port addheader port1 -1 Cc testuser1
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+port removeheader port1 -1 Cc
+
+port addheader port1 -1 To testuser
+port addheader port1 -1 Cc /tmp/testfile
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+port removeheader port1 -1 Cc
+
+port addheader port1 -1 To testuser
+port addheader port1 -1 Bcc testuser1
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+port removeheader port1 -1 Bcc
+
+port addheader port1 -1 To testuser, /tmp/testfile
+port addheader port1 -1 Bcc testuser1
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+port removeheader port1 -1 Bcc
+
+port addheader port1 -1 Cc testuser
+port addheader port1 -1 Bcc testuser1
+port resolve port2 port1 -1
+port removeheader port1 -1 Cc
+port removeheader port1 -1 Bcc
+
+port addheader port1 -1 Cc testuser, /tmp/testfile
+port addheader port1 -1 Bcc testuser1
+port resolve port2 port1 -1
+port removeheader port1 -1 Cc
+port removeheader port1 -1 Bcc
+
+port addheader port1 -1 To testuser
+port addheader port1 -1 Cc testuser1
+port addheader port1 -1 Bcc testuser2
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+port removeheader port1 -1 Cc
+port removeheader port1 -1 Bcc
+
+port addheader port1 -1 To testuser
+port addheader port1 -1 Cc /tmp/testfile
+port addheader port1 -1 Bcc testuser2
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+port removeheader port1 -1 Cc
+port removeheader port1 -1 Bcc
+
+port addheader port1 -1 To /tmp/testfile
+port addheader port1 -1 Cc testuser1
+port addheader port1 -1 Bcc testuser2
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+port removeheader port1 -1 Cc
+port removeheader port1 -1 Bcc
+
+/**/# these should fail
+
+port resolve port2 port1 -1
+
+port addheader port1 -1 Bcc testuser
+port resolve port2 port1 -1
+port removeheader port1 -1 Bcc
+
+port addheader port1 -1 To /tmp/test
+port addheader port1 -1 Bcc testuser
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+port removeheader port1 -1 Bcc
+
+port addheader port1 -1 Cc /tmp/test
+port addheader port1 -1 Bcc testuser
+port resolve port2 port1 -1
+port removeheader port1 -1 Cc
+port removeheader port1 -1 Bcc
+
+port addheader port1 -1 To /tmp/test1
+port addheader port1 -1 Cc /tmp/test
+port addheader port1 -1 Bcc testuser
+port resolve port2 port1 -1
+port removeheader port1 -1 To
+port removeheader port1 -1 Cc
+port removeheader port1 -1 Bcc
+
+/**/# Close the source port
+port close port1
+port shutdown port1
+port delete port1
+
+/**/# Close the smtp port
+port close port2
+port shutdown port2
+port delete port2
+
+quit

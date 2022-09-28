@@ -1,0 +1,94 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+.\" *************************************************************************
+.\" **
+.\" ** (c) Copyright 1993,1994 Hewlett-Packard Company 
+.\" **      All Rights Reserved.
+.\" **
+.\" ** (c) Copyright 1993,1994 International Business Machines Corp. 
+.\" **      All Rights Reserved.
+.\" **  
+.\" ** (c) Copyright 1993,1994 Sun Microsystems, Inc.
+.\" **      All Rights Reserved.
+.\" **
+.\" **
+.\" *************************************************************************
+.\"---
+.\".TH _title _#S_ "_dd_ _Month_ _19yy_"
+.TH DtDbReloadNotify 3 "17 Jan 1994"
+.\".BH "_dd_ _Month_ -_19yy_"
+.BH \*(DT 
+.\"---
+.\"---------------------------------------------------------------------------
+.SH NAME
+DtDbReloadNotify(3) \(em  the API for reloading the Dt actions and data typing
+services database.
+.\"---
+.\"---------------------------------------------------------------------------
+.\"---
+.\"--- SYNOPSIS 
+.\"--- This section is a syntax diagram.  Use the following lines for pages in
+.\"--- manual Sections 1, 1M, 5 and 8:
+.\"---
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Dt/Action.h>
+.sp \n(PDu
+void DtDbReloadNotify(
+.ta .5i 3.0i
+.nf
+	DtDbReloadCallbackProc	\fIcallback_proc\fP,
+	XtPointer	\fIclient_data\fP)
+.wH
+.fi
+.iE
+.sE
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- DESCRIPTION 
+.\"--- This section tells concisely what the command (function, device or
+.\"--- file format) does and includes the parameter list. 
+.\"---
+.SH DESCRIPTION
+.PP
+If you have a long-lived application, then your application
+must be prepared to dynamically reload the Dt actions and data typing services
+databases when they are modified.  To do this, your client must register to
+receive notification whenever the Action/Datatypes database is reloaded. This
+is done with a call to \fBDtDbReloadNotify()\fP.  You must supply a callback
+function, \fIcallback_proc\fP that cleans up any cached database information
+your application is holding and then invoke \fIDtDbLoad()\fP.  
+\fIClient_data\fP may be used to pass additional client information to the
+callback routine.
+.SH "RETURN VALUES"
+\fBDtDbReloadNotify()\fP does not have a meaningful return values.  
+.SH ERRORS
+If errors are encountered reading the database files, error messages will be
+written to the users' errorlog file ($HOME/.dt/errorlog). Records containing
+errors will not be incorporated into the internal database.
+.\"---
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- EXAMPLES
+.\"--- This section gives examples of how to use the command (function
+.\"--- or file format).  Always preface an example with an introduction.
+.\"--- If there are multiple examples, use separate subsection headings
+.\"--- for each _example-type_.  Otherwise, omit these headings.
+.\"---
+.\".SH EXAMPLES
+.SH "SEE ALSO"
+.BR  DtDbLoad(1),
+.BR  DtActionIcon(3),
+.BR  DtActionLabel(3),
+.BR  DtActionDescription(3),
+.BR  DtActionExists(3),
+.BR  DtActionInvoke (3),
+.BR  dtdtfile(4),
+.BR  dtactionfile(4),
+.BR  dtdtsfile(4)
+

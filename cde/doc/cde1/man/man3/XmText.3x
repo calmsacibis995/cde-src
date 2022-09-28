@@ -1,0 +1,1513 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH XmText 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmText\fP \- The Text widget class
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/Text.h>
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+Text provides a single-line and multiline text editor for customizing both user and
+programmatic interfaces.  It can be used for single-line string entry,
+forms entry with verification procedures, and full-window editing.
+It provides an application with a consistent editing system for
+textual data.  The screen's textual data adjusts to the
+application writer's needs.
+.PP 
+Text provides separate callback lists to verify
+movement of the insert cursor, modification of the text, and
+changes in input focus.  Each of
+these callbacks provides the verification function with the
+widget instance, the event that caused the callback, and a
+data structure specific to the verification type.  From this
+information the function can verify if the application considers
+this to be a legitimate state change and can signal the widget
+whether to continue with the action.
+.PP 
+The user interface tailors a new set of translations.  The default
+translations provide key bindings for insert cursor movement, deletion,
+insertion, and selection of text.
+.PP 
+.ne 5
+Text allows the user to select regions of text.
+Selection is based on the model specified in the \fBInter-Client
+Communication Conventions Manual\fP (ICCCM).  Text supports primary
+and secondary selection.
+.SS "Mouse Selection"
+The Text widget allows text to be edited, inserted, and selected.
+The user can cut, copy, and paste text using the clipboard, primary
+transfer, or secondary transfer.
+Text also provides a Drag and Drop facility that enables the user to
+copy or move data within Text or to a different widget.
+When
+keyboard focus policy is set to EXPLICIT, the widget that receives
+focus is the destination widget.  In POINTER mode, any keyboard
+or mouse operation (except secondary selection) in an
+editable widget establishes that widget as the destination.
+.PP
+If a destination widget becomes insensitive or uneditable, it forfeits
+its destination status.  In EXPLICIT mode, when a widget becomes
+insensitive, the focus moves to another widget.  If that widget
+is editable, it becomes the destination widget; otherwise, there
+is no destination widget.  The text of any insensitive Text widget
+is stippled, indicating its state to the user.
+.PP
+The insertion cursor, displayed as an I-beam, shows where input is
+inserted.  Input is inserted just before the insertion cursor.
+.PP 
+.SS "Classes"
+Text inherits behavior and resources from \fICore\fP and \fIPrimitive\fP
+classes.
+.PP
+The class pointer is \fIxmTextWidgetClass\fP.
+.PP
+The class name is \fIXmText\fP.
+.SS "New Resources"
+The following table defines a set of widget resources used by the programmer
+to specify data.  The programmer can also set the resource values for the
+inherited classes to set attributes for this widget.  To reference a
+resource by name or by class in a .Xdefaults file, remove the \fIXmN\fP or
+\fIXmC\fP prefix and use the remaining letters.  To specify one of the defined
+values for a resource in a .Xdefaults file, remove the \fIXm\fP prefix and use
+the remaining letters (in either lowercase or uppercase, but include any
+underscores between words).
+The codes in the access column indicate if the given resource can be
+set at creation time (C),
+set by using \fIXtSetValues\fP (S),
+retrieved by using \fIXtGetValues\fP (G), or is not applicable (N/A).
+.PP
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmText Resource Set
+Name	Class	Type	Default	Access
+_
+XmNactivateCallback	XmCCallback	XtCallbackList	NULL	C
+XmNautoShowCursorPosition	XmCAutoShowCursorPosition	Boolean	True	CSG
+XmNcursorPosition	XmCCursorPosition	XmTextPosition	0	CSG
+XmNeditable	XmCEditable	Boolean	True	CSG
+XmNeditMode	XmCEditMode	int	XmSINGLE_LINE_EDIT	CSG
+XmNfocusCallback	XmCCallback	XtCallbackList	NULL	C
+XmNgainPrimaryCallback	XmCCallback	XtCallbackList	NULL	C
+XmNlosePrimaryCallback	XmCCallback	XtCallbackList	NULL	C
+XmNlosingFocusCallback	XmCCallback	XtCallbackList	NULL	C
+XmNmarginHeight	XmCMarginHeight	Dimension	5	CSG
+XmNmarginWidth	XmCMarginWidth	Dimension	5	CSG
+XmNmaxLength	XmCMaxLength	int	largest integer	CSG
+XmNmodifyVerifyCallback	XmCCallback	XtCallbackList	NULL	C
+XmNmodifyVerifyCallbackWcs	XmCCallback	XtCallbackList	NULL	C
+XmNmotionVerifyCallback	XmCCallback	XtCallbackList	NULL	C
+XmNsource	XmCSource	XmTextSource	Default source	CSG
+XmNtopCharacter	XmCTextPosition	XmTextPosition	0	CSG
+XmNvalue	XmCValue	String	""	CSG
+XmNvalueChangedCallback	XmCCallback	XtCallbackList	NULL	C
+XmNvalueWcs	XmCvalueWcs	wchar_t *	(wchar_t *)""	CSG*
+XmNverifyBell	XmCVerifyBell	Boolean	dynamic	CSG
+.TE
+.KE
+.in
+.sp 1
+.PP
+* This resource cannot be set in a resource file.
+.IP "\fIXmNactivateCallback\fP"
+Specifies the list of callbacks that is called when the user invokes an
+event that calls the \fIActivate()\fP function.
+The type of the structure whose address is passed to this callback is
+\fIXmAnyCallbackStruct\fP.
+The reason sent by the callback is \fIXmCR_ACTIVATE\fP.
+.IP "\fIXmNautoShowCursorPosition\fP"
+Ensures that the visible text contains the insert cursor when set
+to True.
+If the insert cursor changes, the contents
+of Text may scroll in order to bring the insertion
+point into the window.
+.IP "\fIXmNcursorPosition\fP"
+Indicates the position in the text where the current insert cursor is to
+be located.
+Position is determined by the number of characters from the beginning of
+the text.
+The first character position is 0.
+.nL
+.ne 10
+.IP "\fIXmNeditable\fP"
+Indicates that the user can edit the text string when set to
+True.  Prohibits the user from editing the text when set to False.
+.ne 12
+.IP "\fIXmNeditMode\fP"
+Specifies the set of keyboard bindings used in Text.
+The default keyboard bindings (\fIXmSINGLE_LINE_EDIT\fP)
+provides the set of key bindings to be used in editing
+single-line text.  The multiline bindings
+(\fIXmMULTI_LINE_EDIT\fP) provides the set of key bindings to be
+used in editing multiline text.
+.IP
+The results of placing a Text widget inside a ScrolledWindow when the
+Text's \fIXmNeditMode\fP is \fIXmSINGLE_LINE_EDIT\fP are undefined.
+.IP "\fIXmNfocusCallback\fP"
+Specifies the list of callbacks called
+when Text accepts input focus.  The type of the structure whose
+address is passed to this callback is \fIXmAnyCallbackStruct\fP.
+The reason sent by the callback is \fIXmCR_FOCUS\fP.
+.IP "\fIXmNgainPrimaryCallback\fP"
+Specifies the list of callbacks called when an event causes the Text
+widget to gain ownership of the primary selection.
+The reason sent by the callback is \fIXmCR_GAIN_PRIMARY\fP.
+.IP "\fIXmNlosePrimaryCallback\fP"
+Specifies the list of callbacks called when an event causes the Text
+widget to lose ownership of the primary selection.
+The reason sent by the callback is \fIXmCR_LOSE_PRIMARY\fP.
+.nL
+.ne 7
+.IP "\fIXmNlosingFocusCallback\fP"
+Specifies the list of callbacks called
+before Text loses input focus.
+The type of the structure whose address is passed to this callback is
+\fIXmTextVerifyCallbackStruct\fP.
+The reason sent by the callback is \fIXmCR_LOSING_FOCUS\fP.
+.IP "\fIXmNmarginHeight\fP"
+Specifies the distance between the top edge of the widget
+window and the text, and between the bottom edge of the widget
+window and the text.
+.nL
+.ne 6
+.IP "\fIXmNmarginWidth\fP"
+Specifies the distance between the left edge of the widget
+window and the text, and between the right edge of the widget
+window and the text.
+.IP "\fIXmNmaxLength\fP"
+Specifies the maximum length of the text string that can be entered into
+text from the keyboard.  This value must be non-negative.
+Strings that are entered using the \fIXmNvalue\fP resource or the
+\fIXmTextSetString\fP function ignore this resource.
+.IP "\fIXmNmodifyVerifyCallback\fP"
+Specifies the list of callbacks called
+before text is deleted from or inserted into
+Text.
+The type of the structure whose address is passed to this callback is
+\fIXmTextVerifyCallbackStruct\fP.
+The reason sent by the callback is \fIXmCR_MODIFYING_TEXT_VALUE\fP.
+When multiple Text widgets share the same
+source, only the widget that initiates the source change will 
+generate the \fIXmNmodifyVerifyCallback\fP.
+.IP
+If both \fIXmNmodifyVerifyCallback\fP and \fIXmNmodifyVerifyCallbackWcs\fP
+are registered callback lists, the procedure(s) in the
+\fIXmNmodifyVerifyCallback\fP list are always executed first; and the
+resulting data, which may have been modified, is passed to the
+\fIXmNmodifyVerifyCallbackWcs\fP callback routines.
+.IP "\fIXmNmodifyVerifyCallbackWcs\fP"
+Specifies the list of callbacks called before text is deleted from
+or inserted into Text.  The type of the structure whose address is
+passed to this callback is \fIXmTextVerifyCallbackStructWcs\fP.  The
+reason sent by the callback is \fIXmCR_MODIFYING_TEXT_VALUE\fP.
+When multiple Text widgets share the same
+source, only the widget that initiates the source change will 
+generate the \fIXmNmodifyVerifyCallbackWcs\fP.
+.IP
+If both \fIXmNmodifyVerifyCallback\fP and \fIXmNmodifyVerifyCallbackWcs\fP
+are registered callback lists, the procedure(s) in the
+\fIXmNmodifyVerifyCallback\fP list are always executed first; and the
+resulting data, which may have been modified, is passed to the
+\fIXmNmodifyVerifyCallbackWcs\fP callback routines.
+.IP "\fIXmNmotionVerifyCallback\fP"
+Specifies the list of callbacks called
+before the insert cursor is moved to a new position.
+The type of the structure whose address is passed to this callback is
+\fIXmTextVerifyCallbackStruct\fP.
+The reason sent  by the callback is \fIXmCR_MOVING_INSERT_CURSOR\fP.
+It is possible for more than one \fIXmNmotionVerifyCallback\fPs to 
+be generated from a single action.
+.IP "\fIXmNsource\fP"
+Specifies the source with which the widget displays text.
+If no source is specified, the widget creates a default string source.
+This resource can be used to share text sources between Text widgets.
+.IP "\fIXmNtopCharacter\fP"
+Displays the position of text at the top of the window.
+Position is determined by the number of characters from the
+beginning of the text.
+The first character position is 0.
+.IP
+If the \fIXmNeditMode\fP is \fIXmMULTI_LINE_EDIT\fP, the line of text
+that contains the top character is displayed at the top of the widget
+without shifting the text left or right.
+\fIXtGetValues\fP for \fIXmNtopCharacter\fP returns the position of the
+first character in the line that is displayed at the top of the widget.
+.IP "\fIXmNvalue\fP"
+Specifies the string value of the Text widget as a \fIchar*\fP
+data value.  \fIXmNvalue\fP and \fIXmNvalueWcs\fP are both
+defined, the value of \fIXmNvalueWcs\fP supersedes that of
+\fIXmNvalue\fP.  \fIXtGetValues\fP returns a copy of the value of
+the internal buffer and \fIXtSetValues\fP copies the string values
+into the internal buffer.
+.IP "\fIXmNvalueChangedCallback\fP"
+Specifies the list of callbacks called
+after text is deleted from or inserted into
+Text.
+The type of the structure whose address is passed to this callback is
+\fIXmAnyCallbackStruct\fP.
+The reason sent by the callback is \fIXmCR_VALUE_CHANGED\fP.
+When multiple Text widgets share the same
+source, only the widget that initiates the source change will 
+generate the \fIXmNvalueChangedCallback\fP.  This callback represents a 
+change in the source in the Text, not in the Text
+widget.  The \fIXmNvalueChangedCallback\fP should occur only in pairs
+with a \fIXmNmodifyVerifyCallback\fP, assuming that the \fBdoit\fP
+flag in the callback structure of the \fIXmNmodifyVerifyCallback\fP is
+not set to False.
+.IP "\fIXmNvalueWcs\fP"
+Specifies the string value of the Text widget as a \fIwchar_t*\fP data
+value.  This resource cannot be specified in a resource file.
+.IP
+If \fIXmNvalue\fP and \fIXmNvalueWcs\fP are both defined,
+the value of \fIXmNvalueWcs\fP supersedes that of \fIXmNvalue\fP.
+\fIXtGetValues\fP returns a copy of the value of the internal buffer
+encoded as a wide character string.  \fIXtSetValues\fP copies the
+value of the wide character string into the internal buffer.
+.IP "\fIXmNverifyBell\fP"
+Specifies whether the bell should sound when the verification returns
+without continuing the action.
+The default depends on the value of the ancestor VendorShell's 
+\fIXmNaudibleWarning\fP resource.
+.IP
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmText Input Resource Set
+Name	Class	Type	Default	Access
+_
+XmNpendingDelete	XmCPendingDelete	Boolean	True	CSG
+XmNselectionArray	XmCSelectionArray	XtPointer	default array	CSG
+XmNselectionArrayCount	XmCSelectionArrayCount	int	4	CSG
+XmNselectThreshold	XmCSelectThreshold	int	5	CSG
+.TE
+.KE
+.in
+.sp 1
+.IP "\fIXmNpendingDelete\fP"
+Indicates that pending delete mode is on when the Boolean value is True.
+Pending deletion is defined as deletion
+of the selected text when an insertion is made.
+.nL
+.ne 25
+.IP "\fIXmNselectionArray\fP"
+Defines the actions for multiple mouse clicks.
+The value of the resource is an array of \fIXmTextScanType\fP elements.
+\fIXmTextScanType\fP is an enumeration indicating possible actions.
+Each mouse click performed within half a second
+of the previous mouse click increments the index into
+this array and performs the defined action for that index.
+The possible actions in the order they occur in the default array are:
+.wH
+.rS 
+.TP
+\(bu
+\fIXmSELECT_POSITION\fP \- resets the insert cursor position
+.TP
+\(bu
+\fIXmSELECT_WORD\fP \- selects a word
+.TP
+\(bu
+\fIXmSELECT_LINE\fP \- selects a line of text
+.TP
+\(bu
+\fIXmSELECT_ALL\fP \- selects all of the text
+.wH
+.rE
+.IP "\fIXmNselectionArrayCount\fP"
+Indicates the number of elements in the \fIXmNselectionArray\fP resource.
+The value must not be negative.
+.IP "\fIXmNselectThreshold\fP"
+Specifies the number of pixels of motion that is required to select the
+next character when selection is performed using the click-drag
+mode of selection.
+The value must not be negative.
+.IP
+.ne 5i
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmText Output Resource Set
+Name	Class	Type	Default	Access
+_
+XmNblinkRate	XmCBlinkRate	int	500	CSG
+XmNcolumns	XmCColumns	short	dynamic	CSG
+XmNcursorPositionVisible	XmCCursorPositionVisible	Boolean	True	CSG
+XmNfontList	XmCFontList	XmFontList	dynamic	CSG
+XmNresizeHeight	XmCResizeHeight	Boolean	False	CSG
+XmNresizeWidth	XmCResizeWidth	Boolean	False	CSG
+XmNrows	XmCRows	short	dynamic	CSG
+XmNwordWrap	XmCWordWrap	Boolean	False	CSG
+.TE
+.KE
+.in
+.sp 1
+.IP "\fIXmNblinkRate\fP"
+Specifies the blink rate of the text cursor in milliseconds.
+The time indicated in the blink rate relates to the
+time the cursor is visible and the time the
+cursor is invisible (that is, the time it takes to blink
+.ne 5
+the insertion cursor on and off is twice the blink
+rate).  The cursor does not blink when the blink rate
+is set to zero.
+The value must not be negative.
+.IP "\fIXmNcolumns\fP"
+Specifies the initial width of the text window as an integer number of 
+characters.  The width equals the number of characters specified by
+this resource multiplied by the maximum character width of the associated
+font.  For proportionate fonts, the actual number of characters that fit
+on a given line may be greater than the value specified.
+The value must be greater than 0.  The default value depends
+on the value of the \fIXmNwidth\fP resource.
+If no width is specified the default is 20.
+.IP "\fIXmNcursorPositionVisible\fP"
+Indicates that the insert cursor position is marked by a blinking text
+cursor when the Boolean value is True.
+.IP "\fIXmNfontList\fP"
+Specifies the font list to be used for Text.  If this value is
+NULL at initialization, the font list is initialized by looking
+up the parent hierarchy of the widget for an ancestor that is a
+subclass of the XmBulletinBoard or VendorShell
+widget class.  If such an ancestor is found, the font list is
+initialized to the \fIXmNtextFontList\fP of the ancestor widget.
+If no such ancestor is found, the default is implementation dependent.
+.IP
+Text searches the font list for the first occurrence of a font set
+that has a \fIXmFONTLIST_DEFAULT_TAG\fP.  If a default element is
+not found, the first font set in the font list is used.  If the
+list contains no font sets, the first font in the font list will
+be used.  Refer to \fIXmFontList(3X)\fP for
+more information on a font list structure.
+.IP "\fIXmNresizeHeight\fP"
+Indicates that Text
+attempts to resize its height to accommodate all the text
+contained in the widget when the Boolean value is True.  If the Boolean value is set to True,
+the text is always
+displayed starting from the first position in the source, even if
+instructed otherwise.  This attribute is ignored when the application uses a
+ScrolledText widget and when \fIXmNscrollVertical\fP is True.
+.IP "\fIXmNresizeWidth\fP"
+Indicates that Text attempts to resize its width to accommodate all
+the text contained in the widget when the Boolean value is True.
+This attribute is ignored if
+\fIXmNwordWrap\fP is True.
+.IP "\fIXmNrows\fP"
+Specifies the initial height of the text window measured in character
+heights. This attribute is ignored if the text widget resource
+\fIXmNeditMode\fP is \fIXmSINGLE_LINE_EDIT\fP.
+The value must be greater than 0.
+The default value depends on the value of the \fIXmNheight\fP resource.
+If no height is specified the default is 1.
+.IP "\fIXmNwordWrap\fP"
+Indicates that lines are to be broken at word breaks (that is, the text
+does not go off the right edge of the window) when the Boolean value is True.
+Words are defined as a sequence
+of characters separated by white space.  White space is defined as
+a space, tab, or newline.  This attribute is ignored if the text
+widget resource \fIXmNeditMode\fP is \fIXmSINGLE_LINE_EDIT\fP.
+.IP
+The following resources are used only when text is created in a
+ScrolledWindow.  See the man page for \fIXmCreateScrolledText\fP.
+.IP
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmText ScrolledText Resource Set
+Name	Class	Type	Default	Access
+_
+XmNscrollHorizontal	XmCScroll	Boolean	True	CG
+XmNscrollLeftSide	XmCScrollSide	Boolean	dynamic	CG
+XmNscrollTopSide	XmCScrollSide	Boolean	False	CG
+XmNscrollVertical	XmCScroll	Boolean	True	CG
+.TE
+.KE
+.in
+.sp 1
+.nL
+.ne 20
+.IP "\fIXmNscrollHorizontal\fP"
+Adds a ScrollBar that allows the user to scroll horizontally through
+text when the Boolean value is True.
+This resource is forced to False when the Text widget is placed in
+a ScrolledWindow with \fIXmNscrollingPolicy\fP set to
+\fIXmAUTOMATIC\fP.
+.IP "\fIXmNscrollLeftSide\fP"
+.ne 15
+Indicates that the vertical ScrollBar should be placed on the left side of
+the scrolled text window when the Boolean value is True.  This attribute
+is ignored if \fIXmNscrollVertical\fP is False or the Text resource
+\fIXmNeditMode\fP is \fIXmSINGLE_LINE_EDIT\fP.
+The default value may depend on the value of the
+\fIXmNstringDirection\fP resource.
+.IP "\fIXmNscrollTopSide\fP"
+Indicates that the horizontal ScrollBar should be placed on the top side of the
+scrolled text window when the Boolean value is True.
+.IP "\fIXmNscrollVertical\fP"
+Adds a ScrollBar that allows the user to scroll vertically through text when
+the Boolean value is True.
+This attribute is ignored if the Text resource \fIXmNeditMode\fP is
+\fIXmSINGLE_LINE_EDIT\fP.
+This resource is forced to False when the Text widget is placed in
+a ScrolledWindow with \fIXmNscrollingPolicy\fP set to
+\fIXmAUTOMATIC\fP.
+.SS "Inherited Resources"
+Text inherits behavior and resources from the following
+superclasses.  For a complete description of each resource, refer to the
+man page for that superclass.
+.IP
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmPrimitive Resource Set
+Name	Class	Type	Default	Access
+_
+XmNbottomShadowColor	XmCBottomShadowColor	Pixel	dynamic	CSG
+XmNbottomShadowPixmap	XmCBottomShadowPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNforeground	XmCForeground	Pixel	dynamic	CSG
+XmNhelpCallback	XmCCallback	XtCallbackList	NULL	C
+XmNhighlightColor	XmCHighlightColor	Pixel	dynamic	CSG
+XmNhighlightOnEnter	XmCHighlightOnEnter	Boolean	False	CSG
+XmNhighlightPixmap	XmCHighlightPixmap	Pixmap	dynamic	CSG
+XmNhighlightThickness	XmCHighlightThickness	Dimension	2	CSG
+.wH
+.tH
+XmNnavigationType	XmCNavigationType	XmNavigationType	XmTAB_GROUP	CSG
+XmNshadowThickness	XmCShadowThickness	Dimension	2	CSG
+XmNtopShadowColor	XmCTopShadowColor	Pixel	dynamic	CSG
+XmNtopShadowPixmap	XmCTopShadowPixmap	Pixmap	dynamic	CSG
+XmNtraversalOn	XmCTraversalOn	Boolean	True	CSG
+XmNunitType	XmCUnitType	unsigned char	dynamic	CSG
+XmNuserData	XmCUserData	XtPointer	NULL	CSG
+.TE
+.KE
+.in
+.sp 1
+.PP
+.wH
+.in 0 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+Core Resource Set
+Name	Class	Type	Default	Access
+_
+XmNaccelerators	XmCAccelerators	XtAccelerators	dynamic	CSG
+XmNancestorSensitive	XmCSensitive	Boolean	dynamic	G
+XmNbackground	XmCBackground	Pixel	dynamic	CSG
+XmNbackgroundPixmap	XmCPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNborderColor	XmCBorderColor	Pixel	XtDefaultForeground	CSG
+XmNborderPixmap	XmCPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNborderWidth	XmCBorderWidth	Dimension	0	CSG
+XmNcolormap	XmCColormap	Colormap	dynamic	CG
+XmNdepth	XmCDepth	int	dynamic	CG
+XmNdestroyCallback	XmCCallback	XtCallbackList	NULL	C
+XmNheight	XmCHeight	Dimension	dynamic	CSG
+XmNinitialResourcesPersistent	XmCInitialResourcesPersistent	Boolean	True	C
+XmNmappedWhenManaged	XmCMappedWhenManaged	Boolean	True	CSG
+XmNscreen	XmCScreen	Screen *	dynamic	CG
+.wH
+.tH
+XmNsensitive	XmCSensitive	Boolean	True	CSG
+XmNtranslations	XmCTranslations	XtTranslations	dynamic	CSG
+XmNwidth	XmCWidth	Dimension	dynamic	CSG
+XmNx	XmCPosition	Position	0	CSG
+XmNy	XmCPosition	Position	0	CSG
+.TE
+.KE
+.in
+.sp 1
+.wH
+.in  
+.SS "Callback Information"
+A pointer to the following structure is passed to each callback:
+.nL
+.ne 10
+.sS
+.iS
+.ta .25i 1.5i
+.nf
+typedef struct
+{
+	int	\fBreason\fI;
+	XEvent	\fB* event\fI;
+} XmAnyCallbackStruct;
+.iE
+.sE
+.wH
+.fi
+.IP "\fBreason\fP"
+Indicates why the callback was invoked
+.IP "\fBevent\fP"
+Points to the \fIXEvent\fP that triggered the callback
+.IP
+The Text widget defines a new callback structure
+for use with verification callbacks.  Note that
+not all fields are relevant for every
+callback reason.  The application must first
+look at the \fBreason\fP field and use only the structure
+members that are valid for the particular reason.
+The values \fBstartPos\fP, \fBendPos\fP, and \fBtext\fP in the
+callback structure \fIXmTextVerifyCallbackStruct\fP may be modified upon
+receiving the callback, and these changes will be reflected as the
+change made to the source of the Text widget.  (For example, all
+keystrokes can be converted to spaces or NULL characters when a
+password is entered into a Text widget.)  The application
+programmer should not overwrite the \fBtext\fP field, but should
+attach data to that pointer.
+.IP
+A pointer to the following structure is passed to callbacks for
+\fIXmNlosingFocusCallback\fP, \fIXmNmodifyVerifyCallback\fP, and
+\fIXmNmotionVerifyCallback\fP.
+.sS
+.iS
+.ta .25i 1.5i
+.nf
+typedef struct
+.ne 4
+{
+	int	\fBreason\fI;
+	XEvent	\fB* event\fI;
+	Boolean	\fBdoit\fI;
+	XmTextPosition 	\fBcurrInsert, newInsert\fI;
+	XmTextPosition 	\fBstartPos, endPos\fI;
+	XmTextBlock 	\fBtext\fI;
+} XmTextVerifyCallbackStruct, *XmTextVerifyPtr;
+.iE
+.sE
+.wH
+.fi
+.IP "\fBreason\fP"
+Indicates why the callback was invoked.
+.IP "\fBevent\fP"
+Points to the \fIXEvent\fP that triggered the callback.
+It can be NULL.  For example, changes made to the Text widget
+programmatically do not have an event that can be
+passed to the associated callback.
+.IP "\fBdoit\fP"
+Indicates whether the action that invoked the callback is performed.
+Setting \fBdoit\fP to False negates the action.
+.IP "\fBcurrInsert\fP"
+Indicates the current position of the insert cursor.
+.IP "\fBnewInsert\fP"
+Indicates the position at which the user attempts to position the insert
+cursor.
+.IP "\fBstartPos\fP"
+Indicates the starting position of the text to modify.  If the callback is
+not a modify verification callback, this value is the same as \fBcurrInsert\fP.
+.IP "\fBendPos\fP"
+Indicates the ending position of the text to modify.  If no text is replaced or
+deleted, the value is the same as \fBstartPos\fP.  If the callback is not
+a modify verification callback, this value is the same as \fBcurrInsert\fP.
+.IP "\fBtext\fP"
+Points to a structure of type \fIXmTextBlockRec\fP.  This structure holds
+the textual information to be inserted.
+.sS
+.iS
+.ta .25i 1.5i
+.nf
+typedef struct
+{
+	char	*\fBptr\fI;
+	int	\fBlength\fI;
+	XmTextFormat	\fBformat\fI;
+} XmTextBlockRec, *XmTextBlock;
+.iE
+.sE
+.wH
+.fi
+.IP "\fBptr\fP"
+.ne 15
+Points to the text to be inserted.
+.IP "\fBlength\fP"
+Specifies the length of the text to be inserted.
+.IP "\fBformat\fP"
+Specifies the format of the text, either \fIXmFMT_8_BIT\fP or \fIXmFMT_16_BIT\fP.
+.IP
+A pointer to the following structure is passed to callbacks
+for \fIXmNmodifyVerifyCallbackWcs\fP.
+.sS
+.iS
+.ta .25i 1.5i
+.nf
+typedef struct
+.ne 4
+{
+	int	\fBreason\fI;
+	XEvent	*\fBevent\fI;
+	Boolean	\fBdoit\fI;
+	XmTextPosition 	\fBcurrInsert, newInsert\fI;
+	XmTextPosition 	\fBstartPos, endPos\fI;
+	XmTextBlockWcs 	\fBtext\fI;
+} XmTextVerifyCallbackStructWcs, *XmTextVerifyPtrWcs;
+.iE
+.sE
+.iE
+.sE
+.wH
+.fi
+.IP "\fBreason\fP"
+Indicates why the callback was invoked.
+.IP "\fBevent\fP"
+Points to the \fIXEvent\fP that triggered the callback.
+It can be NULL.  For example, changes made to the Text widget
+programmatically do not have an event that can be
+passed to the associated callback.
+.IP "\fBdoit\fP"
+Indicates whether the action that invoked the callback is performed.
+Setting \fBdoit\fP to False negates the action.
+.IP "\fBcurrInsert\fP"
+Indicates the current position of the insert cursor.
+.IP "\fBnewInsert\fP"
+Indicates the position at which the user attempts to position the insert
+cursor.
+.IP "\fBstartPos\fP"
+Indicates the starting position of the text to modify.  If the callback is
+not a modify verification callback, this value is the same as \fBcurrInsert\fP.
+.IP "\fBendPos\fP"
+Indicates the ending position of the text to modify.  If no text is replaced or
+deleted, the value is the same as \fBstartPos\fP.  If the callback is not
+a modify verification callback, this value is the same as \fBcurrInsert\fP.
+.IP "\fBtext\fP"
+Points to a structure of type \fIXmTextBlockRecWcs\fP.  This structure holds
+the textual information to be inserted.
+.sS
+.iS
+.ta .25i 1.5i
+.nf
+typedef struct
+{
+	wchar_t	*\fBwcsptr\fI;
+	int	\fBlength\fI;
+} XmTextBlockRecWcs, *XmTextBlockWcs;
+.iE
+.sE
+.wH
+.fi
+.IP "\fBwcsptr\fP"
+.ne 15
+Points to the wide character text to be inserted.
+.IP "\fBlength\fP"
+Specifies the number of characters to be inserted.
+.IP
+The following table describes the reasons why the individual
+verification callback structure fields are valid:
+.P 
+.wH
+.in -.75i 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+lb  lb
+lb  li.
+Reason;Valid Fields
+.sp .2
+_
+.sp .2
+XmCR_LOSING_FOCUS	T{
+reason, event, doit, currInsert, newInsert, startPos, endPos
+T}
+		
+XmCR_MODIFYING_TEXT_VALUE	T{
+reason, event, doit, currInsert, newInsert, startPos, endPos, text
+T}
+		
+XmCR_MOVING_INSERT_CURSOR	T{
+reason, event, doit, currInsert, newInsert
+T}
+.sp .2
+.TE
+.KE
+.in
+.sp 1
+.wH
+.in  
+.SS "Translations"
+XmText includes translations from XmPrimitive.
+The XmText translations are listed below.
+These translations may not directly correspond to a
+translation table.
+The actions represent the effective behavior of the associated events,
+and they may differ in a right-to-left language environment.
+.iS
+.ta 1.5i
+.nf
+BSelect Press:	grab-focus()
+BSelect Motion:	extend-adjust()
+BSelect Release:	extend-end()
+.sp \n(PDu
+BExtend Press:	extend-start()
+BExtend Motion:	extend-adjust()
+BExtend Release:	extend-end()
+.sp \n(PDu
+BToggle Press:	move-destination()
+.sp \n(PDu
+BDrag Press:	process-bdrag()
+BDrag Motion:	secondary-adjust()
+BDrag Release:	copy-to()
+.sp \n(PDu
+MCtrl BDrag Press:	process-bdrag()
+MCtrl BDrag Motion:	secondary-adjust()
+MCtrl BDrag Release:	copy-to()
+.sp \n(PDu
+MAlt BDrag Press:	process-bdrag()
+MAlt BDrag Motion:	secondary-adjust()
+MAlt BDrag Release:	copy-to()
+MShift BDrag Press:	process-bdrag()
+MShift BDrag Motion:	secondary-adjust()
+MShift BDrag Release:	move-to()
+MAlt MCtrl BDrag Release:	copy-to()
+MAlt MShift BDrag Release:	move-to()
+.sp \n(PDu
+KUp:	process-up()
+MShift KUp:	process-shift-up()
+MCtrl KUp:	backward-paragraph()
+MShift MCtrl KUp:	backward-paragraph(extend)
+.sp \n(PDu
+KDown:	process-down()
+MShift KDown:	process-shift-down()
+MCtrl KDown:	forward-paragraph()
+MShift MCtrl KDown:	forward-paragraph(extend)
+.sp \n(PDu
+KLeft:	backward-character()
+MShift KLeft:	key-select(left)
+MCtrl KLeft:	backward-word()
+MShift MCtrl KLeft:	backward-word(extend)
+.sp \n(PDu
+KRight:	forward-character()
+MShift KRight:	key-select(right)
+MCtrl KRight:	forward-word()
+MShift MCtrl KRight:	forward-word(extend)
+.sp \n(PDu
+KPageUp:	previous-page()
+MShift KPageUp:	previous-page(extend)
+.sp \n(PDu
+.ne 6
+KPageDown:	next-page()
+MShift KPageDown:	next-page(extend)
+.sp \n(PDu
+KPageLeft:	page-left()
+KPageRight:	page-right()
+.sp \n(PDu
+KBeginLine:	beginning-of-line()
+MShift KBeginLine:	beginning-of-line(extend)
+.sp \n(PDu
+KEndLine:	end-of-line()
+MShift KEndLine:	end-of-line(extend)
+.sp \n(PDu
+KBeginData:	beginning-of-file()
+MShift KBeginData:	beginning-of-file(extend)
+.sp \n(PDu
+KEndData:	end-of-file()
+MShift KEndData:	end-of-file(extend)
+.sp \n(PDu
+KTab:	process-tab()
+KNextField:	next-tab-group()
+KPrevField:	prev-tab-group()
+.sp \n(PDu
+KEnter:	process-return()
+KActivate:	activate()
+.sp \n(PDu
+KDelete:	delete-next-character()
+KBackSpace:	delete-previous-character()
+.sp \n(PDu
+KAddMode:	toggle-add-mode()
+.sp \n(PDu
+KSpace:	self-insert()
+MShift KSpace:	self-insert()
+KSelect:	set-anchor()
+KExtend:	key-select()
+MAny KCancel:	process-cancel()
+KClear:	clear-selection()
+KSelectAll:	select-all()
+KDeselectAll:	deselect-all()
+.sp \n(PDu
+.ne 5
+KCut:	cut-clipboard()
+KCopy:	copy-clipboard()
+KPaste:	paste-clipboard()
+.sp \n(PDu
+KPrimaryCut:	cut-primary()
+KPrimaryCopy:	copy-primary()
+KPrimaryPaste:	copy-primary()
+.sp \n(PDu
+KHelp:	Help()
+.sp \n(PDu
+KAny:	self-insert()
+.wH
+.fi
+.iE
+.PP
+The translations for the button events are modified when the XmDisplay's
+\fIenableBtn1Transfer\fP resource is True.
+This option allows the actions for selection and transfer to be integrated
+on Button1 so that the actions for extending the selection can be bound
+to Button2.
+The actions for Button1 that are defined above still apply when the Button1
+press occurs over text that is not selected.
+The following actions apply when the Button1 press occurs over text that
+is selected:
+.PP
+.iS
+.ta 1.5i
+.nf
+BSelect Press:    process-bdrag() resulting in copy
+.sp \n(PDu
+BExtend Press:    process-bdrag() resulting in move
+BExtend Click:    extend-start(), extend-end()
+.sp \n(PDu
+BToggle Press:    process-bdrag() resulting in copy
+.sp \n(PDu
+BDrag Press:      extend-start()
+BDrag Motion:     extend-adjust()
+BDrag Release:    extend-end()
+.wH
+.fi
+.iE
+.SS "Action Routines"
+The XmText action routines are described below:
+.IP "\fIactivate()\fP:"
+Calls the callbacks for \fIXmNactivateCallback\fP.
+If the parent is a manager, passes the event to the parent.
+.IP "\fIbackward-character()\fP:"
+Moves the insertion cursor one character to the left.
+For other effects, see the description of navigation operations in the
+"Keyboard Selection" section.
+This action may have different behavior in a right-to-left language
+environment.
+.nL
+.ne 25
+.IP "\fIbackward-paragraph(\fBextend\fI)\fP:"
+If \fIXmNeditMode\fP is \fIXmMULTI_LINE_EDIT\fP and this action is
+called with no argument,
+moves the insertion cursor to the first non-whitespace character following
+the first previous blank line or beginning of the text.
+If the insertion cursor is already at the beginning of a paragraph,
+moves the insertion cursor to the beginning of the previous paragraph.
+For other effects, see the description of navigation operations in the
+"Keyboard Selection" section.
+.IP
+If \fIXmNeditMode\fP is \fIXmMULTI_LINE_EDIT\fP and this action is
+called with an argument of \fIextend\fP, moves the insertion cursor as
+in the case of no argument and extends the current selection.
+For other effects, see the description of shifted navigation operations
+in the "Keyboard Selection" section.
+.IP "\fIbackward-word(\fBextend\fI)\fP:"
+If this action is called with no argument,
+moves the insertion cursor to the first non-whitespace character after the
+first whitespace character to the left or after the beginning of the line.
+If the insertion cursor is already at the beginning of a word,
+moves the insertion cursor to the beginning of the previous word.
+For other effects, see the description of navigation operations in the
+"Keyboard Selection" section.
+This action may have different behavior in a locale other than the C locale.
+.IP
+.ne 10
+If called with an argument of \fIextend\fP, moves the insertion cursor as
+in the case of no argument and extends the current selection.
+For other effects, see the description of shifted navigation operations
+in the "Keyboard Selection" section.
+.IP "\fIbeep()\fP:"
+Causes the terminal to beep.
+.IP "\fIbeginning-of-file(\fBextend\fI)\fP:"
+If this action is called with no argument,
+moves the insertion cursor to the beginning of the text.
+For other effects, see the description of navigation operations in the
+"Keyboard Selection" section.
+.IP
+If called with an argument of \fIextend\fP, moves the insertion cursor as
+in the case of no argument and extends the current selection.
+For other effects, see the description of shifted navigation operations
+in the "Keyboard Selection" section.
+.IP "\fIbeginning-of-line(\fBextend\fI)\fP:"
+If this action is called with no argument,
+moves the insertion cursor to the beginning of the line.
+For other effects, see the description of navigation operations in the
+"Keyboard Selection" section.
+.IP
+If called with an argument of \fIextend\fP, moves the insertion cursor as
+in the case of no argument and extends the current selection.
+For other effects, see the description of shifted navigation operations
+in the "Keyboard Selection" section.
+.IP "\fIclear-selection()\fP:"
+Clears the current selection by replacing each character except
+\fI<Return>\fP with a \fI<space>\fP character.
+.IP "\fIcopy-clipboard()\fP:"
+Copies the current selection to the clipboard.
+.IP "\fIcopy-primary()\fP:"
+Copies the primary selection to just before the insertion cursor.
+.IP "\fIcopy-to()\fP:"
+If a secondary selection exists, copies the secondary selection to just before
+the insertion cursor.
+If no secondary selection exists, copies the primary selection to the
+pointer location.
+.IP "\fIcut-clipboard()\fP:"
+Cuts the current selection to the clipboard.
+.IP "\fIcut-primary()\fP:"
+Cuts the primary selection to just before the insertion cursor.
+.IP "\fIdelete-next-character()\fP:"
+In normal mode if there is a non-null selection, deletes the selection, otherwise
+deletes the character following the insertion cursor.
+In add mode if there is a non-null selection, the cursor is not disjoint
+from the selection and \fIXmNpendingDelete\fP is set to True,
+deletes the selection, otherwise
+deletes the character following the insertion cursor.
+This may impact the selection.
+.IP "\fIdelete-next-word()\fP:"
+In normal mode if there is a non-null selection, deletes the selection, otherwise
+deletes the characters following the insertion cursor to the next space, tab
+or end of line character.
+In add mode if there is a non-null selection, the cursor is not disjoint
+from the selection and \fIXmNpendingDelete\fP is set to True,
+deletes the selection, otherwise
+deletes the characters following the insertion cursor to the next space, tab
+or end of line character.
+This may impact the selection.
+This action may have different behavior in a locale other than the C locale.
+.IP "\fIdelete-previous-character()\fP:"
+In normal mode if there is a non-null selection, deletes the selection, otherwise
+deletes the character of text immediately preceding the insertion cursor.
+In add mode if there is a non-null selection, the cursor is not disjoint
+from the selection and \fIXmNpendingDelete\fP is set to True,
+deletes the selection, otherwise
+deletes the character of text immediately preceding the insertion cursor.
+This may impact the selection.
+.IP "\fIdelete-previous-word()\fP:"
+In normal mode if there is a non-null selection, deletes the selection, otherwise
+deletes the characters preceding the insertion cursor to the next
+space, tab or beginning of the line character.
+In add mode if there is a non-null selection, the cursor is not disjoint
+from the selection and \fIXmNpendingDelete\fP is set to True,
+deletes the selection, otherwise
+deletes the characters preceding the insertion cursor to the next space,
+tab or beginning of line character..
+This may impact the selection.
+This action may have different behavior in a locale other than the C locale.
+.IP "\fIdelete-selection()\fP:"
+Deletes the current selection.
+.IP "\fIdelete-to-end-of-line()\fP:"
+In normal mode if there is a non-null selection, deletes the selection, otherwise
+deletes the characters following the insertion cursor to the next end of
+line character.
+In add mode if there is a non-null selection, the cursor is not disjoint
+from the selection and \fIXmNpendingDelete\fP is set to True,
+deletes the selection, otherwise
+deletes the characters following the insertion cursor to the next end
+of line character.
+This may impact the selection.
+.IP "\fIdelete-to-start-of-line()\fP:"
+In normal mode if there is a non-null selection, deletes the selection, otherwise
+deletes the characters preceding the insertion cursor to the previous
+beginning of line character.
+In add mode if there is a non-null selection, the cursor is not disjoint
+from the selection and \fIXmNpendingDelete\fP is set to True,
+deletes the selection, otherwise
+deletes the characters preceding the insertion cursor
+to the previous beginning of line character.
+This may impact the selection.
+.IP "\fIdeselect-all()\fP:"
+Deselects the current selection.
+.IP "\fIend-of-file(\fBextend\fI)\fP:"
+If this action is called with no argument,
+moves the insertion cursor to the end of the text.
+For other effects, see the description of navigation operations in the
+"Keyboard Selection" section.
+.IP
+If called with an argument of \fIextend\fP, moves the insertion cursor as
+in the case of no argument and extends the current selection.
+For other effects, see the description of shifted navigation operations
+in the "Keyboard Selection" section.
+.IP "\fIend-of-line(\fBextend\fI)\fP:"
+If this action is called with no argument,
+moves the insertion cursor to the end of the line.
+For other effects, see the description of navigation operations in the
+"Keyboard Selection" section.
+If called with an argument of \fIextend\fP, moves the insertion cursor as
+in the case of no argument and extends the current selection.
+For other effects, see the description of shifted navigation operations
+in the "Keyboard Selection" section.
+.IP "\fIextend-adjust()\fP:"
+Selects text from the anchor to the pointer position and deselects text
+outside that range.
+Moving the pointer over several lines selects text from the anchor to
+the end of each line the pointer moves over and up to the pointer
+position on the current line.
+.IP "\fIextend-end()\fP:"
+Moves the insertion cursor to the position of the pointer.
+.IP "\fIextend-start()\fP:"
+Adjusts the anchor using the balance-beam method.
+Selects text from the anchor to the pointer position and deselects text
+outside that range.
+.IP "\fIforward-character()\fP:"
+Moves the insertion cursor one character to the right.
+For other effects, see the description of navigation operations in the
+"Keyboard Selection" section.
+This action may have different behavior in a right-to-left language
+environment.
+.IP "\fIforward-paragraph(\fBextend\fI)\fP:"
+If \fIXmNeditMode\fP is \fIXmMULTI_LINE_EDIT\fP,
+and this action is called with no argument,
+moves the insertion cursor to the first non-whitespace character
+following the next blank line.
+If the insertion cursor is already at the beginning of a paragraph,
+moves the insertion cursor to the beginning of the next paragraph.
+For other effects, see the description of navigation operations in the
+"Keyboard Selection" section.
+.IP
+If \fIXmNeditMode\fP is \fIXmMULTI_LINE_EDIT\fP and this action is
+called with an argument of \fIextend\fP, moves the insertion cursor as
+in the case of no argument and extends the current selection.
+For other effects, see the description of shifted navigation operations
+in the "Keyboard Selection" section.
+.nL
+.ne 9
+.IP "\fIforward-word(\fBextend\fI)\fP:"
+If this action is called with no argument, moves the insertion cursor to
+the first whitespace character or end of line following the next
+non-whitespace character.
+If the insertion cursor is already at the end of a word,
+moves the insertion cursor to the end of the next word.
+For other effects, see the description of navigation operations in the
+"Keyboard Selection" section.
+This action may have different behavior in a locale other than the C locale.
+.IP
+If called with an argument of \fIextend\fP, moves the insertion cursor as
+in the case of no argument and extends the current selection.
+For other effects, see the description of shifted navigation operations
+in the "Keyboard Selection" section.
+.IP "\fIgrab-focus()\fP:"
+This key binding performs the action defined in the
+\fIXmNselectionArray\fP, depending on the number of multiple mouse
+clicks.
+The default selection array ordering is one click to move the
+insertion cursor to the pointer position, two clicks to select a word, three
+clicks to select a line of text, and four clicks to select all text.
+A single click also deselects any selected text and sets the anchor at
+the pointer position.
+This action may have different behavior in a locale other than the C locale.
+.IP "\fIHelp()\fP:"
+Calls the callbacks for \fIXmNhelpCallback\fP if any exist.
+If there are no help
+callbacks for this widget, this action calls the help callbacks
+for the nearest ancestor that has them.
+.IP "\fIinsert-string(\fBstring\fI)\fP:"
+If \fIXmNpendingDelete\fP is True and the cursor is not disjoint from the
+current selection, deletes the entire selection.
+Inserts \fBstring\fP before the insertion cursor.
+.IP "\fIkey-select(\fBdirection\fI)\fP:"
+If called with an argument of \fIright\fP, moves the insertion cursor
+one character to the right and extends the current selection.
+If called with an argument of \fIleft\fP, moves the insertion cursor
+one character to the left and extends the current selection.
+If called with no argument, extends the current selection.
+For other effects, see the description of shifted navigation operations
+and \fIKExtend\fP" in the "Keyboard Selection" section.
+.IP "\fIkill-next-character()\fP:"
+In normal mode if there is a non-null selection, deletes the selection, otherwise
+kills the character following the insertion cursor and stores the
+character in the cut buffer.
+In add mode if there is a non-null selection, the cursor is not disjoint
+from the selection and \fIXmNpendingDelete\fP is set to True,
+deletes the selection, otherwise
+kills the character following the insertion cursor and stores the character
+in the cut buffer.
+This may impact the selection.
+.IP "\fIkill-next-word()\fP:"
+In normal mode if there is a non-null selection, deletes the selection, otherwise
+kills the characters following the insertion cursor to the next space,
+tab or end of line character, and stores the characters in the cut buffer.
+In add mode if there is a non-null selection, the cursor is not disjoint
+from the selection and \fIXmNpendingDelete\fP is set to True,
+deletes the selection, otherwise
+kills the characters following the insertion cursor to the next space,
+tab or end of line character, and stores the characters in the cut buffer.
+This may impact the selection.
+This action may have different behavior in a locale other than the C locale.
+.IP "\fIkill-previous-character()\fP:"
+In normal mode if there is a non-null selection, deletes the selection, otherwise
+kills the character immediately preceding the insertion cursor and stores the
+character in the cut buffer.
+In add mode if there is a non-null selection, the cursor is not disjoint
+from the selection and \fIXmNpendingDelete\fP is set to True,
+deletes the selection, otherwise
+kills the character immediately preceding the insertion cursor and stores
+the character in the cut buffer.
+This may impact the selection.
+.IP "\fIkill-previous-word()\fP:"
+In normal mode if there is a non-null selection, deletes the selection, otherwise
+kills the characters preceding the insertion cursor up to the next space,
+tab or beginning of line character, and stores the characters in the
+cut buffer.
+In add mode if there is a non-null selection, the cursor is not disjoint
+from the selection and \fIXmNpendingDelete\fP is set to True,
+deletes the selection, otherwise
+kills the characters preceding the insertion cursor up to the next space,
+tab or beginning of line character, and stores the characters in the
+cut buffer.
+This may impact the selection.
+This action may have different behavior in a locale other than the C locale.
+.IP "\fIkill-selection()\fP:"
+Kills the currently selected text and stores the text in the cut buffer.
+.IP "\fIkill-to-end-of-line()\fP:"
+In normal mode if there is a non-null selection, deletes the selection, otherwise
+kills the characters following the insertion cursor to the next end of
+line character and stores the characters in the cut buffer.
+In add mode if there is a non-null selection, the cursor is not disjoint
+from the selection and \fIXmNpendingDelete\fP is set to True,
+deletes the selection, otherwise
+kills the characters following the insertion cursor to the next end of
+line character and stores the characters in the cut buffer.
+This may impact the selection.
+.IP "\fIkill-to-start-of-line()\fP:"
+In normal mode if there is a non-null selection, deletes the selection, otherwise
+kills the characters preceding the insertion cursor to the next
+beginning of line character and stores the characters in the cut buffer.
+In add mode if there is a non-null selection, the cursor is not disjoint
+from the selection and \fIXmNpendingDelete\fP is set to True,
+deletes the selection, otherwise
+kills the characters preceding the insertion cursor to the next
+beginning of line character and stores the characters in the cut buffer.
+This may impact the selection.
+.nL
+.ne 7
+.IP "\fImove-destination()\fP:"
+Moves the insertion cursor to the pointer position without changing any
+existing current selection.
+If there is no current selection, sets the widget as the destination widget.
+.IP "\fImove-to()\fP:"
+If a secondary selection exists, cuts the secondary selection to the
+insertion cursor.
+If no secondary selection exists, cuts the primary selection to the
+pointer location.
+.IP "\fInewline()\fP:"
+If \fIXmNpendingDelete\fP is True and the cursor is not disjoint from the
+current selection, deletes the entire selection.
+Inserts a newline before the insertion cursor.
+.IP "\fInewline-and-backup()\fP:"
+If \fIXmNpendingDelete\fP is True and the cursor is not disjoint from the
+current selection, deletes the entire selection.
+Inserts a newline just before the insertion cursor and repositions the insertion cursor to the end of the
+line before the newline.
+.IP "\fInewline-and-indent()\fP:"
+If \fIXmNpendingDelete\fP is True and the cursor is not disjoint from the
+current selection, deletes the entire selection.
+Inserts a newline and then the same number of whitespace characters as
+at the beginning of the previous line.
+.IP "\fInext-line()\fP:"
+Moves the insertion cursor to the next line.
+For other effects, see the description of navigation operations in the
+"Keyboard Selection" section.
+.IP "\fInext-page(\fBextend\fI)\fP:"
+If this action is called with no argument,
+moves the insertion cursor forward one page.
+For other effects, see the description of navigation operations in the
+"Keyboard Selection" section.
+.IP
+If called with an argument of \fIextend\fP, moves the insertion cursor as
+in the case of no argument and extends the current selection.
+For other effects, see the description of shifted navigation operations
+in the "Keyboard Selection" section.
+.IP "\fInext-tab-group()\fP:"
+Traverses to the next tab group.
+.nL
+.ne 8
+.IP "\fIpage-left()\fP:"
+Scrolls the viewing window left one page of text.
+.IP "\fIpage-right()\fP:"
+Scrolls the viewing window right one page of text.
+.IP "\fIpaste-clipboard()\fP:"
+Pastes the contents of the clipboard before the insertion cursor.
+.IP "\fIprev-tab-group()\fP:"
+Traverses to the previous tab group.
+.IP "\fIprevious-line()\fP:"
+Moves the insertion cursor to the previous line.
+For other effects, see the description of navigation operations in the
+"Keyboard Selection" section.
+.IP "\fIprevious-page(\fBextend\fI)\fP:"
+If this action is called with no argument,
+moves the insertion cursor back one page.
+For other effects, see the description of navigation operations in the
+"Keyboard Selection" section.
+.IP
+If called with an argument of \fIextend\fP, moves the insertion cursor as
+in the case of no argument and extends the current selection.
+For other effects, see the description of shifted navigation operations
+in the "Keyboard Selection" section.
+.IP "\fIprocess-bdrag()\fP"
+The result of this action is determined by several factors:
+position of the location cursor, movement of the location cursor,
+and the interval between a \fIBDrag\fP press and release.
+.IP
+This action copies the current selection to the insertion cursor if text
+is selected, the location cursor is disjoint from the current selection,
+and no motion is detected within a given time interval.
+.IP
+It performs a secondary selection and copies the selection to
+the position where the text was last edited if the cursor is
+disjoint from a current selection (if one exists), the time interval
+is exceeded, and movement of the location cursor is detected.
+.IP
+The action drags the current selection if the location cursor is
+positioned on the selection, the time interval is exceeded, and
+movement of the location cursor is detected.  This action creates
+a DragContext object whose \fIXmNexportTargets\fP resource value
+includes target types of COMPOUND_TEXT, STRING, and TEXT.
+.IP "\fIprocess-cancel()\fP:"
+Cancels the current \fIextend-adjust()\fP, \fIsecondary-adjust()\fP
+or \fIprocess-bdrag()\fP
+operation and leaves the selection state as it was before the operation,
+otherwise, and if the parent is a manager, passes the event to the parent.
+.IP "\fIprocess-down()\fP:"
+If \fIXmNeditMode\fP is \fIXmSINGLE_LINE_EDIT\fP and
+\fIXmNnavigationType\fP is \fIXmNONE\fP,
+traverses to the widget below the current one in the tab group.
+.IP
+If \fIXmNeditMode\fP is \fIXmMULTI_LINE_EDIT\fP,
+moves the insertion cursor down one line.
+For other effects, see the description of navigation operations in the
+"Keyboard Selection" section.
+.nL
+.ne 8
+.IP "\fIprocess-home()\fP:"
+Moves the insertion cursor to the beginning of the line.
+For other effects, see the description of navigation operations in the
+"Keyboard Selection" section.
+.IP "\fIprocess-return()\fP:"
+If \fIXmNeditMode\fP is \fIXmSINGLE_LINE_EDIT\fP,
+calls the callbacks for \fIXmNactivateCallback\fP,
+and if the parent is a manager, passes the event to the parent.
+If \fIXmNeditMode\fP is \fIXmMULTI_LINE_EDIT\fP,
+inserts a newline.
+.IP "\fIprocess-shift-down()\fP:"
+If \fIXmNeditMode\fP is \fIXmMULTI_LINE_EDIT\fP,
+moves the insertion cursor down one line.
+For other effects, see the description of navigation operations in the
+"Keyboard Selection" section.
+.IP "\fIprocess-shift-up()\fP:"
+If \fIXmNeditMode\fP is \fIXmMULTI_LINE_EDIT\fP,
+moves the insertion cursor up one line.
+For other effects, see the description of navigation operations in the
+"Keyboard Selection" section.
+.IP "\fIprocess-tab()\fP:"
+If \fIXmNeditMode\fP is \fIXmSINGLE_LINE_EDIT\fP,
+traverses to the next tab group.
+If \fIXmNeditMode\fP is \fIXmMULTI_LINE_EDIT\fP,
+inserts a tab.
+.IP "\fIprocess-up()\fP:"
+If \fIXmNeditMode\fP is \fIXmSINGLE_LINE_EDIT\fP and
+\fIXmNnavigationType\fP is \fIXmNONE\fP,
+traverses to the widget above the current one in the tab group.
+.IP
+If \fIXmNeditMode\fP is \fIXmMULTI_LINE_EDIT\fP,
+moves the insertion cursor up one line.
+For other effects, see the description of navigation operations in the
+"Keyboard Selection" section.
+.IP "\fIredraw-display()\fP:"
+Redraws the contents of the text window.
+.IP "\fIscroll-cursor-vertically(\fBpercentage\fI)\fP:"
+Scrolls the line containing the insertion cursor vertically 
+to an intermediate position in the visible window based on an
+input percentage.  A value of 0 indicates the top of the window;
+a value of 100, the bottom of the window.   If this action is called
+with no argument, the line containing the insertion cursor is scrolled
+vertically to a new position designated by the \fBy\fP position
+of the event passed to the routine.
+.IP "\fIscroll-one-line-down()\fP:"
+Scrolls the text area down one line.
+.IP "\fIscroll-one-line-up()\fP:"
+Scrolls the text area up one line.
+.IP "\fIsecondary-adjust()\fP:"
+Extends the secondary selection to the pointer position.
+.IP "\fIsecondary-notify()\fP:"
+Copies the secondary selection to the insertion cursor of the
+destination widget.
+.IP "\fIsecondary-start()\fP:"
+Marks the beginning of a secondary selection.
+.IP "\fIselect-adjust()\fP:"
+Extends the current selection.
+The amount of text selected depends on the number of mouse clicks, as
+specified by the \fIXmNselectionArray\fP resource.
+.IP "\fIselect-all()\fP:"
+Selects all text.
+.IP "\fIselect-end()\fP:"
+Extends the current selection.
+The amount of text selected depends on the number of mouse clicks, as
+specified by the \fIXmNselectionArray\fP resource.
+.IP "\fIselect-start()\fP:"
+Marks the beginning of a new selection region.
+.IP "\fIself-insert()\fP:"
+If \fIXmNpendingDelete\fP is True and the cursor is not disjoint from the
+current selection, deletes the entire selection.
+Inserts the character associated with the key pressed
+at the insertion cursor.
+.IP "\fIset-anchor()\fP:"
+Resets the anchor point for extended selections.
+Resets the destination of secondary selection actions.
+.nL
+.ne 8
+.IP "\fIset-insertion-point()\fP:"
+Sets the insertion position.
+.IP "\fIset-selection-hint()\fP:"
+Sets the text source and location of the current selection.
+.IP "\fItoggle-add-mode()\fP:"
+Toggles the state of Add Mode.
+.IP "\fItoggle-overstrike()\fP:"
+Toggles the state of the text insertion mode.  By default,
+characters typed into the Text widget are inserted at
+the position of the insertion cursor.  In overstrike
+mode, characters entered into the Text widget replace
+the characters that directly follow the insertion cursor.
+In overstrike mode, when the end of a line is reached,
+characters are appended to the end of the line.
+.IP "\fItraverse-home()\fP:"
+Traverses to the first widget in the tab group.
+.IP "\fItraverse-next()\fP:"
+Traverses to the next widget in the tab group.
+.IP "\fItraverse-prev()\fP:"
+Traverses to the previous widget in the tab group.
+.IP "\fIunkill()\fP:"
+Restores last killed text to the position of the insertion cursor.
+.SS "Additional Behavior"
+This widget has the additional behavior described below:
+.IP "\fI<FocusIn>\fP:"
+Draws the insertion cursor as solid and starts blinking the cursor.
+.IP "\fI<FocusOut>\fP:"
+Displays the insertion cursor as a stippled I-beam unless it is the
+destination widget.
+.SS "Virtual Bindings"
+The bindings for virtual keys are vendor specific.
+The following table lists the Text-specific bindings of virtual
+keys to actual key event descriptions in 1/Motif:
+.PP
+.sp 1
+.in 0
+.KS
+.TS
+center;
+cb s
+lb | lb.
+Virtual Key Bindings
+_
+Virtual Key@Actual Key Events
+=
+KActivate@Ctrl<Key>Return
+@<Key>osfActivate
+_
+KExtend@Ctrl Shift<Key>space
+@Shift<Key>osfSelect
+_
+KNextField@Ctrl<Key>Tab
+_
+KSelect@Ctrl<Key>space
+@<Key>osfSelect
+_
+.TE
+.KE
+.in
+.sp 1
+For information about bindings for virtual buttons and keys, see
+\fIVirtualBindings(3X)\fP.
+.SH RELATED INFORMATION
+.na
+\fICore(3X)\fP,
+\fIXmCreateScrolledText(3X)\fP,
+\fIXmCreateText(3X)\fP,
+\fIXmDisplay(3X)\fP,
+\fIXmFontList(3X)\fP,
+\fIXmFontListAppendEntry(3X)\fP,
+\fIXmPrimitive(3X)\fP,
+\fIXmTextClearSelection(3X)\fP,
+\fIXmTextCopy(3X)\fP,
+\fIXmTextCut(3X)\fP,
+\fIXmTextEnableRedisplay(3X)\fP,
+\fIXmTextDisableRedisplay(3X)\fP,
+\fIXmTextField(3X)\fP,
+\fIXmTextFindString(3X)\fP,
+\fIXmTextFindStringWcs(3X)\fP,
+\fIXmTextGetBaseline(3X)\fP,
+\fIXmTextGetEditable(3X)\fP,
+\fIXmTextGetInsertionPosition(3X)\fP,
+\fIXmTextGetLastPosition(3X)\fP,
+\fIXmTextGetMaxLength(3X)\fP,
+\fIXmTextGetSelection(3X)\fP,
+\fIXmTextGetSelectionWcs(3X)\fP,
+\fIXmTextGetSelectionPosition(3X)\fP,
+\fIXmTextGetSource(3X)\fP,
+\fIXmTextGetString(3X)\fP,
+\fIXmTextGetStringWcs(3X)\fP,
+\fIXmTextGetSubstring(3X)\fP,
+\fIXmTextGetSubstringWcs(3X)\fP,
+\fIXmTextGetTopCharacter(3X)\fP,
+\fIXmTextInsert(3X)\fP,
+\fIXmTextInsertWcs(3X)\fP,
+\fIXmTextPaste(3X)\fP,
+\fIXmTextPosToXY(3X)\fP,
+\fIXmTextPosition(3X)\fP,
+\fIXmTextRemove(3X)\fP,
+\fIXmTextReplace(3X)\fP,
+\fIXmTextReplaceWcs(3X)\fP,
+\fIXmTextScroll(3X)\fP,
+\fIXmTextSetAddMode(3X)\fP,
+\fIXmTextSetEditable(3X)\fP,
+\fIXmTextSetHighlight(3X)\fP,
+\fIXmTextSetInsertionPosition(3X)\fP,
+\fIXmTextSetMaxLength(3X)\fP,
+\fIXmTextSetSelection(3X)\fP,
+\fIXmTextSetSource(3X)\fP,
+\fIXmTextSetString(3X)\fP,
+\fIXmTextSetStringWcs(3X)\fP,
+\fIXmTextSetTopCharacter(3X)\fP,
+\fIXmTextShowPosition(3X)\fP, and
+\fIXmTextXYToPos(3X)\fP.
+.ad

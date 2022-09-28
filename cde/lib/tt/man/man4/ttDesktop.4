@@ -1,0 +1,260 @@
+'\" t
+.de LI
+.\" simulate -mm .LIs by turning them into .TPs
+.TP \\n()Jn
+\\$1
+..
+.TH ttDesktop 4 "1 March 1996" "ToolTalk 1.3" "ToolTalk Policy"
+.BH "1 March 1996"
+.IX "ttDesktop" "" "ttDesktop.4" ""
+.SH NAME
+ttDesktop \- introduction to desktop messaging policy
+.SH DESCRIPTION
+.PP
+The
+.B Desktop
+message policies apply to any tool in
+a POSIX or
+.BR X11 (7)
+environment.  In addition to standard
+messages for these environments, the
+.B Desktop
+policies define data types and error codes that apply
+to all of the ToolTalk message policies.
+.SH LIST OF MESSAGES
+.PP
+.TS
+tab (/) ;
+l l l l l .
+ /Do_Command(/in/string/\fIcommand\f(CW,	
+ / /out/string/\fIresults\f(CW] );		
+ /Set_Environment(/in/string/\fIvariable\f(CW,	
+ / /in/string/\fIvalue\f(CW	
+ / / / /[...] );	
+ /Get_Environment(/in/string/\fIvariable\f(CW,	
+ / /out/string/\fIvalue\f(CW	
+ / / / /[...] );	
+ /Set_Geometry(/inout/width/\fIw\f(CW	
+ / /inout/height/\fIh\f(CW	
+ / /inout/xOffset/\fIx\f(CW	
+ / /inout/yOffset/\fIy\f(CW	
+ / /[in/messageID/\fIcommission\f(CW] );		
+ /Set_Iconified(/in/boolean/\fIiconic\f(CW	
+ / /[in/messageID/\fIcommission\f(CW] );			
+ /Set_Locale(/in/string/\fIcategory\f(CW,	
+ / /in/string/\fIlocale\f(CW	
+ / / / /[...] );	
+ /Get_Locale(/in/string/\fIcategory\f(CW,	
+ / /out/string/\fIlocale\f(CW	
+ / / / /[...] );	
+ /Set_Mapped(/in/boolean/\fImapped\f(CW	
+ / /[in/messageID/\fIcommission\f(CW] );		
+[\fIfile\f(CW]/Modified(/in/\fItype/ID\f(CW );	
+[\fIfile\f(CW]/Reverted(/in/\fItype/ID\f(CW );	
+[\fIfile\f(CW]/Get_Modified(/in/\fItype/ID\f(CW,	
+ / /out/boolean/\fImodified\f(CW );	
+ /Pause(/[in/messageID/\fIoperation\f(CW] );		
+ /Quit(/in/boolean/\fIsilent\f(CW,	
+ / /in/boolean/\fIforce\f(CW	
+ / /[in/messageID/\fIoperation2Quit\f(CW] );	
+ /Raise(/[in/messageID/\fIcommission\f(CW] );		
+[\fIfile\f(CW]/Save(/in/\fItype/ID\f(CW );	
+[\fIfile\f(CW]/Revert(/in/\fItype/ID\f(CW );	
+[\fIfile\f(CW]/Saved(/in/\fItype/ID\f(CW );	
+ /Set_Situation(/in/string/\fIpath\f(CW );	
+ /Get_Situation(/out/string/\fIpath\f(CW );	
+ /Signal(/in/string/\fItheSignal\f(CW );	
+ /Started(/in/string/\fIvendor\f(CW,	
+ / /in/string/\fItoolName\f(CW,	
+ / /in/string/\fItoolVersion\f(CW );	
+ /Stopped(/in/string/\fIvendor\f(CW,	
+ / /in/string/\fItoolName\f(CW,	
+ / /in/string/\fItoolVersion\f(CW );	
+ /Status(/in/string/\fIstatus\f(CW,	
+ / /in/string/\fIvendor\f(CW,	
+ / /in/string/\fItoolName\f(CW,	
+ / /in/string/\fItoolVersion\f(CW	
+ / /[in/messageID/\fIcommission\f(CW]);	
+ /Get_Status(/out/string/\fIstatus\f(CW,	
+ / /out/string/\fIvendor\f(CW,	
+ / /out/string/\fItoolName\f(CW,	
+ / /out/string/\fItoolVersion\f(CW	
+ / /[in/messageID/\fIoperation2Query\f(CW]);	
+ /Get_Sysinfo(/out/string/\fIsysname\f(CW,	
+ / /out/string/\fInodename\f(CW,	
+ / /out/string/\fIrelease\f(CW,	
+ / /out/string/\fIversion\f(CW,	
+ / /out/string/\fImachine\f(CW );	
+ /Get_XInfo(/out/string/\fIdisplay\f(CW,	
+ / /out/string/\fIvisual\f(CW,	
+ / /out/integer/\fIdepth\f(CW	
+ / /[in/messageID/\fIcommission\f(CW] );
+.TE
+.SH DEFINITIONS
+.PP
+.SS \f(CWboolean\fR
+.PP
+A vtype for logical values.  The underlying data type of
+boolean is integer; that is, arguments of this vtype should
+be manipulated with \fBtt_*_arg_ival\fR[\fB_set\fR]() and
+\fBtt_*_iarg_add()\fR.  Zero means false; non-zero means true.
+.\".SS buffer
+.\".PP
+.\"A volatile, non-shared (e.g., in-memory) representation of
+.\"some persistent data.
+.\".SS \f8bufferID\fR
+.\".PP
+.\"A vtype for uniquely identifying buffers.  The underlying
+.\"data type of \f(CWbufferID\fR is string.  A good way to guarantee
+.\"\f(CWbufferID\fR uniqueness is to make them of the form
+.\""\fIinternal_counter\fR \fIprocid\fR".
+.SS \f(CWmessageID\fR
+.PP
+A vtype for uniquely identifying messages.  The underlying
+data type of \f(CWmessageID\fR is string; that is, arguments of this
+vtype should be manipulated with \fBtt_*_arg_val\fR[\fB_set\fR]() and
+.BR tt_*_arg_add ().
+The \f(CWmessageID\fR of a
+.B Tt_message
+is returned by
+.BR tt_message_id ().
+.SS \fItype\fR
+.PP
+Any of the vtypes that are the name of the kind of objects
+in a particular system of persistent objects.  For example, the
+vtype for the kind of objects in filesystems is \f(CWFile\fR.  The
+vtype for ToolTalk objects is \f(CWToolTalk_Object\fR.
+.SS \fIvendor\fR
+.SS \fItoolName\fR
+.SS \fItoolVersion\fR
+.PP
+Names of arguments that appear in several of the messages in
+the Desktop suite of messages.  These strings are not
+defined rigorously; they merely should be presentable to the
+user as descriptions of these three attributes of the
+relevant procid.
+.\".SS view
+.\".PP
+.\"A piece of screen real estate, such as a (portion of a)
+.\"window, that presents to the user part or all of a document.
+.\".SS \f8viewID\fR
+.\".PP
+.\"A vtype for uniquely identifying views.  The underlying data
+.\"type of \f(CWviewID\fR is string.  A good way to guaranteed
+.\"\f(CWviewID\fR uniqueness is to make them of the form
+.\""\fIinternal_counter\fR \fIprocid\fR".
+.SH ERRORS
+.TP
+.B 1102 ITT_DESKTOP_ENOENT
+\f(CWNo such file or directory\fR
+.TP
+.B 1113 TT_DESKTOP_EACCES
+\f(CWPermission denied\fR
+.TP
+.B 1122 TT_DESKTOP_EINVAL
+\f(CWInvalid argument\fR
+.IP
+An argument's value was not valid in these circumstances --
+e.g., a locale in \f(CWSet_Locale()\fR that is not valid on the
+handler's host.  However,
+.B TT_DESKTOP_EINVAL
+should only be used when no more-specific status (e.g.
+.B TT_DESKTOP_ENOMSG, TT_DESKTOP_EPROTO
+) applies.
+.TP
+.B 1135 TT_DESKTOP_ENOMSG
+\f(CWNo message of desired type\fR
+.IP
+A \f(CWmessageID\fR does not refer to any message currently known by
+the handler.
+.TP
+.B 1171 TT_DESKTOP_EPROTO
+\f(CWProtocol error\fR
+.IP
+A message does could not be understood, because
+.PD 0
+.RS 8
+.HP 2
+\(bu
+a required argument was omitted
+.HP 2
+\(bu
+an argument had the wrong vtype, or a vtype not allowed
+in this message -- e.g., \f(CWboolean\fR in \f(CWGet_Geometry()\fR
+.HP 2
+\(bu
+an argument had the wrong
+.B Tt_mode
+.HP 2
+\(bu
+an argument's value was not legal for its vtype --
+e.g., negative values for \f(CWwidth\fR in \f(CWSet_Geometry()\fR
+.HP 2
+\(bu
+an argument's value was not legal for this message --
+e.g., \f(CWPATH=/foo\fR as a \fIvariable\fR in
+\f(CWGet_Environment()\fR
+.RE
+.PD
+.IP
+In general,
+.B TT_DESKTOP_EPROTO
+means that one could see that
+the request is malformed simply by comparing it with the
+reference page for the message.
+.TP
+.B 1147 TT_DESKTOP_ECANCELED
+\f(CWOperation canceled\fR
+.IP
+The operation was canceled because of direct or indirect
+user intervention.  An example of indirect intervention is
+termination of the handling process caused by the user, or
+receipt of a \f(CWQuit()\fR request.  (All messages should be taken
+as authentically representing the wishes of the user whose uid
+is indicated by
+.BR tt_message_uid ().)
+.TP
+.B 1148 TT_DESKTOP_ENOTSUP
+\f(CWOperation not supported\fR
+.IP
+The requested operation is not supported by this handler.  Normally,
+a well-formed request that a handler does not support should be
+.BR tt_message_reject ()ed,
+thus causing it to fail with
+.B TT_ERR_NO_MATCH
+if no supporting handler can be found or started.
+But sometimes a handler can safely assume that, if it rejects a request,
+no other handler will be able to perform the operation.  Examples: a
+.B TT_HANDLER
+-addressed request such as \f(CWSet_Iconified()\fR,
+or a request referring to state
+.\"(such as a \f(CWbufferID\fR)
+that is managed by this handler and no other.  In these cases, it
+is better to explicitly fail the request with
+.B TT_DESKTOP_ENOTSUP,
+in order to distinguish the case of an incompletely-implemented handler
+from the case of the absence of a handler.
+.IP
+.B TT_ERR_UNIMP
+should not be used in place of
+.B TT_DESKTOP_ENOTSUP,
+because 
+.B TT_ERR_UNIMP
+means that a particular feature of ToolTalk
+itself is not implemented.
+.TP
+.B 1299 TT_DESKTOP_UNMODIFIED
+\f(CWOperation does not apply to unmodified entities\fR
+.SH WARNINGS
+.PP
+The vtype namespace for persistent objects currently only
+contains \f(CWFile\fR and \f(CWToolTalk_Object\fR.  Vendors who wish to
+define a type should either give it a vendor-specific name or
+register it through SunSoft's Developer Integration Format
+Registration program.  SunSoft can be reached at 1-800-227-9227.
+.SH SEE ALSO
+.PP
+.BR ttsession (1),
+.BR intro (2),
+.BR X11 (7),
+.BR Intro (TT Policy)

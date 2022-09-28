@@ -1,0 +1,282 @@
+#ifndef ForceNormalLib
+#define ForceNormalLib YES
+#endif
+
+#ifndef HasSharedLibraries
+#define HasSharedLibraries YES
+#endif
+#ifndef SharedDataSeparation
+#define SharedDataSeparation NO
+#endif
+#ifndef SharedCodeDef
+#define SharedCodeDef /**/ 
+#endif
+#ifndef SharedLibraryDef
+#define SharedLibraryDef /**/
+#endif
+#ifndef ShLibIncludeFile
+#define ShLibIncludeFile <hpLib.tmpl>
+#endif
+#ifndef SharedLibraryLoadFlags
+#define SharedLibraryLoadFlags -b
+#endif
+#ifndef PositionIndependentCFlags
+#define PositionIndependentCFlags +z
+#endif
+#if OSMajorVersion > 9
+#ifndef CPlusPlusPositionIndependentCFlags
+#define CPlusPlusPositionIndependentCFlags -Wb,+z
+#endif
+#endif
+
+/* use null rule for DataTarget */
+# ifndef SharedLibraryDataTarget
+# define SharedLibraryDataTarget(libname,rev,solist)  /**/
+#endif
+# ifndef InstallSharedLibraryData
+# define InstallSharedLibraryData(libname,rev,solist)  /**/
+#endif
+
+
+
+/*****************************************************************
+ * OLD STYLE NON-VERSIONING RULES THAT APPLY TO ALL RELEASES.
+ * The rules below can be used to create non-versioned libraries
+ * in all releases.
+ *****************************************************************/
+
+/*
+ * NormalSharedLibraryTarget - generate rules to create a shared library;
+ * build it into a different name so that the we don't hose people by having
+ * the library gone for long periods.
+ */
+#ifndef NormalSharedLibraryTarget
+#define NormalSharedLibraryTarget(libname,rev,solist)			@@\
+AllTarget(lib/**/libname.sl)   						@@\
+									@@\
+lib/**/libname.sl:  solist						@@\
+	$(RM) $@~							@@\
+	@-$(RM) shared/$(HP_VERSION_OBJ) shared/$(HP_VERSION_SRC)	@@\
+	echo "static char _date_str[]=\"@(#)$(CREATION_DATE)\"; static char _HP_vstr[]=\"@(#)$(HP_VERSION_STRING)\";static char desktop_vstr[]=\"@(#)$(DESKTOP_VERSION_STRING)\"; static char vue_vstr[]=\"@(#)$(VUE_VERSION_STRING)\";static char xtr_vstr[]=\"@(#)$(EXTRA_VERSION_STRING)\";" > shared/$(HP_VERSION_SRC)	@@\
+	(cd shared; \							@@\
+	$(CC) -c $(CFLAGS) $(PICFLAGS) $(HP_VERSION_SRC); \		@@\
+	$(LD) -o ../$@~  $(SHLIBLDFLAGS) solist $(HP_VERSION_OBJ); \	@@\
+	$(CHMOD) 555 ../$@~)						@@\
+	@-$(RM) shared/$(HP_VERSION_OBJ) shared/$(HP_VERSION_SRC)	@@\
+	$(RM) $@ 							@@\
+	$(MV) $@~ $@							@@\
+									@@\
+loadlib/**/libname.sl:							@@\
+	$(RM) lib/**/libname.sl~					@@\
+	@-$(RM) shared/$(HP_VERSION_OBJ) shared/$(HP_VERSION_SRC)	@@\
+	echo "static char _date_str[]=\"@(#)$(CREATION_DATE)\"; static char _HP_vstr[]=\"@(#)$(HP_VERSION_STRING)\";static char desktop_vstr[]=\"@(#)$(DESKTOP_VERSION_STRING)\"; static char vue_vstr[]=\"@(#)$(VUE_VERSION_STRING)\";static char xtr_vstr[]=\"@(#)$(EXTRA_VERSION_STRING)\";" > shared/$(HP_VERSION_SRC)	@@\
+	(cd shared; \							@@\
+	$(CC) -c $(CFLAGS) $(PICFLAGS) $(HP_VERSION_SRC); \		@@\
+	$(LD) -o ../lib/**/libname.sl~  $(SHLIBLDFLAGS) solist $(HP_VERSION_OBJ); \	@@\
+	$(CHMOD) 555 ../lib/**/libname.sl~)				@@\
+	@-$(RM) shared/$(HP_VERSION_OBJ) shared/$(HP_VERSION_SRC)	@@\
+	$(RM) lib/**/libname.sl						@@\
+	$(MV) lib/**/libname.sl~ lib/**/libname.sl			@@\
+									@@\
+clean::									@@\
+	$(RM) lib/**/libname.sl
+# endif  /* NormalSharedLibraryTarget */
+
+
+
+/*****************************************************************/
+/* This rule is exactly like SharedLibraryTarget except lib is not
+ * prepended to the library name.
+ */
+# ifndef LibLessSharedLibraryTarget
+# define LibLessSharedLibraryTarget(libname,rev,solist,down,up)		@@\
+AllTarget(libname/**/rev)						@@\
+									@@\
+libname/**/rev:  solist							@@\
+	$(RM) $@~							@@\
+	@-$(RM) down/$(HP_VERSION_OBJ) down/$(HP_VERSION_SRC)	@@\
+	echo "static char _date_str[]=\"@(#)$(CREATION_DATE)\"; static char _HP_vstr[]=\"@(#)$(HP_VERSION_STRING)\";static char desktop_vstr[]=\"@(#)$(DESKTOP_VERSION_STRING)\"; static char vue_vstr[]=\"@(#)$(VUE_VERSION_STRING)\";static char xtr_vstr[]=\"@(#)$(EXTRA_VERSION_STRING)\";" > down/$(HP_VERSION_SRC)	@@\
+	(cd down; \							@@\
+	$(CC) -c $(CFLAGS) $(PICFLAGS) $(HP_VERSION_SRC); \		@@\
+	$(LD) -o up/$@~  $(SHLIBLDFLAGS) solist $(HP_VERSION_OBJ); \	@@\
+	$(CHMOD) 555 up/$@~)						@@\
+	@-$(RM) down/$(HP_VERSION_OBJ) down/$(HP_VERSION_SRC)		@@\
+	$(RM) $@							@@\
+	$(MV) $@~ $@							@@\
+									@@\
+load/**/libname/**/rev:							@@\
+	$(RM) libname/**/rev~						@@\
+	@-$(RM) down/$(HP_VERSION_OBJ) down/$(HP_VERSION_SRC)		@@\
+	echo "static char _date_str[]=\"@(#)$(CREATION_DATE)\"; static char _HP_vstr[]=\"@(#)$(HP_VERSION_STRING)\";static char desktop_vstr[]=\"@(#)$(DESKTOP_VERSION_STRING)\"; static char vue_vstr[]=\"@(#)$(VUE_VERSION_STRING)\";static char xtr_vstr[]=\"@(#)$(EXTRA_VERSION_STRING)\";" > down/$(HP_VERSION_SRC)	@@\
+	(cd down; \							@@\
+	$(CC) -c $(CFLAGS) $(PICFLAGS) $(HP_VERSION_SRC); \		@@\
+	$(LD) -o up/libname/**/rev~  $(SHLIBLDFLAGS) solist $(HP_VERSION_OBJ); \	@@\
+	$(CHMOD) 555 up/libname/**/rev~)				@@\
+	@-$(RM) down/$(HP_VERSION_OBJ) down/$(HP_VERSION_SRC)		@@\
+	$(RM) libname/**/rev						@@\
+	$(MV) libname/**/rev~ libname/**/rev				@@\
+									@@\
+clean::									@@\
+	$(RM) libname/**/rev
+
+# endif  /* LibLessSharedLibraryTarget */
+
+#ifndef AddExportList
+#if UseExportLists
+#define AddExportList(down,up,lib, exportlist, solist) \
+	@if [ -f exportlist ]; then \					@@\
+	    $(RM) LinkOpts $@.list; \					@@\
+	    $(CPP) exportlist >$@.list ; \				@@\
+	    $(EXPORTLISTGEN) lib $@.list > LinkOpts;	\		@@\
+	    (cd down; \							@@\
+	     $(LD) -c up/LinkOpts -o up/lib $(SHLIBLDFLAGS) solist;); \	@@\
+	    $(RM) LinkOpts $@.list; \					@@\
+	fi
+#else
+#define AddExportList(down,up,lib, exportlist, solist)  @\: ; /* do nothing */
+#endif /* UseExportLists */
+#endif /* AddExportList */
+
+
+
+/*****************************************************************
+ * BEGIN V.4 VERSIONING DIFFERENCE FOR 10*+
+ *****************************************************************/
+#if OSMajorVersion < 10 /* don't use V.4 style versioning */
+
+/* rule for building regular shared libraries */
+# ifndef SharedLibraryTarget
+# define SharedLibraryTarget(libname,rev,solist,down,up)		@@\
+AllTarget(lib/**/libname.sl)						@@\
+									@@\
+lib/**/libname.sl:  solist						@@\
+	$(RM) $@~							@@\
+	@-$(RM) down/$(HP_VERSION_OBJ) down/$(HP_VERSION_SRC)	@@\
+	echo "static char _date_str[]=\"@(#)$(CREATION_DATE)\"; static char _HP_vstr[]=\"@(#)$(HP_VERSION_STRING)\";static char desktop_vstr[]=\"@(#)$(DESKTOP_VERSION_STRING)\"; static char vue_vstr[]=\"@(#)$(VUE_VERSION_STRING)\";static char xtr_vstr[]=\"@(#)$(EXTRA_VERSION_STRING)\";" > down/$(HP_VERSION_SRC)	@@\
+	(cd down; \							@@\
+	$(CC) -c $(CFLAGS) $(PICFLAGS) $(HP_VERSION_SRC); \		@@\
+	$(LD) -o up/$@~  $(SHLIBLDFLAGS) solist $(HP_VERSION_OBJ)) 	@@\
+	$(RM) $@							@@\
+	$(MV) $@~ $@							@@\
+	AddExportList(down,up,$@,lib/**/libname.elist,solist $(HP_VERSION_OBJ))	@@\
+	$(CHMOD) 555 $@							@@\
+	@-$(RM) down/$(HP_VERSION_OBJ) down/$(HP_VERSION_SRC)		@@\
+									@@\
+loadlib/**/libname.sl:							@@\
+	$(RM) lib/**/libname.sl~					@@\
+	@-$(RM) down/$(HP_VERSION_OBJ) down/$(HP_VERSION_SRC)	@@\
+	echo "static char _date_str[]=\"@(#)$(CREATION_DATE)\"; static char _HP_vstr[]=\"@(#)$(HP_VERSION_STRING)\";static char desktop_vstr[]=\"@(#)$(DESKTOP_VERSION_STRING)\"; static char vue_vstr[]=\"@(#)$(VUE_VERSION_STRING)\";static char xtr_vstr[]=\"@(#)$(EXTRA_VERSION_STRING)\";" > down/$(HP_VERSION_SRC)	@@\
+	(cd down; \							@@\
+	$(CC) -c $(CFLAGS) $(PICFLAGS) $(HP_VERSION_SRC); \		@@\
+	$(LD) -o up/lib/**/libname.sl~  $(SHLIBLDFLAGS) solist $(HP_VERSION_OBJ)) @@\
+	$(RM) lib/**/libname.sl						@@\
+	$(MV) lib/**/libname.sl~ lib/**/libname.sl			@@\
+	AddExportList(down,up,lib/**/libname.sl,lib/**/libname.elist,solist $(HP_VERSION_OBJ))	@@\
+	$(CHMOD) 555 lib/**/libname.sl					@@\
+	@-$(RM) down/$(HP_VERSION_OBJ) down/$(HP_VERSION_SRC)		@@\
+									@@\
+clean::									@@\
+	$(RM) lib/**/libname.sl
+
+# endif  /* SharedLibraryTarget */
+
+/*
+ * InstallSharedLibrary - generate rules to install the shared library.
+ */
+#ifndef InstallSharedLibrary
+#define InstallSharedLibrary(libname,rev,dest)				@@\
+	install:: Concat(lib,libname.sl)				@@\
+	MakeDir($(DESTDIR)dest)						@@\
+	$(INSTALL) -m 0555  Concat(lib,libname.sl) $(DESTDIR)dest
+#endif /* InstallSharedLibrary */
+
+/* SharedLibraryBuildInstall - install an archived library to a destination.
+ * Remove it first if you can. If not, move them to file~.
+ */
+#ifndef SharedLibraryBuildInstall
+#define	SharedLibraryBuildInstall(libname,rev,dest)			@@\
+$(INST_STEP)::								@@\
+	MakeDir($(BINSTALLPATH)/dest)					@@\
+	@if [ -f Concat($(BINSTALLPATH)/dest/lib,libname.sl) ];then \	@@\
+	  $(RM) Concat($(BINSTALLPATH)/dest/lib,libname.sl) || \		@@\
+	  $(MV) Concat($(BINSTALLPATH)/dest/lib,libname.sl) Concat(Concat($(BINSTALLPATH)/dest/lib,libname.sl),~);fi	@@\
+	$(BINSTALL) -f $(BINSTALLPATH)/dest Concat(lib,libname.sl)	@@\
+									@@\
+LinkBuildFileList($(BUILDINCTOP),includes,Concat(lib,libname.sl),$(BINSTALLPATH),dest,$(CURRENT_DIR))
+#endif /* SharedLibraryBuildInstall */
+
+
+/***************************************/
+/*********** 10.0 and beyond ***********/
+/***************************************/
+#else /* OSVersion >= 10 with V.4 versioning */
+/* versioned shared library making rule */
+# ifndef SharedLibraryTarget
+# define SharedLibraryTarget(libname,rev,solist,down,up)		@@\
+AllTarget(Concat(lib,libname.rev))					@@\
+									@@\
+Concat(lib,libname.rev):  solist					@@\
+	$(RM) $@~							@@\
+	@-$(RM) down/$(HP_VERSION_OBJ) down/$(HP_VERSION_SRC)	@@\
+	echo "static char _date_str[]=\"@(#)$(CREATION_DATE)\"; static char _HP_vstr[]=\"@(#)$(HP_VERSION_STRING)\";static char desktop_vstr[]=\"@(#)$(DESKTOP_VERSION_STRING)\"; static char vue_vstr[]=\"@(#)$(VUE_VERSION_STRING)\";static char xtr_vstr[]=\"@(#)$(EXTRA_VERSION_STRING)\";" > down/$(HP_VERSION_SRC)	@@\
+	(cd down; \							@@\
+	$(CC) -c $(CFLAGS) $(PICFLAGS) $(HP_VERSION_SRC); \		@@\
+	$(LD) -o up/$@~  $(SHLIBLDFLAGS) +h $@ solist $(HP_VERSION_OBJ))	@@\
+	$(RM) $@							@@\
+	$(MV) $@~ $@							@@\
+	AddExportList(down,up,$@,lib/**/libname.elist,solist $(HP_VERSION_OBJ))	@@\
+	$(CHMOD) 555 $@							@@\
+	@-$(RM) down/$(HP_VERSION_OBJ) down/$(HP_VERSION_SRC)	@@\
+	$(RM) Concat(lib,libname.sl)					@@\
+	$(LN) $@ Concat(lib,libname.sl)					@@\
+									@@\
+loadlib/**/libname.rev:							@@\
+	$(RM) lib/**/libname.rev~					@@\
+	@-$(RM) down/$(HP_VERSION_OBJ) down/$(HP_VERSION_SRC)	@@\
+	echo "static char _date_str[]=\"@(#)$(CREATION_DATE)\"; static char _HP_vstr[]=\"@(#)$(HP_VERSION_STRING)\";static char desktop_vstr[]=\"@(#)$(DESKTOP_VERSION_STRING)\"; static char vue_vstr[]=\"@(#)$(VUE_VERSION_STRING)\";static char xtr_vstr[]=\"@(#)$(EXTRA_VERSION_STRING)\";" > down/$(HP_VERSION_SRC)	@@\
+	(cd down; \							@@\
+	$(CC) -c $(CFLAGS) $(PICFLAGS) $(HP_VERSION_SRC); \		@@\
+	$(LD) -o up/lib/**/libname.rev~  $(SHLIBLDFLAGS) +h lib/**/libname.rev solist $(HP_VERSION_OBJ))	@@\
+	$(RM) lib/**/libname.rev					@@\
+	$(MV) lib/**/libname.rev~ lib/**/libname.rev			@@\
+	AddExportList(down,up,lib/**/libname.rev,lib/**/libname.elist,solist $(HP_VERSION_OBJ))	@@\
+	$(CHMOD) 555  lib/**/libname.rev				@@\
+	@-$(RM) down/$(HP_VERSION_OBJ) down/$(HP_VERSION_SRC)		@@\
+	$(RM) Concat(lib,libname.sl)					@@\
+	$(LN) $@ Concat(lib,libname.sl)					@@\
+									@@\
+clean::									@@\
+	$(RM) Concat(lib,libname.rev) Concat(lib,libname.sl)
+
+# endif  /* SharedLibraryTarget */
+
+/*
+ * InstallSharedLibrary - generate rules to install the shared library.
+ */
+#ifndef InstallSharedLibrary
+#define InstallSharedLibrary(libname,rev,dest)				@@\
+	install:: Concat(lib,libname.sl)				@@\
+	MakeDir($(DESTDIR)dest)						@@\
+	$(INSTALL) -m 0555  Concat(lib,libname.rev) $(DESTDIR)dest
+#endif /* InstallSharedLibrary */
+
+
+/* SharedLibraryBuildInstall - install an archived library to a destination.
+ * Remove it first if you can. If not, move them to file~.
+ */
+#ifndef SharedLibraryBuildInstall
+#define	SharedLibraryBuildInstall(libname,rev,dest)			@@\
+$(INST_STEP)::								@@\
+	MakeDir($(BINSTALLPATH)/dest)					@@\
+	@if [ -f Concat($(BINSTALLPATH)/dest/lib,libname.rev) ];then \	@@\
+	  $(RM) Concat($(BINSTALLPATH)/dest/lib,libname.sl); \		@@\
+	  $(RM) Concat($(BINSTALLPATH)/dest/lib,libname.rev) || \		@@\
+	  $(MV) Concat($(BINSTALLPATH)/dest/lib,libname.rev) Concat(Concat($(BINSTALLPATH)/dest/lib,libname.rev),~);fi	@@\
+	$(BINSTALL) -f $(BINSTALLPATH)/dest Concat(lib,libname.rev)	@@\
+	@(set -x; cd $(BINSTALLPATH)/dest; \				@@\
+	$(LN) Concat(lib,libname.rev) Concat(lib,libname.sl))		@@\
+									@@\
+LinkBuildFileList($(BUILDINCTOP),includes,Concat(lib,libname.rev) Concat(lib,libname.sl),$(BINSTALLPATH),dest,$(CURRENT_DIR))
+#endif /* SharedLibraryBuildInstall */
+
+#endif /* OSMajorVersion < 10 */

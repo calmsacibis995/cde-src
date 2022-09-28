@@ -1,0 +1,686 @@
+.TH DtActionInvoke 3 "4 April 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.\" *************************************************************************
+.SH NAME
+DtActionInvoke \- invoke a Cde action
+.SH SYNOPSIS
+.yS
+#include <Dt/Action.h>
+.sp 0.5v
+.ta \w'DtActionInvoke('u
+DtActionInvocationID
+DtActionInvoke(Widget \f2w\fP,
+	char *\f2action\fP,
+	DtActionArg *\f2args\fP,
+	int \f2argCount\fP,
+	char *\f2termOpts\fP,
+	char *\f2execHost\fP,
+	char *\f2contextDir\fP,
+	int \f2useIndicator\fP,
+	DtActionCallbackProc \f2statusUpdateCb\fP,
+	XtPointer \f2client_data\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn DtActionInvoke
+function provides a way for applications to invoke desktop actions on file or
+buffer arguments.
+Applications can register a callback for receiving action-done status and
+return arguments.
+.P
+The actions and data types databases must be initialized and loaded
+(using
+.Fn DtInitialize 3
+and
+.Fn DtDbLoad 3)
+before
+.Fn DtActionInvoke
+can run successfully.
+.P
+The
+.I w
+argument is a widget that becomes the parent of any dialogs or
+error messages resulting from action invocation.
+This widget should be a top-level application shell widget that continues to
+exist for the action's expected lifetime.
+This argument must have a non-\c
+.Cn NULL
+value.
+.P
+The
+.I action
+argument is the name of the action to be invoked.
+The action database may define more than one action with the same name.
+The action selected for a particular invocation depends on the class, type,
+and number of arguments provided (as described in
+.cde .BR dtactionfile (4)).
+.xo .cX dtactionfile ).
+This argument must have a non-\c
+.Cn NULL
+value.
+.P
+The
+.I args
+argument is an array of action argument structures
+containing information about the arguments for this action invocation.
+If there are no arguments, the value of
+.I args
+must be
+.Cn NULL .
+The items in this array are assigned to the option argument keywords referenced
+in the action definition (see
+.cde .BR dtactionfile (4)).
+.xo .cX dtactionfile ).
+The
+.IR n th
+item is assigned to keyword %Arg_\f2n\fP%.
+For example, the second item is assigned to %Arg_\f22\fP%.
+.P
+The
+.I argCount
+argument is the number of action arguments provided in the
+array
+.I args
+references.
+.P
+The
+.I termOpts
+argument is a string providing special
+execution information for the terminal emulator used for
+.Cn COMMAND
+actions of
+.Cn WINDOW_TYPE
+.Cn TERMINAL
+or
+.Cn PERM_TERMINAL .
+(See
+.cde .BR dtactionfile (4)).
+.xo .cX dtactionfile ).
+This string must be quoted if it contains embedded blanks.
+The application uses this string to pass on title, geometry, color and
+font information to the terminal emulator.
+This information must be in a form the expected terminal emulator recognizes.
+This argument can be
+.Cn NULL .
+.P
+The
+.I execHost
+argument is a string identifying a
+preferred execution host for this action.
+The
+.I execHost
+specified here, supersedes the list of
+execution hosts defined in the action definition.
+If
+.I execHost
+is
+.Cn NULL ,
+the execution host for the action is obtained from the action definition as
+described in
+.cde .BR dtactionfile (4).
+.xo .cX dtactionfile .
+.P
+The
+.I contextDir
+argument is a string identifying a fallback
+working directory for the action.
+File name arguments are interpreted relative to this directory, which
+must reside in the local file name space (for example,
+.BR /usr/tmp
+or
+.BR /net/hostb/tmp ).
+This value is only used if the action definition does not explicitly specify
+a working directory in the
+.Cn CWD
+field of the action definition.
+If
+.I contextDir
+is
+.Cn NULL ,
+the current working directory of the action is obtained from the action
+definition, as described in
+.cde .BR dtactionfile (4).
+.xo .cX dtactionfile .
+.P
+If the
+.I useIndicator
+flag is zero,
+.Fn DtActionInvoke
+does not provide any direct indication to the user that an action
+has been invoked.
+If the
+.I useIndicator
+flag is non-zero, the user is notified
+via some activity indicator (for example, a flashing light in the front panel)
+that an action has been invoked.
+This indication persists only until the invocation of the action completes
+(in other words, until the action begins running).
+.P
+The
+.I statusUpdateCb
+callback may be activated if the invoked actions have returnable status
+(for example, a
+.Cn TT_MSG(TT_REQUEST)
+returning
+.Cn DtACTION_DONE ).
+At a minimum, a
+.Cn DtACTION_INVOKED
+status is returned when
+.Fn DtActionInvoked
+has finished processing and has completely invoked any resulting actions,
+and a
+.Cn DtACTION_DONE
+or equivalent done status is returned when all
+actions terminate.
+If
+.I statusUpdateCb
+is set to
+.Cn NULL ,
+subsequent action status is not returned.
+(See
+.Hd DtAction.h 5
+for a list of all
+.B DtActionStatus
+codes, and see
+.Fn DtActionCallbackProc 3
+for details on
+.I statusUpdateCb
+and a list of specific
+.B DtActionStatus
+codes it can return.)
+.P
+The
+.I client_data
+argument is
+optional data to be passed to the
+.I statusUpdateCb
+callback when
+invoked.
+.P
+The
+.Fn DtActionInvoke
+function searches the action database for an entry that
+matches the specified action name, and accepts arguments of the class,
+type and count provided.
+.P
+If
+.Fn DtActionInvoke
+finds a matching action, the supplied arguments are inserted into the
+indicated action fields.
+If any missing action arguments have an associated prompt
+string, then a dialog box prompts the user to supply the arguments;
+otherwise, missing arguments are ignored.
+If too many arguments are supplied to an action requiring more
+than a single argument, a warning dialog is posted,
+allowing the action to be cancelled or continued, ignoring
+the extra arguments.
+If too many arguments are supplied to
+an action requiring zero or one arguments, then that action
+is invoked once for each of the supplied arguments.
+Arguments in the
+.B DtActionArg
+structure that may have been modified by the
+action are returned
+by the callback if a
+.I statusUpdateCb
+callback is provided.
+For
+.B DtActionBuffer
+arguments, the writable flag acts as a hint that the buffer
+is allowed to be modified and returned.
+.P
+The
+.B DtActionBuffer
+structure contains at least the following members:
+.P
+.ne 6v
+.TS
+center;
+.xo lf5 lf5 lw(3i) .
+.cde lf3 lf2 lw(3i) .
+void	*bp	T{
+.na
+location of buffer
+T}
+int	size	T{
+.na
+size of buffer in bytes
+T}
+char	*type	T{
+.na
+optional type of buffer
+T}
+char	*name	T{
+.na
+optional name of buffer
+T}
+Boolean	writable	T{
+.na
+action is allowed to modify and return the buffer
+T}
+.TE
+.P
+.ne 6v
+The
+.B DtActionFile
+structure contains at least the following member:
+.TS
+center;
+.xo lf5 lf5 lw(3i) .
+.cde lf3 lf2 lw(3i) .
+char	*name	T{
+.na
+name of file
+T}
+.TE
+.P
+The
+.B DtActionArg
+structure contains at least the following members:
+.P
+.ne 6v
+.TS
+center;
+.xo lf5 lf5 lw(3i) .
+.cde lf3 lf2 lw(3i) .
+int	argClass	T{
+.na
+see argument class types (\c
+.Cn ARG_CLASS
+field)
+T}
+DtActionFile	u.file	T{
+.na
+union to a DtActionFile structure
+T}
+DtActionBuffer	u.buffer	T{
+.na
+union to a DtActionBuffer structure
+T}
+.TE
+.P
+where
+.I argClass
+is
+.Cn DtACTION_FILE
+or
+.Cn DtACTION_BUFFER .
+The action service may set
+.I argClass
+to
+.Cn DtACTION_NULLARG
+for action
+arguments returned by a
+.I statusUpdateCb
+to indicate that the
+argument is not being updated or has been removed.
+.Cn DtACTION_NULLARG
+cannot be present in action arguments passed
+to
+.Fn DtActionInvoke .
+.P
+The
+.Fn DtActionInvoke
+function accepts a pointer to an array of
+.B DtActionArg
+structures
+describing the objects to be provided as arguments to the action.
+The
+.I args
+structure can be modified or freed after
+.Fn DtActionInvoke
+returns.
+.P
+A single call to
+.Fn DtActionInvoke
+may initiate several actions or messages.
+For example, if an action is given
+three files, but only needs one, three instances of the action are
+started, one for each file.
+As a result, a single returned
+.B DtActionInvocationID
+may represent a group of running actions, and
+subsequent execution management services
+.cde (DtAction)
+calls operate on that group of actions.
+.P
+For
+.Cn DtACTION_BUFFER
+arguments, the action service first tries to type the
+buffer
+.I *bp
+using the
+.I name
+field (see
+.cde .BR dtdtsfile (4)).
+.xo .cX dtdtsfile ).
+The
+.I name
+field would typically contain a value resembling a file
+name with an optional extension describing its type.
+If
+the
+.I name
+field is
+.Cn NULL ,
+then the action service uses the type specified in the
+.I type
+field.
+If the
+.I type
+field is
+.Cn NULL ,
+then the action service types the buffer
+.I *bp
+by content (see
+.cde .BR dtdtsfile (4)).
+.xo .cX dtdtsfile ).
+If the
+.I name
+and
+.I type
+fields are both non-\c
+.Cn NULL ,
+then the action service uses the
+.I name
+field for typing and ignores the
+.I type
+field.
+If the buffer pointer
+.I bp
+is
+.Cn NULL
+or
+.I size
+is equal to zero, a buffer with no contents is used in the
+resulting action.
+If returned, the buffer pointer
+.I bp
+is defined, and
+.I size
+is equal to or greater than zero.
+.P
+When necessary,
+.Cn DtACTION_BUFFER
+arguments are automatically converted to temporary files
+prior to actual action invocation, and reconverted back to
+buffers after action termination (this is transparent to
+the caller).
+If a non-\c
+.Cn NULL
+.I name
+field is given, it is used in the construction of the temporary file
+name (for example,
+.BR /myhome/.dt/tmp/name ).
+If the use of
+.I name
+would cause a conflict with an existing file, or
+.I name
+is
+.Cn NULL ,
+the action service generates a temporary file name.
+The permission bits on the temporary file are set according
+to the
+.I writable
+field and the
+.Cn IS_EXECUTABLE
+attribute from the action service associated with the
+.I type
+field.
+.P
+For
+.Cn DtACTION_FILE
+arguments,
+.I name
+is required.
+.P
+For
+.Cn DtACTION_BUFFER
+arguments,
+.I name
+cannot contain slash characters.
+.P
+Errors encountered are either displayed to the user in a dialog box or
+reported in the desktop errorlog file
+(\f3$HOME/.dt/errorlog\fP, unless configured otherwise).
+.SH RESOURCES
+This section describes the X11 resources the
+.Fn DtActionInvoke
+function recognizes.
+The resource class string always begins with an upper-case letter.
+The corresponding resource name string begins with the lower
+case of the same letter.
+These resources can be defined for all clients using
+the Action Library API by specifying
+.BR "*resourceName: value" .
+.cdes
+For example, to
+set the terminal emulator to
+.Cm xterm 1X
+for all clients, the application can use
+.BR "*localTerminal: xterm" .
+The resources can also be defined on a per client basis.
+For example, it can use
+.B "Dtfile*localTerminal: xterm"
+to set the terminal
+emulator to
+.Cm xterm 1X
+for the
+.BR dtfile
+client only.
+(See
+.cde .BR dtactionfile (4)).
+.xo .cX dtactionfile ).
+.cdee
+.P
+.cde .ne 10
+.DS
+.TS
+.xo expand box tab(@);
+.cde expand tab(@);
+cb sss
+lb | lb | lb | lb
+lb | lb | lb | lw(4c) .
+X11 Resources
+_
+Name@Class@Value Type@Default
+_
+localterminal@LocalTerminal@string@``Dtterm''
+remoteTerminals@RemoteTerminals@string@``Dtterm''
+waitTime@WaitTime@number@3
+.TE
+.DE
+.P
+.VL 6
+.LI \f3LocalTerminal\fP
+.br
+Defines an alternative local terminal emulator for Command actions of
+.Cn WINDOW_TYPE
+.Cn TERMINAL
+or
+.Cn PERM_TERMINAL
+to use.
+The default terminal emulator is
+.Cm dtterm 1.
+.LI \f3RemoteTerminals\fP
+.br
+Defines a comma-separated list of host and terminal emulator pairs.
+When a remote
+.Cn COMMAND
+action is executed on
+one of the hosts in the list, the terminal emulator associated with that host
+is used for that command.
+The list is passed to the terminal emulator using the
+.B \-e
+argument.
+(Thus, if another terminal emulator than
+.Cm dtterm
+is used, it must support the
+.B \-e
+argument.
+.cdes
+See
+.Cm xterm 1X.
+.cdee
+.br
+.LI \f3WaitTime\fP
+.br
+Used to assign an alternative integer value,
+in seconds, to the threshold successful return time interval.
+If a
+.Cn COMMAND
+action of
+.Cn WINDOW_TYPE
+.Cn TERMINAL
+fails, the terminal emulator
+may be unmapped before the user has a chance to read the
+standard error from the failed command.
+This resource provides a workaround to this problem.
+If a
+.Cn TERMINAL
+window command exits before
+.B WaitTime
+seconds have elapsed, the
+terminal emulator window is forced to remain open, as if it were of
+.Cn TYPE
+.Cn PERM_TERMINAL .
+The default value of
+.B WaitTime
+is 3 seconds.
+.LE
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn DtActionInvoke
+function returns a
+.BR DtActionInvocationID .
+The ID can be used in subsequent execution management services
+.cde (DtAction)
+calls to manipulate the actions
+while they are running.
+.BR DtActionInvocationID s
+are only recycled after many have been generated.
+.SH "APPLICATION USAGE"
+The caller should allocate space for the array of structures
+describing the objects to be provided as arguments to the action.
+The caller can free the memory after
+.Fn DtActionInvoke
+returns.
+.P
+Since
+.Fn DtActionInvoke
+spawns subprocesses to start local actions, the caller should use
+.Fn waitpid 2
+instead of
+.Fn wait 2
+to distinguish between processes started by the action service and
+those the caller starts.
+.br
+.ne 20v
+.SH EXAMPLES
+Given the following action definition:
+.Cs I
+ACTION Edit
+{
+	LABEL		"Text Edit Action"
+	ARG_CLASS	BUFFER, FILE
+	ARG_TYPE	TEXT
+	TYPE		COMMAND
+	WINDOW_TYPE	TERMINAL
+	EXEC_STRING	"textedit %Args%"
+	DESCRIPTION	This action invokes the "textedit" command on
+			an arbitrary number of arguments.  A terminal
+			emulator is provided for this action's I/O.
+			EXEC_HOST and CWD are not specified so the
+			defaults are used for both quantities.
+}
+.Ce
+.P
+The following call invokes the action
+.B Edit
+on the arguments
+.I aap
+supplies:
+.Cs I
+        DtActionInvoke(w, "Edit", aap, 3, NULL, NULL, NULL, 1,
+                       myCallback, myClientData);
+.Ce
+.P
+The working directory for the action defaults to the current working
+directory.
+The execution host is the default execution host.
+.P
+If the variable
+.I aap
+points to an array of
+.B ActionArg
+data structures
+containing the following information:
+.Cs I
+{
+	argClass = DtACTION_FILE;
+	struct {
+	    name="/myhome/file1.txt";
+	} file;
+}
+.Ce
+.Cs I
+{
+	argClass = DtACTION_FILE;
+	struct {
+	    name="file2.txt";
+	} file;
+}
+.Ce
+.Cs I
+{
+	argClass = DtACTION_BUFFER;
+	struct {
+	    bp=(void *) myEditBuffer;
+	    size=lengthOfMyEditBuffer;
+	    type=NULL;
+	    name="Doc1.txt"
+	    writable=TRUE;
+	} buffer;
+}
+.Ce
+.P
+and the current working directory is
+.BR /cwd ,
+then the
+.I Edit
+action results in the execution string:
+.Cs I
+textedit /myhome/file1.txt /cwd/file2.txt /myhome/.dt/tmp/Doc1.txt
+.Ce
+.P
+When the action completes,
+.I myCallback
+is called and
+the callback returns the buffer argument.
+.SH "SEE ALSO"
+.Hd Dt/Action.h 5,
+.cdes
+.Cm xterm 1X,
+.Fn XtFree 3X,
+.Fn XtMalloc 3X,
+.cdee
+.xos
+.Fn XtFree 3X,
+.Fn XtMalloc 3X
+in the \*(Zt;
+.xoe
+.Fn DtDbLoad 3,
+.Fn DtInitialize 3,
+.Fn DtActionCallbackProc 3,
+.cde .BR dtactionfile (4),
+.cde .BR dtdtfile (4),
+.cde .BR dtdtsfile (4).
+.xo .cX dtactionfile ,
+.xo .cX dtdtfile ,
+.xo .cX dtdtsfile .
+.br

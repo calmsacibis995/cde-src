@@ -1,0 +1,256 @@
+.TH dtcm_lookup 1 "8 May 1995"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.SH NAME
+dtcm_lookup \- look up appointments from the calendar database
+.SH SYNOPSIS
+.yS
+dtcm_lookup
+[\-c\0\f2calendar\fP]
+[\-d\0\f2date\fP]
+[\-v\0\f2view\fP]
+.yE
+.SH DESCRIPTION
+The
+.Cm dtcm_lookup
+utility is a non-GUI interface to the CDE calendar and appointment services,
+used to look up appointments from the calendar
+.cde database via the RPC daemon
+.cde .Cm rpc.cmsd 1.
+.xo database.
+Each component of the calendar entry is specified using one
+of the command-line options.
+The current list of appointments for the specified date
+(see the
+.B \-d
+and
+.B \-v
+options) is displayed.
+.SH OPTIONS
+.xos
+The
+.Cm dtcm_lookup
+utility supports the \*(Zu.
+.xoe
+The following options are available:
+.VL 6
+.LI \f3\-c\0\f2calendar\f1
+.br
+Specify the name of the target calendar.
+Calendar names
+.xo are implementation-dependent, but
+typically take the form
+.IR user @\c
+.IR hostname ,
+where
+.I user
+is a user's login name and
+.I hostname
+is the host machine name.
+.cde An example is
+.cde .BR felix@cat .
+If no target calendar is specified,
+the calendar defaults to
+the current user at the current host machine.
+.LI \f3\-d\0\f2date\f1
+.br
+Specify the date for the look up query.
+The
+.I date
+is specified using the form
+.IR mm /\c
+.IR dd /\c
+.IR yy ,
+where
+.IR mm ,
+.I dd
+and
+.I yy
+are the two-digit month, day and year modulo 100, respectively.
+.cdes
+Certain other references such as
+``today,'' ``Tuesday,'' ``tomorrow,'' etc.
+are correctly calculated.
+.cdee
+If no date is specified,
+.I date
+defaults to today's date.
+.LI \f3\-v\0\f2view\f1
+.br
+Specify the view span of appointments to display.
+The
+.I view
+option-argument can be:
+.VL 10
+.LI \f3day\fP
+Display all appointments for the given date (see
+.B \-d
+option).
+.LI \f3week\fP
+Display the full week that contains the given date,
+starting with Sunday.
+.LI \f3month\fP
+Display the entire month that contains the given date.
+.LE
+.cdes
+.P
+If the
+.I view
+option-argument is not specified, the viewing range defaults to the view
+range specified by the user's
+.Cm dtcm
+options sheet.
+If the user has
+not specified a range in his or her options sheet, it defaults to the
+.B day
+value.
+.cdee
+.LE
+.SH OPERANDS
+None.
+.SH STDIN
+Not used.
+.SH "INPUT FILES"
+None.
+.SH "ENVIRONMENT VARIABLES"
+The following environment variables affect the execution of
+.Cm dtcm_lookup :
+.VL 15
+.LI \f2LANG\fP
+Provide a default value for the internationalization variables
+that are unset or null.
+If
+.I LANG
+is unset or null, the corresponding value from the
+implementation-specific default locale will be used.
+If any of the internationalization variables contains an invalid setting, the
+utility behaves as if none of the variables had been defined.
+.LI \f2LC_ALL\fP
+If set to a non-empty string value,
+override the values of all the other internationalization variables.
+.LI \f2LC_MESSAGES\fP
+Determine the locale that is used to affect
+the format and contents of diagnostic
+messages written to standard error
+and informative messages written to standard output.
+.LI \f2NLSPATH\fP
+Determine the location of message catalogues
+for the processing of
+.IR LC_MESSAGES .
+.LE
+.SH "RESOURCES"
+None.
+.SH "ASYNCHRONOUS EVENTS"
+.xo Default.
+.cde The
+.cde .Cm dtcm_lookup
+.cde utility takes the standard action for all signals.
+.SH STDOUT
+The standard output contains the list of appointments
+for the specified view
+.cde span.
+.xo span, in an unspecified format.
+.SH STDERR
+Used only for diagnostic messages.
+.SH "OUTPUT FILES"
+None.
+.SH "EXTENDED DESCRIPTION"
+None.
+.SH "EXIT STATUS"
+The following exit values are returned:
+.VL 4
+.LI \h"\w'>'u"0
+Successful completion.
+.LI >0
+An error occurred.
+.LE
+.SH "CONSEQUENCES OF ERRORS"
+Default.
+.cdes
+.SH FILES
+.TP 20
+.B /usr/spool/calendar/callog.username
+.TP
+.BR /usr/dt/bin/rpc.cmsd
+.cdee
+.SH "APPLICATION USAGE"
+None.
+.SH EXAMPLES
+.xo None.
+.cdes
+The simplest form of
+.B dtcm_lookup
+has no arguments:
+.Cs I
+\f1dtcm_lookup\fP
+Appointments for Tuesday March 29, 1994:
+        1) Appointment
+        2) 10:30am-10:45am Morning Tea
+        3) 2:00pm-3:00pm Staff meeting
+        4) 4:30pm-5:00pm Phone home
+.Ce
+.P
+To look up entries for a specific date:
+.Cs I
+\f1dtcm_lookup \-d 03/29/94\fP
+Appointments for Wednesday March 30, 1994:
+        1) 11:00am-12:00pm Appointment
+        2) 11:30am-12:30pm Group Lunch
+        3) 4:00pm-5:00pm Tech Interview
+.Ce
+.P
+To look up entries from a specific target calendar:
+.Cs I
+\f1dtcm_lookup \-c felix@cat\fP
+Appointments for Tuesday March 29, 1994:
+        1) Appointment
+        2) 10:15am-10:30am Coffee
+        3) 11:15am-11:30am Doughnuts
+        4) 2:00pm-2:15pm Coffee
+        5) 3:30pm-3:45pm Snack
+        6) 4:30pm-4:45pm Coffee
+.Ce
+.P
+To look up an entire week's appointments:
+.Cs I
+\f1dtcm_lookup \-v week\fP
+Appointments for Sunday March 27, 1994:
+        1) 6:00am-5:00pm Hiking
+.sp 0.5v
+Appointments for Monday March 28, 1994:
+        2) 11:00am-11:30am Sync with East Coast
+        3) 4:00pm-4:15pm Confirm flight
+.sp 0.5v
+Appointments for Tuesday March 29, 1994:
+        4) Appointment
+        5) 10:15am-10:30am Coffee
+        6) 11:15am-11:30am Doughnuts
+        7) 2:00pm-2:15pm Coffee
+        8) 3:30pm-3:45pm Snack
+        9) 4:30pm-4:45pm Coffee
+.sp 0.5v
+Appointments for Wednesday March 30, 1994:
+       10) 11:00am-11:15am Appointment
+       11) 11:30am-12:30pm Group Lunch
+       12) 4:00pm-5:00pm Tech Interview
+.sp 0.5v
+Appointments for Friday April 1, 1994:
+       13) Documentation
+       14) 10:00am-11:00am Staff meeting
+.sp 0.5v
+Appointments for Saturday April 2, 1994:
+       15) 9:00am-11:00am Raquetball with Debbie
+.Ce
+.P
+Notice that Thursday does not appear, since there were no appointments
+on that day.
+.cdee
+.SH "SEE ALSO"
+.cde .Cm rpc.cmsd 1,
+.cde .Cm dtcm 1,
+.Cm dtcm_editor 1,
+.Cm dtcm_insert 1,
+.Cm dtcm_delete 1.

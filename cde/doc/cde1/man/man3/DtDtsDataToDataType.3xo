@@ -1,0 +1,148 @@
+.TH DtDtsDataToDataType 3 "15 Jun 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.SH NAME
+DtDtsDataToDataType \- get the data type for a set of data
+.SH SYNOPSIS
+.yS
+#include <Dt/Dts.h>
+.sp 0.5v
+.ta \w'char *DtDtsDataToDataType('u
+char *DtDtsDataToDataType(const char *\f2filepath\fP,
+	const void *\f2buffer\fP,
+	const int \f2size\fP,
+	const struct stat *\f2stat_buff\fP,
+	const char *\f2link_path\fP,
+	const struct stat *\f2link_stat_buff\fP,
+	const char *\f2opt_name\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn DtDtsDataToDataType
+function determines
+the data type of a set of data,
+based on the information given in the non-\c
+.Cn NULL
+pointer arguments to the function.
+The function gathers any additional information, if it is needed,
+to compensate for the
+.Cn NULL
+arguments.
+For example, if the
+.I filepath
+argument is given, but the
+.I stat_buff
+argument is
+.Cn NULL
+and a
+.I stat_buff
+value is required to determine the data type,
+.Fn DtDtsDataToDataType
+calls the
+.Fn stat 2
+function to obtain the information.
+.P
+The
+.I filepath
+argument is the pathname of a file.
+.P
+The
+.I buffer
+argument
+is a pointer to the buffer of the data to be typed.
+.P
+The
+.I size
+argument
+is the size of the buffer in bytes.
+.P
+The
+.I stat_buff
+argument
+is the buffer returned from a
+.Fn stat 2
+or
+.Fn fstat 3
+call for use in typing.
+.P
+The
+.I link_path
+argument
+is the pathname of the target file pointed to by a symbolic link.
+.P
+The
+.I link_stat_buff
+argument
+is the buffer returned from an
+.Fn lstat 2
+call for use in typing.
+.P
+The
+.I opt_name
+argument can be used to specify a name to be associated with the buffer.
+If the
+.I opt_name
+argument is not
+.Cn NULL ,
+it is used as a pseudo file name in typing;
+otherwise, certain attributes may be returned as
+.Cn NULL
+because the filename components could not be determined.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn DtDtsDataToDataType
+function returns a pointer to a data type string, or
+.Cn NULL
+if no value could be determined.
+.SH "APPLICATION USAGE"
+The
+.Fn DtDtsDataToDataType
+function is generally used by applications such as file managers
+to improve performance.
+Typical applications should probably use
+.Fn DtDtsFileToDataType 3
+or
+.Fn DtDtsBufferToDataType 3
+instead.
+.P
+The
+.IR DtDtsBuffer *
+functions assume that the buffer is readable and writable
+by the user, group and other file classes
+and select a type accordingly.
+An application requiring a type based on read-only
+permissions should use
+.Fn DtDtsDataToDataType
+with a
+.I stat_buff
+value created for this purpose:
+all fields should
+.Cn NULL
+except for the
+.I st_mode
+field,
+which should be set to:
+.Cs I
+S_IFREG | S_IROTH | S_IRGRP | S_IRUSR
+.Ce
+.br
+.SH "SEE ALSO"
+.Hd Dt/Dts.h ,
+.Fn DtDtsLoadDataTypes 3,
+.Fn DtDtsFileToDataType 3,
+.cdes
+.Fn DtDtsBufferToDataType 3,
+.Fn fstat 3,
+.Fn lstat 2,
+.Fn stat 2.
+.cdee
+.xos
+.Fn DtDtsBufferToDataType 3;
+.Fn fstat 3,
+.Fn lstat 2,
+.Fn stat 2
+in the \*(ZK.
+.xoe

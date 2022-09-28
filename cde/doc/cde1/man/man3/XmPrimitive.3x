@@ -1,0 +1,411 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH XmPrimitive 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmPrimitive\fP \- The Primitive widget class
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/Xm.h>
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+Primitive is a widget class used as a supporting superclass
+for other widget classes.  It handles border drawing and highlighting,
+traversal activation and deactivation, and various callback lists needed by
+Primitive widgets.
+.SS "Classes"
+Primitive inherits behavior and resources from \fICore\fP class.
+.PP 
+The class pointer is \fIxmPrimitiveWidgetClass\fP.
+.PP 
+The class name is \fIXmPrimitive\fP.
+.nL
+.ne 12
+.SS "New Resources"
+The following table defines a set of widget resources used by the programmer
+to specify data.  The programmer can also set the resource values for the
+inherited classes to set attributes for this widget.  To reference a
+resource by name or by class in a .Xdefaults file, remove the \fIXmN\fP or
+\fIXmC\fP prefix and use the remaining letters.  To specify one of the defined
+values for a resource in a .Xdefaults file, remove the \fIXm\fP prefix and use
+the remaining letters (in either lowercase or uppercase, but include any
+underscores between words).
+The codes in the access column indicate if the given resource can be
+set at creation time (C),
+set by using \fIXtSetValues\fP (S),
+retrieved by using \fIXtGetValues\fP (G), or is not applicable (N/A).
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmPrimitive Resource Set
+Name	Class	Type	Default	Access
+_
+XmNbottomShadowColor	XmCBottomShadowColor	Pixel	dynamic	CSG
+XmNbottomShadowPixmap	XmCBottomShadowPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNforeground	XmCForeground	Pixel	dynamic	CSG
+XmNhelpCallback	XmCCallback	XtCallbackList	NULL	C
+XmNhighlightColor	XmCHighlightColor	Pixel	dynamic	CSG
+XmNhighlightOnEnter	XmCHighlightOnEnter	Boolean	False	CSG
+XmNhighlightPixmap	XmCHighlightPixmap	Pixmap	dynamic	CSG
+XmNhighlightThickness	XmCHighlightThickness	Dimension	2	CSG
+.wH
+.tH
+XmNnavigationType	XmCNavigationType	XmNavigationType	XmNONE	CSG
+XmNshadowThickness	XmCShadowThickness	Dimension	2	CSG
+XmNtopShadowColor	XmCTopShadowColor	Pixel	dynamic	CSG
+XmNtopShadowPixmap	XmCTopShadowPixmap	Pixmap	dynamic	CSG
+XmNtraversalOn	XmCTraversalOn	Boolean	True	CSG
+XmNunitType	XmCUnitType	unsigned char	dynamic	CSG
+XmNuserData	XmCUserData	XtPointer	NULL	CSG
+.TE
+.KE
+.in
+.sp 1
+.nL
+.ne 3
+.IP "\fIXmNbottomShadowColor\fP"
+Specifies the color to use to draw the bottom and right sides of the
+border shadow.
+This color is used if the \fIXmNtopShadowPixmap\fP resource is
+unspecified.
+.IP "\fIXmNbottomShadowPixmap\fP"
+Specifies the pixmap to use to draw the bottom and right sides of the
+border shadow.
+.IP "\fIXmNforeground\fP"
+Specifies the foreground drawing color used by Primitive widgets.
+.IP "\fIXmNhelpCallback\fP"
+Specifies the list of callbacks that is called when the help key
+is pressed.  The reason sent by the callback is \fIXmCR_HELP\fP.
+.IP "\fIXmNhighlightColor\fP"
+Specifies the color of the highlighting rectangle.
+This color is used if the highlight pixmap resource is
+\fIXmUNSPECIFIED_PIXMAP\fP.
+.IP "\fIXmNhighlightOnEnter\fP"
+Specifies if the highlighting rectangle is drawn when the cursor moves
+into the widget.
+If the shell's focus policy is \fIXmEXPLICIT\fP, this resource is
+ignored, and the widget is highlighted when it has the focus.
+If the shell's focus policy is \fIXmPOINTER\fP and if this resource is
+True, the highlighting rectangle is drawn when the the cursor moves into
+the widget.
+If the shell's focus policy is \fIXmPOINTER\fP and if this resource is
+False, the highlighting rectangle is not drawn when the the cursor moves
+into the widget.
+The default is False.
+.IP "\fIXmNhighlightPixmap\fP"
+Specifies the pixmap used to draw the highlighting rectangle.
+.IP "\fIXmNhighlightThickness\fP"
+Specifies the thickness of the highlighting rectangle.
+.IP "\fIXmNnavigationType\fP"
+Determines whether the widget is a tab group.
+.wH
+.rS 
+.TP
+\(bu
+\fIXmNONE\fP indicates that the widget is not a tab group.
+.TP
+\(bu
+\fIXmTAB_GROUP\fP indicates that the widget is a tab group, unless
+another widget in the hierarchy has an \fIXmNnavigationType\fP of
+\fIXmEXCLUSIVE_TAB_GROUP\fP.
+.TP
+\(bu
+\fIXmSTICKY_TAB_GROUP\fP indicates that the widget is a tab group, even
+if another widget in the hierarchy has an \fIXmNnavigationType\fP of
+\fIXmEXCLUSIVE_TAB_GROUP\fP.
+.TP
+\(bu
+\fIXmEXCLUSIVE_TAB_GROUP\fP indicates that the widget is a tab group and
+that widgets in the hierarchy whose \fIXmNnavigationType\fP is
+\fIXmTAB_GROUP\fP are not tab groups.
+.IP
+When a parent widget has an \fIXmNnavigationType\fP of
+\fIXmEXCLUSIVE_TAB_GROUP\fP, traversal of non-tab-group widgets within
+the group is based on the order of those widgets in their parent's
+\fIXmNchildren\fP list.
+.IP
+When any widget in a hierarchy has an \fIXmNnavigationType\fP of
+\fIXmEXCLUSIVE_TAB_GROUP\fP, traversal of tab groups in the hierarchy
+proceeds to widgets in the order in which their \fIXmNnavigationType\fP
+resources were specified as \fIXmEXCLUSIVE_TAB_GROUP\fP or
+\fIXmSTICKY_TAB_GROUP\fP, whether by creating the widgets with that value,
+by calling \fIXtSetValues\fP, or by calling \fIXmAddTabGroup\fP.
+.wH
+.rE
+.IP "\fIXmNshadowThickness\fP"
+Specifies the size of the drawn border shadow.
+.IP "\fIXmNtopShadowColor\fP"
+Specifies the color to use to draw the top and left sides of the border
+shadow.
+This color is used if the \fIXmNtopShadowPixmap\fP resource is
+unspecified.
+.IP "\fIXmNtopShadowPixmap\fP"
+Specifies the pixmap to use to draw the top and left sides of the border
+shadow.
+.IP "\fIXmNtraversalOn\fP"
+Specifies if traversal is activated for this widget.  In CascadeButton
+and CascadeButtonGadget, this resource is forced to TRUE unless the parent
+is an OptionMenu.
+.IP "\fIXmNunitType\fP"
+Provides the basic support for resolution independence.
+It defines the type of units a widget uses with sizing and
+positioning resources.
+If the widget's parent is a subclass of \fIXmManager\fP and if the
+\fIXmNunitType\fP resource is not explicitly set, it defaults to the
+unit type of the parent widget.
+If the widget's parent is not a subclass of \fIXmManager\fP, the
+resource has a default unit type of \fIXmPIXELS\fP.
+.IP
+\fIXmNunitType\fP can have the following values:
+.wH
+.rS 
+.TP
+\(bu
+\fIXmPIXELS\fP \- all values provided to the widget are treated as normal
+pixel values.
+.TP
+\(bu
+\fIXm100TH_MILLIMETERS\fP \- all values provided to the widget are treated
+as 1/100 millimeter.
+.TP
+\(bu
+\fIXm1000TH_INCHES\fP \- all values provided to the widget are treated as
+1/1000 inch.
+.TP
+\(bu
+\fIXm100TH_POINTS\fP \- all values provided to the widget are treated as
+1/100 point.  A point is a unit used in text processing
+applications and is defined as 1/72 inch.
+.TP
+\(bu
+\fIXm100TH_FONT_UNITS\fP \- all values provided to the widget are
+treated as 1/100 of a font unit.
+A font unit has horizontal and vertical components.
+These are the values of the XmScreen resources \fIXmNhorizontalFontUnit\fP
+and \fIXmNverticalFontUnit\fP.
+.IP "\fIXmNuserData\fP"
+Allows the application to attach any necessary specific data to the widget.
+It is an internally unused resource.
+.SS "Dynamic Color Defaults"
+The foreground, background, top shadow, bottom shadow, and
+highlight color resources are dynamically defaulted.
+If no color data is specified, the colors are
+automatically generated.  On a single-plane system, a black and white color
+scheme is generated.  Otherwise, four colors are
+generated, which display the correct shading for the 3-D visuals.
+If the background is the only color specified for a widget, the top
+shadow and bottom shadow colors are generated to give the 3-D appearance.
+Foreground and highlight colors are generated to provide sufficient
+contrast with the background color.
+.IP 
+Colors are generated only at creation.  Resetting the background through
+\fIXtSetValues\fP does not regenerate the other colors.
+\fIXmChangeColor\fP can be used to recalculate all associated colors
+based on a new background color.
+.SS "Inherited Resources"
+Primitive inherits behavior and resources from the following
+superclass.  For a complete description of each resource, refer to the
+man page for that superclass.
+.P 
+.wH
+.in 0 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+Core Resource Set
+Name	Class	Type	Default	Access
+_
+XmNaccelerators	XmCAccelerators	XtAccelerators	dynamic	CSG
+XmNancestorSensitive	XmCSensitive	Boolean	dynamic	G
+XmNbackground	XmCBackground	Pixel	dynamic	CSG
+XmNbackgroundPixmap	XmCPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNborderColor	XmCBorderColor	Pixel	XtDefaultForeground	CSG
+XmNborderPixmap	XmCPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNborderWidth	XmCBorderWidth	Dimension	0	CSG
+XmNcolormap	XmCColormap	Colormap	dynamic	CG
+XmNdepth	XmCDepth	int	dynamic	CG
+XmNdestroyCallback	XmCCallback	XtCallbackList	NULL	C
+XmNheight	XmCHeight	Dimension	dynamic	CSG
+XmNinitialResourcesPersistent	XmCInitialResourcesPersistent	Boolean	True	C
+XmNmappedWhenManaged	XmCMappedWhenManaged	Boolean	True	CSG
+XmNscreen	XmCScreen	Screen *	dynamic	CG
+.wH
+.tH
+XmNsensitive	XmCSensitive	Boolean	True	CSG
+XmNtranslations	XmCTranslations	XtTranslations	dynamic	CSG
+XmNwidth	XmCWidth	Dimension	dynamic	CSG
+XmNx	XmCPosition	Position	0	CSG
+XmNy	XmCPosition	Position	0	CSG
+.TE
+.KE
+.in
+.sp 1
+.wH
+.in  
+.SS "Callback Information"
+A pointer to the following structure is passed to each callback:
+.sS
+.iS
+.ta .25i 1.50i
+.nf
+typedef struct
+{
+	int	\fBreason\fI;
+	\fIXEvent	\fB* event\fI;
+} XmAnyCallbackStruct;
+.iE
+.sE
+.wH
+.fi
+.IP "\fBreason\fP"
+Indicates why the callback was invoked.
+For this callback, \fBreason\fP is set to \fIXmCR_HELP\fP.
+.IP "\fBevent\fP"
+Points to the \fIXEvent\fP that triggered the callback.
+.SS "Translations"
+The XmPrimitive translations are listed below.
+Some of these translations may be affected by the XmDisplay's
+\fIenableMultiKeyBindings\fP resource: see XmDisplay(3X).
+These translations may not directly correspond to a
+translation table.
+.IP 
+Note that for buttons in menus, altering translations in \fI#override\fP
+or \fI#augment\fP mode is undefined.
+.iS
+.ta 1.5i
+.nf
+KUp:	PrimitiveTraverseUp()
+KDown:	PrimitiveTraverseDown()
+KLeft:	PrimitiveTraverseLeft()
+KRight:	PrimitiveTraverseRight()
+.sp \n(PDu
+KBeginLine:	PrimitiveTraverseHome()
+.sp \n(PDu
+KNextField:	PrimitiveNextTabGroup()
+KPrevField:	PrimitivePrevTabGroup()
+.sp \n(PDu
+KActivate:	PrimitiveParentActivate()
+KCancel:	PrimitiveParentCancel()
+.sp \n(PDu
+KHelp:	PrimitiveHelp()
+.wH
+.fi
+.iE
+.SS "Action Routines"
+The XmPrimitive action routines are described below:
+.IP "\fIPrimitiveHelp()\fP:"
+Calls the callbacks for \fIXmNhelpCallback\fP if any exist.  If there are no help
+callbacks for this widget, this action calls the help callbacks
+for the nearest ancestor that has them.
+.IP "\fIPrimitiveNextTabGroup()\fP:"
+This action depends on the value of the XmDisplay resource
+\fIenableButtonTab\fP.
+.IP
+When \fIenableButtonTab\fP is False (the default), this action
+traverses to the first item in the next tab group.  If
+the current tab group is the last entry in the tab group list, it
+wraps to the beginning of the tab group list.
+.IP
+When \fIenableButtonTab\fP is True, this action will move to the next
+item within the current tab group unless it is the last item in the tab
+group.
+When the item is the last in the group,
+the action traverses to the first item in the next tab group.
+The \fIenableButtonTab\fP behavior applies only to XmPushButton, XmArrow,
+and XmDrawnButton.
+.IP "\fIPrimitiveParentActivate()\fP:"
+If the parent is a manager,
+passes the \fIKActivate\fP event received by the widget
+to the parent.
+.IP "\fIPrimitiveParentCancel()\fP:"
+If the parent is a manager,
+Passes the \fIKCancel\fP event received by the widget
+to the parent.
+.IP "\fIPrimitivePrevTabGroup()\fP:"
+This action depends on the value of the XmDisplay resource
+\fIenableButtonTab\fP.
+.IP
+When \fIenableButtonTab\fP is False (the default), this action
+traverses to the first item in the previous tab group.
+If the beginning of the tab group list is reached, it wraps to the end
+of the tab group list.
+.IP
+When \fIenableButtonTab\fP is True, this action will move to the previous
+item within the current tab group unless it is the first item in the tab
+group.
+When the item is the first in the group,
+the action traverses to the first item in the previous tab group.
+The \fIenableButtonTab\fP behavior applies only to XmPushButton, XmArrow,
+and XmDrawnButton.
+.IP "\fIPrimitiveTraverseDown()\fP:"
+Traverses to the next item below the current widget in the current tab
+group, wrapping if necessary.
+.IP "\fIPrimitiveTraverseHome()\fP:"
+Traverses to the first widget or gadget in the current tab group.
+.IP "\fIPrimitiveTraverseLeft()\fP:"
+Traverses to the next item to the left of the current widget in the
+current tab group, wrapping if necessary.
+.IP "\fIPrimitiveTraverseNext()\fP:"
+Traverses to the next item in the current tab group, wrapping if
+necessary.
+.IP "\fIPrimitiveTraversePrev()\fP:"
+Traverses to the previous item in the current tab group, wrapping if
+necessary.
+.nL
+.ne 10
+.IP "\fIPrimitiveTraverseRight()\fP:"
+Traverses to the next item to the right of the current gadget in the
+current tab group, wrapping if necessary.
+.nL
+.ne 3
+.IP "\fIPrimitiveTraverseUp()\fP:"
+Traverses to the next item above the current gadget in the current tab
+group, wrapping if necessary.
+.SS "Additional Behavior"
+This widget has the additional behavior described below:
+.IP "\fI<FocusIn>\fP:"
+If the shell's keyboard focus policy is \fIXmEXPLICIT\fP, highlights the
+widget and gives it the focus.
+.IP "\fI<FocusOut>\fP:"
+If the shell's keyboard focus policy is \fIXmEXPLICIT\fP, unhighlights
+the widget and removes the focus.
+.SS "Virtual Bindings"
+The bindings for virtual keys are vendor specific.
+For information about bindings for virtual buttons and keys, see \fIVirtualBindings(3X)\fP.
+.SH RELATED INFORMATION
+.na
+\fICore(3X)\fP,
+\fIXmChangeColor(3X)\fP,
+\fIXmDisplay(3X)\fP, and
+\fIXmScreen(3X)\fP.
+.ad

@@ -1,0 +1,116 @@
+XCOMM
+XCOMM 	$Revision: 1.11 $
+XCOMM
+XCOMM 	@(#)Imakefile	1.11 02 Feb 1994
+XCOMM
+XCOMM 	RESTRICTED CONFIDENTIAL INFORMATION:
+XCOMM	
+XCOMM	The information in this document is subject to special
+XCOMM	restrictions in a confidential disclosure agreement between
+XCOMM	HP, IBM, Sun, USL, SCO and Univel.  Do not distribute this
+XCOMM	document outside HP, IBM, Sun, USL, SCO, or Univel without
+XCOMM	Sun's specific written approval.  This document and all copies
+XCOMM	and derivative works thereof must be returned or destroyed at
+XCOMM	Sun's request.
+XCOMM
+XCOMM	Copyright 1993 Sun Microsystems, Inc.  All rights reserved.
+XCOMM
+XCOMM
+
+#define PassCDebugFlags 'CDEBUGFLAGS=$(CDEBUGFLAGS)'
+
+#include "../ab.tmpl"
+#include "../ab.rules"
+
+    INCLUDES = -I. -I$(ABINCLUDES)
+
+INSTALLFLAGS = $(INSTINCFLAGS)
+
+    LINTLIBS = $(LINTXLIB) $(LINTXTOOL)
+
+     DEFINES =
+
+
+#ifdef CCOPTIONS  
+#undef CCOPTIONS
+#endif
+CCOPTIONS = -Xa
+
+#ifdef EXTRA_CCOPTIONS
+#undef EXTRA_CCOPTIONS
+#endif
+EXTRA_CCOPTIONS = -D_POSIX_SOURCE=1 -Xa -xF
+
+
+SOURCES.h.shipped =
+
+SOURCES.h.shared = \
+	gilcvt.h
+
+SOURCES.h.unshared = \
+	dtb_utils.h \
+	gilcvt_utilsP.h \
+	gilcvtP.h
+
+SOURCES.msg = \
+		sdtgilcvt.msg 	\
+		../libAButil/libAButil.msg \
+		../libABil/libABil.msg
+
+SRCS = \
+	dtb_utils.c \
+        gilcvt_public.c \
+        gilcvt_utils.c \
+        gilcvt.c
+
+OBJS = \
+	dtb_utils.o \
+        gilcvt_public.o \
+        gilcvt_utils.o \
+        gilcvt.o
+
+  SYS_LIBRARIES = -lm
+
+#ifdef RsArchitecture
+SYS_LIBRARIES = -lm -liconv
+#endif
+
+#ifdef	SunArchitecture
+SYS_LIBRARIES = -lm -ldl -lw -lgen 
+WAITTARGET = .WAIT
+#endif	/* SunArchitecture */
+
+       PROGRAMS = sdtgilcvt
+   INSTALLFLAGS = -m 4755
+       LINTLIBS = $(XINPUTLIB) $(DTHELPLIB) $(DTSVCLIB) $(XMLIB) $(XTOOLLIB) $(XLIB)
+
+/* DEPLIBS contains the list of library depencies for a client.
+ * LOCAL_LIBRARIES contains the list of libraries on the link line.
+ * Generally, the dependency form of a library has DEP as a prefix.
+ * e.g. put $(XLIB) in LOCAL_LIBRARIES and $(DEPXLIB) in DEPLIBS.
+ * NOTE: if DEPLIBS is not set here, it is by default null and there
+ *       are no library dependencies for clients.
+ *       You cannot put -Llibpath into DEPLIBS. You must put actual
+ *       paths to the library.
+ */
+DEPLIBS = ../libABil/libABil.a  \
+                  ../libABobj/libABobj.a ../libAButil/libAButil.a
+LOCAL_LIBRARIES = ../libABil/libABil.a  \
+                  ../libABobj/libABobj.a ../libAButil/libAButil.a
+
+ComplexProgramTarget(sdtgilcvt)
+
+AbMessageCatalogTarget(sdtgilcvt)
+
+/*
+DependTarget()
+*/
+
+BuildAbIncludes(shared_includes, $(SOURCES.h.shared),../include/ab_private, ../../sdtgilcvt)
+
+includes:: shared_includes $(WAITTARGET)
+
+#
+# Test harnesses and drivers
+#
+

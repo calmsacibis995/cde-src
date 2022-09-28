@@ -1,0 +1,349 @@
+<chapter id=ProgrammersJob>The Programmer's Job
+
+<term nogloss|NOTE:  Refer to the Cache Creek API External Specifications
+for the latest API information!|
+
+... introduction here ...
+
+
+<s1>Planning
+
+... introduce planning here ...
+
+
+<s1>Creating and Managing Help Dialogs
+
+The HP Help System provides two help dialogs widget classes:
+
+<list bullet>
+
+ * The !!quick help dialog!! provides a simple window with a topic 
+   display area and a few dialog buttons.
+
+ * The !!general help dialog!! provides a more verbose help browsing
+   window with a menu bar, a topic map, and a help topic display area.
+
+<\list>
+
+You can use either or both within your application.
+
+<s2>To create a quick help dialog
+				<idx|quick help dialog, creating|
+				<idx|XvhCreateQuickHelpDialog()|
+				<idx|creating help dialogs|
+				<idx|help on help for quick help dialogs|
+				<idx|hyperlink callback|
+				<idx|MoreHelpCB()|
+				<idx|HyperlinkCB()|
+				<idx|CloseHelpCB()|
+
+<list order>
+
+ * Create an instance of the quick help dialog widget:
+
+   <list bullet tight>
+    * Use the ``XvhCreateQuickHelpDialog()'' convenience function.
+    * !!Or,!! use the ``XtCreateManagedWidget()'' function.
+   <\list>
+
+ * Add a ++hyperlink callback++ for handling hyperlink events that occur 
+   within the dialog.
+   
+ * Add a ++close callback++ for handling the OK button.  
+
+ * Configure the dialog buttons that you want to use:
+
+   <list bullet tight>
+     * If you intend to use the More button, manage it and add an 
+       activate callback.
+     * If you want to disallow printing, unmanage the Print button.
+     * Add an activate callback to the Help button so you can 
+       provide ++help on help++.
+   <\list>
+
+<\list>
+
+<procedure>Example: Using the Convenience Function
+
+The following code segment creates a quick help dialog using the 
+convenience function.  The dialog is left unmanaged -- presumably 
+it is managed elsewhere in the application when a help request is made.
+
+<ex smaller>
+Widget   quickHelpDialog, moreButton, helpButton;
+
+ac = 0;
+XtSetArg (al[ac], XmNtitle, "My Application - Help");   ac+&empty;+;
+quickHelpDialog = XvhCreateQuickHelpDialog (%%parent%%, "quickHelpDialog", al, ac);
+<\ex>
+
+These two calls add the hyperlink and close callbacks to the dialog.  The 
+functions ``HyperlinkCB()'' and ``CloseQuickHelpCB()'' are declared 
+elsewhere in your application.
+
+<ex smaller>
+XtAddCallback (quickHelpDialog, XmNhyperLinkCallback, HyperlinkCB, (XtPointer)NULL);
+XtAddCallback (quickHelpDialog, XmNcloseCallback, CloseQuickHelpCB, (XtPointer)NULL);
+<\ex>
+
+Here, the More button is managed and assigned an activate callback 
+that will invoke your application's ``MoreHelpCB()'' function.
+
+<ex smaller>
+moreButton = XvhQuickHelpDialogGetChild (quickHelpDialog, XvhDIALOG_MORE_BUTTON);
+XtAddCallback (moreButton, XmNactivateCallback, MoreHelpCB, (XtPointer)NULL);
+<\ex>
+
+To provide "help on help," A callback is also added to the Help button 
+to call a ``HelpOnHelpCB()'' routine, also part of your application.
+
+<ex smaller>
+helpButton = XvhQuickHelpDialogGetChild (quickHelpDialog, XvhDIALOG_HELP_BUTTON);
+XtAddCallback (helpButton, XmNactivateCallback, HelpOnHelpCB, (XtPointer)NULL);
+<\ex>
+
+
+
+
+<s2>To create a general help dialog
+
+
+
+
+<s2 id=to-create-a-cache>To create a dialog cache
+
+<list order>
+
+  * Declare a structure that you can use to create a linked list
+    of dialogs.  Typically, a help dialog cache structure has
+    these attributes:
+
+    <list bullet tight>
+      * Keeps track of the Widget ID for the help dialog.
+      * Maintains a flag that indicates what type of help dialog
+        it is (quick help or general help).
+      * Maintains an "in use" flag.
+    <\list>
+
+  * When you create a help dialog, be sure to add it to your cache.
+
+  * When the user close a help dialog, return the dialog to your
+    cache by clearing its "in use" flag.
+
+<\list>
+
+<procedure>Example
+
+The following type definition demonstrates a simple structure
+that you could use to build a dialog cache.   Instances of this
+structure would be connected (via the ``next'' element) to form
+a linked list.
+
+<ex smaller>
+typedef struct _HelpDialogCacheStruct {
+     Widget   dialog;             /* %%The dialog's ID.%% */
+     Boolean  inUse;              /* %%The "in use" flag.%% */
+     Boolean  isQuickHelpDialog;  /* %%The diaog type flag.%% */
+
+     struct _HelpDialogCacheStruct  *next;  /* %%Next in the list.%% */
+}  HelpDialogCacheStruct;
+<\ex>
+
+<procedure>See Also
+
+<list plain tight>
+ * <xref retrieve-from-cache>
+ * <xref to-return-to-cache>
+<\list>
+
+
+<s2 id=retrieve-from-cache>To retrieve a dialog from your cache
+
+<list bullet>
+ * Scan the cache looking for a dialog of the correct type whose
+   "in use" flag is clear.
+ * If there are no dialogs available in the cache, create a new one, add
+   it to the cache (marked "in use") and use it.
+<\list>
+
+<procedure>
+
+The following ``FetchHelpDialog()'' function scans a dialog cache 
+for a help dialog of the specified type and returns a Widget ID.  If 
+an unused dialog is not found, one is created, added to the cache and 
+returned.
+
+<ex smaller>
+Widget
+FetchHelpDialog(quickHelp)
+     Boolean  quickHelp;
+  {
+     .
+     .
+     .
+
+  }
+<\ex>
+
+<procedure>See Also
+
+<list plain tight>
+
+ * <xref to-create-a-cache>
+ * <xref to-return-to-cache>
+
+<\list>
+
+<s2 id=to-return-to-cache>To return a help dialog to your cache
+
+
+
+
+<s1>Responding to Help Requests
+
+When a user request help while using your application, it is your
+application's responsibility to determine what help topic should be 
+displayed, then ...
+
+There are three general ways for users to request help:
+
+<list bullet>
+
+ * By pressing the ++help key++.
+ * By choosing Help in a dialog.
+ * By choosing a command from your Help menu.
+
+<\list>
+
+The help key mechaism -- usually F1 -- is a feature built into all 
+OSF/Motif manager and primitive widgets.  The help key is automatically
+enabled by adding a help callback to a widget.
+
+<s2>To add a Motif help callback
+
+<list bullet>
+
+ * Use the ``XtAddCallback()'' function as follows:
+
+<ex>
+XtAddCallback (%%widget%%, 
+               XmNhelpCallback, 
+               %%HelpRequestCB%%, 
+               %%clientData%%);
+<\ex>
+
+<lablist>
+\%%widget%%\		Is the widget where you want to activate 
+			the help key.
+\%%HelpRequestCB()%%\	Is the function in your application that will 
+			handle the help request when the user presses the
+			help key.
+\%%clientData%%\	Is the data you want passed to the 
+			%%HelpRequestCB()%% function.  Typically, 
+			this data identifies the topic that should 
+			be displayed.
+<\lablist>
+
+<\list>
+
+When the user presses the help key, the help callback for the widget 
+with the current keyboard focus is invoked.  If that widget does 
+not have a help callback, the help callback for its nearest ansestor
+is invoked.  
+
+If no help callbacks are found, nothing happens.  Therefore, it is 
+recommended that you add a help callback to each shell you use in
+your application.  This ensures that no user requests for help are 
+lost.
+
+Adding a help callback to a dialog shell automatically enables
+the Help button on the dialog.  (CHECK THIS OUT -- IS IT TRUE?)
+
+<procedure>Example: Adding a Motif Callback to a Control
+
+
+
+
+<procedure>See Also
+
+<!--
+<list plain tight>
+ * <xref writing-a-help-request-callback>
+ * <xref identifying-entry-points>
+<\list>
+-->
+
+
+
+<s1>Responding to Hyperlink Events in Help Dialogs
+
+Your application is responsible for handling these hyperlink 
+events that may occure within a help dialog:
+
+<list bullet>
+
+ * ++Jump-new-view hyperlinks++
+ * ++Man page links++
+ * ++Application-defined links++
+
+<\list>
+
+<note>
+Your application needs to provide support only for those links that
+are possible within the help volume(s) that you will be displaying.
+In general, it is recommended that you provide support for all three
+types just in case new help volues are authored using those link types.
+<\note>
+
+
+
+<s2>To provide a hyperlink callback
+
+<list order>
+
+ * Add a hyperlink callback to the help dialog.
+ * Write a hyperlink callback procedure to handle the hyperlink 
+   events that may occur within the dialog.
+
+<\list>
+
+
+<note>
+The examples refer to the hyperlink callback as ``HyperlinkCB()''.  
+However, you can name your hyperlink callback procedure anything you
+want.
+<\note>
+
+<procedure>Example:  A Sample Hyperlink Callback Procedure
+
+<ex smaler>
+XtCallbackProc
+HyperlinkCB (widget, clientData, callData)
+     Widget     widget;
+     XtPointer  clientData;
+     XtPointer  callData;
+  {
+     XvhHelpDialogCallbackStruct *hyperData = 
+        (XvhHelpDialogCallbackStruct *) callData;
+
+     switch ((int)hyperData->hyperType)
+        {
+           case XvhLINK_JUMP_NEW:
+             /* %%Handles "jump new view" hyperlinks.%% */
+             break;
+
+           case XvhLINK_MAN_PAGE:
+             /* %%Handles "man page" hyperlinks.%% */
+             break;
+
+           case XvhLINK_APP_DEFINED:
+             /* %%Handles "applicaiton-defined" hyperlinks.%% */
+             break;
+
+           default:
+             break;
+   }
+<\ex>
+
+
+

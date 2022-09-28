@@ -1,0 +1,369 @@
+.\" $Header: Ci.1,v 1.4 93/07/11 10:26:42 xbuild_hp_cv Exp $
+.TH Ci 1 "" "" HP-UX
+.ds )H Hewlett-Packard Company OSSD-CV
+.ds ]W June 1993
+.SH NAME
+Ci \- OSSD-CV RCS check in with remote capabilities.
+.SH SYNOPSIS
+.B Ci
+.RI [ \|options\| ]
+.I file ...
+.SH DESCRIPTION
+.I Ci
+is a perl front-end to the
+.I ci
+.SM RCS
+program
+and is used exactly like the original RCS executable except for certain
+path anomalies and message input strategies that will be enumerated in 
+future versions of this file. The most useful options for an engineer
+will be
+.IR -u ,
+.IR -l ,
+and
+.IR -m .
+.I Ci 
+stores new revisions into
+.SM RCS
+files.
+Each file name ending in
+.I ,v
+is treated as an
+.SM RCS
+file; all others are assumed to be working files.
+.I Ci
+deposits the contents of each working file
+into the corresponding
+.SM RCS
+file (see
+.IR Rcsintro (1)).
+.PP
+If the
+.SM RCS
+file does not exist,
+.I Ci
+creates it and deposits the contents of the working file
+as the initial revision.
+The default number is "1.1".
+The access list is initialized to empty.
+Instead of the log message,
+.I Ci
+requests descriptive text (see the
+.I -t
+option below).
+.PP
+An
+.SM RCS
+file created by
+.I Ci
+inherits the read and execute permissions from the working file.
+If the
+.SM RCS
+file exists,
+.I Ci
+preserves its read and execute permissions.
+.I Ci
+always turns off all write permissions of
+.SM RCS
+files.
+.PP
+The caller of the command must have read/write permission
+for the directories containing the
+.SM RCS
+file and the working file, and read permission for the
+.SM RCS
+file itself.
+A number of temporary files are created.
+A semaphore file is created in the directory containing the
+.SM RCS
+file.
+.I Ci
+always creates a new
+.SM RCS
+file and unlinks the old one; therefore links to
+.SM RCS
+files are useless.
+.PP
+For
+.I Ci
+to work, the user's login must be in the access list
+unless the access list is empty,
+the user is the owner of the file,
+or the user is super-user.
+.PP
+Normally,
+.I Ci
+checks whether the revision to be deposited
+is different from the preceding one.
+If it is not different,
+.I Ci
+either aborts the deposit (if
+.I -q
+is given) or asks whether to abort (if
+.I -q
+is omitted).
+A deposit can be forced with the
+.I -f
+option.
+.PP
+For each revision deposited,
+.I Ci
+prompts for a log message.
+The log message should summarize the change and must be terminated with
+a line containing a single "." or a control-D.
+If several files are being checked in,
+.I Ci
+asks whether or not to reuse the log message from the previous file.
+If the standard input is not a terminal,
+.I Ci
+suppresses the prompt
+and uses the same log message for all files (see
+.I -m
+option below.
+.PP
+The number of the deposited revision can be given with any of the options
+.IR -r ,
+.IR -f ,
+.IR -k ,
+.IR -l ,
+.IR -u ,
+or
+.I -q
+(see
+.I -r
+option below).
+.PP
+To add a new revision to an existing branch,
+the head revision on that branch must be locked by the caller.
+Otherwise, only a new branch can be created.
+This restriction is not enforced for the owner of the file,
+unless locking is set to
+.I strict
+(see
+.IR Rcs (1)).
+A lock held by someone else can be broken with the
+.I Rcs
+command (see
+.IR Rcs (1)).
+.SS Options
+.TP 15
+.IR -f [\|\f2rev\fP\|]
+Forces a deposit.  The new revision is deposited even if it is not different
+from the preceding one.
+.TP
+.IR -k [\|\f2rev\fP\|]
+Searches the working file for keyword values
+to determine its revision number, creation date,
+author, and state (see
+.IR Co (1)),
+and assigns these values to the deposited revision,
+rather than computing them locally.
+A revision number given with a command option
+overrides the number in the working file.
+This option is useful for software distribution.
+A revision that is sent to several sites
+should be checked in with the
+.I -k
+option at these sites to preserve its original number,
+date, author, and state.
+.TP
+.IR -l [\|\f2rev\fP\|]
+Works like
+.IR -r ,
+except it performs an additional
+.I Co -l
+for the deposited revision.
+Thus, the deposited revision is immediately checked out again and locked.
+This is useful for saving a revision although one wants to continue
+editing it after the check-in.
+.tr ~"
+.TP
+.I -m~ msg ~
+Uses the string
+.I msg
+as the log message for all revisions checked in.
+.TP
+.I -n~ name ~
+Assigns the symbolic name
+.I name
+to the checked-in revision.
+.I Ci
+prints an error message if
+.I name
+is already assigned to another
+number. WARNING! this option is extremely dangerous and may be removed
+in the future. Do not use this option if you are not administering RCS.
+.TP
+.I -N~ name ~
+Same as
+.IR -n ,
+except that it overrides a previous assignment of
+.IR name .
+.tr ~~
+WARNING! this option is extremely dangerous and may be removed
+in the future. Do not use this option if you are not administering RCS.
+.TP
+.IR -q [\|\f2rev\fP\|]
+Quiet mode; diagnostic output is not printed.
+A revision that is not different from the preceding one
+is not deposited unless
+.I -f
+is given.
+.TP
+.IR -r [\|\f2rev\fP\|]
+Assigns the revision number
+.I rev
+to the checked-in revision, releases the corresponding lock,
+and deletes the working file.
+This is the default.
+.IP
+If
+.I rev
+is omitted,
+.I Ci
+derives the new revision number from the caller's last lock.
+If the caller has locked the head revision of a branch,
+the new revision is added to the head of that branch
+and a new revision number is assigned to the new revision.
+The new revision number is obtained by
+incrementing the head revision number.
+If the caller locked a non-head revision,
+a new branch is started at the locked revision,
+and the number of the locked revision is incremented.
+The default initial branch and level numbers are 1.
+If the caller holds no lock,
+but is the owner of the file and locking is not set to
+.IR strict ,
+the revision is added to the head of the trunk.
+.IP
+If
+.I rev
+indicates a revision number, it must be higher
+than the latest one on the branch to which
+.I rev
+belongs, or must start a new branch.
+.IP
+If
+.I rev
+indicates a branch instead of a revision,
+the new revision is added to the head of that branch.
+The level number is obtained by incrementing
+the head revision number of that branch.
+If
+.I rev
+indicates a non-existing branch,
+that branch is created with the initial revision numbered
+.IC rev .1\f1.
+.IP
+.SM NOTE:
+On the trunk, revisions can be added to the head, but not inserted.
+.tr ~"
+.TP
+.I -s~ state ~
+Sets the state of the checked-in revision to the identifier
+.IR state .
+.tr ~~
+The default is
+.IR Exp .
+.TP
+.IR -t [\|\f2txtfile\fP\|]
+Writes descriptive text into the
+.SM RCS
+file (deletes the existing text).
+If
+.I txtfile
+is omitted,
+.I Ci
+prompts the user for text from standard input that is
+terminated with a line containing a single
+.I .
+or Ctrl-D.
+Otherwise, the descriptive text is copied from the file
+.IR txtfile .
+During initialization, descriptive text is requested even if
+.I -t
+is not given.
+The prompt is suppressed if standard input is not a terminal.
+.TP
+.IR -u [\|\f2rev\fP\|]
+Similar to
+.IR -l ,
+except that the deposited revision is not locked.
+This is useful if one wants to process (e.g., compile)
+the revision immediately after check in.
+.SS "Access Control Lists (\s-1ACL\s0s)
+Optional
+.SM ACL
+entries should not be added to
+.SM RCS
+files, because they might be deleted.
+.SH DIAGNOSTICS
+For each revision,
+.I Ci
+prints the
+.SM RCS
+file, the working file, and the number of both the deposited
+and the preceding revision.
+.SH EXAMPLES
+If the current directory contains a subdirectory
+.I RCS
+with an
+.SM RCS
+file
+.IR io.c,v ,
+all of the following commands deposit the latest revision from
+.I io.c
+into
+.IR RCS/io.c,v .
+The -u option saves a copy of the checked in revision.
+.nf
+.IP
+.I "Ci -u io.c"
+.I "Ci io.c RCS/io.c,v"
+.I "Ci io.c (fullpath)/io.c,v"
+.fi
+.SH WARNINGS
+The names of
+.SM RCS
+files are generated by appending
+.I ",v"
+to the end of the working file name.
+If the resulting
+.SM RCS
+file name is too long for the file system on which the
+.SM RCS
+file should reside,
+.I Ci
+terminates with an error message.
+.PP
+The log message cannot exceed 2046 bytes.
+.PP
+A file with approximately 240 revisions
+may cause a hash table overflow.
+.I Ci
+cannot add another revision to the file
+until some of the old revisions have been removed.
+Use the
+.I Rcs -o
+(obsolete)
+command option to remove old revisions.
+.PP
+.SM RCS
+is designed to be used with
+.SM TEXT
+files only.
+Attempting to use
+.SM RCS
+with non-text (binary) files results in data corruption.
+.SH AUTHOR
+.I Ci
+was developed by Marc Ayotte & Ron Voll,
+OSSD-CV, Hewlett-Packard.
+.I ci
+was developed by Walter F. Tichy.
+.SH SEE ALSO
+Co(1),
+Rcs(1), Rcsdiff(1),
+Rcsmerge(1), Rlog(1),
+Rcslocks(1), Rls(1),
+Rcsfile(1), RcsIntro(1).

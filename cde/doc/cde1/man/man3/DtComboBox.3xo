@@ -1,0 +1,347 @@
+.TH DtComboBox 3 "7 Jun 94"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.\" (c) Copyright 1993, 1994, 1995 Interleaf, Inc.
+.SH NAME
+DtComboBox \- the ComboBox widget class
+.SH SYNOPSIS
+.yS
+#include <Dt/ComboBox.h>
+.yE
+.SH DESCRIPTION
+The DtComboBox widget is a combination of a TextField and a List widget
+that provides a list of valid choices for the TextField.
+Selecting an item from this list automatically fills in the TextField
+with that list item.
+.P
+Widget subclassing is not supported for the DtComboBox widget class.
+.P
+The resources for the XmList and XmTextField widgets that are created by the
+DtComboBox are accessible by using the
+.Fn XtNameToWidget 3X
+function.
+The names of these widgets are
+.B *List
+and
+.BR Text ,
+respectively.
+(The
+.B *List
+notation is required because the List widget is not an
+immediate descendant of the DtComboBox.
+See
+.cde .Fn XtNameToWidget 3X.)
+.xo .Fn XtNameToWidget
+in the \*(Zt.)
+.br
+.HU "Classes"
+The DtComboBox widget inherits behavior and resources from the
+.IR Core ,
+.I Composite
+and
+.I XmManager
+classes.
+.P
+The class pointer is
+.BR dtComboBoxWidgetClass .
+.P
+The class name is
+.IR DtComboBoxWidget .
+.HU "New Resources"
+The following table defines a set of widget resources used by the application
+to specify data.
+The application can also set the resource values for the
+inherited classes to set attributes for this widget.
+To reference a resource by name or by class in a
+.B \&.Xdefaults
+file, the application must remove the
+.B DtN
+or
+.B DtC
+prefix and use the remaining letters.
+To specify one of the defined
+values for a resource in a
+.B \&.Xdefaults
+file, the application must remove the
+.B Dt
+prefix and use
+the remaining letters (in either lower case or upper case,
+but including any underscores between words).
+The codes in the access column indicate if the given resource can be
+set at creation time (C),
+set by using
+.Fn XtSetValues
+(S), retrieved by using
+.Fn XtGetValues
+(G), or is not applicable (N/A).
+.P
+.cde .ne 10
+.DS
+.S -1
+.TS
+.xo expand box tab(@);
+.cde expand tab(@);
+cf3 ssss
+.xo lf3 1 | lf3 1 | lf3 1 | lf3 1 | lf3
+.xo lf3 1 | lf3 1 | lf3 1 | l   1 | l .
+.cde lf3 1 lf3 1 lf3 1 lf3 1 lf3
+.cde lf3 1 lf3 1 lf3 1 l   1 l .
+DtComboBox Resource Set
+_
+Name@Class@Type@Default@Access
+_
+DtNmarginHeight@DtCMarginHeight@Dimension@2@CSG
+DtNmarginWidth@DtCMarginWidth@Dimension@2@CSG
+DtNselectedItem@DtCSelectedItem@XmString@dynamic@CSG
+DtNselectedPosition@DtCSelectedPosition@int@dynamic@CSG
+DtNselectionCallback@DtCCallback@XtCallbackList@NULL@C
+DtNcomboBoxType@DtCComboBoxType@unsigned int@DtDROP_DOWN_LIST@C
+.TE
+.S +1
+.DE
+.VL 6
+.LI "\f3DtNmarginHeight\fP"
+.br
+Specifies the number of pixels added between the top and
+bottom of the text widget and the start of the shadow.
+.LI "\f3DtNmarginWidth\fP"
+.br
+Specifies the number of pixels added between the right and
+left sides of the text widget and the start of the shadow.
+.LI "\f3DtNselectedItem\fP"
+.br
+This resource is passed through to the XmList to set the
+.B XmNselectedItemCount
+and
+.B XmNselectedItems
+as the single item
+in the
+.B XmNitems
+that matches this specified
+.B XmString
+in the List.
+Setting both
+.B DtNselectedItem
+and
+.B DtNselectedPosition
+in the
+same argument list produces undefined behavior.
+.LI "\f3DtNselectedPosition\fP"
+.br
+This resource is passed through to the XmList to set the
+.B XmNselectedItemCount
+and
+.B XmNselectedItems
+as the single item
+at this specified position in the List.
+Setting both
+.B DtNselectedItem
+and
+.B DtNselectedPosition
+in the
+same argument list produces undefined behavior.
+.LI "\f3DtNselectionCallback\fP"
+.br
+This callback list is issued when an item is selected from the DtComboBox
+widget's List.
+The
+.I call_data
+structure contains a
+.I DtComboBoxCallbackStruct
+with the reason
+.Cn DtCR_SELECT .
+.LI "\f3DtNcomboBoxType\fP"
+.br
+This resource determines the style of the DtComboBox.
+There are two choices:
+.VL 6
+.Lc DtDROP_DOWN_COMBO_BOX
+.br
+Provides an editable text area.
+.Lc DtDROP_DOWN_LIST
+.br
+Provides a static text area.
+.LE
+.LE
+.HU "Inherited Resources"
+The DtComboBox widget
+inherits behavior and resources from the following named superclasses.
+For a complete description of each resource, see the
+.cde man page
+.xo entry in \*(ZM
+for that superclass.
+.P
+.cde .ne 10
+.DS
+.S -1
+.TS
+.xo expand box tab(@);
+.cde expand tab(@);
+cf3 ssss
+.xo lf3 1 | lf3 1 | lf3 1 | lf3 1 | lf3
+.xo lf3 1 | lf3 1 | lf3 1 | l   1 | l .
+.cde lf3 1 lf3 1 lf3 1 lf3 1 lf3
+.cde lf3 1 lf3 1 lf3 1 l   1 l .
+XmManager Resource Set
+_
+Name@Class@Type@Default@Access
+_
+XmNbottom-@XmCBottom-@Pixel@dynamic@CSG
+   ShadowColor@   ShadowColor
+XmNbottom-@XmCBottom-@Pixmap@XmUNSPECIFIED-@CSG
+   ShadowPixmap@   ShadowPixmap@@   _PIXMAP
+XmNforeground@XmCForeground@Pixel@dynamic@CSG
+XmNhelpCallback@XmCCallback@XtCallbackList@NULL@C
+XmNhighlightColor@XmCHighlightColor@Pixel@dynamic@CSG
+XmNhighlightPixmap@XmCHighlightPixmap@Pixmap@dynamic@CSG
+XmNinitialFocus@XmCInitialFocus@Widget@NULL@CSG
+XmNnavigationType@XmCNavigationType@XmNavigationType@dynamic@CSG
+XmNshadowThickness@XmCShadowThickness@Dimension@dynamic@CSG
+XmNstringDirection@XmCStringDirection@XmStringDirection@dynamic@CG
+XmNtopShadowColor@XmCTopShadowColor@Pixel@dynamic@CSG
+XmNtopShadowPixmap@XmCTopShadowPixmap@Pixmap@dynamic@CSG
+XmNtraversalOn@XmCTraversalOn@Boolean@dynamic@CSG
+XmNunitType@XmCUnitType@unsigned char@dynamic@CSG
+XmNuserData@XmCUserData@XtPointer@NULL@CSG
+.TE
+.S +1
+.DE
+.P
+.cde .ne 10
+.DS
+.S -1
+.TS
+.xo expand box tab(@);
+.cde expand tab(@);
+cf3 ssss
+.xo lf3 1 | lf3 1 | lf3 1 | lf3 1 | lf3
+.xo lf3 1 | lf3 1 | lf3 1 | l   1 | l .
+.cde lf3 1 lf3 1 lf3 1 lf3 1 lf3
+.cde lf3 1 lf3 1 lf3 1 l   1 l .
+Composite Resource Set
+_
+Name@Class@Type@Default@Access
+_
+XmNchildren@XmCReadOnly@WidgetList@NULL@G
+XmNinsertPosition@XmCInsertPosition@XtOrderProc@default procedure@CSG
+XmNnumChildren@XmCReadOnly@Cardinal@0@G
+.TE
+.S +1
+.DE
+.P
+.cde .ne 10
+.DS
+.S -1
+.TS
+.xo expand box tab(@);
+.cde expand tab(@);
+cf3 ssss
+.xo lf3 1 | lf3 1 | lf3 1 | lf3 1 | lf3
+.xo lf3 1 | lf3 1 | lf3 1 | l   1 | l .
+.cde lf3 1 lf3 1 lf3 1 lf3 1 lf3
+.cde lf3 1 lf3 1 lf3 1 l   1 l .
+Core Resource Set
+_
+Name@Class@Type@Default@Access
+_
+XmNaccelerators@XmCAccelerators@XtAccelerators@dynamic@CSG
+XmNancestorSensitive@XmCSensitive@Boolean@dynamic@G
+XmNbackground@XmCBackground@Pixel@dynamic@CSG
+XmNbackgroundPixmap@XmCPixmap@Pixmap@XmUNSPECIFIED-@CSG
+@@@   _PIXMAP
+XmNborderColor@XmCBorderColor@Pixel@XtDefaultForeground@CSG
+XmNborderPixmap@XmCPixmap@Pixmap@XmUNSPECIFIED-@CSG
+@@@   _PIXMAP
+XmNborderWidth@XmCBorderWidth@Dimension@0@CSG
+XmNcolormap@XmCColormap@Colormap@dynamic@CG
+XmNdepth@XmCDepth@int@dynamic@CG
+XmNdestroyCallback@XmCCallback@XtCallbackList@NULL@C
+XmNheight@XmCHeight@Dimension@dynamic@CSG
+XmNinitial-@XmCInitial-@Boolean@True@C
+   ResourcesPersistent@   ResourcesPersistent
+XmNmappedWhen-@XmCMappedWhen-@Boolean@True@CSG
+   Managed@   Managed
+XmNscreen@XmCScreen@Screen *@dynamic@CG
+XmNsensitive@XmCSensitive@Boolean@True@CSG
+XmNtranslations@XmCTranslations@XtTranslations@dynamic@CSG
+XmNwidth@XmCWidth@Dimension@dynamic@CSG
+XmNx@XmCPosition@Position@0@CSG
+XmNy@XmCPosition@Position@0@CSG
+.TE
+.S +1
+.DE
+.HU "Callback Information"
+A pointer to the following structure is passed to each DtComboBox callback:
+.Cs I
+typedef struct {
+	int	 	\f2reason\fP;
+	XEvent		*\f2event\fP;
+	XmString	\f2item_or_text\fP;
+	int		\f2item_position\fP;
+} DtComboBoxCallbackStruct;
+.Ce
+.P
+The
+.I reason
+argument indicates why the callback was invoked; it is always
+.Cn DtCR_SELECT .
+.P
+The
+.I event
+argument points to the
+.B XEvent
+that triggered the callback, or
+.Cn NULL
+if the callback was not triggered by an
+.BR XEvent .
+.P
+The
+.I item_or_text
+argument is
+the contents of the Text widget at the time the event caused the
+callback to be invoked.
+This data is only valid within the scope of the
+.I call_data
+structure, so the application
+must copy it when it is used outside of this scope.
+.P
+The
+.I item_position
+argument is the new value of the
+.B DtNselectedPosition
+resource in the DtComboBox's List.
+If this is zero, it means the user entered a value in the XmTextField widget.
+.SH "SEE ALSO"
+.Fn DtComboBoxAddItem 3X,
+.Fn DtComboBoxDeletePos 3X,
+.Fn DtComboBoxSelectItem 3X,
+.Fn DtComboBoxSetItem 3X,
+.cdes
+.Fn DtCreateComboBox 3X,
+.IR Composite (3X),
+.IR Constraint (3X),
+.IR Core (3X),
+.IR XmList (3X),
+.IR XmManager (3X),
+.IR XmText (3X),
+.IR XmTextField (3X),
+.Fn XtGetValues 3X,
+.Fn XtSetValues 3X.
+.cdee
+.xos
+.Fn DtCreateComboBox 3X;
+.IR Composite ,
+.IR Constraint ,
+.IR Core ,
+.IR XmList ,
+.IR XmManager ,
+.IR XmText ,
+.IR XmTextField
+in the \*(ZM;
+.Fn XtGetValues ,
+.Fn XtSetValues
+in the \*(Zt.
+.xoe

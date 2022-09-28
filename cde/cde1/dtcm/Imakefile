@@ -1,0 +1,41 @@
+XCOMM
+XCOMM  Imakefile ($TOP/cdesrc/cde1/dtcm)
+XCOMM
+XCOMM  @(#)Imakefile 1.16 97/01/16 Copyr 1993 Sun Microsystems, Inc.
+XCOMM
+XCOMM  $Revision: 1.1 $
+XCOMM
+XCOMM  RESTRICTED CONFIDENTIAL INFORMATION:
+XCOMM
+XCOMM  The information in this document is subject to special
+XCOMM  restrictions in a confidential disclosure agreement between
+XCOMM  HP, IBM, Sun, USL, SCO and Univel.  Do not distribute this
+XCOMM  document outside HP, IBM, Sun, USL, SCO, or Univel without
+XCOMM  Sun's specific written approval.  This document and all copies
+XCOMM  and derivative works thereof must be returned or destroyed at
+XCOMM  Sun's request.
+XCOMM
+XCOMM  Copyright 1993 Sun Microsystems, Inc.  All rights reserved.
+XCOMM
+
+#ifdef SunArchitecture
+.NO_PARALLEL:
+#endif /* SunArchitecture */
+
+#define IHaveSubdirs
+#define PassCDebugFlags 'CDEBUGFLAGS=$(CDEBUGFLAGS)'
+
+SUBDIRS = libcsa libDtCmP dtcm server admin
+
+LINTSUBDIRS = libcsa libDtCmP dtcm server admin
+
+MakeSubdirs($(SUBDIRS))
+
+#ifndef SunArchitecture
+DependSubdirs($(SUBDIRS))
+LintSubdirs($(LINTSUBDIRS))
+#else
+depend:
+lint:
+#endif  /* SunArchitecture */
+

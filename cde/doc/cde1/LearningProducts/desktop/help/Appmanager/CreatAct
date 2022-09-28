@@ -1,0 +1,622 @@
+<chapter id=CreateActionOverview>Create Action Help
+
+
+Create Action is a utility for creating:
+
+<list bullet>
+* An action to start an application
+* A data type for an application's data files
+* Actions for opening and printing the application's data files
+<\list>
+
+Create Action is also useful for creating simple actions for shell scripts.
+
+
+<procedure>To Run Create Action
+
+<list bullet>
+* Open the DesktopTools application group in the Application Manager and double-click
+CreateAction.
+<\list>
+
+
+<procedure>Create Action Help Topics
+
+<list bullet>
+* Stepwise instructions:
+	<list bullet tight>
+	* <xref ToCreateAction>
+	* <xref ToCreateDatatype>
+	* <xref ToEditAction>
+	* <xref ToEditDatatype>
+        * <xref ToSpecifyIcon>
+	<\list>
+
+* Functionality of Create Action:
+	<list bullet tight>
+	* <xref WhatCreateActionDoes>
+	* <xref CreateActionFunctionality> 
+	<\list>
+
+* Description of the Create Action window and dialog boxes:
+  <xref CreateActionWindows>
+
+<\list>
+
+
+<s1 id=WhatCreateActionDoes>Files Created by Create Action
+
+ The output from Create Action is:
+
+<list bullet>
+* An action definition that runs a command. A file  
+  ``%%HomeDirectory%%/.dt/types/%%action_name%%.dt'' is created containing the 
+ definition.
+
+* An action icon for the action. The action icon is placed in your home 
+ directory. The icon runs the action command when it is double-clicked. 
+ Optionally, you can make the action icon a drop zone by specifying 
+ droppable data types.
+
+* If you use the advanced functions of Create Action, it may also create:
+<list bullet tight>
+* One or more data types for the application's data files.
+* Open and Print actions for the data type
+<\list>
+
+The data type(s) and Open and Print Actions are also written to the file 
+HomeDirectory/.dt/types/action_name.dt.
+<\list>
+
+
+<s1 id=ToCreateAction>To Create an Action With Create Action
+
+
+<list order>
+* Open the Application Manager and double-click CreateAction in the 
+  DesktopTools application group.  This displays the main Create Action 
+  window.
+
+* In the Action Name text field, type the name that will label the action's icon. 
+
+The action name can include any characters except spaces.
+
+* Use the Action Icons controls to specify the icon for the application. Initially, 
+  the default icon is shown. 
+
+  <list bullet tight>
+  * To choose a different existing icon, choose Find Set to open the Find Set dialog box.
+
+  * To create new icons, choose Edit Icon to run the Icon Editor.
+  <\list>
+
+  For more information, see <xref ToSpecifyIcon>.
+
+* In the "Command When Action Icon is Opened" text field, type the 
+  command to start the application. Use the syntax ``$%%n%%'' for a file
+  argument.  For example:
+
+<ex>
+emacs
+bitmap $1
+diff $1 $2
+lp -oraw $1
+<\ex>
+
+If the command line includes a file argument (``$%%n%%''), then the action
+icon will be a drop zone for files. 
+
+The command lines are not passed to a shell unless you explicitly specify 
+the use of a shell. For example, these lines use shell processing:
+
+<ex>
+/bin/sh -c `ps | lp'
+/bin/sh -c `spell $1 | more'
+<\ex>
+
+* In the "Help Text for Action Icon" text field, type the help information to be 
+ displayed when the user gets on-item help on the action icon.
+ 
+  The text will automatically wrap in the text field.  However, these line 
+  breaks are not preserved online. If you want to specify a "hard" line break, 
+  use ``<esc>\<\esc>n''.
+
+* Use the Window Type controls to choose the kind of windowing support 
+  required
+
+<lablist nowrap>
+\Graphical (X-Window\The application creates its own window
+
+\Terminal (Auto-Close)\The application will be run in a terminal window tha 
+closes automatically when the user exits the 
+application.
+
+\Terminal (Manual Close)\The application will be run in a terminal window that 
+remains open until the user explicitly closes it.
+
+\No Output\The application does not produce output to the display.
+
+<\lablist>
+* Proceed as follows:
+
+   <list bullet>
+   *If your application has data files, and you want to create one or more 
+     data types for them, see <xref ToCreateDatatype>.
+
+   * If you do not need to create a data type:
+
+	<list order>
+	* Save the action by choosing the menu command File&bigrightarrow;Save.
+	* Test the new action by double-clicking its icon in your home directory.
+	<\list>
+
+   <\list>
+<\list>
+	
+
+
+<s1 id=ToCreateDatatype>To Create a Data Type With Create Action
+
+<list order>
+
+* Define the action for the application. See steps 1 through 6 of the 
+  topic <xref ToCreateAction>.
+
+* Choose the menu command Options&bigrightarrow;Show Advanced Functions to 
+ expand the Create Action Main window.
+
+
+* If you want the application icon to prompt for a file argument when the icon 
+ is double-clicked, type the text of the prompt into the "When Action Opens, 
+ Ask Users for" text field.
+
+   <list bullet>
+  * You must use this field if the application's command line has a required file 
+     argument. 
+
+  * You must leave this field blank if the command line does not have a
+    file argument.
+ 
+   * If the file argument in the application's command line is optional, you have 
+     a choice.
+     If you supply the prompt text, the action icon will prompt for the file 
+          when double-clicked. 
+	 If you do not supply the prompt text, the action will be executed with a 
+          null string as the file argument.  
+  <\list>
+
+* Specify the types of files that the action will accept as arguments:
+	<list bullet>
+	* If the action can accept any data type, choose All Datatypes.
+	* If the action can accept only the data type(s) you create for the application, 
+          choose Only Above List.
+	<\list>
+
+ Initially, the Datatypes List is empty. As you create data types for the 
+ application, they are added to the list.
+
+* Choose Add beside the Datatypes list box to display the Add Datatype 
+dialog box.
+
+* Optional: If you don't want to use the default data type name, type a new 
+name for the new data type into the "Name of Datatype" text field. The name 
+cannot include spaces. 
+
+* Choose the Edit button beside the Identifying Characteristics box to display 
+  the Identifying Characteristics dialog box. Use the dialog box to set the
+  characteristics  used to differentiate the data type 
+  from others. You can choose one criteria (for example, Name Pattern) or
+  combine criteria (for example, both Name and Permission Patterns).
+
+<list order>
+
+* If the data type depends on the name, select the toggle button beside the 
+ Name Pattern text field and fill in the text field.
+ You can use ``*'' and ``?'' as wildcards:
+
+<lablist tight>
+\*\Matches any sequence of characters.
+\?\Matches any single character
+<\lablist>
+
+* If the data type depends on the permissions, select the toggle button 
+beisde the Permission Pattern box and select the permissions required for 
+the data type:
+
+<lablist tight>
+\On\The file must have the specified permission
+\Off\The file must lack the specified permission
+\Either\(Default) The permission does not matter
+<\lablist>
+
+* If the data type depends on the contents, select the toggle button beside 
+the Contents box and supply the requested information-Pattern to search 
+for and Type of contents. Optionally, you can supply the byte location where 
+the search should start.
+
+<\list>
+
+
+* Choose OK to close the File Characterstics dialog box. The characteristics 
+will be displayed in the Identifying Characteristic's box.
+
+The Permissions information in the Identifying Characteristics box uses this 
+coding:
+
+<lablist tight>
+\d\Directory
+\r\Read permission
+\w\Write permission
+\x\Executable
+\!\NOT
+\&&\AND
+<\lablist>
+
+
+* Type the help text for the data files into the Help Text text field
+
+* Use the Datatype Icons controls to specfy the icon for the application
+
+Initially, the default icons are shown.
+
+  <list bullet tight>
+  * To choose a different existing icon, choose Find Set to open the Find Set dialog box.
+
+  * To create new icons choose Edit Icon to run the Icon Editor.
+  <\list>
+
+  For more information, see <xref ToSpecifyIcon>.
+
+* Optional: If the application supplies a print command for printing data files from the 
+command line, type the command into the Print Command text field, using 
+the syntax ``$%%n%%'' for a file argument.
+
+* Choose OK to close the Create Datatype dialog box and add the data type
+  to the data types list in the Create Action window.
+
+<\list>
+
+<s1 id=ToSpecifyIcon>To Change the Icon for an Action or Data Type
+
+<procedure>Choosing an Existing Icon
+
+<list order>
+
+
+* Choose Find Set in the Create Action or Edit Datatype window.
+  This displays the Find Set dialog box.  
+
+* In the Directories list, double-click the directory containing
+  the icon.
+
+ The Directories list contains all the directories on the system's 
+  icon search path.
+
+* In the Icon Files list, select (click) the icon you want to use. You do
+  not have to worry about the size or style (bitmap versus pixmap).
+
+* Choose OK.
+<\list>
+
+<procedure>Creating a New Icon
+<list order>
+* Choose Edit Icon in the Create Action or Edit Datatype window.
+  This runs Icon Editor.
+* Use Icon Editor to drawe a new icon. See
+   <link hyperlink="Iconed Tasks" Jump>Icon Editor Tasks<\link>.
+* Choose the menu command File &bigrightarrow; Save to save the icon file.
+	<list bullet tight>
+	* For personal icons, save the file to the ``/%%HomeDirectory%%/.dt/icons''
+	   directory.
+	* For system-wide icons, save the file to a directory to which you
+           have write permission. You can then log in as super-user to move
+           the file to the system-wide location ``/etc/dt/appconfig/icons/%%language%%''.
+	<\list>
+<\list>
+
+
+<procedure>Icon Sizes and Names
+<lablist tight>
+<labheads>\Size (Pixels)\Name
+\32 by 32\``!!name!!.m.pm'' or ``!!name!!.m.bm'' 
+\16 by 16\``!!name!!.s.pm'' or ``!!name!!.s.bm'' 
+<\lablist>
+
+<procedure>The Icon Search Path
+
+The action and data type definitions created using Create Action write 
+out the base name for the icon files and does not include the entire path.
+The icon files created with Create Action must be placed in 
+directories on the icon search path.
+
+<list bullet tight>
+* Built-in: ``/usr/dt/appconfig/icons/!!language!! (default language is ``C'')
+* System-wide: ``/etc/dt/appconfig/icons/!!language!! (default language is ``C'')
+* Personal: ``/%%HomeDirectory%%/.dt/icons''
+<\list>
+
+
+<s1 id=ToEditAction>To Edit an Existing Action
+
+You can use Create Action to edit an existing action if:
+<list bullet>
+* The action was created with Create Action.
+* !!And!!, the action has not been edited manually since it was created.
+<\list>
+
+<list order>
+* Open the Create Action window by opening the DesktopTools application
+group and double-clicking CreateAction.
+* Choose the menu command File &bigrightarrow; Open.
+* Use the Open File dialog box to specify the action to be edited.
+<\list>
+
+
+
+<s1 id=ToEditDatatype>To Edit an Existing Data Type
+
+You can use Create Action to edit an existing data type if:
+<list bullet>
+* The data type was created with Create Action.
+* !!And!!, the data type has not been edited manually since it was created.
+<\list>
+
+
+<list order>
+* Open the Create Action window by opening the DesktopTools application
+group and double-clicking CreateAction.
+* Open the action associated with the data type:
+	<list order tight>
+	* Choose the menu command File &bigrightarrow; Open.
+	* Use the Open File dialog box to specify the action.
+	<\list>
+* In the "Datatypes That Use This Action" list, select the data type to be
+edited.
+
+* Choose Edit to open the Edit Datatype window.
+
+* Make changes in the Edit Datatype window. When you are done, choose OK.
+<\list>
+
+
+
+
+<s1 id=CreateActionWindows>The Create Action Windows
+
+<list bullet>
+* <xref CreateActionMainWindow>
+* <xref AddDatatypeWindow>
+* <xref DatatypeCriteriaWindow>
+* <xref FindIconSetDialog>
+<\list>
+
+
+<s2 id=CreateActionMainWindow>The Create Action Main Window
+
+For task information, see <xref ToCreateAction>.
+
+<lablist nowrap>
+
+\Action Name\Type the name of the action. The name is case sensitive and
+cannot include spaces.
+
+\Action Icons\Displays the icon image that will be used by the action icon.
+
+\Find Set\Displays the Find Set dialog box. Use the Find Set dialog box to
+select a different, existing bitmap or pixmap file.
+
+\Edit Icon\Opens the Icon Editor. Use Icon Editor to create a new
+icon or edit an existing one.
+
+\Command When Action Icon is Double-clicked\Type the command. Use the
+syntax ``$''%%n%% for a file argument.
+
+\Help Text for Action Icon\Type the text of the on-item help for the action
+icon. 
+
+\Window Type\Select the type of window the action will create:
+
+<list bullet tight>
+* Graphical: The application displays its own window
+* Terminal (Auto-Close): The action displays a terminal window that closes
+when the action completes
+* Terminal (Manual Close): The action displays a terminal window that the
+user must manually close
+* No Ouptput: The application requires no window  
+<\list>
+<\lablist>
+
+<procedure>Advanced Functions
+
+Use the advanced features only if the "Command When Action icon Is
+Double-clicked" includes a file argument.
+
+<lablist nowrap>
+
+\When Action Opens, Ask Users for\Type the file prompt displays when the
+action icon is double-clicked.
+
+\Datatypes That Use This Action\A list of the data types created for this action.
+
+\Add\Opens the Add Dattype window for creating a new data type.
+
+\Delete\Deletes the selected data type from the "Data Types That Use This
+Action" list.
+
+\Edit\Choose to edit the data types selected in the "Data Types That Use This
+Action" list. 
+
+\Droppable Datatypes\Select whether the action icon will accept any type
+data file, or only files of data types in the "Data Types That Use This
+Action" list. 
+
+<\lablist>
+
+<s2 id=AddDatatypeWindow>The Add Data Type Dialog Box
+
+For task information, see <xref ToCreateDatatype>.
+
+<lablist nowrap>
+
+\Name of Datatype Family\A name is supplied automatically. You can edit the
+text field. The name is case sensitive and cannot include spaces.
+
+\Identifying Characteristics\A list of the criteria for typing the file.
+Use Edit to set and change characteristics.
+
+\Edit\Displays the Identifying Characteristics dialog box. 
+
+\Help Text for this Datatype Icon\Type the text of the on-item help for
+files of this data type.
+
+\Datatype Icons\Displays the icon image that will be used by the data type.
+
+\Find Set\Displays the Find Set dialog box. Use the Find Set dialog box to
+select a different, existing bitmap or pixmap file.
+
+\Edit Icon\Opens the Icon Editor. Use Icon Editor to create a new
+icon or edit an existing one.
+
+\Command to Open this Datatype\Displays the command that is executed when
+the user double-clicks the data type. This is the same command shown in
+"Command When Action Icon is Double-clicked."
+
+\Command to Print this Datatype\Type the command line supplied by the
+application to print the data type.
+
+\OK\Creates the data type information, adds the data type to the "Datatypes
+That Use This Action" list, and closes the dialog box.
+
+\Apply\Creates the data type information and adds the data type to the "Datatypes
+That Use This Action" list. The dialog box remains open.
+
+\Cancel\Closes the Add Datatype dialog box without creating a data type.
+
+\Help\Displays online help.
+
+
+
+<\lablist>
+
+
+<s2 id=DatatypeCriteriaWindow>The Identify Characteristics Dialog Box
+
+For task information, see <xref ToCreateDatatype>.
+
+<lablist nowrap>
+\Include All\
+	<list bullet tight>
+	* Files: Select if the data type applies only to files
+	* Directories: Select if the data type applies only to directories
+	<\list>
+
+\Name Pattern\Select the check box and type the name pattern. You can use
+these special characters:
+	<list bullet tight>
+	* ``*'': Matches any sequence of characters
+	* ``?'': Matches any single character
+	<\list>
+
+\Permission Pattern\Select the check box, and then select the radio buttons
+that apply. Select "Either" if the permission doesn't matter.
+
+\Contents\Select the check box and type the data the file must contain.
+
+\Type\Select the type of data. Use "String" to text (ascii) data.
+
+\Start byte\Type the location in the file to start searching for the data.
+Use ``1'' to start at the beginning of the file.
+
+\OK\Writes out the characteristics to "Identifying Characteristics" in the
+Add Datatype window and closes the Identifying Characteristics window.
+
+\Cancel\Closes the window without writing out the changes.
+
+\Clear\Clears the settings to the default.
+
+\Help\Displays online help.
+
+<\lablist>
+
+
+<s2 id=FindIconSetDialog>The Find Set Dialog Box
+
+For task information, see <xref ToSpecifyIcon>.
+
+<lablist>
+\Directories\Lists the directories on the icon search path. Double-click a
+directory to see the icons it contains.
+
+\Icon Files\Lists the icons in the directory. Click an icon file to select
+it. It's path is displayed in the Selected Icon File text field.
+
+\Selected Icon File\Displays the path to the currently-selected icon file.
+You can edit the field to supply a different path.
+
+\OK\Makes the icon displayed in Selected Icon File the designated icon and
+closes the Find Set dialog box.
+
+\Cancel\Closes the window without changing the icon.
+
+\Help\Displays online help.
+
+<\lablist>
+
+
+
+
+
+
+
+
+<s1 CreateActionFunctionality>Limitations of Create Action
+
+
+<procedure>Action Limitations
+You cannot use Create Action to create the action for an application if: 
+
+<list bullet>
+
+* The command line requires a non-file parameter. For example, you cannot 
+use Create Action to write an action for the command: 
+
+<ex>lp -d%%device%% %%filename%%<\ex>
+
+where the user has to supply device each time the command is executed. 
+(You can manually create an action that does this.) 
+
+* You want the user to see a different label on the action icon than the action 
+  name. For example, you cannot use Create Action to provide a local-
+  language version of an existing action.
+
+* The action requires some of the advanced features of the action database,
+such as actions that:
+<list bullet tight>
+	* Launch commands on systems remote from the action definition.
+	* Invoke other actions.
+	* Must be run as a different user (for example, as superuser).
+	* Make extensive use of the "map" feature. 
+	*Have very different behaviors, depending on the number of file 
+          arguments supplied to the action.  
+	<\list>
+
+<\list>
+
+<procedure>Data Type Limitations
+
+ You cannot use Create Action to create the data type for an application if:
+
+<list bullet>
+* The data type must have additional actions associated with it other than 
+  Open and Print.
+* The Open action for the data type is not the action's command. For example, 
+  you cannot use Create Action to create the data type that provides a unique 
+  icon for the directory representing the application's application group.
+<\list>
+
+
+
+
+
+
+

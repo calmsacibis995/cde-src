@@ -1,0 +1,132 @@
+#!/bin/sh
+#
+############################################################################
+# Construct shared-library export lists for IBM-AIX based on standardized CDE
+# export list description file
+#
+# Usage: elistgen libfoo.sl libfoo.elist > libfoo.lopt
+#
+#	libfoo.a    => IBM shared library of interest
+#	libfoo.elist => Meta description of necessary export list.
+#
+#    The output file, "libfoo.lopt" may then be passed to the IBM linker to 
+#    reconstruct the shared library, libfoo.sl.
+#
+# Author: Yanling Qi 10/03/94, Last updated 10/03/94
+#    Copyright 1994, IBM
+#
+############################################################################
+#
+# Utility programs
+FILTER=/usr/lpp/xlC/bin/c++filt		# C++ symbol demangler
+AWK=awk				# Awk
+
+# Temporary files
+EXPORTSYMS=/tmp/elistgen1.$$	# list of export symbols from "libfoo.list"
+NMLIST=/tmp/elistgen2.$$	# name list from libfoo.sl
+FILTLIST=/tmp/elistgen3.$$	# demangled (C++) version of above
+
+# Print useful information
+echo "*/*" `date` "*/"
+echo "*/* This linker options list was produced by" $0   "*/"
+echo "*/* Input Export-list description taken from file" $2 "*/"
+echo "*/* Target library:" $1   "*/"
+echo "*/* Target Operating System: " `uname`   "*/"
+echo "*/*"
+
+# Extract the globally visible symbols from target library
+#/usr/ucb/nm -p  $1 | $AWK  '/ [tTdD] /  {print $3}' > $NMLIST
+dump -g  $1 | $AWK  '$1 ~ /[0-9][0-9]/ && $2 !~ /^[\.]/ {print $2}' > $NMLIST
+
+# Demangle the global library symbols
+$FILTER $NMLIST > $FILTLIST
+
+#
+# Translate export-list description file into a simple list of export symbols
+# Note that C++ symbols may have embedded spaces in them.
+#
+$AWK '
+    BEGIN           {
+	csyms     = 0;		# C   language symbols in libfoo.list
+	cplusplus = 0;		# C++ language symbols in libfoo.list
+	count     = 0;		# Running count of symbols
+    }
+    $1 == "public"  || $1 == "private" {
+	csyms ++;
+	symbol[count++] = $2;
+	next;
+    }
+    $1 == "publicC++"  || $1 == "privateC++"{
+	cplusplus ++;
+	string = $2;
+	for (n=3; n <=NF; n++) {
+	    string = string " " $n;
+	    #string = string  $n;
+	}
+	symbol[count++] = string;
+	next;
+    }
+    $1 == "internal"  || $1 == "internalC++" {
+	# Ignore internal symbols
+    }
+    END  {
+	printf("# Found %d C symbols and %d C++ symbols\n",
+			    csyms,cplusplus) | "cat 1>&2";
+ 	for (i in symbol)
+ 	    print symbol[i];
+    }
+' $2 > $EXPORTSYMS
+
+#
+# Read in the above files into the final awk script and write result to stdout
+# The delimiter ";" is used to identify the entries in the symbol lookup table.
+#
+(pr -m -s";" -t -w1024 $NMLIST $FILTLIST| expand -1;cat $EXPORTSYMS ) | $AWK '
+    BEGIN   {
+    	FS = ";";
+    }
+    NF == 2 {	# This is "pr" output, i.e., symbol translation table
+        r2=$2                  #make space unsignificant because
+	gsub(/ /,"",r2);       #the aix c++ demangler c++filt puts
+	syms[r2] = $1;         #uncertain number of space between
+	r1=$1;                 #data type and argument
+	gsub(/ /,"",r1);
+	sy_nd[r1]="yes";    #since the demangler c++filt  of AIX could demangle
+                             # all c++ mangling but the elist sometime gives
+	                     # a mangling instead of prototype, the mangling
+	                     # needs also be stored.
+  #print "#",  $1, " ", $2 # | "cat 1>&2";
+  #print "#QI YANLING", $1 , " ", sy_nd[$1] # | "cat 1>&2";
+	next;
+    }
+    NF == 1 {   # This is a symbol to be mangled, by symbol lookup table, if
+		# necessary
+	r3=$1
+	gsub(/ /,"",r3);
+	ret=gsub(/\(void\)/,"()",r3); #change (void) to () because c++filt
+				      # translating to () instead of (void)
+	#if(ret)
+	 # print $1, r3 |"cat 1>&2";
+	if ((length(syms[r3]) > 0) || (length(sy_nd[r3]) > 0)) {
+	    if (donelist[r3]) {
+		print "# Warning: Duplicate entry for ", $1, " in Export list";
+	    }
+	    else {
+	#	print "SYMS[r3]=", syms[r3], "SY_ND[r3]=", sy_nd[r3], "Symbol is =", $1| "cat 1>&2";
+		print  syms[r3];
+		donelist[r3] = 1;
+	    }
+	}
+	else { 
+	  print "# Warning: Symbol for", $1,
+		 "was not in the nm list for this library" | "cat 1>&2";
+	  #print  $1;
+	}
+	next;
+    }
+'
+
+# Clean up temporary files
+rm $EXPORTSYMS
+rm $NMLIST
+rm $FILTLIST

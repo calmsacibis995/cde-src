@@ -1,0 +1,88 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Novell, Inc
+...\" **
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH XmTextGetSubstring 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmTextGetSubstring\fP \- A Text function that retrieves a copy
+of a portion of the internal text buffer
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/Text.h>
+.sp \n(PDu
+int XmTextGetSubstring (\fBwidget, start, num_chars, buffer_size, buffer\fI)
+.ta .5i 1.7i
+.nf
+	Widget		\fBwidget\fI;
+	XmTextPosition	\fBstart\fI;
+	int		\fBnum_chars\fI;
+	int		\fBbuffer_size\fI;
+	char		*\fBbuffer\fI;
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+\fIXmTextGetSubstring\fP retrieves a copy of a portion of the internal
+text buffer of a Text widget.  The function
+copies a specified number of characters from a given start position
+in the internal text buffer into a buffer provided by the 
+application.  A NULL terminator is placed at the end of the copied data.
+.PP
+The size of the required buffer depends on the maximum number of bytes
+per character (\fIMB_CUR_MAX\fP) for the current locale.
+\fIMB_CUR_MAX\fP is a macro defined in \fIstdlib.h\fP.  The buffer
+should be large enough to contain the substring to be copied and
+a NULL terminator.  Use the following equation to calculate the
+size of buffer the application should provide:
+.PP 
+\fBbuffer_size\fP = (\fBnum_chars\fP * \fIMB_CUR_MAX\fP) + 1
+.IP "\fBwidget\fP"
+Specifies the Text widget ID.
+.IP "\fBstart\fP"
+Specifies the beginning character position from which the data will be
+retrieved.  This is an integer number of characters from the beginning
+of the text buffer.  The first character position is 0.
+.IP "\fBnum_chars\fP"
+Specifies the number of characters to be copied into the provided buffer.
+.IP "\fBbuffer_size\fP"
+Specifies the size of the supplied buffer in bytes.  This size
+should account for a NULL terminator.
+.IP "\fBbuffer\fP"
+Specifies the character buffer into which the internal
+text buffer will be copied. 
+.PP
+For a complete definition of Text and its associated resources,
+see \fIXmText(3X)\fP.
+.SH RETURN VALUE
+.IP "\fIXmCOPY_SUCCEEDED\fP"
+The function was successful.
+.IP "\fIXmCOPY_FAILED\fP"
+The function failed because it was unable to copy the 
+specified number of characters into the buffer provided.
+The buffer size may be insufficient.  The contents of
+\fBbuffer\fP are undefined.
+.IP "\fIXmCOPY_TRUNCATED\fP"
+The requested number of characters extended beyond the internal
+buffer.  The function copied characters between \fBstart\fP and the
+end of the widget's buffer and terminated the string with a NULL
+terminator; fewer than \fBnum_chars\fP characters were copied.
+.SH RELATED INFORMATION
+.na
+\fIXmText(3X)\fP and \fIXmTextGetSubstringWcs(3X)\fP.
+.ad

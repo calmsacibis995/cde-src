@@ -1,0 +1,60 @@
+# %%  (c) Copyright 1993, 1994 Hewlett-Packard Company			
+# %%  (c) Copyright 1993, 1994 International Business Machines Corp.	
+# %%  (c) Copyright 1993, 1994 Sun Microsystems, Inc.			
+# %%  (c) Copyright 1993, 1994 Novell, Inc. 				
+# %%  $Revision: $ 			 				
+#
+# @(#)SunMakefile	1.14 @(#)
+#
+ 
+#
+# The ToolTalk server-library makefile
+#
+# This directory contains routines that are not needed in the
+# ToolTalk client library, yet are shared among multiple
+# ToolTalk binaries (ttsession, tt_type_comp, ttdbck)
+#
+# Copyright (c) 1992 by Sun Microsystems, Inc.
+#
+
+TT_DIR = ..
+THIS_DIR = slib
+
+include $(TT_DIR)/SunMakefile-head.mk
+
+# alone among ToolTalk components, isam does not need headers from
+# $(TT_LIB)/lib.
+
+CPPFLAGS = 
+
+all::	Proto-g
+
+Proto-%::	$(PROTO_DIR)/lib/libisam.a
+
+Clean::
+	$(RM) -fr libisam.a
+
+$(PROTO_DIR)/lib/libisam.a: libisam.a
+		$(TTINSTALL) $(PROTO_DIR)/lib $(@F)
+
+LIBISAM_CONTENTS= \
+isaddindex.o isamaddindex.o isopen.o isamopen.o isdelcurr.o \
+isdelrec.o isamdelrec.o isbuild.o isvars.o isrewrec.o iserase.o iscntl.o \
+isstart.o isaddprimary.o isrewcurr.o isclose.o isread.o iswrite.o \
+isamwrite.o issync.o isapplmr.o ismngfcb.o issort.o ischange1key.o isfab.o \
+isdiskbufs2.o isfd.o isbtree.o isdel1key.o isfcb.o isfixrec.o issignals.o \
+isapplmw.o isfcbwatchfd.o isamhooks.o isfcbindex.o isalloc.o isbytearray.o \
+isdatconv.o isminmax.o isfname.o isvarrec.o isperm.o iserror.o iskeycmp.o \
+iskeycalc.o iskeyvalid.o isamerror.o iskeyaux.o isfileio.o \
+ispageio.o isdlink.o isbtree2.o isbtree3.o isindfreel.o isindexconv.o \
+isbsearch.o isadd1key.o iskeyconv.o isversion.o isrepair.o iswrrec.o \
+isrename.o isindexinfo.o isgarbage.o iscurpos.o
+
+OBJECTS	=	$(LIBISAM_CONTENTS:%=$(DERIVED)/%)
+
+libisam.a:	$$(DERIVED) $$(OBJECTS)
+	rm -fr $@;$(AR) qc $@ $(OBJECTS); $(RANLIB) $@
+
+%/isversion.o	:=	CPPFLAGS += $(CPPFLAGS-version)
+
+include $(TT_DIR)/SunMakefile-tail.mk

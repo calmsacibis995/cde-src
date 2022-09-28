@@ -1,0 +1,11 @@
+/cleaning/p
+/including/p
+/depending/p
+/making/p
+/installing/p
+/make:/p
+/ld:/p
+/cp:/p
+/mv:/p
+/rm:/p
+/[Ee][Rr][Rr][Oo][Rr][^._-]/p

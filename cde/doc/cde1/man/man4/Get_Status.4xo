@@ -1,0 +1,88 @@
+.TH Get_Status 4 "13 May 1994"
+.SH NAME
+Get_Status request \- retrieve a tool's current status
+.SH SYNOPSIS
+.yS
+.ta \w@Get_Status(@u
+Get_Status(out string \f2status\fP,
+	out string \f2vendor\fP,
+	out string \f2toolName\fP,
+	out string \f2toolVersion\fP
+	[in messageID \f2operation2Query\fP]);
+.yE
+.SH DESCRIPTION
+The
+.I Get_Status
+request
+retrieves the current status of a tool (or,
+optionally, of a specific operation being performed by a tool).
+.P
+The
+.I status
+argument
+is the status retrieved.
+.P
+The
+.I vendor
+argument
+is the name of the vendor of the handling tool.
+.P
+The
+.I toolName
+argument
+is the name of the handling tool.
+.P
+The
+.I toolVersion
+argument
+is the version of the handling tool.
+.SH OPTIONAL ARGUMENTS
+.P
+The
+.I operation2Query
+argument
+is the ID of the request that initiated the operation the
+status of which is being requested.
+.SH "APPLICATION USAGE"
+The
+.Fn ttdt_session_join 3,
+and
+.Fn ttdt_message_accept 3,
+functions can be used to register for, and
+help process, the
+.I Get_Status
+request.
+.SH EXAMPLES
+After sending a
+.Cn TT_REQUEST
+and storing its handle in
+.B Tt_message
+.IR request_I_sent ,
+if the handler identifies itself with a
+.I Status
+notice
+saved in
+.B Tt_message
+.IR status_msg_from_handler ,
+then the status of
+.I request_I_sent
+can be queried as in the following example:
+.Cs I
+Tt_message msg = tttk_message_create(0, TT_REQUEST, TT_SESSION,
+		tt_message_sender(status_msg_from_handler),
+		TTDT_GET_STATUS, my_callback);
+tt_message_arg_add(msg, TT_OUT, Tttk_string, 0);
+tt_message_arg_add(msg, TT_OUT, Tttk_string, 0);
+tt_message_arg_add(msg, TT_OUT, Tttk_string, 0);
+tt_message_arg_add(msg, TT_OUT, Tttk_string, 0);
+tt_message_arg_add(msg, TT_IN, Tttk_string,
+			tt_message_id(request_I_sent));
+tt_message_send(msg);
+.Ce
+.SH "SEE ALSO"
+.Fn tt_message_arg_add 3,
+.Fn tt_message_id 3,
+.Fn tt_message_send 3,
+.Fn ttdt_message_accept 3,
+.Fn tt_message_sender 3,
+.Fn ttdt_session_join 3.

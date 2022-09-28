@@ -1,0 +1,135 @@
+.TH ttdt_file_event 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+ttdt_file_event \- use ToolTalk to announce an event about a file
+.SH SYNOPSIS
+.yS
+#include <Tt/tttk.h>
+.sp 0.5v
+.ta \w'Tt_status ttdt_file_event('u
+Tt_status ttdt_file_event(Tt_message \f2context\fP,
+	Tttk_op \f2event\fP,
+	Tt_pattern *\f2patterns\fP,
+	int \f2send\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn ttdt_file_event
+function
+is used to create and send a ToolTalk notice announcing an event
+pertaining to a file.
+The file is indicated by the
+.I pathname
+argument that was passed to
+.Fn ttdt_file_join 3
+when
+.I patterns
+was created.
+.P
+The
+.I event
+argument identifies the event.
+If
+.I event
+is
+.Cn TTDT_MODIFIED ,
+.Fn ttdt_file_event
+registers in the
+.I the_scope
+argument passed to
+.Fn ttdt_file_join 3
+to handle
+.IR Get_Modified ,
+.IR Save ,
+and
+.I Revert
+requests.
+.IR Get_Modified
+is handled transparently by associating the
+modified state of the file with
+.IR patterns .
+.IR Save
+and
+.IR Revert
+requests are passed to the
+.B Ttdt_file_cb
+that was given to
+.Fn ttdt_file_join 3.
+If
+.I send
+is True,
+.Fn ttdt_file_event
+sends
+.IR Modified
+in
+.IR the_scope .
+If
+.I event
+is
+.Cn TTDT_SAVED
+or
+.Cn TTDT_REVERTED ,
+.Fn ttdt_file_event
+unregisters handler patterns for
+.IR Get_Modified ,
+.IR Save ,
+and
+.I Revert
+requests.
+If
+.I send
+is True,
+.Fn ttdt_file_event
+sends
+.IR Saved
+or
+.IR Reverted ,
+respectively, in
+.IR the_scope .
+.P
+The
+.I context
+argument describes the environment to use.
+If
+.I context
+is not zero, messages created by
+.Fn ttdt_file_event
+inherit from
+.I context
+all contexts whose slotname begins with the characters
+.Cn ENV_ .
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn ttdt_file_event
+function returns the status of the operation as one of the following
+.B Tt_status
+values:
+.VL 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_NOMP
+.br
+The
+.Cm ttsession 1
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_OVERFLOW
+.br
+The ToolTalk service has more active messages than it can handle.
+(The maximum number of active messages is
+.ne 2
+implementation specific, but is at least 2000.)
+.Lc TT_ERR_POINTER
+.br
+The
+.I patterns
+argument was
+.Cn NULL .
+.LE
+.SH "SEE ALSO"
+.Hd Tt/tttk.h 5,
+.Fn ttdt_file_join 3,
+.Fn ttdt_Get_Modified 3,
+.Fn ttdt_file_quit 3.

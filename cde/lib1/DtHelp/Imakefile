@@ -1,0 +1,443 @@
+XCOMM $XConsortium: Imakefile /main/cde1_maint/8 1995/10/08 17:20:22 pascale $
+MODULE=DtHelp
+
+#ifdef SunArchitecture
+
+.NO_PARALLEL:
+
+#endif
+
+#ifndef DoNormalLib
+#define DoNormalLib NormalLibDtHelp
+#endif
+#ifndef DoSharedLib
+#define DoSharedLib SharedLibDtHelp
+#endif
+
+#include <Library.tmpl>
+
+/* General case INCLUDES DEFINE 
+ * Each individual architecture may have more or less of the above.
+ * Use EXTRA_DEFINES and EXTRA_INCLUDES to add defines and includes
+ * to an individual architecture. 
+ */
+
+INCLUDES = -I. -I$(ILSRC)
+DEFINES = -DDTLIB -DMESSAGE_CAT -DXK_MISCELLANY $(LOCAL_DEFINES) \
+	  -DCDE_INSTALLATION_TOP='"$(CDE_INSTALLATION_TOP)"' \
+	  -DCDE_CONFIGURATION_TOP='"$(CDE_CONFIGURATION_TOP)"' \
+	  -DCDE_USER_TOP='"$(CDE_USER_TOP)"' \
+	  -DOSMAJORVERSION=$(OSMAJORVERSION) \
+	  -DOSMINORVERSION=$(OSMINORVERSION)
+
+#ifdef AlphaArchitecture
+SYS_LIBRARIES = -lm -lc -liconv
+SO_REQLIBS    = $(ALL_LIBPATH) $(XMLIB) $(XTOOLLIB) $(XLIB) $(DTSVCLIB) $(SYS_LIBRARIES)
+#endif
+
+#ifdef SCOArchitecture
+#endif
+
+#ifdef HPArchitecture
+EXTRA_CCOPTIONS = $(ESLIT_OPTION)
+#endif
+
+#if defined(RsArchitecture)
+#if DoSharedLib
+REQUIREDLIBS =  $(XMLIB) $(XTOOLLIB) $(XLIB) -liconv
+#endif
+#endif
+
+#if defined(HPOSFArchitecture)
+#endif
+
+#if defined(ApolloArchitecture)
+EXTRA_DEFINES = -Dapollo
+#endif
+
+#if defined(SunArchitecture)
+/* This constant is required to use the Sun-specific reg. exp. files */
+EXTRA_DEFINES = -DSUN_MOTIF
+/* This directory is required to use the Sun-specific regexpI.h file */
+EXTRA_INCLUDES =
+/* These files provide a Sun-specific reg. exp. compile & exec functions */
+ARCH_SRCS =
+ARCH_OBJS =
+
+REQUIREDLIBS = $(ALL_LIBPATH)  $(XMLIB) $(DTSVCLIB) $(XTOOLLIB) $(XLIB) -L/usr/lib -lm -lc $(WIDECHARSYSLIB)
+#endif
+
+#if defined(USLArchitecture)
+EXTRA_DEFINES = -DNEED_STRCASECMP -DNOVELL_MOTIF
+EXTRA_INCLUDES = -I$(TOP)/lib/Xm
+#endif
+
+#if defined(UXPArchitecture)
+/*
+ * TODO: Verify
+ */
+EXTRA_DEFINES = -DNEED_STRCASECMP 
+EXTRA_INCLUDES = -I$(TOP)/lib/Xm
+#endif
+
+
+
+INSTALLFLAGS = $(INSTINCFLAGS)
+    LINTLIBS = $(LINTXLIB) $(LINTXTOOL)
+
+HEADERS = Help.h \
+	  HelpP.h \
+          HelpDialog.h \
+          HelpQuickD.h
+
+/* These internal headers will go to the DtI directory */
+I_HEADERS = \
+	FileUtilsI.h \
+	HelpTermP.h \
+	HelposI.h \
+	HourGlassI.h \
+	Canvas.h \
+	Access.h \
+	HelpP.h \
+	bufioI.h \
+	AccessP.h \
+	AccessI.h \
+	AccessCCDFI.h \
+	CEUtilI.h 
+
+LCX_HEADERS =
+
+SRCS1 =\
+	Actions.c \
+	AsciiSpc.c \
+	Callbacks.c \
+	Destroy.c \
+	Environ_c.c \
+        FileListUtils.c \
+        FileUtils.c \
+	Font.c \
+	Format.c \
+	FormatMan.c \
+	FormatTerm.c \
+        GlobSearch.c \
+	Graphics.c \
+        HelpAccess.c \
+        HelpDialog.c \
+        Helpos.c \
+        HelpUtil.c \
+	History.c \
+        HourGlass.c \
+        HyperText.c \
+        Messages.c \
+        PathArea.c \
+        Print.c \
+        HelpQuickD.c \
+        Resize.c \
+	SetList.c \
+        version.c \
+        VolSelect.c \
+	XUICreate.c \
+	XInterface.c
+
+OBJS1 =\
+	Actions.o \
+	AsciiSpc.o \
+	Callbacks.o \
+	Destroy.o \
+	Environ_c.o \
+        FileListUtils.o \
+        FileUtils.o \
+	Font.o \
+	Format.o \
+	FormatMan.o \
+	FormatTerm.o \
+        GlobSearch.o \
+	Graphics.o \
+        HelpAccess.o \
+        HelpDialog.o \
+        Helpos.o \
+        HelpUtil.o \
+	History.o \
+        HourGlass.o \
+        HyperText.o \
+        Messages.o \
+        PathArea.o \
+        Print.o \
+        HelpQuickD.o \
+        Resize.o \
+	SetList.o \
+        version.o \
+        VolSelect.o \
+	XUICreate.o \
+	XInterface.o
+
+SRCS2 =\
+	Access.c \
+	AccessCCDF.c \
+	AccessSDL.c \
+	CCDFUtil.c \
+	CEUtil.c \
+	Canvas.c \
+	CanvasToc.c \
+	CleanUp.c \
+	DefCanvas.c \
+	FontAttr.c \
+	FormatCCDF.c \
+	FormatManCCDF.c \
+	FormatSDL.c \
+	Layout.c \
+	LayoutSDL.c \
+	LayoutUtil.c \
+	LinkMgr.c \
+	Selection.c \
+	Snref.c \
+	StringFuncs.c \
+	UtilSDL.c \
+	VirtFuncs.c \
+	bufio.c \
+	decompress.c
+
+OBJS2 =\
+	Access.o \
+	AccessCCDF.o \
+	AccessSDL.o \
+	CCDFUtil.o \
+	CEUtil.o \
+	Canvas.o \
+	CanvasToc.o \
+	CleanUp.o \
+	DefCanvas.o \
+	FontAttr.o \
+	FormatCCDF.o \
+	FormatManCCDF.o \
+	FormatSDL.o \
+	Layout.o \
+	LayoutSDL.o \
+	LayoutUtil.o \
+	LinkMgr.o \
+	Selection.o \
+	Snref.o \
+	StringFuncs.o \
+	UtilSDL.o \
+	VirtFuncs.o \
+	bufio.o \
+	decompress.o
+
+LCXSRCS =
+
+LCXOBJS =
+
+SRCS3 = \
+	ilX.c \
+	ilbigray.c \
+	ilcodec.c \
+	ilcontext.c \
+	ilconvert.c \
+	ilcrop.c \
+	ildata.c \
+	ildecompg3.c \
+	ildecompg4.c \
+	ildecompjpeg.c \
+	ildecomplzw.c \
+	ildecomppackbits.c \
+	ildecompress.c \
+	ildither.c \
+	ilformat.c \
+	ilgraybi.c \
+	ilimage.c \
+	ilinvert.c \
+	iljpgdecode.c \
+	iljpgdecodejif.c \
+	iljpgdedct.c \
+	iljpgdehuff.c \
+	iljpgutil.c \
+	ilmap.c \
+	ilobject.c \
+	ilpalette.c \
+	ilpipe.c \
+	ilrwimage.c \
+	ilscale.c \
+	ilscalesample.c \
+	iltiff.c \
+	iltiffread.c \
+	iltruegray.c \
+	ilupsample.c \
+	ilutiljpeg.c \
+	ilycbcr.c
+
+#ifdef SCOArchitecture
+/* ilscalesample.o breaks the MS loader.  Remove it for now */
+all:: ilscalesample.o libXvh.a
+
+OBJS3 = \
+	ilX.o \
+	ilbigray.o \
+	ilcodec.o \
+	ilcontext.o \
+	ilconvert.o \
+	ilcrop.o \
+	ildata.o \
+	ildecompg3.o \
+	ildecompg4.o \
+	ildecompjpeg.o \
+	ildecomplzw.o \
+	ildecomppackbits.o \
+	ildecompress.o \
+	ildither.o \
+	ilformat.o \
+	ilgraybi.o \
+	ilimage.o \
+	ilinvert.o \
+	iljpgdecode.o \
+	iljpgdecodejif.o \
+	iljpgdedct.o \
+	iljpgdehuff.o \
+	iljpgutil.o \
+	ilmap.o \
+	ilobject.o \
+	ilpalette.o \
+	ilpipe.o \
+	ilrwimage.o \
+	ilscale.o \
+	ilscalesample.o \
+	iltiff.o \
+	iltiffread.o \
+	iltruegray.o \
+	ilupsample.o \
+	ilutiljpeg.o \
+	ilycbcr.o
+
+#else
+
+
+OBJS3 = \
+	ilX.o \
+	ilbigray.o \
+	ilcodec.o \
+	ilcontext.o \
+	ilconvert.o \
+	ilcrop.o \
+	ildata.o \
+	ildecompg3.o \
+	ildecompg4.o \
+	ildecompjpeg.o \
+	ildecomplzw.o \
+	ildecomppackbits.o \
+	ildecompress.o \
+	ildither.o \
+	ilformat.o \
+	ilgraybi.o \
+	ilimage.o \
+	ilinvert.o \
+	iljpgdecode.o \
+	iljpgdecodejif.o \
+	iljpgdedct.o \
+	iljpgdehuff.o \
+	iljpgutil.o \
+	ilmap.o \
+	ilobject.o \
+	ilpalette.o \
+	ilpipe.o \
+	ilrwimage.o \
+	ilscale.o \
+	ilscalesample.o \
+	iltiff.o \
+	iltiffread.o \
+	iltruegray.o \
+	ilupsample.o \
+	ilutiljpeg.o \
+	ilycbcr.o
+
+#endif
+
+SRCS = $(SRCS1) $(SRCS2) $(LCXSRCS) $(SRCS3) $(ARCH_SRCS)
+OBJS = $(OBJS1) $(OBJS2) $(LCXOBJS) $(OBJS3) $(ARCH_OBJS)
+
+
+#ifdef HPArchitecture
+/* Build +O1 due to 300 optimizer bug on all architectures */
+#ifdef __hp9000s300
+SpecialSharedObjectRule(Search.o,/**/,+O1)
+#endif
+#endif /* HPArchitecture */
+
+LibraryObjectRule()
+
+/**** NOTE!! This is a workaround for a compiler bug in hp 10.0 WC ***
+ **** It should be eventually removed.
+ ****/
+#if defined HPArchitecture && OSMajorVersion == 10
+SpecialLibObjectRule(Canvas.o,,+O1)
+#endif
+
+/* MS Compiler bug, remove when we go to USL compiler */
+#ifdef SCOArchitecture
+SpecialFlagsObjectRule(iltiff, -Oi -DUSE_INLINE_CODE)
+#endif
+
+/* For install of developer's build environment */
+LOCAL_BINSTALL_LIBDEST = lib
+LOCAL_BINSTALL_INCLUDEDEST = include/Dt
+LOCAL_BINSTALL_INCLUDEDEST2 = include/DtI /* for *I.h files */
+LOCAL_BINSTALL_INCLUDEDEST3 = include/Misc
+
+#if DoSharedLib
+#if DoNormalLib
+SharedLibraryTarget(DtHelp,$(SODTHELPREV),$(OBJS),shared,..)
+#else
+SharedLibraryTarget(DtHelp,$(SODTHELPREV),$(OBJS),.,.)
+#endif
+SharedLibraryBuildInstall(DtHelp,$(SODTHELPREV),$(LOCAL_BINSTALL_LIBDEST))
+InstallSharedLibrary(DtHelp,$(SODTHELPREV),$(USRLIBDIR))
+#endif
+#if DoNormalLib
+NormalLibraryTarget(DtHelp,$(OBJS))
+NormalLibraryBuildInstall(DtHelp,$(LOCAL_BINSTALL_LIBDEST))
+InstallLibrary(DtHelp,$(USRLIBDIR))
+#endif
+
+/********* INCLUDES ***********************************************
+ * The headers that are exported are built from the following
+ * BuildIncludes - provides export to $(TOP)/X11.
+ * BuildMultipleInstall - provides export to $(TOP)/binstall/include
+ *                        and build install packages.
+ * BuildLocalIncludes - This rule creates directories
+ *   for local includes via make includes or make localincludes
+ *   This enables users to use local -I paths to find local includes.
+ */
+/* link headers to X11/cde* directory */
+BuildIncludes($(HEADERS),$(DTINCLUDEDEST),../..)
+BuildIncludes($(I_HEADERS),cde$(CDE_VERSION)/DtI,../..)
+/* export header to binstall directories inside and out of tree */
+BuildMultipleInstall($(HEADERS),$(LOCAL_BINSTALL_INCLUDEDEST))
+/* export internal headers for dthelpgen and dthelpview */
+BuildMultipleInstall($(I_HEADERS),$(LOCAL_BINSTALL_INCLUDEDEST2))
+/* link headers to local Dt directory */
+BuildLocalIncludes($(HEADERS),Dt,..)
+
+/********* lcx files ***********************************************
+ * exported for binstall.
+ *
+ */
+
+
+/* link il files over */
+LinkFiles($(ILSRC), $(SRCS3))
+
+DependTarget()
+
+Access.o	:= CCOPTIONS = -Xa
+bufio.o		:= CCOPTIONS = -Xa
+decompress.o	:= CCOPTIONS = -Xa
+
+clean1: 
+	rm -f $(OBJS1)
+
+clean2: 
+	rm -f $(OBJS2)
+
+clean3: 
+	rm -f $(OBJS3)
+
+cleanlcx: 
+	rm -f $(LCXOBJS)

@@ -1,0 +1,57 @@
+# %%  (c) Copyright 1993, 1994 Hewlett-Packard Company			
+# %%  (c) Copyright 1993, 1994 International Business Machines Corp.	
+# %%  (c) Copyright 1993, 1994 Sun Microsystems, Inc.			
+# %%  (c) Copyright 1993, 1994 Novell, Inc. 				
+# %%  $Revision: $ 			 				
+#
+#
+# @(#)SunMakefile	1.20 31 Jul 1993
+#
+# The ToolTalk tttar utility makefile
+#
+# Copyright (c) 1992 by Sun Microsystems, Inc.
+#
+
+TT_DIR = ../..
+THIS_DIR = bin/tttar
+
+include $(TT_DIR)/SunMakefile-head.mk
+
+all::		Bin-g
+
+$(BIN_TARGETS)::	tttar
+
+$(INSTALL_TARGETS)::	$(INSTALL_DIR)/bin/tttar
+
+Clean::
+	$(RM) tttar
+
+TTTAR_CONTENTS = \
+	tttar.o \
+	archiver.o \
+	tttar_utils.o \
+	tttar_api.o \
+	tttar_spec.o \
+	tttar_file_utils.o \
+	tttar_string_map.o
+
+CPPFLAGS	+=	$(CPPFLAGS-bin)
+CCFLAGS		+=	$(CCFLAGS-bin)
+CFLAGS		+=	$(CFLAGS-bin)
+LDFLAGS		+=	$(LDFLAGS-bin)
+
+MYLDLIBS_SunOS_4=	-lX -lI18N
+LDLIBS		+=	$(MYLDLIBS_$(OS_NAME)_$(OS_VERSION))
+
+%/archiver.o	:=	CPPFLAGS +=	$(CPPFLAGS-version)
+
+OBJECTS =	$(TTTAR_CONTENTS:%=$(DERIVED)/%)
+
+# We should probably try to generate a standard link for utilities
+# Trailing -Bstatic ensures libC is linked statically -- that could
+# go away in the future when libC is bundled.
+
+tttar:	$$(DERIVED) $$(OBJECTS) $$(LIBDEPENDENCY)
+	$(LINK.cc) -o $@ $(OBJECTS) \
+	-ltt $(LDLIBS) -Bstatic
+include $(TT_DIR)/SunMakefile-tail.mk

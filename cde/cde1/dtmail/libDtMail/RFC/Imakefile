@@ -1,0 +1,197 @@
+XCOMM
+XCOMM	RESTRICTED CONFIDENTIAL INFORMATION:
+XCOMM	
+XCOMM	The information in this document is subject to special
+XCOMM	restrictions in a confidential disclosure agreement between
+XCOMM	HP, IBM, Sun, USL, SCO and Univel.  Do not distribute this
+XCOMM	document outside HP, IBM, Sun, USL, SCO, or Univel without
+XCOMM	Sun's specific written approval.  This document and all copies
+XCOMM	and derivative works thereof must be returned or destroyed at
+XCOMM	Sun's request.
+XCOMM
+XCOMM	Copyright 1993, 1994, 1995 Sun Microsystems, Inc.  All rights reserved.
+XCOMM
+XCOMM	@(#)Imakefile	1.26 04/26/96
+XCOMM
+
+/*
+ * I turned this off so that it would stop trying to rebuild imake.
+ * Imake is another component, let them build it.
+ */
+#undef  ImakeDependency
+#define ImakeDependency(dummy)	/**/
+
+#ifndef DoNormalLib
+#define DoNormalLib NormalLibDtMail
+#endif
+#ifndef DoSharedLib
+#define DoSharedLib SharedLibDtMail
+#endif
+
+#ifdef SunArchitecture
+#undef LibraryDefines
+#define LibraryDefines /**/
+#endif
+
+#include <Library.tmpl>
+
+INCLUDES	=	-I. -I../Common -I../../include \
+			-I$(TOP)/cde1/dtcompat
+
+DEFINES		=	-DTTLOCK_OFF
+
+
+#ifdef RsArchitecture
+C++INCLUDES	=	-I/usr/lpp/include
+#define NEED_XDR_UTILS	1
+
+EXTRA_DEFINES	=	-DBIG_ENDIAN -DAIX -DSTRCASECMP_NOT_DEFINED \
+			-DI_HAVE_NO_BOOL -DNEED_XDR_SIZEOF -DDL_NOT_DYNAMIC \
+			-DI_HAVE_SELECT_H -DSENDMAIL_LOCKS \
+			-DMAILGROUP_REQUIRED -DDO_ANONYMOUS_MAP \
+			-DMAIL_SPOOL_PATH=\"/var/spool/mail/%s\"
+
+	    
+#if DoSharedLib
+
+REQUIREDLIBS	=	$(DTHELPLIB) $(DTSVCLIB) $(TTLIB) $(XTOOLIB) $(XLIB)
+NONSHAREDLIBCOBJ =	nonsharelibC.o
+#endif
+#endif
+
+#ifdef HPArchitecture
+#define NEED_XDR_UTILS	1
+
+EXTRA_DEFINES	=	-DBIG_ENDIAN -DHPUX -Ds9000 -DI_HAVE_NO_IDENT \
+			-DI_HAVE_NO_BOOL -DNEED_XDR_SIZEOF -DDL_NOT_DYNAMIC \
+			-DNEED_MMAP_WRAPPER -DSENDMAIL_LOCKS \
+			-DMAILGROUP_REQUIRED -DDO_ANONYMOUS_MAP \
+			-DMAIL_SPOOL_PATH=\"/usr/mail/%s\"
+EXTRA_C++OPTIONS =	+p
+#endif
+
+#ifdef SunArchitecture
+#undef NEED_XDR_UTILS
+
+#if !defined(i386) && !defined(__ppc)
+ENDIAN = -DBIG_ENDIAN
+#endif
+
+EXTRA_DEFINES	=	$(ENDIAN) \
+			-DSunOS=$(OSMAJORVERSION)$(OSMINORVERSION) \
+			-DMMAP_NORESERVE \
+			-DI_HAVE_SELECT_H -D_REENTRANT -DSVR4
+
+#ifdef USE_SPRO_V3
+SPRO_V3_OPTIONS =	-noex -USPRO_V2
+#ifdef DEBUGTREE
+SPRO_V3_OPTIONS	+=
+#endif
+#else
+EXTRA_DEFINES	+=	-DSPRO_V2
+#endif
+
+#if REORDER_PROFILED
+EXTRA_C++OPTIONS =     -xF +p +w $(SPRO_V3_OPTIONS)
+C++              =     CC -pg $(BBAFLAGS)
+#else
+EXTRA_C++OPTIONS =     -xF +p +w $(SPRO_V3_OPTIONS)
+#endif
+
+.KEEP_STATE:
+.PARALLEL:
+
+#endif /* SunArchitecture */
+
+#ifdef USLArchitecture
+EXTRA_DEFINES   =       -DSTRCASECMP_NOT_DEFINED
+#endif
+
+#ifdef AlphaArchitecture
+EXTRA_DEFINES	=	-DI_HAVE_NO_IDENT -DDL_NOT_DYNAMIC -DNEED_MMAP_WRAPPER
+#endif /* AlphaArchitecture */
+
+HEADERS		=
+HEADERS_HH      = 
+
+SRCS		= \
+			AliasExpand.C \
+			MIMEBodyPart.C \
+			MIMEPartial.C \
+			RFCBodyPart.C \
+			RFCEnvelope.C \
+			RFCFormat.C \
+			RFCMailBox.C \
+			RFCMailValues.C \
+			RFCMessage.C \
+			RFCMIME.C \
+			RFCTransport.C \
+			SunV3.C \
+			V3BodyPart.C
+
+
+OBJS		= \
+			AliasExpand.o \
+			MIMEBodyPart.o \
+			MIMEPartial.o \
+			RFCBodyPart.o \
+			RFCEnvelope.o \
+			RFCFormat.o \
+			RFCMailBox.o \
+			RFCMailValues.o \
+			RFCMessage.o \
+			RFCMIME.o \
+			RFCTransport.o \
+			SunV3.o \
+			V3BodyPart.o
+
+LibraryObjectRule()
+
+all :: Obj.List
+ 
+#if !defined(USLArchitecture)
+Obj.List : $(OBJS)
+	@echo "Building libDtMail/Common Object List"
+	@$(RM) Obj.List
+	@for O in $(OBJS) ; do \
+		echo "  Adding $$O" ; \
+		echo RFC/$$O >> Obj.List ;\
+	done
+	@echo "."
+#else
+#if DoSharedLib
+Obj.List : $(OBJS)
+        @echo "Building libDtMail/RFC Object List"
+        @$(RM) Obj.List
+        @for O in $(OBJS) ; do \
+                echo "  Adding $$O" ; \
+                echo RFC/shared/$$O >> Obj.List ;\
+        done
+        @echo "."
+#else
+Obj.List : $(OBJS)
+        @echo "Building libDtMail/RFC Object List"
+        @$(RM) Obj.List
+        @for O in $(OBJS) ; do \
+                echo "  Adding $$O" ; \
+                echo RFC/$$O >> Obj.List ;\
+        done
+        @echo "."
+#endif
+#endif
+
+#ifdef SunArchitecture
+clean::
+	$(RM) -r .sb ptrepository
+	$(RM) .make.state*
+#else
+DependTarget()
+#endif
+
+clean::
+	$(RM) cscope.out core dtmail *.cat Obj.List
+	$(RM) -r shared
+
+DependTarget()
+
+NormalLintTarget($(SRCS))

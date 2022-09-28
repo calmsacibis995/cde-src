@@ -1,0 +1,102 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+.\" *************************************************************************
+.\" **
+.\" ** (c) Copyright 1993,1994 Hewlett-Packard Company 
+.\" **      All Rights Reserved.
+.\" **
+.\" ** (c) Copyright 1993,1994 International Business Machines Corp. 
+.\" **      All Rights Reserved.
+.\" **  
+.\" ** (c) Copyright 1993,1994 Sun Microsystems, Inc.
+.\" **      All Rights Reserved.
+.\" **
+.\" **
+.\" *************************************************************************
+.\"---
+.\".TH _title _#S_ "_dd_ _Month_ _19yy_"
+.TH DtDbLoad 3 "17 Jan 1994"
+.\".BH "_dd_ _Month_ -_19yy_"
+.BH \*(DT 
+.\"---
+.\"---------------------------------------------------------------------------
+.SH NAME
+DtDbLoad(3) \(em  the API for loading the Dt actions and data typing
+services database.
+.\"---
+.\"---------------------------------------------------------------------------
+.\"---
+.\"--- SYNOPSIS 
+.\"--- This section is a syntax diagram.  Use the following lines for pages in
+.\"--- manual Sections 1, 1M, 5 and 8:
+.\"---
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Dt/Action.h>
+.sp \n(PDu
+void DtDbLoad (\fIvoid\fP)
+.wH
+.fi
+.iE
+.sE
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- DESCRIPTION 
+.\"--- This section tells concisely what the command (function, device or
+.\"--- file format) does and includes the parameter list. 
+.\"---
+.SH DESCRIPTION
+.PP
+\fBDtDbLoad()\fP reads in the action (\fIDtAction\fP) and data typing services
+(\fIDtDts\fB) databases.  This function will determine the set of directories
+which are to be searched for database files and load the "*.dt" files found
+into the database.
+.PP
+The directory search path is based on the value of the
+\fBDTDATABASESEARCHPATH\fP environment variable and internal defaults. 
+\fBDTDATABASESEARCHPATH\fP contains a comma-separated list of directories
+in \fI[host:]/path\fP format. \fBDtDbLoad()\fP must be called before calling
+any of the routines which query either the action or datatype databases. 
+If called multiple times, the old databases will first be
+freed, before the new ones are created.
+.PP
+If you use this function in a long-lived application, then your application
+must be prepared to dynamically reload the databases when they are modified.
+To do this, your client must register to receive notification whenever the
+Action/Datatypes database is reloaded. This is done with a call to
+\fBDtDbReloadNotify(3)\fP.
+.SH "ENVIRONMENT VARIABLES"
+\fBDTDATABASESEARCHPATH\fP is expected to contain a comma-separated list of
+directories which are to be searched for files ending in \fI*.dt\fP.
+Such files are recognized as action/data types database files.
+.SH "RETURN VALUES"
+\fBDtDbLoad()\fP does not have a meaningful return value.  
+.SH ERRORS
+If errors are encountered reading the database files, error messages will be
+written to the users' errorlog file ($HOME/.dt/errorlog). Records containing
+errors will not be incorporated into the internal database.
+.\"---
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- EXAMPLES
+.\"--- This section gives examples of how to use the command (function
+.\"--- or file format).  Always preface an example with an introduction.
+.\"--- If there are multiple examples, use separate subsection headings
+.\"--- for each _example-type_.  Otherwise, omit these headings.
+.\"---
+.\".SH EXAMPLES
+.SH "SEE ALSO"
+.BR  DtDbReloadNotify(1),
+.BR  DtActionIcon(3),
+.BR  DtActionLabel(3),
+.BR  DtActionDescription(3),
+.BR  DtActionExists(3),
+.BR  DtActionInvoke (3),
+.BR  dtdtfile(4),
+.BR  dtactionfile(4),
+.BR  dtdtsfile(4)

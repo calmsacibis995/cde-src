@@ -1,0 +1,101 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+.\" **
+.\" **
+.\" ** (c) Copyright 1994 Hewlett-Packard Company
+.\" ** (c) Copyright 1994 International Business Machines Corp.
+.\" ** (c) Copyright 1994 Sun Microsystems, Inc.
+.\" ** (c) Copyright 1994 Unix Systems Labs, Inc., a subsidiary of Novell, Inc.
+.\" **
+.\" **
+.TH DtWsmGetWorkspacesOccupied 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Common Desktop Environment 1.0: January 1994
+.SH NAME
+\fBDtWsmGetWorkspacesOccupied\fP,
+\fBDtWsmSetWorkspacesOccupied\fP \- get or set the workspaces in
+which a window resides.
+.iX "DtWsmGetWorkspacesOccupied"
+.iX "workspace functions" "DtWsmGetWorkspacesOccupied"
+.iX "DtWsmSetWorkspacesOccupied"
+.iX "workspace functions" "DtWsmSetWorkspacesOccupied"
+.sp .5
+.SH SYNOPSIS
+\fB
+\&#include <Dt/Wsm.h>
+.sp .5
+int DtWsmGetWorkspacesOccupied (
+.br
+.ta 0.75i 2.20i
+	Display *	\fIdisplay\fP,
+.br
+	Window	\fIwindow\fP,
+.br
+	Atom **	\fIppaWs\fP,
+.br
+	int *	\fIpNumWs\fP)
+.sp .5
+void DtWsmSetWorkspacesOccupied (
+.br
+.ta 0.75i 2.20i
+	Display *	\fIdisplay\fP,
+.br
+	Window	\fIwindow\fP,
+.br
+	Atom *	\fIpaWs\fP,
+.br
+	int	\fInumWs\fP)
+.sp .5
+\fP
+.SH DESCRIPTION
+These functions are designed to work with the Common Desktop Environment
+window/workspace manager (dtwm).
+.PP
+\fBDtWsmGetWorkspacesOccupied\fP returns the list of workspaces in which
+this window resides. Each element of the list is the name of a workspace
+(converted to an X Atom).
+.sp .5
+.IP "\fIdisplay\fP" 1.00i
+The X display.
+.IP "\fIwindow\fP" 1.00i
+The window of interest.
+.IP "\fIppaWs\fP" 1.00i
+The address of pointer to receive the pointer to a list of workspace
+names (converted to X Atoms). These data should be freed with
+\fBXtFree(3x)\fP.
+.IP "\fIpNumWs\fP" 1.00i
+The address of an integer to receive the number of elements in the
+list of workspaces returned in \fI*ppaWs\fP.
+.PP
+\fBDtWsmSetWorkspacesOccupied\fP puts a window into a set of
+workspaces.
+.sp .5
+.IP "\fIdisplay\fP" 1.00i
+The X display.
+.IP "\fIwindow\fP" 1.00i
+The window to be put into this set of workspaces.
+.IP "\fIpaWs\fP" 1.00i
+The pointer to a list of workspace names (converted to X Atoms). These
+are the workspaces into which the window should be placed.
+.IP "\fIpNumWs\fP" 1.00i
+The number of elements in the list of workspaces \fIpaWs\fP.
+.PP
+NOTE: \fBDtWsmSetWorkspacesOccupied\fP does not validate the list of 
+requested workspaces. Invalid workspaces in the list are ignored.
+.sp .5
+.SH RETURN VALUE
+Only \fBDtWsmGetWorkspacesOccupied\fP has a return value.
+.PP
+.IP "\fBSuccess\fP" 1.00i
+The function performed without error. A list of workspace identifiers
+was allocated and returned. 
+.IP "not \fBSuccess\fP" 1.00i
+The function failed either due to a memory allocation error or failure
+to find the correct workspace data (i.e. dtwm was not running).
+.sp .5
+.SH RELATED INFORMATION
+\fBdtwm(1X)\fP.
+.sp .5

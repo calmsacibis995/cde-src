@@ -1,0 +1,408 @@
+.TH ttdt_session_join 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+ttdt_session_join \- join a ToolTalk session
+.SH SYNOPSIS
+.yS
+#include <Tt/tttk.h>
+.sp 0.5v
+.ta \w'Tt_pattern *ttdt_session_join('u
+Tt_pattern *ttdt_session_join(const char *\f2sessid\fP,
+	Ttdt_contract_cb \f2cb\fP,
+	Widget \f2shell\fP,
+	void *\f2clientdata\fP,
+	int \f2join\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn ttdt_session_join
+function
+joins the session
+.IR sessid ,
+registering patterns and
+default callbacks for many standard Desktop message interfaces.
+If
+.I sessid
+is
+.Cn NULL ,
+the default session is joined.
+.P
+The
+.Fn ttdt_session_join
+function
+registers for the following
+.Cn TT_HANDLER -\c
+addressed requests:
+.VL 4
+.LI (1)
+.IR Get_Environment ,
+.IR Set_Environment ,
+.IR Get_Locale ,
+.IR Set_Locale ,
+.IR Get_Situation ,
+.IR Set_Situation ,
+.IR Signal ,
+.IR Get_Sysinfo
+.LI (2)
+.IR Get_Geometry ,
+.IR Set_Geometry ,
+.IR Get_Iconified ,
+.IR Set_Iconified ,
+.IR Get_Mapped ,
+.IR Set_Mapped ,
+.IR Raise ,
+.IR Lower ,
+.IR Get_XInfo ,
+.IR Set_XInfo
+.LI (3)
+.IR Pause ,
+.IR Resume ,
+.IR Quit
+.LI (4)
+.IR Get_Status ,
+.IR Do_Command
+.LE
+.P
+If
+.I join
+is True,
+.Fn ttdt_session_join
+actually joins the indicated session.
+.P
+The ToolTalk service
+handles messages in (1) transparently.
+.P
+If
+.I shell
+is non-\c
+.Cn NULL ,
+then it is expected to be a realized
+.I mappedWhenManaged
+.IR applicationShellWidget ,
+and
+the ToolTalk service
+handles messages in (2) transparently.
+(If
+.I shell
+is merely a realized widget, then
+the ToolTalk service
+handles only the
+.IR Get_XInfo
+request, and
+.Fn ttdt_session_join
+fails the rest of (2) with
+.Cn TT_DESKTOP_ENOTSUP .)
+If
+.I shell
+is
+.Cn NULL ,
+then
+the ToolTalk service
+treats messages in (2) equivalently to those in (4).
+.P
+If
+.I shell
+is non-\c
+.Cn NULL
+and
+.I cb
+is
+.Cn NULL ,
+then
+the ToolTalk service
+handles messages in (3) transparently as follows;
+otherwise, it treats them as equivalent to those in (4).
+The
+.IR Quit
+request results in a
+.Cn WM_DELETE_WINDOW
+event on
+.I shell
+if the
+.I silent
+and
+.I force
+arguments of the
+.IR Quit
+request are both False.
+In other words, if
+.I shell
+is supplied without a
+.IR cb ,
+then a
+.IR Quit
+request may imply that the user
+quit the application's top-level window using the window manager.
+.IR Pause
+and
+.IR Resume
+requests result in
+the ToolTalk service
+passing
+.I shell
+and the appropriate boolean value to
+.Fn XtSetSensitive 3X.
+.P
+If
+.I cb
+is not
+.Cn NULL ,
+the ToolTalk service passes
+messages in (4) to
+.IR cb ;
+otherwise,
+.Fn ttdt_session_join
+fails with
+.Cn TT_DESKTOP_ENOTSUP .
+.P
+The
+.B Ttdt_contract_cb
+argument is a callback defined as:
+.Cs I
+.ta \w'Tt_message (*Ttdt_contract_cb)('u
+Tt_message (*Ttdt_contract_cb)(Tt_message \f2msg\fP,
+	void *\f2clientdata\fP,
+	Tt_message \f2contract\fP);
+.Ce
+.P
+The
+.I msg
+argument is
+a message in
+.B Tt_state
+.Cn TT_SENT .
+If
+.I msg
+is a
+.Cn TT_REQUEST ,
+the client program becomes responsible for either failing,
+rejecting or replying to
+.IR msg .
+After doing so, the client program may dispose of
+.I msg
+with
+.Fn tttk_message_destroy .
+The
+.I clientdata
+argument is the
+.I clientdata
+passed to
+.Fn ttdt_session_join
+or
+.Fn ttdt_message_accept 3.
+The
+.I contract
+argument is the
+.I contract
+passed to
+.Fn ttdt_message_accept .
+For callbacks installed by
+.Fn ttdt_session_join ,
+.I contract
+is always zero.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn ttdt_session_join
+function
+returns a null-terminated array of
+.BR Tt_pattern ;
+otherwise, it returns an error pointer.
+The application can use
+.Fn tt_ptr_error 3
+to extract one of the following
+.B Tt_status
+values from the returned handle:
+.VL 8
+.Lc TT_ERR_NOMEM
+.br
+There is insufficient memory available to perform the function.
+.Lc TT_ERR_NOMP
+.br
+The
+.Cm ttsession 1
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_POINTER
+.br
+The pointer passed does not point to an object
+of the correct type for this operation.
+.Lc TT_ERR_PROCID
+.br
+The specified process identifier is out of date or invalid.
+.Lc TT_ERR_SESSION
+.br
+The specified ToolTalk session is out of date or invalid.
+.LE
+.SH "APPLICATION USAGE"
+The null-terminated array of
+.BR Tt_pattern
+returned by
+.Fn ttdt_session_join
+should be destroyed by passing the array to
+.Fn ttdt_file_quit 3.
+.P
+The ToolTalk service will reply to the
+.IR Quit
+request before generating the
+.Cn WM_DELETE_WINDOW
+event.
+If the application catches and cancels this event,
+then the sender of the
+.IR Quit
+request will be misled
+into thinking the application actually quit.
+Applications that can cancel
+.Cn WM_DELETE_WINDOW
+should install a real
+.BR Ttdt_contract_cb .
+.P
+The ToolTalk service handles the
+.IR Pause
+and
+.IR Resume
+requests by setting the sensitivity of
+.IR widget .
+If
+.I widget
+is the parent of any top-level pop-up shells,
+.Fn XtSetSensitive 3X
+will not affect them.
+Applications that can have such pop-ups
+should install a real
+.BR Ttdt_contract_cb .
+.P
+A
+.B Ttdt_contract_cb
+should return zero if it processes
+.I msg
+successfully, or a
+.Fn tt_error_pointer
+cast to
+.B Tt_message
+if processing results in an error.
+It should return the
+.I msg
+if it does not consume it.
+If
+.I msg
+is returned, then the ToolTalk service passes
+.Cn TT_CALLBACK_CONTINUE
+down the call stack, so that
+.I msg
+will be offered to other callbacks or (more likely) be returned from
+.Fn tt_message_receive 3.
+Applications will rarely want
+.I msg
+to get processed by other callbacks or in the main event loop.
+.SH EXAMPLES
+This is the typical algorithm of a
+.B Ttdt_contract_cb
+for an application that handles
+.IR Pause ,
+.IR Resume
+or
+.IR Quit
+requests for itself, but lets the ToolTalk service
+handle the X11-related requests listed in (2).
+Since this example callback deals with the case when
+.I contract
+is not zero, it can also be used as the
+.B Ttdt_contract_cb
+passed to
+.Fn ttdt_message_accept .
+.Cs
+Tt_message myContractCB(Tt_message      msg,
+	void           *clientdata,
+	Tt_message      contract)
+{
+	char *opString = tt_message_op(msg);
+	Tttk_op op = tttk_string_op(opString);
+	tt_free(opString);
+	int silent = 0;
+	int force  = 0;
+	Boolean cancel = False;
+	Boolean sensitive = True;
+	char *status, command;
+	switch(op) {
+	    case TTDT_QUIT:
+		tt_message_arg_ival(msg, 0, &silent);
+		tt_message_arg_ival(msg, 1, &force);
+		if (contract == 0) {
+			/* Quit entire application */
+			cancel = ! myQuitWholeApp(silent, force);
+		} else {
+			/* Quit just the specified request being worked on */
+			cancel = ! myCancelThisRequest(contract, silent, force);
+		}
+		if (cancel) {
+			/* User canceled Quit; fail the Quit request */
+			tttk_message_fail(msg, TT_DESKTOP_ECANCELED, 0, 1);
+		} else {
+			tt_message_reply(msg);
+			tttk_message_destroy(msg);
+		}
+		return 0;
+	    case TTDT_PAUSE:
+		sensitive = False;
+	    case TTDT_RESUME:
+		if (contract == 0) {
+			int already = 1;
+			if (XtIsSensitive(myTopShell) != sensitive) {
+				already = 0;
+				XtSetSensitive(myTopShell, sensitive);
+			}
+			if (already) {
+				tt_message_status_set(msg, TT_DESKTOP_EALREADY);
+			}
+		} else {
+			if (XtIsSensitive(thisShell) == sensitive) {
+				tt_message_status_set(msg, TT_DESKTOP_EALREADY);
+			} else {
+				XtSetSensitive(thisShell, sensitive);
+			}
+		}
+		tt_message_reply(msg);
+		tttk_message_destroy(msg);
+		return 0;
+	    case TTDT_GET_STATUS:
+		if (contract == 0) {
+			status = "Message about status of entire app";
+		} else {
+			status = "Message about status of this request";
+		}
+		tt_message_arg_val_set(msg, 0, status);
+		tt_message_reply(msg);
+		tttk_message_destroy(msg);
+		return 0;
+	    case TTDT_DO_COMMAND:
+		if (! haveExtensionLanguage) {
+			tttk_message_fail(msg, TT_DESKTOP_ENOTSUP, 0, 1);
+			return 0;
+		}
+		command = tt_message_arg_val(msg, 0);
+		result = myEval(command);
+		tt_free(command);
+		tt_message_status_set(msg, result);
+		if (tt_is_err(result)) {
+			tttk_message_fail(msg, result, 0, 1);
+		} else {
+			tt_message_reply(msg);
+			tttk_message_destroy(msg);
+		}
+		return 0;
+	}
+	/* Unrecognized message; do not consume it */
+	return msg;
+}
+.Ce
+.SH "SEE ALSO"
+.Hd Tt/tttk.h 5,
+.Fn ttdt_session_quit 3,
+.Fn tt_session_join 3,
+.cde .Fn XtSetSensitive 3X,
+.xos
+.Fn XtSetSensitive
+in the \*(Zt,
+.xoe

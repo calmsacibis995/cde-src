@@ -1,0 +1,106 @@
+\###############################################################################
+\#
+\#     dtmail.dt
+\#
+\#     Action and DataType definitions for the Common Desktop Environment
+\#     (CDE) Mailer Component.
+\#
+\#    (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+\#    (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+\#    (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+\#    (c) Copyright 1993, 1994, 1995 Novell, Inc.
+\#
+\#    $Revision: 1.9 $
+\#    97/01/10 @(#)dtmail.dt.src	1.2
+\###############################################################################
+set DtDbVersion=1.0
+
+\###############################################################################
+\#
+%|nls-10-#\# WARNING:...#|
+\#
+\###############################################################################
+
+\###################################################################
+\#
+%|nls-11-#\# Data Attributes#|
+\#
+\###################################################################
+
+DATA_ATTRIBUTES DTMAIL_FILE
+{
+	ACTIONS		Open,Compose,Print
+	ICON	        DtMail
+	COPY_TO_ACTION	MailAppend
+	MEDIA		RFC_822_MESSAGE
+        MIME_TYPE	message/rfc822
+        SUNV3_TYPE      mail-message
+	DESCRIPTION	%|nls-17001-#A DTMAIL_FILE ...#|
+}
+
+DATA_CRITERIA DTMAIL_FILE1
+{
+	DATA_ATTRIBUTES_NAME	DTMAIL_FILE
+	CONTENT		64 string CDE-Mail-Application-MailBox-File
+	MODE		f&!x
+}
+
+DATA_CRITERIA DTMAIL_FILE2
+{
+	DATA_ATTRIBUTES_NAME	DTMAIL_FILE
+	CONTENT		0 string From 
+	MODE		f&!x
+}
+
+ACTION MailAppend
+{
+	TYPE		COMMAND
+	WINDOW_TYPE	NO_STDIO
+	EXEC_STRING     sh -c 'cat "%(File)Arg_2%" >> "%(File)Arg_1%"'
+}
+
+ACTION Open
+{
+	LABEL		%|nls-1-Open|
+	ARG_TYPE	DTMAIL_FILE
+	ARG_COUNT	>0
+	TYPE		MAP
+	MAP_ACTION	Dtmail
+}
+
+ACTION Dtmail
+{
+   LABEL       %|nls-2026-#Mailer#|
+   ARG_TYPE    DTMAIL_FILE
+   ARG_COUNT   >0
+   TYPE        TT_MSG
+   TT_CLASS    TT_REQUEST
+   TT_SCOPE    TT_SESSION
+   TT_OPERATION    Display
+   TT_FILE     %Arg_1%
+   TT_ARG0_MODE    TT_IN
+   TT_ARG0_VTYPE   %Arg_1%
+   TT_ARG0_REP_TYPE    TT_REP_STRING
+}
+
+ACTION Print
+{
+        LABEL           %|nls-2-Print|
+        ARG_TYPE        DTMAIL_FILE
+        TYPE            COMMAND
+	WINDOW_TYPE     NO_STDIO
+	EXEC_STRING     sh -c ' \
+			dtmailpr -p -f %(File)Arg_1% | dtlp -u %(File)Arg_1%;'
+}
+
+ACTION Compose
+{
+    LABEL           %|nls-17002-Compose|
+    ARG_TYPE        *
+    ARG_COUNT       *
+    TYPE            COMMAND
+    WINDOW_TYPE     NO_STDIO
+    EXEC_STRING	    dtmail -a %Args%
+}
+
+\########################### EOF ##############################################

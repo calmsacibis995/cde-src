@@ -1,0 +1,365 @@
+XCOMM   $XConsortium: Imakefile /main/cde1_maint/10 1995/11/13 18:34:28 drk $
+XCOMM
+#define IHaveSubdirs
+#define PassCDebugFlags 'CDEBUGFLAGS=$(CDEBUGFLAGS)'
+
+#ifdef SunArchitecture
+.NO_PARALLEL:
+#endif
+
+SUBDIRS = util TermPrim Term TermView
+
+MakeSubdirs($(SUBDIRS))
+DependSubdirs($(SUBDIRS))
+
+/* this will need to go eventually into the Project.tmpl file... */
+#ifndef	SharedLibDtTerm
+#define	SharedLibDtTerm HasSharedLibraries
+#endif
+
+#ifndef	NormalLibDtTerm
+#define	NormalLibDtTerm (!SharedLibDtTerm | ForceNormalLib)
+#endif
+/*****************************************************************/
+
+#ifndef	DoNormalLib
+#define	DoNormalLib NormalLibDtTerm
+#endif
+
+#ifndef	DoSharedLib
+#define	DoSharedLib SharedLibDtTerm
+#endif
+
+#ifndef	DoDebugLib
+#define	DoDebugLib DebugLibDtTerm
+#endif
+
+#ifndef	DoProfileLib
+#define	DoProfileLib ProfileLibDtTerm
+#endif
+
+#include <Library.tmpl>
+
+SYS_LIBRARIES = -lm
+
+#ifdef AlphaArchitecture
+SYS_LIBRARIES = -lm -lc
+SO_REQLIBS    = $(ALL_LIBPATH) $(HELPLIB) $(XMLIB) $(XTOOLLIB) $(XLIB) $(SYS_LIBRARIES)
+DEFINES       = -DALPHA_ARCHITECTURE -DSUN_TERMINAL_SERVER
+#endif /* AlphaArchitecture */
+
+#ifdef	Build_HpVue
+EXTRA_DEFINES = -DBUILD_HPVUE -DHPVUE
+#endif	/* Build_HpVue */
+
+#ifdef  HPArchitecture
+DEFINES = -DHP_ARCHITECTURE -DSUN_TERMINAL_SERVER
+#endif
+
+#ifdef RsArchitecture
+SYS_LIBRARIES = -lm -liconv
+EXTRA_LOAD_FLAGS = ExtraLoadFlags -blibpath\:$(DTUSRLIBDIR):/usr/lib:/lib
+#endif
+
+#ifdef  IBMArchitecture
+DEFINES = -DIBM_ARCHITECTURE -DSUN_TERMINAL_SERVER
+#endif
+
+#ifdef  SunArchitecture
+DEFINES = -DSUN_ARCHITECTURE -DSUN_TERMINAL_SERVER
+EXTRA_DEFINES = -D_TS_ERRNO
+#endif
+
+#ifdef  USLArchitecture
+DEFINES = -DUSL_ARCHITECTURE -DSUN_TERMINAL_SERVER
+#endif
+
+#ifdef  UXPArchitecture
+DEFINES = -DUXP_ARCHITECTURE -DSUN_TERMINAL_SERVER
+#endif
+
+#ifdef	Build_HpVue
+HELPLIB = $(XVHLIB) $(ILLIB) $(XV30_LIB) $(BMSLIB)
+DEPHELPLIB = $(DEPXVHLIB) $(DEPILLIB) $(DEPXV30_LIB)
+EXTRA_DEFINES = -DHPVUE
+EXTRA_INCLUDES = -I$(XV30_SRC)
+LOCAL_DTTERMLIB = ./libDtTerm.a
+DEPLOCAL_DTTERMLIB = ./libDtTerm.a
+#else	/* Build_HpVue */
+LOCAL_DTTERMLIB = $(DTTERMLIB)
+DEPLOCAL_DTTERMLIB = $(DEPDTTERMLIB)
+#ifdef SunArchitecture
+HELPLIB = $(DTSVCLIB) $(TTLIB)
+DEPHELPLIB = $(DEPDTSVCLIB) $(DEPTTLIB)
+#else
+HELPLIB = $(DTHELPLIB) $(DTSVCLIB)
+DEPHELPLIB = $(DEPDTHELPLIB) $(DEPDTSVCLIB)
+#endif /* SunArchitecture */
+#endif	/* Build_HpVue */
+
+#ifdef	HPArchitecture
+USE_XHPLIB = $(XHPLIB)
+
+#  if (OSMajorVersion >= 10)
+   /*
+    * The symbol _DtTermPrimDebugLevel isn't defined in libDtTerm.sl so
+    * libDtTerm.a must be used.
+    */
+   LOCAL_DTTERMLIB = ./libDtTerm.a
+#  endif
+#endif	/* HPArchitecture */
+
+#ifdef	SunArchitecture
+SYS_LIBRARIES = -lm -ldl $(WIDECHARSYSLIB) -lgen
+EXTRA_CCOPTIONS = -xstrconst -dalign
+
+/* override LD for Sun */
+/* Removed this line as a quick fix to version problem: LD=$(CC) */
+REQUIREDLIBS = $(ALL_LIBPATH) $(DTSVCLIB) $(XMLIB) $(XTOOLLIB) $(XLIB) -L/usr/lib -lc $(WIDECHARSYSLIB) -ldl
+#endif	/* SunArchitecture */
+
+/* DEPLIBS contains the list of library depencies for a client.
+ * LOCAL_LIBRARIES contains the list of libraries on the link line.
+ * Generally, the dependency form of a library has DEP as a prefix.
+ * e.g. put $(XLIB) in LOCAL_LIBRARIES and $(DEPXLIB) in DEPLIBS.
+ * NOTE: if DEPLIBS is not set here, it is by default null and there
+ *       are no library dependencies for clients.
+ *       You cannot put -Llibpath into DEPLIBS. You must put actual
+ *       paths to the library.
+ */
+DEPLIBS = $(DEPLOCAL_DTTERMLIB) $(DEPARCHLIBS) $(DEPXINPUTLIB) $(DEPHELPLIB) \
+	$(DEPXMLIB) $(DEPXTOOLLIB) $(DEPXLIB)
+LOCAL_LIBRARIES = $(LOCAL_DTTERMLIB) $(USE_XHPLIB) $(XINPUTLIB) $(HELPLIB) \
+	$(XMLIB) $(XTOOLLIB) $(XLIB)
+
+INCLUDES = -I. -I./TermPrim -I./Term -I./TermView
+
+INSTALLFLAGS = $(INSTINCFLAGS)
+
+    LINTLIBS = $(LINTXLIB) $(LINTXTOOL)
+
+TERMPRIM_OBJS = \
+	TermPrim/TermPrim.o \
+	TermPrim/TermPrimAction.o \
+	TermPrim/TermPrimBuffer.o \
+	TermPrim/TermPrimBufferWc.o \
+	TermPrim/TermPrimCursor.o \
+	TermPrim/TermPrimDebug.o \
+	TermPrim/TermPrimFunction.o \
+	TermPrim/TermPrimGetPty.o \
+	TermPrim/TermPrimLineDraw.o \
+	TermPrim/TermPrimParse.o \
+	TermPrim/TermPrimParseTable.o \
+	TermPrim/TermPrimParser.o \
+	TermPrim/TermPrimPendingText.o \
+	TermPrim/TermPrimRender.o \
+	TermPrim/TermPrimRenderMb.o \
+	TermPrim/TermPrimRenderFont.o \
+	TermPrim/TermPrimRenderFontSet.o \
+	TermPrim/TermPrimRenderGlyphFont.o \
+	TermPrim/TermPrimRenderLineDraw.o \
+	TermPrim/TermPrimRepType.o \
+	TermPrim/TermPrimScroll.o \
+	TermPrim/TermPrimSelect.o \
+	TermPrim/TermPrimSetPty.o \
+	TermPrim/TermPrimSetUtmp.o \
+	TermPrim/TermPrimSubproc.o \
+	TermPrim/TermPrimUtil.o    \
+	TermPrim/TermPrimVersion.o \
+	TermPrim/TermPrimWMProtocols.o
+
+SHARED_TERMPRIM_OBJS = \
+	TermPrim/shared/TermPrim.o \
+	TermPrim/shared/TermPrimAction.o \
+	TermPrim/shared/TermPrimBuffer.o \
+	TermPrim/shared/TermPrimBufferWc.o \
+	TermPrim/shared/TermPrimCursor.o \
+	TermPrim/shared/TermPrimDebug.o \
+	TermPrim/shared/TermPrimFunction.o \
+	TermPrim/shared/TermPrimGetPty.o \
+	TermPrim/shared/TermPrimLineDraw.o \
+	TermPrim/shared/TermPrimParse.o \
+	TermPrim/shared/TermPrimParseTable.o \
+	TermPrim/shared/TermPrimParser.o \
+	TermPrim/shared/TermPrimPendingText.o \
+	TermPrim/shared/TermPrimRender.o \
+	TermPrim/shared/TermPrimRenderMb.o \
+	TermPrim/shared/TermPrimRenderFont.o \
+	TermPrim/shared/TermPrimRenderFontSet.o \
+	TermPrim/shared/TermPrimRenderGlyphFont.o \
+	TermPrim/shared/TermPrimRenderLineDraw.o \
+	TermPrim/shared/TermPrimRepType.o \
+	TermPrim/shared/TermPrimScroll.o \
+	TermPrim/shared/TermPrimSelect.o \
+	TermPrim/shared/TermPrimSetPty.o \
+	TermPrim/shared/TermPrimSetUtmp.o \
+	TermPrim/shared/TermPrimSubproc.o \
+	TermPrim/shared/TermPrimUtil.o    \
+	TermPrim/shared/TermPrimVersion.o \
+	TermPrim/shared/TermPrimWMProtocols.o
+
+TERM_OBJS = \
+	Term/Term.o \
+	Term/TermAction.o \
+	Term/TermBuffer.o \
+	Term/TermColor.o \
+	Term/TermEnhance.o \
+	Term/TermFunction.o \
+	Term/TermFunctionKey.o \
+	Term/TermLineData.o \
+	Term/TermParse.o \
+	Term/TermParseTable.o \
+	Term/TermVersion.o
+
+SHARED_TERM_OBJS = \
+	Term/shared/Term.o \
+	Term/shared/TermAction.o \
+	Term/shared/TermBuffer.o \
+	Term/shared/TermColor.o \
+	Term/shared/TermEnhance.o \
+	Term/shared/TermFunction.o \
+	Term/shared/TermFunctionKey.o \
+	Term/shared/TermLineData.o \
+	Term/shared/TermParse.o \
+	Term/shared/TermParseTable.o \
+	Term/shared/TermVersion.o
+
+TERMVIEW_OBJS = \
+	TermView/SunDtHelp.o \
+	TermView/TermView.o \
+	TermView/TermViewMenu.o \
+	TermView/TermViewGlobalDialog.o \
+	TermView/TermViewTerminalDialog.o
+
+SHARED_TERMVIEW_OBJS = \
+	TermView/shared/SunDtHelp.o \
+	TermView/shared/TermView.o \
+	TermView/shared/TermViewMenu.o \
+	TermView/shared/TermViewGlobalDialog.o \
+	TermView/shared/TermViewTerminalDialog.o
+
+DTTERM_SRCS = \
+	DtTermLogit.c \
+	DtTermMain.c \
+	DtTermFallBackResources.c \
+	sunDtTermServer.c \
+	DtTermSyntax.c
+
+DTTERM_OBJS = \
+	DtTermLogit.o \
+	DtTermMain.o \
+	DtTermFallBackResources.o \
+	sunDtTermServer.o \
+	DtTermSyntax.o
+
+OBJS2 = \
+	$(TERMPRIM_OBJS) \
+	$(TERM_OBJS) \
+	$(TERMVIEW_OBJS)
+SHARED_OBJS2 = \
+	$(SHARED_TERMPRIM_OBJS) \
+	$(SHARED_TERM_OBJS) \
+	$(SHARED_TERMVIEW_OBJS)
+
+SRCS1 = $(DTTERM_SRCS)
+OBJS1 = $(DTTERM_OBJS)
+
+#ifdef	HPArchitecture
+ARCHLIBS = $(XHPLIB)
+#endif	/* HPArchitecture */
+
+
+       PROGRAMS = dtterm
+   INSTALLFLAGS = -m 4755
+       LINTLIBS = $(USE_XHPLIB) $(XINPUTLIB) $(HELPLIB) \
+		  $(XPMLIB) $(XMLIB) $(XTOOLLIB) $(XLIB)
+#ifdef DEBUGTREE
+#ifdef __hp9000s300
+   LDOPTIONS = $(CDEBUGFLAGS) -N
+#endif
+#endif
+
+
+NormalLibraryObjectRule()
+
+
+/* For install of developer's build environment */
+LOCAL_BINSTALL_LIBDEST = lib
+#if DoSharedLib
+#if DoNormalLib
+SharedLibraryTarget(DtTerm,1,$(SHARED_OBJS2),.,.)
+#else
+SharedLibraryTarget(DtTerm,1,$(OBJS2),.,.)
+#endif
+SharedLibraryBuildInstall(DtTerm,1,$(LOCAL_BINSTALL_LIBDEST))
+InstallSharedLibrary(DtTerm,1,$(USRLIBDIR))
+#endif
+#if DoNormalLib
+NormalLibraryTarget(DtTerm,$(OBJS2))
+NormalLibraryBuildInstall(DtTerm,$(LOCAL_BINSTALL_LIBDEST))
+InstallLibrary(DtTerm,$(USRLIBDIR))
+#endif
+
+LintLibraryTarget(DtTerm,$(SRCS2))
+
+InstallLintLibrary(DtTerm,$(LINTLIBDIR))
+
+CppTextRule(Dtterm.ad, Dtterm.ad.src, $(EXTRA_DEFINES),)
+CppTextRule(DtTermFallBackResources.c.src, Dtterm.ad.src, $(EXTRA_DEFINES) -DFALLBACK_RESOURCES,)
+
+DtTermFallBackResources.c: DtTermFallBackResources.c.src mkfallbk
+	$(RM) DtTermFallBackResources.c
+	./mkfallbk <DtTermFallBackResources.c.src >DtTermFallBackResources.c
+includes:: DtTermFallBackResources.c Dtterm.ad
+localincludes:: DtTermFallBackResources.c Dtterm.ad
+clean::
+	$(RM) DtTermFallBackResources.c
+	$(RM) mkfallbk
+
+dtterm.ti: terminfoChecklist terminfoCreate
+	$(RM) dtterm.ti
+	CPP="$(CPP)" ./terminfoCreate <terminfoChecklist >dtterm.ti
+includes:: dtterm.ti
+localincludes:: dtterm.ti
+clean::
+	$(RM) dtterm.ti
+	$(RM) terminfoCreate
+
+dtterm.tc:
+	$(RM) dtterm.tc
+	/bin/infocmp -C dtterm 2>/dev/null > dtterm.tc
+includes:: dtterm.tc
+localincludes:: dtterm.tc
+clean::
+	$(RM) dtterm.tc
+
+ComplexProgramTarget_1(dtterm,$(LOCAL_LIBRARIES),)
+
+#ifdef	Build_HpVue
+_TermVersion.o: ./Term/TermVersion.o
+        what ./Term/TermVersion.o | \
+        grep 'Revision:' | \
+        head -n 1 | \
+        sed -e 's/^[     ]*/@(#)/' >_TermVersion.o
+MessageCatalogTarget(dtterm, _TermVersion.o)
+#endif	/* Build_HpVue */
+
+NormalLintTarget($(SRCS2))
+NormalLintTarget($(SRCS1))
+
+#ifdef	Build_HpVue
+/***** vuge hidden symbols *******/
+#ifdef HPArchitecture
+#ifdef __hp9000s300
+HIDDEN_SYMBOLS = -h _main -h _Help
+#else
+HIDDEN_SYMBOLS = -h main -h Help
+#endif
+#endif
+
+/***** For vuge make a client_OBJS.o using client_main.o ******/
+/***** This implies the existence of client_main.c       ******/
+#ifdef HPArchitecture
+VugeObjectTarget(dtterm,$(HIDDEN_SYMBOLS),$(OBJS1) $(LOCAL_DTTERMLIB))
+#endif
+#endif	/* Build_HpVue */

@@ -1,0 +1,2161 @@
+.\"$Header: dtwm.man,v 1.11 93/08/13 13:57:38 xbuild Exp $
+.\"
+.de EX		\"Begin example
+.ne 5
+.if n .sp 1
+.if t .sp .5
+.nf
+.in +.5i
+..
+.de EE
+.fi
+.in -.5i
+.if n .sp 1
+.if t .sp .5
+..
+.\"(c)1987,1988,1989,1990,1992 Hewlett-Packard Company\
+.\"(c)1989,1990,1991,1992 Open Software Foundation\
+.\"All Rights Reserved
+..
+.TH DTWM 1X 
+.ds )H Hewlett-Packard Company
+.ds ]W HP DT 3.0 (7/92)
+.ds Rc Resource Description File
+.ds rC resource description file
+.SH NAME
+\fBdtwm - The HP DT Workspace Manager.\fP
+.sp 1
+.SH SYNOPSIS
+.B dtwm
+[options]
+.sp 1
+.SH DESCRIPTION
+\fIDtwm\fP
+is an X11 window manager based upon the Motif Window Manager
+(\fImwm, version 1.1.3\fP). Dtwm is an integral part of the Hewlett-Packard 
+Visual User Environment (HP DT). It communicates with and
+facilitates access to the other components in the environment. 
+.P
+Access to many other DT components is provided throughout the \fIfront
+panel\fP (also called the \fIworkspace manager\fR in HP DT 2.1). 
+The front panel can be configured to contain controls and
+indicators for tasks that you perform frequently. These controls
+include file management, session management, customization, 
+printing, trash, help, or other functions that you define.
+.P
+Workspace window management represents a significant
+enhancement of mwm. Workspaces can be thought of as virtual screens.
+Multiple workspaces gives you a larger, virtual screen area to place
+your windows on.
+.P
+\fIDtwm\fP provides the same window management and limited session
+management functionality as mwm. It gives you (the user or programmer)
+the ability to control window size, position, state (iconic or normal),
+input focus ownership, etc. 
+It also provides session management functions such as stopping a client.
+.sp 1
+.SH OPTIONS
+.TP 8
+.BI \-display " display" 
+This option specifies the display to use, typically of the form
+\fBhostname:display_number.screen_number\fR.  
+For example, \fB-display oregon:2.0\fR specifies
+the first screen of the second display of host \fBoregon\fR.
+.sp
+If no \fIscreen_number\fR
+is specified, the first screen (screen ``0'') becomes the default,
+or \fIDT screen\fR, of the display.
+The front panel is available on the DT screen.
+See also \fIX(1)\fP.
+.TP 8
+.BI \-xrm " resourcestring"
+This option specifies a resource string to use.
+For example,
+\fBdtwm -xrm "dtwm*workspaceList: A B C D"\fR specifies the resource 
+names (and indirectly, the number) of workspaces that \fBdtwm\fR 
+should create at run time.
+.sp 1
+For example,
+\fBdtwm -xrm "dtwm*keyboardFocusPolicy: pointer"\fR specifies that
+\fBdtwm\fR should 
+automatically set the input focus to the window under the pointer.
+.sp 1
+You can specify multiple resources by adding one \fB-xrm\fR
+option after another.
+.TP 8
+.BI \-multiscreen 
+This option causes dtwm to manage all the screens on the display.
+By default, dtwm manages only the default screen of the display.
+For example,
+\fBdtwm -display local:0.1 -multiscreen\fR
+instructs \fBdtwm\fR to manage all the screens on display 0 and
+to place the front panel on the second screen (i.e., screen ``1'').
+.TP 8
+.BI \-screens " name [name...]" 
+This option specifies the screens names to use for fetching screen-based
+resources.
+If -multiscreen is not specified, then the only the first name of the
+list of names will be used. If -multiscreen is specified, all the names
+will be used up to the number of screens managed.
+The first screen on
+the display (screen 0) will use the first name, the second screen will
+use the second name, and so on. If there are more screens to manage than
+names in the list, the first name on the list will be reused for the
+remaining screens.
+.sp 1
+If no names are specified, 
+\fBdtwm\fR constructs the screen name(s) dynamically,
+based on two screen characteristics:
+.sp 1
+.IP "\fBScreen Resolution\fP" 1.25i
+The screen resolution may be \fIHighRes\fR (typically, 1280 by 1024
+pixels), \fIMedRes\fR (typically, 1024 by 768 pixels), or 
+\fILowRes\fR (fewer pixels).
+.sp 1
+.IP "\fBScreen Color Type\fP" 1.25i
+The screen color type may be \fIMono\fR (2-4 colors), \fILowColor\fR
+(16 colors), \fIMedColor\fR (64 colors), 
+or \fIHighColor\fR (256 colors).
+.P
+.sp 1
+For example, at run-time \fBdtwm\fR constructs the screen name
+\fIHighResHighColor\fR
+for an 8-plane (2^8, or 256-color)
+1280x1024 display system.
+.sp 1
+The screen name may be used with resource specifications to
+differentiate behavior on a per screen basis.
+.sp 1
+.SH STARTUP
+Normally, the session manager (dtsession) starts 
+\fBdtwm\fR by running the executable as \fI/usr/dt/bin/dtwm\fR.
+You can change this invocation by modifying a dtsession 
+resource, \fBwmStartupCommand\fR.
+.sp 1
+For example, the following line from the 
+\fB/usr/dt/app-defaults/Dtsession\fR file causes \fBdtwm\fR
+to manage all the screens on the display:
+.sp 1
+Dtsession*wmStartupCommand:  /usr/dt/bin/dtwm -multiscreen
+.sp 1
+(By default, dtwm manages only one screen.)  Using command line options
+is one way of controlling the behavior of \fBdtwm\fR.  Using
+\fIresources\fR is another.
+.SH APPEARANCE
+The following sections describe the basic default behaviors of windows,
+icons, the icon box, input focus, and window stacking.  The appearance and
+behavior of the window manager can be altered by changing the configuration
+of specific resources.  Resources are defined under the heading "X DEFAULTS."
+.sp 1
+.SH WINDOWS
+Default dtwm window frames have distinct components with associated functions:
+.IP "\fBTitle Area\fP" 1.25i
+In addition to displaying the client's title, the title area is used to
+move the 
+window.  To move the window, place the pointer over the title area, press
+button 1 and drag the window to a new location.  A wire frame is moved
+during the drag to indicate the new location.  When the button is released,
+the window is moved to the new location.
+.IP "\fBTitle Bar\fP" 1.25i
+The title bar includes the title area, the minimize button, the maximize
+button and the window menu button.
+.IP "\fBMinimize Button\fP" 1.25i
+To turn the window back into its icon, do a button 1 click on the minimize
+button (the frame box with a \fIsmall\fR square in it).
+.IP "\fBMaximize Button\fP" 1.25i
+To make the window fill the screen (or enlarge to the largest size allowed
+by the configuration files), do a button 1 click on the maximize button 
+(the frame box with a \fIlarge\fR square in it).
+.IP "\fBWindow Menu Button\fP" 1.25i
+The window menu button is the frame box with a horizontal bar in it.
+To pop up the window menu, press button 1.
+While pressing, drag the
+pointer on the menu to your selection, then release the button when your
+selection is highlighted.  Alternately, you can click button 1 to pop up
+the menu and keep it posted; then position the pointer and select.
+.PP
+.sp 1
+.TS
+center, tab(;);
+cbp7ss
+cbp6 cbp6 cbp6
+lp6 lp6 lp6 .
+Default Window Menu
+_
+Selection;Accelerator;Description
+=
+\fIRestore\fR;;T{
+Inactive (not an option for windows).
+T}
+_
+Move;;T{
+Allows the window to be moved with keys or mouse.
+T}
+;Shift + Move Grow;Apollo keyboard.
+_
+Size;;T{
+Allows the window to be resized.
+T}
+;Move Grow;Apollo keyboard.
+_
+Minimize;;T{
+Turns the window into an icon.
+T}
+;Shift + Pop;Apollo keyboard.
+_
+Maximize;;T{
+Makes the window fill the screen.
+T}
+;Ctrl + Move Grow;Apollo keyboard.
+_
+Lower;;T{
+Moves window to bottom of window stack.
+T}
+_
+Occupy Workspace...;;T{
+Display the Occupy Workspace dialog to change the workspaces in which
+the client appears.
+T}
+_
+Occupy All Workspaces;;T{
+Put the client in all workspaces.
+T}
+_
+Unoccupy Workspace;;T{
+Remove the client from the current workspace. (Inactive if the client 
+is in only one workspace.)
+T}
+_
+Close;Alt+F4;Removes client from dtwm management.
+.TE
+.sp 1
+.IP "\fBResize Border Handles\fP" 1.25i
+To change the size of a window, move the pointer over a resize border
+handle (the cursor will change), press button 1, and drag the window to a
+new size.  When the button is released, the window is resized.  While
+dragging is being done, a rubber-band outline is displayed to indicate the
+new window size.
+.sp 1
+.IP "\fBMatte\fP" 1.25i
+An optional matte decoration can be added between the client area and the
+window frame.  A matte is not actually part of the window frame.
+There is no functionality associated with a matte.
+.sp 1
+.SH ICONS
+Icons are small graphic representations of windows.  A window can be
+minimized (iconified) using the minimize button on the window frame.
+Icons provide a way to reduce clutter on the screen.  
+.PP
+Pressing mouse button 1 when the pointer is over an icon will
+cause the icon's window menu to pop up.  Releasing the button (press +
+release without moving mouse = click) will cause the menu to stay posted.  
+The menu contains the following selections:
+.sp 4i
+.TS
+center, tab(;);
+cbp7ss
+cbp6 cbp6 cbp6
+lp6 lp6 lp6 .
+Icon Window Menu
+_
+Selection;Accelerator;Description
+=
+Restore;;T{
+Opens the associated window.
+T}
+;Shift+ Pop;Apollo keyboard.
+_
+Move;;T{
+Allows the icon to be moved with keys.
+T}
+;Shift + Move Grow;Apollo keyboard.
+_
+\fISize\fR;;T{
+Inactive (not an option for icons).
+T}
+_
+\fIMinimize\fR;;T{
+Inactive (not an option for icons).
+T}
+_
+Maximize;;T{
+Opens the associated window and makes it fill the screen.
+T}
+;Ctrl + Pop;Apollo keyboard.
+_
+Lower;;T{
+Moves icon to bottom of icon stack.
+T}
+_
+Occupy Workspace...;;T{
+Display the Occupy Workspace dialog to change the workspaces in which
+the client appears.
+T}
+_
+Occupy All Workspaces;;T{
+Put the client in all workspaces.
+T}
+_
+Unoccupy Workspace;;T{
+Remove the client from the current workspace. (Inactive if the client 
+is in only one workspace.)
+T}
+_
+Close;Alt+F4;T{
+Removes client from dtwm management.
+T}
+.TE
+.sp 1
+Double-clicking button 1 on an icon normalizes the icon into its
+associated window.  Double-clicking button 1 on the icon box's icon
+opens the icon box and allow access to the contained icons.  (In general,
+double-clicking a mouse button offers a quick way to have a function
+performed.
+Another example is double-clicking button 1 with the pointer on the window 
+menu button.  This closes the window.)
+.sp 1
+.SH ICON BOX
+When icons begin to clutter the screen, they can be packed into an "icon
+box."  (To use an icon box, dtwm must be started with the icon box
+configuration already set.)  
+The icon box is a window manager window that holds client
+icons.  There is one icon box for each workspace.
+Icons in the icon box can be manipulated with the mouse.
+The following table summarizes the behavior of this interface.  Button
+actions apply whenever the pointer is on any part of the icon. 
+.sp 1
+.TS
+tab(~), center;
+cbp7 cbp7
+lp6 lp6.
+Button Action~Description
+=
+Button 1 click~Selects the icon and posts the icon's window menu.
+_
+Button 1 double click~Normalizes (opens) the associated window.
+_
+Button 1 double click~Raises an already \fIopen\fR window 
+~to the top of the stack.
+_
+Button 1 drag~Moves the icon.
+.TE
+.sp 1
+The window menu of the icon box differs from the window menu of a client
+window: The "Close"
+selection is replaced with the "PackIcons Alt+Shift+F7" selection.  
+When selected,
+PackIcons packs the icons in the box to achieve
+neat rows with no empty slots.  
+.sp 1
+If the front panel is used with the icon box in dtwm, the 
+behavior of the icon box can be changed. If a control of type
+\fBiconbox\fR is in the front panel, closing the icon box will cause it to
+disappear from the workspace. Pressing on the \fBiconbox\fP control
+will cause the icon box to reappear if it is closed, or to be raised
+if it is open. In this way, the icon box is made to appear like other
+clients that are connected to controls in the front panel.
+.sp 1
+.SH INPUT FOCUS
+Dtwm supports (by default) a keyboard input focus policy of explicit 
+selection.
+This means when a window is selected to get keyboard input, it continues to
+get keyboard input until the window is withdrawn from window management,
+another window is explicitly selected to get keyboard input, or the window
+is iconified.  There
+are numerous resources that control the input focus.
+The client window with the keyboard input focus has the
+active window appearance with a
+visually distinctive window frame.
+.PP
+The following tables summarize the keyboard input focus selection
+behavior:
+.sp 1
+.TS
+tab(~), center;
+cbp7 cbp7 cbp7
+lp6 lp6 lp6.
+Button Action~Object~Function Description
+=
+Button 1 press~Window / window frame~Keyboard focus selection
+_
+Button 1 press~Icon~Keyboard focus selection
+.TE
+.sp 1
+.TS
+tab(~), center;
+cbp7 cbp7
+lp6 lp6.
+Key Action~Function Description
+=
+[Alt][Tab]~T{
+Move input focus to next window in window stack.
+T}
+[Next Wndw]~Apollo keyboard.
+_
+[Alt][Shift][Tab]~Move input focus to previous window in window stack.
+[Shift][Next Wndw]~Apollo keyboard.
+.TE
+.sp 1
+.SH WINDOW STACKING
+The stacking order of windows may be changed as a result of setting the
+keyboard input focus,
+iconifying a window, or by doing a window manager window stacking function.
+.PP
+When a window is iconified, the window's icon is placed
+on the bottom of the stack.
+.PP
+The following table summarizes the default window stacking behavior of the
+window manager:
+.sp 1
+.TS
+tab(~), center;
+cbp7 cbp7
+lp6 lp6.
+Key Action~Function Description
+=
+[Alt][ESC]~Put bottom window on top of stack.
+[Ctrl][Pop]~Apollo keyboard.
+_
+[Alt][Shift][ESC]~Put top window on bottom of stack.
+[Alt][Pop]~Apollo keyboard.
+_
+[Pop]~T{
+Apollo keyboard.  Put bottom window on top of stack; put top window on
+bottom of stack.
+T}
+.TE
+.sp 1
+A window can also be raised to the top when it gets the keyboard
+input focus 
+(e.g., by doing a button 1 press on the window or by using
+[Alt][Tab])
+if this auto-raise feature
+is enabled with the \fBfocusAutoRaise\fP resource.
+.sp 1
+.SH FRONT PANEL
+.sp 1
+The front panel is a central feature of the DT environment. In it are
+controls that connect you with useful system functions and other DT
+components. The default DT environment comes with the preconfigured
+front panel described below.
+.P
+In the center of the front panel is the workspace switch
+which you use to switch between workspaces. The top row of the front
+panel also includes a clock, today's date, system load, system
+customization, help, printer, mail, 
+file management, application management, and trash. The bottom row of
+the front panel provides access to screen locking, workspace renaming, 
+terminal windows, text editor, and session termination.
+.P
+The front panel can be configured for custom installations.
+(See the /usr/dt/config/sys.dtwmrc file and \fBdtwmrc(4X)\fR for 
+more information).
+.SH WORKSPACES
+Dtwm will create as many workspaces as are defined in the
+\fBworkspaceList\fP resource.  Workspaces may be renamed dynamically
+from the \fBRename Workspace\fR dialog. This dialog can be called up
+either from a button on the front panel or by activating a button binding
+or key binding that you have defined (see \fBf.workspace_rename\fP).
+.P
+Switching between workspaces is normally
+done by clicking on the workspace switch, which is usually located
+centrally in the front panel. Workspace switching can also be accomplished
+via key and button bindings (see \fBf.next_workspace\fP and
+\fBf.prev_workspace\fP).
+.P
+Windows may inhabit one or many workspaces. This can be controlled on a
+per-window basis by calling up the \fBOccupy Workspace\fP dialog. This
+dialog is normally posted from the window menu, but may also be posted
+with a button or key binding (see \fBf.workspace_presence\fP). This
+dialog lets you select the workspaces you want the window to be in from
+a list of available workspaces. It is also useful to see what workspaces
+a window is currently in.
+.sp 1
+.SH DYNAMIC CUSTOMIZATION
+When dtwm is running as part of HP DT, you have access to dynamic
+customization of some aspects of dtwm through the \fBStyle Manager\fP. 
+The Style Manager is started by pressing the system customization button 
+on the front panel. Color and backdrops can be customized dynamically.
+Font changes will not take effect until the next session or until
+dtwm is restarted. Dtstyle also provides an easy way of changing the
+keyboard focus policy and the window move feedback (opaque or wire-frame).
+.sp 1
+NOTE:
+.sp 1
+The dynamic customization of colors operates on a fixed set of color
+resources allocated specifically for HP DT.  You will not be able to
+dynamically customize the colors of components for which you have set
+color resources explicitly (see X DEFAULTS).
+.sp 1
+.SH X DEFAULTS
+Dtwm is configured from its resource database.
+This database is built from the following sources. They are listed in order of
+precedence, low to high:
+.EX
+  app-defaults/Dtwm
+  RESOURCE_MANAGER root window property or $HOME/.Xdefaults
+  XENVIRONMENT variable or $HOME/.Xdefaults-host
+  dtwm \fB-xrm\fR and \fB-screens\fR command line options
+.EE
+Entries in the resource database may refer to other resource files 
+for specific types of resources.
+These include files that contain bitmaps, fonts, and \fIdtwm\fP
+specific resources such as menus and behavior specifications
+(i.e., button and key bindings).
+.P
+\fBDtwm\fP is the resource class name of dtwm
+and \fBdtwm\fP is the resource
+name used by dtwm to look up resources.
+In the following discussion of resource specification "Dtwm" 
+and "dtwm" can be used interchangeably. However, if conflicting
+resources are specified, resources specified by resource name ("dtwm")
+will take precedence over resource specified by resource class
+("Dtwm").
+.P
+Dtwm uses the following types of resources:
+.P
+.I "Component Appearance Resources:"
+.P
+These resources specify appearance attributes of
+window manager user interface components.
+They can be applied to the appearance of window manager menus,
+feedback windows (e.g., the window reconfiguration feedback window),
+client window frames, and icons. Generally, these resources are
+specified on a per-screen basis (the same for all workspaces in a
+screen).
+.P
+.I "Specific Appearance and Behavior Resources:"
+.P
+These resources specify dtwm appearance and 
+behavior (e.g., window management policies).
+They are not set separately for different dtwm user interface components.
+Some of these resoures are global in scope; others may be specified on a
+per-screen basis.
+.P
+.I "Client Specific Resources:"
+.P
+These dtwm resources can be set for a particular client window or
+class of client windows.
+They specify client-specific icon and client window frame 
+appearance and behavior.
+.P
+Resource identifiers can be either a resource name (e.g., foreground)
+or a resource class (e.g., Foreground).
+If the value of a resource is a filename and if the filename is
+prefixed by "~/", then it is relative to the path contained in the \fI$HOME\fP
+environment variable
+(generally the user's home directory).  
+This is the only environment variable dtwm uses directly ($XENVIRONMENT is
+used by the resource manager).
+.sp 1
+.SH "\fBRESOURCE HIERARCHY\fP"
+The resource hierarchy for dtwm takes into account the management of
+multiple screens and multiple workspaces per screen. Screen resources
+are subresources of dtwm. Workspace resources are subresources of
+each screen name.  Depending on the
+resource being specified, you may need to add a screen or workspace
+component to the resource name to make sure you are being specific
+enough. 
+.P
+The syntax for a workspace specific resource is:
+.EX
+  \fBDtwm*\fP\fIscreen_name\fP*\fIworkspace_name\fP*\fIresource_id\fP
+.EE
+If you only want to be screen specific, then the \fIworkspace_name\fP
+component should be removed. 
+Currently, the only workspace specific resources deal with the workspace
+backdrop.
+.sp 1
+.SH "\fBCOMPONENT APPEARANCE RESOURCES\fP"
+The syntax for specifying \fIcomponent appearance resources\fP that apply
+to window manager icons, menus, and client window frames is
+.EX
+  \fBDtwm*\fP\fIresource_id\fP
+.EE
+For example, \fBDtwm*foreground\fP is used to specify the foreground color
+for dtwm menus, icons, and client window frames.
+.P
+The syntax for specifying \fIcomponent appearance resources\fP that apply
+to a particular dtwm component is
+.EX
+  \fBDtwm*\fP[\fBmenu\fP|\fBicon\fP|\fBclient\fP|\fBfeedback\fP]\fB*\fP\fIresource_id\fP
+.EE
+If \fImenu\fP is specified, the resource is applied only to dtwm
+menus; if \fIicon\fP is specified, the resource is applied to icons;
+and if \fIclient\fP is specified, the resource is applied to
+client window frames.
+For example, \fBDtwm*icon*foreground\fP is used to specify the foreground color
+for dtwm icons, \fBDtwm*menu*foreground\fP specifies the foreground color
+for dtwm menus, and \fBDtwm*client*foreground\fP is used to specify the
+foreground color for dtwm client window frames.
+.P
+The appearance of the title area of a client window frame
+(including window management buttons)
+can be separately configured.
+The syntax for configuring the title area of a client window frame is:
+.P
+.in+4
+\fBDtwm*client*title*\fIresource_id\fR
+.in-4
+.P
+For example, \fBDtwm*client*title*foreground\fP specifies the foreground color
+for the title area.
+Defaults for title area resources are based on the values of the
+corresponding client window frame resources.
+.P
+The appearance of menus can be configured based on the name of the menu.
+The syntax for specifying menu appearance by name is:
+.P
+.in+4
+\fBDtwm*menu*\fImenu_name\fB*\fIresource_id\fP
+.in-4
+.P
+For example, \fBDtwm*menu*my_menu*foreground\fP specifies the foreground color
+for the menu named \fBmy_menu\fP.
+.P
+The following \fIcomponent appearance resources\fP that apply to 
+all window manager parts can be specified:
+.sp 2
+.TS
+expand, tab(;);
+cbp7 sss
+lbp6  lbp6  lbp6  lbp6
+lp6  lp6  lp6  lp6 .
+Component Appearance Resources - All Window Manager Parts
+Name;Class;Value Type;Default
+_
+background;Background;color;varies*
+backgroundPixmap;BackgroundPixmap;string**;varies*
+bottomShadowColor;Foreground;color;varies*
+bottomShadowPixmap;BottomShadowPixmap;string**;varies*
+fontList;FontList;string;"fixed"
+foreground;Foreground;color;varies*
+saveUnder;SaveUnder;T/F;F
+topShadowColor;Background;color;varies*
+topShadowPixmap;TopShadowPixmap;string**;varies*
+.TE
+.ps 7
+*The default is chosen based on the visual type of the screen.
+**Pixmap image name. See XmInstallImage(3X).
+.ps
+
+.TP 8
+.BR "background\fP (" class " Background)"
+This resource specifies the background color. Any legal X color may be 
+specified.  The default value is chosen based on the visual type of the screen.
+.TP 8
+.BR "backgroundPixmap (" class " BackgroundPixmap)"
+This resource specifies the background Pixmap of the dtwm decoration
+when the window is inactive (does not have the keyboard focus). 
+The default value is chosen based on the visual type of the screen.
+.TP 8
+.BR "bottomShadowColor (" class " Foreground)"
+This resource specifies the bottom shadow color. This color is used for the
+lower and right bevels of the window manager decoration. 
+Any legal X color may be specified.  The default value is chosen based on
+the visual type of the screen.  
+.TP 8
+.BR "bottomShadowPixmap (" class " BottomShadowPixmap)"
+This resource specifies the bottom shadow Pixmap. 
+This Pixmap is used for the lower and right bevels of the window 
+manager decoration. 
+The default is chosen based on the visual type of the screen.
+.TP 8
+.BR "fontList (" class " Font)"
+This resource specifies the font used in the window manager decoration.
+The character encoding of the
+font should match the character encoding of the strings that are used.
+The default is "fixed."
+.TP 8
+.BR "foreground (" class " Foreground)"
+This resource specifies the foreground color.
+The default is chosen based on the visual type of the screen.
+.TP 8
+.BR "saveUnder (" class " SaveUnder)"
+This is used to indicate whether "save unders"
+are used for dtwm components.  For this to have any effect, save unders must
+be implemented by the X server.  If save unders are implemented, the X
+server will save the contents of windows obscured by windows that have the
+save under attribute set.  If the saveUnder resource is 
+True, dtwm will set the save under attribute on the window manager frame
+of any client that has it set.  If saveUnder is False, save unders will
+not be used on any window manager frames.  The default value is False.
+.TP 8
+.BR "topShadowColor (" class " Background)"
+This resource specifies the top shadow color. 
+This color is used for the
+upper and left bevels of the window manager decoration. 
+The default is chosen based on the visual type of the screen.
+.TP 8
+.BR "topShadowPixmap (" class " TopShadowPixmap)"
+This resource specifies the top shadow Pixmap. 
+This Pixmap is used for the
+upper and left bevels of the window manager decoration. 
+The default is chosen based on the visual type of the screen.
+.P
+The following \fIcomponent appearance resources\fP that apply to frame and
+icons can be specified:
+.sp 1
+.TS
+expand, tab(;);
+cbp7 sss
+lbp6  lbp6  lbp6  lbp6
+lp6  lp6  lp6  lp6 .
+Frame and Icon Components
+Name;Class;Value Type;Default
+_
+activeBackground;Background;color;varies*
+activeBackgroundPixmap;BackgroundPixmap;string**;varies*
+activeBottomShadowColor;Foreground;color;varies*
+activeBottomShadowPixmap;BottomShadowPixmap;string**;varies*
+activeForeground;Foreground;color;varies*
+activeTopShadowColor;Background;color;varies*
+activeTopShadowPixmap;TopShadowPixmap;string**;varies*
+.TE
+.ps 7
+*The default is chosen based on the visual type of the screen.
+**See XmInstallImage(3X).
+.ps
+
+.TP 8
+.BR "activeBackground (" class " Background)"
+This resource specifies the background color of the dtwm decoration 
+when the window is active (has the keyboard focus).  The default is chosen
+based on the visual type of the screen. 
+.TP 8
+.BR "activeBackgroundPixmap (" class " ActiveBackgroundPixmap)"
+This resource specifies the background Pixmap of the dtwm decoration
+when the window is active (has the keyboard focus).  The default is chosen
+based on the visual type of the screen.
+.TP 8
+.BR "activeBottomShadowColor (" class " Foreground)"
+This resource specifies the bottom shadow color of the dtwm decoration 
+when the window is active (has the keyboard focus).  The default is chosen
+based on the visual type of the screen.
+.TP 8
+.BR "activeBottomShadowPixmap (" class " BottomShadowPixmap)"
+This resource specifies the bottom shadow Pixmap of the dtwm decoration 
+when the window is active (has the keyboard focus).  The default is chosen
+based on the visual type of the screen.
+.TP 8
+.BR "activeForeground (" class " Foreground)"
+This resource specifies the foreground color of the dtwm decoration 
+when the window is active (has the keyboard focus).  The default is chosen
+based on the visual type of the screen.
+.TP 8
+.BR "activeTopShadowColor (" class " Background)"
+This resource specifies the top shadow color of the dtwm decoration 
+when the window is active (has the keyboard focus).  The default is chosen
+based on the visual type of the screen.
+.TP 8
+.BR "activeTopShadowPixmap (" class " TopShadowPixmap)"
+This resource specifies the top shadow Pixmap of the dtwm decoration 
+when the window is active (has the keyboard focus).  The default is chosen
+based on the visual type of the screen.
+.sp 1
+.SH "\fBGLOBAL APPEARANCE AND BEHAVIOR RESOURCES\fP"
+
+The \fIspecific appearance and behavior resource\fP have been divided 
+according to their scope. The first set of
+resources can only be specified globally. The second set can be
+specified on a per-screen basis.
+.P
+The syntax for specifying \fIglobal\fP appearance and behavior
+resources is
+.EX
+  \fBDtwm*\fP\fIresource_id\fP
+.EE
+For example, \fBDtwm*keyboardFocusPolicy\fP specifies the window
+manager policy for setting the keyboard focus to a particular client
+window.
+.P
+The following \fIspecific appearance and behavior resources\fP can be
+specified on a global basis only: 
+.sp 1
+.TS
+expand, tab(;);
+cbp7 sss
+lbp6 lbp6  lbp6  lbp6
+lp6  lp6  lp6  lp6 .
+Global Specific Appearance and Behavior Resources
+Name;Class;Value Type;Default
+_
+autoKeyFocus;AutoKeyFocus;T/F;T
+autoRaiseDelay;AutoRaiseDelay;millisec;500
+backdropDirectory;BackdropDirectory;directory;/usr/dt/icons/Dtbackdrops
+bitmapDirectory;BitmapDirectory;directory;/usr/include/X11/bitmaps
+clientAutoPlace;ClientAutoPlace;T/F;T
+colormapFocusPolicy;ColormapFocusPolicy;string;keyboard
+configFile;ConfigFile;file;(see description)
+deiconifyKeyFocus;DeiconifyKeyFocus;T/F;T
+doubleClickTime*;DoubleClickTime;millisec.;multiClickTime
+enableWarp;EnableWarp;T/F;T
+enforceKeyFocus;EnforceKeyFocus;T/F;T
+iconAutoPlace;IconAutoPlace;T/F;T
+iconClick;IconClick;T/F;T
+interactivePlacement;InteractivePlacement;T/F;F
+keyboardFocusPolicy;KeyboardFocusPolicy;string;explicit
+lowerOnIconify;LowerOnIconify;T/F;T
+moveThreshold;MoveThreshold;pixels;4
+multiScreen;MultiScreen;T/F;F
+passButtons;PassButtons;T/F;F
+passSelectButton;PassSelectButton;T/F;T
+positionIsFrame;PositionIsFrame;T/F;T
+positionOnScreen;PositionOnScreen;T/F;T
+quitTimeout;QuitTimeout;millisec.;1000
+raiseKeyFocus;RaiseKeyFocus;T/F;F
+screens;Screens;string;varies
+showFeedback;ShowFeedback;string;all
+startupKeyFocus;StartupKeyFocus;T/F;T
+useFrontPanel;UseFrontPanel;T/F;F
+useMessaging;UseMessaging;T/F;F
+wMenuButtonClick;WMenuButtonClick;T/F;T
+wMenuButtonClick2;WMenuButtonClick2;T/F;T
+.TE
+.ps 7
+*Included for backward compatibility. You are encouraged to use the Xt
+resource \fBmultiClickTime\fP.
+.ps
+
+.TP 8
+.BR "autoKeyFocus (" class " AutoKeyFocus)"
+This resource is only available when the keyboard input
+focus policy is explicit.  If autoKeyFocus is given a value of
+True, then when a window with the keyboard input focus is withdrawn from
+window management or is iconified, the focus is set to the previous window
+that had the focus.  If the value given is False, there is no
+automatic setting of the keyboard input focus.  The default value is True.
+.TP 8
+.BR "autoRaiseDelay (" class " AutoRaiseDelay)"
+This resource is only available when the focusAutoRaise resource is True
+and the keyboard focus policy is pointer.  
+The autoRaiseDelay resource specifies the amount of time (in milliseconds)
+that dtwm  
+will wait before raising a window after it gets the keyboard focus.  
+The default value of this resource is 500 (ms).
+.TP 8
+.BR "clientAutoPlace (" class " ClientAutoPlace)"
+This resource determines the
+position of a window when the window has not been given a user specified
+position.  With a value of True, windows are positioned with the top
+left corners of the frames offset horizontally and vertically.  A value of
+False causes the currently configured position of the window to be
+used.  In either case, dtwm will attempt to place the windows totally 
+on-screen.
+The default value is True.
+.TP 8
+.BR "colormapFocusPolicy (" class " ColormapFocusPolicy)"
+This resource indicates the colormap focus policy that is to be used.
+If the resource value is explicit then a colormap selection action
+is done on a client window to set the colormap focus to that window.
+If the value is pointer then the client window containing
+the pointer has the colormap focus.
+If the value is keyboard then the client window that has the
+keyboard input focus will have the colormap focus.
+The default value for this resource is keyboard.
+.TP 8
+.BR "configFile (" class " ConfigFile)"
+The resource value is the path name for a \fIdtwm
+\*(rC\fR.  If none is specified, then \fBdtwm\fR
+searches the following list in order:
+.sp 1
+.EX
+  $HOME/.dt/$LANG/dtwmrc
+  $HOME/.dt/dtwmrc
+  /usr/dt/config/$LANG/sys.dtwmrc
+  /usr/dt/config/sys.dtwmrc
+.EE
+.sp 1
+Upon encountering the first such file, 
+\fBdtwm\fR stops the search and uses it.
+.TP 8
+.BR "deiconifyKeyFocus (" class " DeiconifyKeyFocus)"
+This resource only
+applies when the keyboard input focus policy is explicit.  If a value of
+True is used, a window will receive the keyboard input focus when it is
+normalized (deiconified).  True is the default value.
+.TP 8
+.BR "iconAutoPlace (" class " IconAutoPlace)"
+This resource indicates whether icons are automatically placed on the
+screen by dtwm, or are placed by the user.  
+Users may specify an initial icon position and may move icons after initial
+placement; however, dtwm will adjust the user-specified position to fit into
+an invisible grid.  When icons are automatically placed, dtwm places them
+into the grid using a scheme set with the iconPlacement resource.  
+If the iconAutoPlace resource has a value of True, then dtwm does
+automatic icon placement.  A value of False allows user placement.  
+The default value of this resource is True.
+.TP 8
+.BR "iconClick (" class " IconClick)"
+When this resource is given the value of
+True, the system menu is posted and left posted when an icon is
+clicked.  The default value is True.
+.TP 8
+.BR "interactivePlacement (" class " InteractivePlacement)"
+This resource controls the initial placement of new windows on the screen. 
+If the value is True, then the pointer shape changes before a new window is 
+placed on the screen to indicate to the user that 
+a position should be selected for the upper-left hand corner of the 
+window.
+If the value is False, then windows are placed according to the
+initial window configuration attributes.
+The default value of this resource is False.
+.TP 8
+.BR "keyboardFocusPolicy (" class " KeyboardFocusPolicy)"
+If set to pointer, the keyboard focus policy is to have the keyboard focus set
+to the client window that contains the pointer
+(the pointer could also be in the client window decoration that dtwm adds).
+If set to explicit, the policy is to have the keyboard focus
+set to a client window when the user presses button 1 with the pointer
+on the client window or any part of the associated dtwm decoration.
+The default value for this resource is explicit.
+.TP
+.BR "lowerOnIconify (" class " LowerOnIconify)"
+If this resource is given the default
+value of True, a window's icon appears on the bottom of the window
+stack when the window is minimized (iconified).  A value of False
+places the icon in the stacking order at the same place as its associated
+window. 
+.TP 8
+.BR "moveThreshold (" class " MoveThreshold)"
+This resource is used to control the sensitivity of dragging operations
+that move windows and icons.
+The value of this resource is the number of pixels that the locator will
+be moved with a button down before the move operation is initiated.
+This is used to prevent window/icon movement when a click or
+double-click is done and there is unintentional pointer movement with
+the button down.
+The default value of this resource is 4 (pixels).
+.TP 8
+.BR "multiScreen (" class " MultiScreen)"
+This resource, if True, enables dtwm to manage all the screens on 
+the display. If False, dtwm will only manage a single screen on the
+display.
+The default value for this resource is False.
+.TP 8
+.BR "passButtons (" class " PassButtons)"
+This resource indicates whether or not button press events are passed to
+clients after they are used to do a window manager function in the client
+context.
+If the resource value is False, then the button press will not be passed
+to the client.
+If the value is True, the button press is passed to the
+client window.
+The window manager function is done in either case.
+The default value for this resource is False.
+.TP 8
+.BR "passSelectButton (" class " PassSelectButton)"
+This resource indicates whether or not the keyboard input focus selection
+button press (if keyboardFocusPolicy is explicit)
+is passed on to the client window or used to do a window management action
+associated with the window decorations.
+If the resource value is False then the button press will not be used
+for any operation other than selecting the window to be the keyboard input
+focus; if the value is True, the button press is passed to the
+client window or used to do a window management operation, if appropriate.
+The keyboard input focus selection is done in either case.
+The default value for this resource is True.
+.TP 8
+.BR "positionIsFrame (" class " PositionIsFrame)"
+This resource indicates how client window position information 
+(from the WM_NORMAL_HINTS property and from configuration requests)
+is to be interpreted.
+If the resource value is True then the information is interpreted as
+the position of the dtwm client window frame.  If the value is False then
+it is interpreted as being the position of the client area of the window.
+The default value of this resource is True.
+.TP 8
+.BR "positionOnScreen (" class " PositionOnScreen)"
+This resource is used to indicate that windows should initially be
+placed (if possible) so that they are not clipped by the edge of the 
+screen (if the resource value is True).
+If a window is larger then the size of the screen then
+at least the upper left corner of the window will be on-screen.
+If the resource value is False, then windows are placed in the 
+requested position even if totally off-screen.
+The default value of this resource is True.
+.TP 8
+.BR "quitTimeout (" class " QuitTimeout)"
+This resource specifies the amount of time (in milliseconds) that dtwm
+will wait for a client to update the WM_COMMAND property after dtwm has
+sent the WM_SAVE_YOURSELF message.
+This protocol will only be used for
+those clients that have a WM_SAVE_YOURSELF atom and no WM_DELETE_WINDOW
+atom in the WM_PROTOCOLS client window property.
+The default value of this resource is 1000 (ms). (Refer to the f.kill
+function for additional information.)
+.TP 8
+.BR "raiseKeyFocus (" class " RaiseKeyFocus)" 
+This resource specifies if the keyboard focus should be given to window 
+that has been raised with the \fBf.normalize_and_raise\fP function. If 
+True, then the window will get the keyboard focus. The default value is 
+False.
+.TP 8
+.BR "screens (" class " Screens)"
+This resource is used to provide resource names for the screens to be
+managed by dtwm. The value of this resource is a string containing a
+blank-separated list of names. If fewer names are specified than there
+are screens on the display, then the remaining screens will use the
+first name in the list.
+.IP
+There is no default value for this resource. The default names for
+screens are generated dynamically depending on the screen type. The
+dynamic name is a concatenation of the following:
+.RS
+.sp 1
+.TB "Screen Resolutions"
+.TS
+center, tab(;);
+cBp7 cBp7
+lp6  lp6  .
+Name;Description
+=
+LowRes;less than 1024x768
+_
+MedRes;1024x768
+_
+HighRes;1280x1024 or better
+.TE
+.RE
+
+.RS
+.sp 1
+.TB "Screen Colors"
+.TS
+center, tab(;);
+cBp7 cBp7
+lp6  lp6  .
+Name;Description
+=
+Mono;less than 16 colors
+_
+LowColor;16 colors
+_
+MedColor;64 colors
+_
+HighColor;more than 64 colors
+.TE
+.RE
+
+.IP
+For example, a 1280x1024, 256-color screen would get a default name of
+HighResHighColor. 
+.TP 8
+.BR "showFeedback (" class " ShowFeedback)"
+This resource controls when
+feedback information is displayed.  It controls both window position and
+size feedback during move or resize operations and initial client
+placement.  It also controls window manager message and dialog boxes.  The
+value for this resource is a list of names of the feedback options to be
+enabled; the names must be separated by a space.  The
+names of the feedback options are shown below:
+.RS
+.sp 1
+.TB "Feedback Options"
+.TS
+center, tab(;);
+cBp7 cBp7
+lp6  lp6  .
+Name;Description
+=
+all;Show all feedback. (Default value.)
+_
+behavior;Confirm behavior switch.
+_
+kill;Confirm the killing of dtwm with signal.
+_
+move;Show position during move.
+_
+none;Show no feedback.
+_
+placement;Show position and size during initial placement.
+_
+quit;Confirm the quitting (f.quit_mwm) of dtwm.
+_
+resize;Show size during resize.
+_
+restart;Confirm dtwm restart.
+.TE
+.RE
+.sp 1
+.RS
+The following command line illustrates the syntax for showFeedback:
+.RE
+.P
+.RS
+.TS
+tab(;);
+l l .
+;\fBDtwm*showFeedback: placement resize behavior restart\fP
+.TE
+.RE
+.sp 1
+.RS
+This resource specification provides feedback for initial client
+placement and
+resize, and enables the dialog boxes to confirm the restart and set
+behavior functions.  It disables feedback for the move function.
+.RE
+.TP 8
+.BR "startupKeyFocus (" class " StartupKeyFocus)"
+This resource is only
+available when the keyboard input focus policy is explicit.  When given
+the default 
+value of True, a window gets the keyboard input focus when the window
+is mapped (i.e., initially managed by the window manager).
+.TP 8
+.BR "useFrontPanel (" class " UseFrontPanel)"
+This resource enables the display of the front panel if True. 
+The default value is False.
+.TP 8
+.BR "useMessaging (" class " UseMessaging)"
+This resource controls the connection of dtwm to the Broadcast _DtMessage
+Server (BMS). If set to True, dtwm will try to connect to the BMS and
+will participate in inter-process messaging with other HP DT
+clients.  The default value of this resource is False.
+.TP 8
+.BR "wMenuButtonClick (" class " WMenuButtonClick)"
+This resource
+indicates whether a click of the mouse when the pointer is over
+the window menu button will post and leave posted the system
+menu.  If the value given this resource is True, then the menu
+will remain posted.  True is the default value for this
+resource.
+.TP 8
+.BR "wMenuButtonClick2 (" class " WMenuButtonClick2)"
+When this resource is
+given the default value of True, a double-click action on the window menu
+button will do an f.kill function.
+
+.sp 1
+.SH "\fBSCREEN APPEARANCE AND BEHAVIOR RESOURCES\fP"
+.P
+The syntax for specifying \fIper-screen\fP appearance and behavior
+resources is
+.EX
+   \fBDtwm*\fP\fIscreen_name\fP\fB*\fP\fIresource_id\fP
+.EE
+For example, \fBDtwm*1*keyBindings\fP specifies the key bindings
+to use for the screen "1".
+.P
+.sp 1
+.TS
+expand, tab(;);
+cbp7 sss
+lbp6 lbp6  lbp6  lbp6
+lp6  lp6  lp6  lp6 .
+Screen Specific Appearance and Behavior Resources
+Name;Class;Value Type;Default
+_
+buttonBindings;ButtonBindings;string;NULL
+cleanText;CleanText;T/F;T
+edgeMoveThreshold;EdgeMoveThreshold;pixels;0
+fadeNormalIcon;FadeNormalIcon;T/F;F
+frameBorderWidth;FrameBorderWidth;pixels;5
+iconBoxGeometry;IconBoxGeometry;string;6x1+0-0
+iconBoxName;IconBoxName;string;iconbox
+iconBoxSBDisplayPolicy;IconBoxSBDisplayPolicy;string;all
+iconBoxTitle;IconBoxTitle;string;Icons
+iconDecoration;IconDecoration;string;varies
+iconImageMaximum;IconImageMaximum;wxh;50x50
+iconImageMinimum;IconImageMinimum;wxh;32x32
+iconPlacement;IconPlacement;string;left bottom
+iconPlacementMargin;IconPlacementMargin;pixels;varies
+keyBindings;KeyBindings;string;Motif
+limitResize;LimitResize;T/F;T
+maximumMaximumSize;MaximumMaximumSize;wxh (pixels);2X screen w&h
+moveOpaque;MoveOpaque;T/F;F
+pushButtonClickTime;PushButtonClickTime;millisec.;4 x multiClickTime
+resizeBorderWidth;ResizeBorderWidth;pixels;10
+resizeCursors;ResizeCursors;T/F;T
+subpanelDecoration;SubpanelDecoration;string;title
+transientDecoration;TransientDecoration;string;system title
+transientFunctions;TransientFunctions;string;-minimize -maximize
+useBlinkingIndicator;UseBlinkingIndicator;T/F;T
+useIconBox;UseIconBox;T/F;F
+workspaceList;WorkspaceList;string;NULL
+.TE
+
+.TP 8
+.BR "backdropDirectory (" class " BackdropDirectory)"
+This resource identifies a directory to be searched for workspace
+backdrops.
+This directory is searched if a bitmap is specified without an absolute 
+pathname.
+The default value for this resource is "/usr/dt/icons/Dtbackdrops".
+.IP
+For best results, specify this resource without an application
+qualifier (i.e. use "*backdropDirectory" instead of
+"Dtwm*backdropDirectory"). This will allow the Style Manager and
+the Workspace Manager to work well together in setting up backdrops.
+.TP 8
+.BR "bitmapDirectory (" class " BitmapDirectory)"
+This resource identifies a directory to be searched for window icon
+bitmaps referenced by dtwm resources.
+This directory is searched if a bitmap is specified without an absolute 
+pathname.
+The default value for this resource is "/usr/include/X11/bitmaps".
+.IP
+Note that all images used in the front panel are fetched using
+the resolution- and color-independent naming scheme. The default
+root directory of this search is \fB/usr/dt/icons\fP. Depending
+on the color use, dtwm will look for images in
+\fB/usr/dt/icons/Dtwm\fP or \fB/usr/dt/icons/Dtwm/Color\fP.
+.TP 8
+.BR "buttonBindings (" class " ButtonBindings)"
+This resource identifies the set of button bindings
+for window management functions.
+The named set of button bindings is specified in the 
+\fIdtwm resource description file\fP.
+These button bindings are \fImerged\fP with the built-in default
+bindings.
+The default value for this resource is NULL (i.e., no button bindings are
+added to the built-in button bindings).
+.TP 8
+.BR "cleanText (" class "CleanText)"
+This resource controls the display of window manager text in the client
+title and feedback windows.
+If the default value of True is used, the text is drawn with a clear (no
+stipple) background.  This makes text easier to read on monochrome systems
+where a backgroundPixmap is specified. Only the stippling in the area
+immediately around the text is cleared.  If False, the text is drawn
+directly on top of the existing background.
+.TP 8
+.BR "edgeMoveThreshold (" class " EdgeMoveThreshold)"
+This resource specifies the pixel width of a threshold area
+surrounding the screen.
+When moving or placing a window or icon,
+motion into this threshold area starting from within the screen
+is suppressed
+until the cumulative attempted motion would bring the affected edge
+beyond the threshold.
+Setting this resource to a large value ensures that windows and icons
+are confined completely to the screen.
+The default value is 0 pixels.
+.TP 8
+.BR "fadeNormalIcon (" class " FadeNormalIcon)"
+This resource applies only to icons in the icon box. If this resource 
+is given a value of True, an icon is grayed out whenever it has 
+been normalized (its window has been opened). The default value is False.
+.TP
+.BR "frameBorderWidth (" class " FrameBorderWidth)"
+This resource specifies
+the width (in pixels) of a client window frame border without resize
+handles.  The border width includes the 3-D shadows.  The default value is
+5 pixels.
+.TP 8
+.BR "iconBoxGeometry (" class " IconBoxGeometry)"
+This resource indicates the
+initial position and size of the icon box.  The value of the resource is a
+standard window geometry string with the following syntax:
+.EX
+[\fB=\fP][\fIwidth\fP\fBx\fP\fIheight\fP][{\fB+-\fP}\fIxoffset\fP{\fB+-\fP}\fIyoffset\fP]
+.EE
+If the offsets are not provided, the iconPlacement policy is used to
+determine the initial placement.  The units for width and
+height are columns and rows.
+The actual screen size of the icon box window will depend on the
+iconImageMaximum (size) and iconDecoration resources.  The
+default value for size is (6 * iconWidth + padding) wide by (1 * iconHeight
++ padding) high.  The default value of the location is +0 -0.
+.TP 8
+.BR "iconBoxName (" class " IconBoxName)"
+This resource specifies the name
+that is used to look up icon box resources.  The default name is iconbox.
+.TP
+.BR "iconBoxTitle (" class " IconBoxTitle)
+This resource specifies the name
+that is used in the title area of the icon box frame.  The default value is
+Icons.
+.TP
+.BR "iconBoxSBDisplayPolicy (" class " IconBoxSBDisplayPolicy)
+This resource is used to set the scroll bar display policy for the icon
+box. The possible values for this resource are:
+.TS
+tab(~), center;
+ll.
+\fBall\fP~Display both scroll bars.
+\fBhorizontal\fP~Display only horizontal scroll bar.
+\fBvertical\fP~Display only vertical scroll bar.
+.TE
+
+.IP
+If only one scroll bar is displayed, the icons in the icon box are 
+laid
+out so that all can be accessed
+and the scroll bar is displayed only when
+needed. The default value is all.
+.TP 8
+.BR "iconDecoration (" class " IconDecoration)"
+This resource specifies the general icon decoration.
+The resource value is label"(only the label part is displayed)
+or image (only the image part is displayed) or label image 
+(both the label and image parts are displayed).
+A value of activelabel can also be specified to get a label
+(not truncated to the width of the icon)
+when the icon is selected.
+The default icon decoration for icon box icons is that each icon has a
+label part and an image part (label image).
+The default icon decoration for stand-alone icons is that each icon has an
+active label part, a label part and
+an image part (activelabel label image).
+.TP 8
+.BR "iconImageMaximum (" class " IconImageMaximum)"
+This resource specifies the maximum size of the icon \fIimage\fP.
+The resource value is \fIwidth\fP\fBx\fP\fIheight\fP (e.g., 64x64).
+The maximum supported size is 128x128.
+The default value of this resource is 50x50.
+.TP 8
+.BR "iconImageMinimum (" class " IconImageMinimum)"
+This resource specifies the minimum size of the icon \fIimage\fP.
+The resource value is \fIwidth\fBx\fIheight\fR (e.g., 32x50).
+The minimum supported size is 16x16.
+The default value of this resource is 32x32.
+.TP 8
+.BR "iconPlacement (" class " IconPlacement)"
+This resource specifies the icon placement scheme to be used.
+The resource value has the following syntax:
+.EX
+ \fIprimary_layout  secondary_layout\fP
+.EE
+The layout values are one of the following:
+
+.TS
+tab(~), center;
+ll.
+\fBtop\fP~Lay the icons out top to bottom.
+\fBbottom\fP~Lay the icons out bottom to top.
+\fBleft\fP~Lay the icons out left to right.
+\fBright\fP~Lay the icons out right to left.
+.TE
+.IP
+A horizontal (vertical) layout value should not be used for both the
+\fIprimary_layout\fP and the \fIsecondary_layout\fP
+(e.g., don't use top for the \fIprimary_layout\fP and bottom for the
+\fIsecondary_layout\fP).
+The \fIprimary_layout\fP indicates whether, when an icon placement is done,
+the icon is placed in a row or a column and the direction of placement.
+The \fIsecondary_layout\fP indicates where to place new rows or columns.
+For example, top right indicates that icons should be placed top to bottom
+on the screen and that columns should be added from right to left on the
+screen.
+The default placement is left bottom
+(icons are placed left to right on the screen, with the first row on the
+bottom of the screen, and new rows added from the bottom of the screen
+to the top of the screen).
+.TP 8
+.BR "iconPlacementMargin (" class " IconPlacementMargin)"
+This resource sets the distance between the edge of the screen and the
+icons that are placed along the edge of the screen.
+The value should be greater than or equal to 0.
+A default value (see below) is used if the value specified is invalid.
+The default value for this resource is equal to the space between
+icons as they are placed on the screen (this space is based on maximizing
+the number of icons in each row and column).
+.TP 8
+.BR "keyBindings (" class " KeyBindings)"
+This resource identifies the set of key bindings
+for window management functions.
+If specified
+these key bindings \fIreplace\fP the built-in
+default bindings. 
+The named set of key bindings is specified in 
+\fIdtwm resource description file\fP.
+The default value for this resource is the set of compatible key
+bindings. 
+.TP 8
+.BR "limitResize (" class " LimitResize)" 
+If this resource is True, the user is not allowed to resize a window 
+to greater than the maximum size.
+The default value for this resource is True.
+.TP 8
+.BR "maximumMaximumSize (" class " MaximumMaximumSize)"
+This resource is used to limit the maximum size of a client window
+as set by the user or client.
+The resource value is \fIwidth\fBx\fIheight\fR (e.g., 1024x1024)
+where the width and height are in pixels.
+The default value of this resource is twice the screen width and height.
+.TP 8
+.BR "moveOpaque (" class " MoveOpaque)"
+This resource is used to set the style of feedback provided during
+window moves. If True, the entire window is moved as feedback (at the
+cost of some degradation in performance). If False, only a window
+outline is moved.  The default value of this resource is False.
+.TP 8
+.BR "pushButtonClickTime (" class " PushButtonClickTime)"
+This resource controls the amount of time (in milliseconds) that
+pushbuttons in the front panel will be disabled after their
+initial press.
+The default value of this resource is 4 times the multiClickTime
+set for the window manager, or 2 seconds of wait time.
+The reason for the delay is to suppress multiple application
+invocation from users doubleclicking on pushbuttons.
+.TP 8
+.BR "resizeBorderWidth (" class " ResizeBorderWidth)" 
+This resource specifies the width (in pixels) of a client window frame
+border with resize handles.  The specified border width includes the 3-D
+shadows.  
+The default is 10 (pixels). 
+.TP 8
+.BR "resizeCursors (" class " ResizeCursors)"
+This is used to indicate whether the resize cursors are always displayed
+when the pointer is in the window size border.
+If True the cursors are shown, otherwise the window manager cursor is
+shown.
+The default value is True.
+.TP 8
+.BR "subpanelDecoration (" class " SubpanelDecoration)"
+This controls the amount of decoration that Dtwm puts on subpanel windows.
+The decoration specification is exactly the same as for
+the \fBclientDecoration\fR
+(client specific) resource.
+Subpanels are extensions of the front panel that are configured in the
+\fBdtwmrc\fR file.
+The default value for this resource is \fBtitle\fP
+(i.e., subpanel windows will have titlebar with only a title).
+.TP 8
+.BR "transientDecoration (" class " TransientDecoration)"
+This controls the amount of decoration that Dtwm puts on transient windows.
+The decoration specification is exactly the same as for
+the \fBclientDecoration\fR
+(client specific) resource.
+Transient windows are identified by the WM_TRANSIENT_FOR property which
+is added by the client to indicate a relatively temporary window.
+The default value for this resource is menu title
+(i.e., transient windows will have resize borders and a titlebar with
+a window menu button).
+.TP 8
+.BR "transientFunctions (" class " TransientFunctions)"
+This resource is used to indicate which window management functions are
+applicable (or not applicable) to transient windows.
+The function specification is exactly the same as for
+the \fBclientFunctions\fR (client specific) resource.
+The default value for this resource is -minimize -maximize.
+.TP 8
+.BR "useBlinkingIndicator (" class " UseBlinkingIndicator)"
+This resource enables the operation of the blinking activity light in the
+front panel. If True, the blinking activity light will flash if
+configured into the front panel. If False, the light will not flash;
+instead, the second bitmap specified for the \fBdtwmbusy\fR
+control will be installed in the front panel for the wait duration. 
+The default value is True.
+.TP 8
+.BR "useIconBox (" class " UseIconBox)"
+If this resource is given a value of
+True, icons are placed in an icon box.  When an icon box is not used,
+the icons are placed on the root window (default value).
+.TP 8
+.BR "workspaceList (" class " WorkspaceList)"
+This resource specifies the resource names and number of the workspaces
+to create for a screen. The value of this resource is a list of names
+separated by blanks. The names specified in this resource are used to
+fetch resources with. Consequently, a workspace name should not contain
+any of the following characters: asterisk (*), period (.), colon (:), 
+quote ("), or backslash (\\).
+.sp 1
+.RS
+Example:
+
+    \fBDtwm*0*workspaceList:   A B C D E F\fP
+
+This creates six workspaces for screen 0.
+.RE
+
+.sp 1
+.SH "\fBCLIENT SPECIFIC RESOURCES\fP"
+The syntax for specifying \fIclient specific resources\fP is
+.EX
+   \fBDtwm[*\fIscreen_name\fB]*\fIclient_name_or_class\fB*\fIresource_id\fR
+.EE
+For example, \fBDtwm*mterm*windowMenu\fP is used to specify the window menu to
+be used with mterm clients.
+ 
+The syntax for specifying \fIclient specific resources\fP for
+all classes of clients is
+.EX
+    \fBDtwm*\fIresource_id\fR
+.EE
+Specific client specifications take precedence over the specifications
+for all clients.
+For example, \fBDtwm*windowMenu\fP is used to specify the window menu to
+be used for all classes of clients that don't have a window 
+menu specified.
+  
+The syntax for specifying resource values for windows that have an
+unknown name and class (i.e. the window does not have a WM_CLASS 
+property associated with it) is
+.EX
+    \fBDtwm*defaults*\fIresource_id\fR
+.EE
+For example, \fBDtwm*defaults*iconImage\fP is used to specify the icon image
+to be used for windows that have an unknown name and class.
+  
+The following \fIclient specific resources\fP can be specified:
+
+.TS
+expand, tab(;);
+cbp7 sss
+lbp6 lbp6 lbp6 lbp6
+lp6 lp6 lp6 lp6 .
+Client Specific Resources
+Name;Class;Value Type;Default
+_
+absentMapBehavior;AbsentMapBehavior;string;add
+clientDecoration;ClientDecoration;string;all
+clientFunctions;ClientFunctions;string;all
+focusAutoRaise;FocusAutoRaise;T/F;T
+iconImage;IconImage;pathname;(image)
+iconImageBackground;Background;color;icon background
+iconImageBottomShadowColor;Foreground;color;icon bottom shadow
+iconImageBottomShadowPixmap;BottomShadowPixmap;string*;icon bottom shadow pixmap
+iconImageForeground;Foreground;color;icon foreground
+iconImageTopShadowColor;Background;color;icon top shadow color
+iconImageTopShadowPixmap;TopShadowPixmap;string*;icon top shadow pixmap
+matteBackground;Background;color;background
+matteBottomShadowColor;Foreground;color;bottom shadow color
+matteBottomShadowPixmap;BottomShadowPixmap;string*;bottom shadow pixmap
+matteForeground;Foreground;color;foreground
+matteTopShadowColor;Background;color;top shadow color
+matteTopShadowPixmap;TopShadowPixmap;string*;top shadow pixmap
+matteWidth;MatteWidth;pixels;0
+maximumClientSize;MaximumClientSize;wxh ;fill the screen
+useClientIcon;UseClientIcon;T/F;F
+windowMenu;WindowMenu;string;string
+.TE
+.ps 7
+*See XmInstallImage(3X).
+.ps
+
+.P
+.TP 8
+.BR "absentMapBehavior (" class " AbsentMapBehavior )"
+This resource specifies dtwm's response to a map window request
+from a client that is not in the current workspace. If the value
+of this resource is \fBadd\fP, the the client is mapped 
+and added to 
+the current workspace (it occupies more than one workspace).
+If the value of the resource is \fBmove\fP, the client is mapped,
+removed from its previous workspace(s) and added to the current
+workspace (it occupies only the current workspace). If the value
+of the resource is \fBignore\fP, then the map request is ignored
+and the client is not mapped into the current workspace.
+The default value for this resource is \fBadd\fP.
+.TP 8
+.BR "clientDecoration (" class " ClientDecoration)"
+This resource controls the amount of window frame decoration.
+The resource is specified as a list of decorations to specify their
+inclusion in the frame.  
+If a decoration is preceded by a minus sign, then that decoration is
+excluded from the frame.
+The \fIsign\fR of the first item in the list
+determines the initial amount of decoration.
+If the sign of the first
+decoration is minus, then dtwm assumes all decorations are present and starts
+subtracting from that set.
+If the sign of the first decoration is plus (or not
+specified), then dtwm starts with no decoration and builds up a list from
+the resource. 
+.sp 1
+.TS
+tab(~), center;
+cbp7  cbp7
+lp6  lp6.
+Name~Description
+_
+all~Include all decorations (default value).
+border~Window border.
+maximize~Maximize button (includes title bar).
+minimize~Minimize button (includes title bar).
+none~No decorations.
+resizeh~Border resize handles (includes border).
+menu~Window menu button (includes title bar).
+title~Title bar (includes border).
+.TE   
+.sp 1
+.RS
+Examples:
+
+    \fBDtwm*XClock*clientDecoration: -resizeh -maximize\fP
+
+This removes the resize handles and maximize button from
+XClock windows. 
+
+    \fBDtwm*XClock*clientDecoration: menu minimize border\fP
+
+This does the same thing as above. Note that either \fBmenu\fR or
+\fBminimize\fR implies \fBtitle\fR. 
+.RE
+.sp 1
+.TP 8
+.BR "clientFunctions (" class " ClientFunctions )"
+This resource is used to
+indicate which dtwm functions are applicable (or not applicable) to the
+client window.  The value for the resource is a list of functions.  If the
+first function in the list has a minus sign in front of it, then dtwm starts
+with all functions and subtracts from that set.  If the first function in
+the list has a plus sign in front of it, then dtwm starts with no functions
+and builds up a list.  Each function in the list must be preceded by the
+appropriate plus or minus sign and be separated from the next function by
+a space. 
+.IP
+The table below lists the functions available for this resource:
+.sp 1
+.TB "Values for clientFunctions"
+.TS
+center, tab(;);
+cbp7 cbp7
+lp6 lp6 .
+Name;Description
+_
+all;Include all functions (default value)
+none;No functions
+resize;f.resize
+move;f.move
+minimize;f.minimize
+maximize;f.maximize
+close;f.kill
+.TE
+.sp 1
+.TP 8
+.BR "focusAutoRaise (" class " FocusAutoRaise)"
+When the value of this resource is True, clients are made
+completely unobscured when they get the keyboard input focus.  If
+the value is False,  the stacking of windows on the display is
+not changed when a window gets the keyboard input focus.
+The default value is True.
+.TP 8
+.BR "iconImage (" class " IconImage)"
+This resource can be used to specify an icon image for a client (e.g., 
+Dtwm*myclock*iconImage).  The resource value is a pathname for a bitmap file.
+The value of the (client specific) useClientIcon resource is used
+to determine whether or not user supplied icon images are used instead of
+client supplied icon images.    
+The default value is to display a built-in window manager icon image.
+.TP 8
+.BR "iconImageBackground (" class " Background)"
+This resource specifies the background color of the icon image that
+is displayed in the image part of an icon.
+The default value of this resource is the icon background color
+(i.e., specified by Dtwm*background or Dtwm*icon*background).
+.TP 8
+.BR "iconImageBottomShadowColor (" class " Foreground)"
+This resource specifies the bottom shadow color of the icon image that
+is displayed in the image part of an icon.
+The default value of this resource is the icon bottom shadow color
+(i.e., specified by Dtwm*icon*bottomShadowColor).
+.TP 8
+.BR "iconImageBottomShadowPixmap (" class " BottomShadowPixmap)"
+This resource specifies the bottom shadow Pixmap of the icon image that
+is displayed in the image part of an icon.
+The default value of this resource is the icon bottom shadow Pixmap
+(i.e., specified by Dtwm*icon*bottomShadowPixmap).
+.TP 8
+.BR "iconImageForeground (" class " Foreground)"
+This resource specifies the foreground color of the icon image that
+is displayed in the image part of an icon.
+The default value of this resource is the icon foreground color
+(i.e., specified by Dtwm*foreground or Dtwm*icon*foreground).
+.TP 8
+.BR "iconImageTopShadowColor (" class " Background)"
+This resource specifies the top shadow color of the icon image that
+is displayed in the image part of an icon.
+The default value of this resource is the icon top shadow color
+(i.e., specified by Dtwm*icon*topShadowColor).
+.TP 8
+.BR "iconImageTopShadowPixmap (" class " TopShadowPixmap)"
+This resource specifies the top shadow Pixmap of the icon image that
+is displayed in the image part of an icon.
+The default value of this resource is the icon top shadow Pixmap
+(i.e., specified by Dtwm*icon*topShadowPixmap).
+.TP 8
+.BR "matteBackground (" class " Background)"
+This resource specifies the background color of the matte, when 
+\fBmatteWidth\fR is positive.
+The default value of this resource is the client background color
+(i.e., specified by Dtwm*background or Dtwm*client*background).
+.TP 8
+.BR "matteBottomShadowColor (" class " Foreground)"
+This resource specifies the bottom shadow color of the matte, when 
+\fBmatteWidth\fR is positive.
+The default value of this resource is the client bottom shadow color
+(i.e., specified by Dtwm*bottomShadowColor or Dtwm*client*bottomShadowColor).
+.TP 8
+.BR "matteBottomShadowPixmap (" class " BottomShadowPixmap)"
+This resource specifies the bottom shadow Pixmap of the matte, when 
+\fBmatteWidth\fR is positive.
+The default value of this resource is the client bottom shadow Pixmap
+(i.e., specified by Dtwm*bottomShadowPixmap or Dtwm*client*bottomShadowPixmap).
+.TP 8
+.BR "matteForeground (" class " Foreground)"
+This resource specifies the foreground color of the matte, when 
+\fBmatteWidth\fR is positive.
+The default value of this resource is the client foreground color
+(i.e., specified by Dtwm*foreground or Dtwm*client*foreground).
+.TP 8
+.BR "matteTopShadowColor (" class " Background)"
+This resource specifies the top shadow color of the matte, when 
+\fBmatteWidth\fR is positive.
+The default value of this resource is the client top shadow color
+(i.e., specified by Dtwm*topShadowColor or Dtwm*client*topShadowColor).
+.TP 8
+.BR "matteTopShadowPixmap (" class " TopShadowPixmap)"
+This resource specifies the top shadow Pixmap of the matte, when 
+\fBmatteWidth\fR is positive.
+The default value of this resource is the client top shadow Pixmap
+(i.e., specified by Dtwm*topShadowPixmap or Dtwm*client*topShadowPixmap).
+.TP 8
+.BR "matteWidth (" class " MatteWidth)"
+This resource specifies the width of the optional matte.  
+The default value is 0, which effectively disables the matte.
+.TP 8
+.BR "maximumClientSize (" class " MaximumClientSize)"
+This is a size specification that indicates the client size to be used
+when an application is maximized.
+The resource value is specified as \fIwidth\fBx\fIheight\fR.  The width and
+height are interpreted in the units that the client uses
+(e.g., for terminal emulators this is generally characters).
+If this resource is not specified then the maximum size from the
+WM_NORMAL_HINTS property is used if set.
+Otherwise the default value is the size where the client window with
+window management borders fills the screen.  When the maximum client size
+is not determined by the maximumClientSize resource, the maximumMaximumSize
+resource value is used as a constraint on the maximum size.
+.TP 8
+.BR "useClientIcon (" class " UseClientIcon)"
+If the value given for this 
+resource is True, then a client supplied icon image will take precedence
+over a user supplied icon image.  The default value is False, making the
+user supplied icon image have higher precedence than the client supplied
+icon image. 
+.TP 8
+.BR "windowMenu (" class " WindowMenu)"
+This resource indicates the name of the menu pane that is posted when
+the window menu is popped up (usually by pressing button 1 on the window
+menu button on the client window frame).
+Menu panes are specified in the \fIdtwm resource description file\fP file.
+Window menus can be customized
+on a client class basis by specifying resources of the form 
+\fBDtwm*\fIclient_name_or_class\fB*windowMenu\fR (see \fBdtwmrc(4)\fP).
+The default value of this resource is the name of the built-in window menu
+specification. 
+.sp 1
+.SH "\fBFRONT PANEL RESOURCES\fP"
+The front panel is an integral part of dtwm. However, from a resource
+perspective, it looks more like a client. The syntax for specifying
+front panel resources is:
+.EX
+    \fBDtwm[*\fIscreen_name\fB]*\fIfront_panel_name\fB*\fIresource_id\fR
+.EE
+For example, \fBDtwm*frontPanel*name\fR is used to 
+determine which front panel to use out of those specified in the dtwmrc
+file.
+  
+.P
+The following resources are used to configure the front panel.
+
+.TS
+expand, tab(;);
+cbp7 sss
+lbp6 lbp6 lbp6 lbp6
+lp6 lp6 lp6 lp6 .
+Front Panel Resources
+Name;Class;Value Type;Default
+_
+clientTimeoutInterval;ClientTimeoutInterval;millisec;10000
+geometry;Geometry;string;dynamic
+highResFontList;HighResFontList;string;"fixed"
+lowResFontList;LowResFontList;string;"fixed"
+mediumResFontList;MediumResFontList;string;"fixed"
+name;Name;string;varies
+pushButtonClickTime;PushButtonClickTime;millisec;1000
+waitingBlinkRate;WaitingBlinkRate;millisec;500
+.TE
+
+.P
+.TP 8
+.BR "clientTimeoutInterval (" class " ClientTimeoutInterval)"
+This resource specifies the time that dtwm will wait for a window to
+appear that is invoked by a front panel action. In many cases,
+there is a delay between the time a control is activated and the time a 
+client window appears. This resource specifies the time 
+that dtwm will wait for the
+window before assuming that the activation failed.
+The default value of this resource is 10000 ms, or 10 seconds.
+.sp 1
+Typically, the activity light on the
+front panel blinks and a front panel hourglass
+appears until either the timeout interval has expired
+or the client window appears on the screen.
+.TP 8
+.BR "geometry (" class " Geometry)"
+This resource specifies the placement of the front panel on the
+screen, using a simplified form of the standard window geometry.
+The value is determined dynamically.
+The default is to center the front panel at the bottom of the
+screen.
+.sp 1
+Of the standard window geometry string:
+.EX
+[\fB=\fP][\fIwidth\fP\fBx\fP\fIheight\fP][{\fB+-\fP}\fIxoffset\fP{\fB+-\fP}\fIyoffset\fP]
+.EE
+--only the plus and minus forms of the \fIxoffset\fR and \fIyoffset\fR
+are used.  A given \fIwidth\fR or \fIheight\fR will be ignored, because
+\fBdtwm\fR determines the overall width and height of the front panel
+from the controls within it.
+.sp 1
+For example, \fB=-10+5\fR places the front panel at the upper right
+of the screen, indented from the left edge by 10 pixels and down from
+the top edge by 5 pixels.
+.sp 1
+The default geometry is centered at the bottom of the screen. Note that
+this resource will be written out by dtwm when the session is saved 
+so that the front panel position can be restored to a position that
+you move it to.
+.TP 8
+.BR "highResFontList (" class " HighResFontList)"
+This resource specifies the font to use when the front panel is running
+on a high resolution display. Typically, this will be a large-size font.
+The default is "fixed."
+.TP 8
+.BR "mediumResFontList (" class " MediumResFontList)"
+This resource specifies the font to use when the front panel is running
+on a medium resolution display. Typically, this will be a medium-size font.
+The default is "fixed."
+.TP 8
+.BR "lowResFontList (" class " lowResFontList)"
+This resource specifies the font to use when the front panel is running
+on a medium resolution display. Typically, this will be a small-size font.
+The default is "fixed."
+.TP 8
+.BR "name (" class " Name)"
+This resource sets the name of the front panel. This name is used to
+look up the front panel specification in the \fBdtwmrc\fP file.
+The default value is dynamically determined based on the screen
+resolution type--it may be \fILargeFrontPanel\fR (typically,
+1280 by 1024 pixels),
+\fIMediumFrontPanel\fR (typically,
+1024 by 768 pixels), or \fISmallFrontPanel\fR.
+.IP
+From these resource values, \fBdtwm\fR
+computes the sizes and layout of the buttons
+themselves in the workspace switch.
+.TP 8
+.BR "pushButtonClickTime (" class " PushButtonClickTime)"
+This resource sets the time that is used to filter out double-clicks
+done on a control. This prevent accidentally launching two instances
+of an application when a double-click was done instead of a single
+click. The defaul value is 1000 milliseconds (1 second).
+.TP 8
+.BR "waitingBlinkRate (" class " WaitingBlinkRate)"
+This resource sets the rate of the busy light. The time set by this
+resource measures a half cycle of the busy light blink frequency. The
+light is on for this amount of time before being turned off for the same
+amount of time. The default value is 500 milliseconds.
+
+.sp 1
+.SH "\fBSPECIAL CONTROL RESOURCES\fP"
+A control of type \fBdate\fP observes an additional resource.
+Specify this resource by interpolating the control name before
+the \fIresource_id\fR. 
+For example, \fBDtwm*frontPanel*Date*format\fP is used to set the 
+\fBformat\fP for the control named \fBDate\fP.
+
+.TS
+expand, tab(;);
+cbp7 sss
+lbp6 lbp6 lbp6 lbp6
+lp6 lp6 lp6 lp6 .
+Special Control Resources
+Name;Class;Value Type;Default
+_
+format;format;string;"%b %.1d%n%a"
+.TE
+
+.TP 8
+.BR "format (" class " Format)"
+This resource provides the format string for controls of type
+\fBdate\fP. The format string is passed to \fBstrftime(3)\fP 
+for interpretation.  The character string returned from that 
+function is parsed for new lines and displayed appropriately 
+in the control using the font for the front panel.
+The default value for this resource is "%b %.1d%n%a".
+
+.P
+.SH "\fBOBSOLETE FRONT PANEL RESOURCES\fP"
+Several resources used by dtwm in HP DT 2.0 are no longer used
+in HP DT 3.0.
+.sp 1
+.TS
+expand, tab(;);
+cbp7 sss
+lbp6 lbp6 
+lp6 lp6 .
+Obsolete DT 2.0 Front Panel Resources
+Name;Class
+_
+borderWidth;BorderWidth
+controlSpacing;ControlSpacing
+colorSetId;ColorSetId
+numberOfSwitchRows;NumberOfSwitchRows
+rowBackgroundPixmap;RowBackgroundPixmap
+rowSpacing;RowSpacing
+wsButtonBorder;WsButtonBorder
+wsButtonShadowThickness;WsButtonShadowThickness
+wsButtonSpacing;WsButtonSpacing
+.TE
+.sp 1
+The \fBnumberOfSwitchRows\fP resource has been replaced by the
+\fBNUMBER_OF_ROWS\fP keyword in the dtwmrc file.  See the
+\fBdtwmrc(4X)\fP man page for more information.
+.sp 1
+The other resources are no longer necessary due to the new visual and
+layout policies of the HP DT 3.0 front panel. 
+
+.sp 1
+.SH "\fBOBSOLETE DTWMDATE RESOURCES\fP"
+The dtwmdate resources in the table below are no longer supported.
+See SPECIAL CONTROL RESOURCES for more information on setting resources for
+controls of type "date."
+
+.TS
+expand, tab(;);
+cbp7 sss
+lbp6 lbp6 
+lp6 lp6.
+Obsolete Dtwmdate Resources
+Name;Class
+_
+fontList;FontList
+fontList1;FontList
+fontList2;FontList
+fontList3;FontList
+fontList4;FontList
+fontList5;FontList
+.TE
+.sp 1
+
+.sp 1
+.SH "\fBWORKSPACE RESOURCES\fP"
+The only workspace resource is the \fBtitle\fR resource. 
+The title of a workspace appears in the workspace button 
+in the workspace switch. It is a user-visible name for the workspace
+whereas the workspace name given in the \fBworkspaceList\fR resource is
+used for fetching resources.
+.P
+The syntax for specifying the workspace title resource is:
+.EX
+    \fBDtwm[*\fIscreen_name\fB]*\fIworkspace_name\fB*\fBtitle\fR
+.EE
+For example, \fBDtwm*0*A*title\fR is used to set the title
+of workspace \fBA\fR on screen \fB0\fR.
+Note that \fIworkspace_name\fR must appear elsewhere in the
+\fBworkspaceList\fR resource.
+.P
+The following table describes the workspace title resource.
+.sp 1
+.TS
+expand, tab(;);
+cbp7 sss
+lbp6 lbp6 lbp6 lbp6
+lp6 lp6 lp6 lp6 .
+Workspace Title Resource
+Name;Class;Value Type;Default
+_
+title;Title;XmString;varies*
+.TE
+.ps 7
+*The default title is the workspace name.
+.ps
+.TP 8
+.BR "title (" class " Title)"
+This resource specifies the user-visible title of a workspace.
+The default value is the workspace name (as given in the 
+\fBworkspaceList\fR resource).
+
+.sp 1
+.SH "\fBBACKDROP RESOURCES\fP"
+The backdrop resources are the only resource that can be specified on a
+per-workspace basis. These resource set the backdrop bitmap image and
+colors to be used for that workspace.
+.P
+The syntax for specifying backdrop resources is:
+.EX
+    \fBDtwm[*\fIscreen_name\fB][*\fIworkspace_name\fB]*backdrop*\fIresource_id\fR
+.EE
+For example, \fBDtwm*0*Main*backdrop*image\fR is used to set the
+backdrop bitmap image for the \fBMain\fR workspace on screen \fB0\fR.
+.sp 1
+The following resources may be used to configure backdrops.
+Note that setting these resources may interfere with the dynamic
+backdrop configuration done through dtstyle.
+
+.TS
+expand, tab(;);
+cbp7 sss
+lbp6 lbp6 lbp6 lbp6
+lp6 lp6 lp6 lp6 .
+Backdrop Resources
+Name;Class;Value Type;Default
+_
+colorSetId;ColorSetId;integer;NULL
+image;Image;string;"none"
+imageBackground;ImageBackground;pixel;varies*
+imageForeground;ImageForeground;pixel;varies*
+.TE
+.ps 7
+*The default is chosen based on the display type.
+.ps
+.sp 1
+.TP 8
+.BR "colorSetId (" class " ColorSetId)"
+This resource specifies a color set to use for the backdrop. This is
+normally an integer from 1 to 8. 
+The default value of this resource is display dependent.
+.TP 8
+.BR "image (" class " Image)"
+This resource specifies an image to use as the backdrop.
+If "none" is specified, then no backdrop image will be used. The root
+window will show through. Either a bitmap or an xpm file can be specified.
+If the first four letters in the base name
+of the bitmap file are "deep", then dtwm will create a 3D shaft
+with the bitmap image at the "bottom".
+Image files are fetched using
+the directory search path of \fBXmGetPixmap()\fR.
+.\"""""""""" hhhhhhhhhhhhhhhhh
+.IP
+The default value for this resource is none (no image).
+.TP 8
+.BR "imageBackground (" class " ImageBackground)"
+This resource specifies a color to use as the background color of the
+backdrop. If not specified, this color will default to a 
+pixel value that can be dynamically customized with the color
+customizer, providing you are running in the HP DT. If this resource is
+specified, a color cell will be allocated outside of any dynamically
+customizable set.
+The default value varies based on the screen type.
+.TP 8
+.BR "imageForeground (" class " ImageForeground)"
+This resource specifies a color to use as the foreground color of the
+backdrop. If not specified, this color will default to a 
+pixel value that can be dynamically customized with the color
+customizer, providing you are running in the HP DT. If this resource is
+specified, a color cell will be allocated outside of any dynamically
+customizable set.
+The default value varies based on the screen type.
+
+.sp 1
+.SH "\fBDIALOG RESOURCES\fP"
+The titles of the Rename Workspace and Occupy Workspace dialog are 
+settable via resources.
+.P
+The syntax for setting the Rename Workspace title is:
+.EX
+    \fBDtwm*\fIscreen_name\fB*workspaceController*title\fR
+.EE
+.P
+Similarly, the syntax for setting the Occupy Workspace title is:
+.EX
+    \fBDtwm*\fIscreen_name\fB*workspacePresence*title\fR
+.EE
+.P
+The title subresource is described below:
+.sp 1
+.TS
+expand, tab(;);
+cbp7 sss
+lbp6 lbp6 lbp6 lbp6
+lp6 lp6 lp6 lp6 .
+Workspace Dialog Resources
+Name;Class;Value Type;Default
+_
+title;Title;XmString;varies*
+.TE
+.ps 7
+*The default name of the dialog: ``Rename Workspace'' or ``Occupy 
+Workspace''.
+.ps
+.sp 1
+.TP 8
+.BR "title (" class " Title)"
+This resource specifies the title of a workspace dialog.
+The default value varies based on the dialog.
+
+.sp 1
+.SH RESOURCE DESCRIPTION FILE
+.P
+The \fIdtwm resource description file\fP is a supplementary resource file
+that contains resource descriptions that are referred to by entries in 
+the defaults files (.Xdefaults, app-defaults/Dtwm).
+It contains descriptions of resources that are to be used by dtwm,
+and that cannot be easily encoded in the defaults files.
+  
+The following types of resources can be described in the \fIdtwm
+resource description file\fP:
+
+.TP 15
+.B Buttons
+Window manager functions can be bound (associated) with button events.
+.TP 15
+.B Front Panel
+The dtwm front panel can be configured for a custom content or layout.
+.TP 15
+.B Keys
+Window manager functions can be bound (associated) with key press events.
+.TP 15
+.B Menus
+Menu panes can be used for the window menu and other menus posted
+with key bindings and button bindings.
+.P
+Use \fBdtwm\fR resources (such as \fBdtwm*windowMenu\fR
+and \fBdtwm*frontPanelName\fR) described on the preceding
+pages to select which corresponding description to use from the 
+\*(rC.
+.\"The \fBdtwm\fR \*(rC
+.\"is fully described in
+.\"\fBdtwmrc(4X)\fP.
+.sp 1
+.SH ENVIRONMENT
+\fBDtwm\fR uses the environment variable \fB$HOME\fP specifying the user's 
+home directory.
+.sp 1
+\fBDtwm\fR uses the environment variable \fB$MWMSHELL\fP (first)
+or \fB$SHELL\fR (second) for specifying the user's shell in
+carrying out f.exec functions.  (If neither variable is set,
+\fBdtwm\fR uses \fB/bin/sh\fR.)
+.sp 1
+\fBDtwm\fR uses the environment variable \fB$LANG\fP 
+to specify the location of the \*(rC and its 
+localized message file.
+.SH FILES
+ $HOME/.dt/$LANG/dtwmrc
+ $HOME/.dt/dtwmrc
+ /usr/dt/config/$LANG/sys.dtwmrc
+ /usr/dt/config/sys.dtwmrc
+ /usr/dt/icons/Dtwm/*
+ /usr/dt/icons/Dtwm/Color/*
+ /usr/lib/nls/$LANG/dtwm.cat
+ $HOME/.Xdefaults
+ /usr/dt/app-defaults/Dtwm
+
+.sp 1
+.SH COPYRIGHT
+(c) Copyright 1989,1990,1991,1992 by Open Software Foundation, Inc.
+.br
+(c) Copyright 1987,1988,1989,1990,1992 by Hewlett-Packard Company.
+.br
+All rights reserved.
+.sp 1
+.SH ORIGIN
+Open Software Foundation, Inc.
+Hewlett-Packard Company.
+.sp 1
+.SH SEE ALSO
+\fBdtsession(1X)\fR,
+\fBdtstyle(1X)\fR,
+\fBX(1)\fR,
+\fBVendorShell(3X)\fR, 
+\fBstrftime(3)\fR,
+\fBXmInstallImage(3X)\fR,
+\fBXmGetPixmap(3X)\fR,
+and
+\fBdtwmrc(4X)\fR. 

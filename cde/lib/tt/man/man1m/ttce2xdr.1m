@@ -1,0 +1,124 @@
+.TH ttce2xdr 1M "1 March 1996" "ToolTalk 1.3" "ToolTalk Commands" 
+.BH "1 March 1996"
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\"  (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\"  (c) Copyright 1993, 1994 International Business Machines Corp.
+.IX "ttce2xdr" "" ""ttce2xdr.1m" ""
+.SH NAME
+ttce2xdr \- convert ToolTalk Classing Engine type tables to XDR format 
+.SH SYNOPSIS
+.B ttce2xdr
+.RB [ -xn ]
+.B -d
+.I user
+|
+.I system
+.br
+.B ttce2xdr
+.RB [ -xn ]
+.B -d
+.I network
+.RI [ OPENWINHOME-from
+.RI [ OPENWINHOME-to ]]
+.br
+.B ttce2xdr
+.RB [ -h ]
+.br
+.B ttce2xdr
+.RB [ -v ]
+.LP
+.SH DESCRIPTION
+.B ttce2xdr
+converts ToolTalk types stored in the Classing Engine data base, used by
+ToolTalk in versions 1.0.x, to the XDR-format data base used in
+version 1.1 and later.
+For user type data bases, this conversion is done automatically the
+first time a version 1.1 ttsession is started for the user, so
+this command generally only needs to be used by administrators updating types
+data bases common to systems or the network.
+.LP
+The first format is used to convert user or system data bases for the
+current user or current system.
+The second format is used to convert the network-wide data base, and
+provides additional options allowing types to be taken from one data
+base and stored into another.
+.sp 
+.SH OPTIONS
+.TP
+.B \-x
+Show the underlying commands executed by ttce2xdr.
+.TP
+.B \-v
+Print version and exit.
+.TP
+.B \-n
+Just show underlying commands that would be executed by ttce2xdr.
+.TP
+.B \-h
+Describe the options for ttce2xdr and exit.
+.TP
+.B \-d
+Specify the data base to work on which should be one of user (default),
+system, or network. The types are read from the  Classing Engine data
+base, which is:
+.LP
+		user -- ~/.cetables/cetables
+.LP
+		system -- /etc/cetables/cetables
+.LP
+		network -- $OPENWINHOME/lib/cetables/cetables
+.sp
+	The types are written to the XDR data base which is:
+.LP
+		user -- ~/.tt/types.xdr
+.LP
+		system -- /etc/tt/types.xdr
+.LP
+		network -- $OPENWINHOME/etc/tt/types.xdr
+.sp
+If the
+.B network
+data base is specified, the optional arguments
+.R OPENWINHOME-from
+and
+.R OPENWINHOME-to
+may be specified.
+If neither is specified, the current value of the environment
+variable OPENWINHOME is used to locate the data bases to be read
+and written.
+If only OPENWINHOME-from is specified, the data bases under
+the directory named by OPENWINHOME-from are read and written.
+If both are specified, the data base under OPENWINHOME-from is
+read and the data base under OPENWINHOME-to is written.
+.SH ENVIRONMENT
+.TP
+.SM CEPATH
+In Classing Engine mode,
+.B tt_type_comp
+will use this variable for its definition of
+where the databases are located.  See
+.BR ce_db_build (1).
+.SM OPENWINHOME
+Location of network data bases.
+.SH FILES
+.PD 0
+.TP 20
+.B ~/.tt/types.xdr
+User's ToolTalk XDR format types file
+.TP 20
+.B /etc/tt/types.xdr
+System ToolTalk XDR format types file
+.TP 20
+.B $OPENWINHOME/etc/tt/types.xdr
+"Network-wide" ToolTalk XDR format types file
+.TP 20
+.B $OPENWINHOME/lib/cetables/cetables
+Classing Engine database containing the ToolTalk type definitions
+.PD
+.sp
+.SH SEE ALSO
+.BR tt_type_comp (1),
+.BR ttsession (1),
+.BR ce_db_build (1),
+.BR ce_db_merge (1)
+

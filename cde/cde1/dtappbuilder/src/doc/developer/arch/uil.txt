@@ -1,0 +1,31 @@
+			Wed Apr 19 15:33:56 PDT 1995
+				  bfreeman
+
+Structure of UIL import/export code:
+
+Import
+------
+proj.c:import_uil()
+    top level fcn that reads in the uil file and displays the resulting tree
+    if sucessful.
+
+abuil_load.c:abuil_get_uil_file()
+    called from import_uil(). This function parses a UIL file specified by
+    uil_file_path using the standard callable UIL compiler and constructs a
+    ABObj tree rooted at a AB_TYPE_MODULE after adding it to the supplied
+    AB_TYPE_PROJECT, ab_project. Returns NULL in case of error; otherwise
+    returns the AB_TYPE_MODULE object.
+
+abuil_load.c:parse_uil()
+    Use the callable UIL compiler to create a uil parse tree. Check all
+    error conditionals and print a report on stdout. Returns the uil parse
+    tree or NULL if there were errors.
+
+    calls Uil()
+
+    	For the call to Uil(), message_cb and status_cb handle stdout info
+    	while the Uil compiler is running. user_mess_data is passed into
+    	message_cb by the compiler and is used to indicate the number of
+    	diagnostic messages output. user_stat_data is passed into status_cb
+    	by the compiler and incremented to indicate the number of status
+    	messages output.

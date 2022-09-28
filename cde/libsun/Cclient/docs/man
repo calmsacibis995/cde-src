@@ -1,0 +1,265 @@
+.\"Created 30 May 1996
+.TH imapd 1M "05 Jun 1996" 
+.SH NAME
+imapd \- internet message access protocol version 4 server
+.SH SYNOPSIS
+.B imapd
+.SH AVAILABILITY
+SUNWimap
+.SH DESCRIPTION
+.B imapd
+is the Internet Message Access Protocol (\c
+.SM IMAP\c
+) server process.
+The server is invoked by the Internet daemon
+.BR inetd (1M)
+each time a connection to the
+IMAP service (see
+.BR services (4))
+is made.
+.SH OPTIONS
+None
+.SH SEE ALSO
+.BR inetd (1M),
+.BR inetd.conf (4),
+.BR services (4)
+.LP
+M. Crispin,
+.IR "Internet Access Message Protocol - version 4" ,
+RFC 1730, December 1994.
+.SH DIAGNOSTICS
+.B imapd
+logs various messages and errors to
+.BR syslogd ,
+with a facility code of 
+.BR daemon .
+.SS Info Messages
+.B imapd
+logs the following informational messages to
+.BR syslogd :
+.HP 12
+.B "Preauthenticated user ="
+.I username
+.B "host ="
+.I "client hostname"
+.br
+The user
+.I username
+has already been authenticated on the host
+.I "client hostname"
+by external means.  No 
+.B LOGIN
+command is required.
+.HP 12
+.B "Authenticated user ="
+.I username
+.B "host ="
+.I "client hostname"
+.br
+.B imapd
+has authenticated the user
+.I username
+on host
+.IR "client hostname" .
+.HP 12
+.B "Authentication failure host ="
+.I "client hostname"
+.br
+Authentication attempt failed for
+.IR "client hostname" .
+.HP 12
+.B "Excessive authentication failures host ="
+.I "client hostname" 
+.br
+Authentication denied on 
+.I "client hostname"
+because of excessive failed attempts.
+.HP 12
+.B "Login user ="
+.I username
+.B "host ="
+.I "client hostname"
+.br
+Login successful for
+.I username
+on
+.IR "client hostname" .
+.HP 12
+.B "Login failure user ="
+.I username
+.B "host ="
+.I "client hostname"
+.br
+A single login attempt failed for
+.I username
+on host
+.IR "client hostname" .
+.HP 12
+.B "Excessive login failures user ="
+.I username
+.B "host ="
+.I "client hostname"
+.br
+Access denied for 
+.I username
+because of excessive failed attempts.
+.HP 12
+.B "Fatal mailbox error user ="
+.I username
+.B "mbx ="
+.I mbox
+.B "host ="
+.I "client hostname"
+.br
+An error occured which caused the server to stop processing
+the messages in the mailbox 
+.IR mbox .
+The connection is closed.
+.IP 
+If successive attempts to open 
+.I mbox
+fail, then the mailbox needs to be carefully examined by
+an appropriate administrator.  
+.B imapd
+refuses to open mailboxes that appear to be corrupted.
+.HP 12
+.B "Logout user ="
+.I username
+.B "host ="
+.I "client hostname"
+.br
+The user
+.I username
+has quit the current IMAP session.
+.HP 12
+.B "Anonymous select of"
+.I mbox
+.B "host ="
+.I "client hostname"
+.br
+Anonymous access has been granted for the the mailbox
+.IR mbox .
+.HP 12
+.B "Autologout user ="
+.I username
+.B "host ="
+.I "client hostname"
+The inactivity timer has expired for the user
+.IR username .
+The timer's default is set to 30 minutes.
+.HP 12
+.B "Connection broken while reading line user ="
+.I username
+.B "host ="
+.I "client hostname"
+.br
+A network read error has occurred.  The connection is closed.
+.HP 12
+.B "Retrying after disk error user ="
+.I username
+.B "host ="
+.I "client hostname"
+.br
+A disk error has occurred while reading a mailbox.  The server
+is attempting to resolve the problem.
+.HP 12
+.B "Fatal disk error user ="
+.I username
+.B "host ="
+.I "client hostname"
+.br
+A fatal disk error has occurred while reading a mailbox.  
+The connection is closed.
+.HP 12
+.B "Fatal error user ="
+.I username
+.B "host ="
+.I "client hostname"
+.B "mbx =" 
+.IR mbox :
+.I error
+.br
+A fatal system error has occurred.  This could indicate that the
+system is out of virtual memory, or that a server bug has been
+detected.
+.SS Critical Message
+.B imapd
+logs the following critical message to
+.BR syslogd :
+.HP 12
+.B "IMAPD SECURITY PROBLEM: lockfile"
+.I filename
+.B "is a symbolic link"
+.br
+An attempt to modify an IMAP server session lock has occurred.
+This happens when the server session lock is soft linked to
+another file.  When this is detected, the 
+server attempts to correct the problem by removing the illegal
+file.  The associated mailbox cannot be opened until the file
+is removed.
+.SH DEBUGGING
+This section provides server status information and problem work-arounds.
+.SS Testing the Server
+You can test whether a host has a working IMAP server by 
+entering:
+.IP
+.B "example% telnet hostname 143"
+.P
+You should see a message similar to the following:
+.P
+.B "* OK mailserver IMAP4 Service 8.1(sun.11) at Wed, 5 Jun 1996 15:17:50 -0700 (PDT)"
+.P
+The following error message indicates that the host does not have
+the IMAP server running:
+.IP
+.B "telnet: connect: Connection refused"
+.P
+To disconnect from the server, enter:
+.IP
+.B "example% 0 logout"
+.SS Update Lock Files
+An update lock file appears in the same directory as mailbox, usually:
+.IP
+.BI /var/mail/ user .lock
+.P
+If the system crashes while the mailbox is being updated, a stale
+.IR user .lock
+file may be created.  When the system comes back up and encounters
+a stale
+.IR user .lock
+file, it will automatically attempt to delete it.
+If the update lock file cannot be removed 
+(write permission is not granted to the user), 
+it must be removed by the administrator.
+.SS Session Lock Files
+For session locking, the IMAP server creates a file in the
+.B /tmp
+directory of the form:
+.IP
+.BI /tmp/.imap_ device.inode
+.P
+The 
+.IR device and 
+.I inode 
+fields are the respective values for the 
+mailbox file being session locked.  The 
+.I inode 
+field is displayed in hexadecimal form.  
+.P
+A stale session lock file can be created during a system crash
+or a core dump.  The server will attempt to remove the session
+lock file.  If it cannot be removed by the server, the user will
+be denied mailbox access.  The session lock file must then be 
+removed manually.
+.P
+To do this, first locate the correct session lock file
+in the 
+.B /tmp 
+directory that is associated with the mailbox.  Execute:
+.IP
+.BI "example% ls -i /var/mail/" user
+.P
+.I user 
+is the name of the mailbox.  This returns the inode number
+in decimal form.  Convert the inode number into hexadecimal form
+and locate its session lock file.

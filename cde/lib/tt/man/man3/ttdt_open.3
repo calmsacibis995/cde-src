@@ -1,0 +1,72 @@
+.TH ttdt_open 3 "1 March 1996" "ToolTalk 1.3" "ToolTalk Functions"
+.BH "1 March 1996"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.IX "ttdt_open.3" "" "ttdt_open.3" "" 
+.SH NAME
+ttdt_open \- create a ToolTalk communication endpoint
+.SH SYNOPSIS
+.ft 3
+.nf
+#include <Tt/tttk.h>
+.sp 0.5v
+.ta \w'char *ttdt_open('u
+char *ttdt_open(int *\f2ttfd\fP,
+	const char *\f2toolname\fP,
+	const char *\f2vendor\fP,
+	const char *\f2version\fP,
+	int \f2sendStarted\fP);
+.PP
+.fi
+.SH DESCRIPTION
+The
+.BR ttdt_open (\|)
+function calls
+.BR tt_open (3)
+and
+.BR tt_fd (3).
+It associates
+.IR toolname ,
+.IR vendor
+and
+.I version
+with the created
+procid,
+and initializes the new
+procid's
+default contexts from the process environment.
+If
+.IR sendStarted
+is True,
+.BR ttdt_open (\|)
+sends a
+.I Started
+notice.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.BR ttdt_open (\|)
+function
+returns the created
+procid
+in a string that can be freed with
+.BR tt_free (\|);
+otherwise, the
+.BR ttdt_open (\|)
+function may return any of the errors returned by
+.BR tt_open (3)
+and
+.BR tt_fd (3).
+.PP
+No errors are propagated if sending the
+.I Started
+notice fails.
+.SH "SEE ALSO"
+.na
+.BR tttk (5),
+.BR ttdt_close (3),
+.BR tt_open (3),
+.BR tt_fd (3),
+.BR tt_free (3).

@@ -1,0 +1,134 @@
+.\" **
+.\" ** (c) Copyright 1994 Hewlett-Packard Company
+.\" ** (c) Copyright 1994 International Business Machines Corp.
+.\" ** (c) Copyright 1994 Novell, Inc.
+.\" ** (c) Copyright 1994 Sun Microsystems, Inc.
+.\" **
+.TH DtEditorGetContents 3 ""
+.BH "3 May - 1994"
+.SH NAME
+\fBDtEditorGetContents(3) \- Retrieve the contents of an Editor widget.\fP
+.iX "DtEditorGetContents"
+.iX "DtEditor functions" "DtEditorGetContents"
+.sp .5
+.SH SYNOPSIS
+\fB
+\&#include <Dt/Editor.h>
+.sp .5
+DtEditorErrorCode DtEditorGetContents (
+.br
+.ta	0.75i 1.75i
+	Widget \fIwidget\fP,
+.br
+	DtEditorContentRec *\fIdata\fP,
+.br
+	Boolean	\fImarkContentsAsSaved\fP)
+.fi
+\fP
+.SH DESCRIPTION
+\fBDtEditorGetContents\fP retrieves the entire contents of an Editor
+widget, \fIwidget\fP, in
+the format specified by the content record, \fIdata\fP.  The data can be
+retrieved as either a string or wide character string.
+.P
+The Editor widget keeps track of whether there have been changes to its
+contents since the contents were last saved or retrieved.  
+There may be times when an application will want to request a
+copy of the contents without effecting whether 
+\fBDtEditorCheckForUnsavedChanges(3)\fP reports there are
+unsaved changes.  For example, when the application needs a
+temporary copy of the contents for printing.  The application can
+indicate this with \fImarkContentsAsSaved\fP.
+.sp .5
+.IP "\fIwidget\fP" 1.00i
+Specifies the editor widget ID.
+.IP "\fIdata\fP" 1.00i
+Pointer to a data structure to receive the contents of \fIwidget\fP.
+.IP "\fImarkContentsAsSaved\fP" 1.00i
+Setting \fImarkContentsAsSaved\fP to True causes the Editor to mark that
+all changes made to date have been saved.  When set to False, the Editor
+will not change its status regarding unsaved changes.
+.sp .5
+.PP
+This function transfers content data between the 
+Editor widget and the application using a \fBDtEditorContentRec\fP.  
+This structure indicates the 
+type of data to be transfered along with the actual data.
+.sp .5
+.nf
+.ta .25i 1.1i 1.5i 2.0i
+\fBtypedef struct DtEditorContentRec\fP {
+	\fBDtEditorFormat\fP \fItype\fP;
+	union {
+		\fBchar\fP	*\fIstring\fP;
+		\fBwchar_t\fP	*\fIwchar\fP;
+	} value;
+} \fBDtEditorContentRec\fP\fP;
+.sp .5
+.IP "\fItype\fP"
+Indicates in what format the data should be retrieved from the widget.  
+There are two possible types.
+.wH
+.rS
+.TP
+\(bu
+DtEDITOR_TEXT - \fIvalue\fP pointer to a NULL terminated string of 
+characters (a char *)
+.TP
+\(bu
+DtEDITOR_WCHAR - \fIvalue\fP is a \fBwchar_t*\fP value.
+.fi
+.sp .5
+.IP "\fIvalue\fP"
+The data retrieved from \fIwidget\fP.  It is the responsibility of the 
+application to free this string with \fBXtFree(3X)\fP when it is
+finished with it.
+.sp .5
+.PP
+For a complete definition of Editor and its associated resources, see
+\fBDtEditor(3)\fP.
+.sp .5
+.SH RETURN VALUE
+When the data is retrieved sucessfully from the widget,
+\fBDtEditorGetContents\fP returns \fBDtEDITOR_NO_ERRORS\fP.
+If the type specified is not recognized \fBDtEDITOR_INVALID_TYPE\fP is 
+returned.
+.sp .5
+.SH EXAMPLES
+.P
+The following code segment retrieves the contents of an Editor, marking
+that all changes to date have been saved.
+.nf
+.ta .25i 1.1i 
+	Widget			editor;
+	DtEditorContentRec	cr;
+	DtEditorErrorCode       status;
+	Boolean			markContentsAsSaved = True;
+
+	cr.type = DtEDITOR_TEXT;
+	status = DtEditorGetContents ( editor, &cr, markContentsAsSaved );
+	if (status != DtEDITOR_NO_ERRORS)
+	{
+	  printf( "The contents are:\\n%s\\n", cr.value.string );
+	}
+	else
+	{
+          printf("Unable to retrieve contents of the widget\\n");
+	}
+
+.fi
+.SH APPLICATION USAGE
+To write the data directly to a file 
+the application should use \fBDtEditorSaveContentsToFile(3)\fP.
+.SH RELATED INFORMATION
+\fBDtEditor(3)\fP, 
+\fBDtEditorAppend(3)\fP,
+\fBDtEditorAppendFromFile(3)\fP,
+\fBDtEditorCheckForUnsavedChanges(3)\fP,
+\fBDtEditorInsert(3)\fP,
+\fBDtEditorInsertFromFile(3)\fP,
+\fBDtEditorSaveContentsToFile(3)\fP,
+\fBDtEditorSetContents(3)\fP, and
+\fBDtEditorSetContentsFromFile(3)\fP.
+.sp .5
+

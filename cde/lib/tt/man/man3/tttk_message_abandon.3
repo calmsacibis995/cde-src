@@ -1,0 +1,94 @@
+.de Lc
+.\" version of .LI that emboldens its argument
+.TP \\n()Jn
+\s-1\f3\\$1\f1\s+1
+..
+.TH tttk_message_abandon 3 "1 March 1996" "ToolTalk 1.3" "ToolTalk Functions"
+.BH "1 March 1996"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.IX "tttk_message_abandon.3" "" "tttk_message_abandon.3" "" 
+.SH NAME
+tttk_message_abandon \- finalize a message properly
+.SH SYNOPSIS
+.ft 3
+.nf
+#include <Tt/tttk.h>
+.sp 0.5v
+.ta \w'Tt_status tttk_message_abandon('u
+Tt_status tttk_message_abandon(Tt_message \f2msg\fP);
+.PP
+.fi
+.SH DESCRIPTION
+The
+.BR tttk_message_abandon (\|)
+function is used by an application
+when it does not understand a message
+and wants to get rid of it.
+The
+.BR tttk_message_abandon (\|)
+function fails or rejects
+.I msg
+if appropriate, and then destroys it.
+The
+.BR tttk_message_abandon (\|)
+will reject or fail the message only if
+.I msg
+is a
+.BR \s-1TT_REQUEST\s+1
+in
+.B Tt_state
+.BR \s-1TT_SENT\s+1 .
+If it has a
+.B Tt_address
+of
+.BR \s-1TT_HANDLER\s+1
+or a
+.BR tt_message_status (\|)
+of
+.BR \s-1TT_WRN_START_MESSAGE\s+1 ,
+then it fails the message;
+otherwise, it rejects it.
+In either case,
+.BR tttk_message_abandon (\|)
+gives
+.I msg
+a message status (see
+.BR tt_message_status (3))
+of
+.BR \s-1TT_DESKTOP_ENOTSUP\s+1 .
+.SH "RETURN VALUE"
+Upon successful completion, the
+.BR tttk_message_abandon (\|)
+function returns the status of the operation as one of the following
+.B Tt_status
+values:
+.PP
+.RS 3
+.nr )J 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_NOMP
+.br
+The
+.BR ttsession (1)
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_NOTHANDLER
+.br
+This application is not the handler for this message.
+.Lc TT_ERR_POINTER
+.br
+The pointer passed does not point to an object
+of the correct type for this operation.
+.PP
+.RE
+.nr )J 0
+.SH "SEE ALSO"
+.na
+.BR tttk (5),
+.BR tt_message_status (3),
+.BR tttk_message_fail (3),
+.BR tttk_message_reject (3).

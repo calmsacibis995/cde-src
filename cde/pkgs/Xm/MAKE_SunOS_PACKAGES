@@ -1,0 +1,133 @@
+#!/usr/bin/ksh
+
+if (($# > 0))
+then
+	packages="$*"
+else
+	packages="SUNWmfman SUNWmfdev SUNWmfrun"
+fi
+
+if test "${CDE_PACK_VER}" = ""
+then
+        CDE_PACK_VER=10
+        export CDE_PACK_VER
+fi
+
+if test "${CDE_PACK_DATE}" = ""
+then
+        CDE_PACK_DATE=`date '+%y.%m.%d'`
+        export CDE_PACK_DATE
+fi
+
+echo Making $packages
+
+for i in $packages
+do
+	if test $i = SUNWmfman
+	then
+		cd ${i}
+		sccs get pkginfo.${i}
+		chmod 666 pkginfo.${i}
+		sed s/REV=/REV=${CDE_PACK_VER}.${CDE_PACK_DATE}/ pkginfo.${i} > pkginfo.${i}.tmp
+		mv pkginfo.${i}.tmp pkginfo.${i}
+                sccs get prototype.${i}
+                chmod 666 prototype.${i}
+                sed s/ARCH/${BUILD_ARCH}/ prototype.${i} > prototype.${i}.tmp
+                mv prototype.${i}.tmp prototype.${i}
+                chmod 444 prototype.${i}
+		chmod 444 pkginfo.${i}
+		pkgmk -a ${BUILD_ARCH} \
+		-b ${BUILD_TREE} \
+		-o -d ${CDE_PACK_DIR}/ -f ./prototype.${i}
+		cd ..
+
+	elif test $i = SUNWmfdm
+	then
+
+                cd ${i}
+		sccs get pkginfo.${i}
+                chmod 666 pkginfo.${i}
+                sed s/REV=/REV=${CDE_PACK_VER}.${CDE_PACK_DATE}/ pkginfo.${i} > pkginfo.${i}.tmp
+                mv pkginfo.${i}.tmp pkginfo.${i}
+		sccs get prototype.${i}
+                chmod 666 prototype.${i}
+                sed s/ARCH/${BUILD_ARCH}/ prototype.${i} > prototype.${i}.tmp
+                mv prototype.${i}.tmp prototype.${i}
+                chmod 444 prototype.${i}
+                chmod 444 pkginfo.${i}
+                pkgmk -a ${BUILD_ARCH} \
+                -b ${BUILD_TREE} \
+                -o -d ${CDE_PACK_DIR}/ -f ./prototype.${i}
+                cd ..
+
+	elif test $i = SUNWmfwm
+        then
+ 
+               cd ${i}
+		sccs get pkginfo.${i}
+                chmod 666 pkginfo.${i}
+                sed s/REV=/REV=${CDE_PACK_VER}.${CDE_PACK_DATE}/ pkginfo.${i} > pkginfo.${i}.tmp
+                mv pkginfo.${i}.tmp pkginfo.${i}
+		sccs get prototype.${i}
+                chmod 666 prototype.${i}
+                sed s/ARCH/${BUILD_ARCH}/ prototype.${i} > prototype.${i}.tmp
+                mv prototype.${i}.tmp prototype.${i}
+                chmod 444 prototype.${i}
+                chmod 444 pkginfo.${i}
+                pkgmk -a ${BUILD_ARCH} \
+                -b ${BUILD_TREE}/.. \
+                -o -d ${CDE_PACK_DIR}/ -f ./prototype.${i}
+                cd ..
+
+
+	elif test $i = SUNWmfrun
+	then
+
+		cd ${i}
+		sccs get pkginfo.${i}
+                chmod 666 pkginfo.${i}
+                sed s/REV=/REV=${CDE_PACK_VER}.${CDE_PACK_DATE}/ pkginfo.${i} > pkginfo.${i}.tmp
+                mv pkginfo.${i}.tmp pkginfo.${i}
+		sccs get prototype.${i}
+		chmod 666 prototype.${i}
+                sed s/ARCH/${BUILD_ARCH}/ prototype.${i} > prototype.${i}.tmp
+                mv prototype.${i}.tmp prototype.${i}
+                chmod 444 prototype.${i}
+                chmod 444 pkginfo.${i}
+                pkgmk -a ${BUILD_ARCH} \
+                -b ${BUILD_TREE} \
+                -o -d ${CDE_PACK_DIR}/ -f ./prototype.${i}
+                cd ..
+
+	elif test $i = SUNWmfdev
+	then
+
+		cd ${i}
+		sccs get pkginfo.${i}
+                chmod 666 pkginfo.${i}
+                sed s/REV=/REV=${CDE_PACK_VER}.${CDE_PACK_DATE}/ pkginfo.${i} > pkginfo.${i}.tmp
+                mv pkginfo.${i}.tmp pkginfo.${i}
+		sccs get prototype.${i}
+		chmod 666 prototype.${i}
+                sed s/ARCH/${BUILD_ARCH}/ prototype.${i} > prototype.${i}.tmp
+                mv prototype.${i}.tmp prototype.${i}
+                chmod 444 prototype.${i}
+                chmod 444 pkginfo.${i}
+                pkgmk -a ${BUILD_ARCH} \
+                -b ${BUILD_TREE} \
+                -o -d ${CDE_PACK_DIR}/ -f ./prototype.${i}
+                cd ..
+
+	else
+
+		cd ${i}
+                chmod 666 pkginfo.${i}
+                sed s/REV=/REV=${CDE_PACK_VER}.${CDE_PACK_DATE}/ pkginfo.${i} > pkginfo.${i}.tmp
+                mv pkginfo.${i}.tmp pkginfo.${i}
+                chmod 444 pkginfo.${i}
+                pkgmk -a ${BUILD_ARCH} \
+                -b ${BUILD_TREE} \
+                -o -d ${CDE_PACK_DIR}/ -f ./prototype.${i}
+                cd ..
+	fi
+done

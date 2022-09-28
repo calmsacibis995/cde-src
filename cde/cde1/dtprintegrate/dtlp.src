@@ -1,0 +1,1339 @@
+\#! /usr/dt/bin/dtksh
+\#####################################################################
+\###
+\###  (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+\###  (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+\###  (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+\###  (c) Copyright 1993, 1994, 1995 Novell, Inc.
+\###
+\#####################################################################
+\###  File:              dtlp
+\###
+\###  Default Location:  /usr/dt/bin/dtlp
+\###
+\###  Purpose:           Set up print spooler options and print.
+\###
+\###  Description:       This shell script provides a graphical interface
+\###                     for a print spooler dialog by default.   If 
+\###                     DTPRINTSILENT is "true", however, then it processes
+\###                     the file and directly invokes "lp".
+\###
+\###  Invoked by:        The default Print action or custom print actions.
+\###
+\###  Product:           @(#)Common Desktop Environment 1.0          
+\###
+\###  Note:              Please do not modify this file.
+\###                     Later product updates will overwrite this file.
+\###
+\###  Revision:          $XConsortium: dtlp.src /main/cde1_maint/3 1995/10/06 08:56:52 lehors $
+\###
+\#####################################################################
+set -u
+
+\##################################################################
+\#
+\#  Following are the environmental options we support
+\#
+\##################################################################
+
+\# LPDEST
+\# DTPRINTCWD
+\# DTPRINTFILEREMOVE
+\# DTPRINTSILENT
+\# DTPRINTTESTOUTPUT
+\# DTPRINTUSERFILENAME
+
+\##################################################################
+\###  Internal Globals
+\###
+\###  Actually, most variables in this script are global.
+\###
+\###  Most are defined in the Initialize() routine.
+\###
+\##################################################################
+COMMAND_NAME=dtlp
+
+PATH=/bin:/usr/bin
+export PATH
+
+\#
+\# Add /usr/dt/lib/nls/msg/%L/%N.cat to NLSPATH
+\#
+NLSPATH=/usr/dt/lib/nls/msg/%L/%N.cat:$NLSPATH
+export NLSPATH
+
+\#
+\# Exit/Return codes
+\#
+CANCEL_EXIT=-1
+SUCCESS=0
+NO_PRINT_MESSAGE=1
+USAGE_EXIT=2
+NO_FILE_ERR=3
+NO_INIT_FILE_ERR=4
+NO_REGULAR_FILE_ERR=5
+NO_READ_FILE_ERR=6
+
+failure_flag=$SUCCESS
+
+\#
+\# For string processing
+\#
+DOUBLE_QUOTE=\"
+SINGLE_QUOTE=\'
+MINUS_T="-t"
+
+\##################################################################
+\###  Initialize()
+\###
+\###         Set a number of key variables to their defaults.
+\###
+\###         Examples
+\###         ----------------------
+\###            File to print:                     Stdin
+\###            Formatted printing:                True
+\###            Number of copies:                  1
+\###
+\##################################################################
+Initialize()
+{
+    typeset -u Uppercase_string
+
+    LPOPTIONS=""
+
+    format_flag=0
+
+    print_page_allowed=1
+
+    \#
+    \#  Assume print file is stdin, unless told otherwise...
+    \#
+    print_file="-"
+    print_file_flag=1
+
+    simple_file_name=""
+
+    print_man=""
+    print_man_flag=0
+
+    print_cwd=""
+    print_cwd_flag=0
+
+    print_raw_flag=0
+
+    silent_flag=0
+
+    remove_flag=0
+
+    verbose_flag=0
+
+    lpdest_flag=0
+    lpdest=""
+
+    banner_title_flag=0
+    banner_title=""
+
+    other_options_flag=0
+    other_options=""
+
+    print_command_flag=0
+    print_command=lp
+
+    copy_count_flag=0
+    copy_count="1"
+
+    test_flag=0
+    test_output_file=""
+
+    user_filename_flag=0
+    user_filename=""
+
+    Uppercase_string=""
+
+    copy_count_flag=0
+    copy_count="1"
+
+    CAT_MESG_STRING=""
+
+    catopen CAT_ID $COMMAND_NAME
+
+    SetPreEnvironment
+
+}
+
+\##################################################################
+\###  ReconcileOptions()
+\###
+\###       Arbitrate when there are two or more conflicting 
+\###       print options.
+\###
+\##################################################################
+ReconcileOptions()
+{
+    \#
+    \# The RAW option takes precedence over all others.
+    \#
+    if (( $print_raw_flag ))
+    then
+	format_flag=0
+        print_man_flag=0
+	print_page_allowed=0
+    \#
+    \# Next, this MAN option comes into play
+    \#
+    elif (( $print_man_flag ))
+    then
+	format_flag=0
+	print_page_allowed=0
+
+    fi
+#if 0
+    \#
+    \# Finally, the unformatted option takes precedence over the rest.
+    \#
+    elif (( $format_flag == 0 ))
+    then
+	print_page_allowed=0
+    fi
+#endif
+}
+
+\##################################################################
+\###  DoParameterCollectionSilent()
+\###
+\###       Collect the silent lp options, mimicking the GUI
+\###       collection process.
+\###
+\##################################################################
+DoParameterCollectionSilent()
+{
+    if (( $lpdest_flag ))
+    then
+         LPOPTIONS=-d${lpdest}" "
+    fi
+\# Give user feedback if printer not good
+    XtInitialize TOPLEVEL printerConfig Dtlp "${@:-}"
+    XtDisplay DISPLAY $TOPLEVEL
+
+\#  Strip any leading or trailing spaces
+   DEVICE_VAL=${lpdest:-"`/usr/bin/lpstat -d | /usr/bin/awk -F: ' { print $2 } '`"}
+   DEVICE_VAL=${DEVICE_VAL\##+( )}
+   DEVICE_VAL=${DEVICE_VAL%%+( )}
+
+\#  Check for printer
+   lpstat $DEVICE_VAL 2> /dev/null
+   if [ $? != 0 ]
+   then
+    XmCreateInformationDialog INFORMATION $TOPLEVEL information
+
+    catgets CAT_MESG_STRING $CAT_ID 1 170 "Printer Information"
+    XtSetValues $(XtParent "-" $INFORMATION) \
+                title:"$CAT_MESG_STRING"
+
+    catgets CAT_MESG_STRING $CAT_ID 1 40 "Printer:"
+    CAT_MESG_STRING=${CAT_MESG_STRING}" \"$DEVICE_VAL\""
+    catgets TMP_CAT_MESG_STRING $CAT_ID 1 45 "doesn't exist."
+    CAT_MESG_STRING=${CAT_MESG_STRING}"  ${TMP_CAT_MESG_STRING}"
+
+    XtSetValues $INFORMATION \
+            okCallback:"NoFileCallback" \
+            messageString:"${CAT_MESG_STRING}" \
+            noResize:True \
+            defaultButtonType:DIALOG_OK_BUTTON \
+            messageAlignment:ALIGNMENT_CENTER
+
+    XtUnmanageChild $(XmMessageBoxGetChild "-" $INFORMATION \
+                DIALOG_CANCEL_BUTTON)
+
+    XtUnmanageChild $(XmMessageBoxGetChild "-" $INFORMATION \
+                DIALOG_HELP_BUTTON)
+
+    XtManageChild $INFORMATION
+
+    XtMainLoop
+   fi
+   if [ "$DEVICE_VAL" == "" ]
+   then
+    XmCreateInformationDialog INFORMATION $TOPLEVEL information
+    catgets CAT_MESG_STRING $CAT_ID 1 170 "Printer Information"
+    XtSetValues $(XtParent "-" $INFORMATION) \
+                title:"$CAT_MESG_STRING"
+
+    catgets CAT_MESG_STRING $CAT_ID 1 46 "No default printer configured."
+
+    XtSetValues $INFORMATION \
+            okCallback:"NoFileCallback" \
+            messageString:"${CAT_MESG_STRING}" \
+            noResize:True \
+            defaultButtonType:DIALOG_OK_BUTTON \
+            messageAlignment:ALIGNMENT_CENTER
+
+     XtUnmanageChild $(XmMessageBoxGetChild "-" $INFORMATION \
+         DIALOG_CANCEL_BUTTON)
+
+     XtUnmanageChild $(XmMessageBoxGetChild "-" $INFORMATION \
+         DIALOG_HELP_BUTTON)
+
+    XtManageChild $INFORMATION
+
+    XtMainLoop
+   fi
+\#
+
+    if (( $banner_title_flag ))
+    then
+      LPOPTIONS=${LPOPTIONS}${MINUS_T}${SINGLE_QUOTE}${banner_title}${SINGLE_QUOTE}" "
+    fi
+
+    if (( $copy_count_flag ))
+    then
+       LPOPTIONS=${LPOPTIONS}"-n${copy_count} "
+    fi
+
+    if (( $other_options_flag ))
+    then
+       LPOPTIONS=${LPOPTIONS}"${other_options} "
+    fi
+
+    if (( $verbose_flag ))
+    then
+	echo Options are $LPOPTIONS
+    fi
+}
+
+
+\##################################################################
+\###  EchoTestOptions()
+\###
+\###         Echo all the command settings.
+\###	     If dtlp is run stand-alone, the invoker may redirect 
+\###	     the test output to a log file. Under the test harness
+\###	     this is done automatically by the "record" function.
+\###
+\##################################################################
+EchoLpSetupOptions()
+{
+	if (( $remove_flag ))
+	then
+		echo Remove file flag is SET.
+	fi
+	if (( $print_man_flag ))
+	then
+		echo Manpage flag is SET.
+	fi
+	if (( $print_raw_flag ))
+	then
+		echo Raw print flag is SET.
+	fi
+	if (( $print_cwd_flag ))
+	then
+		echo Print working directory is $print_cwd.
+	fi
+	if (( $print_page_allowed ))
+	then
+		echo Page printing is allowed.
+	else
+		echo Page printing is NOT allowed.
+	fi
+	if (( $format_flag ))
+	then
+		echo Format flag is SET.
+	fi
+	if (( $silent_flag ))
+	then
+		echo Silent flag is SET.
+	fi
+	if (( $user_filename_flag ))
+	then
+		echo User-visible filename is \"$user_filename\".
+	fi
+	if (( $verbose_flag ))
+	then
+		echo Verbose flag is SET.
+	fi
+	if (( $other_options_flag ))
+	then
+		echo Other options include \"$other_options\".
+	fi
+}
+
+\##################################################################
+\###  PrintIt()
+\###
+\###         Do the actual spooling, based on the value of LPOPTIONS.
+\###
+\###         If possible, log the results.
+\##################################################################
+PrintIt()
+{
+    if (( $banner_title_flag ))
+    then
+	PAGEHEADER="$banner_title"
+    elif (( $user_filename_flag ))
+    then
+	PAGEHEADER="$user_filename"
+    else
+	PAGEHEADER=$print_file
+    fi
+
+    if (( $print_cwd_flag )) && [[ (-d $print_cwd) && (-x $print_cwd) ]]
+    then
+	cd $print_cwd
+    fi
+
+    if (( $test_flag ))
+    then
+	\# then don't do any printing--instead log the results
+
+	EchoLpSetupOptions
+	echo ""
+	echo "Command that will be invoked is..."
+	INVOKER='echo'
+    else
+    	INVOKER='sh -c'
+    fi
+
+    if (( $print_raw_flag ))
+    then
+#ifdef  __hpux
+	LPOPTIONS="${LPOPTIONS} -oraw"
+#else /*  __hpux */
+	\# Nothing special is required for raw mode on this platform.
+	LPOPTIONS="${LPOPTIONS}"
+#endif  
+    fi
+
+    if (( $format_flag ))
+    then
+	$INVOKER "cat '$print_file' | pr -f -h '${PAGEHEADER}' | ${print_command} ${LPOPTIONS}"
+
+    elif (( $print_man_flag ))
+    then
+#ifdef __sun
+	$INVOKER "cat '$print_file' | tbl | nroff -man | ${print_command} ${LPOPTIONS}"
+#else /* __sun */
+	$INVOKER "cat '$print_file' | tbl | nroff -man | col | ${print_command} ${LPOPTIONS}"
+#endif /* __sun */
+
+    else
+	if [ $print_file = "-" ]
+	then
+	    $INVOKER "cat '$print_file' | ${print_command} ${LPOPTIONS}"
+	else
+	    $INVOKER "${print_command} -c ${LPOPTIONS} '$print_file'"
+	fi
+    fi
+}
+
+\##################################################################
+\###  Cleanup()
+\###
+\###         End the show
+\##################################################################
+Cleanup()
+{
+    if [ $remove_flag -eq 1 -a $print_file != "-" ]
+    then
+	rm -f '$print_file'
+    fi
+
+    if (( $verbose_flag ))
+    then
+	PrintEndLog
+    fi
+}
+
+\##################################################################
+\###  CheckOptions()
+\###
+\###         Ensure that the necessary minimum parameters are
+\###         supplied.
+\###
+\##################################################################
+CheckOptions() {
+
+    if (( $print_file_flag == 0 ))
+    then
+	failure_flag=1
+	echo Sorry--missing a file name to print.
+    fi
+
+    if (( $failure_flag ))
+    then
+	if (( $verbose_flag ))
+	then
+	    PrintEndLog
+	fi
+	Exit $NO_FILE_ERR
+    fi
+}
+
+\##################################################################
+\###  CheckValidFile()
+\###
+\###         Ensure that the supplied file name references a
+\###         valid file. 
+\###
+\###         Returns true or false.
+\##################################################################
+CheckValidFile() {
+	if [[ $1 == "-" ]]
+	then
+		return $SUCCESS
+	fi
+	
+	if [[ ! -f $1 ]] 
+	then
+		return $NO_REGULAR_FILE_ERR
+	fi
+	if [[ ! -r $1 ]]
+	then
+		return $NO_READ_FILE_ERR
+	fi
+	return $SUCCESS
+}
+
+
+\##################################################################
+\###  PrintStartLog()
+\###
+\###         Print the start of the log
+\###
+\##################################################################
+PrintStartLog() {
+    print "$COMMAND_NAME..."
+    print ""
+}
+
+\##################################################################
+\###  PrintEndLog()
+\###
+\###         Print the values of the variables.
+\###
+\##################################################################
+PrintEndLog() {
+    print ""
+    if (( $failure_flag ==0 ))
+    then
+        print "...successfully completed."
+    else
+        print "...completed unsuccessfully."
+    fi
+    print ""
+}
+
+\##################################################################
+\###  PrintUsage()
+\###
+\###        Print a usage message.
+\###
+\##################################################################
+PrintUsage() {
+    print ""
+    print "Usage: $COMMAND_NAME  [-b <banner_title>] [-d <lpdest>]"
+    print "             [-m <print_command>] [-n <copy_count>]"
+    print "             [-o <other_options>] [-u <user_filename>]"
+    print "             [-a] [-e] [-h] [-r] [-s] [-v] [-w]"
+    print "             <print_file>"
+    print "  where:"
+    print ""
+    print "  <banner_title>"
+    print "      Specifies the title to put on the banner page."
+    print ""
+    print "  <lpdest>"
+    print "      Specifies the printer name as known to the lp spooler."
+    print ""
+    print "  <print_command>"
+    print "      Specifies the command with which to invoke the printer."
+    print ""
+    print "  <copy_count>"
+    print "      Specifies the number of copies to print."
+    print ""
+    print "  <other_options>"
+    print "      Specifies the other print options."
+    print ""
+    print "  <user_filename>"
+    print "      Specifies the title of the file to display to the user."
+    print ""
+    print "  -a"
+    print "      Formats the file with "man" before printing."
+    print ""
+    print "  -e"
+    print "      Removes the file after printing."
+    print ""
+    print "  -h"
+    print "      Displays this help message."
+    print ""
+    print "  -r"
+    print "      Formats the file with "pr -f" before printing."
+    print ""
+    print "  -s"
+    print "      Prints silently (no dialog box)."
+    print ""
+    print "  -v"
+    print "      Directs verbose messages to standard output."
+    print ""
+    print "  -w"
+    print "      Prints the data raw (uninterpreted)."
+    print ""
+    print "  <print_file>"
+    print "      Specifies the file name to print."
+     
+}
+
+\##################################################################
+\###  Exit()
+\###
+\###	All exits should go through this routine.
+\###
+\##################################################################
+Exit() {
+        exit $1
+}
+
+\##################   GUI Callbacks  ####################
+
+\#
+\# This is the 'Help' callback; it will post a help dialog
+\#
+DoHelp()
+{
+   DtkshDisplayQuickHelpDialog "dtlp_help" HELP_TYPE_TOPIC \
+   			    "Printmgr" "dtlpPrintDialog"
+}
+
+\#
+\# This is the 'OK' callback; it will unpost the main application window, 
+\# print to stdout the resulting string or to a printer, and then exit;
+\#
+DoParameterCollection()
+{
+   XtUnmanageChild $FORM
+   \#
+   \# Let's force a fast unmap
+   \#
+   XSync $DISPLAY True
+
+   XmTextGetString DEVICE_VAL $DEVICE 
+   XmTextGetString TITLE_VAL $TITLE 
+   XmTextGetString COPIES_VAL $COPIES 
+
+   if (( $other_options_flag == 0 ))
+   then
+	XmTextGetString COMMAND_OPTIONS_VAL $OPTIONS
+   else
+	COMMAND_OPTIONS_VAL=$other_options
+   fi 
+
+   XtGetValues $PNUM_TOGGLE \
+		set:PNUM_PRINT_VAL
+
+   if [[ $PNUM_PRINT_VAL = "true" ]]
+   then
+	format_flag=1
+   else
+	format_flag=0
+   fi
+
+   catgets CAT_MESG_STRING $CAT_ID 1 10 "Default"
+
+\#  Strip any leading or trailing spaces
+   DEVICE_VAL=${DEVICE_VAL\##+( )}
+   DEVICE_VAL=${DEVICE_VAL%%+( )}
+   if [[ ("$DEVICE_VAL" != "") && "$DEVICE_VAL" != "$CAT_MESG_STRING" ]] 
+   then
+      LPOPTIONS="-d"$DEVICE_VAL
+   fi
+\#  Check for printer
+   lpstat $DEVICE_VAL 2> /dev/null
+   if [ $? != 0 ]
+   then
+    XmCreateInformationDialog INFORMATION $TOPLEVEL information
+
+    catgets CAT_MESG_STRING $CAT_ID 1 170 "Printer Information"
+    XtSetValues $(XtParent "-" $INFORMATION) \
+		title:"$CAT_MESG_STRING"
+
+    catgets CAT_MESG_STRING $CAT_ID 1 40 "Printer:"
+    CAT_MESG_STRING=${CAT_MESG_STRING}" \"$DEVICE_VAL\""
+    catgets TMP_CAT_MESG_STRING $CAT_ID 1 45 "doesn't exist."
+    CAT_MESG_STRING=${CAT_MESG_STRING}"  ${TMP_CAT_MESG_STRING}"
+
+    XtSetValues $INFORMATION \
+            okCallback:"NoFileCallback" \
+            messageString:"${CAT_MESG_STRING}" \
+            noResize:True \
+            defaultButtonType:DIALOG_OK_BUTTON \
+            messageAlignment:ALIGNMENT_CENTER
+
+    XtUnmanageChild $(XmMessageBoxGetChild "-" $INFORMATION \
+                DIALOG_CANCEL_BUTTON)
+
+    XtUnmanageChild $(XmMessageBoxGetChild "-" $INFORMATION \
+                DIALOG_HELP_BUTTON)
+
+    XtManageChild $INFORMATION
+
+    XtMainLoop
+   fi
+   if [ "$DEVICE_VAL" == "" ]
+   then
+    XmCreateInformationDialog INFORMATION $TOPLEVEL information
+    catgets CAT_MESG_STRING $CAT_ID 1 170 "Printer Information"
+    XtSetValues $(XtParent "-" $INFORMATION) \
+		title:"$CAT_MESG_STRING"
+
+    catgets CAT_MESG_STRING $CAT_ID 1 46 "No default printer configured."
+
+    XtSetValues $INFORMATION \
+            okCallback:"NoFileCallback" \
+            messageString:"${CAT_MESG_STRING}" \
+            noResize:True \
+            defaultButtonType:DIALOG_OK_BUTTON \
+            messageAlignment:ALIGNMENT_CENTER
+
+     XtUnmanageChild $(XmMessageBoxGetChild "-" $INFORMATION \
+         DIALOG_CANCEL_BUTTON)
+
+     XtUnmanageChild $(XmMessageBoxGetChild "-" $INFORMATION \
+         DIALOG_HELP_BUTTON)
+
+    XtManageChild $INFORMATION
+
+    XtMainLoop
+   fi
+
+
+\#  Strip any leading or trailing spaces
+   TITLE_VAL=${TITLE_VAL\##+( )}
+   TITLE_VAL=${TITLE_VAL%%+( )}
+   if [ "$TITLE_VAL" != "" ] ; then
+      if [ ${\#LPOPTIONS} -gt 0 ] ; then
+         LPOPTIONS=${LPOPTIONS}" "
+      fi
+      banner_title=${SINGLE_QUOTE}${TITLE_VAL}${SINGLE_QUOTE}
+      banner_title_flag=1
+      LPOPTIONS=${LPOPTIONS}${MINUS_T}${SINGLE_QUOTE}${TITLE_VAL}${SINGLE_QUOTE}
+   fi
+
+\#  Strip any leading or trailing spaces
+\#  This should be validated, to make sure it is a valid integer.
+   COPIES_VAL=${COPIES_VAL\##+( )}
+   COPIES_VAL=${COPIES_VAL%%+( )}
+   if [ "$COPIES_VAL" != "" ] ; then
+      if [ ${\#LPOPTIONS} -gt 0 ] ; then
+         LPOPTIONS=${LPOPTIONS}" "
+      fi
+       copy_count=$COPIES_VAL
+       copy_count_flag=1
+       LPOPTIONS=${LPOPTIONS}"-n$COPIES_VAL"
+   fi
+
+\#  Strip any leading or trailing spaces
+   COMMAND_OPTIONS_VAL=${COMMAND_OPTIONS_VAL\##+( )}
+   COMMAND_OPTIONS_VAL=${COMMAND_OPTIONS_VAL%%+( )}
+   if  [ "$COMMAND_OPTIONS_VAL" != "" ]
+   then
+       LPOPTIONS=${LPOPTIONS}" $COMMAND_OPTIONS_VAL"
+   fi
+
+   if (( $verbose_flag ))
+   then
+	echo The LP options are \"${LPOPTIONS}\".
+   fi
+
+   PrintIt
+
+   Cleanup
+
+   Exit $failure_flag
+}
+
+\#
+\# This is the callback for the 'Cancel' button.  It will send an empty
+\# string to stdout, and will then exit with a value of -1.
+\#
+CancelPrint()
+{
+  echo ""
+  Exit $CANCEL_EXIT
+}
+
+\##################################################################
+\###  _DetermineColumns()
+\###
+\###         Determine the XmNcolumns value from the current LANG
+\###         ( This is AIX only )
+\###
+\##################################################################
+_DetermineColumns()
+{
+  if (( ${\#LANG} ))
+  then
+      case $LANG in
+                ja_JP | ja_JP.IBM-eucJP |\
+                Ja_JP | Ja_JP.IBM-932   |\
+                Jp_JP | Jp_JP.pc932     |\
+                zh_TW | zh_TW.IBM-eucTW |\
+                zh_CN | zh_CN.IBM-eucCN |\
+                ZH_CN | ZH_CN.UTF-8     |\
+                ko_KR | ko_KR.IBM-eucKR  )
+                   return $2;;
+                *)
+                   return $1;;
+      esac
+  fi
+  return $1
+}
+
+\##################################################################
+\###  UseGui()
+\###
+\###         Create the Main UI and set up the callbacks.
+\###
+\##################################################################
+UseGui()
+{
+
+	catgets CAT_MESG_STRING $CAT_ID 1 20 "Print"
+
+	XmCreateFormDialog FORM $TOPLEVEL form 
+
+	XtSetValues $(XtParent "-" $FORM) \
+		    title:"$CAT_MESG_STRING"
+	\#
+	\#  Ensure that we won't unmap when 'Help' is pressed.
+	\#  Our FORM widget is a subclass of XmBulletinBoard.
+	\#
+	XtSetValues $FORM \
+		autoUnmanage:False
+	
+	XtGetValues $FORM \
+		foreground:FOREGROUND
+	
+	XtGetValues $FORM \
+		background:BACKGROUND
+
+	XtSetValues $FORM \
+		noResize:True
+
+	catgets CAT_MESG_STRING $CAT_ID 1 30 "File:"
+
+	XtCreateManagedWidget FILE_LABEL file_label XmLabel $FORM \
+	    labelString:"${CAT_MESG_STRING}" \
+	    alignment:ALIGNMENT_BEGINNING \
+	    $(DtkshAnchorTop 15) \
+	    $(DtkshAnchorLeft 20)
+
+	if (( $user_filename_flag ))
+	then
+	    LABEL_STRING="${user_filename}"
+	else
+	    \#
+	    \#  Remove all path components except the last.
+	    \#
+	    simple_file_name=${print_file\##*/}
+
+	    LABEL_STRING="${simple_file_name}"
+	fi
+
+	XtCreateManagedWidget PFILENAME pfilename XmLabel $FORM \
+	    labelString:"${LABEL_STRING}" \
+	    $(DtkshAnchorTop 15) \
+	    $(DtkshRightOf $FILE_LABEL 10) 
+    
+	catgets CAT_MESG_STRING $CAT_ID 1 40 "Printer:"
+
+	XtCreateManagedWidget DEVICE_LABEL device_label XmLabel $FORM \
+	    labelString:"$CAT_MESG_STRING" \
+	    $(DtkshUnder $FILE_LABEL 22) \
+	    $(DtkshAnchorLeft 20) 
+    
+	\#
+	\#  Decide the appropriate XmNcolumns
+	\#
+	\# XtCreateManagedWidget DEVICE device XmTextField $FORM \
+	\#     columns:10 \
+	\#     $(DtkshUnder $FILE_LABEL 15) \
+	\#     $(DtkshRightOf $DEVICE_LABEL 20) \
+	\#     $(DtkshAnchorLeft 110) \
+	\#     navigationType:EXCLUSIVE_TAB_GROUP
+        _DetermineColumns 10 5
+        _columns=$?
+	XtCreateManagedWidget DEVICE device XmTextField $FORM \
+	    columns:"$_columns" \
+	    $(DtkshUnder $FILE_LABEL 15) \
+	    $(DtkshRightOf $DEVICE_LABEL 20) \
+	    $(DtkshFloatRight 50) \
+	    navigationType:EXCLUSIVE_TAB_GROUP
+
+
+	catgets CAT_MESG_STRING $CAT_ID 1 50 "Default"
+
+        DEFAULT_LP=${lpdest:-"`lpstat -d | awk -F: ' { print $2 } '`"}
+        DEFAULT_LP=${DEFAULT_LP##+( )}
+
+	XtSetValues $DEVICE \
+		value:$DEFAULT_LP \
+		cursorPosition:${\#DEFAULT_LP}
+	
+	catgets CAT_MESG_STRING $CAT_ID 1 60 "Copies:"
+
+	XtCreateManagedWidget COPIES_LABEL copies_label XmLabel $FORM \
+		labelString:"$CAT_MESG_STRING" \
+		$(DtkshUnder $FILE_LABEL 22) \
+		$(DtkshRightOf $DEVICE 55)
+
+	\#
+	\#  Decide the appropriate XmNcolumns
+	\#
+	\# XtCreateManagedWidget COPIES copies XmTextField $FORM \
+	\# 	columns:4 \
+	\# 	value:"${copy_count}" \
+	\# 	cursorPosition:${\#copy_count} \
+	\# 	$(DtkshUnder $FILE_LABEL 15) \
+	\# 	$(DtkshRightOf $COPIES_LABEL 15) \
+	\# 	$(DtkshAnchorRight 10) \
+	\# 	navigationType:EXCLUSIVE_TAB_GROUP
+        _DetermineColumns 4 2
+        _columns=$?
+	XtCreateManagedWidget COPIES copies XmTextField $FORM \
+		columns:"$_columns" \
+		value:"${copy_count}" \
+		cursorPosition:${\#copy_count} \
+		$(DtkshUnder $FILE_LABEL 15) \
+		$(DtkshRightOf $COPIES_LABEL 15) \
+		navigationType:EXCLUSIVE_TAB_GROUP
+
+	catgets CAT_MESG_STRING $CAT_ID 1 70 "Banner Page Title:"
+
+	XtCreateManagedWidget TITLE_LABEL title_label XmLabel $FORM \
+		labelString:"$CAT_MESG_STRING" \
+		$(DtkshUnder $DEVICE_LABEL 33) \
+		$(DtkshAnchorLeft 20)
+	
+	\#
+	\#  Decide the appropriate XmNcolumns
+	\#
+	\# XtCreateManagedWidget TITLE title XmTextField $FORM \
+	\# 	columns:10 \
+	\# 	$(DtkshUnder $DEVICE_LABEL 25) \
+	\# 	$(DtkshRightOf $TITLE_LABEL 20) \
+	\# 	$(DtkshAnchorRight 10) \
+	\# 	navigationType:EXCLUSIVE_TAB_GROUP
+        _DetermineColumns 10 5
+        _columns=$?
+	XtCreateManagedWidget TITLE title XmTextField $FORM \
+		columns:"$_columns" \
+		$(DtkshUnder $DEVICE_LABEL 25) \
+		$(DtkshRightOf $TITLE_LABEL 20) \
+		$(DtkshAnchorRight 10) \
+		navigationType:EXCLUSIVE_TAB_GROUP
+	
+	\#
+	\# if banner_title is set, then use it as the default value
+	\#
+	if (( $banner_title_flag ))
+	then
+	   TEMP_VALUE=$banner_title
+	
+	   XtSetValues $TITLE \
+		value:"${TEMP_VALUE}" \
+		cursorPosition:${\#TEMP_VALUE}
+	fi
+
+	XtCreateManagedWidget SEP sep XmSeparator $FORM \
+		$(DtkshUnder $TITLE 10) \
+		$(DtkshSpanWidth)
+
+	catgets CAT_MESG_STRING $CAT_ID 1 80 "Print Page Numbers"
+
+	XtCreateManagedWidget PNUM_TOGGLE pnum_toggle XmToggleButton $FORM \
+		$(DtkshUnder $SEP 8) \
+		$(DtkshAnchorLeft 20) \
+		labelString:"$CAT_MESG_STRING" \
+		navigationType:EXCLUSIVE_TAB_GROUP
+
+	if (( $print_page_allowed == 0 ))
+	then
+	   XtSetValues $PNUM_TOGGLE \
+		sensitive:"False"
+	elif (( $format_flag ))
+	then
+	   XtSetValues $PNUM_TOGGLE \
+		set:"True"
+	fi
+
+	catgets CAT_MESG_STRING $CAT_ID 1 90 "Print Command Options:"
+
+	XtCreateManagedWidget OPTIONS_LABEL options_label XmLabel $FORM \
+		labelString:"$CAT_MESG_STRING" \
+		$(DtkshUnder $PNUM_TOGGLE 13) \
+		$(DtkshAnchorLeft 20)
+	
+	\#
+	\#  Decide the appropriate XmNcolumns
+	\#
+	\# XtCreateManagedWidget OPTIONS options XmTextField $FORM \
+	\# 	columns:20 \
+	\# 	$(DtkshUnder $PNUM_TOGGLE 6) \
+	\# 	$(DtkshRightOf $OPTIONS_LABEL 20) \
+	\# 	$(DtkshAnchorRight 10) \
+	\# 	navigationType:EXCLUSIVE_TAB_GROUP
+        _DetermineColumns 20 10
+        _columns=$?
+	XtCreateManagedWidget OPTIONS options XmTextField $FORM \
+		columns:"$_columns" \
+		$(DtkshUnder $PNUM_TOGGLE 6) \
+		$(DtkshRightOf $OPTIONS_LABEL 20) \
+		$(DtkshAnchorRight 10) \
+		navigationType:EXCLUSIVE_TAB_GROUP
+	
+	if (( $other_options_flag == 1 ))
+	then
+	   XtSetValues $OPTIONS_LABEL \
+		sensitive:"False"
+	   XtSetValues $OPTIONS \
+		sensitive:"False"
+	fi	
+
+	XtCreateManagedWidget SEP1 sep XmSeparator $FORM \
+		$(DtkshUnder $OPTIONS_LABEL 14) \
+		$(DtkshSpanWidth)
+	
+	catgets CAT_MESG_STRING $CAT_ID 1 100 "Print"
+
+	XtCreateManagedWidget OK ok XmPushButton $FORM \
+	        labelString:"$CAT_MESG_STRING" \
+		$(DtkshUnder $SEP1 5) \
+		$(DtkshFloatLeft 10) \
+		$(DtkshFloatRight 30) \
+		$(DtkshAnchorBottom 5) 
+
+	XtAddCallback $OK activateCallback "DoParameterCollection"
+	
+	catgets CAT_MESG_STRING $CAT_ID 1 110 "Cancel"
+
+	XtCreateManagedWidget CANCEL cancel XmPushButton $FORM \
+	        labelString:"$CAT_MESG_STRING" \
+		$(DtkshUnder $SEP1 5) \
+		$(DtkshFloatLeft 40) \
+		$(DtkshFloatRight 60) \
+		$(DtkshAnchorBottom 5) 
+	XtAddCallback $CANCEL activateCallback "CancelPrint"
+	
+	catgets CAT_MESG_STRING $CAT_ID 1 120 "Help"
+
+	XtCreateManagedWidget HELP help XmPushButton $FORM \
+	        labelString:"$CAT_MESG_STRING" \
+		$(DtkshUnder $SEP1 5) \
+		$(DtkshFloatLeft 70) \
+		$(DtkshFloatRight 90) \
+		$(DtkshAnchorBottom 5) 
+	XtAddCallback $HELP activateCallback "DoHelp"
+	
+	\#XtAddCallback $HELP activateCallback \
+	\#       "DtkshDisplayQuickHelpDialog 'Using The Find Command' HELP_TYPE_FILE \
+	\#	'./Find.help' "
+	
+	XtSetValues $FORM \
+		initialFocus:$OK \
+		defaultButton:$OK \
+		cancelButton:$CANCEL \
+		navigationType:EXCLUSIVE_TAB_GROUP
+	
+	DtkshSetReturnKeyControls $DEVICE $TITLE $FORM $OK
+	DtkshSetReturnKeyControls $TITLE $COPIES $FORM $OK
+	
+	XtManageChild $FORM
+	XtMainLoop
+	
+}
+
+\##################################################################
+\###  DoNoFileMessage()
+\###
+\###         We have determined that we have no valid file
+\###         to print.  Write out a message to that effect.
+\###
+\##################################################################
+DoNoFileMessage()
+{
+    catgets CAT_MESG_STRING $CAT_ID 1 130 "Sorry--Unable to print:"
+
+    GetNoFileMessageString
+
+    print ""
+    print `date`
+    print "${CAT_MESG_STRING}"
+    print ""
+}
+
+\#
+\# This is the 'NoFile' callback.  It will exit the program.
+\#
+NoFileCallback()
+{
+	Exit $NO_FILE_ERR
+}
+
+GetNoFileMessageString()
+{
+    catgets CAT_MESG_STRING $CAT_ID 1 130 "Sorry--Unable to print:"
+
+    if (( $user_filename_flag ))
+    then
+	CAT_MESG_STRING=${CAT_MESG_STRING}"  \"$user_filename\"."
+    else
+	simple_file_name=${print_file\##*/}
+
+	CAT_MESG_STRING=${CAT_MESG_STRING}"  \"$simple_file_name\"."
+    fi
+
+    if (( $failure_flag == $NO_REGULAR_FILE_ERR ))
+    then
+	catgets TEMP_MESG_STRING $CAT_ID 1 132 "This is not a printable file or doesn't exist."
+    elif (( $failure_flag == $NO_READ_FILE_ERR ))
+    then
+	catgets TEMP_MESG_STRING $CAT_ID 1 134 "You don't have permission to read that file."
+    else
+	catgets TEMP_MESG_STRING $CAT_ID 1 136 "Please check whether this file exists."
+    fi
+
+    CAT_MESG_STRING="${CAT_MESG_STRING}""
+    ${TEMP_MESG_STRING}"
+}
+
+\##################################################################
+\###  DoNoFileMessageGUI()
+\###
+\###         We have determined that we have no valid file
+\###         to print.  Post a dialog to that effect and exit
+\###         as a result.
+\###
+\###         Upon entry, check the failure_flag value for
+\###         the proper message to print.
+\###
+\##################################################################
+DoNoFileMessageGui()
+{
+
+    XmCreateInformationDialog INFORMATION $TOPLEVEL information
+
+    catgets CAT_MESG_STRING $CAT_ID 1 160 "Print Information"
+
+    XtSetValues $(XtParent "-" $INFORMATION) \
+		title:"$CAT_MESG_STRING"
+
+    GetNoFileMessageString
+
+    XtSetValues $INFORMATION \
+	    okCallback:"NoFileCallback" \
+	    messageString:"${CAT_MESG_STRING}" \
+	    noResize:True \
+	    defaultButtonType:DIALOG_OK_BUTTON \
+	    messageAlignment:ALIGNMENT_CENTER 
+
+     XtUnmanageChild $(XmMessageBoxGetChild "-" $INFORMATION \
+	 DIALOG_CANCEL_BUTTON)
+
+     XtUnmanageChild $(XmMessageBoxGetChild "-" $INFORMATION \
+	 DIALOG_HELP_BUTTON)
+
+    XtManageChild $INFORMATION
+
+    XtMainLoop
+}
+
+\##################################################################
+\###  SetPreEnvironment()
+\###
+\###         Check the ENVIRONMENT values we care about, and
+\###         set the corresponding internal variable values.
+\###
+\##################################################################
+SetPreEnvironment()
+{
+    if (( ${\#LPDEST} ))
+    then
+	lpdest=$LPDEST
+	lpdest_flag=1
+    fi
+
+    if (( ${\#DTPRINTCWD} ))
+    then
+	print_cwd=$DTPRINTCWD
+	print_cwd_flag=1
+    fi
+
+    if (( ${\#DTPRINTFILEREMOVE} ))
+    then
+	\# check for True
+	Uppercase_string=$DTPRINTFILEREMOVE
+	if [[ $Uppercase_string = "TRUE" ]]
+	then
+	    remove_flag=1
+	fi
+	Uppercase_string=""
+    fi
+
+    if (( ${\#DTPRINTSILENT} ))
+    then
+	\# check for True
+	Uppercase_string=$DTPRINTSILENT
+	if [[ $Uppercase_string = "TRUE" ]]
+	then
+	    silent_flag=1
+	fi
+	Uppercase_string=""
+    fi
+
+    if (( ${\#DTPRINTUSERFILENAME} ))
+    then
+	user_filename=$DTPRINTUSERFILENAME
+	user_filename_flag=1
+    fi
+
+    if (( ${\#DTPRINTTESTOUTPUT} ))
+    then
+	test_output_file=$DTPRINTTESTOUTPUT
+	test_flag=1
+    fi
+
+}
+
+\##################################################################
+\###  Main()
+\###
+\###  Set up and call either the silent or the GUI routines.
+\###
+\###
+\##################################################################
+
+Initialize
+
+while getopts b:d:m:n:o:u:aehrsvw argument
+do
+    case $argument in
+	    a)	print_man_flag=1
+		;;
+	    b)  banner_title=$OPTARG
+		banner_title_flag=1
+		;;
+	    d)  lpdest=$OPTARG
+		lpdest_flag=1
+		;;
+            e)  remove_flag=1
+                ;;
+            h)  PrintUsage
+		Exit $SUCCESS
+                ;;
+	    m)  print_command=$OPTARG
+		print_command_flag=1
+                ;;
+	    n)  copy_count=$OPTARG
+		copy_count_flag=1
+                ;;
+            o)  other_options=$OPTARG
+	        other_options_flag=1
+                ;;
+            r)  format_flag=1
+                ;;
+            s)  silent_flag=1
+                ;;
+            u)  user_filename=$OPTARG
+		user_filename_flag=1
+                ;;
+            v)  verbose_flag=1
+                ;;
+            w)  print_raw_flag=1
+                ;;
+	    \?) PrintUsage
+		Exit $USAGE_EXIT
+		;;
+    esac
+done
+
+((shift_positions = OPTIND - 1))
+
+if (( $shift_positions < $\# ))
+then
+\#
+\# We have at least one remaining non-switch command line argument
+\#
+	shift $shift_positions
+	\#
+	\# We assume that any remaining arguments constitute the 
+	\# filename.
+	\# At some later point, may want to parse a list of filenames.
+	\#
+	print_file=$*
+	print_file_flag=1
+fi
+
+\#
+\#  Make sure all these settings line up consistently.
+\#
+ReconcileOptions
+
+if (( $verbose_flag ))
+then
+    PrintStartLog
+fi
+
+\#
+\#  Do we have enough information to do our job?
+\#  This step may cause us to exit.
+\#
+CheckOptions
+
+\#
+\#  Have we been given a valid file?
+\#
+CheckValidFile "$print_file"
+
+failure_flag=$?
+
+
+if (( $silent_flag ))
+then
+    if (( $failure_flag == $SUCCESS ))
+    then
+	DoParameterCollectionSilent
+
+	PrintIt
+
+	Cleanup
+
+        Exit $failure_flag
+    else
+	DoNoFileMessage
+
+	Exit $NO_FILE_ERR
+    fi
+else
+    if [[ -r /usr/dt/lib/dtksh/DtFuncs.dtsh ]]
+    then
+	. /usr/dt/lib/dtksh/DtFuncs.dtsh
+    else
+	failure_flag=1
+	echo Sorry--cannot find initialization file.
+	Exit $NO_INIT_FILE_ERR
+    fi
+
+    XtInitialize TOPLEVEL printerConfig Dtlp "${@:-}"
+
+    XtDisplay DISPLAY $TOPLEVEL
+
+    if (( $failure_flag == $SUCCESS ))
+    then
+	UseGui
+    else
+	DoNoFileMessageGui
+    fi
+fi
+
+\#
+\#  Never reached.
+\#
+\#####################         eof       ##############################

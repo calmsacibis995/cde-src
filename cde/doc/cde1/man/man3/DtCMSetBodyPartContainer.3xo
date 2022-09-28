@@ -1,0 +1,65 @@
+.TH DtCMSetBodyPartContainer 3 "17 January 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH "NAME"
+DtCMSetBodyPartContainer \- set the content of a body part to a container
+.SH "SYNOPSIS"
+.yS
+#include <Bento/DtCM.h>
+.sp 0.5v
+.ta \w'CMContainer DtCMSetBodyPartContainer('u
+CMContainer DtCMSetBodyPartContainer(DtCMBodyPart *\f2body_part\fP,
+	CMEnv *\f2error\fP,
+	CMGlobalName \f2type_name\fP);
+.yE
+.SH "DESCRIPTION"
+The
+.Fn DtCMSetBodyPartContainer
+function sets the content of the body part to an embedded container.
+It creates the embedded container and returns a handle to the container.
+If the body part has an existing value, this
+value is destroyed and a new value is created for the container.
+.P
+The
+.I body_part
+argument is a body-part structure returned by any of the
+.Fn DtCMGetBodyPart 3,
+.Fn DtCMGetNextBodyPart 3,
+or
+.Fn DtCMNewBodyPart 3
+functions.
+The
+.I error
+argument is a pointer to an error return structure.
+The
+.I type_name
+argument is the type associated with the container.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn DtCMSetBodyPartContainer
+function returns an open container handle to a new embedded container.
+If an error occurs,
+.Fn DtCMSetBodyPartContainer
+sets the major code in the
+.I error
+structure to
+.Cn USER_EXCEPTION ,
+and the application can use the
+.Fn CMRexception_number
+function to determine the minor code.
+See the Error API Appendix in the \*(ZB.
+.SH "APPLICATION USAGE"
+The application should close the container handle with the
+.Fn CMRCloseContainer .
+function.
+.SH "SEE ALSO"
+.Fn DtCMGetBodyPart 3,
+.Fn DtCMGetNextBodyPart 3,
+.Fn DtCMGetBodyPartContainer 3,
+.Fn DtCMNewBodyPart 3,
+.Hd Bento/DtCM.h 5;
+.Fn CMRCloseContainer ,
+.Fn CMRexception_number
+in the \*(ZB.

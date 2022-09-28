@@ -1,0 +1,340 @@
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994 Novell, Inc.
+.\" *************************************************************************
+.TH dtdtsfile 4
+.SH NAME
+dtdtsfile \-  format and location of desktop data type and action files
+.SH SYNOPSIS
+.nf
+.in +5n
+set \fBDtDbVersion\fP=\fIversion_number\fP
+set \fIVariableName\fP=\fIvariable_value\fP
+
+\fIRecordType\fP  \fIrecord_name\fP
+{
+.in +5n
+# Comment
+\fIFieldName\fP \fIfield_value\fP
+\fIFieldName\fP \fIfield_value\fP
+        \.
+        \.
+        \.
+.in -5n
+}
+.in -5n
+.fi
+.SH DESCRIPTION
+.PP
+The \fIData Type\fP database provides definitions for the data types
+and actions recognized by clients participating in the Common Desktop 
+Environment (CDE).
+.SH FILE FORMAT
+The general syntax of the Data Types files is as described above in
+the SYNOPSIS section of this man page.  The set of general constructs 
+composing the database entries is as follows:
+.SS "Comments"
+Any line whose first non-space character is '#' will be treated as a
+comment line, and will be ignored during the reading of the database file.
+.SS "Database Version"
+Over time, it is possible that the syntax understood by the
+database loader may change or evolve.  To allow older
+configuration files to continue to be loaded, the database loader supports the concept of a version number; the version number indicates
+the version of the database syntax used by a particular database file.
+If a database version number is not specified, then the database
+loader will assume that the file uses the 1.0 syntax, described here.
+If a database file specifies a version number, then it
+must be the first non-blank, non-comment line in the database file;
+if the version is specified anywhere else in the file, then an error
+message is generated, and the remainder of that database file will be
+ignored. The database version number is specified using the following syntax:
+.nf
+.in +5n
+set \fBDtDbVersion\fP=\fIversion_number\fP
+.in -5n
+.fi
+.SS "String Variables"
+Database entries can reference string variables which may be set
+within the database file. The scope of a string variable is restricted
+to only those record definitions within the database file defining the
+string variable. A string variable is defined using the following syntax:
+.nf
+.in +5n
+set \fIVariableName\fP=\fIvariable_value\fP
+.in -5n
+.fi
+String variables are referenced using either of the standard shell
+variable referenceing syntaxes: $\fIvariable_name\fP or ${\fIvariable_name\fP}.
+A variable name may be made up of any of the alphanumeric characters, and the
+underscore.
+.SS "Environment Variables"
+Database records may refer to environment variables, using either
+of the standard shell variable referencing syntaxes: $\fIenvironment_variable\fP
+or ${\fIenvironment_variable\fP}.  If the environment variable name conflicts
+with a string variable name, the string variable takes precedence.
+.SS "Line Continuation"
+Any field within a record may be continued onto another line, simply by
+ending the line with a '\\' character. The <Newline> character
+must immediately follow the line continuation character.
+.SS "Record Name"
+The first line of a record is made up of the record type, \fIRecordType\fP 
+( one of: DATA_ATTRIBUTES, DATA_CRITERIA, or ACTION), followed by the record
+name, \fIrecord_name\fP, which is henceforth used to identify this record. 
+.SS "Record Delimiters"
+After the record name has been located, the set of corresponding
+fields is delimited by the '{' and '}' characters. Each of these characters
+must appear on a line by themselves.
+.SS "Fields"
+The fields are all of the non-comment lines found between the
+record delimiters. They are composed of keyword/value pairs.
+.SS "Record Types"
+There are three recognized record types in database files used for data types 
+(and actions):
+.TP
+\(bu
+\fBDATA_CRITERIA\fP
+.TP
+\(bu
+\fBDATA_ATTRIBUTES\fP
+.TP
+\(bu
+\fBACTION\fP
+.PP
+These three kinds of database record may appear together in the same file or
+they may be segregated into separate files.  See 
+.BR dtaction (4)
+for the file format of ACTION records.
+.SH "DATA_CRITERIA RECORDS"
+
+o	NAME_PATTERN A csh style expression describing the file names that could match this data. See Wildcard Characters. Default is an empty string which means to ignore file patterns in matching.
+
+o	PATH_PATTERN A csh style expression describing the absolute file paths that could match this data. See Wildcard Characters. Default is an empty string which means to ignore path pattern in matching.
+
+o	CONTENT Three values that include start, type and value much like the magic file on UNIX. Default is an empty field which means to ignore contents in matching. Supported types are that can be matched are "string" "byte" "short" "long" and "filename". 
+
+o	MODE A field to match the mode field of a status structure. These include read(r), write(w) and execute(x) for owner, group, and others. Also the first character indicates directory(d), socket(s), symbolic link(l), regular file(f), block file(b) or character special file(c). Default is an empty field which means to ignore the mode in matching.
+
+o	LINK_NAME A csh style expression describing the name portion of the filename the symbolic link points to that could match this data. See Wildcard Characters. Default is an empty expression which means to ignore symbolic link name in matching. LINK_NAME points to the file itself, not to the name of the file.
+
+o	LINK_PATH A csh style expression describing the absolute path portion of the filename the symbolic link that could match this data. See Wildcard Characters. Default is an empty expression which means to ignore symbolic link name in matching. 
+
+o	DATA_ATTRIBUTES_NAME The name of this type of data. This value is a pointer into the Data_Attributes table.
+
+.SS "Wildcard Characters"
+
+The pattern-matching text field permits use of the csh wild card characters *,?, and []. The asterisk (*) matches any set of characters, the question mark (?) matches a single character, and the square brackets ([]) match any one of a set of characters enclosed in the square brackets. 
+
+.SS "Logical expressions"
+
+The logical operators And (`&') and/or Or (`|') can be used in any of the above Criteria (except for DATA_ATTRIBUTES_NAME). The resultant expressions will be evaluated from left to right and leading/trailing white space will be significant to the expression/values.
+
+.SS "Escape character"
+
+Users can escape wildcard characters and use them as regular characters by preceding the character with a backslash (\\). For example, \\* is interpreted as an asterisk, \\? as a question mark, and \\[\\] as square brackets. Users can escape backslash itself by preceding it with a backslash (\\\\).
+
+The following pseudo-BNF describes the data-criteria variable definition:
+
+DataCriteriaDefinition	 = DATA_CRITERIA name
+
+{
+
+	data_criteria_definition
+
+}
+
+data_criteria_definition = (
+
+|	PATH_PATTERN pattern_datas newline
+
+|	NAME_PATTERN pattern_datas newline
+
+|	LINK_PATH pattern_datas newline
+
+|	LINK_NAME pattern_datas newline
+
+|	CONTENT content_fields newline
+
+|	MODE mode_specs newline
+
+|	DATA_ATTRIBUTES_NAME name newline
+
+)	
+
+pattern_datas = pattern_data [(`&' |'|') pattern_datas]
+
+pattern_data = < any name_char plus "*", "?", "["and "] >
+
+mode_specs = mode_spec [(`&' | '|') mode_specs]
+
+mode_spec = type_spec [ permission_spec ]
+
+type_spec = type_char {type_char}
+
+permission_spec = permission_char {permission_char}
+
+type_char = ["!"] ("d" | "l" | "s" | "b" | "c" )
+
+permission_char = ["!"] ("r" | "w" | "x")
+
+content_fields = starting_byte data_value ...
+
+starting_byte = number 
+
+data_value = (numeric | alphanumeric | filename)
+
+numeric = ("byte" | "short" | "long") number
+
+alphanumeric = "string" string
+
+filename = "filename" string
+
+name = name_char {name_char}
+
+name_char = {A-Z | a-z | 0-9 | -}
+
+string = < any character not including end of line > {any_string}
+
+any_string = {< any character not including end of line >}
+
+number = < any valid number >
+
+newline = \\n 
+
+spaces = ""| \\t | \\n
+
+
+.SH "DATA_ATTRIBUTES RECORDS"
+
+
+o	DESCRIPTION A "human" readable description of this data. Default: Data-Attributes name.
+
+o	ICON Path of icon to use for this data. Defaults to standard icon
+
+o	INSTANCE_ICON Description of icon path to use for this instance of data. Default is ICON.
+
+o	PROPERTIES Keywords to indicate properties for this data (hidden/visible are, currently). Default is visible.
+
+o	ACTIONS List of actions that can be performed on this data. This list contains a set of pointers into the action table for actions that can be performed on this data. Default is empty.
+
+o	NAME_TEMPLATE A printf format to use to create a new data of this type, i.e. "%s.mif"
+
+o	MODE_TEMPLATE An ascii string representation of the umask to use to create a new data of this type.
+
+o	MOVE_TO_ACTION Names an action to be invoked when an object is moved to the current object.
+
+o	COPY_TO_ACTION Names an action to be invoked when an object is copied to the current object.
+
+o	LINK_TO_ACTION Names an action to be invoked when an object is linked to the current object.
+
+o	IS_TEXT This attribute tells users of this data type to display it directly to end users in a text widget. If IS_TEXT is set to "true," the text is displayed. If this attribute is missing or not set to "true," then the item is represented using an icon, or otherwise not directly presented to the user.
+
+o	MEDIA This unique name identifies the underlying data type. The format of this name is locally chosen but globally unique. This name uses identifiers that are defined by ISO 9070. These names begin with a naming authority (assigned to a system vendor or an application vendor), and then continue with a series of more and more specific segments, until they end in a specific type name. The format of these names is tokens separated by colons. The following examples show how some existing names would be represented (assuming approved top level registries):
+SunSoft:SunRaster
+common desktop environment:textfile
+ADOBE:postscript (or common desktop environment:postscript if Adobe won't play)
+
+o	MIME_TYPE MEDIA is the internal, unique name for data types. However other external naming authorities that have tried to solve the same problem. MIME (Multipurpose Internet Message Extensions) is one of those external registries, and is the standard type namespace for our mail system. This type allows us to set up a one-to-one correspondence between MIME types and MEDIA types.
+
+o	MIME_TO_MEDIA_FILTER This attribute names an (action? filter?) that can be used to convert the MIME type to the MEDIA type, assuming that some data manipulation needs to be done.
+
+o	MEDIA_TO_MIME_FILTER This attribute names an (action? filter?) that can be used to convert the MEDIA type to the MIME type, assuming that some data manipulation needs to be done.
+
+o	X400_TYPE X400 has its own set of types, that are similar in structure to the MEDIA type, but are formatted using different rules and having different naming authorities.
+
+o	X400_TO_MEDIA_FILTER/MEDIA_TO_X400_FILTER If needed, these filters can be defined in order to translate the contents of these types to or from the local MEDIA type.
+
+
+.SS "Modifiers"
+
+The following modifiers can be used in the values of the Data Attributes to modify the runtime values:
+
+%file% The entire file name of the file.
+
+%dir% The dir to the file. e.g. for /usr/src/file.c -> %dir% = /usr/src
+
+%name% The name of the file. e.g. for /usr/src/file.c -> %name% = file.c
+
+%suffix% The suffix of the file. e.g. for /usr/src/file.c -> %suffix% = c
+
+%base% The base name of the file. e.g. for /usr/src/file.c -> %base% = file
+
+Strings enclosed in backquote (`) will be exec'ed and the output will replace the backquotes and string. 
+
+.SS "Data Attributes Format"
+
+DataAttributesDefinition	 = DATA_ATTRIBUTES name 
+
+{
+
+	data_attributes_definition
+
+}
+
+data_attributes_definition = (
+
+|	DESCRIPTION string newline
+
+|	ICON string newline
+
+|	INSTANCE_ICON string newline
+
+|	PROPERTIES string {, string} newline
+
+|	ACTIONS name {, name} newline
+
+|	NAME_TEMPLATE string newline
+
+|	MODE_TEMPLATE	number newline
+
+|	MOVE_TO_ACTION string newline
+
+|	COPY_TO_ACTION string newline
+
+|	LINK_TO_ACTION string newline
+
+|	IS_TEXT string newline
+
+|	MEDIA string newline
+
+|	MIME_TYPE string newline
+
+|	MIME_TO_MEDIA_FILTER string newline
+
+|	MEDIA_TO_MIME_FILTER string newline
+
+|	X400_TYPE string newline
+
+|	X400_TO_MEDIA_FILTER string newline
+
+|	MEDIA_TO_X400_FILTER string newline
+
+|	unique_string string newline
+
+|	# string newline
+
+)	
+
+name			name_char {name_char}
+
+name_char		{"A-Z" | "a-z" | "0-9" | "-"}
+
+string			< any character not including end of line > {any_string}
+
+any_string		{< any character not including end of line >}
+
+number		< any valid number >
+
+newline			"\\n"
+
+spaces 		 	" " | "\\t" | "\\n"
+.SH ERRORS
+Errors encountered when loading database files are written to the
+CDE errorlog file.  Records containing errors are rejected.
+.SH "SEE ALSO"
+.BR dttypes(1),
+.BR dtdtfile(4),
+.BR dtactionfile(4).
+./" tooltalk man page should  be referenced.
+./" should dtaction or dtfile be referenced?

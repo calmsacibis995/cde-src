@@ -1,0 +1,83 @@
+.TH DtEditorGetSizeHints 3 "3 August 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.\" ************************************************************************
+.SH NAME
+DtEditorGetSizeHints \- retrieve sizing information from a DtEditor widget
+.SH SYNOPSIS
+.yS
+#include <Dt/Editor.h>
+.sp 0.5v
+.ta \w'void DtEditorGetSizeHints('u
+void DtEditorGetSizeHints(Widget \f2widget\fP,
+	XSizeHints *\f2pHints\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn DtEditorGetSizeHints
+function retrieves the current sizing information from
+a DtEditor widget, allowing the application to compute appropriate size hints
+for the window manager.
+.P
+The
+.I widget
+argument specifies the DtEditor widget ID.
+.P
+The
+.I pHints
+argument is a pointer to an
+.B XSizeHints
+structure into which the current sizing information is placed.
+The fields in this structure do not have to contain any
+values when it is passed in.
+.P
+Upon successful completion, the
+.Fn DtEditorGetSizeHints
+function fills in the following fields of the
+.B XSizeHints
+structure: minimum width (\c
+.IR min_width )
+and height (\c
+.IR min_height );
+width (\c
+.IR width_inc )
+and height (\c
+.IR height_inc )
+increment; and base width (\c
+.IR base_width )
+and height (\c
+.IR base_height );
+otherwise, the structure is unchanged.
+The Flags field is set to:
+.Cs I
+PMinSize | PResizeInc | PBaseSize
+.Ce
+.SH "RETURN VALUE"
+The
+.Fn DtEditorGetSizeHints
+function returns no value.
+.SH EXAMPLES
+The following code segment sets the resize increment and minimum window
+size properties for the application.
+.Cs I
+Widget          editor,
+                application_shell;
+Display         display;
+XSizeHints      size_hints;
+long            supplied_return;
+.sp 0.5v
+XGetWMSizeHints(display, XtWindow(application_shell),
+                 &size_hints, &supplied_return, XA_WM_NORMAL_HINTS);
+.sp 0.5v
+DtEditorGetSizeHints(editor, &size_hints);
+.sp 0.5v
+XSetWMSizeHints(display, XtWindow(application_shell),
+                 &size_hints, XA_WM_NORMAL_HINTS);
+.Ce
+.SH "SEE ALSO"
+.Hd Dt/Editor.h 5,
+.Fn DtEditor 3.

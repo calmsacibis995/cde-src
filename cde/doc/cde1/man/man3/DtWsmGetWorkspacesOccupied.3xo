@@ -1,0 +1,92 @@
+.TH DtWsmGetWorkspacesOccupied 3 "19 Apr 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.\" *************************************************************************
+.SH NAME
+DtWsmGetWorkspacesOccupied \- get the workspaces in which a window resides
+.SH SYNOPSIS
+.yS
+#include <Dt/Wsm.h>
+.sp 0.5v
+.ta \w'Status DtWsmGetWorkspacesOccupied('u
+Status DtWsmGetWorkspacesOccupied(Display *\f2display\fP,
+	Window \f2window\fP,
+	Atom **\f2ppaWorkspaces\fP,
+	int *\f2pNumWs\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn DtWsmGetWorkspacesOccupied
+function works with the
+.xos
+workspace manager
+.xoe
+.cdes
+Cde
+workspace manager,
+.Cm dtwm 1,
+.cdee
+and returns the list of workspaces in which this window resides.
+Each element of the list is the name of a workspace (converted to an X atom).
+.P
+The
+.I display
+argument is the X display.
+.P
+The
+.I window
+argument is the window of interest.
+.P
+The
+.I *ppaWorkspaces
+argument is the address of a pointer to receive the pointer to
+a list of workspace names (converted to X atoms).
+.P
+The
+.I pNumWs
+argument is the address of an integer to receive the number
+of elements in the list of workspaces returned in
+.IR *ppaWorkspaces .
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn DtWsmGetWorkspacesOccupied
+function returns Success and the workspace manager returns in
+.I *ppaWorkspaces
+a list of atoms identifying the
+occupied workspaces, and returns in
+.I pNumWs
+the number of occupied
+workspaces; otherwise, it returns a value not equal to Success.
+.SH "APPLICATION USAGE"
+If the
+.Fn DtWsmGetWorkspacesOccupied
+function
+is not successful, failure may be due to a memory allocation error or
+failure to find the correct workspace information (that is, the
+.xos
+workspace manager
+.xoe
+.cdes
+Cde
+workspace manager,
+.Cm dtwm 1,
+.cdee
+is not running).
+The application must use
+.Fn XtFree 3X
+to free data returned in
+.IR *ppaWorkspaces .
+.SH "SEE ALSO"
+.Hd Dt/Wsm.h 5,
+.cde .Fn XtFree 3X,
+.xos
+.Fn XtFree 3X
+in the \*(Zt.
+.xoe
+.cdes
+.Cm dtwm 1.
+.cdee

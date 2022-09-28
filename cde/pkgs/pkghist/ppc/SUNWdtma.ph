@@ -1,0 +1,16 @@
+PKG=SUNWdtma
+ARCH=ppc
+VERSION=1000
+REMOVED_FILES=dt/share/man/man6/ttsnoop.6
+REMOVED_FILES=dt/share/man/man4/tttracefile.4
+REMOVED_FILES=dt/share/man/man1m/ttdbserverd.1m
+REMOVED_FILES=dt/share/man/man1m/ttdbserver.1m
+REMOVED_FILES=dt/share/man/man1/tttrace.1
+REMOVED_FILES=dt/share/man/man1/tttar.1
+REMOVED_FILES=dt/share/man/man1/ttsession.1
+REMOVED_FILES=dt/share/man/man1/ttrmdir.1
+REMOVED_FILES=dt/share/man/man1/ttrm.1
+REMOVED_FILES=dt/share/man/man1/ttmv.1
+REMOVED_FILES=dt/share/man/man1/ttdbck.1m
+REMOVED_FILES=dt/share/man/man1/ttcp.1
+REMOVED_FILES=dt/share/man/man1/tt_type_comp.1

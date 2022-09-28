@@ -1,0 +1,475 @@
+XCOMM platform:  $XConsortium: hp.cf /main/cde1_maint/2 1995/11/10 18:07:57 drk $
+/** for be install **/
+#ifndef InstallCmd
+#define InstallCmd              sh $(SCRIPTSRC)/install.sh
+#endif
+
+/* ESlit macro which is usually assigned to SPECIAL_CC_OPTIONS
+ * or SPECIAL_C++OPTIONS in an Imakefile to turn on ESlit.
+ * This option is turned on in each Imakefile
+ */
+ESLIT++_OPTION = +T +a1 -Wb,+ESlit
+ESLIT_OPTION = +ESlit
+
+/* Forces use of library macros from hpLib.tmpl. Ignores macros
+ * in Project.tmpl.
+ */
+#ifndef UseVendorLibraryDefinitions
+#define UseVendorLibraryDefinitions YES
+#endif
+
+/* need to explictly pass system defines to CPP */
+#ifdef __hp9000s800
+  HPSYSTEMDEFINE = -D__hp9000s800
+#endif
+#ifdef __hp9000s700
+  HPSYSTEMDEFINE = -D__hp9000s700
+#endif
+#ifdef __hp9000s300
+  HPSYSTEMDEFINE = -D__hp9000s300
+#endif
+
+/* cpp & cc, etc. are in different location in 10.0 */
+#if OSMajorVersion >= 10
+# ifndef CppCmd
+#  define CppCmd /opt/langtools/lbin/cpp
+# endif
+# ifndef CcCmd
+#  define CcCmd /opt/ansic/bin/cc
+# endif
+# ifndef CPlusPlusCcCmd
+#  define CPlusPlusCcCmd /opt/CC/bin/CC
+# endif
+# ifndef CppTextFlags
+#  define CppTextFlags -P -C $(HPSYSTEMDEFINE) -Uhpux  -DhpV4
+# endif
+# ifndef YaccCmd
+#   define YaccCmd /opt/langtools/bin/yacc
+# endif
+YACC = YaccCmd
+# ifndef LexCmd
+#   define LexCmd /opt/langtools/bin/lex
+# endif
+# ifndef BInstallCmd
+#   define BInstallCmd /usr/sbin/install
+# endif
+#else
+# ifndef CppCmd
+#  define CppCmd /lib/cpp
+# endif
+# ifndef CppTextFlags
+#  define CppTextFlags -P -C $(HPSYSTEMDEFINE) -Uhpux
+# endif
+#endif
+
+#ifndef PreProcessCmd
+#define PreProcessCmd CppCmd
+#endif
+
+
+/* Force use of archived C++ Library. It is not on all systems */
+#ifndef CPlusPlusLibPath
+#if OSMajorVersion >= 10
+#define CPlusPlusLibPath -Wl,-a,archive -lC -lcl -Wl,-a,default -lc -Wl,-a,archive
+#else
+#define CPlusPlusLibPath -Wl,-a,archive -lC /usr/lib/libcxx.a -lcl -Wl,-a,default -lc -Wl,-a,archive
+#endif
+#endif
+
+
+/* Forces use of binstall directory in build tree for library and 
+ * header search.
+ */
+#ifndef UseInstalledBuildInTree
+#define UseInstalledBuildInTree YES
+#endif
+
+#ifndef AllXLibPath
+#define AllXLibPath -L/usr/lib/X11R5
+#endif
+
+/* use mit libraries and headers from system not build tree */
+#ifndef UseMitLibrariesFromSystemOnly
+#define UseMitLibrariesFromSystemOnly YES
+#endif
+
+/* Forces use and build of Xt from build tree */
+#ifndef USE_XT_FROM_SYSTEM_ONLY
+#define USE_XT_FROM_SYSTEM_ONLY NO
+#endif
+
+/* controls symbol table overflow in yaxx */
+#ifndef YaccFlags
+#define YaccFlags -Nm80000
+#endif
+
+/* Set shared library load flags */
+/* For release trees have /usr/dt first */
+/* don't use +s in release trees */
+HPCOLSEP = ::
+HPSINGLECOLSEP = :
+#ifndef SharedClientLoadFlags
+#if ReleaseTree
+#define SharedClientLoadFlags -Wl,+b,$(DTUSRLIBDIR)$(HPCOLSEP)
+#else
+#define SharedClientLoadFlags -Wl,+s -Wl,+b,$(HPCOLSEP)$(DTUSRLIBDIR)
+#endif
+#endif
+
+/* adds date to binstall path on system */
+/* Be sure to set BInstallTop in either BuildTree.Name or treedefines
+*/
+#ifndef BInstallDate
+#define BInstallDate `date +/%m_%d`
+#endif
+
+/******* HP ADDITION  this is really an r4ism ***/
+#ifndef BuildXawBC
+#define BuildXawBC YES
+#endif
+
+#ifndef AnsiDefines
+/* +e needed for 10.0 non C++ builds */
+#if (OSMajorVersion > 9) && (!UseCPlusPlus)
+#define AnsiDefines -Aa +e -D_HPUX_SOURCE -DANSICPP /* for ansi C */
+#else
+#define AnsiDefines -Aa -D_HPUX_SOURCE -DANSICPP /* for ansi C */
+#endif
+#endif
+
+#ifndef DefaultCPlusPlusIncludes
+#define DefaultCPlusPlusIncludes -I/usr/include/CC
+#endif
+#ifndef DefaultCPlusPlusOptions
+#define DefaultCPlusPlusOptions     DefaultCCOptions
+#endif
+#ifndef ExtraCPlusPlusOptions
+#define ExtraCPlusPlusOptions     ExtraCCOptions
+#endif
+
+#ifndef ARCHIVED_LINK
+#define ARCHIVED_LINK NO
+#endif
+
+#ifndef SharedLibXext
+#define SharedLibXext NO
+#endif
+#ifndef SharedLibXmu
+#define SharedLibXmu NO
+#endif
+#ifndef SharedLibXaw
+#define SharedLibXaw NO
+#endif
+#ifndef SharedLibXinput
+#define SharedLibXinput NO
+#endif
+#ifndef SharedLibXau
+#define SharedLibXau NO         /* don't need shared form */
+#endif
+#ifndef SharedLibXdmcp
+#define SharedLibXdmcp NO
+#endif
+#ifndef SharedLibil
+#define SharedLibil NO
+#endif
+#ifndef SharedLibVfa
+#define SharedLibVfa NO
+#endif
+#ifndef SharedLibFw
+#define SharedLibFw NO
+#endif
+#ifndef SharedLibSpc
+#define SharedLibSpc NO
+#endif
+
+#define HasSaberC     YES
+/*#define HasNdbm       YES */
+/*#define HasShm        YES */
+#define DefineOldLibraryRules /* pull in oldlib.rules */
+#define HasSecureRPC      NO
+#define SetTtyGroup   YES
+#define HasPutenv     YES
+#define XhpServer Xhp
+#define Malloc0ReturnsNull   YES
+#ifndef BuildPex
+#define BuildPex NO
+#endif
+#define BuildXInputExt		YES
+#define NeedBerklibInXlib YES  /* for r4 library build */
+#define ExtensionOSDefines -DHPINPUT -DXTESTEXT1
+#ifndef ServerLoadOptions /* for shared X */
+#define ServerLoadOptions -Wl,-E
+#endif
+/*********************** VENDOR DEFINE (a local creation) ***********/
+VENDOR = hpux
+
+
+#include <hpLib.rules>
+
+
+/*********************** STANDARD DEFINES SETUP **********************/
+/**                                                                 **/
+/* Standard Defines are built from Architecture Independent Defines,
+   Architecture and possibly OS specific Compatability Defines and
+   finally OS defines
+*/
+#ifndef StandardDefines
+#define StandardDefines ArchIndependentDefines CompatabilityDefines OsDefines HPPexDefines
+#endif
+
+NLS_16=-DNLS16 
+/*********** ARCHITECTURE INDEPENDENT DEFINES */
+/* Architecture Independent Defines */
+#ifdef DEBUGTREE
+#ifndef ArchIndependentDefines
+#define ArchIndependentDefines -DSYSV $(NLS_16) -DMALLOC_0_RETURNS_NULL -DMERGE -D__hpux -Dhpux -DOSMAJORVERSION=OSMajorVersion -DOSMINORVERSION=OSMinorVersion SharedMemoryDefines -DAIX_ILS
+#endif
+#else
+#ifndef ArchIndependentDefines
+#define ArchIndependentDefines -DSYSV $(NLS_16) -DMALLOC_0_RETURNS_NULL -DMERGE -DNDEBUG -D__hpux -Dhpux -DOSMAJORVERSION=OSMajorVersion -DOSMINORVERSION=OSMinorVersion SharedMemoryDefines -DAIX_ILS
+#endif
+#endif
+
+
+/* added for operating system specific defines */
+/* 
+ * this use to be (OSMinorVersion == 08 || OSMinorVersion == 09)
+ * I had to change the 08 and 09 to 8 and 9 to get the 10 cpp to
+ * accept it.
+ */
+#ifndef OsDefines
+#  if OSMajorVersion > 9
+#      define OsDefines  -DhpV4
+#  else
+#     if OSMajorVersion == 8 && (OSMinorVersion == 8 || OSMinorVersion == 9)
+#        define OsDefines              -DOS80 -DBLS  /* for B1 secure systems */
+#     else
+#         define OsDefines /**/
+#     endif
+#  endif
+#endif
+
+/******** COMPATABILITY DEFINES
+/* The following defines add backward and forward compatability to
+   source code. They also add defines to cpp that would not normally
+   be present in a pseudo-root build environment.
+*/
+#if OSMajorVersion >= 8
+#  ifdef  __hp9000s300
+#    ifndef CompatabilityDefines
+#      define CompatabilityDefines -D__hp9000s300 -Dhp9000s300
+#    endif
+#  else
+#    ifdef __hp9000s700
+#      ifndef CompatabilityDefines
+#        define CompatabilityDefines -D__hp9000s800 -Dhp9000s800 -D__hp9000s700
+#      endif
+#    else  /* 8.0 and beyond 800 */
+#      ifndef CompatabilityDefines
+#        define CompatabilityDefines -D__hp9000s800 -Dhp9000s800
+#      endif
+#    endif
+#  endif
+
+#else
+#  if OSMajorVersion >= 7
+#    ifdef  __hp9000s300
+#      ifndef CompatabilityDefines
+#        define CompatabilityDefines -D__hp9000s300 -Dhp9000s300 -Wp,-H200000 -Wc,-Nw500,-Ns10000,-Np300
+#      endif
+#    else
+#      ifndef CompatabilityDefines
+#        define CompatabilityDefines -Dhp9000s800 -D__hp9000s800
+#      endif
+#    endif
+#  endif
+#endif
+
+/************** SHARED MEMORY DEFINES /* for lib X and server */
+#ifndef SharedMemoryDefines 
+#if OSMajorVersion >= 8
+#define SharedMemoryDefines -DSHMLINK
+#endif
+#endif
+
+
+/************************** END STANDARD DEFINES ***********************/
+#ifndef Slink
+#define Slink slink
+#endif
+SLINK = Slink
+
+#define SystemV                YES
+#ifdef __hp9000s700
+#if UseAnsiC
+#define PexCCOptions           +Obb2000
+#else
+#define PexCCOptions           -Wp,-H256000 +Obb2000
+#endif
+#else
+#define PexCCOptions           -Wp,-H256000
+#endif
+#define PexShmIPC              NO
+
+#if OSMajorVersion >= 8
+#  ifdef __hp9000s700
+#    ifndef BuildHPPex
+#      define BuildHPPex YES
+#    endif
+#  endif
+#endif
+#ifndef HPPexDefines
+# if BuildHPPex
+#   define HPPexDefines -DHPPEX
+# else 
+#   define HPPexDefines /**/
+# endif
+#endif
+
+#ifndef ExtraHPDefines /** cannot use Wp option with Ansi **/
+#define ExtraHPDefines -Wp,-H256000
+#endif
+
+#if (OSMajorVersion == 7)
+#ifdef __hp9000s800
+#define LintOpts               -ax -DSYSV -Zf500 -Zn5000 -Zt9000
+#else
+#define LintOpts               -ax -DSYSV -Nd7000 -Ns7500 -Na70000 -Np300 -Zf500 -Zn5000 -Zt9000
+#endif
+#else
+#define LintOpts               -ax -DSYSV -Nd7000 -Ns7500 -Na70000 -Np300 -Zf500 -Zn5000 -Zt9000
+#endif
+
+#define LnCmd                  ln -s
+#define MvCmd                  mv -f
+#define ExecableScripts        YES
+#define HasSockets             YES
+#define HasVFork               YES
+#define RemoveTargetProgramByMoving NO
+#define ExpandManNames         YES
+#define LdCombineFlags -r
+
+#ifndef BuildServer /* don't build 800 server */
+#if (OSMajorVersion >= 8)
+#  if defined __hp9000s300 || defined __hp9000s700
+#define BuildServer            YES
+#  else
+#define BuildServer            NO
+#  endif
+#else
+#define BuildServer            NO
+#endif
+#endif
+#define NeedBerklib            YES
+
+/*
+ ********************* FONT DEFINES *************************************
+ */
+#ifndef BuildFonts
+#define BuildFonts		YES
+#endif
+#ifndef BuildFontServer
+#define BuildFontServer		YES
+#endif
+
+/*
+ ********************* SERVER DEFINES *************************************
+ */
+/* Determine machine type for server sdi directories */
+OSMAJORVERSION =OSMajorVersion
+OSMINORVERSION =OSMinorVersion
+#ifdef __hp9000s300
+HARDWARE=s300
+#else
+#ifdef __hp9000s700
+HARDWARE=s700
+#else
+HARDWARE=s800
+#endif
+#endif
+
+
+/* define this as you like for server compilation */
+
+#define UNCOMPRESSPATH          /usr/bin/uncompress
+
+#if OSMajorVersion >= 7
+#define NetDefines -DHAS_IFREQ
+#else
+#define NetDefines
+#endif
+
+#define ConnectionFlags         -DTCPCONN -DUNIXCONN -DTCP_NODELAY /* unix available*/
+
+/*
+ * Xhp-specific parameters
+ */
+#define WritableBlackWhite              /* want BlackPixel and WhitePixel rw */
+
+
+#if OSMajorVersion >= 8
+#if defined(__hp9000s700)
+#define XV YES
+XVDEFINES= -DXV
+#endif
+#ifndef HP_MBX
+#define HP_MBX YES
+HPMBXDEFINES = -DHP_MBX
+#endif
+#ifndef SHAREDX
+#define SHAREDX YES
+SHAREDXDEFINES = -DSX
+#endif
+#ifndef SMART_CLIPPING
+#define SMART_CLIPPING YES
+CLIPPINGDEFINES = -DSMART_CLIPPING
+#endif
+#ifndef HOODIX
+#define HOODIX YES
+HOODIXDEFINES = -DHOODIX
+#endif
+SERVEREXTDEFINES = $(SHAREDXDEFINES) $(CLIPPINGDEFINES) $(HOODIXDEFINES) $(XVDEFINES) $(HPMBXDEFINES)
+#define ServerDefines StandardDefines ExtensionDefines -DXDMCP -DXOS -DBSTORE -DSOFTWARE_CURSOR -DNO_ALLOCA -DSCREEN_PIXMAPS -DMERGE_SAVE_UNDERS -DR5 NetDefines $(SERVEREXTDEFINES)
+#else /*pre 8.0 systems */
+#define ServerDefines StandardDefines ExtensionDefines -DXDMCP -DXOS -DBSTORE -DSOFTWARE_CURSOR -DNO_ALLOCA -DSCREEN_PIXMAPS -DMERGE_SAVE_UNDERS NetDefines
+#endif
+
+
+/******************************************************************************
+*	Support for automatic HPVersion strings
+******************************************************************************/
+#if OSMajorVersion >= 8
+#ifndef HPVersion
+#define HPVersion YES
+#endif
+#if HPVersion
+#ifndef HPVersionString
+#define HPVersionString	X Window System, Version 11 OSName OSRev \
+ $(X11VERSIONENV)
+#endif
+#endif
+#endif
+
+
+/******************************************************************************
+*       default user and system PATHS for Vuelogin
+******************************************************************************/
+#if OSMajorVersion > 9
+
+# ifndef DefaultUserPath                /* for xdm and Vuelogin */
+# define DefaultUserPath   $(BINDIR):/usr/bin:/usr/ccs/bin:/usr/contrib/bin:/usr/local/bin:/usr/contrib/bin/X11:/usr/local/bin/X11
+# endif
+# ifndef DefaultSystemPath              /* for xdm and Vuelogin */
+# define DefaultSystemPath $(BINDIR):/usr/bin:/usr/ccs/bin:/usr/sbin:/sbin:/usr/contrib/bin:/home/root
+# endif
+
+#else
+
+# ifndef DefaultUserPath                /* for xdm and Vuelogin */
+# define DefaultUserPath   $(BINDIR):/bin:/usr/bin:/usr/contrib/bin:/usr/local/bin:/usr/contrib/bin/X11:/usr/local/bin/X11
+# endif
+# ifndef DefaultSystemPath              /* for xdm and Vuelogin */
+# define DefaultSystemPath $(BINDIR):/etc:/bin:/usr/bin:
+# endif
+
+#endif

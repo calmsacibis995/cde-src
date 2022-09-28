@@ -1,0 +1,316 @@
+.\""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+.\"--- 
+.\"---  dtlpsetup.P man page
+.\"--- 
+.\"---  Revision 1.1
+.\"---
+.\" S1 for dtlpsetup
+.de S1
+\f(CWdtlpsetup\fR
+..
+.de S2
+\f(CWPrint\fR
+..
+.de S3
+\f(CWPrint\fR
+..
+.de S4
+\f(CWlp\fR
+..
+.\"---
+.\"----------------------------------------------------------------------------
+.\"----------------------------------------------------------------------------
+.TH dtlpsetupP 1 "22 April 1994 - Earth Day Edition"
+.BH "22 April -1994"
+.\"---
+.\"----------------------------------------------------------------------------
+.SH NAME
+\f(CWdtlpsetupP\fR \- use the private interface to \f(CWdtlpsetup\fR
+.\"----------------------------------------------------------------------------
+.SH SYNOPSIS
+.TP 12
+\f(CWdtlpsetup\fR
+.SM [\fIPlease see the \f(CWdtlpsetup(1) man page\fR]
+.SH DESCRIPTION
+This man page describes the internal interface to the 
+.S1
+print utility.
+.S1
+is an example of an applet that is invoked primararily through
+actions, as when a user
+drag/drops a PCL File Manager icon onto
+one of the printers in the Front Panel \f(CWPersonal Printers\fR
+slideup.  As such, it relies heavily on the inherited
+ENVIRONMENT as its primary mechanism for acquiring knowledge
+about the invoker's wishes.
+.\"""""""""""""""""""""""""sssssssss
+.SS Desktop Printing Model
+The
+.S1
+command is intended to work in conjunction with:
+.TP 4
+\(em
+The vendor's system administration facility for installing local
+and remote
+printers.  
+For example, on AIX workstations, system administrators
+use the \f(CWSMIT\fR tool.
+.TP 4
+\(em
+The \f(CWdtprintinfo -populate\fR utility for adding printer objects to
+the desktop.  Presumably, the \f(CWdtprintinfo -populate\fR utility will
+be invoked by the
+above system administration facility whenever a printer is installed
+or removed.
+.TP 4
+\(em
+The CDE components that require a simple print facility, such as the
+File Manager, the Text Editor, and the Help system.  
+.sp
+.RS 4
+For example,
+the Text Editor will use the 
+.S1
+.S3
+dialog for the files it wishes to
+print. The Help system will collect help-specific
+parameters through its own GUI dialog and then invoke
+.S1
+to operate silently
+through the
+.S2
+action.
+.RE
+.TP 4
+\(em
+The factory-supplied 
+.S2 
+actions for printing ASCII, PCL, and PS files.
+.LE
+.P
+All these facilities play together so that new printer objects are:
+.TP 4
+\(em
+Installed easily onto the desktop.
+.TP 4
+\(em
+Accessed easily through
+the \f(CWPrinters\fR container of the Application Manager.
+.TP 4
+\(em
+Incorporated easily into the \f(CWPersonal Printers\fR
+subpanel of the Front Panel.
+.TP 4
+\(em
+Operated easily by means of drag/drop 
+.S2
+actions and pushbutton
+access to queue information.
+.TP 4
+\(em
+Accessed easily by the CDE components through standard
+\f(CWPrint\fR \f(CWDtActionInvoke()\fR APIs.
+.P
+The command can also run standalone by means of a plethora of
+command line options, but doing so is not its design center.
+The assumption is that 
+.S1
+is primarily invoked from within a
+.S2
+action.
+.SS Limitations
+The
+.S1
+command
+is not for everyone.  Its functionality is limited to the lowest common
+functionality among the vendors' 
+.S4
+spoolers.
+The
+.S1
+command is not very extensible.
+Adding new capabilities to its printing functionality (e.g., enabling
+it to translate an ASCII file into a PS format) means altering
+its source code.
+.\"""""""""""""""""""""""""sssssssss
+.SS Printing Operation
+A CDE component that wants to print will either wish to:
+.TP 4
+\(em
+Collect printing
+parameters through its own GUI and hand them off to the
+\f(CWPrint\fR action
+for the silent operation of \f(CWdtlpsetup\fR.
+.TP 4
+\(em
+Invoke
+.S1
+in GUI mode and have
+.S1
+perform the printing operation when the user
+presses the \f(CWPrint\fR button.
+.P
+For usability reasons, 
+it's \fInot\fR advisable for a CDE component to collect print parameters
+through its own GUI and then invoke 
+.S1
+to put up \fIanother\fR GUI print dialog.  Doing so would be
+time-consuming and unsettling for most users.
+.\"""""""""""""""""""""""""sssssssss
+.SH OPTIONS
+Please see the \f(CWdtlpsetup(1)\fR man page.
+.SH RETURN VALUES
+Please see the \f(CWdtlpsetup(1)\fR man page.
+.SH ENVIRONMENT
+.LP
+Because
+.S1
+is intended to be invoked primarily from within
+.S2
+actions, the primary interface to the command is through the environment
+context in which it is invoked.  
+For example, a CDE component may invoke
+printing in this fashion:
+.PP
+.in +10
+.nf
+\f(CW
+putenv("DTPRINTUSERFILENAME=ShowThisNameToTheUser");
+.sp
+DtActionInvoke(widget, "Print", ... );
+\fR
+.in -10
+.fi
+.P
+The notion is that the 
+.S2
+action inherits the environment from the invoking application
+(e.g., from \f(CWdtpad\fR), and passes it on to the EXEC_STRING
+command\(emin this case the
+.S1
+command.
+.SH EXAMPLES
+Following are some pseudo-code ways of invoking the 
+.S2
+action:
+.SS \fBGUI Mode\(emUse the dtlpsetup Print Dialog:\fR
+.in +10
+.nf
+\f(CW
+/*
+ * Assume we want to put up a nice file name
+ * in the dialog for a temporary print file.
+ */
+putenv("DTPRINTUSERFILENAME=ShowThisNameToTheUser");
+/*
+ * Run dtlpsetup in GUI mode
+ */
+putenv("DTPRINTSILENT=False");
+/*
+ * Assume we want to pr the output
+ */
+putenv("DTPRINTFORMAT=True");
+/*
+ * Throw away this temporary file when done
+ */
+putenv("DTPRINTFILEREMOVE=True");
+/*
+ * We don't ask what Printer the user wants to use,
+ * so let us check the default Print action.
+ */
+paction <-- NULL
+
+if (pname = getenv("LPDEST"))
+{
+	pactionname <-- $LPDEST_Print
+}
+
+if ( (paction) && DtIsActionName (pactionname))
+then
+    /*
+     *  The LPDEST printer has been printegrated.
+     */
+    DtActionInvoke(widget, pactionname, ... );
+else
+    DtActionInvoke(widget, "Print", ... );
+\fR
+.in -10
+.fi
+.P
+.SS \fBSilent Mode\(emRun dtlpsetup Quietly Afterwards:\fR
+.PP
+.in +10
+.nf
+\f(CW
+/* 
+ * Post my particular GUI dialog for collecting print parameters
+ */
+
+/*
+ * Run dtlpsetup in silent mode
+ */
+putenv("DTPRINTSILENT=True");
+
+/*
+ * Assume source codeset is HP Roman8
+ */
+putenv("DTPRINTFROMCODESET=roman8");
+
+/*
+ * Assume we want to get rid of this file after printing
+ */
+putenv("DTPRINTFILEREMOVE=True");
+
+/*
+ * Assume we want to put a title on the banner page
+ */
+putenv("DTPRINTBANNERTITLE='Help Topic'");
+
+/* 
+ * Given the printer name from our print GUI dialog, 
+ * get the appropriate action by tacking
+ * on "_Print" to the name of the printer
+ */
+
+if ( DtIsActionName (printername_Print))
+then
+    DtActionInvoke(widget, "printername_Print", ... );
+else
+    /*
+     *  Fall through to the default Print action
+     */
+    putenv("LPDEST=printername");
+
+    DtActionInvoke(widget, "Print", ... );
+.sp
+\fR
+.in -10
+.fi
+.P
+Note that in each case, the name of the file to be printed should
+passed as part of the \f(CWDtActionInvoke()\fR parameter list, so
+that it can be properly typed.
+.SH FILES
+Please see the \f(CWdtlpsetup\fR \fIFiles\fR section.
+.SH DIAGNOSTICS
+The CDE component should take care that the file that triggers
+the 
+.S2
+action has a robust filetype; otherwise, the expected
+.S2
+action may be inadvertently overridden by a user-defined 
+.S2
+action for the same filetype.  For example, if the 
+\f(CWdthiccup\fR component generates a file suffixed with \f(CW.c\fR
+and invokes its \f(CWPrint\fR action on that file, then chances are
+good that another (and wrong)
+.S2
+action will be invoked instead, simply because a user-defined
+file type for \f(CW*.c\fR may have been installed on the system with
+its own (and different)
+\f(CWPrint\fR
+action.
+.SH "SEE ALSO"
+.BR dtaction (1),
+.BR dtlpsetup (1).
+.\""""""""""""""""""""""""""""    eof  """"""""""""""""""""""""""""""""

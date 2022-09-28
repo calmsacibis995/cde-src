@@ -1,0 +1,79 @@
+# @(#)README	1.1 96/07/24 SMI
+
+This README describes how to create and use the sdmporttest scripts.
+
+Requirements
+------------
+
+1. An IMAP4 server must be available on the test machine.  The latest IMAP4
+   server may be obtained from:
+     /net/mcm-home/export/pkgs/imapd/latest/sparc   and
+     /net/mcm-home/export/pkgs/imapd/latest/x86
+
+2. The test machine must provide the following user account (necessary for
+   IMAP4 access):
+     username: imaptest
+     password: imaptestpassword
+
+
+Naming conventions
+------------------
+
+  *.src	  Test sources
+  *L.tst  Generated "local" test scripts
+  *I.tst  Generated "imap" test scripts
+  *.mbx   Test mailboxes
+
+
+Test generation and execution
+-----------------------------
+
+The automatic generation of the tests is achieved by issuing the command
+`make cclient_tests'.  The details of how this works are described below.
+
+The tests are then executed by providing the test script as input to the
+sdmporttest program, eg. ./sdmporttest < getheadersL.tst
+
+
+Test synopses
+-------------
+
+commitpending.src	Commits a new message to a store
+copymove.src		Exercises copy and move operations
+getattributes.src	Fetches attributes eg. name, boundary
+getcontents.src		Fetching message contents
+getcontentsV3.src	Fetches contents of a V3 message
+getflags.src		Fetches and clears various flags
+getheaders.src		Fetches headers - real, pseudo and indirect styles
+scan.src		Tests scan and scansubscribed commands
+setup.src		Common "init" file #included by *.src
+submitaudatt.src	Submits a MP message with an audio attachment
+submitaudbdy.src	Submits a audio message in a single body
+submitnstatt.src	Submits a message with (multiply) nested attachments
+
+
+How it works
+------------
+
+For each test source, 2 test scripts are automatically generated using the C
+preprocessor (/usr/ccs/lib/cpp).  This is in order to accommodate "local"
+and "imap" flavors of each test where essentially the "bulk" of the test
+script is the same in both cases.
+
+The following preprocessor conditionals are currently supported:
+
+ IMAP 
+   Specifies that the generated test script will connect to an IMAP4
+   server as opposed to accessing the mailbox locally.
+
+ LOGNAME
+   Specifies the user's login name - this is used as the value for the "To:"
+   header in tests which exercise sending email.
+
+ HOSTNAME
+   Specifies the host on which the IMAP4 server resides.  This host must be
+   the same host on which the test is executed, since the /tmp directory is
+   used as a shared repository between server and client tests.
+
+Note that the Imakefile automatically sets appropriate values for the above
+conditionals when the test scripts are generated.

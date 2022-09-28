@@ -1,0 +1,53 @@
+.TH tt_thread_procid 3 "1 March 1996" "ToolTalk 1.3" "ToolTalk Functions"
+.BH "1 March 1996"
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.IX "tt_thread_procid" "" "tt_thread_procid.3" ""
+.SH NAME
+tt_thread_procid - identify the default process for the currently active thread
+.SH SYNOPSIS
+.PP
+.B #include
+<\fBTt/tt_c.h\fR>
+.br
+.B char *tt_thread_procid
+.RB (
+.I void
+.RB );
+.ft
+.fi
+.SH DESCRIPTION
+.PP
+The
+.B tt_thread_procid()
+function retrieves the current default procid for the thread.
+.PP
+If there is no default \fIprocid\fR set for the currently-active thread, then the process default \fIprocid\fR is returned.
+.SH RETURN VALUE
+.PP
+Upon successful completion, the \fBtt_thread_procid()\fR function returns the  pointer to a character string that uniquely identifies the default process for the currently active thread. The application can use
+.BR tt_ptr_error (3)
+to  extract one of the following \fBTt_status\fR values from the returned pointer:
+.HP 8
+.PD 0
+.BR TT_OK
+.PD
+The operation completed successfully.
+.TP
+.BR TT_ERR_NOMP
+The 
+.BR ttsession (1)
+process is not running and the ToolTalk service cannot restart it.
+.TP
+.BR TT_ERR_PROCID
+The current default process identifier is out of date or invalid.
+.SH APPLICATION USAGE
+.PP
+The application should use 
+.BR tt_free (3)
+to free any data stored in the address returned by the ToolTalk API.
+.SH SEE ALSO
+.na
+.PP
+.BR tt_c (5),
+.BR tt_prt_error (3),
+.BR tt_free (3)

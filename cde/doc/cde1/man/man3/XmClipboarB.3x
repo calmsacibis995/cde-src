@@ -1,0 +1,123 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1988 by Massachusetts Institute of Technology
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH XmClipboardCopy 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmClipboardCopy\fP \- A clipboard function that copies a data item to temporary storage for later copying to clipboard
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/Xm.h>
+\&#include <Xm/CutPaste.h>
+.sp \n(PDu
+.ta 1i
+.nf
+int \fIXmClipboardCopy\fI (\fBdisplay, window, item_id, format_name,
+	buffer, length, private_id, data_id\fI)
+.ta .5i 1.65i
+.nf
+	Display	\fB* display\fI;
+	Window	\fBwindow\fI;
+	long	\fBitem_id\fI;
+	char	\fB* format_name\fI;
+	XtPointer	\fBbuffer\fI;
+	unsigned long	\fBlength\fI;
+	long	\fBprivate_id\fI;
+	long	\fB* data_id\fI;
+.wH
+.fi
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+\fIXmClipboardCopy\fP
+copies a data item to temporary storage.
+The data item is moved from temporary storage
+to the clipboard data structure when a
+call to \fIXmClipboardEndCopy\fP is made.
+Additional calls to \fIXmClipboardCopy\fP before a call to
+\fIXmClipboardEndCopy\fP add
+additional data item formats to the same data item or
+append data to an existing format.  Formats are described in the
+\fBInter-Client Communication Conventions Manual\fP (ICCCM) as targets.
+.PP 
+\fINOTE:\fP  Do not call \fIXmClipboardCopy\fP before a call to
+\fIXmClipboardStartCopy\fP has been made.  The latter function allocates
+temporary storage required by \fIXmClipboardCopy\fP.
+.PP 
+If the \fBbuffer\fP argument is NULL, the data is considered
+to be passed by name.
+When data that
+has been passed by name is later requested by another application, the
+application that owns the data receives a callback with a request for
+the data.  The application that owns the data must then transfer the
+data to the clipboard with the \fIXmClipboardCopyByName\fP function.
+When a data item that was passed by name is deleted
+from the clipboard, the application that owns the data receives a
+callback stating that the data is no longer needed.
+.PP 
+For information on the callback function, see the callback argument
+description for \fIXmClipboardStartCopy\fP.
+.IP "\fBdisplay\fP"
+Specifies a pointer to the \fIDisplay\fP structure that was returned in a
+previous call to \fIXOpenDisplay\fP or \fIXtDisplay\fP.
+.IP "\fBwindow\fP"
+Specifies a widget's window ID that relates the application window to the
+clipboard.  The widget's window ID can be obtained by using
+\fIXtWindow\fP.
+The same application instance should pass the same window ID to each of the
+clipboard functions that it calls.
+.IP "\fBitem_id\fP"
+Specifies the number assigned to this data item.
+This number was returned by a previous call to
+\fIXmClipboardStartCopy\fP.
+.IP "\fBformat_name\fP"
+Specifies the name of the format in which the data item
+is stored on the clipboard.  Format is known as target in the ICCCM.
+.IP "\fBbuffer\fP"
+Specifies the buffer from which the clipboard copies the data.
+.IP "\fBlength\fP"
+Specifies the length of the data being copied to the clipboard.
+.IP "\fBprivate_id\fP"
+Specifies the private data that the application wants
+to store with the data item.
+.IP "\fBdata_id\fP"
+Specifies an identifying number assigned to the data item that uniquely
+identifies the data item and the format.
+This argument is required only for data that is passed by name.
+.SH RETURN VALUE
+.IP "\fIClipboardSuccess\fP"
+The function is successful.
+.IP "\fIClipboardLocked\fP"
+The function failed because the clipboard was locked by another
+application.  The application can continue to call the function again with
+the same parameters until the lock goes away.  This gives the application
+the opportunity to ask if the user wants to keep trying or to give up
+on the operation.
+.IP "\fIClipboardFail\fP"
+The function failed because \fIXmClipboardStartCopy\fP was not called or
+because the data item contains too many formats.
+.SH RELATED INFORMATION
+.na
+\fIXmClipboardCopyByName(3X)\fP,
+\fIXmClipboardEndCopy(3X)\fP, and
+\fIXmClipboardStartCopy(3X)\fP.
+.ad

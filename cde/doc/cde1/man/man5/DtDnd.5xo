@@ -1,0 +1,158 @@
+.TH Dt/Dnd.h 5 "13 Jun 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.SH "NAME"
+Dt/Dnd.h \- Drag and drop definitions
+.SH "SYNOPSIS"
+.yS
+#include <Dt/Dnd.h>
+.yE
+.SH "DESCRIPTION"
+The
+.Hd Dt/Dnd.h
+header defines the following enumeration types:
+.Cs I
+DtCR_DND_CONVERT_DATA
+DtCR_DND_CONVERT_DELETE
+DtCR_DND_DRAG_FINISH
+DtCR_DND_TRANSFER_DATA
+DtCR_DND_DROP_ANIMATE
+.Ce
+The header defines the following enumeration data types,
+with at least the following members:
+.VL 6
+.na
+.LI \f3DtDndStatus\fP
+.br
+.Cn DtDND_SUCCESS ,
+.Cn DtDND_FAILURE
+.LI \f3DtDndProtocol\fP
+.br
+.Cs I
+DtDND_TEXT_TRANSFER     = (1L << 0)
+DtDND_FILENAME_TRANSFER = (1L << 1)
+DtDND_BUFFER_TRANSFER   = (1L << 2)
+.Ce
+.LE
+.P
+The header declares the following structures:
+.Cs I
+typedef struct _DtDndBuffer {
+	void *\f2bp\fP;
+	int \f2size\fP;
+	string \f2name\fP;
+} DtDndBuffer;
+.Ce
+.P
+.Cs I
+typedef struct _DtDndContext {
+	DtDndProtocol \f2protocol\fP;
+	int \f2numItems\fP;
+	union {
+		XmString *\f2strings\fP;
+		String *\f2files\fP;
+		DtDndBuffer *\f2buffers\fP;
+	} \f2data\fP;
+} DtDndContext;
+.Ce
+.P
+.Cs I
+typedef struct _DtDndConvertCallbackStruct {
+	int \f2reason\fP;
+	XEvent *\f2event\fP;
+	DtDndContext *\f2dragData\fP;
+	DtDndStatus \f2status\fP;
+} DtDndConvertCallbackStruct, *DtDndConvertCallback;
+.Ce
+.P
+.Cs I
+typedef struct _DtDndDragFinishCallbackStruct {
+	int \f2reason\fP;
+	XEvent *\f2event\fP;
+	DtDndContext *\f2dragData\fP;
+	Widget \f2sourceIcon\fP;
+} DtDndDragFinishCallbackStruct, *DtDndDragFinishCallback;
+.Ce
+.P
+.Cs I
+typedef struct _DtDndTransferCallbackStruct {
+	int \f2reason\fP;
+	XEvent *\f2event\fP;
+	Position \f2x\fP, \f2y\fP;
+	unsigned char \f2operation\fP;
+	DtDndContext *\f2dropData\fP;
+	Boolean \f2completeMove\fP;
+	DtDndStatus \f2status\fP;
+} DtDndTransferCallbackStruct, *DtDndTransferCallback;
+.Ce
+.P
+.Cs I
+typedef struct _DtDndDropAnimateCallbackStruct {
+	int \f2reason\fP;
+	XEvent *\f2event\fP;
+	Position \f2x\fP, \f2y\fP;
+	unsigned char \f2operation\fP;
+	DtDndContext *\f2dropData\fP;
+} DtDndDropAnimateCallbackStruct, *DtDndDropAnimateCallback;
+.Ce
+.P
+The header declares the following as functions:
+.P
+.yS
+.ta \w'Widget DtDndCreateSourceIcon('u
+Widget DtDndCreateSourceIcon(Widget \f2parent\fP,
+	Pixmap \f2pixmap\fP,
+	Pixmap \f2mask\fP);
+.yE
+.P
+.yS
+.ta \w'Widget DtDndDragStart('u
+Widget DtDndDragStart(Widget \f2dragSource\fP,
+	XEvent *\f2event\fP,
+	DtDndProtocol \f2protocol\fP,
+	Cardinal \f2numItems\fP,
+	unsigned char \f2operations\fP,
+	XtCallbackList \f2convertCallback\fP,
+	XtCallbackList \f2dragFinishCallback\fP,
+	ArgList \f2argList\fP,
+	Cardinal \f2argCount\fP);
+.yE
+.P
+.yS
+.ta \w'Widget DtDndVaDragStart('u
+Widget DtDndVaDragStart(Widget \f2dragSource\fP,
+	XEvent *\f2event\fP,
+	DtDndProtocol \f2protocol\fP,
+	Cardinal \f2numItems\fP,
+	unsigned char \f2operations\fP,
+	XtCallbackList \f2convertCallback\fP,
+	XtCallbackList \f2dragFinishCallback\fP,
+	...);
+.yE
+.P
+.yS
+.ta \w'void DtDndDropRegister('u
+void DtDndDropRegister(Widget \f2dropSite\fP,
+	DtDndProtocol \f2protocols\fP,
+	unsigned char \f2operations\fP,
+	XtCallbackList \f2transferCallback\fP,
+	ArgList \f2argList\fP,
+	Cardinal \f2argCount\fP);
+.yE
+.P
+.yS
+.ta \w'void DtDndVaDropRegister('u
+void DtDndVaDropRegister(Widget \f2dropSite\fP,
+	DtDndProtocol \f2protocols\fP,
+	unsigned char \f2operations\fP,
+	XtCallbackList \f2transferCallback\fP,
+	...);
+.yE
+.P
+.yS
+.ta \w'void DtDndDropUnregister('u
+void DtDndDropUnregister(Widget \f2dropSite\fP);
+.yE

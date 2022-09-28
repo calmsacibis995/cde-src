@@ -1,0 +1,88 @@
+.TH DtWsmRemoveWorkspaceFunctions 3 "19 Apr 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.\" *************************************************************************
+.SH NAME
+DtWsmRemoveWorkspaceFunctions \- remove a window's workspace functions
+.SH SYNOPSIS
+.yS
+#include <Dt/Wsm.h>
+.sp 0.5v
+.ta \w'void DtWsmRemoveWorkspaceFunctions('u
+void DtWsmRemoveWorkspaceFunctions(Display *\f2display\fP,
+	Window \f2window\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn DtWsmRemoveWorkspaceFunctions
+function removes a window's workspace functions.
+When
+.Fn DtWsmRemoveWorkspaceFunctions
+removes workspace functions, the window menu for
+the window the
+.xos
+workspace manager
+.xoe
+.cdes
+Cde
+workspace manager,
+.Cm dtwm 1,
+.cdee
+displays does not have the entries that allow the window to occupy a different
+set of workspaces, occupy all workspaces, or be removed from the
+current workspace.
+.P
+The
+.I display
+argument is the X display.
+.P
+The
+.I window
+argument is the window to have its workspace functions
+disabled.
+.br
+.SH "RETURN VALUE"
+The
+.Fn DtWsmRemoveWorkspaceFunctions
+function returns no value.
+.SH "APPLICATION USAGE"
+The application must call
+.Fn DtWsmRemoveWorkspaceFunctions
+before the window is mapped.
+The
+.xos
+workspace manager
+.xoe
+.cdes
+Cde
+workspace manager,
+.Cm dtwm 1,
+.cdee
+only looks at the workspace function information at the time the
+workspace manager manages the window.
+If the
+.xos
+workspace manager
+.xoe
+.cdes
+Cde
+workspace manager,
+.Cm dtwm 1,
+.cdee
+is managing the window, the application must withdraw the window
+(see
+.Fn XWithdrawWindow 3X),
+remove the workspace functions, and map the window once again.
+.SH "SEE ALSO"
+.cdes
+.Cm dtwm 1,
+.cdee
+.xos
+.Fn XWithdrawWindow 3X
+in the \*(Zl;
+.xos
+.Hd Dt/Wsm.h 5.

@@ -1,0 +1,102 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+.\" **
+.\" **
+.\" ** (c) Copyright 1994 Hewlett-Packard Company
+.\" ** (c) Copyright 1994 International Business Machines Corp.
+.\" ** (c) Copyright 1994 Sun Microsystems, Inc.
+.\" ** (c) Copyright 1994 Unix Systems Labs, Inc., a subsidiary of Novell, Inc.
+.\" **
+.\" **
+.TH DtWsmAddCurrentWorkspaceCallback 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Common Desktop Environment 1.0: January 1994
+.SH NAME
+\fBDtWsmAddCurrentWorkspaceCallback\fP,
+\fBDtWsmRemoveCurrentWorkspaceCallback\fP \- add or remove a callback
+that is called when the current workspace changes.
+.iX "DtWsmAddCurrentWorkspaceCallback"
+.iX "workspace functions" "DtWsmAddCurrentWorkspaceCallback"
+.iX "DtWsmRemoveCurrentWorkspaceCallback"
+.iX "workspace functions" "DtWsmRemoveCurrentWorkspaceCallback"
+.sp .5
+.SH SYNOPSIS
+\fB
+\&#include <Dt/Wsm.h>
+.sp .5
+DtWsmCBContext DtWsmAddCurrentWorkspaceCallback (
+.br
+.ta 0.75i 2.20i
+	Widget	\fIwidget\fP,
+.br
+	DtWsmWsChangeProc	\fIws_change\fP,
+.br
+	Pointer	\fIclient_data\fP)
+.sp .5
+void DtWsmRemoveCurrentWorkspaceCallback (
+.br
+.ta 0.75i 2.20i
+	Widget	\fIwidget\fP,
+.br
+	DtWsmWsChangeProc	\fIws_change\fP,
+.br
+	Pointer	\fIclient_data\fP,
+.br
+	DtWsmCBContext	\fIcontext\fP)
+.sp .5
+typedef void (*DtWsmWsChangeProc) (
+.br
+.ta 0.75i 2.20i
+	Widget	\fIwidget\fP,
+.br
+	Atom	\fIaWs\fP,
+.br
+	Pointer	\fIclient_data\fP)
+.sp .5
+\fP
+.SH DESCRIPTION
+\fBDtWsmAddCurrentWorkspaceCallback\fP registers a function to be called
+when the Common Desktop Environment workspace manager (dtwm) switches to
+a new workspace. It returns a registration context that should be saved
+if this callback is ever to be removed.
+.PP
+\fBDtWsmRemoveCurrentWorkspaceCallback\fP unregisters a previously
+registered current workspace callback function. 
+.PP
+Both these functions take these three parameters:
+.sp .5
+.IP "\fIwidget\fP" 1.00i
+A realized widget. (Note: A window is required, hence a gadget is not
+acceptable)
+.IP "\fIws_change\fP" 1.00i
+The procedure to be called when the workspace changes.
+.IP "\fIclient_data\fP" 1.00i
+A pointer to arbitrary client data passed back to \fIws_change\fP.
+.PP
+\fBDtWsmRemoveCurrentWorkspaceCallback\fP requires an additional
+parameter:
+.sp .5
+.IP "\fIcontext\fP" 1.00i
+The context returned by \fBDtWsmAddCurrentWorkspaceCallback\fP when the
+callback was registered.
+.PP
+The callback function (type \fBDtWsmChangeProc\fI) has three arguments:
+.sp .5
+.IP "\fIwidget\fP" 1.20i
+The widget used to register the callback.
+.IP "\fIaWs\fP" 1.20i
+The name of the new current workspace (converted to an X atom).
+.IP "\fIclient_data\fP" 1.20i
+The pointer to the client data registered with the callback.
+.sp .5
+.PP
+.sp .5
+.SH RETURN VALUE
+See DESCRIPTION.
+.sp .5
+.SH RELATED INFORMATION
+\fBdtwm(1X)\fP.
+.sp .5

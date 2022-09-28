@@ -1,0 +1,143 @@
+SHELL=/bin/csh
+# This makefile should reside in UTIL. It causes the utility
+# programs to be compiled.  These utility programs are used in making
+# BUILD, ELTDEF and PARSER.  This makefile also includes instructions 
+# for building UTIL.A, a library of utility routines.
+
+.SUFFIXES : .o .m .e
+
+COPYCMD = cp
+DELCMD = -rm -f
+ARCCMD = arc u
+UNARCCMD = arc x
+ARCDELCMD = arc d
+OBJ = o
+EXE = e
+
+LIBOBJECTS = allwhite.$(OBJ) inctest.$(OBJ) \
+	letter.$(OBJ) triedump.$(OBJ) \
+	triepdmp.$(OBJ) trieplk.$(OBJ) \
+	trierset.$(OBJ) upstrcmp.$(OBJ) \
+	upcmp8.$(OBJ) 
+
+CTXOBJECTS = conutil.$(OBJ) error.$(OBJ) \
+	exit.$(OBJ) itoa.$(OBJ) lower.$(OBJ) \
+	malloc.$(OBJ) openchk.$(OBJ) trie.$(OBJ) \
+	triecnt.$(OBJ) upper.$(OBJ) whitesp.$(OBJ) 
+
+# Implicit rules for constructing objects and executables 
+#
+# Default rule for object files for main programs
+.c.m:
+	cc -c -g $*.c
+	mv $*.o $*.m
+
+.c.o:
+# Default rule for object files
+	cc -c -g $*.c
+	if (-r $*.o) ar -r util.a $*.o
+	if (-r $*.o) rm $*.o; echo '\c' >$*.o
+
+.m.e:
+# Default rule for executables
+	mv $*.m $*.o
+	-hp9000s800 && ld /lib/crt0.o $*.o util.a -lc /usr/lib/xdbend.o -o $@
+	-hp9000s300 && ld /lib/crt0.o $*.o util.a -lc /usr/lib/end.o -o $@
+	mv $*.o $*.m
+
+# Default targets.  UTIL library is generated during this process
+# too.  Listing the library as a target causes double compilation.
+all : context fclndir 		# Not currently using EMPTYFIL
+
+# Instructions for utility programs EMPTYFIL and FCLNDIR
+emptyfil : emptyfil.$(EXE)
+
+emptyfil.$(EXE) : emptyfil.m
+
+emptyfil.m : emptyfil.c
+
+fclndir : fclndir.$(EXE)
+
+fclndir.$(EXE) : fclndir.m
+
+fclndir.m : fclndir.c basic.h
+
+# Instructions for creating CONTEXT
+context : context.$(EXE)
+
+context.$(EXE) : util.a context.m $(CTXOBJECTS)
+
+context.m : context.c basic.h trie.h cont.h common.h chartype.h
+
+conutil.$(OBJ) : conutil.c basic.h trie.h cont.h common.h 
+
+error.$(OBJ) : error.c basic.h 
+
+exit.$(OBJ) : exit.c basic.h
+
+itoa.$(OBJ) : itoa.c
+
+lower.$(OBJ) : lower.c
+
+malloc.$(OBJ) : malloc.c 
+
+openchk.$(OBJ) : openchk.c 
+
+trie.$(OBJ) : trie.c basic.h trie.h 
+
+triecnt.$(OBJ) : triecnt.c basic.h trie.h 
+
+upper.$(OBJ) : upper.c 
+
+whitesp.$(OBJ) : whitesp.c basic.h 
+
+# Instructions for creating UTIL.A and its contents.  
+# UTIL.A gets created when constituent files are entered
+# into it after compilation.  (See the implicit rule for
+# getting .$(OBJ) files from .c files.)
+util : util.a
+
+util.a : $(LIBOBJECTS)
+
+allwhite.$(OBJ) : allwhite.c 
+
+inctest.$(OBJ) : inctest.c 
+
+letter.$(OBJ) : letter.c basic.h 
+
+triedump.$(OBJ) : triedump.c basic.h trie.h 
+
+triepdmp.$(OBJ) : triepdmp.c basic.h trie.h 
+
+trieplk.$(OBJ) : trieplk.c basic.h trie.h 
+
+trierset.$(OBJ) : trierset.c basic.h trie.h 
+
+upstrcmp.$(OBJ) : upstrcmp.c 
+
+upcmp8.$(OBJ) : upcmp8.c basic.h common.h 
+
+# Special targets 
+#
+# clean removes all generated files 
+clean : 
+	$(DELCMD) *.$(OBJ)
+	$(DELCMD) *.m
+	$(DELCMD) *.$(EXE)
+	$(DELCMD) util.a
+
+# mini removes all intermediate files, leaving executables and libraries
+mini minimal minimum : 
+	$(DELCMD) *.$(OBJ)
+	$(DELCMD) *.m
+	$(DELCMD) *.$(EXE)
+	$(DELCMD) util.a
+
+# arc generates an arc file containing all the source files 
+# in this directory
+arc package : 
+	if exist util.arc $(COPYCMD) util.arc old.arc
+	$(ARCCMD) util.arc *.c *.h makefile
+
+unarc dearc :
+	$(UNARCCMD) util.arc

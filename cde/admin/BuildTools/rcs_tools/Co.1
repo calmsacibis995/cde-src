@@ -1,0 +1,353 @@
+.\" $Header: Co.1,v 1.4 93/07/11 10:30:22 xbuild_hp_cv Exp $
+.TH Co 1 "" "" HP-UX
+.ds )H Hewlett-Packard Company OSSD-CV
+.ds ]W June 1993
+.SH NAME
+Co \- OSSD-CV RCS check out with remote capabilities.
+.SH SYNOPSIS
+.B Co
+.RI [ \|options\| ]
+.I file ...
+.SH DESCRIPTION
+.I Co
+is a perl front-end to the
+.I co
+.SM RCS
+program
+and is used exactly like the original RCS executable except the 
+.I -j
+option is not supported. 
+.I Co
+is usually used either with no options or the
+.I -l
+option.
+.I Co
+retrieves revisions from
+.SM RCS
+files.
+Each file name ending in
+.I ,v
+is taken to be an
+.SM RCS
+file.
+All other files are assumed to be working files.
+.I Co
+retrieves a revision from each
+.SM RCS
+file and stores it in the corresponding working file (see also
+.IR Rcsintro (1)).
+.PP
+Revisions of an
+.SM RCS
+file can be checked out locked or unlocked.
+Locking a revision prevents overlapping updates.
+A revision checked out for reading or processing
+(e.g., compiling) need not be locked.
+A revision checked out for editing and later checked in
+must normally be locked.
+Locking a revision currently locked by another user fails
+(a lock can be broken with the
+.I Rcs
+command, but poses inherent risks
+when independent changes are being made simultaneously (see
+.IR Rcs (1)).
+.I Co
+with locking requires the caller to be on the access list of the
+.SM RCS
+file unless: he is the owner of the file,
+a user with appropriate privileges,
+or the access list is empty.
+.I Co
+without locking is not subject to access list restrictions.
+.PP
+A revision is selected by number,
+check-in date/time, author, or state.
+If none of these options are specified,
+the latest revision on the trunk is retrieved.
+When the options are applied in combination,
+the latest revision that satisfies all of them is retrieved.
+The options for date/time, author, and state
+retrieve a revision on the selected branch.
+The selected branch is either
+derived from the revision number (if given),
+or is the highest branch on the trunk.
+A revision number can be attached to the options
+.IR -l ,
+.IR -p ,
+.IR -q ,
+or
+.IR -r .
+.PP
+The caller of the command must have write permission in the working
+directory, read permission for the
+.SM RCS
+file, and either read permission
+(for reading) or read/write permission (for locking) in the directory that
+contains the
+.SM RCS
+file.
+.PP
+The working file inherits the read and execute permissions from the
+.SM RCS
+file.
+In addition, the owner write permission is turned on, unless the file
+is checked out unlocked and locking is set to
+.I strict
+(see
+.IR Rcs (1)).
+.PP
+If a file with the name of the working file exists already
+and has write permission,
+.I Co
+aborts the check out if
+.I -q
+is given, or asks whether to abort if
+.I -q
+is not given.
+If the existing working file is not writable,
+it is deleted before the check out.
+.PP
+A number of temporary files are created.
+A semaphore file is created in the directory of the
+.SM RCS
+file to prevent simultaneous update.
+.PP
+A
+.I Co
+command applied to an
+.SM RCS
+file with no revisions creates a zero-length file.
+.I Co
+always performs keyword substitution (see below).
+.SS Options
+.TP 15
+.IR -l [\|\f2rev\fP\|]
+Locks the checked out revision for the caller.
+If omitted, the checked out revision is not locked.
+See option
+.I -r
+for handling of the revision number
+.IR rev .
+.TP
+.IR -p [\|\f2rev\fP\|]
+Prints the retrieved revision on the standard output rather than storing it
+in the working file.
+This option is useful when
+.I Co
+is part of a pipe.
+.TP
+.IR -q [\|\f2rev\fP\|]
+Quiet mode; diagnostics are not printed.
+.TP
+.I -d date
+Retrieves the latest revision on the selected branch
+whose check in date/time is less than or equal to
+.IR date .
+The date and time may be given in free format
+and are converted to local time.
+Examples of formats for
+.IR date :
+.IP
+.TS
+tab(@);
+lI l.
+Tue\-PDT, 1981, 4pm Jul 21@(free format)
+Fri April 16 15:52:25 EST 1982@(output of \f2ctime\f1(3C))
+86/4/21 10:30am@(format: yy/mm/dd hh:mm:ss)
+.TE
+.IP
+Most fields in the date and time can be defaulted.
+.I Co
+determines the defaults in the order year, month, day,
+hour, minute, and second (from most- to least-significant).
+At least one of these fields must be provided.
+For omitted fields that are of higher significance
+than the highest provided field, the current values are assumed.
+For all other omitted fields, the lowest possible values are assumed.
+For example, the date
+.I "20, 10:30"
+defaults to 10:30:00 of the 20th of the current month and current year.
+Date/time fields can be delimited by spaces or commas.
+If spaces are used, the string must be surrounded by double quotes.
+.TP 10
+.IR -r [\|\f2rev\fP\|]
+Retrieves the latest revision whose number is less than or equal to
+.IR rev .
+If
+.I rev
+indicates a branch rather than a revision,
+the latest revision on that branch is retrieved.
+.I rev
+is composed of one or more numeric or symbolic fields
+separated by
+.IR .\| .
+The numeric equivalent of a symbolic field is specified with the
+.I Ci -n
+and
+.I Rcs -n
+commands (see
+.IR Ci (1)
+and
+.IR Rcs (1)).
+.TP
+.I -s state
+Retrieves the latest revision
+on the selected branch whose state is set to
+.IR state .
+.TP
+.IR -w [\|\f2login\fP\|]
+Retrieves the latest revision
+on the selected branch that was checked in
+by the user with login name
+.IR login .
+If the argument
+.I login
+is omitted, the caller's login is assumed.
+.SS Keyword Substitution
+Strings of the form
+.I $ keyword $
+and
+.I $ keyword : \f1...\fP $
+embedded in the text are replaced with strings of the form
+.I $ keyword : \0value\0$\f1,
+where
+.I keyword
+and
+.I value
+are pairs listed below.
+Keywords may be embedded in literal strings
+or comments to identify a revision.
+.PP
+Initially, the user enters strings of the form
+.I $ keyword $\f1.
+On check out,
+.I Co
+replaces these strings with strings of the form
+.I $ keyword : \0value\0$\f1.
+If a revision containing strings of the latter form
+is checked back in,
+the value fields are replaced during the next checkout.
+Thus, the keyword values are automatically updated on checkout.
+.PP
+Keywords and their corresponding values:
+.TP 15
+.I $\&Author$
+The login name of the user who checked in the revision.
+.TP
+.I $\&Date$
+The date and time the revision was checked in.
+.TP
+.I $\&Header$
+A standard header containing the
+.SM RCS
+file name, the revision number, the date, the author, and the state.
+.TP
+.I $\&Locker$
+The login name of the user who locked the revision (empty if not locked).
+.TP
+.I $\&Log$
+The log message supplied during checkin,
+preceded by a header containing the
+.SM RCS
+file name, the revision number, the author, and the date.
+Existing log messages are
+.I not
+replaced.
+Instead, the new log message is inserted after
+.IR $\&Log: ... $ .
+This is useful for accumulating a complete change log in a source file.
+.TP
+.I $\&Revision$
+The revision number assigned to the revision.
+.TP
+.I $\&Source$
+The full pathname of the
+.SM RCS
+file.
+.TP
+.I $\&State$
+The state assigned to the revision with
+.I Rcs -s
+or
+.IR "Ci -s" .
+.SS "Access Control Lists (ACLs)
+.PP
+Optional ACL entries should not be added to
+.SM RCS
+files because they might be deleted.
+.SH DIAGNOSTICS
+The
+.SM RCS
+file name, the working file name,
+and the revision number retrieved
+are written to the diagnostic output.
+The exit status always refers to the last file checked out,
+and is 0 if the operation was successful, 1 if unsuccessful.
+.SH EXAMPLES
+Suppose the current directory contains a subdirectory named
+.I RCS
+with an
+.SM RCS
+file named
+.IR io.c,v .
+Each of the following commands retrieves the latest revision from
+.I RCS\s0/io.c,v
+and stores it into
+.IR io.c :
+.nf
+.IP
+.I "Co  io.c"
+.I "Co  RCS/io.c,v"
+.I "Co  io.c  RCS/io.c,v"
+.I "Co  io.c  io.c,v"
+.fi
+.SH WARNINGS
+The
+.I Co
+command generates the working file name by removing the
+.I ,v
+from the end of the
+.SM RCS
+file name.
+If the given
+.SM RCS
+file name is too long for the file system on which the
+.SM RCS
+file should reside,
+.I Co
+terminates with an error message.
+.PP
+There is no way to suppress the expansion of keywords,
+except by writing them differently.
+In
+.I nroff
+and
+.IR troff ,
+this is done by embedding the null-character
+.I \e&
+into the keyword.
+.PP
+The
+.I -d
+option gets confused in some circumstances,
+and accepts no date before 1970.
+.PP
+.SM RCS
+is designed to be used with
+.I text
+files only.
+Attempting to use
+.SM RCS
+with non-text (binary) files results in data corruption.
+.SH AUTHOR
+.I Co
+was developed by Marc Ayotte & Ron Voll,
+OSSD-CV, Hewlett-Packard.
+.I co
+was developed by Walter F. Tichy.
+.SH SEE ALSO
+Ci(1),
+Rcs(1), Rcsdiff(1),
+Rcsmerge(1), Rlog(1),
+Rcslocks(1), Rls(1),
+Rcsfile(1), RcsIntro(1).

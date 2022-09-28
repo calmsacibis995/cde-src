@@ -1,0 +1,69 @@
+.TH tt_message_scope 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+tt_message_scope \- retrieve the scope attribute from a message
+.SH SYNOPSIS
+.yS
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'Tt_scope tt_message_scope('u
+Tt_scope tt_message_scope(Tt_message \f2m\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn tt_message_scope
+function
+retrieves the scope attribute from the specified message.
+.P
+The
+.I m
+argument is the opaque handle for the message involved in this operation.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn tt_message_scope
+function returns a value that identifies the set of processes
+eligible to receive the message.
+The following values are defined:
+.VL 8
+.Lc TT_SESSION
+.br
+All processes joined to the indicated session are eligible.
+.Lc TT_FILE
+.br
+All processes joined to the indicated file are eligible.
+.Lc TT_BOTH
+.br
+All processes joined to either indicated file
+or the indicated session are eligible.
+.Lc TT_FILE_IN_SESSION
+.br
+All processes joined to both the indicated file
+and the indicated session are eligible.
+.LE
+.P
+The application can use
+.Fn tt_int_error 3
+to extract one of the following
+.B Tt_status
+values from the
+.B Tt_scope
+integer return value:
+.VL 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_NOMP
+.br
+The
+.Cm ttsession 1
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_POINTER
+.br
+The pointer passed does not point to an object of
+the correct type for this operation.
+.LE
+.SH "SEE ALSO"
+.Hd Tt/tt_c.h 5,
+.Fn tt_int_error 3.

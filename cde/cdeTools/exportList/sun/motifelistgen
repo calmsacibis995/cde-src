@@ -1,0 +1,262 @@
+#!/bin/sh
+# $XConsortium: motifelistgen /main/cde1_maint/3 1995/11/06 15:41:57 drk $
+#
+############################################################################
+# Construct shared-library scoping mapfile for Solaris based on standardized CDE
+# export list description file
+#
+# Usage: exportlistgen libfoo.so libfoo.elist > mapfile.scope
+#
+#	libfoo.so    => Solaris shared library of interest
+#	libfoo.elist => Meta description of necessary export list.
+#
+#    The output file, "mapfile.scope" may then be passed to the Solaris 
+#    linker to reconstruct the shared library, libfoo.so.
+#
+############################################################################
+#
+# Utility programs
+FILTER=c++filt			# C++ symbol demangler
+AWK=awk				# Awk
+
+# Try to detect broken versions of c++filt.
+if [ `echo _okay | $FILTER` != "_okay" ]; then
+    if [ -x /opt/SUNWspro/bin/c++filt ]; then
+	echo "# Your $FILTER is broken -- using /opt/SUNWspro/bin/c++filt."
+	FILTER=/opt/SUNWspro/bin/c++filt
+    else
+	echo "# ERROR: no working $FILTER available."
+	exit 1
+    fi;
+fi;
+
+# Temporary files
+CPPELIST=/tmp/elistgen0.$$	# elist after passing through cpp
+EXPORTSYMS=/tmp/elistgen1.$$	# list of export symbols from "libfoo.list"
+PRIVATESYMS=/tmp/elistgen2.$$	# list of private symbols from "libfoo.list"
+NMLIST=/tmp/elistgen3.$$	# name list from libfoo.sl
+FILTLIST=/tmp/elistgen4.$$	# demangled (C++) version of above
+ALLSYMS=/tmp/elistgen5.$$	# EXPORTSYMS + PRIVATESYMS
+
+############################################################################
+# Print useful information at the top of the output
+echo "#" `date`
+echo "# This scoping mapfile was produced by" $0
+echo "# Export list description taken from file" $2
+echo "# Target library:" $3
+echo "# Target Operating System: Solaris"
+echo "# "
+
+############################################################################
+#
+# Pass the elist file through cpp to remove non sun specific symbols.
+#
+/usr/ccs/lib/cpp -Dsun $2 > $CPPELIST
+
+############################################################################
+#
+# Extract the globally visible symbols from target library
+# The NMLIST generated here is later used to cross-check the symbols in the
+#
+nm -p $1 | $AWK '/ [ TDBS] /{print $3}' > $NMLIST
+
+############################################################################
+#
+# Extract the globally visible symbols from target library
+# The NMLIST generated here is later used to cross-check the symbols in the
+#
+$FILTER $NMLIST > $FILTLIST
+
+############################################################################
+# Translate export-list description file into a simple list of export symbols
+# embedded spaces in them.
+#
+$AWK '
+    BEGIN           {
+	csyms         = 0;	# Clanguage symbols in libfoo.list
+	cplusplus     = 0;	# C++ language symbols in libfoo.list
+	count         = 0;	# Running count of symbols
+    }
+    $1 == "public" {
+	csyms ++;
+	symbol[count++] = $2;
+	next;
+    }
+    $1 == "private" {
+	#ignore for now
+    }
+    $1 == "publicC++" {
+	cplusplus ++;
+	string = $2;
+	for (n=3; n <=NF; n++) {
+	    string = string " " $n;
+	}
+	symbol[count++] = string;
+	next;
+    }
+    $1 == "privateC++" {
+	#ignore for now
+    }
+    $1 == "internal"  || $1 == "internalC++" {
+	# Ignore internal symbols
+    }
+    END  {
+	printf("# Found %d C public symbols and %d C++ public symbols\n", csyms,cplusplus) | "cat 1>&2";
+	if (count > 0) {
+ 	    for (i in symbol)
+ 	        print symbol[i];
+	}
+    }
+' $CPPELIST > $EXPORTSYMS
+
+# Find the private symbols
+
+$AWK '
+    BEGIN           {
+	cprivsyms     = 0;	# Private C language symbols in libfoo.list
+	cpluspluspriv = 0;	# PrivateC++ language symbols in libfoo.list
+	privcount     = 0;	# Running count of private symbols
+    }
+    $1 == "public" {
+	# allready handled
+    }
+    $1 == "private" {
+	cprivsyms ++;
+	symbol[privcount++] = $2;
+	next;
+    }
+    $1 == "publicC++" {
+	# allready handled
+    }
+    $1 == "privateC++" {
+	cpluspluspriv ++;
+	string = $2;
+	for (n=3; n <= NF; n++) {
+	    string = string " " $n;
+	}
+	symbol[privcount++] = string;
+	next;
+    }
+    $1 == "internal"  || $1 == "internalC++" {
+	# Ignore internal symbols
+    }
+    END  {
+	printf("# Found %d C private symbols and %d C++ private symbols\n", cprivsyms,cpluspluspriv) | "cat 1>&2";
+	if (privcount > 0) {
+ 	    for (i in symbol)
+ 	        print symbol[i];
+        }
+    }
+' $CPPELIST > $PRIVATESYMS
+
+############################################################################
+# Read in the above files into the final awk script and write result to stdout
+# The contents of NMLIST and FILTLIST are used to construct a symbol lookup
+# table. The contents of EXPORTSYMS are converted with the help of this table.
+# The delimiter ";" is used to identify the entries in the symbol lookup table.
+#
+printf "\n";
+printf "SUNW_1.2 {\n    global:\n";
+(pr -m -s";" -t -w1024 $NMLIST $FILTLIST| expand -1;cat $EXPORTSYMS ) | $AWK '
+    BEGIN   {
+    	FS = ";";
+    }
+    NF == 2 {	# This is "pr" output, i.e., symbol translation table
+	syms[$2] = $1;
+	next;
+    }
+    NF == 1 {   # This is a symbol to be mangled, by symbol lookup table, if
+		# necessary
+	if (length(syms[$1]) > 0 ) {
+	    if (donelist[$1]) {
+		print "# Warning: Duplicate entry for ", $1, " in Export list";
+	    }
+	    else {
+		printf "        ";
+		printf syms[$1];
+		printf ";\n";
+		donelist[$1] = 1;
+	    }
+	}
+	else { 
+	  print "# Warning: Symbol for", $1, "was not in the nm list for this library" | "cat 1>&2";
+	  # print "+e", $1;
+	}
+	next;
+    }
+'
+
+(pr -m -s";" -t -w1024 $NMLIST $FILTLIST| expand -1;cat $PRIVATESYMS ) | $AWK '
+    BEGIN   {
+    	FS = ";";
+    }
+    NF == 2 {	# This is "pr" output, i.e., symbol translation table
+	syms[$2] = $1;
+	next;
+    }
+    NF == 1 {   # This is a symbol to be mangled, by symbol lookup table, if
+		# necessary
+	if (length(syms[$1]) > 0 ) {
+	    if (donelist[$1]) {
+		print "# Warning: Duplicate entry for ", $1, " in Export list";
+	    }
+	    else {
+		printf "        ";
+		printf $1;
+		printf ";\n";
+		donelist[$1] = 1;
+	    }
+	}
+	else { 
+	  print "# Warning: Symbol for", $1, "was not in the nm list for this library" | "cat 1>&2";
+	  # print "+e", $1;
+	}
+	next;
+    }
+'
+printf "    local:\n        *;\n};\n\n";
+
+printf "SUNW.1.1 {\n    global:\n        SUNW.1.1;\n};\n\n";
+
+cat $EXPORTSYMS $PRIVATESYMS > $ALLSYMS;
+
+printf "SUNWprivate_1.2 {\n    global:\n";
+
+(pr -m -s";" -t -w1024 $ALLSYMS $ALLSYMS| expand -1;cat $FILTLIST ) | $AWK '
+    BEGIN   {
+    	FS = ";";
+    }
+    NF == 2 {	# This is "pr" output, i.e., symbol translation table
+	syms[$2] = $1;
+	next;
+    }
+    NF == 1 {   # We have a potential symbol.  See if it was listed in
+		# the libXm.elist file. If not print it out.
+	if (length(syms[$1]) > 0 ) {
+	}
+	else { 
+	    if (donelist[$1]) {
+		print "# Warning: Duplicate entry for ", $1, " in Export list";
+	    }
+	    else {
+	        printf "        ";
+	        printf $1;
+	        printf ";\n";
+	        donelist[$1] = 1;
+	    }
+	}
+	next;
+    }
+'
+
+printf "};\n\n";
+
+printf "SUNW_private.1.1 {\n    global:\n        SUNW_private.1.1;\n};\n\n";
+
+# Clean up temporary files
+rm $CPPELIST
+rm $EXPORTSYMS
+rm $PRIVATESYMS
+rm $NMLIST
+rm $FILTLIST
+rm $ALLSYMS

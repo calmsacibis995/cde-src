@@ -1,0 +1,95 @@
+.de Lc
+.\" version of .LI that emboldens its argument
+.TP \\n()Jn
+\s-1\f3\\$1\f1\s+1
+..
+.TH tt_message_context_xval 3 "1 March 1996" "ToolTalk 1.3" "ToolTalk Functions"
+.BH "1 March 1996"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.IX "tt_message_context_xval" "" "tt_message_context_xval(3)" ""
+.SH NAME
+tt_message_context_xval \- retrieve and deserialize the data from a message's context
+.SH SYNOPSIS
+.ft 3
+.nf
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'Tt_status tt_message_context_xval('u
+Tt_status tt_message_context_xval(Tt_message \f2m\fP,
+	const char *\f2slotname\fP,
+	xdrproc_t \f2xdr_proc\fP,
+	void **\f2value\fP);
+.PP
+.fi
+.SH DESCRIPTION
+The
+.BR tt_message_context_xval (\|)
+function
+retrieves and deserializes the data from a message's context.
+.PP
+The
+.I m
+argument is the opaque handle for the message involved in this operation.
+The
+.I slotname
+argument describes the context of this message.
+The
+.I xdr_proc
+argument
+points to the XDR procedure to be used to deserialize the data in the
+.IR n th
+argument into newly allocated storage,
+the address of which will be stored in the pointer whose address is
+.IR value .
+.PP
+The
+.I value
+argument is the data to be deserialized.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.BR tt_message_context_xval (\|)
+function returns the status of the operation as one of the following
+.B Tt_status
+values:
+.PP
+.RS 3
+.nr )J 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_MODE
+.br
+The specified
+.B Tt_mode
+is invalid.
+.Lc TT_ERR_NOMP
+.br
+The
+.BR ttsession (1)
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_POINTER
+.br
+The pointer passed does not point to an object of
+the correct type for this operation.
+.Lc TT_ERR_NUM
+.br
+The integer value passed was invalid (out of range).
+.Lc TT_ERR_XDR
+.br
+The XDR procedure failed on the given data, or evaluated to a
+zero-length expression.
+.PP
+.RE
+.nr )J 0
+.SH "APPLICATION USAGE"
+The allocation calls are made by the XDR procedure; therefore, any
+storage allocated is not allocated from the ToolTalk allocation stack.
+The application should use the
+.BR xdr_free (3)
+call to free this storage.
+.SH "SEE ALSO"
+.na
+.BR tt_c (5).

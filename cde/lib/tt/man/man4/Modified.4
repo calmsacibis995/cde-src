@@ -1,0 +1,59 @@
+.TH Modified 4 "1 March 1996" "ToolTalk 1.3" "Desktop Services Message Sets"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.BH "1 March 1996" 
+.IX "Modified.4" "" "Modified.4" "" 
+.SH NAME
+Modified \- an entity has been modified
+.SH SYNOPSIS
+.ft 3
+.nf
+.ta \w@[\f2file\fP] Modified(@u
+[\f2file\fP] Modified(in \f2type ID\fP);
+.PP
+.fi
+.SH DESCRIPTION
+The
+.I Modified
+notice
+is sent whenever a tool first modifies a volatile,
+non-shared (for example, in-memory) representation of the persistent
+state of an entity (such as a file), with the intention of
+eventually making that representation persistent.
+.PP
+The
+.I ID
+argument
+is the identity of the modified entity.
+When its
+.I type
+is
+.BR File ,
+then the
+.I ID
+argument is unset (in other words, has a
+value of
+.BR (char\ *)0 ),
+and it refers to the file or directory
+named in the message's file attribute.
+.SH "APPLICATION USAGE"
+The
+.BR ttdt_file_join (3),
+function can be used to register for,
+and help process, the
+.I Modified
+request.
+.PP
+The
+.I Modified
+request can be sent with
+.BR ttdt_file_event (3).
+.SH "SEE ALSO"
+.na
+.BR ttdt_file_event (3).
+.BR ttdt_file_join (3);
+.I Reverted
+notice.

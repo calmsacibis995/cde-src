@@ -1,0 +1,177 @@
+.TH dthelpview 1 "11 Jan 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994 Novell, Inc.
+.\" *************************************************************************
+.SH NAME
+dthelpview \- view a CDE help volume
+.SH SYNOPSIS
+.yS
+dthelpview \f1[ \f2options\f1 ]
+.yE
+.SH DESCRIPTION
+The
+.Cm dthelpview
+utility supports the viewing of CDE online Help volumes, ASCII files
+or manual pages.
+The
+.Cm dthelpview
+utility is an integral part of the CDE application Help
+environment.
+The
+.Cm dthelpview
+utility's functionality and user interface is almost completely that 
+of the standard CDE general Help and quick Help dialog widgets.
+(See
+.Fn DtCreateHelpDialog 3
+and
+.Fn DtCreateHelpQuickDialog 3.)
+.SH OPTIONS
+The following options are available:
+.VL 6
+.LI "\f3\-helpVolume\f1 \f2volume\f1"
+Specifies the name of the \f3<filename>.sdl\f1 file you want to 
+view.
+If \f3locationId\f1 is not set, the default \f3_HOMETOPIC\f1 ID is used.
+If the requested volume is in the current working directory, or the Help volume
+has been properly registered, no path is required.
+.LI "\f3\-locationId\f1 \f2location_id\f1"
+Specifies the location ID representing the desired Help topic to be viewed.
+By default, Helpview uses \f3_HOMETOPIC\f1 if an ID is not specified.
+.LI "\f3\-file\f1 \f2file\f1"
+Specifies a particular ASCII text file to be displayed.
+.LI "\f3\-manPage \f2man_page\f1"
+Specifies a particular man page to be displayed.
+.LI \f3\-man\f1
+Displays a dialog that prompts for a man page to view, 
+then displays the requested man page.
+.LE
+.SH "ENVIRONMENT VARIABLES"
+The CDE Help system uses two environment variables for locating 
+Help volumes and Family files within the desktop environment:
+.VL 15
+.LI \f2DTHELPSEARCHPATH\f1
+\f2System\f1 search path environment variable for locating
+Help volumes on local and remote nfs mounted systems.
+.LI \f2DTHELPUSERSEARCHPATH\f1
+\f2Users\f1 search path environment variable for locating user
+specific Help volumes on local and remote nfs mounted systems.
+.LE
+.P
+The environment variables contain colon-separated lists of directory paths.
+Each directory path can contain both environment variable names as well as
+special field descriptors that are expanded at runtime via each Help component
+that uses these environment variables.
+.P
+Field descriptors consist of a \f3%\f1
+followed by a single character.
+Field descriptors and their substitution values are:
+.VL 15
+.LI \f3%H\f1
+This value is replaced with the current volume name being searched 
+for.
+.LI \f3%L\f1
+Replaced with the current value of the
+.I LANG
+environment variable.
+.LI \f3%%\f1
+Replaced with a single \f3%\f1.
+.LE
+.P
+The default value for
+.I DTHELPUSERSEARCHPATH
+is:
+.P
+\f3
+.br
+$HOME/.dt/help/$DTUSERSESSION/%H:
+.br
+$HOME/.dt/help/$DTUSERSESSION/%H.sdl:
+.br 
+$HOME/.dt/help/$DTUSERSESSION/%H.hv:
+.br
+$HOME/.dt/help/%H:
+.br
+$HOME/.dt/help/%H.sdl:
+.br 
+$HOME/.dt/help/%H.hv
+.P
+The
+.I DTHELPUSERSEARCH
+is first searched for the requested volume.
+If
+the volume is not found, the
+.I DTHELPSEARCHPATH
+value is searched.
+.P
+The default value for \f2DTHELPSEARCHPATH\f1 path is:
+.br
+\f3
+.br
+/etc/dt/appconfig/help/%L/%H:
+.br
+/etc/dt/appconfig/help/%L/%H.sdl:
+.br
+/etc/dt/appconfig/help/%L/%H.hv:
+.br
+/etc/dt/appconfig/help/C/%H:
+.br
+/etc/dt/appconfig/help/C/%H.sdl:
+.br
+/etc/dt/appconfig/help/C/%H.hv:
+.br
+/usr/dt/appconfig/help/%L/%H:
+.br
+/usr/dt/appconfig/help/%L/%H.sdl:
+.br
+/usr/dt/appconfig/help/%L/%H.hv:
+.br
+/usr/dt/appconfig/help/C/%H:
+.br
+/usr/dt/appconfig/help/C/%H.sdl:
+.br
+/usr/dt/appconfig/help/C/%H.hv
+.P
+\f1
+.SH RESOURCES
+For information on Help dialog widget resources, refer to
+.Fn DtCreateHelpDialog 3
+or
+.Fn DtCreateQuickHelpDialog 3.
+.P
+The
+.Cm dthelpview
+utility's specific resources set in the Dthelpview app-defaults file are:
+.VL
+.LI "Dthelpview*manBox*rows: 32"
+.LI "Dthelpview*manBox*columns: 80"
+.LI "Dthelpview*fileBox*rows: 32"
+.LI "Dthelpview*fileBox*columns: 80"
+.LI "Dthelpview*man_text.columns: 20"
+.LE
+.SH FILE
+Following files are used in conjunction with the
+.Cm dthelpview 
+application:
+.br
+.VL 15
+.LI "\f3Dthelpview\f1"
+App-defaults file used by
+.Cm dthelpview . 
+.LE
+.SH EXAMPLES
+.VL 15
+.LI "dthelpview \-helpVolume dtintro.sdl \-locationId _hometopic"
+Displays the topic associated with _hometopic in the Help 
+volume dtintor.sdl.
+.LI "dthelpview \-file /etc/checklist"
+Displays the file /etc/checklist in a general Help dialog
+.LI "dthelpview \-man grep"
+Displays the grep man page in a quick Help dialog
+.LE
+.SH "SEE ALSO"
+.Cm dtsearchpath 1,
+\f2CDE Help System Author's and Programmer's Guide\f1.

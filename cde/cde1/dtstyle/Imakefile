@@ -1,0 +1,107 @@
+XCOMM $XConsortium: Imakefile /main/cde1_maint/3 1995/10/18 14:33:09 drk $
+
+DESKTOP_VERSION_STRING = DesktopVersionString
+
+/* General case INCLUDES DEFINES LOCAL_LIBRARIES
+ * Each individual architecture may have more or less of the above.
+ * Use EXTRA_DEFINES and EXTRA_INCLUDES to add defines and includes
+ * to an individual architecture.  There is no equivalent for
+ * LOCAL_LIBRARIES.
+ * USE_libraryname in LOCAL_LIBRARIES is by default empty.
+ * It should be set when necessary to the real library macro name.
+ */
+
+        DEFINES = -DMESSAGE_CAT \
+                  -DCDE_INSTALLATION_TOP=\"$(CDE_INSTALLATION_TOP)\" \
+                  -DCDE_CONFIGURATION_TOP=\"$(CDE_CONFIGURATION_TOP)\"
+
+       INCLUDES = -I. -I$(BMSLIBSRC)
+
+/* DEPLIBS contains the list of library depencies for a client.
+ * LOCAL_LIBRARIES contains the list of libraries on the link line.
+ * Generally, the dependency form of a library has DEP as a prefix.
+ * e.g. put $(XLIB) in LOCAL_LIBRARIES and $(DEPXLIB) in DEPLIBS.
+ * NOTE: if DEPLIBS is not set here, it is by default null and there
+ *       are no library dependencies for clients.
+ *       You cannot put -Llibpath into DEPLIBS. You must put actual
+ *       paths to the library.
+ */
+#if defined(SunArchitecture)
+DEPLIBS = $(DEPDTWIDGETLIB) $(DEPDTSVCLIB) \
+                  $(DEPXMLIB) $(DEPXTOOLLIB) $(DEPXLIB)
+LOCAL_LIBRARIES = $(DTWIDGETLIB) $(DTSVCLIB) \
+                  $(XMLIB) $(XTOOLLIB) $(XLIB)
+#else
+DEPLIBS = $(DEPDTHELPLIB) $(DEPDTWIDGETLIB) $(DEPDTSVCLIB) \
+                  $(DEPXMLIB) $(DEPXTOOLLIB) $(DEPXLIB)
+LOCAL_LIBRARIES = $(DTHELPLIB) $(DTWIDGETLIB) $(DTSVCLIB) \
+                  $(XMLIB) $(XTOOLLIB) $(XLIB)
+#endif /* SunArchitecture */
+SYS_LIBRARIES = -lm
+
+#ifdef HPArchitecture
+#endif
+
+#if defined(RsArchitecture)
+EXTRA_DEFINES = -DANSICPP -Aa -D_POSIX_SOURCE
+SYS_LIBRARIES = -lm -liconv
+#endif
+
+#if defined(SunArchitecture)
+EXTRA_SRC  = OWsync.c
+EXTRA_OBJS = OWsync.o
+EXTRA_DEFINES = -D$(PROGRAMS)
+EXTRA_CCOPTIONS = -dalign -xstrconst
+#SYS_LIBRARIES = -lm -ldl -lw
+#endif
+
+#if defined(USLArchitecture)
+  SYS_LIBRARIES = -lm -ldl $(WIDECHARSYSLIB) -lgen
+#endif
+
+#if defined(UXPArchitecture)
+  SYS_LIBRARIES = -lm -ldl $(WIDECHARSYSLIB) -lgen
+#endif
+
+
+PROGRAMS = dtstyle
+
+OBJS = Main.o version.o MainWin.o Font.o Audio.o \
+	Startup.o Mouse.o SaveRestore.o Backdrop.o Screen.o \
+        Keyboard.o ColorMain.o ColorPalette.o ColorFile.o ColorEdit.o \
+        Resource.o Protocol.o Dtwm.o Help.o HelpCB.o $(EXTRA_OBJS)
+
+SRCS = Main.c version.c MainWin.c Font.c Audio.c \
+	Startup.c Mouse.c SaveRestore.c Backdrop.c Screen.c \
+        Keyboard.c ColorMain.c ColorPalette.c ColorFile.c ColorEdit.c \
+        Resource.c Protocol.c Dtwm.c Help.c HelpCB.c $(EXTRA_SRC)
+
+
+NormalLibraryObjectRule()
+ComplexProgramTarget($(PROGRAMS))
+
+LOCAL_CPP_DEFINES = -DCDE_INSTALLATION_TOP=$(CDE_INSTALLATION_TOP)
+
+CppTextRule(Dtstyle, Dtstyle.src, -Dhp_roman8 $(LOCAL_CPP_DEFINES), )
+CppTextRule(Dtstyle.iso, Dtstyle.src, -Diso8859_1, )
+
+CppTextRule(Backdrops, Backdrops.src, -Dhp_roman8 $(LOCAL_CPP_DEFINES), )
+CppTextRule(Backdrops.iso, Backdrops.src, -Diso8859_1, )
+
+CppTextRule(Palettes, Palettes.src, -Dhp_roman8 $(LOCAL_CPP_DEFINES), )
+CppTextRule(Palettes.iso, Palettes.src, -Diso8859_1, )
+
+
+/***** For dtge make a client_OBJS.o using client_main.o ******/
+/***** This implies the existence of client_main.c       ******/
+/***** dtge hidden symbols *******/
+#ifdef BuildHugeObject
+#ifdef HPArchitecture
+#ifdef __hp9000s300
+HIDDEN_SYMBOLS = -h _main -h _CheckMonitor -h _HelpRequestCB -h _HelpHyperlinkCB -h _DisplayHelp -h _HelpCloseCB 
+#else
+HIDDEN_SYMBOLS = -h main -h CheckMonitor -h HelpRequestCB -h HelpHyperlinkCB -h DisplayHelp -h HelpCloseCB 
+#endif
+#endif
+SpecialRelocatableTarget(dtstyle,$(HIDDEN_SYMBOLS),$(OBJS))
+#endif

@@ -1,0 +1,72 @@
+/*                                                                      *
+ * (c) Copyright 1993, 1994 Hewlett-Packard Company                     *
+ * (c) Copyright 1993, 1994 International Business Machines Corp.       *
+ * (c) Copyright 1993, 1994 Sun Microsystems, Inc.                      *
+ * (c) Copyright 1993, 1994 Novell, Inc.                                *
+ */
+/* don't use library dependencies for shared libraries */
+#ifdef SHLIB
+DEPLIBS =
+#endif
+DEFINES =
+
+
+/*local debuggable libs*/
+/*
+INCLUDES = -I./. -I/projects.build/echo \
+                -I/projects.build/echo/localsrc/lib/Xt\
+                 -I/projects.build/echo/localsrc/lib\
+		 -I/projects.build/echo/localsrc/lib/Xe/Xe
+
+XLIB = /projects.build/echo/lib/libX11.a
+XMLIB = /projects.build/echo/lib/libXm_d.a
+XTOOLLIB = /projects.build/echo/lib/libXt_d.a
+XVLIB = /projects.build/echo/lib/libXv.a
+XELIB = /projects.build/echo/lib/libXe.a
+*/
+
+CATOBJS = example.cat ex_appl.cat ex_keys.cat
+MAKECAT = $(TOP)/hp/dt/helpfiles/util/makehelp
+
+#ifdef STABLE
+INCLUDES = -I. -I$(ST_XMSRC) -I$(ST_TOOLKITSRC) -I$(TOP) -I$(INCLUDESRC)
+LOCAL_LIBRARIES = $(XVLIB) $(ST_XMLIB) $(ST_XTOOLLIB) $(XHPLIB) $(XLIB)
+#else
+INCLUDES = -I. -I$(DT30_SRC) -I$(TOP) -I$(INCLUDESRC) 
+LOCAL_LIBRARIES = $(DT30_LIB) $(XMLIB) $(XTOOLLIB) $(XHPLIB) $(XLIB)
+#endif
+
+/* a different objs for each test */
+OBJS1 = pushbutton.o
+OBJS2 = example.o
+OBJS3 = trapRes.o
+OBJS4 = rmDir.o
+OBJS5 = change_argv.o
+OBJS6 = testimg.o
+
+
+/* all of the sources */
+SRCS=	\
+	pushbutton.c \
+	example.c \
+	trapRes.c \
+	rmDir.c \
+	change_argv.c \
+	testimg.c
+
+SYS_LIBRARIES =
+
+/* put all of the programs here */
+PROGRAMS=pushbutton example trapRes rmDir change_argv
+AllTarget($(PROGRAMS))
+
+/* one for each program */
+SingleProgramTarget(pushbutton,$(OBJS1),$(LOCAL_LIBRARIES),$(SYS_LIBRARIES))
+SingleProgramTarget(example,$(OBJS2),$(LOCAL_LIBRARIES),$(SYS_LIBRARIES))
+SingleProgramTarget(trapRes,$(OBJS3),$(LOCAL_LIBRARIES),$(SYS_LIBRARIES))
+SingleProgramTarget(rmDir,$(OBJS4),$(LOCAL_LIBRARIES),$(SYS_LIBRARIES))
+SingleProgramTarget(change_argv,$(OBJS5),$(LOCAL_LIBRARIES),$(SYS_LIBRARIES))
+SingleProgramTarget(testimg,$(OBJS6),$(LOCAL_LIBRARIES),$(SYS_LIBRARIES))
+SingleInputProgramTargets($(CATOBJS),help,cat,$(MAKECAT))
+
+DependTarget()

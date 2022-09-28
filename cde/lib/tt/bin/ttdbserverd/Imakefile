@@ -1,0 +1,99 @@
+XCOMM $XConsortium: Imakefile /main/cde1_maint/4 1995/10/07 18:59:42 pascale $
+/* bin/ttdbserverd/Imakefile */
+
+TT_DIR = ../..
+#include "../../tooltalk.tmpl"
+/* find libtt locally */
+LOCAL_TTLIB_DIR=../../lib  /* reset library top for correct dependencies */
+
+
+XINCLUDES=
+CDEINCLUDES=
+
+/* General case INCLUDES DEFINES
+ * Each individual architecture may have more or less of the above.
+ * Use EXTRA_DEFINES and EXTRA_INCLUDES to add defines and includes
+ * to an individual architecture.
+ */
+DEFINES = -DTT_VERSION_STRING=\"$(TT_VERSION)\"
+INCLUDES = -I. -I../../slib -I../../lib -I../../mini_isam
+
+/* DEPLIBS contains the list of library depencies for a client.
+ * LOCAL_LIBRARIES contains the list of libraries on the link line.
+ * Generally, the dependency form of a library has DEP as a prefix.
+ * e.g. put $(XLIB) in LOCAL_LIBRARIES and $(DEPXLIB) in DEPLIBS.
+ * NOTE: if DEPLIBS is not set here, it is by default null and there
+ *       are no library dependencies for clients.
+ *       You cannot put -Llibpath into DEPLIBS. You must put actual
+ *       paths to the library.
+ */
+DEPLIBS = ../../slib/libstt.a $(DEPTTLIB_AND_MAYBE_XLIB) \
+	 ../../mini_isam/libisam.a 
+LOCAL_LIBRARIES = ../../slib/libstt.a $(TTLIB_AND_MAYBE_XLIB) \
+                  ../../mini_isam/libisam.a ../../lib/util/copyright.o
+
+/* put EXTRA_DEFINES and EXTRA_INCLUDES and anything else below */
+#ifdef HpArchitecture
+#endif
+
+#ifdef SunArchitecture
+SYS_LIBRARIES = -ldl $(I18NSYSLIB) -lsocket -lnsl
+EXTRA_DEFINES = -D_REENTRANT -DSVR4 -DOS_VERSION=OSMajorVersion -DOS_MINOR_VERSION=OSMinorVersion
+EXTRA_INCLUDES = -I../../lib/db
+#endif
+
+#ifdef RsArchitecture
+#endif
+
+#ifdef USLArchitecture
+EXTRA_LIBRARIES= -ldl -lnsl -lsocket -lgen
+#endif
+
+#ifdef UXPArchitecture
+EXTRA_LIBRARIES= -ldl -lnsl -lsocket -lgen
+#endif
+
+#ifdef AlphaArchitecture
+EXTRA_LIBRARIES= -lc
+#endif
+
+
+SRCS = \
+        db_server_functions.C \
+        db_server_svc.C \
+        dm_access_cache.C \
+        dm_server.C \
+        tt_db_message_info_utils.C \
+        tt_db_msg_q_lock.C \
+        tt_db_msg_q_lock_entry_utils.C \
+        tt_db_partition_global_map_ref.C \
+        tt_db_partition_redirection_map.C \
+        tt_db_server_db.C \
+        tt_db_server_db_utils.C \
+        tt_isam_file.C \
+        tt_isam_file_utils.C
+
+OBJS = \
+        db_server_functions.o \
+        db_server_svc.o \
+        dm_access_cache.o \
+        dm_server.o \
+        tt_db_message_info_utils.o \
+        tt_db_msg_q_lock.o \
+        tt_db_msg_q_lock_entry_utils.o \
+        tt_db_partition_global_map_ref.o \
+        tt_db_partition_redirection_map.o \
+        tt_db_server_db.o \
+        tt_db_server_db_utils.o \
+        tt_isam_file.o \
+        tt_isam_file_utils.o \
+        $(NONSHAREDLIBCOBJ)
+
+
+
+/* Build the .o's */
+NormalLibraryObjectRule()
+#ifdef SunArchitecture
+ComplexProgramTarget(rpc.ttdbserverd)
+#endif
+ComplexProgramTarget(rpc.ttdbserver)

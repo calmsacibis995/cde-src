@@ -1,0 +1,122 @@
+written by: aim
+      date: 2/10/94
+
+Adding an Object to the Palette:
+--------------------------------
+
+-1)  Design the Object! (read Motif docs, determine what should
+     be editable from a prop-sheet, what extra ABObj fields will
+     be required, how the object fits in with other objs, etc...)
+
+
+ 0)  libAButil
+
+    a. Make sure new object has an AB_OBJECT_TYPE type 
+
+	util_types.h
+
+
+ 1)  libABobj
+
+    a. Make sure libABobj supports the Object Type & correct set
+       of fields in ABObj  (specifically the INFO union structure
+       which contains fields specific to that object type).
+
+	obj.h, obj_init.c, obj_release.c
+
+    b. Make sure there are appropriate obj_set_*() & obj_get_*()
+	routines for type-specific fields
+
+	obj.h, obj_fields.c
+
+    c. Make sure there is an "isa" test routine
+
+	obj_isa.c
+
+
+ 2) libABil
+
+    a. Make sure the object (& fields) can be WRITTEN OUT to BIL
+
+	bil_parse.y, bil_store.c, bil.c
+
+    b. Make sure the object (& fields) can be READ IN from BIL
+
+	bil_loadatt.c
+
+	(Martha- this right?)
+
+
+3)  libABobjXm
+
+    a.  Create Objxm "methods" for object type:
+
+		. xmconfig -> expand ABObj "Composite" hierarchy equivelent 
+			      to required Motif hierarchy
+		. unconfig -> compresses xmconfigured "Composite" hierarchy
+			      back down to original obj
+		. get_config_obj -> returns config obj type based on
+			      xmconfigured hierarchy
+		. set_arg  -> set Motif resources specific to object type
+
+		. post_instantiate -> do anything else specially required
+			      AFTER instantiation (OPTIONAL)
+
+	objxm_objects.c
+    
+
+4)  ab
+
+    a. Create pal "methods" for object type:
+
+		. initialize    -> sets name & default values for fields
+		. prop_create   -> creates editing pane for Props
+		. prop_activate -> makes a Prop editing pane active/inactive
+		. prop_clear    -> clears Prop editing pane
+ 		. prop_load     -> loads an object into Prop editing pane
+		. prop_apply    -> causes Prop changes to be set &
+				   instantiated
+		, prop_pending  -> returns whether there are un-applied
+				   edits pending in Prop editing pane
+
+
+       NOTE: easiest way to do this is to copy an existing pal_*.c file
+  	     and modify it for your object type
+
+	pal_*.c
+
+    b. Add any new abobj_set_*() routines required for new fields
+	(all prop edits should be set through one of these routines!)
+
+	abobj_set.c, abobj_set.h
+
+
+    c. Add object to palette (if it's a palette object)
+
+	ab_uil.c, ab_palette_main.uil
+
+	0.  Edit ab_uil.c and Add an "extern PalItemInfo" declaration
+	    for the object TYPE.
+	    Also, Add a switch "case" for the new object TYPE to 		
+	    register_palette_info()
+
+	1.  Create the new palette object widget
+
+	    IF the widget representing the object on the palette is
+	    a Motif widget:
+
+		Edit ab_palette_main.uil and add palette-widget
+		with a createCallback (set_palette_infoCB())
+
+	    If the widget respresenting the object is a Dt widget:
+
+		Edit ab_uil.c and add creation of the widget to
+		create_dt_widgets()
+
+
+	NOTE: IF the object is NOT one displayed on the palette (like Menu),
+	      then add a call to pal_register_item_info() to main() in ab_uil.c. 
+
+
+
+

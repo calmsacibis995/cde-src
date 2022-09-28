@@ -1,0 +1,124 @@
+#!/bin/ksh
+
+###
+#
+# "@(#)upgrade-cde 1.5 96/10/17 
+#
+# Copyright 1996 Sun Microsystems, Inc.  All rights reserved.
+#
+# Description: This script upgrades CDE software on a Solaris 2.6 system.
+#              It should be run as root from a CDE 1.2 package area.
+#
+###
+
+###
+#  
+#   First check for a correct upgrade environment. 
+#
+#   Note, this area should also check that pkg CDE_VERSION number is 
+#   actually set at 1.2.  But till the packages are actually updated to
+#   1.2 version, will not check CDE_VERSION value.
+#
+###
+
+    DATE=`LANG=C date '+%d%b%y-%H:%M:%S'`
+
+    USER=`/bin/id | grep root | wc -l`
+    if [ $USER -eq 0 ]
+    then
+	echo ""
+        echo "You must be root to run this script"
+        echo ""
+        exit 1
+    fi
+
+
+    CDE_BASE_PKG=SUNWdtbas/pkginfo
+
+    if [ -f ${CDE_BASE_PKG} ]; then
+        CDE_VERSION=`grep PRODVERS ${CDE_BASE_PKG} | /bin/cut -f2 -d=`
+    else
+	echo ""
+        echo "Cannot find base CDE package -- SUNWdtbas" 
+	echo "You need to run this script from the CDE 1.2 package area"
+        echo ""
+        exit 1
+    fi
+
+    if [ -z "${CDE_VERSION}" ]; then
+	echo ""
+        echo "Cannot find SUNWdtbas package version." 
+	echo "It should have a CDE 1.2 version string"
+        echo ""
+        exit 1
+    fi
+
+    case "X$(uname -r)" in
+
+	X5.6)
+	PKG_UPGRADE_LOG=/usr/tmp/SunSoft_CDE1.2_upgrade.log.${DATE}
+	;;
+
+	*)
+	echo "Incorrect Solaris version number"
+	echo "CDE 1.2 is only supported on Solaris 2.6"
+	exit 1
+	;;
+    esac
+
+####
+#
+#   List of packages to upgrade
+#
+#   Note: Spelling engine packages for German, Spanish, French, Italian
+#         and Swedish have been included in the END_PKGS, since these
+#	  are delivered in the Euro version of Solaris 2.6 as well.
+####        
+
+    MIN_PKGS="SUNWdtcor SUNWmfrun SUNWtltk SUNWdtbas SUNWdticn SUNWdtdte SUNWdtlog SUNWdtdmn"
+
+    END_PKGS="SUNWdtwm SUNWdthe SUNWdthev SUNWdtdst SUNWdtim SUNWdtrme SUNWspl SUNWdespl SUNWesspl SUNWfrspl SUNWitspl SUNWsvspl"
+
+    DEV_PKGS="SUNWdtinc SUNWdtma SUNWdtmad SUNWdthed SUNWdtab SUNWdtdem SUNWmfman SUNWmfdev SUNWtltkd SUNWtltkm SUNWdtdev"
+
+    pkg_list="${MIN_PKGS} ${END_PKGS} ${DEV_PKGS}"
+
+###
+#
+#   Do the upgrade
+#
+###
+
+    echo ""
+    echo "Starting CDE 1.2 upgrade.  An upgrade log file can be found at:"
+    echo "    $PKG_UPGRADE_LOG"
+    echo ""
+
+    VERBOSE="-n -a /tmp/admin.$$"
+
+    cat >/tmp/admin.$$ <<EOF
+basedir=default
+mail=
+runlevel=quit
+conflict=nocheck
+setuid=nocheck
+action=nocheck
+partial=nocheck
+instance=unique
+idepend=nocheck
+rdepend=nocheck
+space=quit
+EOF
+
+    for pkg in $pkg_list
+    do
+	/bin/pkginfo -q ${pkg}
+	FOUNDPKG=$?
+	if [ $FOUNDPKG -eq 0 ]; then
+	    /usr/sbin/pkgrm $VERBOSE ${pkg}.* 2>&1 | tee -a $PKG_UPGRADE_LOG | grep $pkg
+	    /usr/sbin/pkgadd $VERBOSE  -d `pwd` $pkg 2>&1 | tee -a $PKG_UPGRADE_LOG | grep $pkg
+	    echo ""
+	fi
+    done
+
+    echo "CDE 1.2 upgrade is complete"

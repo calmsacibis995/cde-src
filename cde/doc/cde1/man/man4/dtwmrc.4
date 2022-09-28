@@ -1,0 +1,863 @@
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc., a subsidiary of Novell, Inc.
+...\" **  (c) Copyright 1989,1990,1992,1993 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+.de EX                \"Begin example
+.ne 5
+.if n .sp 1
+.if t .sp .5
+.nf
+.in +.5i
+..
+.de EE
+.fi
+.in -.5i
+.if n .sp 1
+.if t .sp .5
+..
+.TH dtwmrc 4 
+.ds )H Common Desktop Environment 
+.ds ]W Version 1.0: April 1994
+.SH NAME
+\fIdtwmrc\fP \- The dtwm Window Manager Resource Description File
+.SH DESCRIPTION
+.fi
+\fIdtwmrc\fP
+is a supplementary resource file that controls much of the behavior of
+the Common Desktop Environment window manager \fIdtwm\fP. It contains
+descriptions of resources that cannot easily be written using standard X
+Window System, Version 11 resource syntax. 
+The resource description file contains entries that are 
+referred to by X resources in defaults files (e.g.
+\fI/usr/dt/app-defaults/$LANG/Dtwm\fP) or in the
+RESOURCE_MANAGER property on the root window.
+.P
+For example, the resource description file enables you to specify different
+types of window menus. However, an X resource is used to
+specify which of these window menus the \fIdtwm\fP should
+use for a particular window.
+.P
+The specifications of the resource description file supported by the dtwm
+workspace manager are a strict superset of the specifications supported by
+the OSF Motif Window Manager (\fImwm 1.2.3\fP).  In other
+words, the \fIsystem.mwmrc\fP or \fI$HOME/.mwmrc\fP
+file that you've used for \fImwm\fP is easily made
+usable by \fIdtwm\fP.
+.P
+To merge your personal mwm resource specifications into dtwm:
+.IP "\(bu" 1.75
+Copy either \fI/etc/dt/config/$LANG/sys.dtwmrc\fP or 
+\fI/usr/dt/config/$LANG/sys.dtwmrc\fP to \fI$HOME/dtwmrc\fP.
+.IP "\(bu" 1.75
+Use a text editor to move menu definitions, key bindings, and button
+bindings from your \fI.mwmrc\fP file to your dtwmrc file. To merge
+your key and button bindings, you'll need to augment the key and button
+bindings that are referenced by \fIdtwm\fP by default. To replace the key or 
+button bindings, you'll also need to modify the appropriate \fIdtwm\fP
+resources (see \fIkeyBindings\fP and \fIbuttonBindings\fP).
+.IP "\(bu" 1.75
+Restart \fIdtwm\fP
+.P
+.SS Location
+The workspace manager searches for one of the following 
+\fIresource description files\fP, where $LANG is the value
+of the language environment on a per-user basis:
+.sp 1
+ $HOME/.dt/$LANG/dtwmrc
+ $HOME/.dt/dtwmrc
+ /etc/dt/config/$LANG/sys.dtwmrc
+ /etc/dt/config/sys.dtwmrc
+ /usr/dt/config/$LANG/sys.dtwmrc
+ /usr/dt/config/sys.dtwmrc
+.sp 1
+.P
+The first file found is the first used.
+.P
+If none is found, then a set of \fIbuilt-in\fP specifications
+is used.  
+.P
+A particular \fIresource description file\fP
+can be selected using the \fIconfigFile\fP resource.
+.P
+The following shows how a different resource description file can
+be specified from the command line:
+.P
+.RS
+.TS
+tab(;);
+l l .
+;/usr/dt/bin/dtwm -xrm "Dtwm*configFile: mydtwmrc"
+.TE
+.RE
+.SS "Resource Types"
+.sp 1
+The following types of resources can be described in the dtwm
+resource description file:
+.TP 15
+.B Buttons
+Workspace manager functions can be bound (associated) with button events.
+.TP 15
+.B Keys
+Workspace manager functions can be bound (associated) with key press events.
+.TP 15
+.B Menus
+Menu panes can be used for the window menu and other menus posted
+with key bindings and button bindings.
+.sp 1
+.SH "\fBDTWM RESOURCE DESCRIPTION FILE SYNTAX\fP"
+The dtwm resource description file
+is a standard text file that contains items
+of information separated by blanks, tabs, and new lines characters.
+Blank lines are ignored.
+Items or characters can be quoted to avoid special interpretation
+(e.g., the comment character can be quoted to prevent it from being
+interpreted as the comment character).
+A quoted item can be contained in double quotes (\fI"\fP).
+.P
+Single characters can be quoted by preceding them by the back-slash
+character (\fI\\\fP), except for workspace names, which
+may contain no back-slash characters. If a line ends with a back-slash,
+the next line is considered a continuation of that line.
+.P
+All text from an unquoted \fI#\fP to the end of the line is regarded 
+as a comment and is not interpreted as part of a resource description.
+If \fI!\fP is the first character in a line, the line is regarded as a comment.
+.SS "Workspace Manager Functions"
+Workspace manager functions can be accessed with button and key bindings, and
+with workspace manager menus.
+Functions are indicated as part of the specifications for button and key
+binding sets, and menu panes.
+The function specification has the following syntax:
+
+.TS
+tab(~), center;
+ll.
+\fBfunction\fP =~\fBfunction_name\fP [\fBfunction_args\fP]
+\fBfunction_name\fP =~\fBworkspace manager function\fP
+\fBfunction_args\fP =~{\fBquoted_item\fP | \fBunquoted_item\fP}
+.TE
+
+The following functions are supported.
+If a function is specified that isn't one of the supported functions then it
+is interpreted by dtwm as \fIf.nop\fP.
+.sp 1
+.RS
+.IP \fIf.action\fP
+This function causes the specified \fIaction\fP to be invoked
+by means of the message server.
+.IP \fIf.beep\fP
+This function causes a beep.
+.IP "\fIf.circle_down\fP [\fIicon\fP | \fIwindow\fP]"
+This function causes the window or icon that is on the top of the window
+stack to be put on the bottom of the window stack (so that it is no
+longer obscuring any other window or icon).
+This function affects only those windows and icons
+that are obscuring other windows and icons,
+or that are obscured by other windows and icons.
+Secondary windows (i.e. transient windows) are restacked with their
+associated primary window.
+Secondary windows always stay on top of the associated primary window and
+there can be no other primary windows between the secondary windows and
+their primary window.  If an \fIicon\fP function argument is specified, then
+the function applies only to icons.
+If a \fIwindow\fP function argument is specified then the function applies
+only to windows.
+.IP "\fIf.circle_up\fP [\fIicon\fP | \fIwindow\fP]"
+This function raises the window or icon on the bottom of the window stack
+(so that it is not obscured by any other windows).
+This function affects only those windows and icons
+that are obscuring other windows and icons,
+or that are obscured by other windows and icons.
+Secondary windows (i.e. transient windows) are restacked with their
+associated primary window.
+If an \fIicon\fP function argument is specified then the
+function applies only to icons.
+If an \fIwindow\fP function argument is specified then the function applies
+only to windows.
+.IP "\fIf.create_workspace\fP"
+This function creates a new workspace. The new workspace name is
+generated automatically and is of the form \fIws_\fP\fBn\fP where
+\fBn\fP is an integer. 
+.IP "\fIf.delete_workspace\fP"
+This function deletes the current workspace. Windows that reside only in
+this workspace will be moved to the next workspace. If the last
+workspace is being deleted, then windows will be moved to the first
+workspace.
+.IP "\fIf.exec\fP \fBcommand\fP (or \fI!\fP \fBcommand\fP)"
+This function causes \fIcommand\fP to be executed (using the
+value of the \fI$MWMSHELL\fP or \fI$SHELL\fP environment variable if set,
+otherwise \fI/usr/bin/sh\fP).
+The \fI!\fP notation can be used in place of the \fIf.exec\fP function
+name.
+.IP "\fIf.focus_color\fP"
+This function sets the colormap focus to a client window.
+If this function is done in a root context, then the default colormap
+(setup by the \fIX Window System\fP for the screen where dtwm is running)
+is installed and there is no specific client window colormap focus.
+This function is treated as \fIf.nop\fP if \fIcolormapFocusPolicy\fP is not
+explicit.
+.IP "\fIf.focus_key\fP"
+This function sets the keyboard input focus to a client window or icon.
+This function is treated as \fIf.nop\fP if \fIkeyboardFocusPolicy\fP is not
+explicit or the function is executed in a root context.
+.IP "\fIf.goto_workspace\fP \fBworkspace\fP"
+This function causes the workspace manager to switch to the
+workspace named by \fBworkspace\fP. If no workspace exists by 
+the specified name, then no action occurs. Note that adding and deleting
+workspaces dynamically and affect this function.
+.IP "\fIf.help\fP [\fBtopic\fP [\fBvolume\fP]]"
+This function displays help on the
+specified \fBtopic\fP and \fBvolume\fP.  If no \fBvolume\fP is given,
+then the workspace manager volume is assumed. If no \fBtopic\fP 
+is given, then help on the front panel is shown.
+.IP "\fIf.help_mode\fP"
+This function causes the workspace manager to enter into help mode. 
+In help mode, the pointer changes shape to indicate that the window
+manager is waiting for you to select a front panel control. Any help
+defined for the control is then shown in a help window.
+.IP "\fIf.kill\fP"
+This function is used to close application windows. The actual
+processing that occurs depends on the protocols that the application
+observes. The application lists the protocols it observes in the
+WM_PROTOCOLS property on its top level window.
+.in 1.7i
+.sp 1
+If the application observes the WM_DELETE_WINDOW protocol, it is sent
+a message that requests the window be deleted.
+.sp 1
+If the application observes both WM_DELETE_WINDOW and
+WM_SAVE_YOURSELF, it is sent one message requesting the window be
+deleted and another message advising it to save its state.
+.sp 1
+If the application observes only the WM_SAVE_YOURSELF protocol,
+it is sent a message advising it to save its state. After a delay
+(specified by the resource \fIquitTimeout\fP),
+the application's connection to the X server is terminated.
+.sp 1
+If the application observes neither of these protocols, its 
+connection to the X server is terminated.
+.in
+.IP "\fIf.lower\fP\ [\fI\-\fP\fBclient\fP | \fIwithin\fP\ | \fIfreeFamily\fP]"
+This function lowers a primary window to the bottom of the global window
+stack (where it obscures no other window) and lowers the secondary window
+(transient window or dialog box) within the client family.  The
+arguments to this function are mutually exclusive.
+.sp 1
+The \fBclient\fP argument indicates the name or class of a client to
+lower.  The name or class of a client appears in the WM_CLASS property 
+on the client's top-level window.
+If the \fBclient\fP argument is not specified, the context that the
+function was invoked in indicates the window or icon to lower.
+.sp 1
+Specifying \fIwithin\fP lowers the secondary window within the family
+(staying above the parent) but does not lower the client family in the
+global window stack.
+.sp 1
+Specifying \fIfreeFamily\fP lowers the window to the bottom of the
+global windows stack from its local family stack. 
+.IP "\fIf.marquee_selection\fP"
+This function is only useful in conjunction with the Common Desktop
+Environment file manager (see \fIdtfile(1)\fP).  It enables selection of
+file manager objects that have been placed on the root window. It
+must be bound to a button when used.
+.IP "\fIf.maximize\fP"
+This function causes a client window to be displayed with its maximum
+size. Refer to the \fImaximumClientSize\fP, \fImaximumMaximumSize\fP,
+and \fIlimitResize\fP resources in \fIdtwm(1)\fP.
+.IP "\fIf.menu\fP \fBmenu_name\fP"
+This function associates a cascading (pull-right) menu 
+with a menu pane entry or a menu with a button or key binding.
+The \fBmenu_name\fP function argument identifies the menu to be used.
+.IP "\fIf.minimize\fP"
+This function causes a client window to be minimized (iconified).
+When a window is minimized with no icon box in use, and if the
+\fIlowerOnIconify\fP resource has the value True (the default), the icon is
+placed on the bottom of the window
+stack (such that it obscures no other window).  If an icon box is used,
+then the client's icon changes to its iconified form inside the icon box.
+Secondary windows (i.e. transient windows) are minimized with their
+associated primary window.
+There is only one icon for a primary window and all its secondary windows.
+.IP "\fIf.move\fP"
+This function initiates an interactive move of a client window.
+.IP "\fIf.next_cmap\fP"
+This function installs the next colormap in the list of colormaps for
+the window with the colormap focus.
+.IP "\fIf.next_key\fP [\fIicon\fP | \fIwindow\fP | \fItransient\fP]"
+This function sets the keyboard input focus to the next window/icon in the set
+of windows/icons managed by the workspace manager 
+(the ordering of this set is based on the stacking of windows on the screen).
+This function is treated as \fIf.nop\fP if \fIkeyboardFocusPolicy\fP is not
+explicit.
+The keyboard input focus is only moved to windows that do not have an
+associated secondary window that is application modal.
+If the \fItransient\fP argument is specified, then transient (secondary)
+windows are traversed (otherwise, if only \fIwindow\fP is specified,
+traversal is done only to the last focused window in a transient
+group).
+If an \fIicon\fP function argument is specified, then the
+function applies only to icons.
+If a \fIwindow\fP function argument is specified, then the function applies
+only to windows.
+.IP "\fIf.next_workspace\fP"
+This function causes the workspace manager to switch to
+the next workspace. If the last workspace is currently active, then this
+function will switch to the first workspace.
+.IP "\fIf.nop\fP"
+This function does nothing.
+.IP "\fIf.normalize\fP"
+This function causes a client window to be displayed with its normal size.
+Secondary windows (i.e. transient windows) are placed in their normal state
+along with their associated primary window. 
+.IP "\fIf.normalize_and_raise\fP"
+This function causes a client window to be displayed with its normal size 
+and raised to the top of the window stack.
+Secondary windows (i.e. transient windows) are placed in their normal state
+along with their associated primary window. 
+.IP "\fIf.occupy_all\fP"
+This function causes the associated window to be placed in
+all workspaces.
+.IP "\fIf.pack_icons\fP"
+This function is used to relayout icons 
+(based on the layout policy being used)
+on the root window or in the icon box.
+In general this causes icons to be "packed" into the icon grid.
+.IP "\fIf.pass_keys\fP"
+This function is used to enable/disable (toggle) processing of key bindings
+for workspace manager functions.  When it disables key binding processing all
+keys are passed on to the window with
+the keyboard input focus and no workspace manager functions are invoked.
+If the \fIf.pass_keys\fP function is invoked with a key binding to
+disable key binding processing the
+same key binding can be used to enable key binding processing. 
+.IP "\fIf.post_wmenu\fP"
+This function is used to post the window menu.  If a key is used to post
+the window menu and a window menu button is present, the window menu is
+automatically
+placed with its top-left corner at the bottom-left corner of the
+window menu button for the client window.  If no window menu button is
+present,  the window menu is placed
+at the top-left corner of the client window.
+.IP "\fIf.prev_cmap\fP"
+This function installs the previous colormap in the list of colormaps for
+the window with the colormap focus.
+.IP "\fIf.prev_key\fP [\fIicon\fP | \fIwindow\fP | \fItransient\fP]"
+This function sets the keyboard input focus to the previous window/icon in
+the set of windows/icons managed by the workspace manager 
+(the ordering of this set is based on the stacking of windows on the screen).
+This function is treated as \fIf.nop\fP if \fIkeyboardFocusPolicy\fP is not
+explicit.
+The keyboard input focus is only moved to windows that do not have an
+associated secondary window that is application modal.
+If the \fItransient\fP argument is specified, then transient (secondary)
+windows are traversed (otherwise, if only \fIwindow\fP is specified,
+traversal is done only to the last focused window in a transient
+group).
+If an \fIicon\fP function argument is specified then the
+function applies only to icons.
+If an \fIwindow\fP function argument is specified then the function applies
+only to windows.
+.IP "\fIf.prev_workspace\fP"
+This function causes the workspace manager to switch to
+the previous workspace.  If the first workspace is currently active,
+then this function switches to the last workspace.
+.IP "\fIf.quit_mwm\fP"
+This function terminates dtwm (but NOT the X window system).
+.IP "\fIf.raise\fP\ [\fI\-\fP\fBclient\fP | \fIwithin\fP | \fIfreeFamily\fP]"
+This function raises a primary window to the top of the global window stack
+(where it is obscured by no other window) and raises the secondary window
+(transient window or dialog box) within the client family.  The
+arguments to this function are mutually exclusive.
+.sp 1
+The \fBclient\fP argument indicates the name or class of a client to
+lower.
+If the \fBclient\fP is not specified, the context that the
+function was invoked in indicates the window or icon to lower.
+.sp 1
+Specifying \fIwithin\fP raises the secondary window within the family
+but does not raise the client family in the
+global window stack.
+.sp 1
+Specifying \fIfreeFamily\fP raises the window to the top of its local
+family stack and raises the family to the top of the global window stack.
+.IP "\fIf.raise_lower\fP\ [\fIwithin\fP | \fIfreeFamily\fP]"
+This function raises a primary window to the top of the global window stack if
+it is partially obscured by another window; otherwise, it lowers the window
+to the bottom of the window stack.  The arguments to this function
+are mutually exclusive.
+.sp 1
+Specifying \fIwithin\fP raises a secondary window within the family
+(staying above the parent window), if it
+is partially obscured by another window in the application's family; 
+otherwise, it lowers the
+window to the bottom of the family stack.  It has no effect on the global 
+window stacking order.
+.sp 1
+Specifying \fIfreeFamily\fP raises the window to the top of its local family
+stack, if obscured by another window, and raises the family to the top of the 
+global window stack; otherwise, it lowers the window to the bottom of its
+local family stack and lowers the family to the bottom of the global window
+stack.
+.IP "\fIf.refresh\fP"
+This function causes all windows to be redrawn.
+.IP "\fIf.refresh_win\fP"
+This function causes a client window to be redrawn.
+.IP "\fIf.remove\fP"
+This function causes a client window to be removed from the
+current workspace.  If the client window exists only 
+in this workspace, no action occurs.
+.IP "\fIf.resize\fP"
+This function initiates an interactive resize of a client window.
+.IP "\fIf.restore\fP"
+This function restores the previous state of an icon's associated window.
+If a maximized window is iconified, then
+\fIf.restore\fP restores it to its maximized state.  If a normal window is
+iconified, then \fIf.restore\fP restores it to its normalized state.
+.IP "\fIf.restore_and_raise\fP"
+This function restores the previous state of an icon's associated
+window and raises the window to the top of the window stack.
+If a maximized window is iconified, then
+\fIf.restore_and_raise\fP restores it to its maximized state and raises it
+to the top of the window stack.  If a normal window is iconified, then
+\fIf.restore_and_raise\fP restores it to its normalized state and raises it
+to the top of the window stack.
+.IP "\fIf.restart\fP"
+This function causes dtwm to be restarted (effectively terminated
+and re-executed). Restart is necessary for \fIdtwm\fP to incorporate 
+changes in both the \fIdtwmrc\fP file and X resources.
+.IP "\fIf.screen\fP\ [\fInext\fP | \fIprev\fP | \fIback\fP | \fBscreen_number\fP]"
+This function causes the pointer to be warp to a specific screen number
+or to the \fInext\fP, \fIprevious\fP, or last visited (\fIback\fP) screen.
+The arguments to this function are mutually exclusive.
+.sp 1
+The \fBscreen_number\fP argument indicates the screen number that the
+pointer is to be warped.  Screens are numbered starting from screen 0.
+.sp 1
+Specifying \fInext\fP cause the pointer to warp to the next managed
+screen (skipping over any unmanaged screens).
+.sp 1
+Specifying \fIprev\fP cause the pointer to warp to the previous managed
+screen (skipping over any unmanaged screens).
+.sp 1
+Specifying \fIback\fP cause the pointer to warp to the last visited
+screen.
+.IP "\fIf.send_msg\fP \fBmessage_number\fP"
+This function sends an \fIXClientMessageEvent\fP of type 
+_MOTIF_WM_MESSAGES with \fImessage_type\fP set to \fBmessage_number\fP.
+The client message is sent only if \fImessage_number\fP is included in the
+client's _MOTIF_WM_MESSAGES property.  A menu item label is grayed out if
+the menu item is used to do \fIf.send_msg\fP of a message that is not
+included in the client's _MOTIF_WM_MESSAGES property.  
+.IP "\fIf.separator\fP"
+This function causes a menu separator to be put in the menu pane at the
+specified location (the label is ignored).
+.IP "\fIf.set_behavior\fP"
+This function causes the workspace manager to restart with the default 
+behavior (if a custom behavior is configured) or a custom behavior (if a 
+default behavior is configured).
+By default this is bound to \fIShift\ Ctrl\ Meta\ <Key>!\fP.
+.IP "\fIf.title\fP"
+This function inserts a title in the menu pane at the specified location.
+.IP "\fIf.toggle_frontpanel\fP"
+If the front panel is in the normal state, this function causes it to be
+minimized. If the front panel is minimized, this function will change it
+to the normal state.
+.IP "\fIf.version\fP"
+This function causes the workspace manager to display its
+release version in a dialog box.
+.IP "\fIf.workspace_presence\fP"
+This function displays the workspace presence (or "Occupy Workspace")
+dialog box. This dialog allows you to view and set the workspace in which 
+a particular window resides. The root context is disallowed for this function.
+.SS "Function Constraints"
+Each function may be constrained as to which resource types can specify 
+the function (e.g., menu pane) and also what context the function can
+be used in (e.g., the function is done to the selected client window).
+Function contexts are
+.P
+
+.TP 15
+.B root
+No client window or icon has been selected as an object for
+the function.
+.TP 15
+.B window
+A client window has been selected as an object for the function.
+This includes the window's title bar and frame.
+Some functions are applied only when the window is
+in its normalized state (e.g., f.maximize) or its maximized state
+(e.g., f.normalize).
+.TP 15
+.B icon
+An icon has been selected as an object for the function.
+.P
+If a function is specified in a type of resource where it is not supported
+or is invoked in a context that does not apply
+then the function is treated as \fIf.nop\fP.
+The following table indicates the resource types and function contexts in
+which workspace manager functions apply.
+.sp 1
+.TS
+tab(~), center;
+cBp7 cBp7 cBp7
+lp6 lp6 lp6 .
+Function~Contexts~Resources
+=
+.sp
+f.action~root,icon,window~button,key,menu
+f.beep~root,icon,window~button,key,menu
+f.circle_down~root,icon,window~button,key,menu
+f.circle_up~root,icon,window~button,key,menu
+f.create_workspace~root,icon,window~button,key,menu
+f.delete_workspace~root,icon,window~button,key,menu
+f.exec~root,icon,window~button,key,menu
+f.focus_color~root,icon,window~button,key,menu
+f.focus_key~root,icon,window~button,key,menu
+f.goto_workspace~root,icon,window~button,key,menu
+f.help~root,icon,window~button,key,menu
+f.help_mode~root,icon,window~button,key,menu
+f.kill~icon,window~button,key,menu
+f.lower~root,icon,window~button,key,menu
+f.marquee_selection~root~button
+f.maximize~icon,window(normal)~button,key,menu
+f.menu~root,icon,window~button,key,menu
+f.minimize~window~button,key,menu
+f.move~icon,window~button,key,menu
+f.next_cmap~root,icon,window~button,key,menu
+f.next_key~root,icon,window~button,key,menu
+f.next_workspace~root,icon,window~button,key,menu
+f.nop~root,icon,window~button,key,menu
+f.normalize~icon,window(maximized)~button,key,menu
+f.normalize_and_raise~icon,window~button,key,menu
+f.occupy_all~icon, window~button,key,menu
+f.pack_icons~root,icon,window~button,key,menu
+f.pass_keys~root,icon,window~button,key,menu
+f.post_wmenu~root,icon,window~button,key
+f.prev_cmap~root,icon,window~button,key,menu
+f.prev_key~root,icon,window~button,key,menu
+f.prev_workspace~root,icon,window~button,key,menu
+f.quit_dtwm~root~button,key,menu (root only)
+f.raise~root,icon,window~button,key,menu
+f.raise_lower~icon,window~button,key,menu
+f.refresh~root,icon,window~button,key,menu
+f.refresh_win~window~button,key,menu
+f.remove~root,icon,window~button,key,menu
+f.resize~window~button,key,menu
+f.restart~root~button,key,menu (root only)
+f.restore~icon,window~button,key,menu
+f.restore_and_raise~icon,window~button,key,menu
+f.screen~root,icon,window~button,key,menu
+f.send_msg~icon,window~button,key,menu
+f.separator~root,icon,window~menu
+f.set_behavior~root,icon,window~button,key,menu
+f.title~root,icon,window~menu
+f.toggle_frontpanel~root,icon,window~button,key,menu
+f.version~root,icon,window~button,key,menu
+f.workspace_presence~window~button,key,menu
+.TE
+.sp 1
+.SH "\fBWORKSPACE MANAGER EVENT SPECIFICATION\fP"
+Events are indicated as part of the specifications for button and key
+binding sets, and menu panes.
+.P
+Button events have the following syntax:
+.P
+.in+4
+.TS
+tab(~);
+l l.
+\fBbutton\fP =~[\fBmodifier_list\fP]\fI<\fBbutton_event_name\fP\fI>\fP
+\fBmodifier_list\fP =~\fBmodifier_name\fP {\fBmodifier_name\fP}
+.TE
+.in-4
+.P
+All modifiers specified are interpreted as being exclusive
+(this means that only the specified modifiers can be present when the
+button event occurs).
+The following table indicates the values that can be used
+for \fBmodifier_name\fP.\*F
+.FS
+The [Alt] key is frequently labeled [Extend] or [Meta].
+Alt and Meta can be used interchangeably in event specification.
+.FE
+.sp 1
+.TS
+tab(~),center;
+cbp7 cbp7
+= | =
+lp6 lp6.
+Modifier~Description
+Ctrl~Control Key
+Shift~Shift Key
+Alt~Alt/Meta Key
+Meta~Meta/Alt Key
+Lock~Lock Key
+Mod1~Modifier1
+Mod2~Modifier2
+Mod3~Modifier3
+Mod4~Modifier4
+Mod5~Modifier5
+.TE
+.sp 1
+The following table indicates the values that can be used for
+\fBbutton_event_name\fP.
+.sp 1
+.TS
+tab(~),center;
+cbp7 cbp7
+= | =
+lp6 lp6.
+Button~Description
+Btn1Down~Button 1 Press
+Btn1Up~Button 1 Release
+Btn1Click~Button 1 Press and Release
+Btn1Click2~Button 1 Double Click
+Btn2Down~Button 2 Press
+Btn2Up~Button 2 Release
+Btn2Click~Button 2 Press and Release
+Btn2Click2~Button 2 Double Click
+Btn3Down~Button 3 Press
+Btn3Up~Button 3 Release
+Btn3Click~Button 3 Press and Release
+Btn3Click2~Button 3 Double Click
+Btn4Down~Button 4 Press
+Btn4Up~Button 4 Release
+Btn4Click~Button 4 Press and Release
+Btn4Click2~Button 4 Double Click
+Btn5Down~Button 5 Press
+Btn5Up~Button 5 Release
+Btn5Click~Button 5 Press and Release
+Btn5Click2~Button 5 Double Click
+.TE
+.sp 1
+Key events that are used by the workspace manager for menu mnemonics
+and for binding to workspace manager functions are single key presses;
+key releases are ignored.
+Key events have the following syntax:
+.P
+.in+4
+.TS
+tab(~);
+l l.
+\fBkey\fP =~[\fBmodifier_list\fP]\fI<Key>\fP\fBkey_name\fP
+\fBmodifier_list\fP =~\fBmodifier_name\fP {\fBmodifier_name\fP}
+.TE
+.in-4
+.P
+All modifiers specified are interpreted as being exclusive
+(this means that only the specified modifiers can be present when the
+key event occurs).
+Modifiers for keys are the same as those that apply to buttons.
+The \fBkey_name\fP is an X11 keysym name.
+Keysym names can be found in the keysymdef.h file
+(remove the \fIXK_\fP prefix).
+.sp 1
+.SH "\fBBUTTON BINDINGS\fP"
+The \fIbuttonBindings\fP resource value is the name of a set of button 
+bindings that are used to configure workspace manager behavior.
+A workspace manager function can be done when a button press  occurs with 
+the pointer over a framed client window,
+an icon or the root window.
+The context for indicating where the button press applies is also the
+context for invoking the workspace manager function when the button press
+is done
+(significant for functions that are context sensitive).  
+.P
+The button binding syntax is
+.P
+.EX
+\fIButtons\fP \fBbindings_set_name\fP
+\fI{\fP
+    \fBbutton\fP    \fBcontext\fP    \fBfunction\fP
+    \fBbutton\fP    \fBcontext\fP    \fBfunction\fP
+                         .
+                         .
+    \fBbutton\fP    \fBcontext\fP    \fBfunction\fP
+\fI}\fP
+.EE
+.P
+The syntax for the \fBcontext\fP specification is
+  
+.TS
+tab(~), center;
+ll.
+\fBcontext\fP =~\fBobject\fP[\fI|\fP\fBcontext\fP]
+\fBobject\fP =~\fIroot\fP | \fIicon\fP | \fIwindow\fP | \fItitle\fP | \fIframe\fP | \fIborder\fP | \fIapp\fP
+.TE
+
+The context specification indicates where the pointer must be for the
+button binding to be effective.
+For example, a context of \fIwindow\fP indicates that the pointer must
+be over a client window or
+window management frame for the button binding to be effective.
+The \fIframe\fP context is for the window management frame around a
+client window
+(including the border and titlebar), the \fIborder\fP context is
+for the border part of the window management frame
+(not including the titlebar), the \fItitle\fP
+context is for the title area of the window management frame,
+and the \fIapp\fP context is for the application window
+(not including the window management frame).  
+
+If an \fIf.nop\fP function is specified for a button binding, the button
+binding is not done.
+.sp 1
+.SH "\fBKEY BINDINGS\fP"
+The \fIkeyBindings\fP resource value is the name of a set of key 
+bindings that are used to configure workspace manager behavior.  A window
+manager function can be done when a particular key is pressed. 
+The context in which the key binding applies is indicated in the key
+binding specification.
+The valid contexts are the same as those that apply to button bindings.
+  
+The key binding syntax is
+.P
+.EX
+.B
+\fIKeys\fP \fBbindings_set_name\fP
+\fI{\fP
+    \fBkey\fP    \fBcontext\fP    \fBfunction\fP
+    \fBkey\fP    \fBcontext\fP    \fBfunction\fP
+                .
+                .
+    \fBkey\fP    \fBcontext\fP    \fBfunction\fP
+\fI}\fP
+.EE
+.P
+If an \fIf.nop\fP function is specified for a key binding, the key
+binding is not done.
+If an \fIf.post_wmenu\fP or \fIf.menu\fP function is bound to a 
+key, dtwm automatically uses the same key for removing the menu from
+the screen after it has been popped up.
+
+The \fBcontext\fP specification syntax is the same as for button bindings.
+For key bindings, the \fIframe\fP, \fItitle\fP, \fIborder\fP, and \fIapp\fP 
+contexts are equivalent to the \fIwindow\fP context.
+The context for a key event is the window or icon that has the keyboard
+input focus (\fIroot\fP if no window or icon has the keyboard input focus).
+.sp 1
+.SH "\fBMENU PANES\fP"
+Menus can be popped up using the \fIf.post_wmenu\fP and
+\fIf.menu\fP workspace manager functions.
+The context for workspace manager functions that are done from 
+a menu is \fIroot\fP, \fIicon\fP or \fIwindow\fP depending on how the
+menu was popped up.
+In the case of the \fIwindow\fP menu or menus popped up with a key
+binding, the location of the keyboard input
+focus indicates the context.
+For menus popped up using a button binding,
+the context of the button binding is the context of the menu.
+  
+The menu pane specification syntax is
+.P
+.EX
+.B
+\fIMenu\fP \fBmenu_name\fP
+\fI{\fP
+    \fBlabel\fP  [\fBmnemonic\fP]  [\fBaccelerator\fP]   \fBfunction\fP
+    \fBlabel\fP  [\fBmnemonic\fP]  [\fBaccelerator\fP]   \fBfunction\fP
+                .
+                .
+    \fBlabel\fP  [\fBmnemonic\fP]  [\fBaccelerator\fP]   \fBfunction\fP
+\fI}\fP
+.EE
+.P
+Each line in the \fIMenu\fP specification identifies the label for a menu
+item and the function to be done if the menu item is selected.
+Optionally a menu button mnemonic and a menu button keyboard accelerator
+may be specified.
+Mnemonics are functional only when the menu is posted
+and keyboard traversal applies.
+.P
+The \fBlabel\fP may be a string or a bitmap file.
+The label specification has the following syntax:
+
+.TS
+tab(~), center;
+l l.
+\fBlabel\fP =~\fBtext\fP | \fBbitmap_file\fP
+\fBbitmap_file\fP =~\fI@\fP\fBfile_name\fP
+\fBtext\fP =~\fBquoted_item\fP | \fBunquoted_item\fP
+.TE
+  
+The string encoding for labels must be compatible with the menu font that 
+is used.
+Labels are greyed out for menu items that do the \fIf.nop\fP function 
+or an invalid function or a function that doesn't apply in the current
+context.
+
+A \fBmnemonic\fP specification has the following syntax
+.sp 1
+.in+4
+.TS
+tab(~);
+l l.
+\fBmnemonic\fP =~\fI_\fP\fBcharacter\fP
+.TE
+.in-4
+.sp 1
+The first matching \fBcharacter\fP in the label is underlined.
+If there is no matching \fBcharacter\fP in the label, no 
+mnemonic is registered with the workspace manager for that label.
+Although the \fBcharacter\fP must exactly match a character in the
+label,
+the mnemonic does not execute if any modifier (such as Shift) is pressed with 
+the character key.
+.sp 1
+The \fBaccelerator\fP specification is a key event specification with
+the same syntax as is used for key bindings to workspace manager functions.
+.sp 1
+.SH "INCLUDING FILES"
+You may include other files into your dtwmrc file by using the
+\fIinclude\fP construct. For example:
+.EX
+INCLUDE
+{
+    /usr/local/shared/dtwm.menus
+    /home/kmt/personal/my.bindings
+}
+.EE
+.sp 1
+causes the files named to be read in and interpreted in order as an
+additional part of the dtwmrc file. 
+.P
+\fIInclude\fP is a top-level construct. It cannot be nested
+inside another construct. 
+.sp 1
+.SH WARNINGS
+.P
+Errors that occur during the processing of  
+the resource description file are recorded in: \fI$HOME/.dt/errorlog\fP.  
+Be sure to check this file if the appearance or behavior of \fIdtwm\fP 
+is not what you expect.
+.sp 1
+.SH FILES
+.sp 1
+ $HOME/.dt/$LANG/dtwmrc
+ $HOME/.dt/dtwmrc
+ /etc/dt/config/$LANG/sys.dtwmrc
+ /etc/dt/config/sys.dtwmrc
+ /usr/dt/config/$LANG/sys.dtwmrc
+ /usr/dt/config/sys.dtwmrc
+ $HOME/.dt/errorlog
+.sp 1
+.SH COPYRIGHT
+(c) Copyright 1989,1990,1991,1992,1993 by Open Software Foundation, Inc.
+.br
+(c) Copyright 1987,1988,1989,1990,1992,1993,1994 Hewlett-Packard Company
+.br
+(c) Copyright 1993,1994 International Business Machines Corp.
+.br
+(c) Copyright 1993,1994 Sun Microsystems, Inc.
+.br
+(c) Copyright 1993,1994 Unix System Labs, Inc., a subsidiary of Novell, Inc.
+.sp 1
+.SH RELATED INFORMATION
+\fIdtwm(1)\fP, \fImwm(1X)\fP, \fIdtfile(1)\fP, and \fIX(1)\fP.

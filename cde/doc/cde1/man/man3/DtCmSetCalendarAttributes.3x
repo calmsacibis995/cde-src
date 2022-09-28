@@ -1,0 +1,129 @@
+.\" *************************************************************************
+.\" **
+.\" ** (c) Copyright 1993,1994 Hewlett-Packard Company 
+.\" **      All Rights Reserved.
+.\" **
+.\" ** (c) Copyright 1993,1994 International Business Machines Corp. 
+.\" **      All Rights Reserved.
+.\" **  
+.\" ** (c) Copyright 1993,1994 Sun Microsystems, Inc.
+.\" **      All Rights Reserved.
+.\" **
+.\" ** (c) Copyright 1993,1994 Unix Systems Labs, Inc., a susidiary of Novell, Inc
+.\" **      All Rights Reserved.
+.\" **
+.\" *************************************************************************
+.\"----------------------------------------------------------------------------
+.\" %\&Z%%\&M% %\&I% %\&E% SMI;
+.TH DtCmSetCalendarAttributes 3X "26 January 1994"
+.BH "26 January -_1994"
+.\"---
+.\"----------------------------------------------------------------------------
+.SH NAME
+DtCmSetCalendarAttributes(3X) \- Set calendar attribute values.
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- DESCRIPTION 
+.\"--- This section tells concisely what the command (function, device or
+.\"--- file format) does and includes the parameter list. 
+.\"---
+.SH DESCRIPTION
+\&#include <Dt/DtCm.h>
+.sp .5
+DtCmStatus DtCmSetCalendarAttributes (
+.br
+.ta 0.75i 1.75i
+        DtCmCalendar	\fIcal\fP,
+.br
+        DtCmAttributes	\fIattrs\fP,
+.br
+        int		\fInum_attrs\fP)
+.fi
+\fP
+.SH
+\fBDtCmSetCalendarAttributes\fP sets the attribute values specified in 
+\fIattrs\fP which is a pointer to an array of \fBDtCmAttribute\fP 
+structures with \fInum_attrs\fP elements. The existing value of the 
+attribute will be replaced by the new value.  New attributes can be 
+added using this function and existing attributes can be deleted by 
+setting the value part of the \fBDtCmAttribute\fP structure to \fBNULL\fP. 
+If a read only attribute is specified, the function returns an error. 
+If the function returns an error, none of the specified attributes 
+will be updated. Only the owner of the calendar can set the 
+calendar attributes.
+
+.sp .5
+.IP "\fIcal\fP" 1.25i
+Specifies the calendar to set attribute values.
+.IP "\fInattrs\fP" 1.25i
+Specifies the array of \fBDtCmAttribute\fP structures which contains the 
+attribute names and values.
+.IP "\fInum_attrs\fP" 1.25i
+Specifies the number of elements in \fIattrs\fP.
+.sp .5
+.PP
+
+
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- RETURN VALUES
+.\"--- This section appears in pages from Sections 2 and 3 only.
+.\"--- List the _values_ that the function returns and give _explanations_.
+.\"---
+.SH "RETURN VALUES"
+The function returns a status indicating whether the function is completed successfully.
+
+.TP 15
+names_r
+If the function is successful, an array of calendar names is returned in names_r; otherwise NULL is returned.
+.\"---
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- ERRORS
+.\"--- This section lists and explains _ERROR-CODES_ that the function may
+.\"--- may generate.  List _ERROR-CODES_ alphabetically.
+.\"---
+.SH ERRORS
+.SH
+.IP "\fBDT_CM_DATA_TYPE\fP" 2.5i
+Invalid data type specified for predefined attributes.
+.IP "\fBDT_CM_ERR_MEMORY\fP" 2.5i
+Not enough memory.
+.IP "\fBDT_CM_ERR_NOT_OWNER\fP" 2.5i
+The client is not the owner of the calendar.
+.IP "\fBDT_CM_ERR_OBJECT\fP" 2.5i
+Bad object or wrong object type.
+.IP "\fBDT_CM_ERR_PARAMETER\fP" 2.5i
+Invalid parameter.
+.IP "\fBDT_CM_ERR_READONLY\fP" 2.5i
+Read-only attribute specified.
+.IP "\fBDT_CM_ERR_SERVER\fP" 2.5i
+Server problem.
+.IP "\fBDT_CM_ERR_SPACE\fP" 2.5i
+No space left on device.
+.IP "\fBDT_CM_OK\fP" 2.5i
+The call is completed successfully.
+.PP
+.sp
+.\"---
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- EXAMPLES
+.\"--- This section gives examples of how to use the command (function
+.\"--- or file format).  Always preface an example with an introduction.
+.\"--- If there are multiple examples, use separate subsection headings
+.\"--- for each _example-type_.  Otherwise, omit these headings.
+.\"---
+.SH EXAMPLES
+NEED MARKUP HERE, SIMILAR TO SYNOPSIS
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- SEE ALSO
+.\"--- This section lists references to other man pages, sample files, etc.
+.\"---
+.SH "SEE ALSO"
+.BR DtCmOpenCalendar (3X),
+.BR DtCmCloseCalendar (3X),
+.BR DtCmRemoveCalendar (3X),
+.BR DtCmGetCalendarAttributes (3X),
+.BR DtCmEnumerateCalendarAttributes (3X)

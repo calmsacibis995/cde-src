@@ -1,0 +1,143 @@
+XCOMM @(#)Reference.tmpl	1.5 96/05/28 SMI
+XCOMM Copyright (c) 1996 Sun Microsystems, Inc.
+
+/*
+ * Imake rules for building link to references packages
+ *
+ * The component Imakefile should set the following variables
+ * before including <sun/Reference.tmpl> :
+ *
+ * REFERENCE_PKGNAME
+ *	Used to locate component in the common install tree
+ *	if UseReferenceInstall is yes.
+ * REFERENCE_PKGBASE
+ *	Used to locate component in the local filesystem
+ *	if UseReferenceInstall is no.
+ * REFERENCE_PKGDIR
+ *	Common path once basedir is set from above.
+ *
+ * Example: Reference Motif with a basedir of /usr 
+ *
+ * REFERENCE_PKGNAME	= RefMotif
+ * REFERENCE_PKGBASE	= /usr
+ * REFERENCE_PKGDIR	= dt
+ */
+
+/*
+ * UseReferenceInstall - controls whether local install or a
+ *	reference install (in ReferenceInstallDir) are used
+ */
+#ifndef UseReferenceInstall
+#define UseReferenceInstall YES
+#endif
+
+/*
+ * Reference install location - used to find the common install
+ *	tree if UseReferenceInstalls is yes.
+ */
+#ifndef ReferenceInstallDir
+#define ReferenceInstallDir /scde/install/cbe
+#endif
+
+/*
+ * If UseReferenceInstall is yes then override Imakefile's
+ * REFERENCE_PKGBASE with one using the common install tree.
+ */
+#if UseReferenceInstall && defined(ReferenceInstallDir)
+ARCH:sh			= uname -p
+REFERENCE_INSTALLDIR	= ReferenceInstallDir
+REFERENCE_PKGBASE	= $(REFERENCE_INSTALLDIR)/$(REFERENCE_PKGNAME)/$(ARCH)
+#endif
+
+REFERENCE_BASEDIR	= $(REFERENCE_PKGBASE)/$(REFERENCE_PKGDIR)
+REFERENCE_BINDIR	= $(REFERENCE_BASEDIR)/bin
+REFERENCE_LIBDIR	= $(REFERENCE_BASEDIR)/lib
+REFERENCE_INCDIR	= $(REFERENCE_BASEDIR)/include
+
+/*
+ * ReferenceFileList - link a list of files from one place to a reference place
+ */
+#ifndef ReferenceFileList
+#define ReferenceFileList(list,deplist,dir,ref)				@@\
+includes::	deplist							@@\
+	MakeDir(dir)							@@\
+	@case '${MFLAGS}' in *[i]*) set +e;; esac; \			@@\
+	echo "	cd" dir; cd dir; \					@@\
+	for i in list; do (set -x; $(RM) $$i; $(LN) ref/$$i .); done
+#endif
+
+/*
+ * ReferenceHeadersList - link a list of reference headers
+ *	Links from reference tree to binstall tree using different include dirs
+ */
+#ifndef ReferenceHeadersList
+#define ReferenceHeadersList(list,todir,fromdir)			@@\
+	ReferenceFileList(list,NullParameter, \
+		$(BINSTALL_INCDIR)/todir,$(REFERENCE_INCDIR)/fromdir)
+#endif
+
+/*
+ * ReferencePublicHeadersList - link a list of reference public headers
+ *	Links from reference tree to binstall tree using same include dir
+ */
+#ifndef ReferencePublicHeadersList
+#define ReferencePublicHeadersList(list,dir)				@@\
+	ReferenceFileList(list,NullParameter, \
+		$(BINSTALL_INCDIR)/dir,$(REFERENCE_INCDIR)/dir)
+#endif
+
+/*
+ * ReferencePrivateHeadersList - link a list of reference private headers
+ *	Links from current dir to binstall tree
+ */
+#ifndef ReferencePrivateHeadersList
+#define ReferencePrivateHeadersList(list,dir)				@@\
+	ReferenceFileList(list,list, \
+		$(BINSTALL_INCDIR)/dir,../../../$(CURRENT_DIR))
+#endif
+
+/*
+ * ReferenceLibrariesList - link a list of reference libraries
+ *	Links from reference tree to binstall tree
+ */
+#ifndef ReferenceLibrariesList
+#define ReferenceLibrariesList(list)					@@\
+	ReferenceFileList(list,NullParameter, \
+		$(BINSTALL_LIBDIR),$(REFERENCE_LIBDIR))
+#endif
+
+/*
+ * ReferenceBinariesList - link a list of reference binaries/commands
+ *	Links from reference tree to binstall tree
+ */
+#ifndef ReferenceBinariesList
+#define ReferenceBinariesList(list)					@@\
+	ReferenceFileList(list,NullParameter, \
+		$(BINSTALL_BINDIR),$(REFERENCE_BINDIR))
+#endif
+
+/*
+ * ReferenceSharedLibrary - link a shared lib with version number
+ *	Links from reference tree to binstall tree
+ */
+#ifndef ReferenceSharedLibrary
+#define ReferenceSharedLibrary(lib,libvers)				@@\
+includes::								@@\
+	MakeDir($(BINSTALL_LIBDIR))					@@\
+	@case '${MFLAGS}' in *[i]*) set +e;; esac; \			@@\
+	dir=$(BINSTALL_LIBDIR); ref=$(REFERENCE_LIBDIR); \		@@\
+	libso=lib.so.libvers; libln=lib.so; \				@@\
+	echo "	cd" $$dir; cd $$dir; \					@@\
+	(set -x; $(RM) $$libso; $(LN) $$ref/$$libso .); \		@@\
+	(set -x; $(RM) $$libln; $(LN) $$libso $$libln)
+#endif
+
+/*
+ * ReferenceArchiveLibrary - link an archived library
+ *	Links from reference tree to binstall tree
+ */
+#ifndef ReferenceArchiveLibrary
+#define ReferenceArchiveLibrary(lib)					@@\
+	ReferenceFileList(lib,NullParameter, \
+		$(BINSTALL_LIBDIR),$(REFERENCE_LIBDIR))
+#endif

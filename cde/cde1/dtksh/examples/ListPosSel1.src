@@ -1,0 +1,65 @@
+\#! CDE_INSTALLATION_TOP/bin/dtksh
+
+\##########################################################################
+\#  (c) Copyright 1993, 1994 Hewlett-Packard Company	
+\#  (c) Copyright 1993, 1994 International Business Machines Corp.
+\#  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+\#  (c) Copyright 1993, 1994 Unix System Labs, Inc., a subsidiary of
+\#      Novell, Inc.
+\##########################################################################
+
+
+\#
+\# This sample shell script demonstrates how to create a list widget, and
+\# also verifies that the XmListPosSelected command works; this command
+\# returns information about whether an indicated list item is selected.
+\#
+
+integer i
+
+\# Pushbutton Callback: print the selection state of each list item.
+GetSelectionStatus()
+{
+   i=1
+   echo
+   while (($i <= 11 )); do
+      if XmListPosSelected $LIST $i; then
+         echo "Item "$i" is selected"
+      else
+         echo "Item "$i" is not selected"
+      fi
+      i=i+1
+   done
+}
+
+\######################### Create the Main UI #################################
+
+XtInitialize TOPLEVEL listPosSel1 ListPosSel1 "$0" "$@"
+XtSetValues $TOPLEVEL allowShellResize:True
+
+XmCreateScrolledList LIST $TOPLEVEL list \
+	itemCount:11 \
+	items:"item1,item2,item3,item4,item5,item6,item7,item8,item9,item10,item11" \
+	visibleItemCount:15 \
+	listSizePolicy:VARIABLE
+XtSetValues $LIST \
+	selectedItemCount:3 \
+	selectedItems:"item2,item4,item6"
+XtManageChild $LIST
+
+XtRealizeWidget $TOPLEVEL
+
+XtCreateApplicationShell TOPLEVEL2 ListPosSel1a TopLevelShell
+
+XtCreateManagedWidget RC rc XmRowColumn $TOPLEVEL2 \
+         orientation:HORIZONTAL \
+         numColumns:2 \
+         packing:PACK_COLUMN 
+
+XtCreateManagedWidget PB1 pb1 XmPushButton $RC \
+	labelString:"Get Item Selection Status"
+XtAddCallback $PB1 activateCallback "GetSelectionStatus"
+
+XtRealizeWidget $TOPLEVEL2
+
+XtMainLoop

@@ -1,0 +1,142 @@
+'\" t
+.de LI
+.\" simulate -mm .LIs by turning them into .TPs
+.TP \\n()Jn
+\\$1
+..
+.\"--- 
+.\"    (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\"    (c) Copyright 1993, 1994 International Business Machines Corp.
+.\"    (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\"    (c) Copyright 1993, 1994 Novell, Inc.
+.\"--- 
+.TH dthello 1X "19 Feb. 1995"
+.BH "19 Feb. 1995""
+.SH NAME
+dthello - CDE login transitional greeting
+.SH SYNOPSIS
+dthello [
+.BI \-display " <display>"
+] [
+.BI \-fground " <color>"
+]
+.P 
+[
+.BI \-bground " <color>"
+] [
+.BI \-font " <fontname>"
+] 
+.P
+[
+.BI \-string " <message>"
+] [
+.BI \-file " <filename>"
+] 
+.P
+[
+.BI \-timeout " <seconds>"
+]
+.SH DESCRIPTION
+The dthello client provides transition visuals from the end of login
+to the start of the window manager in the user's session.  The current
+CDE version information will also be displayed here on the default
+background of dthello, directly below the Solaris(TM) logo.
+
+.P
+Upon invocation, the dthello client will create an override-redirect
+window the size ofthe screen and draw a specified message on it. At
+the same time, a 1x1 window is created that will be picked up by the
+window manager. When the window manager reparents the little window
+(an indication that the window manager has started), this program
+exits.
+.P
+The message may be specified on the command line, or in a text file.
+.SH OPTIONS
+NOTE: The dthello client is designed to be started by the system's 
+/usr/dt/bin/Xsession file and is not intended to be started directly
+by users.  Its start options can be modified by updating the value
+of the dtstart_hello[0] variable used in the Xsession script to 
+start dthello.  Editing of Xsession file is not required here.  This
+variable can be set on a per user basis by adding it to a user's
+$HOME/.dtprofile.  Or it can be set by adding a custom script file
+of any name to the system's /usr/dt/config/Xsession.d directory.
+An example line to add the systems message of the day, would be:
+
+dtstart_hello[0]="/usr/dt/bin/dthello -file /etc/motd &"
+
+.sp .5
+.BI \-display " display"
+Display id.
+.sp .5
+.BI \-fground " color" 
+Foreground color, includes the color of message text.
+.sp .5
+.BI \-bground " color" 
+Background color.  If specified will replace the default Solaris(TM) background
+with the specified solid color.  Can be useful if planning to display
+large amounts of text here during startup.
+.sp .5
+.BI \-font " fontname" 
+Font.
+.sp .5
+.BI \-string " message" 
+String to be displayed in window.
+.sp .5
+.BI \-file " filename" 
+Text file name whose contents will be displayed in window. This option
+may be specified up to five times.
+.sp .5
+.BI \-timeout " seconds" 
+Number of seconds before giving up on the window manager and
+terminating.
+.SH RETURN VALUE
+ Exit values are:
+.IP "\f30\fP" 1.5i
+Successful completion.
+.IP "\f3>0\fP" 1.5i
+Error condition occured.
+.SH EXAMPLES
+.sp .5
+.B dthello -string "Welcome to the Deskop"
+Transition window will contain this message.
+.SH RESOURCES
+NOTE: Resources should be prefaced with the string "Dthello*" when
+specified. Resources should be specified in the Dthello app-defaults
+file.
+.TS
+center;
+cf3 cf3 cf3 cf3
+l l l l .
+
+Name	Class	Value Type	Default
+_
+vbackground	Vbackground	Pixel	dynamic
+vforeground	Vforeground	Pixel	dynamic
+vfont	Vfont	FontList	dynamic
+string	String	String	.........
+file	File	String	NULL
+timeout	Timeout	Integer	240
+.TE
+.PP
+.SS vbackground
+Specifes the background color for the transition message.
+If specified, will replace the default Solaris(TM) background
+with the specified solid color.  Can be useful if planning to display
+large amounts of text here during startup.
+.sp .5
+.SS vforeground
+Specifes the foreground color for the transition message.
+.sp .5
+.SS vfont
+Specifes the font to use for the transition message.
+.sp .5
+.SS string
+Specifes the text to use in the transition message. 
+.sp .5
+.SS file
+Specifies a file whose contents is to be displayed in addition to the
+transition message.  Only one file may be specified.
+.sp .5
+.SS timeout
+Number of seconds before giving up on the window manager and
+terminating.

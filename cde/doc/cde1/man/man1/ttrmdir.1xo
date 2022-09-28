@@ -1,0 +1,166 @@
+.TH ttrmdir 1 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH "NAME"
+ttrmdir \- remove empty directories and inform the ToolTalk service
+.SH "SYNOPSIS"
+.yS
+ttrmdir
+[\-L]
+\f2directory\fP
+\&.\|.\|.
+.yE
+.yS
+ttrmdir
+\-h
+|
+\-v
+.yE
+.SH "DESCRIPTION"
+The
+.Cm ttrmdir
+utility
+invokes
+.Cm rmdir 1
+to remove empty directories and informs
+ToolTalk about its actions so that the ToolTalk objects
+associated with the deleted directories can also be deleted.
+.P
+The
+.Cm ttrmdir
+utility removes the ToolTalk objects before it removes the directories
+and does not check whether a directory is empty or whether the
+directory-removing operation will succeed before performing the
+object-removing operation.
+.SH "OPTIONS"
+.xos
+The
+.Cm ttrmdir
+utility supports the \*(Zu.
+.xoe
+The following options are available:
+.VL 6
+.LI \f3\-h\f1
+Write a help message for invoking
+.Cm ttrmdir
+and then exit.
+.LI \f3\-L\f1
+Remove the ToolTalk objects of the directories, but do not invoke
+.Cm rmdir 1
+to remove the actual directories.
+.LI \f3\-v\f1
+Write the version number of
+.Cm ttrmdir
+and then exit.
+.LE
+.P
+.xos
+It is unspecified whether the
+.B \-p
+option to
+.Cm cp 1
+is supported.
+.xoe
+.cdes
+The
+.B \-p
+option to
+.Cm cp 1
+is not supported.
+.cdee
+.SH OPERANDS
+The following operand is supported:
+.VL 6
+.LI \f2directory\fP
+.br
+A pathname of an empty directory to be removed.
+.LE
+.SH STDIN
+Not used.
+.SH "INPUT FILES"
+The input files specified as operands can be of any file type.
+.SH "ENVIRONMENT VARIABLES"
+The following environment variables affect the execution of
+.Cm ttrmdir :
+.VL 15
+.LI \f2LANG\fP
+Provide a default value for the internationalization variables
+that are unset or null.
+If
+.I LANG
+is unset or null, the corresponding value from the
+implementation-specific default locale will be used.
+If any of the internationalization variables contains an invalid setting, the
+utility behaves as if none of the variables had been defined.
+.LI \f2LC_ALL\fP
+If set to a non-empty string value,
+override the values of all the other internationalization variables.
+.LI \f2LC_MESSAGES\fP
+Determine the locale that is used to affect
+the format and contents of diagnostic
+messages written to standard error
+and informative messages written to standard output.
+.LI \f2NLSPATH\fP
+Determine the location of message catalogues
+for the processing of
+.IR LC_MESSAGES .
+.LE
+.SH "RESOURCES"
+None.
+.SH "ASYNCHRONOUS EVENTS"
+Default.
+.SH STDOUT
+When the
+.B \-h
+option is used,
+.Cm ttrmdir
+writes to standard output a help message
+in an unspecified format.
+.P
+When the
+.B \-v
+option is used,
+.Cm ttrmdir
+writes to standard output a version number
+in an unspecified format.
+.SH STDERR
+Used only for diagnostic messages.
+.SH "OUTPUT FILES"
+None.
+.SH "EXTENDED DESCRIPTION"
+None.
+.SH "EXIT STATUS"
+The following exit values are returned:
+.VL 4
+.LI \h"\w'>'u"0
+All directories and ToolTalk objects were removed successfully.
+.LI >0
+An error occurred or the invoked
+.Cm rmdir 1
+command exited with a non-zero value.
+.LE
+.SH "CONSEQUENCES OF ERRORS"
+Default.
+.cdes
+.SH FILES
+.TP 20
+/\f2mountpoint\fP/TT_DB
+The directory used as a database
+for the ToolTalk objects of files in the
+file system mounted at
+.IR /mountpoint .
+.cdee
+.SH "APPLICATION USAGE"
+The definition of an empty directory
+is one that contains, at most,
+directory entries for dot and dot-dot.
+.SH EXAMPLES
+None.
+.SH "SEE ALSO"
+.cde .Cm rmdir 1,
+.xo .Cm rmdir
+.xo in the \*(ZC;
+.Cm ttrm 1,
+.Cm ttsession 1.

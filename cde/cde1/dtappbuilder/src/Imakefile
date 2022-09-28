@@ -1,0 +1,64 @@
+XCOMM
+XCOMM 	$XConsortium: Imakefile /main/cde1_maint/2 1995/09/06 07:16:48 lehors $
+XCOMM
+XCOMM 	@(#)Imakefile	1.6 22 Jan 1995
+XCOMM
+XCOMM 	RESTRICTED CONFIDENTIAL INFORMATION:
+XCOMM	
+XCOMM	The information in this document is subject to special
+XCOMM	restrictions in a confidential disclosure agreement between
+XCOMM	HP, IBM, Sun, USL, SCO and Univel.  Do not distribute this
+XCOMM	document outside HP, IBM, Sun, USL, SCO, or Univel without
+XCOMM	Sun's specific written approval.  This document and all copies
+XCOMM	and derivative works thereof must be returned or destroyed at
+XCOMM	Sun's request.
+XCOMM
+XCOMM	Copyright 1993 Sun Microsystems, Inc.  All rights reserved.
+XCOMM
+XCOMM
+
+#ifdef SunArchitecture
+.NO_PARALLEL:				# don't build subdirs in parallel
+#endif
+
+#define IHaveSubdirs
+#define PassCDebugFlags 'CDEBUGFLAGS=$(CDEBUGFLAGS)'
+
+SUBDIRS = \
+	libAButil	\
+	libABobj	\
+	libABobjXm	\
+	libABil		\
+	abmf		\
+	sdtgilcvt	\
+	ab
+
+MakeSubdirs($(SUBDIRS))
+DependSubdirs($(SUBDIRS))
+
+dtbuilder::
+	@case '${MFLAGS}' in *[ik]*) set +e;; esac; \
+	for i in libAButil libABobj libABobjXm libABil ab ;\
+	do \
+	(cd $$i ; echo "making" dtbuilder "in $(CURRENT_DIR)/$$i..."; \
+	$(MAKE) $(MFLAGS) 'CDEBUGFLAGS=$(CDEBUGFLAGS)' 'FIRST_LIBPATH=$(FIRST_LIBPATH)' 'FIRST_INCLUDES=$(FIRST_INCLUDES)' dtbuilder); \
+	done
+
+dtcodegen::
+	@case '${MFLAGS}' in *[ik]*) set +e;; esac; \
+	for i in libAButil libABobj libABobjXm libABil abmf ;\
+	do \
+	(cd $$i ; echo "making" dtcodegen "in $(CURRENT_DIR)/$$i..."; \
+	$(MAKE) $(MFLAGS) 'CDEBUGFLAGS=$(CDEBUGFLAGS)' 'FIRST_LIBPATH=$(FIRST_LIBPATH)' 'FIRST_INCLUDES=$(FIRST_INCLUDES)' dtcodegen); \
+	done
+
+sdtgilcvt::
+	@case '${MFLAGS}' in *[ik]*) set +e;; esac; \
+	for i in libAButil libABobj libABil sdtgilcvt ;\
+	do \
+	(cd $$i ; echo "making" sdtgilcvt "in $(CURRENT_DIR)/$$i..."; \
+	$(MAKE) $(MFLAGS) 'CDEBUGFLAGS=$(CDEBUGFLAGS)' 'FIRST_LIBPATH=$(FIRST_LIBPATH)' 'FIRST_INCLUDES=$(FIRST_INCLUDES)' sdtgilcvt); \
+	done
+
+clean::
+	$(RM) -rf include

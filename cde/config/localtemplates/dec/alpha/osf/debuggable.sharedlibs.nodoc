@@ -1,0 +1,53 @@
+/*
+ * $XConsortium: debuggable.sharedlibs.nodoc /main/cde1_maint/1 1995/11/15 17:48:04 drk $
+ */
+
+/* Skip the doc and learning_products directories. */
+#define DONT_BUILD_LEARNING_PRODUCTS	YES
+
+/* use mit libraries and headers from system not build tree */
+#ifndef UseMitLibrariesFromSystemOnly
+#define UseMitLibrariesFromSystemOnly YES
+#endif
+
+#ifndef BUILD_BMS
+#define BUILD_BMS NO
+#endif
+
+/**** NOTE ******/
+/* many Imakefiles have entries that decide which subdirectories
+ * are built based on the DEBUGTREE define.
+ * The default is that only certain libraries will be built if 
+ * DEBUGTREE is set. If you want every thing debuggable, remove
+ # define DEBUGTREE.
+ */ 
+#define DEBUGTREE
+
+/* build only the cose bits */
+#ifndef BUILD_UNITY_1_ONLY  
+#define BUILD_UNITY_1_ONLY YES
+#endif
+
+/* build archived libraries in this tree */
+#ifndef ForceNormalLib
+#define ForceNormalLib NO
+#endif
+ 
+/* build shared libraries in this tree */
+ #ifndef HasSharedLibraries
+ #define HasSharedLibraries YES
+ #endif
+
+/* optimized tree  */
+#ifndef OptimizedCDebugFlags
+#define OptimizedCDebugFlags    -g
+#endif
+
+/* used to link against archived libraries in a shlib tree */
+#ifndef ARCHIVED_LINK
+#define ARCHIVED_LINK NO
+#endif
+
+#if ARCHIVED_LINK
+#define ExtraLoadFlags -non_shared
+#endif

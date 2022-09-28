@@ -1,0 +1,100 @@
+# %%  (c) Copyright 1993, 1994 Hewlett-Packard Company			
+# %%  (c) Copyright 1993, 1994 International Business Machines Corp.	
+# %%  (c) Copyright 1993, 1994 Sun Microsystems, Inc.			
+# %%  (c) Copyright 1993, 1994 Novell, Inc. 				
+# %%  $Revision: $ 			 				
+#
+#
+# @(#)SunMakefile	1.25 07 Sep 1993
+#
+# The ToolTalk tt_type_comp utility makefile
+#
+# Copyright (c) 1992 by Sun Microsystems, Inc.
+#
+
+TT_DIR = ../..
+THIS_DIR = bin/tt_type_comp
+
+include $(TT_DIR)/SunMakefile-head.mk
+
+all::		Bin-g
+
+$(BIN_TARGETS)::	tt_type_comp
+
+$(INSTALL_TARGETS)::	$(INSTALL_DIR)/bin/tt_type_comp
+
+TTTYPECOMP_CONTENTS = \
+	mp_type_comp.o \
+	mp_types_table.o \
+	mp_types_gram.o \
+	mp_types_lex.o
+
+
+CPPFLAGS	+=	$(CPPFLAGS-bin) -I$(TT_DIR)/slib
+CCFLAGS		+=	$(CCFLAGS-bin)
+CFLAGS		+=	$(CFLAGS-bin)
+LDFLAGS		+=	$(LDFLAGS-bin)
+
+MYLDLIBS_SunOS_4=	-lce -lX -lI18N -ldl
+LDLIBS		+=	$(MYLDLIBS_$(OS_NAME)_$(OS_VERSION))
+
+%/mp_type_comp.o	:=	CPPFLAGS +=	$(CPPFLAGS-version)
+
+OBJECTS =	$(TTTYPECOMP_CONTENTS:%=$(DERIVED)/%)
+
+# We should probably try to generate a standard link for utilities
+# Trailing -Bstatic ensures libC is linked statically -- that could
+# go away in the future when libC is bundled.
+
+tt_type_comp:	$$(DERIVED) $$(OBJECTS) $$(LIBDEPENDENCY) $$(SLIBDEPENDENCY)
+	$(LINK.cc) -o $@ $(OBJECTS) \
+	-lstt -ltt $(LDLIBS) -Bstatic
+
+# Because we hack up the yacc/lex output with sed scripts, and yacc/lex
+# have tiny variations between platforms, we actually ship "frozen"
+# copies of the yacc/lex output with the source products.  Since we
+# change the yacc/lex grammars so infrequently this is not a big deal,
+# but to make sure that changes are always propagated we diff the
+# yacc/lex output against the frozen versions.
+
+# Note, yacc changed slightly in Solaris 2.3 alpha 2.7 or so (it now puts an
+# #pragma ident in instead of a static char sccsid.)  Rather
+# than replace the frozen versions right now, and thus break builds on
+# earlier OSes, I'm just turning the errors into warnings.  RFM 08/20/93
+
+mp_types_gram.C + mp_types_gram.h : \
+	mp_types_gram.y frozen.mp_types_gram.C frozen.mp_types_gram.h
+	$(YACC.y) -d mp_types_gram.y
+	sed 's/^\([int]*[ ]*\)yyparse(/\1_Tt_types_table::yyparse(/' y.tab.c > mp_types_gram.C
+	$(RM) y.tab.c
+	mv y.tab.h mp_types_gram.h
+	-@if cmp -s mp_types_gram.C frozen.mp_types_gram.C ;\
+	then exit 0;\
+	else echo Warning: replace frozen.mp_types_gram.C with new version ; exit 1;\
+	fi
+	-@if cmp -s mp_types_gram.h frozen.mp_types_gram.h ;\
+	then exit 0;\
+	else echo Warning: replace frozen.mp_types_gram.h with new version ; exit 1;\
+	fi
+
+mp_types_lex.C : mp_types_lex.l mp_types_gram.h frozen.mp_types_lex.C
+	$(LEX.l) mp_types_lex.l | sed -e '/^# define output/d' \
+	-e '/^# define input/d' -e '/^# define unput/d' \
+	-e '/^#ident/d' \
+	-e 's/^yylex()/int _Tt_types_table::yylex()/' \
+	-e 's/^[int]*[ ]*yylook(/int _Tt_types_table::yylook(/' \
+	-e 's/^[int]*[ ]*yyback(/int _Tt_types_table::yyback(/' \
+	-e 's/(p, m)/(int *p, int m)/' -e 's/lex_input/input/' \
+	-e 's/lex_output/output/' -e '/^	int \*p;/ d' \
+	-e 's/struct yysvf {/struct yywork; struct yysvf {/' \
+	-e '/lex library/ q' > mp_types_lex.C
+	-@if cmp -s mp_types_lex.`C frozen.mp_types_lex.C ;\
+	then exit 0;\
+	else echo Warning: replace frozen.mp_types_lex.C with new version ; exit 1;\
+	fi
+
+Clean::
+	$(RM) tt_type_comp mp_types_gram.C mp_types_gram.h mp_types_lex.C
+
+include $(TT_DIR)/SunMakefile-tail.mk
+

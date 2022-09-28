@@ -1,0 +1,95 @@
+XCOMM @(#)Imakefile	1.17 96/11/22 SMI
+XCOMM Copyright (c) 1996 Sun Microsystems, Inc.
+
+LIBTOPDIR = ../..
+LIBCURDIR = sdmtest
+
+#include "../../ImakeSdm.tmpl"
+
+TESTPROG1 = sdmtest
+TESTPROG2 = sdmtest0
+TESTPROGS = $(TESTPROG1) $(TESTPROG2)
+
+TESTHEADERS = \
+	Main.hh \
+	Str.hh
+
+TESTSRCS = \
+	AsyncTest.cc \
+	BasicTest.cc \
+	ComposeTest.o \
+	ConnectionTest.cc \
+	DataTypeTest.cc \
+	DisconnectTest.cc \
+	Main.cc \
+	MessageBodyTest.cc \
+	MessageEnvelopeTest.cc \
+	MessageStoreTest.cc \
+	MessageTest.cc \
+	OutgoingMessageTest.cc \
+	UnsolicitEventTest.cc \
+	SearchTest.cc \
+	SessionTest.cc \
+	Str.cc \
+	UtilityTest.cc
+
+TESTOBJS = \
+	AsyncTest.o \
+	BasicTest.o \
+	ComposeTest.o \
+	ConnectionTest.o \
+	DataTypeTest.o \
+	DisconnectTest.o \
+	Main.o \
+	MessageBodyTest.o \
+	MessageEnvelopeTest.o \
+	MessageStoreTest.o \
+	MessageTest.o \
+	OutgoingMessageTest.o \
+	UnsolicitEventTest.o \
+	SearchTest.o \
+	SessionTest.o \
+	Str.o \
+	UtilityTest.o
+
+DEFINES			= $(SDMTESTDEFINES)
+
+INCLUDES		= -I. $(SDMINCLUDES) 
+
+TESTDEPLIBS		=
+
+TEST_LIBRARIES		= $(SDMTESTLIBS) $(SDMCCLIENTLIBRARY) $(SDMLCLLIBRARY) $(XMLIB) $(XTOOLLIB) $(XLIB) 
+
+SDM_LIBRARIES		= $(SDMLIBRARY) $(SDMCCLIENTLIBRARY) $(SDMLCLLIBRARY)
+
+#if OSMajorVersion > 5 || (OSMajorVersion == 5 && OSMinorVersion > 5)
+SYS_LIBRARIES		= /usr/lib/libnsl.a -lintl -lsocket -ldl -mt -ltt 
+#else
+SYS_LIBRARIES		= /usr/lib/libnsl.a -lintl -lsocket -ldl -ltt 
+#endif
+
+EXTRA_LOAD_FLAGS        = -L/usr/dt/lib
+
+
+LINKCC			= $(C++)
+
+OBJS2			= $(TESTOBJS)
+DEPLIBS2		= $(TESTDEPLIBS)
+
+OBJS3			= $(TESTOBJS)
+DEPLIBS3		= $(TESTDEPLIBS)
+
+AllTarget()
+
+SdmTestTarget($(TESTOBJS))
+SdmTestTarget($(TESTPROG1))
+SdmCleanTest($(TESTPROGS))
+
+NormalLibraryObjectRule()
+
+ComplexProgramTarget_2($(TESTPROG1),$(TEST_LIBRARIES),$(SYS_LIBRARIES))
+ComplexProgramTarget_3($(TESTPROG2),$(SDM_LIBRARIES),$(SYS_LIBRARIES))
+
+includes::
+
+depend::

@@ -1,0 +1,106 @@
+.TH DtCMOpen 3 "17 January 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH "NAME"
+DtCMOpen \- create or open a Cde document container
+.SH "SYNOPSIS"
+.yS
+#include <Bento/DtCM.h>
+.sp 0.5v
+.ta \w'CMContainer DtCMOpen('u
+CMContainer DtCMOpen(CMSession \f2session\fP,
+	CMEnv *\f2error\fP,
+	const char *\f2path\fP,
+	int \f2open_flag\fP,
+	...
+	mode_t \f2mode\fP,
+	const char *\f2magic_bytes\fP);
+.yE
+.SH "DESCRIPTION"
+The
+.Fn DtCMOpen
+function creates or opens a Cde document container using the Cde file handler.
+The
+.I open_flag
+argument accepts the same flags as the
+.Fn open 2
+function.
+If the
+.I open_flag
+argument includes
+.Cn O_CREAT ,
+then the optional
+.I mode
+and
+.I magic_bytes
+arguments are required; otherwise, they are ignored.
+The
+.I session
+argument is a session handle from
+.Fn DtCMStartSession 3
+or
+.Fn CMRStartSession .
+The
+.I error
+argument is a pointer to an error return structure.
+The
+.I path
+argument specifies the path to be opened.
+Any path valid to the
+.Fn open 2
+function may be used.
+.P
+The
+.I open_flag
+argument accepts the same values as
+.Fn open 2
+function.
+Common flags are
+.Cn O_RDONLY ,
+.Cn O_RDWR ,
+and
+.Cn O_WRONLY .
+The application can use the bitwise inclusive OR of
+.Cn O_CREAT
+with any of the previous flags to create a new Cde document container.
+The
+.I mode
+argument is used when
+.Cn O_CREAT
+is specified; otherwise, the
+.I mode
+argument is ignored.
+.P
+The
+.I magic_bytes
+argument is used when
+.Cn O_CREAT
+is specified; otherwise,
+.I magic_bytes
+is ignored.
+The first 64 bytes of this string are stored as the magic-byte
+sequence in the container header.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn DtCMOpen
+function returns a valid container handle.
+If an error occurs,
+.Fn DtCMOpen
+sets the major code in the
+.I error
+structure to
+.Cn USER_EXCEPTION ,
+and the application can use the
+.Fn CMRexception_number
+function to determine the minor code.
+See the Error API Appendix in the \*(ZB.
+.SH "SEE ALSO"
+.Hd Bento/DtCM.h 5;
+.Fn CMROpenContainer ,
+.Fn CMRexception_number
+in the \*(ZB;
+.cde .Fn open 2.
+.xo .Fn open
+.xo in the \*(ZK.

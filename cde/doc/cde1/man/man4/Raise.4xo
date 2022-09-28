@@ -1,0 +1,54 @@
+.TH Raise 4 "13 May 1994"
+.SH NAME
+Raise request \- raise a tool's window(s) to the front
+.SH SYNOPSIS
+.yS
+.ta \w@Raise(@u
+Raise([in messageID \f2commission\fP]);
+.yE
+.SH DESCRIPTION
+The
+.I Raise
+request
+raises the window(s) associated with the handling procid.
+If any optional arguments are present, then it raises
+only the indicated window(s).
+.P
+The
+.I commission
+argument
+is the ID of the message, if any, that resulted in the creation
+of the window(s) that should be raised.
+.SH "APPLICATION USAGE"
+The
+.Fn ttdt_session_join 3,
+and
+.Fn ttdt_message_accept 3,
+functions can be used by Xt applications to register for,
+and transparently process, the
+.I Raise
+request.
+.SH EXAMPLES
+The
+.I Raise
+request can be sent as in the following example:
+.Cs I
+Tt_message msg = tttk_message_create(0, TT_REQUEST, TT_SESSION,
+			the_recipient_procid, TTDT_RAISE,
+			my_callback);
+tt_message_send(msg);
+.Ce
+.cdes 
+.SH WARNINGS
+.I Raise
+can also be sent as a multicast notice, as an
+.I edict 
+to all tools in the scope of the message.
+The consequences of doing so can be severe and unexpected.
+.cdee
+.SH "SEE ALSO"
+.Fn tt_message_send 3,
+.Fn ttdt_message_accept 3,
+.Fn ttdt_session_join 3;
+.I Lower
+request.

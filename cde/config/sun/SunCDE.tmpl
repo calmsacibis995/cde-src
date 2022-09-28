@@ -1,0 +1,227 @@
+XCOMM	@(#)SunCDE.tmpl	1.15 97/03/05 
+
+/*
+ * Sun CDE Imake Template
+ *
+ * Copyright (c) 1996 Sun Microsystems, Inc.
+ */
+
+/*
+ * Enable Sun CDE features by default (if this tmpl is included)
+ */
+#ifndef SunCDE
+#define SunCDE	YES
+#endif
+
+/*
+ * Only use if SunCDE is enabled
+ */
+#if SunCDE
+
+/*
+ * Only build C locale since L10N delivers separate packages
+ */
+#ifndef BuildForClocaleOnly
+#define BuildForClocaleOnly YES
+#endif
+
+/*
+ * Controls whether to build certain components or not.
+ * See corresponding use in cdesrc/lib/Imakefile
+ */
+#ifndef BuildMotif
+#define BuildMotif 		YES
+#endif
+#ifndef BuildToolTalk
+#define BuildToolTalk 		YES
+#endif
+#ifndef BuildPam
+#define BuildPam 		YES
+#endif
+
+/*
+ * References: controls which packages to create reference links for
+ *	and where to create the links to (a reference install tree).
+ *	Used by Reference.tmpl and reference package Imakefile's.
+ */
+#ifndef UseReferenceInstall
+#define UseReferenceInstall	YES
+#endif
+#ifndef UseReferenceMotif
+#define UseReferenceMotif	NO
+#endif
+#ifndef UseReferenceToolTalk
+#define UseReferenceToolTalk	NO
+#endif
+#ifndef UseReferenceXaudio
+#define UseReferenceXaudio	NO
+#endif
+#ifndef UseReferenceCclient
+#define UseReferenceCclient	NO
+#endif
+#ifndef UseReferenceLCLib
+#define UseReferenceLCLib	NO
+#endif
+#ifndef UseReferenceFns
+#define UseReferenceFns		YES
+#endif
+
+/*
+ * Sun CDE Source Locations
+ */
+
+        SUNLIBSRC		= $(TOP)/libsun
+        SDTLIBSRC		= $(SUNLIBSRC)
+        SDTFWALIBSRC		= $(SDTLIBSRC)/SDtFwa
+        SDTSPELLLIBSRC		= $(SDTLIBSRC)/SDtSpell
+        SDTMAILLIBSRC		= $(SDTLIBSRC)/SDtMail
+
+        SUNCDESRC		= $(TOP)/cdesun
+        SDTCDESRC		= $(SUNCDESRC)
+        SDTIMAGESRC		= $(SDTCDESRC)/sdtimage
+        SDTAUDIOSRC		= $(SDTCDESRC)/sdtaudio
+
+/*
+ * Standard OPENWINHOME location
+ */
+
+#ifndef OpenWinHome
+#define OpenWinHome /usr/openwin
+#endif
+
+        OPENWINHOME		= OpenWinHome
+
+/*
+ * SunCDE Libraries
+ */
+
+/*
+ * libSDtFwa - SunCDE Flyweight Allocator
+ *	replacement for malloc/free with better performance
+ */
+
+#ifndef SharedLibSDtFwa
+#define SharedLibSDtFwa 	HasSharedLibraries
+#endif
+#ifndef NormalLibSDtFwa
+#define NormalLibSDtFwa 	(!SharedLibSDtFwa | ForceNormalLib)
+#endif
+#ifndef DebugLibSDtFwa
+#define DebugLibSDtFwa		NO
+#endif
+#ifndef ProfiledLibSDtFwa
+#define ProfiledLibSDtFwa	NO
+#endif
+#ifndef SharedSDtFwaRev
+#define SharedSDtFwaRev		1
+#endif
+#if SharedLibSDtFwa
+#define SDtFwaLibraryDep	libSDtFwa.so
+#else
+#define SDtFwaLibraryDep	libSDtFwa.a
+#endif
+
+#if UseAltBuildScheme
+        SDTFWALIB		= -lSDtFwa
+        DEPSDTFWALIB		= $(BINSTALL_LIBDIR)/SDtFwaLibraryDep
+#else
+        SDTFWALIB		= -L$(SDTFWALIBSRC) -lSDtFwa
+        DEPSDTFWALIB		= $(SDTFWALIBSRC)/SDtFwaLibraryDep
+#endif
+
+/*
+ * If enabled use Flyweight Allocator library by attaching
+ * -lSDtFwa to EXTRA_LIBRARIES make variable for commands
+ * that start with "dt" or "sdt".  Disable for 'build' tool
+ * in dthelp/parser/pass2.
+ */
+
+#ifndef SunUseFlyweightAllocator
+#define SunUseFlyweightAllocator YES
+#endif
+
+#if SunUseFlyweightAllocator
+dt%   := EXTRA_LIBRARIES += $(SDTFWALIB)
+sdt%  := EXTRA_LIBRARIES += $(SDTFWALIB)
+build := SDTFWALIB =
+#endif
+
+/*
+ * libSDtSpell - SunCDE Spell Widget Library
+ */
+
+#ifndef SharedLibSDtSpell
+#define SharedLibSDtSpell 	HasSharedLibraries
+#endif
+#ifndef NormalLibSDtSpell
+#define NormalLibSDtSpell 	(!SharedLibSDtSpell | ForceNormalLib)
+#endif
+#ifndef DebugLibSDtSpell
+#define DebugLibSDtSpell	NO
+#endif
+#ifndef ProfiledLibSDtSpell
+#define ProfiledLibSDtSpell	NO
+#endif
+#ifndef SharedSDtSpellRev
+#define SharedSDtSpellRev	1
+#endif
+
+#if SharedLibSDtSpell
+#define SDtSpellLibraryDep	libSDtSpell.so
+#else
+#define SDtSpellLibraryDep	libSDtSpell.a
+#endif
+
+#if UseAltBuildScheme
+        SDTSPELLLIB		= -lSDtSpell
+        DEPSDTSPELLLIB		= $(BINSTALL_LIBDIR)/SDtSpellLibraryDep
+#else
+        SDTSPELLLIB		= -L$(SDTSPELLLIBSRC) -lSDtSpell
+        DEPSDTSPELLLIB		= $(SDTSPELLLIBSRC)/SDtSpellLibraryDep
+#endif
+
+/*
+ * libSDtMail - SunCDE Mail Backend Library
+ */
+
+#ifndef SharedLibSDtMail
+#define SharedLibSDtMail 	HasSharedLibraries
+#endif
+#ifndef NormalLibSDtMail
+#define NormalLibSDtMail 	(!SharedLibSDtMail | ForceNormalLib)
+#endif
+#ifndef DebugLibSDtMail
+#define DebugLibSDtMail		NO
+#endif
+#ifndef ProfiledLibSDtMail
+#define ProfiledLibSDtMail	NO
+#endif
+#ifndef SharedSDtMailRev
+#define SharedSDtMailRev	2
+#endif
+
+#if SharedLibSDtMail
+#define SDtMailLibraryDep	libSDtMail.so
+#else
+#define SDtMailLibraryDep	libSDtMail.a
+#endif
+
+#if UseAltBuildScheme
+        SDTMAILLIB		= -lSDtMail
+        DEPSDTMAILLIB		= $(BINSTALL_LIBDIR)/SDtMailLibraryDep
+#else
+        SDTMAILLIB		= -L$(SDTMAILLIBSRC) -lSDtMail
+        DEPSDTMAILLIB		= $(SDTMAILLIBSRC)/SDtMailLibraryDep
+#endif
+
+/*
+ * Include SunCDE Rules
+ */
+
+#ifndef SunCdeRules
+#define SunCdeRules		<sun/SunCDE.rules>
+#endif
+
+#include SunCdeRules
+
+#endif /* SunCDE */

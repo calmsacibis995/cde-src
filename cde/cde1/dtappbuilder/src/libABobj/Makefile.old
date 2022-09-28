@@ -1,0 +1,92 @@
+
+#
+#	$Revision: 1.1 $
+#
+#  @(#)Makefile.old	1.33 01/18/94	cde_app_builder/src/libABobj
+#
+# 	RESTRICTED CONFIDENTIAL INFORMATION:
+#	
+#	The information in this document is subject to special
+#	restrictions in a confidential disclosure agreement between
+#	HP, IBM, Sun, USL, SCO and Univel.  Do not distribute this
+#	document outside HP, IBM, Sun, USL, SCO, or Univel without
+#	Sun's specific written approval.  This document and all copies
+#	and derivative works thereof must be returned or destroyed at
+#	Sun's request.
+#
+#	Copyright 1993 Sun Microsystems, Inc.  All rights reserved.
+#
+#
+
+default_targets: test_notify #all test
+
+.KEEP_STATE:
+
+PROJECTDIR = ../..
+
+LIBPART = libABobj
+
+SOURCES.c = \
+	obj.c \
+	obj_action.c \
+	obj_alloc.c \
+	obj_args.c \
+	obj_fields.c \
+	obj_geometry.c \
+	obj_init.c \
+	obj_isa.c \
+	obj_motif.c \
+	obj_notify.c \
+	obj_release.c \
+	obj_scoped.c \
+	obj_select.c \
+	obj_tree.c \
+	obj_trigger.c \
+	obj_utils.c \
+	trav.c \
+	travP.c \
+	trav_public.c \
+	trav_safe.c
+
+LIBS.shared = libABobj.a
+
+SOURCES.h.shipped =
+
+SOURCES.h.shared =\
+	obj.h \
+	obj_motifdefs.h \
+	obj_notify.h \
+	trav.h
+
+SOURCES.h.unshared = \
+	objP.h \
+	obj_notifyP.h \
+	obj_utils.h \
+	travP.h
+
+SOURCES.h = \
+		$(SOURCES.h.shipped)	\
+		$(SOURCES.h.shared)	\
+		$(SOURCES.h.unshared)
+
+LIBRARY = libABobj.a
+
+# Compiler flags.
+
+# Temporarily including stuff from Guide until we move
+# everything we need over
+#
+
+# Make information.
+
+.INIT:  $(PROJECTDIR)/Makefile.include
+include $(PROJECTDIR)/Makefile.include
+
+# Until we move in guide stuff as libAButil,
+# this part remains commented out.
+#
+test: includes .WAIT test.o $(LIBRARY) Makefile
+	$(CC) $(LDFLAGS) -L$(PROJECTDIR)/installed/lib -o test test.o $(LIBRARY) -lAButil
+
+test_notify: includes .WAIT test_notify.o $(LIBRARY) Makefile
+	$(CC) $(LDFLAGS) -L$(PROJECTDIR)/installed/lib -o test_notify test_notify.o $(LIBRARY) -lAButil /local/home/dunn/lib/libjjmalloc.so

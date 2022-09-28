@@ -1,0 +1,133 @@
+.de Lc
+.\" version of .LI that emboldens its argument
+.TP \\n()Jn
+\s-1\f3\\$1\f1\s+1
+..
+.TH tt_message_state 3 "1 March 1996" "ToolTalk 1.3" "ToolTalk Functions"
+.BH "1 March 1996"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.IX "tt_message_state" "" "tt_message_state(3)" ""
+.SH NAME
+tt_message_state \- retrieve the state attribute from a message
+.SH SYNOPSIS
+.ft 3
+.nf
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'Tt_state tt_message_state('u
+Tt_state tt_message_state(Tt_message \f2m\fP);
+.PP
+.fi
+.SH DESCRIPTION
+The
+.BR tt_message_state (\|)
+function
+retrieves the state attribute from the specified message.
+.PP
+The
+.I m
+argument is the opaque handle for the message involved in this operation.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.BR tt_message_state (\|)
+function returns a value that indicates the current delivery
+state of the message.
+The
+.BR tt_message_state (\|)
+function returns one of the following
+.B Tt_status
+values:
+.PP
+.RS 3
+.nr )J 8
+.Lc TT_CREATED
+.br
+The message has been created, but not yet sent.
+.Lc TT_SENT
+.br
+The message has been sent, but not yet handled.
+.Lc TT_HANDLED
+.br
+The message has been handled; return values are valid.
+.Lc TT_FAILED
+.br
+The message could not be delivered to a handler.
+.Lc TT_QUEUED
+.br
+The message has been queued for delivery.
+.Lc TT_STARTED
+.br
+The ToolTalk service is attempting to start a process to handle the message.
+.Lc TT_REJECTED
+.br
+The message has been rejected by a possible handler.
+.Lc TT_RETURNED
+.br
+all observers (and the handler, if there is one) have
+accepted, rejected, or destroyed the TT_OFFER. The
+original sender sees this state, and it can be
+observed.
+.br
+This comes back to the original sender like the reply
+for a request. In particular, any message callbacks
+for the offer are run, and user data attached to the
+message before sending are available.
+.Lc TT_ACCEPTED
+.br
+Offers (only) enter this state when tt_message_accept
+is done on them by a receiver. The state is seen
+only by the receiver.
+.Lc TT_REJECTED
+.br
+This state already exists; a receiver can
+tt_message_reject a request that matched a
+handle pattern, which puts the message into
+state TT_REJECTED for it.  This will be extended
+to offers -- a receiver that gets an offer will see
+this message in the TT_REJECTED state.
+.Lc TT_ABSTAINED
+.br
+Offers (only) enter this state when a receiving
+procid does the next tt_message_receive without
+accepting or rejecting the offer.  One can think
+of TT_ABSTAINED also being entered when a procid
+destroys an offer without accepting or rejecting
+it, but since the message is destroyed at that time
+the procid will never see the state.  This state is
+seen only by the receiver.
+.PP
+.RE
+.nr )J 0
+.PP
+The application can use
+.BR tt_int_error (3)
+to extract one of the following
+.B Tt_status
+values from the
+.B Tt_state
+integer return value:
+.PP
+.RS 3
+.nr )J 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_NOMP
+.br
+The
+.BR ttsession (1)
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_POINTER
+.br
+The pointer passed does not point to an object of
+the correct type for this operation.
+.PP
+.RE
+.nr )J 0
+.SH "SEE ALSO"
+.na
+.BR tt_c (5),
+.BR tt_int_error (3).

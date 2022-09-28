@@ -1,0 +1,419 @@
+			 AppBuilder UIL Release Notes
+				FCS CDE 1.0
+				 June 1995
+
+File Location:/home/bfreeman/ab/arch/uil_release_notes.txt
+
+AppBuilder and UIL Import/Export Capabilities
+==============================================================================
+
+AppBuilder provides basic OSF/Motif User Interface Language, UIL, import and
+export capabilities.  If you plan to use either of these features, you
+should be aware of the following issues.
+
+o Widget and Object Hierarchies
+
+  In AppBuilder, the GUI objects are abstracted over the Motif widget set, which 
+  means one AppBuilder object can map to one or more Motif widgets. For example, 
+  the AppBuilder Text Field object is normally comprised of a Label widget, a 
+  Text Field widget, and contained in a Row Column widget.  However, if the user 
+  does not specify a string for the AppBuilder Text Field object's label, the 
+  Label widget and containing Row Column widget will not be created. In summary:
+
+    AppBuilder object		Motif widgets used/created
+    -----------------		--------------------------
+    Text Field (with label)	Row Column + Label + TextField
+    Text Field (no label)	TextField
+
+  Because the AppBuilder object hierarchy is different from the Motif widget 
+  hierarchy, some transformation is required when UIL export or import is done.
+  In the current design, AppBuilder defines its UIL support as providing a
+  functionally equivalent hierarchy. The transformation will only try 
+  to map the Motif widgets to the closest AppBuilder object (and vice versa).   
+  Some things like positions, layout, attachments, and connections/callbacks may 
+  not be retained after the transformation is done. Therefore, the user is 
+  expected to perform some amount of work after a UIL import or export operation 
+  is executed.
+
+  For example, if a Label widget and a Text Field widget are UIL imported they
+  will be converted to an AppBuilder Label object and an AppBuilder Text Field
+  object which does not contain a label. The import process does not assume that
+  the Label widget and the Text Field widget should be optimized into a single
+  AppBuilder Text Field object with a label. The optimization of the object
+  hierarchy is left up to the user.
+
+o Exporting: AppBuilder Functionality not supported in UIL
+
+  There a number of AppBuilder project components which do not map
+  directly to UIL source and will therefore be dropped in the exported
+  UIL files.  These include:
+  
+  - Certain Connection types: "Create" callbacks, "Prefefined" actions
+  - Object On-line Help properties
+  - Object Drag & Drop properties
+  - Message Objects
+  - Application Framework properties
+
+o Exporting: Long Object Names 
+
+  When a module is exported as UIL, AppBuilder object names can become longer
+  than UIL allows.  UIL does not allow names to exceed 31 characters. AppBuilder
+  does not have such a limit. On UIL export, the full object names are output to
+  preserve the naming conventions of the module. For now, it is up to the user
+  to shorten those names that exceed 31 characters.
+
+o Importing: UIL Module Structure 
+
+  When importing a UIL module into AppBuilder, it must be self-contained.
+  Syntactically it is possible to write an interface definition in UIL that
+  spans multiple UIL modules. But, semantically such a module would not fit into
+  AppBuilder's import model. AppBuilder's currently allows importing one UIL
+  module at a time. This imposes the requirement that the module be completely
+  defined within the file being imported. UIL's 'exported' and 'imported'
+  storage specifiers should not be used within the module to reference widgets
+  outside of the imported module. Also, other UIL modules should not be included
+  into the imported module via the 'include' directive.
+
+  Just as every AppBuilder module contains at least one window, so must any
+  imported UIL module. All of the objects defined in a UIL module must have a
+  window to sit on. 
+  
+o Known Bugs
+1189650   uil import and export problems
+There are several problems that occur when importing or exporting a module
+as UIL from AppBuilder:
+
+Connection to/from callback conversions are not performed by UIL
+import/export. It is left up to the user to determine and enter them.
+
+Importing a UIL module, the default action taken by AppBuilder when an
+attribute is not understood is to destroy the object the attribute is being
+applied on. This is incorrect. It should be to print an error message and
+ignore the attribute. Thus, preserving the object in the resulting object
+hierarchy.
+
+Importing a UIL module that does not have a containing window causes
+a core dump.
+
+Exporting a module as UIL also has several problems the user will need to
+work through before the exported UIL code can be compiled via the UIL
+compiler. Some examples are: object names equal to UIL reserved words,
+XmNslidingMode not a valid UIL argument for XmScale, XmNentryClass argument
+defined as a string when it should be a class_rec_name.
+
+
+==============================================================================
+
+o Known Bugs
+1189650   uil import and export failing on basic cases
+  Importing the O'Reilly ch22/hello_world.uil example resulted in only
+  the main window being read in.
+
+  Importing the O'Reilly ch24/first.uil example caused dtbuilder to
+  core dump.
+
+  Exporting brws.bil, then importing the generated uil failed.
+
+1209524   UIL Import:On error default=destroy obj. Should be ignore attr
+While importing a UIL module, the default action taken by AppBuilder
+when an attribute is not understood is to destroy the object the
+attribute is being applied on. This is incorrect. The default should be
+to print an error message and ignore the attribute. Thus, preserving
+the object in the resulting object hierarchy.
+
+For example: If a XmPushButton has a certain font associated with it
+but that font can not be found, the current action taken is to omit the
+button from the resulting object hierarchy. It would be better to have
+the button in the resulting object hierarchy without the font, than to
+not have it in the hierarchy at all.
+
+1209541   UIL Import:Modules w/o a containing window cause SEGV
+Performing a UIL import on a module that does not have a containing
+window causes dtbuilder to SEGV.
+
+    signal SEGV (no mapping at the fault address) in obj_is_virtual at line
+    82 in file "/opt/ws/ab/cdesrc/cde1/dtappbuilder/src/libABobj/obj_isa.c"
+
+1209543   UIL Import:SEGV in arguments_into_ab_widget corrupt pointer
+    signal SEGV (no mapping at the fault address) in
+    arguments_into_ab_widget at line 696 in file
+    "/opt/ws/ab/cdesrc/cde1/dtappbuilder/src/libABil/abuil_load.c"
+
+1209547   UIL Import/Export: connection/callback conversion not implemented
+In dtbuilder's UIL import/export functionality connection/callback
+conversions are not performed. It is left up to the user to determine
+and enter them.
+
+1209554   UIL Export:AppBuilder object names can = UIL reserved words
+When performing a UIL Export, AppBuilder object names can be equal to
+UIL reserved words.
+
+Example: list
+
+1209558   UIL Export:List item syntax incorrect
+UIL exporting a module that contains list items will result in code
+that can not be compiled via the UIL compiler. The list items are
+exported in a controls declaration. They should be exported in the
+arguments declaration.
+
+    uil -I/usr/dt/include -I/usr/openwin/include TM_VisObjects.uil
+
+	        (nil) list_itemA_item;
+	        *
+    Error: unexpected LEFT_PAREN token seen - parsing resumes after ";"
+		 line: 815  file: TM_VisObjects.uil
+
+The workaround is to manually rework the exported code, moving the
+items into the arguments declaration as below:
+
+
+    Code exported:
+
+    object
+    list_list:XmList {
+        arguments {
+            XmNscrollBarDisplayPolicy = XmAUTOMATIC ;
+            XmNlistSizePolicy = XmCONSTANT ;
+            XmNselectionPolicy = XmBROWSE_SELECT ;
+            XmNvisibleItemCount = 4 ;
+            };
+        controls {
+            (nil) list_itemA_item;
+            (nil) list_itemB_item;
+            };
+        callbacks {
+            /* unimplemented */
+            };
+    };
+
+
+    Should be:
+
+    object
+    list_list:XmList {
+        arguments {
+            XmNscrollBarDisplayPolicy = XmAUTOMATIC ;
+            XmNlistSizePolicy = XmCONSTANT ;
+            XmNselectionPolicy = XmBROWSE_SELECT ;
+            XmNvisibleItemCount = 4 ;
+            XmNitems = string_table ("itemA", "itemB");
+    	    XmNselectedItems = string_table ("itemA");
+            };
+        callbacks {
+            /* unimplemented */
+            };
+    };
+
+    Note: "itemA" is list_itemA_item's label and "ItemB" is
+           list_itemB_item's label.
+
+1209560   UIL Export:Build mode status areas not removed before export
+When exporting a module from dtbuilder as UIL, the build mode status
+areas are not removed before the export. This causes a UIL compile
+error:
+
+    uil -I/usr/dt/include -I/usr/openwin/include TM_VisObjects.uil
+
+	        XmForm dialog_status_area;
+	               *
+    Error: XmForm dialog_status_area was never defined
+		 line: 63  file: TM_VisObjects.uil
+
+The workaround is to edit the resulting uil file and remove the
+reference to the status area.
+
+1209587   UIL Export:XmNslidingMode not a valid UIL argument scales/gauges
+When exporting a module as UIL that contains a Scale or Gauge,
+XmNslidingMode is output as one of the arguments. This is not a valid UIL
+argument for the XmScale widget.
+
+Ex: 
+
+    uil -I/usr/dt/include -I/usr/openwin/include TM_VisObjects.uil
+
+	        XmNslidingMode = false ;
+	        *
+    Error: value XmNslidingMode was never defined
+		 line: 1502  file: TM_VisObjects.uil
+
+
+Workaround:
+
+Comment out or remove the line containing XmNslidingMode in the
+exported UIL module.
+
+Code exported:
+
+	object
+	gauge_scale:XmScale {
+	    arguments {
+		XmNshowValue = false ;
+	!	XmNvalue = currently unsupported
+		XmNdecimalPoints = 0 ;
+		XmNscaleMultiple = 1 ;
+		XmNmaximum = 100 ;
+		XmNminimum = 0 ;
+		XmNprocessingDirection = XmMAX_ON_RIGHT ;
+		XmNorientation = XmHORIZONTAL ;
+	        XmNslidingMode = true ;
+		XmNheight = 19 ;
+		XmNwidth = 90 ;
+		};
+	    callbacks {
+		/* unimplemented */
+		};
+	};
+
+
+Fixed code:
+
+	object
+	gauge_scale:XmScale {
+	    arguments {
+		XmNshowValue = false ;
+	!	XmNvalue = currently unsupported
+		XmNdecimalPoints = 0 ;
+		XmNscaleMultiple = 1 ;
+		XmNmaximum = 100 ;
+		XmNminimum = 0 ;
+		XmNprocessingDirection = XmMAX_ON_RIGHT ;
+		XmNorientation = XmHORIZONTAL ;
+		XmNheight = 19 ;
+		XmNwidth = 90 ;
+		};
+	    callbacks {
+		/* unimplemented */
+		};
+	};
+
+1209590   UIL Export:XmNentryClass syntax incorrect for choice rowcolumn
+When exporting as UIL a module that contains a choice object, the
+syntax for the XmNentryClass argument of the choice's XmRowColumn is
+incorrect. The argument is exported as a string when it should be a
+class_rec_name.
+
+~/ab/test/TM_VisObjects
+
+    uil -I/usr/dt/include -I/usr/openwin/include TM_VisObjects.uil
+
+	        XmNentryClass = "xmToggleButtonWidgetClass" ;
+	        *
+    Error: found string value when expecting class_rec_name value
+		 line: 446  file: TM_VisObjects.uil
+
+Workaround: Change the argument in the code to use a class_rec_name(). ie:
+
+    This:
+    	XmNentryClass = "xmToggleButtonWidgetClass" ;
+
+    should be:
+    	XmNentryClass = class_rec_name ("xmToggleButtonWidgetClass") ;
+
+1209591   UIL Export:scrollBarDisplayPolicy on XmList not XmScrolledWindow
+When exporting a module as UIL that contains a list, the
+XmNscrollBarDisplayPolicy argument is incorrectly placed on the XmList.
+It should be placed on the XmList's parent, the XmScrolledWindow.
+
+~/ab/test/TM_VisObjects
+
+    uil -I/usr/dt/include -I/usr/openwin/include TM_VisObjects.uil
+
+	        XmNscrollBarDisplayPolicy = XmAUTOMATIC ;
+	                                                *
+    Warning: the XmNscrollBarDisplayPolicy argument is not supported for the
+             XmList object 
+		 line: 809  file: TM_VisObjects.uil
+
+Workaround:
+
+In the exported UIL code, move the XmNscrollBarDisplayPolicy argument
+from the XmList to its parent, a XmScrolledWindow.
+
+1209594   UIL Export:Unsupported arguments exported for textpanes
+When exporting a module as UIL that contains a textpane,
+XmNscrollVertical and XmNscrollHorizontal arguments are incorrectly
+exported. These are not supported for the XmText object. Since the
+XmText object is placed inside a XmScrolledWindow object, these
+resources are not needed.  They will be automatically forced to False
+by the XmScrolledWindow when the XmScrolledWindow's XmNscrollingPolicy
+is set to XmAUTOMATIC.
+
+
+~/ab/test/TM_VisObjects
+
+	        XmNscrollVertical = true ;
+	                                 *
+    Warning: the XmNscrollVertical argument is not supported for the
+    XmText object
+		 line: 899  file: TM_VisObjects.uil
+
+	        XmNscrollHorizontal = false ;
+	                                    *
+    Warning: the XmNscrollHorizontal argument is not supported for the
+    XmText object
+		 line: 898  file: TM_VisObjects.uil
+
+Workaround: From the exported UIL module, remove the XmNscrollVertical and XmNscrollHorizontal argument lines from the textpane's definition.
+
+object
+textpane:XmScrolledWindow {
+    arguments {
+        XmNbottomAttachment = XmATTACH_NONE ;
+        XmNrightAttachment = XmATTACH_NONE ;
+        XmNleftOffset = 266 ;
+        XmNleftAttachment = XmATTACH_FORM ;
+        XmNtopOffset = 533 ;
+        XmNtopAttachment = XmATTACH_FORM ;
+        XmNscrollBarDisplayPolicy = XmAUTOMATIC ;
+        XmNvisualPolicy = XmVARIABLE ;
+        XmNscrollingPolicy = XmAPPLICATION_DEFINED ;
+        XmNy = 533 ;
+        XmNx = 266 ;
+        };
+    controls {
+        XmText textpane_pane;
+        };
+    callbacks {
+        /* unimplemented */
+        };
+};
+
+object
+textpane_pane:XmText {
+    arguments {
+	XmNscrollHorizontal = false ;	<===== remove this line
+	XmNscrollVertical = true ;	<===== remove this line
+        XmNwordWrap = true ;
+        XmNeditMode = XmMULTI_LINE_EDIT ;
+        XmNcolumns = 8 ;
+        XmNrows = 4 ;
+        XmNcursorPositionVisible = true ;
+        XmNeditable = true ;
+        };
+    callbacks {
+        /* unimplemented */
+        };
+};
+
+1209596   UIL Export:Object names can exceed UILs 31 char limit
+When exporting a module as UIL, it is possible for AppBuilder object
+names to exceed the 31 character limit imposed by the UIL compiler.
+Each such occurance  will cause a UIL compiler error. 
+
+A scheme of shortening the names perserving the module naming
+convensions needs to be created. The overhead of shortening the names
+could become a non-trivial task in a large application.
+
+Ex:
+
+~/ab/test/TM_Visible
+
+    uil -I/usr/dt/include -I/usr/openwin/include TM_Visible.uil
+
+	        XmForm visible_objects_custdialog_button_group;
+	               *
+    Error: name exceeds 31 characters - truncated to: visible_objects_custdialog_button_
+		 line: 875  file: TM_Visible.uil
+
+1209598   UIL Import:Purify errors
+Purify errors recieved while importing a module as UIL.

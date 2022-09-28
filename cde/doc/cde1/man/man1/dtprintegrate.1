@@ -1,0 +1,160 @@
+.\"----------------------------------------------------------------------------
+.\"----------------------------------------------------------------------------
+.TH dtprintegrate 1X "13 May 1994"
+.BH "13 May -1994"
+.de V1
+\fBdtprintegrate\fR
+..
+.\"---
+.\"----------------------------------------------------------------------------
+.SH NAME
+dtprintegrate \- integrate a printer into the desktop
+.\"----------------------------------------------------------------------------
+.SH SYNOPSIS
+.V1
+\fR[\fB-d\fI destination\fR] 
+\fR[\fB-i\fI icon_name\fR] 
+\fR[\fB-h\fI help_text \fB|\fR \fB-f\fR \fIhelp_file\fR] 
+\fR[\fB-r\fR] 
+\fR[\fB-u\fR] 
+\fR[\fB-v\fR] 
+\fR\fIprinter_name\fR
+.SH DESCRIPTION
+The 
+.V1
+utility, run at printer installation time, accepts
+a small number of parameters and creates the appropriate desktop configuration
+files for easy user access.  
+.PP
+After the system administrator has run \fBdtprintegrate\fR, the end user
+will see an icon for the new printer in the \f(CWPrinters\fR
+container, part of
+the Application Manager.  By dropping a file on this printer icon, the
+user invokes the \f(CWPrint\fR action for that filetype, with the 
+\f(CWLPDEST\fR destination set appropriately.  
+By double-clicking the printer icon, the
+user invokes the \f(CWPrintManager\fR action for that printer.
+.PP
+Because it writes in system configuration directories by default, 
+.V1 
+is usually
+run at a privileged level.
+.SH OPTIONS
+.TP
+\fB-d \fIdestination\fR
+Specifies the printer destination as known to the print spooler (if 
+different from the \fIprinter_name\fR).
+.TP
+\fB-i \fIicon_name\fR
+Include the icon file name to represent the printer on the desktop.
+The \fIicon_name\fR may consist of just the basename (\fIe.g.\fR,
+\f(CWlaser3\fR) or a complete file name (\fIe.g.\fR, \f(CWlaser3.l.pm\fR).
+The directories listed in the \f(CWDTPRINTICONPATH\fR environment variable
+will be searched for icons matching the basename. Any found will
+be copied to the \f(CWDTPRINTERICONFOLDER\fR subdirectory.  (See the
+\fIENVIRONMENT\fR section below.)
+If an icon cannot be found on the search path
+a warning message will be issued and the default printer icon will be
+used.
+.TP
+\fB-h\fR \fIhelp_text\fR
+Specifies the \fIhelp_text\fR to be displayed when the user invokes help
+on the printer icon, typically by pressing function key 1 when the
+printer icon is selected.
+.TP
+\fB-f\fR \fIhelp_file\fR
+Read the contents of the entire \fIhelp_file\fR into the descriptive 
+help for the printer. 
+.TP
+\fB-r\fR
+Forces the action database to be reloaded.  Normally, the actionbase
+is reloaded only when the printer is integrated on the local desktop
+host.  This option is useful when adding a printer by means of an
+X station.
+.TP
+\fB-u\fR
+Causes the named printer to be \fIun\fR-integrated.  That is, its
+desktop configuration files will be removed from the configured
+locations on the session server.
+.TP
+\fB-v\fR 
+Causes the utility to print a log of its actions.
+By default, the command operates silently.
+.TP
+\fIprinter_name\fR
+Names the printer as it will be presented to the end user.  By default, also 
+names the printer as it is known to the lp print spooler.
+.SH RETURN VALUES
+.TP 15
+0
+Command completed sucessfully.
+.TP 15
+1
+Command completed unsucessfully due to a usage error.
+.TP 15
+2
+Command completed unsucessfully due to a configuration file creation
+error.
+.SH ENVIRONMENT
+.LP
+.TP 15
+.SM DTPRINTERFOLDER
+Causes the 
+.V1
+command to install the Printer
+action file in the specified subdirectory.
+Default value is \f(CW/etc/dt/appconfig/appmanager/C/Printers\fR, where
+it will be presented under the \f(CWPrinters\fR container of
+the Application Manager.
+.TP 15
+.SM DTPRINTACTIONFOLDER
+Causes the
+.V1 
+command to install the Printer
+action definition file (\f(CW*.dt\fR) 
+in the specified subdirectory.
+Default value is \f(CW/etc/dt/appconfig/types/C\fR.
+.TP 15
+.SM DTPRINTICONPATH
+Sets the path to search for icon images.  The path may consist of a
+comma-separated list of subdirectories.
+Default value is \f(CW.,$HOME/.dt/icons,/usr/dt/appconfig/icons/C\fR.
+.TP 15
+.SM DTPRINTERICONFOLDER
+Specifies the subdirectory where printer icons should be installed for
+the desktop.  Default value is \f(CW/etc/dt/appconfig/icons/C\fR.
+.TP 15
+.SM LPDEST
+Set in the \f(CWPrint\fR action
+by
+.V1
+to specify the printer.  It is honored
+by the lp print spooling subsystem and by most applications.
+It is set to the \fIprinter_name\fR as specified on the command line.
+.SH FILES
+.PD 0
+.TP 20
+\fB/usr/dt/appconfig/appmanager/C/Printers\fR
+The default location for printer action files shipped from the factory.
+.TP 20
+\fB/etc/dt/appconfig/appmanager/C/Printers\fR
+The default location for configured printer action files.
+.PD
+.SH "SEE ALSO"
+.BR dtappgather (1X).
+.SH DIAGNOSTICS
+.TP 20
+.B Unable to create the file "<name>" under subdirectory "<name>"
+The command probably did not have write privileges to install the
+named configuration file in the named subdirectory.
+.SH NOTES
+.LP
+The \f(CWPrint\fR action is mapped to the appropriate execution string.
+For application-specific files (\fIe.g.\fR, a file having an
+application-defined \f(CW*.art\fR suffix), the \f(CWPrint\fR action
+may map to a command to invoke the application with a \f(CW-print\fR
+parameter and with the \f(CWLPDEST\fR environment variable set to the
+printer name.   Files that have no predefined \f(CWPrint\fR action mappings will
+be assumed to be ASCII text files whose \f(CWPrint\fR action is an
+invocation of the \fBlp\fR spooler for the chosen printer.
+.\""""""""""""""

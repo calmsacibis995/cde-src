@@ -1,0 +1,126 @@
+#!/usr/bin/ksh
+
+if (($# > 0))
+then
+	packages="$*"
+else
+	packages="SUNWspl SUNWcaspl SUNWdespl SUNWesspl SUNWfrspl SUNWitspl SUNWsvspl"
+fi
+
+if test "${CDE_PACK_VER}" = ""
+then
+        CDE_PACK_VER=10
+        export CDE_PACK_VER
+fi
+
+if test "${CDE_PACK_DATE}" = ""
+then
+        CDE_PACK_DATE=`date '+%y.%m.%d'`
+        export CDE_PACK_DATE
+fi
+
+echo Making $packages
+
+for i in $packages
+do
+	if test $i = SUNWspl
+	then
+
+	        cd ${i}
+                sccs get pkginfo.${i}
+                chmod 666 pkginfo.${i}
+                sed s/REV=/REV=${CDE_PACK_VER}.${CDE_PACK_DATE}/ pkginfo.${i} > pkginfo.${i}.tmp
+                mv pkginfo.${i}.tmp pkginfo.${i}
+                chmod 444 pkginfo.${i}
+                pkgmk -a ${BUILD_ARCH} \
+                -b ${BUILD_TREE}/ \
+                -o -d ${CDE_PACK_DIR}/ -f ./prototype.${i}
+                cd ..
+
+# REMOVE, per Jean Cunnington
+#	elif test $i = SUNWcaspl
+#	then
+#	
+#		cd ${i}
+#               sccs get pkginfo.${i}
+#		chmod 666 pkginfo.${i}
+#		sed s/REV=/REV=${CDE_PACK_VER}.${CDE_PACK_DATE}/ pkginfo.${i} > pkginfo.${i}.tmp
+#		mv pkginfo.${i}.tmp pkginfo.${i}
+#		chmod 444 pkginfo.${i}
+#		pkgmk -a ${BUILD_ARCH} \
+#		-b ${BUILD_TREE}/ \
+#		-o -d ${CDE_PACK_DIR}/ -f ./prototype.${i}
+#		cd ..
+
+	elif test $i = SUNWdespl
+	then
+	
+                cd ${i}
+                sccs get pkginfo.${i}
+                chmod 666 pkginfo.${i}
+                sed s/REV=/REV=${CDE_PACK_VER}.${CDE_PACK_DATE}/ pkginfo.${i} > pkginfo.${i}.tmp
+                mv pkginfo.${i}.tmp pkginfo.${i}
+                chmod 444 pkginfo.${i}
+                pkgmk -a ${BUILD_ARCH} \
+                -b ${BUILD_TREE}/ \
+                -o -d ${CDE_PACK_DIR}/ -f ./prototype.${i}
+                cd ..
+
+	elif test $i = SUNWesspl
+	then
+	
+                cd ${i}
+                sccs get pkginfo.${i}
+                chmod 666 pkginfo.${i}
+                sed s/REV=/REV=${CDE_PACK_VER}.${CDE_PACK_DATE}/ pkginfo.${i} > pkginfo.${i}.tmp
+                mv pkginfo.${i}.tmp pkginfo.${i}
+                chmod 444 pkginfo.${i}
+                pkgmk -a ${BUILD_ARCH} \
+                -b ${BUILD_TREE}/ \
+                -o -d ${CDE_PACK_DIR}/ -f ./prototype.${i}
+                cd ..
+
+	elif test $i = SUNWfrspl
+	then
+	
+                cd ${i}
+                sccs get pkginfo.${i}
+                chmod 666 pkginfo.${i}
+                sed s/REV=/REV=${CDE_PACK_VER}.${CDE_PACK_DATE}/ pkginfo.${i} > pkginfo.${i}.tmp
+                mv pkginfo.${i}.tmp pkginfo.${i}
+                chmod 444 pkginfo.${i}
+                pkgmk -a ${BUILD_ARCH} \
+                -b ${BUILD_TREE}/ \
+                -o -d ${CDE_PACK_DIR}/ -f ./prototype.${i}
+                cd ..
+
+	elif test $i = SUNWitspl
+	then
+	
+                cd ${i}
+                sccs get pkginfo.${i}
+                chmod 666 pkginfo.${i}
+                sed s/REV=/REV=${CDE_PACK_VER}.${CDE_PACK_DATE}/ pkginfo.${i} > pkginfo.${i}.tmp
+                mv pkginfo.${i}.tmp pkginfo.${i}
+                chmod 444 pkginfo.${i}
+                pkgmk -a ${BUILD_ARCH} \
+                -b ${BUILD_TREE}/ \
+                -o -d ${CDE_PACK_DIR}/ -f ./prototype.${i}
+                cd ..
+
+	elif test $i = SUNWsvspl
+	then
+	
+                cd ${i}
+                sccs get pkginfo.${i}
+                chmod 666 pkginfo.${i}
+                sed s/REV=/REV=${CDE_PACK_VER}.${CDE_PACK_DATE}/ pkginfo.${i} > pkginfo.${i}.tmp
+                mv pkginfo.${i}.tmp pkginfo.${i}
+                chmod 444 pkginfo.${i}
+                pkgmk -a ${BUILD_ARCH} \
+                -b ${BUILD_TREE}/ \
+                -o -d ${CDE_PACK_DIR}/ -f ./prototype.${i}
+                cd ..
+
+	fi
+done

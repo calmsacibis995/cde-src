@@ -1,0 +1,649 @@
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994 Novell, Inc.
+.\" *************************************************************************
+.\"--- The above copyrights must appear at the top of each man page.
+.\"---
+.\"--- ********  THIS IS THE SECTION 1 MAN PAGE TEMPLATE/STYLE GUIDE  *******
+.\"---
+.\"--- Naming conventions:
+.\"--- The title of the page name starts with dt (except ToolTalk and Motif).
+.\"--- The section number is 1 or 1m if appropriate (except ToolTalk and Motif).
+.\"--- The Sample Implementation man page file is the complete title
+.\"--- without truncation or abbreviation, plus the .1 or .1m extension.
+.\"--- The common source (X/Open and Sample Implementation) man page file name
+.\"--- is the complete title without truncation or abbreviation, plus the 
+.\"--- .1xo extension.
+.\"--- As the man pages are converted to the common source, the .1 files are
+.\"--- replaced by .1xo files, and the .1 files are generated at build time.
+.\"--- 
+.\"--- 
+.\"--- Substitute the appropriate text for items beginning and ending with `_'
+.\"--- (for example, _title_ and _name_). \-option_ items begin with
+.\"--- `\-' (minus) and end with `_'.  Do not delete the `\-' characters.
+.\"--- Be sure to use upper or lower case as indicated for each item.
+.\"--- 
+.\"--- 
+.\"--- GUI documentation:
+.\"--- The graphical user interfaces (menus, dialogs, etc.) are not 
+.\"--- documentated in section 1 man pages.  A reference to the appropriate 
+.\"--- on-line help volume is included instead.
+.\"--- 
+.\"---
+.\"--- Use Cde whenever you want CDE.  The scripts will then pick up the
+.\"--- correct trademark name for the X/Open version and use CDE for the man
+.\"--- page.
+.\"--- 
+.\"--- Always spell out standard input, output, and error.
+.\"--- 
+.\"--- Never use "print" unless you are describing literal printing 
+.\"--- operations; use "write to standard output [error]."
+.\"--- 
+.\"--- Be careful not to say "character" when you mean "byte."
+.\"--- 
+.\"--- Never change the case of a symbol such as a function name.  If it
+.\"--- starts lowercase, you cannot start a sentence with it.
+.\"--- 
+.\"--- Do not use the second person form of address or imperatives when
+.\"--- referring to the reader or application.
+.\"--- 
+.\"--- Avoid passive voice.
+.\"--- 
+.\"--- Call utilities utilities, not commands.  
+.\"--- 
+.\"--- *******
+.\"--- *** Question for Hal *** The CDE specs distinguish between utilities 
+.\"--- (no GUI) and clients (GUI).  Should both of these be referred to
+.\"---  as utilities for X/Open?
+.\"--- *******
+.\"--- 
+.\"--- Utilities appear in italics.
+.\"--- Use the following macro with a second argument for the section number.
+.\"--- For example:   .Cm tt_session 1
+.\"--- There is no section number for same page usage.
+.\"--- If no information is appropriate under a heading, say None or Not used.
+.\"--- 
+.\"--- Variable list example:
+.\"--- .VL 12
+.\"--- .LI foo
+.\"--- text text text
+.\"--- .LI averylongtagneedsabreak
+.\"--- .br
+.\"--- text text text
+.\"--- .Lc R_OK
+.\"--- text text text
+.\"--- .LE
+.\"--- 
+.\"--- Bulleted list example:
+.\"--- .VL 3
+.\"--- .LI \(bu
+.\"--- text text text
+.\"--- .LI \(bu
+.\"--- text text text
+.\"--- .LE
+.\"--- 
+.\"--- Environment variables example:
+.\"--- Use italics and all uppercase. Do not prefix with a $ in regular text,
+.\"--- (only shell script examples)
+.\"--- .I SHELL
+.\"--- .IR LC_MESSAGES
+.\"--- .LI \f2LANG\fP  [.VL list version]
+.\"--- 
+.\"--- Pathnames example:
+.\"--- Use bold font
+.\"--- .B /etc/passwd
+.\"--- .BR \&.profile    [note the \& to protect leading dot]
+.\"--- .LI \f3/tmp\fP
+.\"--- 
+.\"--- Utility options in SYNOPSIS example:
+.\"--- .SH SYNOPSIS
+.\"--- .yS
+.\"--- ttsession
+.\"--- [\-hNpsStv]
+.\"--- [\-E|\-X]
+.\"--- [\-a\ \f2level\fP]
+.\"--- [\-d\ \f2display\fP]
+.\"--- [\-c\ [\f2command\fP]]
+.\"--- .yE
+.\"---
+.\"--- Utility options in TEXT example (bold for X/Open; use \- for minus):
+.\"--- .B \-x
+.\"--- .BR \-y ;
+.\"--- .BI \-f " makefile"   [note space]
+.\"--- \f3\(mif\ \fPmakefile\fP   [version of previous if you're breaking
+.\"---				    across two lines]
+.\"--- .LI \f3\-a\0\f2level\f1 [.VL version; note usage of \0 as an internal
+.\"--- 					space and the return to font 1]
+.\"---
+.\"--- 
+.\"--- 
+.\"--- *** Typographical Conventions
+.\"--- 
+.\"--- Use the following to denote different fonts: italic = \f2, bold = \f3
+.\"--- regular font = \f1.  These are used in the common source and are 
+.\"--- translated by the sed scripts into the appropriate font needed for X/Open 
+.\"--- or the SI.
+.\"---
+.\"--- Bold font is used for options and commands, filenames, keywords and 
+.\"--- typenames.  It is also used to identify brackets surrounding optional 
+.\"--- items in syntax, [ ].
+.\"---
+.\"--- Italic strings are used for emphasis or to identify the first instance
+.\"--- of a word requiring definition.  Italic also denotes: variable names, 
+.\"--- which are also shown in capitals; commands or utilities; external 
+.\"--- variables; X Window System widgets; functions - all these are shown as
+.\"--- follows: \f2name\fP(), name without parentheses are either external
+.\"--- variables or function family names.
+.\"---
+.\"--- Regular font is used for the names of constants and literals.
+.\"---
+.\"--- The notation <file.h> indicates a header file.
+.\"--- 
+.\"--- Names surrounded by braces, for example, {ARG_MAX}, represent symbolic
+.\"--- limits or configuration values that may be declared in appropriate
+.\"--- headers by means of the C #define construct.
+.\"---
+.\"--- Ellipses, . . . , are used to show that additional arguments are
+.\"--- optional.
+.\"--- 
+.\"--- Syntax and code examples are shown in fixed-width font.  Brackets 
+.\"--- shown in this font, [ ], are part of the syntax and do not indicate
+.\"--- optional items.
+.\"---
+.\"--- Variables within syntax statements are shown in italic fixed-width font.
+.\"---
+.\"--- ***Headings for Section 1 man pages
+.\"---
+.\"--- Use the headings in the list below for Section 1 man pages in the order
+.\"--- listed.  Use only these listed main headings.  List each heading even 
+.\"--- if no information is appropriate; if no information is appropriate, say
+.\"--- "None" or "Not used."
+.\"--- 
+.\"--- Headings use uppercase and are marked with the .SH macro.
+.\"--- If the heading is more than one word, you must put the entire heading
+.\"--- between quotes.
+.\"--- 
+.\"--- You may use headings other than those in the list when 
+.\"--- they help you organize the page; headings other than those in the list
+.\"--- are subordinate to the listed main headings. Place subordinate 
+.\"--- headings under the appropriate main heading.
+.\"--- Use the .HU macro for subordinate headings.
+.\"--- 
+.\"--- There should be only one utility per man page.
+.\"--- 
+.\"--- REQUIRED Headings for Section 1 man pages:
+.\"--- NAME, SYNOPSIS, DESCRIPTION, OPTIONS, OPERANDS, RESOURCES, 
+.\"--- CAPABILITIES, STDIN, "INPUT FILES", "ENVIRONMENT VARIABLES",
+.\"--- "ASYNCHRONOUS EVENTS", STDOUT, STDERR, "OUTPUT FILES",
+.\"--- "EXTENDED DESCRIPTION", "EXIT STATUS", "CONSEQUENCES OF ERRORS",
+.\"--- "APPLICATION USAGE", EXAMPLES, "SEE ALSO"
+.\"--- 
+.\"--- -------------------------------------------------------------------------
+.\"--- .TH Macro
+.\"--- The .TH macro specifies information that applies to the man page as
+.\"--- a whole.
+.\"--- _title_ is the name of the man page.  This should correspond to the
+.\"--- first word under the NAME heading.  _#_ specifies the manual section in 
+.\"--- which the page appears, where # is the number of the section.
+.\"---
+.\"--- .TH _title _#_ 
+.\"---
+.\"----------------------------------------------------------------------------
+.\"--- NAME
+.\"--- Give the name of the entry and briefly state its purpose.
+.\"--- This section is used by cross-referencing programs.  Hence, do not
+.\"--- use any font changes or troff escape sequences in this section.
+.\"--- After the name, use one space, a backslash minus \-, and then another space
+.\"--  before the summary.  
+.\"--- Do not start the summary sentence with a capital letter or use
+.\"--- any punctuation at the end.
+.\"--- The summary line must be on one line (it can wrap). The reason for this
+.\"--- is that some man page implementations build an index of man page values
+.\"--- by reading through and getting the single line that follows the .SH NAME
+.\"--- line.  The line doesn't have to fit on a terminal screen, but there
+.\"--- can be only one physical new line on the line.
+.\"--- Make the summary a simple declarative sentence. 
+.\"--- 
+.\"--- NAME example:
+.\"--- 
+.\"--- ttsession \- the ToolTalk message server
+.\"--- or:
+.\"--- dtgather \- gather application files for presentation by the Application Manager
+.\"---
+.SH Name
+_name_ \- _summary-line_
+.\"---
+.\"----------------------------------------------------------------------------
+.\"--- SYNOPSIS
+.\"--- This section summarizes the syntax of the calling sequence for the
+.\"--- utility, including options, option-arguments and operands.
+.\"--- 
+.\"--- Begin the synopsis with the .yS macro and end the synopsis with the
+.\"--- .yE macro.
+.\"--- 
+.\"--- Use backslash minus \- for minus.
+.\"--- 
+.\"--- List single letters first in a group.
+.\"--- 
+.\"--- Code as in the following example; the conversion scripts do the rest.
+.\"--- 
+.\"--- Utility options in SYNOPSIS example:
+.\"--- 
+.\"--- .SH SYNOPSIS
+.\"--- .yS
+.\"--- ttsession
+.\"--- [\-hNpsStv]
+.\"--- [\-E|\-X]
+.\"--- [\-a\ \f2level\fP]
+.\"--- [\-d\ \f2display\fP]
+.\"--- [\-c\ [\f2command\fP]]
+.\"--- .yE
+.\"---
+.\"--- Utility options in TEXT example (bold for X/Open; use \- for minus):
+.\"--- .B \-x
+.\"--- .BR \-y ;
+.\"--- .BI \-f " makefile"   [note space]
+.\"--- \f3\(mif\ \fPmakefile\fP   [version of previous if you're breaking
+.\"---				    across two lines]
+.\"--- .LI \f3\-a\0\f2level\f1 [.VL version; note usage of \0 as an internal
+.\"--- 					space and the return to font 1]
+.\"---
+.SH SYNOPSIS
+.yS
+_synopsis-syntax-lines_
+.yE
+.\"---
+.\"----------------------------------------------------------------------------
+.\"--- DESCRIPTION
+.\"--- This section describes the actions of the utility. If the utility
+.\"--- has a very complex set of subcommands or its own procedural language,
+.\"--- an EXTENDED DESCRIPTION heading is provided.  Most explanations of
+.\"--- optional functionality are omitted here, as they are usually explained
+.\"--- under the OPTIONS heading.
+.\"--- When specific functions are cited, the underlying operating system
+.\"--- provides equivalent functionality and all side effects associated 
+.\"--- with successful execution of the function.  The treatment of erors and 
+.\"--- intermediate results from the individual functions cited are generally
+.\"--- not specified by this document.  See the utility's EXIT STATUS and
+.\"--- CONSEQUENCES OF ERRORS section for all actions associated with errors
+.\"--- encountered with by the utility.
+.\"---   
+.\"--- When writing, use active voice, never use 2nd person, and make it 
+.\"--- clear who or what the requirements are placed on.
+.\"--- 
+.\"--- DESCRIPTION example:
+.\"--- 
+.\"--- Do not say:  When you are done with this 
+.\"--- implementation object, it should be freed. (Who frees
+.\"--- it, the programmer or the implementation?) 
+.\"--- Do use active voice and say:  When you are done with this implementation
+.\"--- object, you must free it.  Or:  When you are done with this
+.\"--- implementation object, the implementation will free it.
+.\"--- 
+.\"--- Make the utility the grammatical subject
+.\"--- of the first sentence; use a present tense verb to describe the utility;
+.\"--- note that whenever you use the utility name, use the
+.\"--- .Fn request and put it on a single line.  
+.\"--- .Fn gets the correct font and puts in the trailing  
+.\"--- "( )" with the correct spacing.
+.\"---  
+.\"--- DESCRIPTION example:
+.\"--- 
+.\"--- The 
+.\"--- .Fn tt_session
+.\"--- utility is the ToolTalk message server. 
+.\"---
+.SH DESCRIPTION
+The 
+.Fn utility_name 
+utility does something.
+.\"---
+.\"----------------------------------------------------------------------------
+.\"--- OPTIONS
+.\"--- This section describes the utility options and option-arguments, and how
+.\"--- they modify the actions of the utility.
+.\"--- Default behavior:  When this section is listed as "None", it means that
+.\"--- the implementation need not support any options.
+.\"---
+.\"--- OPTIONS example:
+.\"---
+.\"--- .SH OPTIONS
+.\"--- need something here as an example
+.\"--- 
+.SH OPTIONS
+description of options and option-arguments goes here
+.\"---
+.\"----------------------------------------------------------------------------
+.\"--- OPERANDS
+.\"--- This section describes the utility operands, and how they affect the
+.\"--- actions of the utility. 
+.\"--- Default behavior: When this section is listed as "None", it means that 
+.\"--- the implementation need not support any operands.  
+.\"--- 
+.\"--- OPERANDS example:
+.\"--- 
+.\"--- .SH OPERANDS
+.\"--- need some sort of example here
+.\"--- 
+.SH OPERANDS
+description of utility operand goes here.  If no information is appropriate, 
+say None.
+.\"--- 
+.\"----------------------------------------------------------------------------
+.\"--- RESOURCES
+.\"--- This section, which has no corresponding section in the X/Open CAE
+.\"--- Specification, Commands and Utilities, Issue 4, lists the X Window 
+.\"--- System resources that affect the utility operation.
+.\"--- 
+.\"--- RESOURCES example:
+.\"---
+.\"--- .SH RESOURCES
+.\"--- need some sort of example here.
+.\"--- 
+.SH RESOURCES
+list the X Window System resources that affect the utility operation
+.\"----------------------------------------------------------------------------
+.\"--- CAPABILITIES
+.\"--- TBD
+.\"--- 
+.\"--- 
+.\"----------------------------------------------------------------------------
+.\"--- STDIN
+.\"--- This section describes the standard input of the utility.  This section 
+.\"--- is frequently a reference to the following section, as many utilties
+.\"--- treat standard input and input files in the same manner.  Unless
+.\"--- otherwise stated, all restrictions described under the INPUT FILES
+.\"--- heading apply to this section as well.
+.\"--- Default behavior: When this section is listed as "Not used", it means
+.\"--- that the standard input will not be read when the utility is used as
+.\"--- described by this document.
+.\"--- 
+.\"---STDIN example:
+.\"--- 
+.\"--- .SH STDIN
+.\"--- need some example here 
+.\"---
+.SH STDIN
+describe standard input here.  If no information is appropriate, say Not used.
+.\"---
+.\"----------------------------------------------------------------------------
+.\"--- "INPUT FILES"
+.\"--- This section describes the files, other than the standard input, used
+.\"--- as input by the utility.  It includes files named as operands
+.\"--- and option-arguments as well as other files that are referred to, such
+.\"--- as startup and initialization files, databases, etc.  Commonly-used
+.\"--- files are generally described in one place and cross-referenced by other 
+.\"--- utilities.
+.\"--- Default Behavior:  When this section is listed as "None", it means that
+.\"--- no input files are required to be supplied when the utility is used as d
+.\"--- described om this document.
+.\"--- 
+.\"--- INPUT FILES example:
+.\"---
+.\"--- "INPUT FILES"
+.\"--- need an example here
+.\"--- 
+.SH "INPUT FILES"
+description of files, other than standard input, used by utility, goes here.  
+If no information is appropriate, say None.
+.\"----------------------------------------------------------------------------
+.\"--- "ENVIRONMENT VARIABLES"
+.\"--- This section lists what variables affect the utility's execution.
+.\"--- Default Behavior:  When this section is listed as "None", it means that the
+.\"--- behavior of the utility is not directly affected by environment variables
+.\"--- described by this document when the utility is used as described in this 
+.\"--- document.
+.\"--- 
+.\"--- ENVIRONMENT VARIABLES example:
+.\"---
+.\"--- .SH "ENVIRONMENT VARIABLES"
+.\"--- need example here
+.\"--- 
+.SH "ENVIRONMENT VARIABLES"
+list variables affecting utility's execution
+.\"--- 
+.\"----------------------------------------------------------------------------
+.\"--- "ASYNCHRONOUS EVENTS"
+.\"--- This section lists how the utility reacts to such events as signals 
+.\"--- and what signals are caught.
+.\"--- 
+.\"--- ASYNCHRONOUS EVENTS example:
+.\"--- 
+.\"--- .SH "ASYCHRONOUS EVENTS"
+.\"--- The
+.\"--- .Cm ttsession
+.\"--- utility reacts to two signals.
+.\"--- If it receives the
+.\"--- .Cn SIGUSR1
+.\"--- signal, it toggles trace mode on or off (see the
+.\"--- .B \-t
+.\"--- option).
+.\"--- If it receives the
+.\"--- .Cn SIGUSR2
+.\"--- signal, it rereads the types file.
+.\"--- The
+.\"---.Cm ttsession
+.\"--- utility takes the standard action for all other signals.
+.\"--- 
+.SH "ASYCHRONOUS EVENTS"
+list how utility reacts to such events as signals and what signals are caught.
+.\"---
+.\"----------------------------------------------------------------------------
+.\"--- "STDOUT"
+.\"--- This section describes the standard output of the utility.
+.\"--- Default Behavior:  When this section is listed as "Not Used", it means 
+.\"--- that the standard output will not be written when the utility is used as
+.\"--- described in this document.
+.\"--- 
+.\"--- STDOUT example:
+.\"---
+.\"--- .SH STDOUT
+.\"--- When the
+.\"--- .B \-v
+.\"--- option is used,
+.\"--- .Cm ttsession
+.\"--- writes the version number in an unspecified format.
+.\"--- When
+.\"--- .B \-p
+.\"--- is used,
+.\"--- .Cm ttsession
+.\"--- writes the name of a new process tree session.
+.\"--- 
+.SH STDOUT
+describe standard output here.  
+.\"---
+.\"----------------------------------------------------------------------------
+.\"--- STDERR
+.\"--- This section describes the standard error output of the utility.  
+.\"--- Only those messages that are purposely sent by the utility are 
+.\"--- described.
+.\"--- Default Behavior:  When this section is listed as "Used only for dagnostic
+.\"--- messages", it means that, unless otherwise stated, the diagnostic messages
+.\"--- are sent to the standard error only when the exit status is non-zero
+.\"--- and the utility is used as described by this document.
+.\"--- When this section is listed as "Not used", it means that the standard 
+.\"--- output will not be written when the utility is used as
+.\"--- described in this document.
+.\"--- 
+.\"--- STDERR example:
+.\"--- 
+.\"--- .SH STDERR
+.\"--- need example here
+.\"--- 
+.SH STDERR
+describe standard error output here
+.\"---
+.\"----------------------------------------------------------------------------
+.\"--- "OUTPUT FILES"
+.\"--- This section describes the files created or modified by the utility.
+.\"--- Default Behavior:  When this section is listed as "None", it means that no 
+.\"--- files are created or modified as a consequence of direct action on the
+.\"--- part of the utility when the utility is used as described by this 
+.\"--- document.  However, the utility may create or modify system files, such
+.\"--- as log files, that are outside the utility's normal execution environment.
+.\"--- 
+.\"---  OUTPUT FILES example:
+.\"---
+.\"--- .SH "OUTPUT FILES"
+.\"--- need example 
+.\"--- 
+.SH "OUTPUT FILES"
+describe the files created or modified by the utility.  If no information is
+appropriate, say None.
+.\"---
+.\"----------------------------------------------------------------------------
+.\"--- "EXTENDED DESCRIPTION"
+.\"--- This section provides a place for describing the actions of very complicated
+.\"--- utilities, such as text editors or language processors, which typically
+.\"--- have elaborate command languages.
+.\"--- Default behavior: When this section is listed as "None", no further 
+.\"--- description is necessary.
+.\"---
+.\"--- EXTENDED DESCRIPTION example:
+.\"--- 
+.\"--- .SH "EXTENDED DESCRIPTION"
+.\"--- need example
+.\"--- 
+.SH "EXTENDED DESCRIPTION"
+describe complicated utilities here.  If no information is appropriate, say
+None.
+.\"---
+.\"----------------------------------------------------------------------------
+.\"--- "EXIT STATUS"
+.\"--- This section describes the values the utility returns to the calling 
+.\"--- program, or shell, and the conditions that cause these
+.\"--- values to be returned.  Usually, utilities return zero for successful
+.\"--- completion and values greater than zero for various error conditions.
+.\"--- If specific numeric values are listed in this section, the system
+.\"--- uses those values for the errors described.  In some cases, status
+.\"--- values are listed more loosely, such as ">0".  A portable application 
+.\"--- cannot rely on any specific value in the range shown and must be 
+.\"--- prepared to receive any value in the range.  For example,
+.\"--- a utility may list zero as a successful return, 1 as a failure for a 
+.\"--- specific reason, and >1 as "an error occurred".  In this case,  
+.\"--- unspecified conditions may cause a 2 or 3, or other value, to be 
+.\"--- returned.  A portable application should be written
+.\"--- so that it tests for successful exit status values (zero in this case),
+.\"--- rather than relying on the single specific error value listed
+.\"--- in this document. In that way, it will have maximum portability,
+.\"--- even on implementations with extensions.  Unspecified error 
+.\"--- conditions may be represented by specific values not listed
+.\"--- in this document.
+.\"---
+.\"--- EXIT STATUS example:
+.\"--- 
+.\"--- .SH "EXIT STATUS"
+.\"--- When the
+.\"--- .B \-c
+.\"--- child process exits,
+.\"--- .Cm ttsession
+.\"--- exits with the status of the exited child.
+.\"--- Otherwise, the following exit values are returned:
+.\"--- .VL 4
+.\"--- .LI 0
+.\"--- Normal termination.
+.\"--- Without the
+.\"--- .B \-c
+.\"--- or
+.\"--- .B \-S
+.\"--- options, a zero exit status means
+.\"--- .Cm ttsession
+.\"--- has successfully forked an instance of itself that has begun
+.\"--- serving the session.
+.\"--- .LI 1
+.\"--- Abnormal termination.
+.\"--- The
+.\"--- .Cm ttsession
+.\"--- utility was given invalid command line options, was interrupted by
+.\"--- .Cn SIGINT ,
+.\"--- or encountered some internal error.
+.\"--- .LI 2
+.\"--- Collision.
+.\"--- Another
+.\"--- .Cm ttsession
+.\"--- was found to be serving the session already.
+.\"--- .LE
+.\"--- 
+.SH "EXIT STATUS"
+describe the values the utility returns to calling program or shell
+.\"---
+.\"----------------------------------------------------------------------------
+.\"--- "CONSEQUENCES OF ERRORS"
+.\"--- This section describes the effects on the environment, files systems, and
+.\"--- so on, when error conditions occur.  It does not describe error messages
+.\"--- produced or exit status values used.
+.\"--- When a utility encounters an error condition, several actions are possible,
+.\"--- depending on the severity of the error and the state of the utility.  
+.\"--- Included in the possible actions of various utilities are: deletion of
+.\"--- temporary intermediate work files; deletion of incomplete files; validity
+.\"--- checking of the file system or directory.
+.\"--- Default behavior:  When this section is listed as "Default", it means that
+.\"--- any changes to the environment are unspecified.
+.\"--- 
+.\"--- CONSEQUENCES OF ERRORS example:
+.\"--- 
+.\"--- .SH "CONSEQUENCES OF ERRORS"
+.\"--- need example here.
+.\"--- 
+.SH "CONSEQUENCES OF ERRORS"
+describe the effects on the environment, files systems, and
+so on, when error conditions occur
+.\"---
+.\"----------------------------------------------------------------------------
+.\"--- "APPLICATION USAGE"
+.\"--- This section gives advice to the application programmer or user about the
+.\"--- way the utility should be used.
+.\"--- 
+.SH "APPLICATION USAGE"
+describe how to use the utility
+.\"---
+.\"----------------------------------------------------------------------------
+.\"--- EXAMPLES
+.\"--- This section gives one or more examples of usage, where appropriate.
+.\"--- 
+.SH EXAMPLES
+give usage examples here.  If no information is appropriate, say None.
+.\"---
+.\"----------------------------------------------------------------------------
+.\"--- "SEE ALSO"
+.\"--- This section lists related entries
+.\"--- 
+.\"--- for example:
+.\"--- 
+.\"--- .SH "SEE ALSO"
+.\"--- .Hd <header_file.h> 5, if needed
+.\"--- .Fn utility_name section number,
+.\"--- .Fn utility_name section number,
+.\"--- .Fn utility_name section number.
+.\"--- 
+.SH "SEE ALSO"
+.Hd header file man page reference 5,
+.Fn reference to a utility_name (include the section number after the utility),
+.Fn reference to another utility_name (include the section number after the 
+utility).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

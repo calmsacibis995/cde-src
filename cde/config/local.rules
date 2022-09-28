@@ -1,0 +1,1442 @@
+/* This file is for local rules that are either not present in
+   Imake.rules are should supersede the rules in Imake.rules.  This file
+   will be included before Imake.rules.
+*/
+
+/* new depend rule to include C++ header files */
+/*
+ * DependTarget - generate rules to compute dependencies for all files listed
+ * in $(SRCS).
+ */
+#if UseCPlusPlus
+#ifndef DependTarget
+#define	DependTarget()							@@\
+DependDependency()							@@\
+									@@\
+depend::								@@\
+	$(DEPEND) $(DEPENDFLAGS) -s "# DO NOT DELETE" -- $(ALL++INCLUDES) $(ALL++DEFINES) $(DEPEND_DEFINES) -- $(SRCS)
+#endif /* DependTarget */
+#endif
+
+/***************** NOTE NEW .c.o .C.o rules ******************/
+/*
+ * CPlusPlusObjectCompile - compile fragment for a normal object file
+ * for .C to .o
+ */
+#ifndef CPlusPlusObjectCompile
+#define CPlusPlusObjectCompile(options) $(RM) $@			@@\
+	$(C++) -c $(C++FLAGS) options $*.C
+#endif
+
+/*
+ * CPlusPlusObjectCompile - compile fragment for a normal object file
+ * for .C to .o
+ */
+#ifndef ccCPlusPlusObjectCompile
+#define ccCPlusPlusObjectCompile(options) $(RM) $@			@@\
+	$(C++) -c $(C++FLAGS) options $*.cc
+#endif
+
+/*
+ * CPlusPlusLibObjCompile - compile fragment for shared/profiled/debugged objects
+ */
+#ifndef CPlusPlusLibObjCompile
+#define CPlusPlusLibObjCompile(dir,options) $(RM) $@ dir/$@		@@\
+	$(C++) -c $(C++OPTIONS) $(ALL++INCLUDES) $(ALL++DEFINES) options $(EXTRA_C++OPTIONS) $*.C	@@\
+	$(MV) $@ dir/$@
+#endif
+
+/*
+ * CPlusPlusSharedLibObjCompile - compile fragment for shared objects
+ */
+#ifndef CPlusPlusSharedLibObjCompile
+#define CPlusPlusSharedLibObjCompile(options) CPlusPlusLibObjCompile(shared, $(SHLIBDEF) $(SHAREDCODEDEF) $(C++PICFLAGS) $(C++DEBUGFLAGS) options)
+#endif
+
+/*
+ * ccCPlusPlusLibObjCompile - compile fragment for shared/profiled/debugged objects
+ */
+#ifndef ccCPlusPlusLibObjCompile
+#define ccCPlusPlusLibObjCompile(dir,options) $(RM) $@ dir/$@		@@\
+	$(C++) -c $(C++OPTIONS) $(ALL++INCLUDES) $(ALL++DEFINES) options $(EXTRA_C++OPTIONS) $*.cc	@@\
+	$(MV) $@ dir/$@
+#endif
+
+/*
+ * ccCPlusPlusSharedLibObjCompile - compile fragment for shared objects
+ */
+#ifndef ccCPlusPlusSharedLibObjCompile
+#define ccCPlusPlusSharedLibObjCompile(options) ccCPlusPlusLibObjCompile(shared, $(SHLIBDEF) $(SHAREDCODEDEF) $(C++PICFLAGS) $(C++DEBUGFLAGS) options)
+#endif
+
+/*
+ * CPlusPlusNormalLibObjCompile - compile fragment for a normal library object file
+ */
+#ifndef CPlusPlusNormalLibObjCompile
+#define CPlusPlusNormalLibObjCompile(options) CPlusPlusObjectCompile(options)
+#endif
+
+/*
+ * CPlusPlusNormalSharedLibObjCompile - compile fragment for shared object when
+ * a normal library is not being built for .C files
+ */
+#ifndef CPlusPlusNormalSharedLibObjCompile
+#define CPlusPlusNormalSharedLibObjCompile(options) CPlusPlusNormalLibObjCompile(options $(SHLIBDEF) $(SHAREDCODEDEF) $(C++PICFLAGS))
+#endif
+
+/*
+ * ccCPlusPlusNormalLibObjCompile - compile fragment for a normal library object file for .cc files
+ */
+#ifndef ccCPlusPlusNormalLibObjCompile
+#define ccCPlusPlusNormalLibObjCompile(options) ccCPlusPlusObjectCompile(options)
+#endif
+
+/*
+ * ccCPlusPlusNormalSharedLibObjCompile - compile fragment for shared object when
+ * a normal library is not being built
+ */
+#ifndef ccCPlusPlusNormalSharedLibObjCompile
+#define ccCPlusPlusNormalSharedLibObjCompile(options) ccCPlusPlusNormalLibObjCompile(options $(SHLIBDEF) $(SHAREDCODEDEF) $(C++PICFLAGS))
+#endif
+
+
+
+/*
+ * NormalLibraryObjectRule - for simple libraries
+ */
+#ifndef NormalLibraryObjectRule
+#define NormalLibraryObjectRule()					@@\
+.c.o:									@@\
+	ObjectCompile($(_NOOP_))					@@\
+.SUFFIXES: .cc								@@\
+.cc.o:									@@\
+	ccCPlusPlusObjectCompile($(_NOOP_))				@@\
+.SUFFIXES: .C								@@\
+.C.o:									@@\
+	CPlusPlusObjectCompile($(_NOOP_))
+#endif /* NormalLibraryObjectRule */
+
+/*
+ * CPlusPlusToCRule  -- generate a ".c" file from C++ source (".C")
+ * c_sources must be a .c file.
+ */
+
+#ifndef CPlusPlusToCRule
+#define CPlusPlusToCRule(c_sources)					@@\
+									@@\
+.SUFFIXES: .c .C							@@\
+all:: c_sources								@@\
+									@@\
+.C.c:									@@\
+	@echo " creating file $*.c"					@@\
+	$(RM) $*.c							@@\
+	$(C++) $(ALL++INCLUDES) $(ALL++DEFINES) $(C++TRANSLATE_ONLY)  $<  > $*.c || $(RM) $*.c	@@\
+									@@\
+CCclean::								@@\
+	@-for i in c_sources; do \					@@\
+		echo "      removing file $$i"; \			@@\
+		$(RM) $$i; \						@@\
+	done								@@\
+									@@\
+depend::								@@\
+	@-for i in c_sources; do \					@@\
+	j=`basename $$i .c`; \						@@\
+	if [ ! -f $$i ]; then \						@@\
+		echo "      creating file $$i"; \			@@\
+		$(RM) $$i; \						@@\
+		echo "	$(C++) $(ALL++INCLUDES) $(ALL++DEFINES) $(C++TRANSLATE_ONLY) $$j.C > $$i || $(RM) $$i"; \	@@\
+		$(C++) $(ALL++INCLUDES) $(ALL++DEFINES) $(C++TRANSLATE_ONLY) $$j.C > $$i || $(RM) $$i; fi;done
+#endif
+
+/***************** END NEW .c.o .C.o rules ******************/
+
+
+/*
+ * CCPlusPlusToCRule  -- generate a ".c" file from C++ source (".cc")
+ * c_sources must be a .c file.
+ */
+
+#ifndef CCPlusPlusToCRule
+#define CCPlusPlusToCRule(c_sources)					@@\
+									@@\
+.SUFFIXES: .c .cc							@@\
+all:: c_sources								@@\
+									@@\
+.cc.c:									@@\
+	@echo " creating file $*.c"					@@\
+	$(RM) $*.c							@@\
+	$(C++) $(ALL++INCLUDES) $(ALL++DEFINES) $(C++TRANSLATE_ONLY)  $<  > $*.c || $(RM) $*.c	@@\
+									@@\
+CCclean::								@@\
+	@-for i in c_sources; do \					@@\
+		echo "      removing file $$i"; \			@@\
+		$(RM) $$i; \						@@\
+	done								@@\
+									@@\
+depend::								@@\
+	@-for i in c_sources; do \					@@\
+	j=`basename $$i .c`; \						@@\
+	if [ ! -f $$i ]; then \						@@\
+		echo "      creating file $$i"; \			@@\
+		$(RM) $$i; \						@@\
+		echo "	$(C++) $(ALL++INCLUDES) $(ALL++DEFINES) $(C++TRANSLATE_ONLY) $$j.C > $$i || $(RM) $$i"; \	@@\
+		$(C++) $(ALL++INCLUDES) $(ALL++DEFINES) $(C++TRANSLATE_ONLY) $$j.C > $$i || $(RM) $$i; fi;done
+#endif
+
+/***************** END NEW .c.o .cc.o rules ******************/
+
+#ifndef BuildIncludes
+#define BuildIncludes(srclist,dstsubdir,dstupdir)			@@\
+includes::								@@\
+	MakeDir($(BUILDINCDIR)/dstsubdir)				@@\
+	@(set -x; cd $(BUILDINCDIR)/dstsubdir; for i in srclist; do \	@@\
+	$(RM) $$i; \							@@\
+	if [ "$(X11ENV)" ];then \					@@\
+		NEWBUILDINCTOP=$(BUILDINCTOP)/..; \			@@\
+	else NEWBUILDINCTOP=$(BUILDINCTOP);fi;\				@@\
+	$(LN) $$NEWBUILDINCTOP/dstupdir/$(CURRENT_DIR)/$$i .; \		@@\
+	done)
+#endif /* BuildIncludes */
+
+#ifndef BuildR4Includes
+#define BuildR4Includes(srclist,dstsubdir,dstupdir)			@@\
+includes::								@@\
+	MakeDir($(TOP)/X11R4/X11/dstsubdir)				@@\
+	@(set -x; cd $(TOP)/X11R4/X11/dstsubdir; for i in srclist; do \	@@\
+	$(RM) $$i; \							@@\
+	$(LN) ../../dstupdir/$(CURRENT_DIR)/$$i .; \			@@\
+	done)
+#endif /* BuildR4Includes */
+
+
+/*
+ * CodecenterLoadTarget - generate rules to load Codecenter files
+ */
+#ifndef CodecenterLoadTarget
+#if HasSaberC
+#define CodecenterLoadTarget(target,program,srclist,libs,defines)	@@\
+target:: srclist							@@\
+	XCOMM setopt path "$(XVHSRC) $(COESRC) $(XMSRC) $(TOOLKITSRC) $(XLIBSRC)"	@@\
+	XCOMM setopt swap_uses_path					@@\
+	XCOMM unsetopt win_fork						@@\
+	XCOMM setopt program_name program				@@\
+	XCOMM setopt load_flags $(CFLAGS)				@@\
+	XCOMM setopt ansi						@@\
+	XCOMM load defines srclist libs					@@\
+	XCOMM link
+#else
+#define CodecenterLoadTarget(target,program,srclist,libs,defines) /**/
+#endif
+#endif
+
+
+
+/*
+ * CodecenterProgramTarget - generate rules to make codecenter read in
+ * sources and objects.
+ */
+#ifndef CodecenterProgramTarget
+#define CodecenterProgramTarget(program,srclist,objlist,locallibs,syslibs)	@@\
+CodecenterLoadTarget(Concat(codecenter_,program),program,srclist, locallibs $(SYS_LIBRARIES) $(EXTRA_LIBRARIES) syslib $(C++LIBPATH) s,$(ALLDEFINES))	@@\
+									@@\
+CodecenterLoadTarget(Concat(ocodecenter_,program),program,objlist, locallibs $(SYS_LIBRARIES) $(EXTRA_LIBRARIES) syslibs,$(ALLDEFINES))
+#endif
+
+
+/*
+ * PristineProgramTarget - generate rules for compiling and linking the 
+ * program specified by $(OBJS) and $(SRCS), installing the program, and
+ * cleaning.
+ */
+#ifndef PristineProgramTarget
+#define	PristineProgramTarget(program)					@@\
+AllTarget(program)							@@\
+									@@\
+program: $(OBJS) $(DEPLIBS)						@@\
+	RemoveTargetProgram($@)						@@\
+	BbaTargetProgram(program,$(OBJS))				@@\
+	CreateHPVersion()						@@\
+	$(PRISTINELINKCC) -o $@ $(HP_VERSION_OBJ) $(OBJS) $(LDOPTIONS) $(LOCAL_LIBRARIES) $(EXTRA_LOAD_FLAGS) $(LDLIBS) $(C++LIBPATH) @@\
+	RemoveHPVersion()						@@\
+	MakeDebugProgramWritable(program)				@@\
+									@@\
+load/**/program:							@@\
+	RemoveTargetProgram(program)					@@\
+	BbaTargetProgram(program,$(OBJS))				@@\
+	CreateHPVersion()						@@\
+	$(PRISTINELINKCC) -o program $(HP_VERSION_OBJ) $(OBJS) $(LDOPTIONS) $(LOCAL_LIBRARIES) $(EXTRA_LOAD_FLAGS) $(LDLIBS)  $(C++LIBPATH) @@\
+	RemoveHPVersion()						@@\
+	MakeDebugProgramWritable(program)				@@\
+									@@\
+InstallProgram(program,$(BINDIR))					@@\
+									@@\
+clean::									@@\
+	$(RM) program
+#endif /* PristineProgramTarget */
+
+
+/*
+ * ComplexProgramTarget - generate rules for compiling and linking the 
+ * program specified by $(OBJS) and $(SRCS), installing the program and its
+ * man page, and generating dependencies.  It should only be used in 
+ * Imakefiles that describe a single program.
+ */
+#ifndef ComplexProgramTarget
+#define	ComplexProgramTarget(program)					@@\
+        PROGRAM = program						@@\
+									@@\
+AllTarget(program)							@@\
+									@@\
+AixLinkArchivedLibC()							@@\
+program: $(OBJS) $(DEPLIBS)						@@\
+	RemoveTargetProgram($@)						@@\
+	BbaTargetProgram(program,$(OBJS))				@@\
+	CreateHPVersion()						@@\
+	$(LINKCC) -o $@ $(HP_VERSION_OBJ) $(OBJS) $(LDOPTIONS) $(LOCAL_LIBRARIES) $(EXTRA_LOAD_FLAGS) $(LDLIBS) $(C++LIBPATH) @@\
+	Strip()						        @@\
+	RemoveHPVersion()						@@\
+	MakeDebugProgramWritable(program)				@@\
+									@@\
+load/**/program:							@@\
+	RemoveTargetProgram(program)					@@\
+	BbaTargetProgram(program,$(OBJS))				@@\
+	CreateHPVersion()						@@\
+	$(LINKCC) -o program $(HP_VERSION_OBJ) $(OBJS) $(LDOPTIONS) $(LOCAL_LIBRARIES) $(EXTRA_LOAD_FLAGS) $(LDLIBS)  $(C++LIBPATH) @@\
+	RemoveHPVersion()						@@\
+	MakeDebugProgramWritable(program)				@@\
+									@@\
+SaberProgramTarget(program,$(SRCS),$(OBJS),$(LOCAL_LIBRARIES),NullParameter) @@\
+									@@\
+CodecenterProgramTarget(program,$(SRCS),$(OBJS),$(LOCAL_LIBRARIES),NullParameter) @@\
+									@@\
+InstallProgram(program,$(BINDIR))					@@\
+InstallManPage(program,$(MANDIR))					@@\
+DependTarget()								@@\
+LintTarget()								@@\
+									@@\
+clean::									@@\
+	$(RM) $(PROGRAM)
+#endif /* ComplexProgramTarget */
+
+
+/*
+ * ComplexProgramTarget_2 - generate rules for compiling and linking the
+ * program specified by $(OBJS2) and $(SRCS2) and installing the program and
+ * man page.  It should be used to build the second program in Imakefiles 
+ * describing more than one program.
+ */
+#ifndef ComplexProgramTarget_2
+#define	ComplexProgramTarget_2(program,locallib,syslib )			@@\
+program: $(OBJS2) $(DEPLIBS2)						@@\
+	RemoveTargetProgram($@)						@@\
+	BbaTargetProgram(program,$(OBJS2))				@@\
+	CreateHPVersion()						@@\
+	$(LINKCC) -o $@ $(LDOPTIONS) $(HP_VERSION_OBJ) $(OBJS2) locallib $(EXTRA_LOAD_FLAGS) syslib $(LDLIBS) $(C++LIBPATH)  @@\
+	Strip()						        @@\
+	RemoveHPVersion()                                               @@\
+	MakeDebugProgramWritable(program)				@@\
+									@@\
+load/**/program:							@@\
+	RemoveTargetProgram(program)					@@\
+	BbaTargetProgram(program,$(OBJS2))				@@\
+	CreateHPVersion()						@@\
+	$(LINKCC) -o program $(LDOPTIONS) $(HP_VERSION_OBJ) $(OBJS2) locallib $(EXTRA_LOAD_FLAGS) syslib $(LDLIBS) $(C++LIBPATH)  @@\
+	RemoveHPVersion()						@@\
+	MakeDebugProgramWritable(program)				@@\
+									@@\
+SaberProgramTarget(program,$(SRCS2),$(OBJS2),locallib,syslib )		@@\
+									@@\
+CodecenterProgramTarget(program,$(SRCS2),$(OBJS2),locallib,syslib )	@@\
+									@@\
+InstallProgram(program,$(BINDIR))					@@\
+InstallManPage(program,$(MANDIR))
+#endif /* ComplexProgramTarget_2 */
+
+
+/*
+ * ComplexProgramTarget_3 - generate rules for compiling and linking the
+ * program specified by $(OBJS3) and $(SRCS3) and installing the program and
+ * man page.  It should be used to build the third program in Imakefiles 
+ * describing more than one program.
+ */
+#ifndef ComplexProgramTarget_3
+#define	ComplexProgramTarget_3(program,locallib,syslib )			@@\
+program: $(OBJS3) $(DEPLIBS3)						@@\
+	RemoveTargetProgram($@)						@@\
+	BbaTargetProgram(program,$(OBJS3))				@@\
+	CreateHPVersion()						@@\
+	$(LINKCC) -o $@ $(LDOPTIONS) $(HP_VERSION_OBJ) $(OBJS3) locallib $(EXTRA_LOAD_FLAGS) syslib $(LDLIBS) $(C++LIBPATH)  @@\
+	Strip()						        @@\
+	RemoveHPVersion()						@@\
+	MakeDebugProgramWritable(program)				@@\
+									@@\
+load/**/program:							@@\
+	RemoveTargetProgram(program)					@@\
+	BbaTargetProgram(program,$(OBJS3))				@@\
+	CreateHPVersion()						@@\
+	$(LINKCC) -o program $(LDOPTIONS) $(HP_VERSION_OBJ) $(OBJS3) locallib $(EXTRA_LOAD_FLAGS) syslib $(LDLIBS) $(C++LIBPATH)  @@\
+	RemoveHPVersion()						@@\
+	MakeDebugProgramWritable(program)				@@\
+									@@\
+SaberProgramTarget(program,$(SRCS3),$(OBJS3),locallib,syslib )		@@\
+									@@\
+CodecenterProgramTarget(program,$(SRCS3),$(OBJS3),locallib,syslib )	@@\
+									@@\
+InstallProgram(program,$(BINDIR))					@@\
+InstallManPage(program,$(MANDIR))
+#endif /* ComplexProgramTarget_3 */
+
+
+/*** The following is necessary to extend the complex program target
+ *   rules to more clients.
+**/
+
+/*
+ * ComplexProgramTarget_1 - generate rules for compiling and linking the
+ * program specified by $(OBJS1) and $(SRCS1), installing the program and its
+ * man page, and generating dependencies for it and any programs described
+ * by $(SRCS2) and $(SRCS3).  It should be used to build the primary 
+ * program in Imakefiles that describe multiple programs.
+ */
+#ifndef ComplexProgramTarget_1
+#define	ComplexProgramTarget_1(program,locallib,syslib )			@@\
+            OBJS = $(OBJS1) $(OBJS2) $(OBJS3) $(OBJS4) $(OBJS5) $(OBJS6) $(OBJS7) $(OBJS8) $(OBJS9) $(OBJS10) $(OBJS11) $(OBJS12) $(OBJS13) $(OBJS14) $(OBJS15)	@@\
+            SRCS = $(SRCS1) $(SRCS2) $(SRCS3) $(SRCS4) $(SRCS5) $(SRCS6) $(SRCS7) $(SRCS8) $(SRCS9) $(SRCS10) $(SRCS11) $(SRCS12) $(SRCS13) $(SRCS14) $(SRCS15)	@@\
+									@@\
+AllTarget($(PROGRAMS))							@@\
+									@@\
+AixLinkArchivedLibC()							@@\
+program: $(OBJS1) $(DEPLIBS1)						@@\
+	RemoveTargetProgram($@)						@@\
+	BbaTargetProgram(program,$(OBJS1))				@@\
+	CreateHPVersion()						@@\
+	$(LINKCC) -o $@ $(LDOPTIONS) $(HP_VERSION_OBJ) $(OBJS1) locallib $(EXTRA_LOAD_FLAGS) syslib $(LDLIBS) $(C++LIBPATH) 	@@\
+	Strip()						        @@\
+	RemoveHPVersion()						@@\
+	MakeDebugProgramWritable(program)				@@\
+									@@\
+load/**/program:							@@\
+	RemoveTargetProgram(program)					@@\
+	BbaTargetProgram(program,$(OBJS1))				@@\
+	CreateHPVersion()						@@\
+	$(LINKCC) -o program $(LDOPTIONS) $(HP_VERSION_OBJ) $(OBJS1) locallib $(EXTRA_LOAD_FLAGS) syslib $(LDLIBS) $(C++LIBPATH) 	@@\
+	RemoveHPVersion()                                               @@\
+	MakeDebugProgramWritable(program)				@@\
+									@@\
+InstallProgram(program,$(BINDIR))					@@\
+InstallManPage(program,$(MANDIR))					@@\
+									@@\
+SaberProgramTarget(program,$(SRCS1),$(OBJS1),locallib,syslib )		@@\
+									@@\
+CodecenterProgramTarget(program,$(SRCS1),$(OBJS1),locallib,syslib )	@@\
+									@@\
+DependTarget()								@@\
+LintTarget()								@@\
+									@@\
+clean::									@@\
+	$(RM) $(PROGRAMS)
+#endif /* ComplexProgramTarget_1 */
+
+
+/*
+ * ComplexProgramTarget_4 - generate rules for compiling and linking the
+ * program specified by $(OBJS4) and $(SRCS4) and installing the program and
+ * man page.  It should be used to build the second program in Imakefiles 
+ * describing more than one program.
+ */
+#ifndef ComplexProgramTarget_4
+#define	ComplexProgramTarget_4(program,locallib,syslib )			@@\
+program: $(OBJS4) $(DEPLIBS4)						@@\
+	RemoveTargetProgram($@)						@@\
+	BbaTargetProgram(program,$(OBJS4))				@@\
+	CreateHPVersion()						@@\
+	$(LINKCC) -o $@ $(LDOPTIONS) $(HP_VERSION_OBJ) $(OBJS4) locallib $(EXTRA_LOAD_FLAGS) syslib $(LDLIBS) $(C++LIBPATH)  @@\
+	Strip()						        @@\
+	RemoveHPVersion()                                               @@\
+	MakeDebugProgramWritable(program)				@@\
+									@@\
+load/**/program:							@@\
+	RemoveTargetProgram(program)					@@\
+	BbaTargetProgram(program,$(OBJS4))				@@\
+	CreateHPVersion()						@@\
+	$(LINKCC) -o program $(LDOPTIONS) $(HP_VERSION_OBJ) $(OBJS4) locallib $(EXTRA_LOAD_FLAGS) syslib $(LDLIBS) $(C++LIBPATH) 	@@\
+	RemoveHPVersion()                                               @@\
+	MakeDebugProgramWritable(program)				@@\
+									@@\
+SaberProgramTarget(program,$(SRCS4),$(OBJS4),locallib,syslib )		@@\
+									@@\
+InstallProgram(program,$(BINDIR))					@@\
+InstallManPage(program,$(MANDIR))
+#endif /* ComplexProgramTarget_4 */
+
+/*
+ * ComplexProgramTarget_5 - generate rules for compiling and linking the
+ * program specified by $(OBJS5) and $(SRCS5) and installing the program and
+ * man page.  It should be used to build the second program in Imakefiles 
+ * describing more than one program.
+ */
+#ifndef ComplexProgramTarget_5
+#define	ComplexProgramTarget_5(program,locallib,syslib )			@@\
+program: $(OBJS5) $(DEPLIBS5)						@@\
+	RemoveTargetProgram($@)						@@\
+	BbaTargetProgram(program,$(OBJS5))				@@\
+	CreateHPVersion()						@@\
+	$(LINKCC) -o $@ $(LDOPTIONS) $(HP_VERSION_OBJ) $(OBJS5) locallib $(EXTRA_LOAD_FLAGS) syslib $(LDLIBS) $(C++LIBPATH)  @@\
+	Strip()						        @@\
+	RemoveHPVersion()                                               @@\
+	MakeDebugProgramWritable(program)				@@\
+									@@\
+load/**/program:							@@\
+	RemoveTargetProgram(program)					@@\
+	BbaTargetProgram(program,$(OBJS5))				@@\
+	CreateHPVersion()						@@\
+	$(LINKCC) -o program $(LDOPTIONS) $(HP_VERSION_OBJ) $(OBJS5) locallib $(EXTRA_LOAD_FLAGS) syslib $(LDLIBS) $(C++LIBPATH)  @@\
+	RemoveHPVersion()                                               @@\
+	MakeDebugProgramWritable(program)				@@\
+									@@\
+SaberProgramTarget(program,$(SRCS5),$(OBJS5),locallib,syslib )		@@\
+									@@\
+InstallProgram(program,$(BINDIR))					@@\
+InstallManPage(program,$(MANDIR))
+#endif /* ComplexProgramTarget_5 */
+
+/*
+ * ComplexProgramTarget_6 - generate rules for compiling and linking the
+ * program specified by $(OBJS6) and $(SRCS6) and installing the program and
+ * man page.  It should be used to build the second program in Imakefiles 
+ * describing more than one program.
+ */
+#ifndef ComplexProgramTarget_6
+#define	ComplexProgramTarget_6(program,locallib,syslib )			@@\
+program: $(OBJS6) $(DEPLIBS6)						@@\
+	RemoveTargetProgram($@)						@@\
+	BbaTargetProgram(program,$(OBJS6))				@@\
+	CreateHPVersion()						@@\
+	$(LINKCC) -o $@ $(LDOPTIONS) $(HP_VERSION_OBJ) $(OBJS6) locallib $(EXTRA_LOAD_FLAGS) syslib $(LDLIBS) $(C++LIBPATH)  @@\
+	Strip()						        @@\
+	RemoveHPVersion()                                               @@\
+	MakeDebugProgramWritable(program)				@@\
+									@@\
+load/**/program:							@@\
+	RemoveTargetProgram(program)					@@\
+	BbaTargetProgram(program,$(OBJS6))				@@\
+	CreateHPVersion()						@@\
+	$(LINKCC) -o program $(LDOPTIONS) $(HP_VERSION_OBJ) $(OBJS6) locallib $(EXTRA_LOAD_FLAGS) syslib $(LDLIBS) $(C++LIBPATH)  @@\
+	RemoveHPVersion()                                               @@\
+	MakeDebugProgramWritable(program)				@@\
+									@@\
+SaberProgramTarget(program,$(SRCS6),$(OBJS6),locallib,syslib )		@@\
+									@@\
+InstallProgram(program,$(BINDIR))					@@\
+InstallManPage(program,$(MANDIR))
+#endif /* ComplexProgramTarget_6 */
+
+/*
+ * ComplexProgramTarget_7 - generate rules for compiling and linking the
+ * program specified by $(OBJS7) and $(SRCS7) and installing the program and
+ * man page.  It should be used to build the second program in Imakefiles 
+ * describing more than one program.
+ */
+#ifndef ComplexProgramTarget_7
+#define	ComplexProgramTarget_7(program,locallib,syslib )			@@\
+program: $(OBJS7) $(DEPLIBS7)						@@\
+	RemoveTargetProgram($@)						@@\
+	BbaTargetProgram(program,$(OBJS7))				@@\
+	CreateHPVersion()						@@\
+	$(LINKCC) -o $@ $(LDOPTIONS) $(HP_VERSION_OBJ) $(OBJS7) locallib $(EXTRA_LOAD_FLAGS) syslib $(LDLIBS) $(C++LIBPATH)  @@\
+	Strip()						        @@\
+	RemoveHPVersion()                                               @@\
+	MakeDebugProgramWritable(program)				@@\
+									@@\
+load/**/program:							@@\
+	RemoveTargetProgram(program)					@@\
+	BbaTargetProgram(program,$(OBJS7))				@@\
+	CreateHPVersion()						@@\
+	$(LINKCC) -o program $(LDOPTIONS) $(HP_VERSION_OBJ) $(OBJS7) locallib $(EXTRA_LOAD_FLAGS) syslib $(LDLIBS) $(C++LIBPATH)  @@\
+	RemoveHPVersion()                                               @@\
+	MakeDebugProgramWritable(program)				@@\
+									@@\
+SaberProgramTarget(program,$(SRCS7),$(OBJS7),locallib,syslib )		@@\
+									@@\
+InstallProgram(program,$(BINDIR))					@@\
+InstallManPage(program,$(MANDIR))
+#endif /* ComplexProgramTarget_7 */
+
+/*
+ * ComplexProgramTarget_8 - generate rules for compiling and linking the
+ * program specified by $(OBJS8) and $(SRCS8) and installing the program and
+ * man page.  It should be used to build the second program in Imakefiles 
+ * describing more than one program.
+ */
+#ifndef ComplexProgramTarget_8
+#define	ComplexProgramTarget_8(program,locallib,syslib )			@@\
+program: $(OBJS8) $(DEPLIBS8)						@@\
+	RemoveTargetProgram($@)						@@\
+	BbaTargetProgram(program,$(OBJS8))				@@\
+	CreateHPVersion()						@@\
+	$(LINKCC) -o $@ $(LDOPTIONS) $(HP_VERSION_OBJ) $(OBJS8) locallib $(EXTRA_LOAD_FLAGS) syslib $(LDLIBS) $(C++LIBPATH)  @@\
+	Strip()						        @@\
+	RemoveHPVersion()                                               @@\
+	MakeDebugProgramWritable(program)				@@\
+									@@\
+load/**/program:							@@\
+	RemoveTargetProgram(program)					@@\
+	BbaTargetProgram(program,$(OBJS8))				@@\
+	CreateHPVersion()						@@\
+	$(LINKCC) -o program $(LDOPTIONS) $(HP_VERSION_OBJ) $(OBJS8) locallib $(EXTRA_LOAD_FLAGS) syslib $(LDLIBS) $(C++LIBPATH)  @@\
+	RemoveHPVersion()                                               @@\
+	MakeDebugProgramWritable(program)				@@\
+									@@\
+SaberProgramTarget(program,$(SRCS8),$(OBJS8),locallib,syslib )		@@\
+									@@\
+InstallProgram(program,$(BINDIR))					@@\
+InstallManPage(program,$(MANDIR))
+#endif /* ComplexProgramTarget_8 */
+
+/*
+ * ComplexProgramTarget_9 - generate rules for compiling and linking the
+ * program specified by $(OBJS9) and $(SRCS9) and installing the program and
+ * man page.  It should be used to build the second program in Imakefiles 
+ * describing more than one program.
+ */
+#ifndef ComplexProgramTarget_9
+#define	ComplexProgramTarget_9(program,locallib,syslib )			@@\
+program: $(OBJS9) $(DEPLIBS9)						@@\
+	RemoveTargetProgram($@)						@@\
+	BbaTargetProgram(program,$(OBJS9))				@@\
+	CreateHPVersion()						@@\
+	$(LINKCC) -o $@ $(LDOPTIONS) $(HP_VERSION_OBJ) $(OBJS9) locallib $(EXTRA_LOAD_FLAGS) syslib $(LDLIBS) $(C++LIBPATH)  @@\
+	Strip()						        @@\
+	RemoveHPVersion()                                               @@\
+	MakeDebugProgramWritable(program)				@@\
+									@@\
+load/**/program:							@@\
+	RemoveTargetProgram(program)					@@\
+	BbaTargetProgram(program,$(OBJS9))				@@\
+	CreateHPVersion()						@@\
+	$(LINKCC) -o program $(LDOPTIONS) $(HP_VERSION_OBJ) $(OBJS9) locallib $(EXTRA_LOAD_FLAGS) syslib $(LDLIBS) $(C++LIBPATH)  @@\
+	RemoveHPVersion()                                               @@\
+	MakeDebugProgramWritable(program)				@@\
+									@@\
+SaberProgramTarget(program,$(SRCS9),$(OBJS9),locallib,syslib )		@@\
+									@@\
+InstallProgram(program,$(BINDIR))					@@\
+InstallManPage(program,$(MANDIR))
+#endif /* ComplexProgramTarget_9 */
+
+/*
+ * ComplexProgramTarget_10 - generate rules for compiling and linking the
+ * program specified by $(OBJS10) and $(SRCS10) and installing the program and
+ * man page.  It should be used to build the second program in Imakefiles 
+ * describing more than one program.
+ */
+#ifndef ComplexProgramTarget_10
+#define	ComplexProgramTarget_10(program,locallib,syslib )			@@\
+program: $(OBJS10) $(DEPLIBS10)						@@\
+	RemoveTargetProgram($@)						@@\
+	BbaTargetProgram(program,$(OBJS10))				@@\
+	CreateHPVersion()						@@\
+	$(LINKCC) -o $@ $(LDOPTIONS) $(HP_VERSION_OBJ) $(OBJS10) locallib $(EXTRA_LOAD_FLAGS) syslib $(LDLIBS) $(C++LIBPATH)  @@\
+	Strip()						        @@\
+	RemoveHPVersion()                                               @@\
+	MakeDebugProgramWritable(program)				@@\
+									@@\
+load/**/program:							@@\
+	RemoveTargetProgram(program)					@@\
+	BbaTargetProgram(program,$(OBJS10))				@@\
+	CreateHPVersion()						@@\
+	$(LINKCC) -o program $(LDOPTIONS) $(HP_VERSION_OBJ) $(OBJS10) locallib $(EXTRA_LOAD_FLAGS) syslib $(LDLIBS) $(C++LIBPATH)  @@\
+	RemoveHPVersion()                                               @@\
+	MakeDebugProgramWritable(program)				@@\
+									@@\
+SaberProgramTarget(program,$(SRCS10),$(OBJS10),locallib,syslib )		@@\
+									@@\
+InstallProgram(program,$(BINDIR))					@@\
+InstallManPage(program,$(MANDIR))
+#endif /* ComplexProgramTarget_10 */
+
+/*
+ * ComplexProgramTarget_11 - generate rules for compiling and linking the
+ * program specified by $(OBJS11) and $(SRCS11) and installing the program and
+ * man page.  It should be used to build the second program in Imakefiles 
+ * describing more than one program.
+ */
+#ifndef ComplexProgramTarget_11
+#define	ComplexProgramTarget_11(program,locallib,syslib )			@@\
+program: $(OBJS11) $(DEPLIBS11)						@@\
+	RemoveTargetProgram($@)						@@\
+	BbaTargetProgram(program,$(OBJS11))				@@\
+	CreateHPVersion()						@@\
+	$(LINKCC) -o $@ $(LDOPTIONS) $(HP_VERSION_OBJ) $(OBJS11) locallib $(EXTRA_LOAD_FLAGS) syslib $(LDLIBS) $(C++LIBPATH)  @@\
+	Strip()						        @@\
+	RemoveHPVersion()                                               @@\
+	MakeDebugProgramWritable(program)				@@\
+									@@\
+load/**/program:							@@\
+	RemoveTargetProgram(program)					@@\
+	BbaTargetProgram(program,$(OBJS11))				@@\
+	CreateHPVersion()						@@\
+	$(LINKCC) -o program $(LDOPTIONS) $(HP_VERSION_OBJ) $(OBJS11) locallib $(EXTRA_LOAD_FLAGS) syslib $(LDLIBS) $(C++LIBPATH)  @@\
+	RemoveHPVersion()                                               @@\
+	MakeDebugProgramWritable(program)				@@\
+									@@\
+SaberProgramTarget(program,$(SRCS11),$(OBJS11),locallib,syslib )		@@\
+									@@\
+InstallProgram(program,$(BINDIR))					@@\
+InstallManPage(program,$(MANDIR))
+#endif /* ComplexProgramTarget_11 */
+
+/*
+ * ComplexProgramTarget_12 - generate rules for compiling and linking the
+ * program specified by $(OBJS12) and $(SRCS12) and installing the program and
+ * man page.  It should be used to build the second program in Imakefiles 
+ * describing more than one program.
+ */
+#ifndef ComplexProgramTarget_12
+#define	ComplexProgramTarget_12(program,locallib,syslib )			@@\
+program: $(OBJS12) $(DEPLIBS12)						@@\
+	RemoveTargetProgram($@)						@@\
+	BbaTargetProgram(program,$(OBJS12))				@@\
+	CreateHPVersion()						@@\
+	$(LINKCC) -o $@ $(LDOPTIONS) $(HP_VERSION_OBJ) $(OBJS12) locallib $(EXTRA_LOAD_FLAGS) syslib $(LDLIBS) $(C++LIBPATH)  @@\
+	Strip()						        @@\
+	RemoveHPVersion()                                               @@\
+	MakeDebugProgramWritable(program)				@@\
+									@@\
+load/**/program:							@@\
+	RemoveTargetProgram(program)					@@\
+	BbaTargetProgram(program,$(OBJS12))				@@\
+	CreateHPVersion()						@@\
+	$(LINKCC) -o program $(LDOPTIONS) $(HP_VERSION_OBJ) $(OBJS12) locallib $(EXTRA_LOAD_FLAGS) syslib $(LDLIBS) $(C++LIBPATH)  @@\
+	RemoveHPVersion()                                               @@\
+	MakeDebugProgramWritable(program)				@@\
+									@@\
+SaberProgramTarget(program,$(SRCS12),$(OBJS12),locallib,syslib )		@@\
+									@@\
+InstallProgram(program,$(BINDIR))					@@\
+InstallManPage(program,$(MANDIR))
+#endif /* ComplexProgramTarget_12 */
+
+
+
+/*
+ * ComplexProgramTarget_13 - generate rules for compiling and linking the
+ * program specified by $(OBJS13) and $(SRCS13) and installing the program and
+ * man page.  It should be used to build the second program in Imakefiles 
+ * describing more than one program.
+ */
+#ifndef ComplexProgramTarget_13
+#define	ComplexProgramTarget_13(program,locallib,syslib )			@@\
+program: $(OBJS13) $(DEPLIBS13)						@@\
+	RemoveTargetProgram($@)						@@\
+	BbaTargetProgram(program,$(OBJS13))				@@\
+	CreateHPVersion()						@@\
+	$(LINKCC) -o $@ $(LDOPTIONS) $(HP_VERSION_OBJ) $(OBJS13) locallib $(EXTRA_LOAD_FLAGS) syslib $(LDLIBS) $(C++LIBPATH)  @@\
+	Strip()						        @@\
+	RemoveHPVersion()                                               @@\
+	MakeDebugProgramWritable(program)				@@\
+									@@\
+load/**/program:							@@\
+	RemoveTargetProgram(program)					@@\
+	BbaTargetProgram(program,$(OBJS13))				@@\
+	CreateHPVersion()						@@\
+	$(LINKCC) -o program $(LDOPTIONS) $(HP_VERSION_OBJ) $(OBJS13) locallib $(EXTRA_LOAD_FLAGS) syslib $(LDLIBS) $(C++LIBPATH)  @@\
+	RemoveHPVersion()                                               @@\
+	MakeDebugProgramWritable(program)				@@\
+									@@\
+SaberProgramTarget(program,$(SRCS13),$(OBJS13),locallib,syslib )		@@\
+									@@\
+InstallProgram(program,$(BINDIR))					@@\
+InstallManPage(program,$(MANDIR))
+#endif /* ComplexProgramTarget_13 */
+
+
+
+/*
+ * ComplexProgramTarget_14 - generate rules for compiling and linking the
+ * program specified by $(OBJS14) and $(SRCS14) and installing the program and
+ * man page.  It should be used to build the second program in Imakefiles 
+ * describing more than one program.
+ */
+#ifndef ComplexProgramTarget_14
+#define	ComplexProgramTarget_14(program,locallib,syslib )			@@\
+program: $(OBJS14) $(DEPLIBS14)						@@\
+	RemoveTargetProgram($@)						@@\
+	BbaTargetProgram(program,$(OBJS14))				@@\
+	CreateHPVersion()						@@\
+	$(LINKCC) -o $@ $(LDOPTIONS) $(HP_VERSION_OBJ) $(OBJS14) locallib $(EXTRA_LOAD_FLAGS) syslib $(LDLIBS) $(C++LIBPATH)  @@\
+	Strip()						        @@\
+	RemoveHPVersion()                                               @@\
+	MakeDebugProgramWritable(program)				@@\
+									@@\
+load/**/program:							@@\
+	RemoveTargetProgram(program)					@@\
+	BbaTargetProgram(program,$(OBJS14))				@@\
+	CreateHPVersion()						@@\
+	$(LINKCC) -o program $(LDOPTIONS) $(HP_VERSION_OBJ) $(OBJS14) locallib $(EXTRA_LOAD_FLAGS) syslib $(LDLIBS) $(C++LIBPATH)  @@\
+	RemoveHPVersion()                                               @@\
+	MakeDebugProgramWritable(program)				@@\
+									@@\
+SaberProgramTarget(program,$(SRCS14),$(OBJS14),locallib,syslib )		@@\
+									@@\
+InstallProgram(program,$(BINDIR))					@@\
+InstallManPage(program,$(MANDIR))
+#endif /* ComplexProgramTarget_14 */
+
+
+
+
+/*
+ * ComplexProgramTarget_15 - generate rules for compiling and linking the
+ * program specified by $(OBJS15) and $(SRCS15) and installing the program and
+ * man page.  It should be used to build the second program in Imakefiles 
+ * describing more than one program.
+ */
+#ifndef ComplexProgramTarget_15
+#define	ComplexProgramTarget_15(program,locallib,syslib )			@@\
+program: $(OBJS15) $(DEPLIBS15)						@@\
+	RemoveTargetProgram($@)						@@\
+	BbaTargetProgram(program,$(OBJS15))				@@\
+	CreateHPVersion()						@@\
+	$(LINKCC) -o $@ $(LDOPTIONS) $(HP_VERSION_OBJ) $(OBJS15) locallib $(EXTRA_LOAD_FLAGS) syslib $(LDLIBS) $(C++LIBPATH)  @@\
+	Strip()						        @@\
+	RemoveHPVersion()                                               @@\
+	MakeDebugProgramWritable(program)				@@\
+									@@\
+load/**/program:							@@\
+	RemoveTargetProgram(program)					@@\
+	BbaTargetProgram(program,$(OBJS15))				@@\
+	CreateHPVersion()						@@\
+	$(LINKCC) -o program $(LDOPTIONS) $(HP_VERSION_OBJ) $(OBJS15) locallib $(EXTRA_LOAD_FLAGS) syslib $(LDLIBS) $(C++LIBPATH)	@@\
+	RemoveHPVersion()                                               @@\
+	MakeDebugProgramWritable(program)				@@\
+									@@\
+SaberProgramTarget(program,$(SRCS15),$(OBJS15),locallib,syslib )		@@\
+									@@\
+InstallProgram(program,$(BINDIR))					@@\
+InstallManPage(program,$(MANDIR))
+#endif /* ComplexProgramTarget_15 */
+
+
+/* start of new .cc.c rules */
+/*
+ * CPlusPlusToCRule  -- generate a ".c" file from C++ source (".C")
+ * c_sources must be a .c file.
+ */
+
+#ifndef CCPlusPlusToCRule
+#define CCPlusPlusToCRule(c_sources)					@@\
+									@@\
+.SUFFIXES: .c .cc							@@\
+all:: c_sources								@@\
+									@@\
+.cc.c:									@@\
+	@echo " creating file $*.c"					@@\
+	$(RM) $*.c							@@\
+	$(C++) $(ALL++INCLUDES) $(ALL++DEFINES) $(C++TRANSLATE_ONLY)  $<  > $*.c || $(RM) $*.c	@@\
+									@@\
+CCclean::								@@\
+	@-for i in c_sources; do \					@@\
+		echo "      removing file $$i"; \			@@\
+		$(RM) $$i; \						@@\
+	done								@@\
+									@@\
+depend::								@@\
+	@-for i in c_sources; do \					@@\
+	j=`basename $$i .c`; \						@@\
+	if [ ! -f $$i ]; then \						@@\
+		echo "      creating file $$i"; \			@@\
+		$(RM) $$i; \						@@\
+		echo "	$(C++) $(ALL++INCLUDES) $(ALL++DEFINES) $(C++TRANSLATE_ONLY) $$j.C > $$i || $(RM) $$i"; \	@@\
+		$(C++) $(ALL++INCLUDES) $(ALL++DEFINES) $(C++TRANSLATE_ONLY) $$j.C > $$i || $(RM) $$i; fi;done
+#endif
+
+
+/*
+ * CCComplexProgramTarget - generate rules for compiling and linking the 
+ * program specified by $(OBJS) and $(SRCS), installing the program and its
+ * man page, and generating dependencies.  It should only be used in 
+ * Imakefiles that describe a single C++ program.
+ */
+#ifndef CCComplexProgramTarget
+#define	CCComplexProgramTarget(program)					@@\
+        PROGRAM = program						@@\
+									@@\
+AllTarget(program)							@@\
+									@@\
+AixLinkArchivedLibC()							@@\
+program: $(OBJS) $(DEPLIBS)						@@\
+	RemoveTargetProgram($@)						@@\
+	BbaTargetProgram(program,$(OBJS))				@@\
+	CreateHPVersion()						@@\
+	$(C++) -o $@ $(HP_VERSION_OBJ) $(OBJS) $(LDOPTIONS) $(LOCAL_LIBRARIES) $(EXTRA_LOAD_FLAGS) $(LDLIBS) @@\
+	RemoveHPVersion()						@@\
+	MakeDebugProgramWritable(program)				@@\
+									@@\
+load/**/program:							@@\
+	RemoveTargetProgram(program)					@@\
+	BbaTargetProgram(program,$(OBJS))				@@\
+	CreateHPVersion()						@@\
+	$(C++) -o program $(HP_VERSION_OBJ) $(OBJS) $(LDOPTIONS) $(LOCAL_LIBRARIES) $(EXTRA_LOAD_FLAGS) $(LDLIBS) @@\
+	RemoveHPVersion()						@@\
+	MakeDebugProgramWritable(program)				@@\
+									@@\
+SaberProgramTarget(program,$(SRCS),$(OBJS),$(LOCAL_LIBRARIES),NullParameter) @@\
+									@@\
+InstallProgram(program,$(BINDIR))					@@\
+InstallManPage(program,$(MANDIR))					@@\
+DependTarget()								@@\
+LintTarget()								@@\
+									@@\
+clean::									@@\
+	$(RM) $(PROGRAM)
+#endif /* CCComplexProgramTarget */
+
+
+/*
+ * CCComplexProgramTarget_1 - generate rules for compiling and linking the
+ * program specified by $(OBJS1) and $(SRCS1), installing the program and its
+ * man page, and generating dependencies for it and any programs described
+ * by $(SRCS2), $(SRCS3) and $(SRCS4).  It should be used to build the primary 
+ * program in Imakefiles that describe multiple C++ programs.
+ */
+#ifndef CCComplexProgramTarget_1
+#define	CCComplexProgramTarget_1(program,locallib,syslib )		@@\
+            OBJS = $(OBJS1) $(OBJS2) $(OBJS3) $(SRCS4)			@@\
+            SRCS = $(SRCS1) $(SRCS2) $(SRCS3) $(SRCS4)			@@\
+									@@\
+AllTarget($(PROGRAMS))							@@\
+									@@\
+AixLinkArchivedLibC()							@@\
+program: $(OBJS1) $(DEPLIBS1)						@@\
+	RemoveTargetProgram($@)						@@\
+	BbaTargetProgram(program,$(OBJS1))				@@\
+	CreateHPVersion()						@@\
+	$(C++) -o $@ $(LDOPTIONS) $(HP_VERSION_OBJ) $(OBJS1) locallib $(EXTRA_LOAD_FLAGS) syslib $(LDLIBS) $(C++LIBPATH)  @@\
+	RemoveHPVersion()						@@\
+	MakeDebugProgramWritable(program)				@@\
+									@@\
+load/**/program:							@@\
+	RemoveTargetProgram(program)					@@\
+	BbaTargetProgram(program,$(OBJS1))				@@\
+	CreateHPVersion()						@@\
+	$(C++) -o program $(LDOPTIONS) $(HP_VERSION_OBJ) $(OBJS1) locallib $(EXTRA_LOAD_FLAGS) syslib $(LDLIBS) $(C++LIBPATH)  @@\
+	RemoveHPVersion()						@@\
+	MakeDebugProgramWritable(program)				@@\
+									@@\
+InstallProgram(program,$(BINDIR))					@@\
+InstallManPage(program,$(MANDIR))					@@\
+									@@\
+SaberProgramTarget(program,$(SRCS1),$(OBJS1),locallib,syslib )		@@\
+									@@\
+DependTarget()								@@\
+LintTarget()								@@\
+									@@\
+clean::									@@\
+	$(RM) $(PROGRAMS)
+#endif /* CCComplexProgramTarget_1 */
+
+
+/*
+ * CCComplexProgramTarget_2 - generate rules for compiling and linking the
+ * program specified by $(OBJS2) and $(SRCS2) and installing the program and
+ * man page.  It should be used to build the second C++ program in Imakefiles 
+ * describing more than one program.
+ */
+#ifndef CCComplexProgramTarget_2
+#define	CCComplexProgramTarget_2(program,locallib,syslib )		@@\
+program: $(OBJS2) $(DEPLIBS2)						@@\
+	RemoveTargetProgram($@)						@@\
+	BbaTargetProgram(program,$(OBJS2))				@@\
+	CreateHPVersion()						@@\
+	$(C++) -o $@ $(LDOPTIONS) $(HP_VERSION_OBJ) $(OBJS2) locallib $(EXTRA_LOAD_FLAGS) syslib $(LDLIBS) $(C++LIBPATH)  @@\
+	RemoveHPVersion()						@@\
+	MakeDebugProgramWritable(program)				@@\
+									@@\
+load/**/program:							@@\
+	RemoveTargetProgram(program)					@@\
+	BbaTargetProgram(program,$(OBJS2))				@@\
+	CreateHPVersion()						@@\
+	$(C++) -o program $(LDOPTIONS) $(HP_VERSION_OBJ) $(OBJS2) locallib $(EXTRA_LOAD_FLAGS) syslib $(LDLIBS) $(C++LIBPATH)  @@\
+	RemoveHPVersion()						@@\
+	MakeDebugProgramWritable(program)				@@\
+									@@\
+SaberProgramTarget(program,$(SRCS2),$(OBJS2),locallib,syslib )		@@\
+									@@\
+InstallProgram(program,$(BINDIR))					@@\
+InstallManPage(program,$(MANDIR))
+#endif /* CCComplexProgramTarget_2 */
+
+
+/*
+ * CCComplexProgramTarget_3 - generate rules for compiling and linking the
+ * program specified by $(OBJS3) and $(SRCS3) and installing the program and
+ * man page.  It should be used to build the third C++ program in Imakefiles 
+ * describing more than one program.
+ */
+#ifndef CCComplexProgramTarget_3
+#define	CCComplexProgramTarget_3(program,locallib,syslib )		@@\
+program: $(OBJS3) $(DEPLIBS3)						@@\
+	RemoveTargetProgram($@)						@@\
+	BbaTargetProgram(program,$(OBJS3))				@@\
+	CreateHPVersion()						@@\
+	$(C++) -o $@ $(LDOPTIONS) $(HP_VERSION_OBJ) $(OBJS3) locallib $(EXTRA_LOAD_FLAGS) syslib $(LDLIBS) $(C++LIBPATH)  @@\
+	RemoveHPVersion()						@@\
+	MakeDebugProgramWritable(program)				@@\
+									@@\
+load/**/program:							@@\
+	RemoveTargetProgram(program)					@@\
+	BbaTargetProgram(program,$(OBJS3))				@@\
+	CreateHPVersion()						@@\
+	$(C++) -o program $(LDOPTIONS) $(HP_VERSION_OBJ) $(OBJS3) locallib $(EXTRA_LOAD_FLAGS) syslib $(LDLIBS) $(C++LIBPATH)  @@\
+	RemoveHPVersion()						@@\
+	MakeDebugProgramWritable(program)				@@\
+									@@\
+SaberProgramTarget(program,$(SRCS3),$(OBJS3),locallib,syslib )		@@\
+									@@\
+InstallProgram(program,$(BINDIR))					@@\
+InstallManPage(program,$(MANDIR))
+#endif /* CCComplexProgramTarget_3 */
+
+/*
+ * CCComplexProgramTarget_4 - generate rules for compiling and linking the
+ * program specified by $(OBJS4) and $(SRCS4) and installing the program and
+ * man page.  It should be used to build the third C++ program in Imakefiles 
+ * describing more than one program.
+ */
+#ifndef CCComplexProgramTarget_4
+#define	CCComplexProgramTarget_4(program,locallib,syslib )		@@\
+program: $(OBJS4) $(DEPLIBS4)						@@\
+	RemoveTargetProgram($@)						@@\
+	BbaTargetProgram(program,$(OBJS4))				@@\
+	CreateHPVersion()						@@\
+	$(C++) -o $@ $(LDOPTIONS) $(HP_VERSION_OBJ) $(OBJS4) locallib $(EXTRA_LOAD_FLAGS) syslib $(LDLIBS) $(C++LIBPATH)  @@\
+	RemoveHPVersion()						@@\
+	MakeDebugProgramWritable(program)				@@\
+									@@\
+load/**/program:							@@\
+	RemoveTargetProgram(program)					@@\
+	BbaTargetProgram(program,$(OBJS4))				@@\
+	CreateHPVersion()						@@\
+	$(C++) -o program $(LDOPTIONS) $(HP_VERSION_OBJ) $(OBJS4) locallib $(EXTRA_LOAD_FLAGS) syslib $(LDLIBS) $(C++LIBPATH)  @@\
+	RemoveHPVersion()						@@\
+	MakeDebugProgramWritable(program)				@@\
+									@@\
+SaberProgramTarget(program,$(SRCS4),$(OBJS4),locallib,syslib )		@@\
+									@@\
+InstallProgram(program,$(BINDIR))					@@\
+InstallManPage(program,$(MANDIR))
+#endif /* CCComplexProgramTarget_4 */
+/***************** END NEW .cc.c rules ******************/
+
+ /*
+ * This target is an interface for building a message catalog
+ * with a version string for non C message Catalogs. 
+ */
+#ifndef Non_C_MessageCatalogTarget
+#define Non_C_MessageCatalogTarget(program,versionfile,directory,language)	@@\
+									@@\
+AllTarget (directory/program.cat)					@@\
+									@@\
+directory/program.cat: directory/program.msg				@@\
+	$(RM) $@							@@\
+	$(RM) directory/program.vmsg					@@\
+	-VERSION=`what < versionfile | paste - - -`;\			@@\
+	sed "s~@(#)version_goes_here~@(#)$$VERSION~" directory/program.msg \
+		> directory/program.vmsg;\				@@\
+	LANG=language;\							@@\
+	gencat directory/program.cat directory/program.vmsg		@@\
+clean:: 								@@\
+	$(RM) directory/program.cat  directory/program.vmsg
+#endif /* MessageCatalogTarget */
+
+/* This macro loads all of the .o's for a client and its associated
+   libraries into a single .o and then runs bbagen on it. bbagen then
+   produces a bba.a to link into a client.
+*/
+#ifndef BbaTargetProgram
+#if UseCPlusPlus
+#define BbaTargetProgram(program,objects) \
+	$(BBAGEN) $(BBA_L_OPTION) $(BBA_D_OPTION) objects > /dev/null
+#else
+#define BbaTargetProgram(program,objects) \
+	$(LD_BBAGEN) -r -o program.bba.o objects $(BBA_LIBRARIES)> /dev/null	@@\
+	$(BBAGEN) $(BBA_L_OPTION) $(BBA_D_OPTION) program.bba.o > /dev/null
+#endif
+#endif
+
+/******************************************************************************
+		New Rules for Version Strings
+******************************************************************************/
+
+#ifndef	RemoveHPVersion
+#  if	HPVersion
+#define	RemoveHPVersion()	@-$(RM) $(HP_VERSION_OBJ) $(HP_VERSION_SRC)
+#  else
+#define	RemoveHPVersion()	@\: ; /*do nothing */
+#  endif
+#endif
+
+#ifndef	CreateHPVersion
+#  if HPVersion
+#define	CreateHPVersion() \
+	RemoveHPVersion()						@@\
+echo "static char _date_str[]=\"@(#)$(CREATION_DATE)\"; static char _HP_vstr[]=\"@(#)$(HP_VERSION_STRING)\";static char desktop_vstr[]=\"@(#)$(DESKTOP_VERSION_STRING)\"; static char vue_vstr[]=\"@(#)$(VUE_VERSION_STRING)\";static char xtr_vstr[]=\"@(#)$(EXTRA_VERSION_STRING)\";" > $(HP_VERSION_SRC);\
+$(CC) -c $(CFLAGS) $(HP_VERSION_SRC)
+#  else
+#define CreateHPVersion()   @\: ; /* do nothing */
+#  endif
+#endif
+
+
+/*
+ * SpecialRelocatableTarget - generate rules to produce a relocatable 
+ * object file instead of a library, with options.
+ */
+#ifndef SpecialRelocatableTarget
+#define SpecialRelocatableTarget(client_name,options,objlist)		@@\
+AllTarget(client_name/**/_OBJS.o)					@@\
+									@@\
+client_name/**/_OBJS.o: client_name/**/_main.o objlist Imakefile	@@\
+	$(RM) $@							@@\
+	$(LD) $(LDCOMBINEFLAGS) options client_name/**/_main.o objlist -o $@	@@\
+									@@\
+load/**/client_name/**/_OBJS.o:						@@\
+	$(RM) client_name/**/_OBJS.o					@@\
+	$(LD) $(LDCOMBINEFLAGS) options client_name/**/_main.o objlist -o client_name/**/_OBJS.o	@@\
+clean::									@@\
+	$(RM) client_name/**/_OBJS.o client_name/**/_main.o
+
+#endif /* SpecialRelocatableTarget */
+
+/* This rule is a front end to SpecialRelocatableTarget for vuge */
+#ifndef VugeObjectTarget
+#define VugeObjectTarget(client_name,options,objlist) \
+SpecialRelocatableTarget(client_name,options,objlist)
+#endif /* VugeObjectTarget */
+
+#ifndef CoegeObjectTarget
+#define CoegeObjectTarget(client_name,options,objlist) \
+SpecialRelocatableTarget(client_name,options,objlist)
+#endif /* CoegeObjectTarget */
+
+
+#ifndef DoServerClone
+#define DoServerClone()							@@\
+setup_clone:								@@\
+	@set -x; \							@@\
+	SERVERLESSUBDIR=`echo "$(CURRENT_DIR)" |sed -e "s/server//"`;\	@@\
+	#get the destination (user directory) ; \			@@\
+	BASEDIR=`basename $(CURRENT_DIR)`; \				@@\
+	if eval 'grep -F "CURRENT_DIR =" Makefile | grep -F "hooligan/" | grep -F -q -v eval';then \@@\
+		ISHOOLIGANSUBDIR=TRUE; \				@@\
+	fi; \								@@\
+	if [ "$$BASEDIR" = "server" ];then \				@@\
+		if eval 'grep -F "CURRENT_DIR =" Makefile | grep -F "extensions/" | grep -F -q -v "grep -F"';then \	@@\
+			ISSERVER=; \					@@\
+			ISEXTENSIONS=TRUE; \				@@\
+		else ISSERVER=TRUE;fi; \				@@\
+	fi; \								@@\
+	if [ ! -d "$(CLONEDEST)" ];then mkdir -p $(CLONEDEST);fi; \	@@\
+	cd $(CLONEDEST); \						@@\
+	if [ ! -d "server" ];then \					@@\
+		mkdir server; \						@@\
+		#if this directory is not server, dont do full clone;\	@@\
+		if [ ! "$$ISSERVER" ];then \				@@\
+			(cd server; \					@@\
+			$(RM) Imakefile; \				@@\
+			$(LN) $(REALTOP)/server/Imakefile .; \		@@\
+			$(RM) Makefile; \				@@\
+			$(LN) $(REALTOP)/server/Makefile .;); \		@@\
+		fi; \							@@\
+	fi; \								@@\
+	#hooligan, another special case; \				@@\
+	if [ "$$BASEDIR" = "hooligan" -o "$$ISHOOLIGANSUBDIR" ];then \	@@\
+		HOOLIGANDIR=server/ddx/hp/hooligan; \			@@\
+		if [ ! -d "$$HOOLIGANDIR" ];then \			@@\
+			mkdir -p $$HOOLIGANDIR; \			@@\
+			#if base is not hooligan, dont do full clone;\	@@\
+			if [ "$$BASEDIR" != "hooligan" ];then \		@@\
+				(cd $$HOOLIGANDIR; \			@@\
+				$(RM) Imakefile; \			@@\
+				$(LN) $(REALTOP)/$$HOOLIGANDIR/Imakefile .; \		@@\
+				$(RM) Makefile; \			@@\
+				$(LN) $(REALTOP)/$$HOOLIGANDIR/Makefile .;); \		@@\
+			fi; \						@@\
+		fi; \							@@\
+	fi; \								@@\
+	# This is the server or hooligan directory, do full clone,etc.\	@@\
+	if [ "$$ISSERVER" -o "$$BASEDIR" = "hooligan" ];then\		@@\
+		(cd $(CURRENT_DIR); \					@@\
+		fnrclone -s $(REALTOP)/$(CURRENT_DIR) .; \		@@\
+		make "TOP=$(REALTOP)" Makefile; \			@@\
+		make "TOP=$(REALTOP)" -i Makefiles;); \			@@\
+		if [ "$$BASEDIR" = "hooligan" ];then\			@@\
+			(cd server; \					@@\
+			echo "$(CLONEMACRO)=$$SERVERLESSUBDIR/$(CLONEPRODUCT)">>localmacros;); \	@@\
+		fi; \							@@\
+	else \								@@\
+		[ ! -d $(CURRENT_DIR) ] && mkdir -p $(CURRENT_DIR); \	@@\
+		(cd $(CURRENT_DIR); \					@@\
+		fnrclone -s $(REALTOP)/$(CURRENT_DIR) .; \		@@\
+		make "TOP=$(REALTOP)" Makefile; \			@@\
+		make "TOP=$(REALTOP)" -i Makefiles;); \			@@\
+		if [ "$$ISHOOLIGANSUBDIR" ];then \			@@\
+			(cd $$HOOLIGANDIR; \				@@\
+			echo "$(CLONEMACRO)=$$SERVERLESSUBDIR/$(CLONEPRODUCT)">>localmacros; \	@@\
+			make Makefile;); \				@@\
+		else \							@@\
+			(cd server; \					@@\
+			if [ "$$ISEXTENSIONS" ];then \			@@\
+				echo "$(CLONEMACRO)=../$(CURRENT_DIR)/$(CLONEPRODUCT)">>localmacros; \	@@\
+			else \						@@\
+			echo "$(CLONEMACRO)=$$SERVERLESSUBDIR/$(CLONEPRODUCT)">>localmacros; \	@@\
+			fi;); \						@@\
+		fi; \							@@\
+	fi; \								@@\
+	(cd server; \							@@\
+	# Make the server Makefile with the new localmacros; \		@@\
+	make "TOP=$(REALTOP)" Makefile;)
+#endif /* DoServerClone */
+
+
+/* rule to link files in a remote directory to your current directory. */
+#ifndef LinkFiles
+#define LinkFiles(srcdir, filelist)					@@\
+includes::								@@\
+	@for i in filelist ;do \					@@\
+	    $(RM) `basename $$i`; \					@@\
+	    echo "	linking srcdir/$$i to $$i ";\			@@\
+	    ln -f -s srcdir/$$i .; \					@@\
+	done								@@\
+localincludes::								@@\
+	@for i in filelist ;do \					@@\
+	    $(RM) `basename $$i`; \					@@\
+	    echo "	linking srcdir/$$i to $$i ";\			@@\
+	    ln -f -s srcdir/$$i .; \					@@\
+	done								@@\
+cleanlinks::								@@\
+	@for i in filelist ;do \					@@\
+	    echo "	removing linked file $$i ";\			@@\
+	    $(RM) `basename $$i`; \					@@\
+	done
+#endif
+
+/*
+ * Simple rule to symbolically link files in the build tree.
+ * Used by the NLS tagging Imakefiles to link the source files to
+ * the localized directories.
+ */
+
+#ifndef FileLinkRule
+#define FileLinkRule(a,b)						@@\
+includes::								@@\
+	@echo "Linking a to b"						@@\
+	@if [ ! -f "b" ]; then \					@@\
+		$(RM) b; \						@@\
+		$(LN) a b; \						@@\
+	else \								@@\
+		if [ -h "b" ]; then \ 					@@\
+			$(RM) b; \					@@\
+			$(LN) a b; \					@@\
+		else \							@@\
+			echo "Existing file: \"b\""; \			@@\
+		fi; \							@@\
+	fi;								@@\
+localincludes::								@@\
+	@echo "Linking a to b"						@@\
+	@if [ ! -f "b" ]; then \					@@\
+		$(RM) b; \						@@\
+		$(LN) a b; \						@@\
+	else \								@@\
+		if [ -h "b" ]; then \ 					@@\
+			$(RM) b; \					@@\
+			$(LN) a b; \					@@\
+		else \							@@\
+			echo "Existing file: \"b\""; \			@@\
+		fi; \							@@\
+	fi;
+#endif
+
+/*
+ * Implicit rules to generate localized text files from an nls source
+ * template (.nls) and a message tag file (.tmsg).  The message tag
+ * file is identical to an ordinary nls .msg file except that it is
+ * never used to build a ".cat" file -- instead it is used to build
+ * the localized text file itself.
+ */
+.SUFFIXES: .tmsg .nls
+
+.nls:
+	@echo "Extracting NLS messages for: $*"
+	$(NLSTAGUTIL) -lang $(LANG) $*.tmsg < $*.nls > $* || $(RM) $*
+	$(RM) .*.m
+
+.tmsg.nls:
+	@if [ -w "$*.nls" ]; then touch $*.nls; else true; fi
+	@sleep 1;
+	
+
+#ifndef HelpTagRule
+#define HelpTagRule							@@\
+.SUFFIXES: .htg .sdl							@@\
+									@@\
+.htg.sdl:								@@\
+	@if [ "$$HELPTAGPASS1" = "" ]; then \				@@\
+		HELPTAGPASS1=$(HELPTAGPASS1DEF); \			@@\
+	fi; \								@@\
+	if [ "$$HELPTAGPASS2" = "" ]; then \				@@\
+		HELPTAGPASS2=$(HELPTAGPASS2DEF); \			@@\
+	fi; \								@@\
+	if [ "$$DTLCXSEARCHPATH" = "" ]; then \				@@\
+		DTLCXSEARCHPATH=$(DTLCXSEARCHPATHDEF); \		@@\
+	fi; \								@@\
+	export DTLCXSEARCHPATH HELPTAGPASS1 HELPTAGPASS2; \		@@\
+	sh $(HELPTAG) $*.htg 
+#endif
+
+/*
+ * Rule to use helptag in LearningProducts dirs
+ */
+#ifndef CCDFHelpTagRule
+#define CCDFHelpTagRule							@@\
+									@@\
+.SUFFIXES: .htg .err .hmi .hv .hvk .xrh .idt .idx .tcp .ht .ent .CHs .CIs .SIs .opt	@@\
+									@@\
+.htg.hv .htg.hvk  .htg.xrh .htg.ht .htg.opt .htg.ent .htg.hmi .htg.hv  .htg.idt .htg.idx .htg.tcp :	@@\
+	HELPTAGPARSER=$(HTAGSRC) \					@@\
+	VOLUMEGEN=$(VOLUMEGENSRC) \					@@\
+	HELPCOMP=$(HELPCOMPSRC) \					@@\
+	$(HELPTAGSRC) $*.htg
+#endif
+
+/* empty rules for common source between cde and test builds */
+#ifndef	TestBuildInstall
+#define TestBuildInstall(parm1,parm2)  /**/
+#endif
+#ifndef	TestBuildMultipleInstall
+#define TestBuildMultipleInstall(parm1,parm2)  /**/
+#endif
+#ifndef	TestLibraryBuildInstall
+#define TestLibraryBuildInstall(parm1,parm2) /**/
+#endif
+
+/*
+ * CppText2Rule - generate rules to create a text file by running the
+ * input through cpp.  Typically used for architectural variations of
+ * config files. Backslash initial '#' characters (except for preprocessor
+ * directives).
+ */
+#ifndef CppText2Rule
+#ifdef IBMArchitecture
+/*
+ * The IBM version of "cc -E" or "cpp" does not allow escaping of the
+ * '#' character with a backslash (\) to prevent the '#' from being interpreted
+ * as a preprocessor directive.  To overcome this problem the "src" is passed
+ * through and extra invocation of sed(1) to change the escape character to
+ * the string "\!#" (which seems to keep cpp happy).  Since this requires
+ * the PREPROCESSCMD to accept standard input, the command is hard wired
+ * to "/lib/cpp" which produces acceptable results. (CPP_TXT_FLAGS should
+ * undefine any preprocesor definitions which may appear in the text being
+ * processed.) 
+ */
+#define CppText2Rule(dst,src,defs,deplist)				@@\
+all:: dst								@@\
+dst:: src deplist							@@\
+	$(RM) $@							@@\
+	sed 's/[ \t]*\\#/\\!#/' src  | \				@@\
+	/lib/cpp $(CPP_TXT_FLAGS) defs  | \				@@\
+	sed 's/[ \t]*\\!#/#/' | \					@@\
+	sed 's/\\+/"/g' > $@						@@\
+clean::									@@\
+	$(RM) dst							@@\
+depend::
+#else /* not IBMArchitecture */
+#define CppText2Rule(dst,src,defs,deplist)				@@\
+all:: dst								@@\
+dst:: src deplist							@@\
+	$(RM) $@							@@\
+	$(PREPROCESSCMD) $(CPP_TXT_FLAGS) defs src | \			@@\
+	sed 's/[ \t]*\\#/#/' | \					@@\
+	sed 's/\\+/"/g' > $@						@@\
+clean::									@@\
+	$(RM) dst							@@\
+depend::
+#endif /* IBMArchitecture */
+#endif
+
+/*
+ * This rule scans all of the .msg files in a directory at make includes
+ * time to create a list of dependencies(.cat) for the message catalog rule
+ * run at make all time.
+ * In essence it builds a .cat for every .msg present in a directory.
+ */
+#ifndef RandomMessageCatalogRule
+#define RandomMessageCatalogRule()					@@\
+TMPLOCAL_FILE = tmplocalfile						@@\
+TMPLOCAL_MAKEFILE = tmplocalMakefile					@@\
+TMPLOCAL_DEST = `ls *.msg |grep -v libAB |\				@@\
+   sed -e 's/.msg/.cat/g'`						@@\
+									@@\
+AllTarget($(TMPLOCAL_TARGET))						@@\
+									@@\
+includes::								@@\
+	$(RM) localtmpfile						@@\
+	$(RM) tmp.msg							@@\
+	echo TMPLOCAL_TARGET = $(TMPLOCAL_DEST) > $(TMPLOCAL_FILE) && \	@@\
+	$(CP) Makefile $(TMPLOCAL_MAKEFILE)				@@\
+	if [ -f $(TMPLOCAL_FILE) -a -f $(TMPLOCAL_MAKEFILE) ];then \	@@\
+		$(MV) Makefile Makefile.bak; \				@@\
+	cat $(TMPLOCAL_FILE) $(TMPLOCAL_MAKEFILE)  > Makefile;fi	@@\
+	$(RM) $(TMPLOCAL_FILE) $(TMPLOCAL_MAKEFILE)			@@\
+									@@\
+.SUFFIXES: .msg .cat							@@\
+									@@\
+MKCATTOOL = MkCatToolCmd						@@\
+SYM2NUM_CMD = $(CDESRC)/dtprintinfo/sym2num				@@\
+Xm.cat : Xm.msg								@@\
+	( \								@@\
+		rm -f $@; \						@@\
+		LANG=$(LANG); \						@@\
+		export LANG; \						@@\
+		$(MKCATTOOL) $(@:.cat=) $(@:.cat=.msg) -h > tmp.msg; \	@@\
+		gencat $(MAKEMESSCAT_FLAGS) $@ tmp.msg; \		@@\
+		rm -f tmp.msg \						@@\
+	)								@@\
+dtprintinfo.cat: dtprintinfo.msg					@@\
+	( \								@@\
+		rm -f $@; \						@@\
+		LANG=$(LANG); \						@@\
+		export LANG; \						@@\
+		$(SYM2NUM_CMD) $(@:.cat=) $(@:.cat=.msg) > tmp.msg; \	@@\
+		gencat $(MAKEMESSCAT_FLAGS) $@ tmp.msg; \		@@\
+		rm -f tmp.msg $(@:.cat=_msg.h) \			@@\
+	)								@@\
+									@@\
+.msg.cat:								@@\
+	$(RM) $@							@@\
+	$(MAKEMESSCAT) $(MAKEMESSCAT_OPTIONS) $@ $(LANG)		@@\
+									@@\
+dtcodegen.cat dtbuilder.cat: libAButil.msg libABobjXm.msg libABil.msg	@@\
+	$(RM) $@							@@\
+	$(MAKEMESSCAT) $(MAKEMESSCAT_OPTIONS) $(@:.cat=.msg) \		@@\
+	 libAButil.msg libABobjXm.msg libABil.msg $(LANG) 
+#endif /* RandomMessageCatalogRule */
+
+/*
+ * This rule creates a description file containing resources from a tagged
+ * .nls file and a .tmsg file.  This file is used by dtstyle for the labels
+ * of the backdrops and palettes.
+ *
+ */
+#ifndef DtstyleDescRule
+#define DtstyleDescRule(targetfile,sourcefile)				@@\
+all:: targetfile							@@\
+									@@\
+targetfile: sourcefile.nls sourcefile.tmsg				@@\
+	@echo "Extracting NLS messages for: targetfile"			@@\
+	$(NLSTAGUTIL) -lang $(LANG) sourcefile.tmsg < sourcefile.nls >\ @@\
+	targetfile || $(RM) targetfile
+#endif /* DtstyleDescRule */
+
+

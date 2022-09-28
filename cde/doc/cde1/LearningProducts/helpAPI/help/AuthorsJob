@@ -1,0 +1,384 @@
+
+
+
+
+<chapter id=AuthorsJob>The Author's Job
+
+
+The authoring process for the HP Help System 
+can be divided into three general phases:
+
+<list order tight>
+
+ * <xref AuthorsJob-Planning>
+
+ * <xref AuthorsJob-Writing>
+
+ * <xref AuthorsJob-Publishing>
+
+<\list>
+
+
+Phases 2 and 3 are iterative.  That is, periodically as you write, you can
+generate and preview run-time help files to see your help as your audience
+will. 
+
+
+<s1 id=AuthorsJob-Planning>Planning Your Online Help
+
+The first step to creating useful online help is good planning.
+
+Here are some general questions you should answer during your 
+planning:
+
+<list plain tight>
+
+ * Who is the user (audience)?
+
+ * What are the user's information requirements?
+
+ * What conditions might lead the user to seek help?
+
+<!--
+ * What is the best presentation for the information?
+-->
+
+<\list>
+
+<otherhead>Application Help
+
+If you are writing help for an application, learn all you can
+about the application and how users are intended to interact
+with it.  As you organize your help topics, consider which
+ones should be <link EntryPoints>entry points<\link> that the 
+application can display directly.
+
+<otherhead>Stand-Alone Help
+
+If you are writing online help that isn't associated with a particular
+application, primary access to your online information will be provided by
+through a help browser.  One such browser is the HP VUE Help Manager,
+Version 3.0.
+
+<s2 id=AuthorsJob-OrganizingInformation>Organizing Help Information
+
+As with any writing, before you start, it is wise to have an outline
+or map of the topics you want to include.   This becomes even more 
+important when writing for online presentation, since you are not
+limited to a linear presentation like the pages of a book.
+
+<otherhead>Traditional Hierarchies 
+
+By the nature of the HelpTag markup language, topics are arranged in
+a hierarchy.  Often, this hierarchical organization is a sufficient 
+foundation for the information you need to present.  Most users quickly 
+become comfortable with hierarchical navigation.
+
+Well placed hyperlinks within help topics provide additional
+ways for users to navigate to the information they need.  Hyperlinks
+are especially useful for connecting related topics that may be in
+different brances of the topic hierarchy.
+
+
+<otherhead>Alternative Organization Styles
+
+For some applications, there may be a need for alternative 
+organization styles, depending
+on the information you are presenting and how you want users to
+interact with it.  Using hyperlinks, you can create many different
+styles of organization, including "webs," "trails," and "chains."
+
+Advanced organizations require more careful planning, since
+it is easier for users to get lost.  You also need to be sure not to
+create endless loops, ... more here ...
+ 
+
+
+
+
+
+<s2 id=EntryPoints>Creating Entry Points
+
+An application can display any help topic directly as long as it is a valid
+++entry point++.  To create an entry point, the topic (or an element within
+a topic) must have a unique author-defined ID.
+
+Once an ID is established, it can be used to display the topic, either
+directly from the application, or as the destination for a 
+<link link-ReferenceSection>hyperlink<\link>.
+
+<otherhead>Assigning IDs to Topics and Other Elements
+
+Many tags in the HelpTag language support an ID attribute, including
+all of the tags that mark the start of a new topic.  For example, 
+this markup starts a new topic titled "Welcome" and assigns the ID
+"WelcomeTopic":
+
+<ex smaller>
+\&<s2 id=WelcomeTopic> Welcome
+<\ex>
+
+<otherhead>Assigning IDs to Arbitrary Locations
+
+To assign an ID to a location within a topic where there's otherwise
+no support for entering an ID, use the ``\&<location>'' tag.  For
+example, you could enter this tag to create an entry point with the 
+ID "ImportantSpot":
+
+<ex smaller>
+\&<location id="ImportantSpot">
+<\ex>
+
+<otherhead>Rules for ID Strings
+
+<list bullet>
+
+  * Must begin with a letter ("A" -- "Z").
+  * May contain !!only!! letters, digits, plus ("+") or minus ("-").
+  * Case is !!not!! significant.
+  * May !!not!! contain any whitespace characters (spaces and tabs).
+
+<\list>
+
+To refer to an ID in another help volume, the syntax is:
+
+<ex>"%%Volume%%  %%ID%%"<\ex>
+
+Where %%Volume%% is the name of the volume file and %%ID%% is the ID
+within that volume that you are refering to.  
+
+<procedure>See Also
+
+<!--
+<list plain>
+ * <xref linking-to-another-volume>
+ * <xref built-in-IDs>
+<\list>
+-->
+
+
+
+<s2>Presentation Options
+
+The HP Help System provides two types of help dialogs for displaying
+topics.  
+
+<list bullet>
+
+ * The ++general help dialog++ provides a full-featured help window
+   including 
+
+ * The ++quick help dialog++ provides the same formatted display, but
+   hides the navigation aids.  
+
+ * The ++definition window++ is a temporary pop-up window, intended for
+   displaying the definition of a particular word or phrase.
+
+<\list>
+
+
+
+
+<s1 id=AuthorsJob-Writing>Writing Your Online Help
+
+Online help is written in ordinary text files.
+You use special codes, or "tags," to markup elements within the information.
+The tags used in authoring for the HP Help System form a markup language
+called HP HelpTag.  HelpTag is based on the Standard Generalized 
+Markup Language (SGML), ISO 8879.
+
+By design, an SGML-based markup language defines a hierarchy of 
+elements that you can choose from to organize the information you are
+writing.  At a high level, these elements define structure, such as
+chapters, sections, and subsections.  At lower levels, you mark elements
+such as emphasized words, book titles, and various types of lists.
+
+<s2>Getting Started
+
+All of the help text you write will be included in 
+a master HelpTag file, either directly or by reference to
+other files.  
+
+<ex>%%master%%.htg<\ex>
+
+You may name this file anything you want, however, the ``.htg'' 
+extention is recommended to identify it as a HelpTag file.
+
+<otherhead>Creating Working Directories
+
+For most projects, it's useful to create a working directory 
+and appropriate subdirectories to help organize your files.  
+It's recommended that you at least create a subdirectory for graphics 
+(or perhaps multiple subdirectories if additional organization is needed).
+
+In addition, you may also want to create a subdirectory for 
+help files (these are files that will be included by reference 
+into your master HelpTag file).
+
+
+<s2 id=AuthorsJob-OrganizingTopics>Organizing Topics
+
+Help topics are arranged in a hierarchy.  The tags used to mark the 
+start of topics are:
+
+<list plain tight>
+  * ``\&<hometopic>''
+  * ``\&<chapter>''
+  * ``\&<s1>'', ``\&<s2>'', ... , ``\&<s9>''
+  * ``\&<glossary>''
+  * ``\&<message>''
+<\list>
+
+The top-level topic in the hierachy, called the ++home topic++, is
+started with the  ``\&<hometopic>'' tag.  Subtoics are entered 
+following the home topic using the ``\&<chapter>'' tag.  
+
+For example, to create a home topic with two subtopics, 
+enter markup like this:
+
+<ex smaller>
+\&<hometopic>%%Title Here%%
+
+%%Write the home topic here ...%%
+
+     \&<chapter>%%First Subtopic Title Here%%
+
+     %%Write the first subtopic here ...%%
+
+     \&<chapter>%%Second Subtopic Title Here%%
+
+     %%Write the second subtopic here ...%%
+<\ex>
+
+Within each ``\&<chapter>'', subtopics are entered using ``\&<s1>''.
+Subtopics of ``\&<s1>''s are entered using ``\&<s2>'', and so on.  
+
+The ``\&<glossary>'' and ``\&<message>'' elements are 
+chapter-level topics that have special semantics.  ... add more here ...
+
+
+
+
+<s2 id=AuthorsJob-OrganizingFiles>Organizing Work Files
+
+Writing all of your help topics in a single file could get quite tedious.
+Therefore, it's recommended that you divide your work into multiple files
+and organize them to optimize your own productivity.
+
+If you write multiple files, you must include references to them in
+your master HelpTag file using ++entity declarations++.  For example,
+suppose you wrote your home topic in a file named ``hometopic.top''.
+You could include it in your ``%%master%%.htg'' file with an entity
+declaration like this:
+
+<ex smaller>
+\&<!entity MyHomeTopic FILE "hometopic.top">
+&&MyHomeTopic;
+
+<\ex>
+
+The first line declares an entity name ("MyHomeTopic") that refers
+to the file ``hometopic.top''.  The second line is the actual 
+++entity reference++ that includes the file.  Entity references always
+begin with an ampersand (``&&'') and end with a semicolon (``;'').
+
+
+
+
+<s1 id=AuthorsJob-Publishing>Generating Run-Time Help Files
+
+To create the run-time help files needed by the HP Help dialogs, you run
+the HelpTag software.
+Here's the command syntax:
+
+<ex>helptag [%%options%%] %%filename%%<\ex>
+
+The %%filename%% parameter is the name of your master HelpTag file and
+%%options%% are one or more of the following:
+
+<esc><paragraph leftindent 14 label "<spacing m>-memo</>">
+Includes writer's memos entered with <spacing m>\<memo></>.
+(Not in pre-Alpha release.)
+</p><\esc>
+
+<esc><paragraph leftindent 14 label "<spacing m>-verbose</>">
+Displays parser activity as it works on your files.
+</p><\esc>
+
+<esc><paragraph leftindent 14 label "<spacing m>-shortnames</>">
+Truncates all generated filenames for portability
+to other operating systems.
+(Not in pre-Alpha release.)
+</p><\esc>
+
+<esc><paragraph leftindent 14 label "<spacing m>-charset </><angle italic>c</>"> 
+Sets the default characterset to <angle italic>c</>.
+(Not in pre-Alpha release.)
+</p><\esc>
+
+
+When the processing is complete, the run-time help files are left in the
+current working directory.  The run-time files are identified by the
+extensions ``.hv'' (help volume) and ``.ht'' (help topics).  These are the
+files you will distribute.
+
+<s2>To specify where to find your files
+
+<list bullet>
+ * Create a ``helptag.opt'' file containing a list of the directories you
+want HelpTag to search.
+<\list>
+
+By default, the HelpTag software searches only the current working
+directory for your files.  If you separate your files into other
+directories, you must list all of the directories to be searched.  
+
+To creat a list of search paths for your project, create a ``helptag.opt''
+file in the same directory as your master input (``%%master%%.htg'').
+For each directory you want HelpTag to search, add a line to the file using
+this syntax:
+
+<ex>search=%%directory%%<\ex>
+
+It's recommended that each %%directory%% be specified as a relative path,
+if possible.  
+
+For example, if you place your graphic files are in a subdirectory
+named ``graphics/'' and you have additional text files in a subdirectory
+named ``topics/'', your ``helptag.opt'' file should contain these lines:
+
+<ex smaller>
+search=./
+search=./graphics/
+search=./topics/
+<\ex>
+
+The first line isn't needed, but it helps remind you that the current
+directory will also be searched.
+
+
+<s2>To remove generated files
+
+<list bullet>
+* Run the HelpTag software using the ``-clean'' option.
+<\list>
+
+<ex>helptag -clean %%filename%%<\ex>
+
+... where %%filename%% is the name of your master input file.
+
+
+<s2>To list file entities
+
+<list bullet>
+* Run the HelpTag software using the ``-files'' option.
+<\list>
+
+<ex>helptag -files %%filename%%<\ex>
+
+... where %%filename%% is the name of your master input file.
+
+The list shows the path used to resolve the file entities you've created.
+The list does !!not!! indicate which files are
+actually referenced withing your help topics.
+

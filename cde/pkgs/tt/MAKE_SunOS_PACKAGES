@@ -1,0 +1,82 @@
+#!/usr/bin/ksh
+
+if (($# > 0))
+then
+	packages="$*"
+else
+	packages="SUNWtltk SUNWtltkd SUNWtltkm"
+fi
+
+if test "${CDE_PACK_VER}" = ""
+then
+        CDE_PACK_VER=10
+        export CDE_PACK_VER
+fi
+
+if test "${CDE_PACK_DATE}" = ""
+then
+        CDE_PACK_DATE=`date '+%y.%m.%d'`
+        export CDE_PACK_DATE
+fi
+
+echo Making $packages
+
+for i in $packages
+do
+	if test $i = SUNWtltk
+	then
+
+	        cd ${i}
+                sccs get pkginfo.${i}
+                chmod 666 pkginfo.${i}
+                sed s/REV=/REV=${CDE_PACK_VER}.${CDE_PACK_DATE}/ pkginfo.${i} > pkginfo.${i}.tmp
+                mv pkginfo.${i}.tmp pkginfo.${i}
+                chmod 444 pkginfo.${i}
+                pkgmk -a ${BUILD_ARCH} \
+                -b ${BUILD_TREE}/lib/tt \
+                -o -d ${CDE_PACK_DIR}/ -f ./prototype.${i}
+                cd ..
+
+	elif test $i = SUNWtltkd
+	then
+	
+                cd ${i}
+                sccs get pkginfo.${i}
+                chmod 666 pkginfo.${i}
+                sed s/REV=/REV=${CDE_PACK_VER}.${CDE_PACK_DATE}/ pkginfo.${i} > pkginfo.${i}.tmp
+                mv pkginfo.${i}.tmp pkginfo.${i}
+                chmod 444 pkginfo.${i}
+                pkgmk -a ${BUILD_ARCH} \
+                -b ${BUILD_TREE}/lib/tt \
+                -o -d ${CDE_PACK_DIR}/ -f ./prototype.${i}
+                cd ..
+
+	elif test $i = SUNWtltkm
+	then
+
+                cd ${i}
+                sccs get pkginfo.${i}
+                chmod 666 pkginfo.${i}
+                sed s/REV=/REV=${CDE_PACK_VER}.${CDE_PACK_DATE}/ pkginfo.${i} > pkginfo.${i}.tmp
+                mv pkginfo.${i}.tmp pkginfo.${i}
+                chmod 444 pkginfo.${i}
+                pkgmk -a ${BUILD_ARCH} \
+                -b ${BUILD_TREE}/lib/tt \
+                -o -d ${CDE_PACK_DIR}/ -f ./prototype.${i}
+                cd ..
+
+	else
+
+                cd ${i}
+                sccs get pkginfo.${i}
+                chmod 666 pkginfo.${i}
+                sed s/REV=/REV=${CDE_PACK_VER}.${CDE_PACK_DATE}/ pkginfo.${i} > pkginfo.${i}.tmp
+                mv pkginfo.${i}.tmp pkginfo.${i}
+                chmod 444 pkginfo.${i}
+                pkgmk -a ${BUILD_ARCH} \
+                -b ${BUILD_TREE} \
+                -o -d ${CDE_PACK_DIR}/ -f ./prototype.${i}
+                cd ..
+
+	fi
+done

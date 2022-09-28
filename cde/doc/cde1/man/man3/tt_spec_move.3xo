@@ -1,0 +1,96 @@
+.TH tt_spec_move 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+tt_spec_move \- notify the ToolTalk service that an object has moved to a different file
+.SH SYNOPSIS
+.yS
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'char *tt_spec_move('u
+char *tt_spec_move(const char *\f2objid\fP,
+	const char *\f2newfilepath\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn tt_spec_move
+function
+notifies the ToolTalk service that this object has moved to a different file.
+.P
+The ToolTalk service returns a new
+objid
+for the object and leaves a forwarding
+pointer from the old
+objid
+to the new one.
+.P
+If a new
+objid
+is not required (for example, because the new and old
+files are in the same file system),
+.Fn tt_spec_move
+returns
+.Cn TT_WRN_SAME_OBJID .
+.P
+The
+.I objid
+argument is the identifier of the object involved in this operation.
+.P
+The
+.I newfilepath
+argument is the new file name.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn tt_spec_move
+function returns the new unique identifier of the object involved in this operation.
+The application can use
+.Fn tt_ptr_error 3
+to extract one of the following
+.B Tt_status
+values from the returned pointer:
+.VL 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_DBAVAIL
+.br
+The ToolTalk service could not access the
+ToolTalk database needed for this operation.
+.Lc TT_ERR_DBEXIST
+.br
+The ToolTalk service could not access the
+specified ToolTalk database in the expected place.
+.Lc TT_ERR_NOMP
+.br
+The
+.Cm ttsession 1
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_OBJID
+.br
+The
+.I objid
+passed to the ToolTalk service does not reference an existing object spec.
+.Lc TT_ERR_PATH
+.br
+The specified pathname included an unsearchable directory.
+.Lc TT_WRN_SAME_OBJID
+.br
+A new
+.I objid
+is not required.
+.LE
+.SH "APPLICATION USAGE"
+The application should use
+.Fn tt_free 3
+to free any data stored in the address returned by the
+ToolTalk API.
+.P
+For efficiency and reliability,
+the application should replace any references in the application to the old
+.I objid
+with references to the new one.
+.SH "SEE ALSO"
+.Hd Tt/tt_c.h 5,
+.Fn tt_ptr_error 3,
+.Fn tt_free 3.

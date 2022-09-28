@@ -1,0 +1,88 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Novell, Inc
+...\" **
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH MrmFetchColorLiteral 3X
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIMrmFetchColorLiteral\fP \- Fetches a named color literal from a UID file
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Mrm/MrmPublic.h>
+.sp \n(PDu
+int MrmFetchColorLiteral(\fBhierarchy_id, index, display, colormap_id, pixel\fI)
+.ta .5i 1.5i
+.nf
+	MrmHierarchy	\fBhierarchy_id\fI;
+	String	\fBindex\fI;
+	Display	*\fBdisplay\fI;
+	Colormap	\fBcolormap_id\fI;
+	Pixel	*\fBpixel\fI;
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+The
+\fIMrmFetchColorLiteral\fP
+function
+fetches a named color literal from a UID file, and converts the
+color literal to a pixel color value.
+.IP "\fBhierarchy_id\fP"
+Specifies the ID of the UID hierarchy that contains the
+specified literal.
+The \fBhierarchy_id\fP was returned in a previous call to
+\fIMrmOpenHierarchyPerDisplay\fP.
+.IP "\fBindex\fP"
+Specifies the UIL name of the color literal to fetch.
+You must define this name in UIL as an exported value.
+.IP "\fBdisplay\fP"
+Specifies the display used for the pixmap.
+The
+\fBdisplay\fP
+argument specifies the connection to the X server.
+For more information on the
+\fIDisplay\fP structure, see the Xlib function
+\fIXOpenDisplay\fP.
+.IP "\fBcolormap_id\fP"
+Specifies the ID of the color map.
+If NULL, the default color map is used.
+.IP "\fBpixel\fP"
+Returns the ID of the color literal.
+.nL
+.ne 9
+.SH RETURN VALUE
+This function returns one of these status return constants:
+.IP "\fIMrmSUCCESS\fP"
+The function executed successfully.
+.IP "\fIMrmBAD_HIERARCHY\fP"
+The hierarchy ID was invalid.
+.IP "\fIMrmNOT_FOUND\fP"
+The color literal was not found in the UIL file.
+.IP "\fIMrmWRONG_TYPE\fP"
+The caller tried to fetch a literal of a type not supported by this
+function.
+.IP "\fIMrmFAILURE\fP"
+The function failed.
+.SH RELATED INFORMATION
+.na
+\fIMrmFetchBitmapLiteral(3X)\fP,
+\fIMrmOpenHierarchyPerDisplay(3X)\fP,
+\fIMrmFetchIconLiteral(3X)\fP,
+\fIMrmFetchLiteral(3X)\fP, and
+\fIXOpenDisplay(3X)\fP.
+.ad

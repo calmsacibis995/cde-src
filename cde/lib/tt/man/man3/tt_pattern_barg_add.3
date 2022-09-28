@@ -1,0 +1,120 @@
+.de Lc
+.\" version of .LI that emboldens its argument
+.TP \\n()Jn
+\s-1\f3\\$1\f1\s+1
+..
+.TH tt_pattern_barg_add 3 "1 March 1996" "ToolTalk 1.3" "ToolTalk Functions"
+.BH "1 March 1996"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.IX "tt_pattern_barg_add.3" "" "tt_pattern_barg_add.3" "" 
+.SH NAME
+tt_pattern_barg_add \- add an argument with a value that contains embedded nulls to a pattern
+.SH SYNOPSIS
+.ft 3
+.nf
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'Tt_status tt_pattern_barg_add('u
+Tt_status tt_pattern_barg_add(Tt_pattern \f2m\fP,
+	Tt_mode \f2n\fP,
+	const char *\f2vtype\fP,
+	const unsigned char *\f2value\fP,
+	int \f2len\fP);
+.PP
+.fi
+.SH DESCRIPTION
+The
+.BR tt_pattern_barg_add (\|)
+function
+adds an argument with a value that contains embedded nulls to a pattern.
+.PP
+The
+.I m
+argument is the opaque handle for the pattern involved in this operation.
+The
+.I n
+argument specifies who
+(sender, handler, observers) writes and reads a message argument.
+The following modes are defined:
+.PP
+.RS 3
+.nr )J 8
+.Lc TT_IN
+The argument is written by the sender and read by the
+handler and any observers.
+.Lc TT_OUT
+.br
+The argument is written by the handler and read by the
+sender and any reply observers.
+.Lc TT_INOUT
+.br
+The argument is written by the sender and the
+handler and read by all.
+.PP
+.RE
+.nr )J 0
+.PP
+The
+vtype
+argument describes the type of argument data being added.
+Type
+.B ALL
+matches any argument value type.
+.PP
+The ToolTalk service treats the value as an opaque byte string.
+To pass structured data, the application and the receiving application
+must encode and decode these unique values.
+The most common method to use is XDR.
+.PP
+The
+.I value
+argument is the value to be added.
+.BR \s-1NULL\s+1
+matches any value.
+.PP
+The
+.I len
+argument is the length of the value in bytes.
+.PP 
+.PP
+Pattern arguments are positional paramaters, and thus will only match
+an incoming message if the arguments have the same type and position
+within the argument list of the incoming message. In order to match 
+an argument which is not the first in a list of arguments, the programmer   
+must use tt_pattern_arg_add(3) to register wildcard arguments for the  
+intervening arguments between the first argument and the argument which 
+it is desired to match on. Wildcard arguments should have the vtype of "ALL"
+and a value of NULL. 
+.SH "RETURN VALUE"
+Upon successful completion, the
+.BR tt_pattern_barg_add (\|)
+function returns the status of the operation as one of the following
+.B Tt_status
+values:
+.PP
+.RS 3
+.nr )J 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_NOMP
+.br
+The
+.BR ttsession (1)
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_POINTER
+.br
+The pointer passed does not point to an object of
+the correct type for this operation.
+.PP
+.RE
+.nr )J 0
+.SH "SEE ALSO"
+.na
+.BR tt_c (5),
+.BR tt_pattern_register (3),
+.BR tt_pattern_arg_add (3),
+.BR tt_pattern_iarg_add (3).

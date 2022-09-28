@@ -1,0 +1,67 @@
+.TH Display Media "07 Apr 1994" "SunSoft" "ToolTalk Policy"
+.SH NAME
+.PP
+Display \- display a document
+.SH SYNOPSIS
+.so ../.synopsis
+[\fIfile\f(CW]	Display(	in	\fImediaType	contents\f(CW	
+.\"		[in	messageID	\fIcounterfoil\f(CW]	
+		[in	title	\fIdocName\f(CW] );
+.ft
+.fi
+.SH DESCRIPTION
+.LP
+Display a document that is either read-only or unlikely to
+be modified.  Here,
+.I display
+means to present or manifest the document to the user.  Thus,
+audiotool is said to
+.I display
+audio documents when it plays them.
+.PP
+It is up to the handler to decide issues such as
+.PD 0
+.RS 3
+.HP 2
+\(bu
+when the display operation can be deemed completed;
+.HP 2
+\(bu
+what user gesture signals the completion of the displaying;
+.HP 2
+\(bu
+what the handling tool should do with itself after replying.
+.RE
+.PD
+.SH REQUIRED ARGUMENTS
+.so .contents
+.SH OPTIONAL ARGUMENTS
+.\".so ../.counterfoil
+.so .title
+.SH EXAMPLES
+.LP
+To display a PostScript document, send a \f(CWDisplay()\fR request with a
+first argument whose vtype is \f(CWPostScript\fR, and whose value is a
+a vector of bytes such as "\f(CW%!^J/inch {72 mul} def...\fR".  (By
+"\f(CW^J\fR" here we mean the newline character, octal 12.)
+.LP
+To display a PostScript document contained in a file, send a
+\f(CWDisplay()\fR request with the file attribute set to that file,
+and with an unset first argument whose
+vtype is \f(CWPostScript\fR.
+.PP
+.BR ttmedia_ptype_declare ()
+can be used to register for
+and help process this message.
+.PP
+This message can be sent with
+.BR ttmedia_load ().
+.SH ERRORS
+.so .errors
+.SH SEE ALSO
+.PP
+.BR Intro (Desktop),
+.BR Status (Desktop),
+.BR Intro (Media),
+.BR Edit (Media),
+.BR Deposit (Media)

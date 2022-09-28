@@ -1,0 +1,126 @@
+o  Is the c-client compatible with RFC1341, RFC1521 or both?
+
+Supposedly both.
+
+o  How will the proposed new flags mechanism for dealing with CRLF work?
+
+TBD.
+
+o  Where is the latest roam source.
+
+/net/roam/ws1/roam.dynamic/roam.dev/src-imap4
+
+o  Where is the interpretation of Status and X-Status defined?
+
+Status is used by `mail' and `mailx' - it uses "R" and "O" for "Read" and
+"Old".
+
+X-Status is a c-client addition.
+
+o  After translating V3 to MIME:
+
+   If we're saving the MIME translation to disk, we nuke the
+   X-Sun-Attachment and set mime_tr to NIL.
+
+   If we're not saving the MIME translation to disk, we keep the old
+   X-Sun-Attachment and store the MIME translation in mime_tr.  Why do we
+   need to keep this translation around?
+
+   The comments just say /* Pour Martin: 10-oct-94 */, but not why?
+
+The IMAP protocol only talks MIME - the MIME translation is kept so we have
+the MIME information available to transmit over the wire.
+
+o  What does it mean for a stream to be "silent"?
+
+When a stream is in a "silent" state, it doesn't receive (certain) replies.
+This is for "half-open" streams, such as when listing mailboxes.
+
+o  But what's the difference between "halfopen" and "silent" streams?  When
+   should a stream by in each state?
+
+A stream is "halfopen" for simple commands, eg. LIST .  The stream is "half"
+opened, a connection is made to the imap server, the simple command is sent,
+and then the stream is closed.
+
+When a stream is "silent", then any untagged EXISTS or EXPUNGE replies will
+be ignored.  This is done at times when it is necessary for the cache to
+remain consistent for a while.
+
+o  In the `mtest' program, I get some garbage protocol when disconnecting:
+
+MTest>8
+A00006 STATUS INBOX (UID-VALIDITY CHECKSUM)
+* 243 EXISTS
+* STATUS /var/mail/jsc (MESSAGES 243 UNSEEN 125 UID-NEXT 260 UID-VALIDITY 820698472 CHECKSUM 10154913943)
+Checksum 10154 size 913943 uid-validity 820698472
+* 0 RECENT
+A00006 OK STATUS completed
+A00007 FETCH ïm^D UID
+A00007 BAD Bogus sequence in FETCH
+%IMAP error: Bogus sequence in FETCH
+?Bogus sequence in FETCH
+A00008 FETCH  UID
+A00008 BAD Missing required argument to FETCH
+%IMAP error: Missing required argument to FETCH
+?Missing required argument to FETCH
+A00009 LOGOUT
+* BYE grimsby IMAP4 server terminating connection
+A00009 OK LOGOUT completed
+[Stream successfully disconnected]
+MTest>    
+
+
+This is a c-client bug - fixed in the latest c-client.
+
+o In imap_disconnect, why is the imap_uid called without storing its return
+  value? :
+
+    if (stream->nmsgs > 0)
+      imap_uid (stream,stream->nmsgs);
+
+This information is returned in as an untagged reply.
+
+o mail_checkpoint seems similar to mail_disconnect, except that it pulls
+  data over from the server and stores it in the cache.  This function
+  doesn't seem to be used in roam or mtest.  When might we need to use it?
+
+  I notice stream->checkpointed is set to T in both imap_disconnect and
+  imap_checkpoint.
+
+o The record_subdir is file static - this seems to imply only one mailbox
+  may be in record-mode at once.  We may need to fix this for
+  mailbox-per-thread capabilities.
+
+static char *record_subdir = NIL;
+
+o Why does roam call the following function in various places before
+  operating on the cache?
+
+  mail_parameters(NIL, SET_SAVECACHEPATH, (void *)ROAMSUBDIR);
+
+I notice that savecachepath is file static - this may need to be fixed for
+multi-threaded support, depending on whether a different cache directory is
+needed for different folders?
+
+
+o The following static variables need reworking for the c-client to be
+  thread safe:
+
+static DRIVER *maildrivers = NIL;
+				/* pointer to alternate gets function */
+static mailgets_t mailgets = NIL;
+				/* mail cache manipulation function */
+static mailcache_t mailcache = mm_cache;
+				/* WJY/SunSoft: for stream->userdata on open */
+static void *userdata = NIL;
+				/* WJY/SunSoft: for saving c-client cache */
+
+  DATAPAGE wrt_buf;
+  /* Allocate our write buffer */
+  wrt_buf. buf = (unsigned char *)fs_get(PAGESIZE+sizeof(long));
+
+  Why is PAGESIZE defined to 8K when on most Sparcs (except Ultra) use a 4K
+  page?
+
+This was fixed in Bill's version to be a parameter and use the stack.

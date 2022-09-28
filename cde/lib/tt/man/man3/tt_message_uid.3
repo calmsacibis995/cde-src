@@ -1,0 +1,51 @@
+.TH tt_message_uid 3 "1 March 1996" "ToolTalk 1.3" "ToolTalk Functions"
+.BH "1 March 1996"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.IX "tt_message_uid" "" "tt_message_uid(3)" ""
+.SH NAME
+tt_message_uid \- retrieve the user identifier attribute from a message
+.SH SYNOPSIS
+.ft 3
+.nf
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'uid_t tt_message_uid('u
+uid_t tt_message_uid(Tt_message \f2m\fP);
+.PP
+.fi
+.SH DESCRIPTION
+The
+.BR tt_message_uid (\|)
+function
+retrieves the user identifier attribute from the specified message.
+.PP
+The ToolTalk service automatically sets the user identifier of a message with
+the user identifier of the process that created the message.
+.PP
+The
+.I m
+argument is the opaque handle for the message involved in this operation.
+.PP
+The application should check the
+.BR tt_message_uid(\|)
+and tt_message_gid(3) against
+the User ID and Group ID of the application receiving the messsage. If the UID and/or
+GID of the application do not match that of the message then the receiving application
+should consider failing the message with TT_DESKTOP_EACCES.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.BR tt_message_uid (\|)
+function returns
+the user identifier of the message.
+If the group
+.B nobody
+is returned, the
+message handle is not valid.
+.SH "SEE ALSO"
+.na
+.BR tt_c (5),
+.BR tt_message_gid (3).

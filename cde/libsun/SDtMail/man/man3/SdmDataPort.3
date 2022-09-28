@@ -1,0 +1,4100 @@
+.de LI
+.\" simulate -mm .LIs by turning them into .TPs
+.TP \\n()Jn
+\\$1
+..
+.de Lc
+.\" version of .LI that emboldens its argument
+.TP \\n()Jn
+\s-1\f3\\$1\f1\s+1
+..
+.TH SdmDataPort 3 "09/17/96"
+.BH "09/17/96"
+.\" @(#)SdmDataPort.3	1.20 96/09/17 SMI
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994, 1995, 1996 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994, 1995, 1996 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994, 1995, 1996 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994, 1995, 1996 Novell, Inc.
+.SH NAME
+SdmDataPort \- data port api interface object
+.SH SYNOPSIS
+.\"
+.SS Includes
+.ft 3
+.nf
+#include <Sdtmail.hh>
+#include <PortObjs/DataPort.hh>
+.\"
+.SS Creation
+.ft 3
+.nf
+.sp 0.5v
+.ta \w'new SdmDataPort('u
+new SdmDataPort(Sdm_CL_Port);
+.PP
+.fi
+.ft 1
+.\"
+.SS Methods
+.ft 3
+.nf
+.sp 0.5v
+.ta \w'SdmErrorCode AddMessageBodyToMessage('u
+SdmErrorCode AddMessageBodyToMessage(SdmError& \f2err\fP,
+	SdmDpMessageStructure& \f2r_msgstruct\fP,
+	const SdmMsgStrType \f2bodytype\fP,
+	const SdmMessageNumber \f2msgnum\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode AddMessageBodyToMessage('u
+SdmErrorCode AddMessageBodyToMessage(SdmError& \f2err\fP,
+	SdmDpMessageStructure& \f2r_msgstruct\fP,
+	const SdmMsgStrType \f2bodytype\fP,
+	const SdmMessageNumber \f2msgnum\fP,
+	const SdmDPMessageComponent& \f2mcmp\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode AddMessageHeader('u
+SdmErrorCode AddMessageHeader(SdmError& \f2err\fP,
+	const SdmString& \f2header\fP,
+	const SdmString& \f2headervalue\fP,
+	const SdmMessageNumber \f2msgnum\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode AddToSubscribedNamespace('u
+SdmErrorCode AddToSubscribedNamespace(SdmError& \f2err\fP,
+	const SdmString& \f2name\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode AppendMessage('u
+SdmErrorCode AppendMessage(SdmError& \f2err\fP,
+	SdmString& \f2contents\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode Attach('u
+SdmErrorCode Attach(SdmError& \f2err\fP,
+	const SdmToken& \f2tk\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode CancelPendingOperations('u
+SdmErrorCode CancelPendingOperations(SdmError& \f2err\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode CheckForNewMessages('u
+SdmErrorCode CheckForNewMessages(SdmError& \f2err\fP,
+	SdmMessageNumber& \f2r_nummessages\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode Close('u
+SdmErrorCode Close(SdmError& \f2err\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode CommitPendingMessageChanges('u
+SdmErrorCode CommitPendingMessageChanges(SdmError& \f2err\fP,
+	SdmBoolean& \f2r_messageRewritten\fP,
+	const SdmMessageNumber \f2msgnum\fP,
+	SdmBoolean \f2includeBcc\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode CopyMessage('u
+SdmErrorCode CopyMessage(SdmError& \f2err\fP,
+	const SdmToken& \f2token\fP,
+	const SdmMessageNumber \f2msgnum\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode CopyMessages('u
+SdmErrorCode CopyMessages(SdmError& \f2err\fP,
+	const SdmToken& \f2token\fP,
+	const SdmMessageNumber \f2startmsgnum\fP);
+	const SdmMessageNumber \f2endmsgnum\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode CopyMessages('u
+SdmErrorCode CopyMessages(SdmError& \f2err\fP,
+	const SdmToken& \f2token\fP,
+	const SdmMessageNumberL \f2msgnums\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode Create('u
+SdmErrorCode Create(SdmError& \f2err\fP,
+	const SdmString& \f2tk\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode CreateDerivedMessage('u
+SdmErrorCode CreateDerivedMessage(SdmError& \f2err\fP,
+	SdmMessageNumber& \f2r_msgnum\fP,
+	const SdmDataPort& \f2msgdp\fP,
+	const SdmMessageNumber \f2msgnum\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode CreateNewMessage('u
+SdmErrorCode CreateNewMessage(SdmError& \f2err\fP,
+	SdmMessageNumber& \f2r_msgnum\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode Delete('u
+SdmErrorCode Delete(SdmError& \f2err\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode DeleteMessageBodyFromMessage('u
+SdmErrorCode DeleteMessageBodyFromMessage(SdmError& \f2err\fP,
+	SdmBoolean& \f2r_previousState\fP,
+	SdmBoolean \f2newState\fP,
+	const SdmMessageNumber \f2msgnum\fP,
+	const SdmDpMessageComponent& \f2mcmp\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode DiscardPendingMessageChanges('u
+SdmErrorCode DiscardPendingMessageChanges(SdmError& \f2err\fP,
+	const SdmMessageNumber \f2msgnum\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode Disconnect('u
+SdmErrorCode Disconnect(SdmError& \f2err\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode ExpungeDeletedMessages('u
+SdmErrorCode ExpungeDeletedMessages(SdmError& \f2err\fP,
+	SdmMessageNumberL& \f2r_msgnums\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetCapabilities('u
+SdmErrorCode GetCapabilities(SdmError& \f2err\fP,
+	SdmToken*& \f2r_capabilities\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetMessageAttributes('u
+SdmErrorCode GetMessageAttributes(SdmError& \f2err\fP,
+	SdmStrStrL& \f2r_attribute\fP,
+	const SdmMessageNumber \f2msgnum\fP,
+	const SdmDpMessageComponent& \f2mcmp\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetMessageAttribute('u
+SdmErrorCode GetMessageAttribute(SdmError& \f2err\fP,
+	SdmString& \f2r_attribute\fP,
+	const SdmString& \f2attribute\fP,
+	const SdmMessageNumber \f2msgnum\fP,
+	const SdmDpMessageComponent& \f2mcmp\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetMessageAttributes('u
+SdmErrorCode GetMessageAttributes(SdmError& \f2err\fP,
+	SdmStrStrL& \f2r_attribute\fP,
+	const SdmStringL& \f2attributes\fP,
+	const SdmMessageNumber \f2msgnum\fP,
+	const SdmDpMessageComponent& \f2mcmp\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetMessageAttributes('u
+SdmErrorCode GetMessageAttributes(SdmError& \f2err\fP,
+	SdmStrStrL& \f2r_attribute\fP,
+	const SdmMessageAttributeAbstractFlags \f2attributes\fP,
+	const SdmMessageNumber \f2msgnum\fP,
+	const SdmDpMessageComponent& \f2mcmp\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetMessageContents('u
+SdmErrorCode GetMessageContents(SdmError& \f2err\fP,
+	SdmContentBuffer& \f2r_contents\fP,
+	const SdmDpContentType  \f2contenttype\fP,
+	const SdmMessageNumber \f2msgnum\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetMessageContents('u
+SdmErrorCode GetMessageContents(SdmError& \f2err\fP,
+	SdmContentBuffer& \f2r_contents\fP,
+	const SdmDpContentType  \f2contenttype\fP,
+	const SdmMessageNumber \f2msgnum\fP,
+	const SdmDpMessageComponent& \f2mcmp\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetMessageFlags('u
+SdmErrorCode GetMessageFlags(SdmError& \f2err\fP,
+	SdmMessageFlagAbstractFlags& \f2r_aflags\fP,
+	const SdmMessageNumber \f2msgnum\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetMessageFlags('u
+SdmErrorCode GetMessageFlags(SdmError& \f2err\fP,
+	SdmMessageFlagAbstractFlagsL& \f2r_aflags\fP,
+	const SdmMessageNumber \f2startmsgnum\fP,
+	const SdmMessageNumber \f2endmsgnum\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetMessageFlags('u
+SdmErrorCode GetMessageFlags(SdmError& \f2err\fP,
+	SdmMessageFlagAbstractFlagsL& \f2r_aflags\fP,
+	const SdmMessageNumberL& \f2msgnums\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetMessageHeader('u
+SdmErrorCode GetMessageHeader(SdmError& \f2err\fP,
+	SdmStrStrL& \f2r_hdr\fP,
+	const SdmString& \f2hdr\fP,
+	const SdmMessageNumber \f2msgnum\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetMessageHeader('u
+SdmErrorCode GetMessageHeader(SdmError& \f2err\fP,
+	SdmStrStrL& \f2r_hdr\fP,
+	const char* \f2hdr\fP,
+	const SdmMessageNumber \f2msgnum\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetMessageHeader('u
+SdmErrorCode GetMessageHeader(SdmError& \f2err\fP,
+	SdmStrStrLL& \f2r_copiesof_hdr\fP,
+	const SdmString& \f2hdr\fP,
+	const SdmMessageNumber \f2startmsgnum\fP,
+	const SdmMessageNumber \f2endmsgnum\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetMessageHeader('u
+SdmErrorCode GetMessageHeader(SdmError& \f2err\fP,
+	SdmStrStrLL& \f2r_copiesof_hdr\fP,
+	const char* \f2hdr\fP,
+	const SdmMessageNumber \f2startmsgnum\fP,
+	const SdmMessageNumber \f2endmsgnum\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetMessageHeader('u
+SdmErrorCode GetMessageHeader(SdmError& \f2err\fP,
+	SdmStrStrLL& \f2r_copiesof_hdr\fP,
+	const SdmString& \f2hdr\fP,
+	const SdmMessageNumberL& \f2msgnums\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetMessageHeader('u
+SdmErrorCode GetMessageHeader(SdmError& \f2err\fP,
+	SdmStrStrLL& \f2r_copiesof_hdr\fP,
+	const char* \f2hdr\fP,
+	const SdmMessageNumberL& \f2msgnums\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetMessageHeaders('u
+SdmErrorCode GetMessageHeaders(SdmError& \f2err\fP,
+	SdmStrStrL& \f2r_hdr\fP,
+	const SdmMessageNumber \f2msgnum\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetMessageHeaders('u
+SdmErrorCode GetMessageHeaders(SdmError& \f2err\fP,
+	SdmStrStrLL& \f2r_copiesof_hdr\fP,
+	const SdmMessageNumber \f2startmsgnum\fP,
+	const SdmMessageNumber \f2endmsgnum\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetMessageHeaders('u
+SdmErrorCode GetMessageHeaders(SdmError& \f2err\fP,
+	SdmStrStrLL& \f2r_copiesof_hdr\fP,
+	const SdmMessageNumberL& \f2msgnums\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetMessageHeaders('u
+SdmErrorCode GetMessageHeaders(SdmError& \f2err\fP,
+	SdmStrStrL& \f2r_hdrs\fP,
+	const SdmStringL& \f2hdrs\fP,
+	const SdmMessageNumber \f2msgnum\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetMessageHeaders('u
+SdmErrorCode GetMessageHeaders(SdmError& \f2err\fP,
+	SdmStrStrLL& \f2r_copiesof_hdrs\fP,
+	const SdmStringL& \f2hdrs\fP,
+	const SdmMessageNumber \f2startmsgnum\fP,
+	const SdmMessageNumber \f2endmsgnum\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetMessageHeaders('u
+SdmErrorCode GetMessageHeaders(SdmError& \f2err\fP,
+	SdmStrStrLL& \f2r_copiesof_hdrs\fP,
+	const SdmStringL& \f2hdrs\fP,
+	const SdmMessageNumberL& \f2msgnums\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetMessageHeaders('u
+SdmErrorCode GetMessageHeaders(SdmError& \f2err\fP,
+	SdmStrStrL& \f2r_hdr\fP,
+	const SdmMessageHeaderAbstractFlags \f2hdr\fP,
+	const SdmMessageNumber \f2msgnum\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetMessageHeaders('u
+SdmErrorCode GetMessageHeaders(SdmError& \f2err\fP,
+	SdmStrStrLL& \f2r_copiesof_hdr\fP,
+	const SdmMessageHeaderAbstractFlags \f2hdr\fP,
+	const SdmMessageNumber \f2startmsgnum\fP,
+	const SdmMessageNumber \f2endmsgnum\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetMessageHeaders('u
+SdmErrorCode GetMessageHeaders(SdmError& \f2err\fP,
+	SdmStrStrLL& \f2r_copiesof_hdr\fP,
+	const SdmMessageHeaderAbstractFlags \f2hdr\fP,
+	const SdmMessageNumberL& \f2msgnums\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetMessageHeaders('u
+SdmErrorCode GetMessageHeaders(SdmError& \f2err\fP,
+	SdmIntStrL& \f2r_hdr\fP,
+	const SdmMessageHeaderAbstractFlags \f2hdr\fP,
+	const SdmMessageNumber \f2msgnum\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetMessageHeaders('u
+SdmErrorCode GetMessageHeaders(SdmError& \f2err\fP,
+	SdmIntStrLL& \f2r_copiesof_hdr\fP,
+	const SdmMessageHeaderAbstractFlags \f2hdr\fP,
+	const SdmMessageNumber \f2startmsgnum\fP,
+	const SdmMessageNumber \f2endmsgnum\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetMessageHeaders('u
+SdmErrorCode GetMessageHeaders(SdmError& \f2err\fP,
+	SdmIntStrLL& \f2r_copiesof_hdr\fP,
+	const SdmMessageHeaderAbstractFlags \f2hdr\fP,
+	const SdmMessageNumberL& \f2msgnums\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetMessageStructure('u
+SdmErrorCode GetMessageStructure(SdmError& \f2err\fP,
+	SdmDpMessageStructureL& \f2r_structure\fP,
+	const SdmMessageNumber \f2msgnum\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetMessageStructure('u
+SdmErrorCode GetMessageStructure(SdmError& \f2err\fP,
+	SdmDpMessageStructureLL& \f2r_copiesof_structure\fP,
+	const SdmMessageNumber \f2startmsgnum\fP,
+	const SdmMessageNumber \f2endmsgnum\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetMessageStructure('u
+SdmErrorCode GetMessageStructure(SdmError& \f2err\fP,
+	SdmDpMessageStructureLL& \f2r_copiesof_structure\fP,
+	const SdmMessageNumberL& \f2msgnums\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetMessageCacheStatus('u
+SdmErrorCode GetMessageCacheStatus(SdmError& \f2err\fP,
+	SdmBoolean& \f2r_cached\fP,
+	const SdmMessageNumber \f2msgnum\fP,
+	const SdmDpMessageComponent& \f2mcmp\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetMessageStoreStatus('u
+SdmErrorCode GetMessageStoreStatus(SdmError& \f2err\fP,
+	SdmMessageStoreStatus& \f2r_status\fP,
+	const SdmMessageStoreStatusFlags \f2storeFlags\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode MoveMessage('u
+SdmErrorCode MoveMessage(SdmError& \f2err\fP,
+	const SdmToken& \f2token\fP,
+	const SdmMessageNumber \f2msgnum\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode MoveMessages('u
+SdmErrorCode MoveMessages(SdmError& \f2err\fP,
+	const SdmToken& \f2token\fP,
+	const SdmMessageNumber \f2startmsgnum\fP);
+	const SdmMessageNumber \f2endmsgnum\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode MoveMessages('u
+SdmErrorCode MoveMessages(SdmError& \f2err\fP,
+	const SdmToken& \f2token\fP,
+	const SdmMessageNumberL \f2msgnums\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode Open('u
+SdmErrorCode Open(SdmError& \f2err\fP,
+	SdmBoolean& \f2r_readOnly\fP,
+	const SdmToken& \f2tk\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode PerformSearch('u
+SdmErrorCode PerformSearch(SdmError& \f2err\fP,
+	SdmMessageNumberL& \f2r_msgnums\fP,
+	const SdmSearch& \f2search\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode PerformSearch('u
+SdmErrorCode PerformSearch(SdmError& \f2err\fP,
+	SdmMessageNumberL& \f2r_msgnums\fP,
+	const SdmSearch& \f2search\fP,
+	const SdmMessageNumber \f2startmsgnum\fP,
+	const SdmMessageNumber \f2endmsgnum\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode PerformSearch('u
+SdmErrorCode PerformSearch(SdmError& \f2err\fP,
+	SdmMessageNumberL& \f2r_msgnums\fP,
+	const SdmSearch& \f2search\fP,
+	const SdmMessageNumberL& \f2msgnums\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode PerformSearch('u
+SdmErrorCode PerformSearch(SdmError& \f2err\fP,
+	SdmBoolean& \f2r_bool\fP,
+	const SdmSearch& \f2search\fP,
+	const SdmMessageNumber \f2msgnum\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode Reconnect('u
+SdmErrorCode Reconnect(SdmError& \f2err\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode RemoveFromSubscribedNamespace('u
+SdmErrorCode RemoveFromSubscribedNamespace(SdmError& \f2err\fP,
+	const SdmString& \f2name\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode RemoveMessageHeader('u
+SdmErrorCode RemoveMessageHeader(SdmError& \f2err\fP,
+	const SdmString& \f2header\fP,
+	const SdmMessageNumber \f2msgnum\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode ReplaceMessageHeader('u
+SdmErrorCode ReplaceMessageHeader(SdmError& \f2err\fP,
+	const SdmString& \f2header\fP,
+	const SdmString& \f2newvalue\fP,
+	const SdmMessageNumber \f2msgnum\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode Rename('u
+SdmErrorCode Rename(SdmError& \f2err\fP,
+	const SdmString& \f2name\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode SaveMessageStoreState('u
+SdmErrorCode SaveMessageStoreState(SdmError& \f2err\fP,
+	 SdmMessageNumber& \f2r_nummessages\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode ScanNamespace('u
+SdmErrorCode ScanNamespace(SdmError& \f2err\fP,
+	SdmIntStrL& \f2r_names\fP,
+	const SdmString& \f2reference\fP,
+	const SdmString& \f2pattern\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode ScanSubscribedNamespace('u
+SdmErrorCode ScanSubscribedNamespace(SdmError& \f2err\fP,
+	SdmIntStrL& \f2r_names\fP,
+	const SdmString& \f2reference\fP,
+	const SdmString& \f2pattern\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode SetMessageAttribute('u
+SdmErrorCode SetMessageAttribute(SdmError& \f2err\fP,
+	const SdmString& \f2attribute\fP,
+	const SdmString& \f2attribute_value\fP,
+	const SdmMessageNumber \f2msgnum\fP,
+	const SdmDpMessageComponent& \f2mcmp\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode SetMessageAttribute('u
+SdmErrorCode SetMessageAttribute(SdmError& \f2err\fP,
+	const SdmMessageAttributeAbstractFlags \f2attribute\fP,
+	const SdmString& \f2attribute_value\fP,
+	const SdmMessageNumber \f2msgnum\fP,
+	const SdmDpMessageComponent& \f2mcmp\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode SetMessageBodyStructure('u
+SdmErrorCode SetMessageBodyStructure(SdmError& \f2err\fP,
+	const SdmDpMessageStructure& \f2msgstr\fP,
+	const SdmMessageNumber \f2msgnum\fP,
+	const SdmDpMessageComponent& \f2mcmp\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode SetMessageContents('u
+SdmErrorCode SetMessageContents(SdmError& \f2err\fP,
+	const SdmString& \f3contents\fP,
+	const SdmMessageNumber \f3msgnum\fP,
+	const SdmDpMessageComponent& \f3mcmp\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode SetMessageFlagValues('u
+SdmErrorCode SetMessageFlagValues(SdmError& \f2err\fP,
+	const SdmBoolean \f2flagValue\fP,
+	const SdmMessageFlagAbstractFlags \f2aflags\fP,
+	const SdmMessageNumber \f2msgnum\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode SetMessageFlagValues('u
+SdmErrorCode SetMessageFlagValues(SdmError& \f2err\fP,
+	const SdmBoolean \f2flagValue\fP,
+	const SdmMessageFlagAbstractFlags \f2aflags\fP,
+	const SdmMessageNumber \f2startmsgnum\fP,
+	const SdmMessageNumber \f2endmsgnum\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode SetMessageFlagValues('u
+SdmErrorCode SetMessageFlagValues(SdmError& \f2err\fP,
+	const SdmBoolean \f2flagValue\fP,
+	const SdmMessageFlagAbstractFlags \f2aflags\fP,
+	const SdmMessageNumberL& \f2msgnums\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode SetMessageHeaders('u
+SdmErrorCode SetMessageHeaders(SdmError& \f2err\fP,
+	const SdmStrStrL& \f2r_hdr\fP,
+	const SdmMessageNumber \f2msgnum\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode Submit('u
+SdmErrorCode Submit(SdmError& \f2err\fP,
+ 	SdmDeliveryResponse& \f2r_deliveryResponse\fP,
+	const SdmMsgFormat \f2msgFormat\fP,
+	SdmDataPort& \f2dataPort\fP,
+	const SdmMessageNumber \f2msgnum\fP);
+
+.fi
+.ft 1
+.\" end of methods list
+.ta 0.25i 0.50i 0.75i 1.0i 1.25i 1.50i 1.75i 2.0i 2.5i 3.0i
+.SH TERMINOLOGY
+For purposes of discussion and identification, there are at least 5 distinct components
+comprising electronic mail in the Solaris CDE environment:
+.SS front\ end
+The desktop mail user agent implementing the interface that the computer system use
+directly interacts with. Examples include command line interface ("CLI") and graphical
+user interface ("GUI") applications. Examples of CLI interfaces include /bin/mail and
+mh. Examples of GUI interfaces include dtmail and mailtool.
+.SS mid\ end
+A library providing a consistent and seamless interface between front end applications and
+one or more back end service providers. Multiple service providers may be supported,
+allowing a variety of message stores, message transports, address books, and other
+facilities to be made available to front end applications.
+.SS back\ end
+A provider of some form of e-mail related service, such as message stores, message
+transports, address books, etc. typically provided as both an interface library and
+accompanying server processes implementing the functionality.
+.SS operating\ system
+Provides the data access and control process primitives facilitating storage, retrieval and
+sending of messages, and the implementation of user interface applications (Unix, MacOS,
+Windows, etc.)
+.SS network
+Provides transport of information between computer systems via network connections
+(TCP/IP, TLI, ACM, NFS, etc.)
+.SH LIBSDTMAIL
+libSDtMail provides functionality consistent with the definition of a mid end library
+component; it can be divided into two distinct pieces:
+.SS upper\ half
+The upper half provides a high level object oriented API interface allowing messaging
+components to be manipulated (e.g. message stores, address books, etc). This is called the
+Front End API. Part of this API is the session object implementing a queued multi threaded
+request management system, allowing multiple synchronous and asynchronous requests to be
+processed concurrently. This allows a front end application to have "outstanding
+requests", allowing it to keep its user interface "alive", so a failure of a back end
+component (such as NFS, a IMAP server, or the network) does not "lock" the entire user
+interface.
+.SS lower\ half
+The lower half provides a low level object API interface to various service providers
+implementing specific services (such as message stores, message transports, address books,
+etc).
+.PP
+This is called the data port, and is what this object implements.
+.SH DESCRIPTION
+The data port is a private internal object that implements the lower half of libSDtMail. It
+provides two API interfaces: one that allows the upper half to gain access to the data
+port ("data port API"), and one that allows service providers to interface with the data
+port ("data channel API").
+.PP
+The data port is used to connect libSDtMail with service providers that provide access "to the
+outside world"; that is, the data paths to outside data, both for transmission and
+reception purposes. The individual paths out from the data port are referred to as
+"channels", of which there are many types, each of which connect to a specific type of
+service provider.
+.SS Private Object
+The data port is not meant to be called directly by front end applications; among other
+things, it does not provide any concurrency guarantees, does not provide any asynchronous
+call capabilities, and does not provide any asynchronous callback capabilities. Its intent
+is to provide an interface object between the front end API and external service
+providers, so that they may be easily integrated into libSDtMail.
+.SS Components
+The data port itself consists of several major components:
+.RS 3
+.nr )J 6
+.Lc data\ port\ API
+.br
+implements the API used by the upper half of libSDtMail to gain access to the data port. It is
+a consistent API that is used to create, configure and manipulate a data port object,
+regardless of the type of underlying service providers that may be used to implement the
+data path.
+.Lc data\ channel\ API
+.br
+implements the API used by channel adapters that allow external service providers to be
+integrated into libSDtMail. It is a consistent API that is provided by the data port to allow
+different services providers to interface their API with the data port.
+.Lc channel\ adapter
+.br
+specific code that interfaces the data port channel API onto a specific type of service
+provider; that is, implements a channel between the data port and a specific type of
+service provider.
+.Lc service\ provider
+.br
+a specific type of service provider (e.g. c-client, smtp transmission, etc.)
+.RE
+.nr )J 0
+.SH MESSAGE STRUCTURE
+Each message in a message store has a "message structure" associated with it. This
+structure describes the nature of the message; how many parts are contained within the
+message, how the parts are nested, and some information about each part of the message.
+.PP
+This SdmDpMessageStructure is a smart container and is used to hold the structure of a
+message. The GetMessageStructure method is used to retrieve the structure of a message. It
+fills in a vector of SdmDpMessageStructure objects, one object for each part of a
+message. If the message has nested components (e.g. multipart/mixed MIME message), then
+the message structure has nested components representing the nesting of the message.
+.PP
+For example, a message with a single text plain component has a vector with one object in
+it describing the text plain component.
+.PP
+A message that is a multipart mixed with three text plain components has a vector with one
+object in it describing the multipart mixed. That component has a reference to another
+vector of SdmDpMessageStructure objects, with three objects in it, each describing one of
+the text plain components of the multipart mixed.
+.PP
+The elements of each SdmDpMessageStructure object are detailed below.
+.SS ms_attachment_name
+An "attachment name" for the body part. If this information is available, it means that
+the sender included a file name for this body part, which indicates it is probably not
+meant to be displayed "in line" (see ms_disposition).
+.SS ms_bytes
+Size of this body part in bytes.
+.SS ms_component
+This is called the "message component" and is used in various data port methods to access
+this particular component of this message. If is of type "SdmDpMessageComponent" and is
+passed in to appropriate data port calls.
+.SS ms_description
+An optional description of the body part. Probably of no real use to a front end
+application other than in providing the user with extended information on the body part if
+asked for.
+.SS ms_disposition
+The disposition for the body part. The sender may have given a hint as to how to handle
+this body part. One of:
+.PP
+.nf
+		Sdm_MSDISP_not_specified	- disposition of component not specified
+		Sdm_MSDISP_inline		- component should be handled "in line" if possible
+		Sdm_MSDISP_attachment	- component should be handled as an "attachment" 
+.fi
+.SS ms_encoding
+Message encoding: transport encoding used for this body part. Probably of no real use
+to a front end application other than in providing the user with extended information
+on the body part if asked for. One of:
+.PP
+.nf
+		Sdm_MSENC_none
+		Sdm_MSENC_7bit
+		Sdm_MSENC_8bit
+		Sdm_MSENC_binary
+		Sdm_MSENC_base64
+		Sdm_MSENC_quoted_printable
+		Sdm_MSENC_other
+.fi
+.SS ms_id
+Message identification: message/content id. Probably of no real use to a front end
+application other than in providing the user with extended information on the body part if
+asked for.
+.SS ms_lines
+Size of this body part in lines.
+.SS ms_md5
+MD5 checksum for the body part. Needed if a front end application decides to implement MD5
+checksum verification.
+.SS ms_ms
+If this component of the message is a nested component (for example, a multipart/mixed),
+then this element of the SdmDpMessageStructure is non-zero. It is of type
+SdmDpMessageStructureL, and is a nested message structure. It can be traversed to find out
+the structure of the nested message.
+.SS ms_subtype
+Message subtype: secondary MIME type (e.g. plain, mixed).
+.SS ms_type
+Message type: primary type of message body. Of use in determining the overall nature of
+the body part (e.g. is it text, a multi part message, etc.) One of:
+.PP
+.nf
+		Sdm_MSTYPE_none
+		Sdm_MSTYPE_text
+		Sdm_MSTYPE_multipart
+		Sdm_MSTYPE_message
+		Sdm_MSTYPE_application
+		Sdm_MSTYPE_audio
+		Sdm_MSTYPE_image
+		Sdm_MSTYPE_video
+		Sdm_MSTYPE_other
+.fi
+.SS ms_unix_mode
+The "Unix mode" hint for saving this body part to a file. If non-zero the sender has given
+a hint of the original mode of this file when sent.
+.\"
+.SH DATA PORT USES
+You would create a data port object for each type of "object" to be manipulated; for
+example, each message store, address book and message transport would be represented by
+its own SdmDataPort object. This allows each object to be manipulated independently of all
+the rest.
+.SS CDE/Unix
+The upper half of libSDtMail is designed to work under CDE on Unix, and provide a C++
+interface to command line interface and graphical user interface front end applications
+written in C++. The upper half of libSDtMail uses the data port object to gain access to
+service providers and services, such as message stores, message transports, address books,
+etc.
+.SS Other Environments
+Other upper half type libraries that support other types of front end applications (such
+as Java, Windows, TCL, etc.) could also use the data port object to gain access to these
+same service providers and services.
+.\"
+.SH CREATION
+A SdmDataPort object is created directly:
+.PP
+.nf
+	SdmDataPort *dp = new SdmDataPort(Sdm_CL_Port);
+.fi
+.PP
+Note: The Sdm_CL_Port argument is an internal class ID used in identifying the data port
+object internally and in memory allocation and deallocation. It should not be changed
+unless you know what you are doing.
+.PP
+This constructs a new data port object object. Any number of data port objects may be
+created. Each data port object is independent of all other data port objects.
+.PP
+Once instantiated, a SdmDataport object is in a "shutdown" state. It must be successfully
+started (via the StartUp method) before any other methods may be invoked.
+.PP
+The libSDtMail SdmMessageStore object creates a data port for each type of service object that
+it creates (such as SdmMessageStore).
+.\"
+.SH DESTRUCTION
+An SdmDataPort object can be destroyed like any other C++ object.
+.PP
+The libSDtMail SdmSession object automatically destroys all SdmDataPort objects that it
+creates at appropriate times.
+.SH OPERATORS
+No standard C operators are overloaded to operate with the SdmDataPort object; in
+addition, the copy and assignment constructors are private, and not available for use.
+.\"
+.SH DATA PORT API METHODS
+A plethora of methods are provided by the SdmDataPort object. They are detailed below.
+.PP
+Note that the data port API is an "all inclusive" API; that is, all operations for all
+types of services for all types of service providers are supplied in what is essentially a
+"flat" object. If the service connected to the data port does not support the operation
+(e.g. check for new messages on an address book) then the method returns a failure
+indication. It is the responsibility of each data channel adapter to field these methods
+and handle them appropriately.
+.\"
+.SS \f3AddMessageBodyToMessage\fP
+(\f3err\fP, \f3r_msgstruct\fP, \f3bodytype\fP, \f3msgnum\fP)
+.PP
+Add a new message body to the top level portion of a message. A message structure object
+is filled in to represent the newly added message body. This method is called when
+creating or editing a message and it is desired to add a new message body to the message.
+This method adds the new message body at the outer most body nesting level of the message.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)\fP"
+.br
+Error container, used to store return result code.
+.LI "\f3r_msgstruct\fP (\f3SdmDpMessageStruecture&\fP)"
+.br
+The structure of the newly added message body is returned in this container.
+.LI "\f3bodytype\fP (\f3const SdmMsgStrType\fP)"
+.br
+The type of message body to be added. See the ms_type component of the
+SdmDpmessageStructure object detailed in the "MESSAGE STRUCTURE" section above.
+.LI "\f3msgnum\fP (\f3SdmMessageNumber\fP)"
+.br
+Message number to add this top level message body to.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3AddMessageBodyToMessage\fP
+(\f3err\fP, \f3r_msgstruct\fP, \f3bodytype\fP, \f3msgnum\fP, \f3mcmp\fP)
+.PP
+Add a new message body to a specific component of a message. A message structure object is
+filled in to represent the newly added message body. This method is called when creating
+or editing a message and it is desired to add a new message body to the message. This
+method adds the new message body at the nesting level in which the specified component of
+the message exists. For example, if the component is a multipart, then the new message
+body is added to that multipart.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)\fP"
+.br
+Error container, used to store return result code.
+.LI "\f3r_msgstruct\fP (\f3SdmDpMessageStruecture&\fP)"
+.br
+The structure of the newly added message body is returned in this container.
+.LI "\f3bodytype\fP (\f3const SdmMsgStrType\fP)"
+.br
+The type of message body to be added. See the ms_type component of the
+SdmDpmessageStructure object detailed in the "MESSAGE STRUCTURE" section above.
+.LI "\f3msgnum\fP (\f3SdmMessageNumber\fP)"
+.br
+Message number to add this top level message body to.
+.LI "\f3mcmp\fP (\f3const SdmDpMessageComponent&\fP)"
+.br
+The message component describing the message body of the specified message to which this
+new message body should be added. This component must be capable of accepting additional
+message bodies (e.g. multipart).
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3AddMessageHeader\fP
+(\f3err\fP, \f3header\fP, \f3headervalue\fP, \f3msgnum\fP)
+.PP
+Add a new header to the message without deleting any previous values set
+for the same header; for example, you can add multiple "To:" headers which 
+allows multiple recipients to be specified.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)\fP"
+.br
+Error container, used to store return result code.
+.LI "\f3header\fP (\f3const SdmString&\fP)"
+.br
+The text describing the header field to be added.
+.LI "\f3headervalue\fP (\f3const SdmString&\fP)"
+.br
+The text for the value of the header to add.
+.LI "\f3msgnum\fP (\f3SdmMessageNumber\fP)"
+.br
+Message number of the message to add this header to.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3AddToSubscribedNamespace\fP
+(\f3err\fP, \f3name\fP)
+.PP
+Add a object to the list of "subscribed to" objects stores that is
+returned by the "ScanSubscribedNamespace" method.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3name\fP (\f3const SdmString&\fP)"
+.br
+The full path name of the message store name to add (as returned from ScanNamespace).
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3AppendMessage\fP
+(\f3err\fP, \f3contents\fP)
+.PP
+Append a single message to the message store.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)\fP"
+.br
+Error container, used to store return result code.
+.LI "\f3contents\fP (\f3SdmString&\fP)"
+.PP
+The complete contents of the message to be appended. 
+.PP
+NOTE: This must be in a format compatible with the message store (e.g. MIME). If
+the message is in any way improperly formatted, the message store may become
+corrupted.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3Attach\fP
+(\f3err\fP, \f3tk\fP)
+.PP
+Attach to one or more service providers by cycling through all available data channels and
+gathering a list of all channel adapters that respond successfully to the attach.  The
+object described could be a new message store service, address book service,
+etc. Appropriate action is taken to attach to the type of object specified.  See
+SdmGlossary(3) for a comparison of Attach and Open.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3tk\fP (\f3const SdmToken&\fP)"
+.br
+A SdmToken object describing the message store service to be attached to.
+See SdmGlossary(3) for a description of how to initialize the token.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3CancelPendingOperations\fP
+(\f3err\fP)
+.PP
+This method causes all outstanding operations on this data port object to be
+cancelled; any asynchronous requests that are outstanding at the time this call
+is made are terminated, causing them to return a specific "operation cancelled"
+response to their appropriate service function callbacks.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3CheckForNewMessages\fP
+(\f3err\fP, \f3r_nummessages\fP)
+.PP
+Check to see if new messages have been placed in the message store since the
+last time this method was called or since the last time the message store was
+saved using the SaveMessageStoreState method; 
+for the first call, since the message store was initially opened.
+.PP
+This method is usually connected to a UI "check for new mail" component, and
+is called when the user activates the component.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)\fP"
+.br
+Error container, used to store return result code.
+.LI "\f3r_nummessages\fP (\f3SdmMessageNumber&\fP)"
+.br
+The number of new messages in the object since the last time SaveMessageStoreState
+or CheckForNewMessages was made is returned in this variable. The value of zero 
+means no new messages are available.
+
+Even though the return value is not a message number per-se, the return value is declared
+type SdmMessageNumber (as opposed to type int or long) because type SdmMessageNumber
+represents the maximum value that a message number may be, and the number of new messages
+in an object could be arbitrarily large.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3Close\fP
+(\f3err\fP)
+.PP
+Close the connection between this data port object and any data channels that
+may be active. Any changes or updates are committed or discarded as appropriate
+for the service provider in use. Any cached information is written from memory
+to appropriate long term storage or discarded. Any connection with a remote
+server is terminated. This call is typically followed by a call to ShutDown() as
+a prelude to destroying the data port object.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3CommitPendingMessagesChanges\fP
+(\f3err\fP, \f3r_messageRewritten\fP, \f3msgnum\fP, \f3includeBcc\fP)
+.PP
+Commit the changes made to a message to the message store.
+.br
+ 
+NOTE: These changes are committed to memory or a cache and
+may not necessarily be written to the actual storage.  To have
+the changes in a message store written to the actual storage
+you must call the SaveMessageStoreState method.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_messageRewritten\fP (\f3SdmBoolean&\fP)"
+.br
+Boolean set to a value that indicates whether the commit
+resulted in the message be placed in another location
+in the store.
+.LI "\f3msgnum\fP (\f3SdmMessageNumber\fP)"
+.br
+Message number of the message to have changes committed.
+.LI "\f3includeBcc\fP (\f3SdmBoolean\fP)"
+.br
+Boolean to specify whether any "Bcc:" header is committed.  Sdm_False
+indicates not to commit any "Bcc:" header that's present in the message;
+Sdm_True means the "Bcc:" header is committed.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+
+.\"
+.SS \f3CopyMessage\fP
+(\f3err\fP, \f3token\fP, \f3msgnum\fP)
+.PP
+Copy a single message from this message store to another message store.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3token\fP (\f3const SdmToken&\fP)"
+.br
+Token for the message store where the message will be copied to.
+.LI "\f3msgnum\fP (\f3const SdmMessageNumber\fP)"
+.br
+Message number of the message in this store to be copied.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3CopyMessages\fP
+(\f3err\fP, \f3token\fP, \f3startmsgnum\fP, \f3endmsgnum\fP)
+.PP
+Copy a range of messages from this message store to another message store.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3token\fP (\f3const SdmToken&\fP)"
+.br
+Token for the message store where the messages will be copied to.
+.LI "\f3startmsgnum\fP (\f3const SdmMessageNumber\fP)"
+.br
+Message number of the first message in this message store to be copied.
+.LI "\f3endmsgnum\fP (\f3const SdmMessageNumber\fP)"
+.br
+Message number of the last message in this message store to be copied.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+ 
+.SS \f3CopyMessages\fP
+(\f3err\fP, \f3token\fP, \f3msgnums\fP)
+.PP
+Copy a list of messages from this message store to another message store.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3token\fP (\f3const SdmToken&\fP)"
+.br
+Token for the message store where the messages will be copied to.
+.LI "\f3msgnums\fP (\f3const SdmMessageNumberL\fP)"
+.br
+A list containing the message numbers of the messages in this message store to
+be copied.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+
+.SS \f3Create\fP
+(\f3err\fP, \f3tk\fP)
+.PP
+Create a new object identified by the token provided. The object described could
+be a new message store, address book, etc. Appropriate action is taken to create
+the type of object specified.
+.PP
+Even though this method creates a new object, it must be opened (via Open)
+before it can be manipulated.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3tk\fP (\f3const SdmToken&\fP)"
+.br
+The full path name of the name for the new message store to be created
+(such as returned from ScanNamespace).
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+
+
+.SS \f3CreateDerivedMessage\fP
+(\f3err\fP, \f3r_msgnum\fP, \f3msgdp\fP, \f3msgnum\fP)
+.PP
+Return the message number for a new message.  It creates
+a new message derived from an existing message.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_msgnum\fP (\f3SdmMessageNumber\fP)"
+The message number of the new message is returned.
+.LI "\f3msgdp\fP (\f3const SdmDataPort&\fP)"
+.br
+The data port that contains the existing message which the
+new message is to be derived from.
+.LI "\f3msgnum\fP (\f3const SdmMessageNumber\fP)"
+.br
+The message number of the existing message which the new message
+is to be derived from.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+
+
+.SS \f3CreateNewMessage\fP
+(\f3err\fP, \f3r_msgnum\fP)
+.PP
+Return the message number for a new message.  It creates
+a new message from scratch that can then be filled in
+appropriately.  Typically you would use this
+method to compose a new message from scratch.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_msgnum\fP (\f3SdmMessageNumber\fP)"
+The message number of the new message is returned.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+ 
+.SS \f3Delete\fP
+(\f3err\fP)
+.PP
+Delete the object currently open on this data port. If a message store is opened
+on this data port, the message store is closed and deleted. Similar results
+happen with other types of objects as appropriate.
+.PP
+Upon successful completion, the object is deleted, any locally cached
+information is removed, and the data port is returned to the shutdown state.
+There is no recovery (no "undelete") if this method returns success.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3DeleteMessageBodyFromMessage\fP
+(\f3err\fP, \f3r_previousState\fP, \f3newState\fP, \f3msgnum\fP, \f3mcmp\fP)
+.PP
+Set or clear the "deleted state" of the specified message body, returning the
+previous deleted state setting. Any message body may be marked for deletion; it
+does not take effect immediately, but rather is remembered until the message is
+either committed (rewritten to a message store) or submitted (given to a
+transport for sending). A message body marked for deletion will not be included
+in the message when it is committed or submitted.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)\fP"
+.br
+Error container, used to store return result code.
+.LI "\f3r_previousState\fP (\f3SdmBoolean&\fP)"
+.br
+The previous "deleted state" of the specified message body is returned here;
+that is, the deleted state of the specified message body immediately before it
+is changed by this method. It is Sdm_True if this message body is marked for
+deletion, or Sdm_False if this message body is not marked for deletion.
+.LI "\f3newState\fP (\f3SdmBoolean\fP)"
+.br
+The new state for the specified message body; Sdm_True causes this message body
+to be marked for deletion, while Sdm_False causes this message body to not
+be marked for deletion.
+.LI "\f3msgnum\fP (\f3SdmMessageNumber\fP)"
+.br
+Message number of the message to delete the message body from.
+.LI "\f3mcmp\fP (\f3const SdmDpMessageComponent&\fP)"
+.br
+The message component describing the message body of the specified message to which this
+new message body should be added. This component must be capable of accepting additional
+message bodies (e.g. multipart).
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3DiscardPendingMessageChanges\fP
+(\f3err\fP, \f3msgnum\fP)
+.PP
+Discards the changes made to the message since the last
+time the CommitPendingChanges method was called; for the 
+first call, since the SdmDataPort object was initially opened. 
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3msgnum\fP (\f3SdmMessageNumber\fP)"
+.br
+Message number of the message to have changes discarded.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+
+.\"
+.SS \f3Disconnect\fP
+(\f3err\fP)
+.PP
+FUTURE IMPLEMENTATION: Disconnect the object represented by this data 
+port from the server providing service for
+the object. The object must currently be connected to a server that supports disconnect
+and reconnect protocols (such as a message store using IMAP4).
+.PP
+Any further operations on the object are recorded (cached) locally until the object is
+reconnected (via the Reconnect() method) at which point the cached operations are played
+back so that the local state of the object contents and the remote servers state of the
+object contents are synchronized.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3ExpungeDeletedMessages\fP
+(\f3err\fP, \f3r_msgnums\fP)
+.PP
+Causes any messages which are marked for deletion (have the "deleted" flag set) to be
+physically deleted from the object. There is no recovery of those messages after this
+operation is successful.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)\fP"
+.br
+Error container, used to store return result code.
+.LI "\f3r_msgnums\fP (\f3SdmMessageNumberL&\fP)"
+.br
+A list of message numbers describing the messages to be deleted is returned in
+this container. 
+
+NOTE: UNSURE AT THIS TIME HOW THE LIST IS REALLY ORDERED AND PRESENTED.
+.br
+
+NOTE: This container must be empty (have no elements) before calling this
+method; after the call returns, it is the responsibility of the caller to
+destroy the  container when the information in it is no longer
+needed.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+
+.\"
+.SS \f3GetCapabilities\fP
+(\f3err\fP, \f3r_capabilities\fP)
+.PP
+FUTURE IMPLEMENTATION: Return an object that can be queried to determine the
+characteristics about objects that are attached to this data port object.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)\fP"
+.br
+Error container, used to store return result code.
+.LI "\f3r_capabilities\fP (\f3SdmToken*&\fP)"
+.PP
+TBD.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetMessageAttribute\fP
+(\f3err\fP, \f3r_attribute\fP, \f3attribute\fP, \f3msgnum\fP, \f3mcmp\fP)
+.PP
+Get one attribute by attribute name from this message body. Return the attribute
+by attribute field body text.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_attribute\fP (\f3SdmString&\fP)"
+.br
+The attribute field body text is returned in this simple data type.
+.LI "\f3attribute\fP (\f3const SdmString&\fP)"
+.br
+The text of the attribute field to retrieve from the message body.
+.LI "\f3msgnum\fP (\f3const SdmMessageNumber\fP)"
+.br
+Message number of the single message to retrieve the attribute from.
+.LI "\f3mcmp\fP (\f3const SdmDpMessageComponent&\fP)"
+.br
+The message component describing the message body of the specified message to
+retrieve the attribute from. This component is retrieved from and entry of the
+message structure for this message returned from the GetMessageStructure call.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetMessageAttributes\fP
+(\f3err\fP, \f3r_attribute\fP, \f3msgnum\fP, \f3mcmp\fP)
+.PP
+Get all attributes from a message body. Return the attributes by attribute field name and
+attribute field body text.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_attribute\fP (\f3SdmStrStrL&\fP)"
+.br
+All attributes for the message body are returned in this container. The container is a
+vector of String value pairs, where each entry in the vector corresponds to a single
+attribute in the message body. The first string value corresponds to one of the attribute
+field name text, and the second string value corresponds to the contents of the attribute
+field body.
+.br
+
+NOTE: This container must be empty (have no elements) before calling this
+method; after the call returns, it is the responsibility of the caller to
+destroy the container when the information in it is no longer needed.
+.LI "\f3msgnum\fP (\f3const SdmMessageNumber\fP)"
+.br
+Message number of the single message to retrieve the attributes from.
+.LI "\f3mcmp\fP (\f3const SdmDpMessageComponent&\fP)"
+.br
+The message component describing the message body of the specified message to
+retrieve the attributes from. This component is retrieved from and entry of the
+message structure for this message returned from the GetMessageStructure call.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetMessageAttributes\fP
+(\f3err\fP, \f3r_attribute\fP, \f3attributes\fP, \f3msgnum\fP, \f3mcmp\fP)
+.PP
+Get one or more attributes specified by attribute name string from a message body. Return
+the attributes by attribute field name and attribute field body text.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_attribute\fP (\f3SdmStrStrL&\fP)"
+.br
+All attributes specified by the abstract name text vector are returned in this
+container. The container is a vector of string value pairs, where each entry in
+the vector corresponds to a single attribute in the message body. The first
+string value corresponds to one of the attribute field name text, and the second
+string value corresponds to the contents of the attribute field body.
+.br
+
+NOTE: This container must be empty (have no elements) before calling this
+method; after the call returns, it is the responsibility of the caller to
+destroy the container when the information in it is no
+longer needed.
+.LI "\f3attributes\fP (\f3const SdmStringL&\fP)"
+.br
+A vector of strings containing the text of the attribute fields to retrieve from the
+message body.
+.LI "\f3msgnum\fP (\f3const SdmMessageNumber\fP)"
+.br
+Message number of the single message to retrieve the attributes from.
+.LI "\f3mcmp\fP (\f3const SdmDpMessageComponent&\fP)"
+.br
+The message component describing the message body of the specified message to
+retrieve the attributes from. This component is retrieved from and entry of the
+message structure for this message returned from the GetMessageStructure call.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetMessageAttributes\fP
+(\f3err\fP, \f3r_attribute\fP, \f3attributes\fP, \f3msgnum\fP, \f3mcmp\fP)
+.PP
+Get one or more attributes specified by abstract attribute bit mask from a message
+body. Return the attributes by attribute field name and attribute field body text.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_attribute\fP (\f3SdmStrStrL&\fP)"
+.br
+All attributes specified by the abstract attribute flag mask are returned in this
+container. The container is a vector of String value pairs, where each entry in
+the vector corresponds to a single attribute in the message body. The first
+string value corresponds to one of the attribute field name text, and the second
+string value corresponds to the contents of the attribute field body.
+.br
+
+NOTE: This container must be empty (have no elements) before calling this
+method; after the call returns, it is the responsibility of the caller to
+destroy the container when the information in it is no longer needed.
+.LI "\f3attributes\fP (\f3const SdmMessageAttributeAbstractFlags\fP)"
+.br
+A bit mask representing the attributes to be retrieved from the message body; a bit that
+is on indicates the attribute should be retrieved.
+.LI "\f3msgnum\fP (\f3const SdmMessageNumber\fP)"
+.br
+Message number of the single message to retrieve the attributes from.
+.LI "\f3mcmp\fP (\f3const SdmDpMessageComponent&\fP)"
+.br
+The message component describing the message body of the specified message to
+retrieve the attributes from. This component is retrieved from and entry of the
+message structure for this message returned from the GetMessageStructure call.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetMessageCacheStatus\fP
+(\f3err\fP, \f3r_status\fP, \f3msgnum\fP, \f3mcmp\fP)
+.PP
+Returns boolean indicating whether message body is currently cached.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_status\fP (\f3SdmBoolean&\fP)"
+.br
+A boolean is returned in this simple data type indicating whether this
+message body part is cached.
+.LI "\f3msgnum\fP (\f3SdmMessageNumber\fP)"
+.br
+Message number of the single message to check the cache status for.
+.LI "\f3mcmp\fP (\f3const SdmDpMessageComponent&\fP)"
+.br
+The message component describing the message body of the specified message to
+check the cache status for. This component is retrieved from and entry of the
+message structure for this message returned from the GetMessageStructure call.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetMessageContents\fP
+(\f3err\fP, \f3r_contents\fP, \f3contenttype\fP, \f3msgnum\fP)
+.PP
+Return requested contents for a message (as opposed to a message component). This method operates
+on an entire message.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_contents\fP (\f3SdmContentBuffer&\fP)"
+.br
+The appropriate contents of this object is returned in this object; methods are provided
+to retrieve the data of the contents itself.
+.LI "\f3contenttype\fP (\f3const SdmDpContentType\fP)"
+.br
+The type of contents to retrieve from the message. One of the following:
+.PP
+.RS 3
+.Lc DPCTTYPE_rawfull
+.br
+Return the contents for the entire message; in this case, the "contents" refer to the
+complete raw unprocessed data that the entire message consists of, including all unparsed
+headers and body parts. Typically used for drag and drop purposes where the raw data is
+being transmitted between applications.
+.Lc DPCTTYPE_rawheader
+.br
+Return the contents for the primary envelope (headers) for the entire message; in this
+case, the "contents" refer to the complete raw unprocessed data for the primary envelope.
+.Lc DPCTTYPE_rawbody
+.br
+Return the contents for the entire message body for the message; in this case, "contents"
+refer to the complete raw data for all of the message except the primary envelope.
+.Lc DPCTTYPE_processedcomponent
+.br
+This type of contents is not valid for this call; if specified, it returns an error.
+.PP
+.RE
+.LI "\f3msgnum\fP (\f3const SdmMessageNumber\fP)"
+.br
+Message number of the single message to retrieve the contents from.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetMessageContents\fP
+(\f3err\fP, \f3r_contents\fP, \f3contenttype\fP, \f3msgnum\fP, \f3mcmp\fP)
+.PP
+Return requested contents for a component of a message (as opposed to an entire
+message). This method operates on a specific component of a single message.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_contents\fP (\f3SdmContentBuffer&\fP)"
+.br
+The appropriate contents of this object is returned in this object; methods are provided
+to retrieve the data of the contents itself.
+.LI "\f3contenttype\fP (\f3const SdmDpContentType\fP)"
+.br
+The type of contents to retrieve from the message. One of the following:
+.PP
+.RS 3
+.Lc DPCTTYPE_rawfull
+.br
+Return the contents of the entire specified component of the message in a raw
+unprocessed form; in this case, "contents" refer to the complete raw unprocessed
+data for the entire component, including all unparsed headers and body parts,
+depending upon the type of component.
+.Lc DPCTTYPE_rawheader
+.br
+Return the contents of the envelope portion of the specified component of the message in a
+raw unprocessed form; in this case, the "contents" refer to the complete raw unprocessed
+data for any envelope that may be present in the component.
+.Lc DPCTTYPE_rawbody
+.br
+Return the contents of the body portion of the specified component of the message in a raw
+unprocessed form; in this case, the "contents" refer to the complete raw unprocessed data
+for any body portion that may be present in the component.
+.Lc DPCTTYPE_processedcomponent
+.br
+Return the contents of the specified component of the message in a form that is ready to
+present to the user; in this case, "contents" refer to the complete processed data for
+this part of the message; the body part is completely parsed and processed. Typically used
+when displaying the body part, when saving the body part, or passing it off to an action.
+.PP
+.RE
+.LI "\f3msgnum\fP (\f3const SdmMessageNumber\fP)"
+.br
+Message number of the single message to retrieve the contents from.
+.LI "\f3mcmp\fP (\f3const SdmDpMessageComponent&\fP)"
+.br
+The message component of the specified message to retrieve the contents
+from. This component is retrieved from and entry of the message structure for
+this message returned from the GetMessageStructure call.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetMessageFlags\fP
+(\f3err\fP, \f3r_aflags\fP, \f3msgnum\fP)
+.PP
+Get all flags associated with a single message in a message store.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_aflags\fP (\f3SdmMessageFlagAbstractFlags&\fP)"
+.br
+All flags set for this message are returned in this simple data type.
+.LI "\f3msgnum\fP (\f3const SdmMessageNumber\fP)"
+.br
+Message number of the single message to retrieve flags from.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetMessageFlags\fP
+(\f3err\fP, \f3r_aflags\fP, \f3startmsgnum\fP, \f3endmsgnum\fP)
+.PP
+Get all flags associated with a range of messages in a message store.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_aflags\fP (\f3SdmMessageFlagAbstractFlagsL&\fP)"
+.br
+All flags set for all messages in the specified range are returned in this container.
+The container is a vector with a size equal to the number of messages in the range.
+The first element in the vector corresponds to the first message in the range,
+with the last element in the vector corresponding to the last message in the range.
+.br
+
+NOTE: This container must be empty (have no elements) before calling this
+method; after the call returns, it is the responsibility of the caller to
+destroy the container when the information in it is no longer needed.
+.LI "\f3startmsgnum\fP (\f3const SdmMessageNumber\fP)"
+.br
+Message number of the first message in the message store to retrieve flags from.
+.LI "\f3endmsgnum\fP (\f3const SdmMessageNumber\fP)"
+.br
+Message number of the last message in the message store to retrieve flags from.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetMessageFlags\fP
+(\f3err\fP, \f3r_aflags\fP, \f3msgnums\fP) 
+
+Get all flags associated with a list of messages in a message store.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3(SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_aflags\fP (\f3SdmMessageFlagAbstractFlagsL&\fP)"
+.br
+All flags set for all messages in the specified list are returned in this
+container. The container is a vector with a size equal to the number of
+messages in the list. The first element in the vector corresponds to the first
+message in the list, with the last element in the vector corresponding to the
+last message in the list. There is a one to one correspondence in the indices
+between the message number list and the message flag returned list.
+.br
+
+NOTE: This container must be empty (have no elements) before calling this
+method; after the call returns, it is the responsibility of the caller to
+destroy the container when the information in it is no longer needed.
+.LI "\f3msgnums\fP (\f3const SdmMessageNumberL&\fP)"
+.br
+A list containing the message numbers of the messages to retrieve flags from.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetMessageHeader\fP
+(\f3err\fP, \f3r_hdr\fP, \f3hdr\fP, \f3msgnum\fP)
+.PP
+Get one header specified by header name text from a single message in a message
+store. Return the header by header field name text and header field body text.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_hdr\fP (\f3SdmStrStrL&\fP)"
+.br
+The header as specified by the header field name text is returned in this
+container. The container is a vector of String value pairs, where each entry in
+the vector corresponds to a single header in the message. The first string value
+corresponds to one of the header field name text, and the second string value
+corresponds to the contents of the header field body. Because a single header
+field can have multiple entries in a message envelope, more than one header may
+be returned in this vector.
+.br
+
+NOTE: This container must be empty (have no elements) before calling this
+method; after the call returns, it is the responsibility of the caller to
+destroy the container when the information in it is no longer needed.
+.LI "\f3hdr\fP (\f3const SdmString&\fP)"
+.br
+The text of the header field to retrieve from the message.
+.LI "\f3msgnum\fP (\f3const SdmMessageNumber\fP)"
+.br
+Message number of the single message to retrieve the header from.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+
+.\"
+.SS \f3GetMessageHeader\fP
+(\f3err\fP, \f3r_hdr\fP, \f3hdr\fP, \f3msgnum\fP)
+.PP
+Get one header specified by header name character string from a single message in a message
+store. Return the header by header field name text and header field body text.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_hdr\fP (\f3SdmStrStrL&\fP)"
+.br
+The header as specified by the header field name character string is returned in this
+container. The container is a vector of String value pairs, where each entry in
+the vector corresponds to a single header in the message. The first string value
+corresponds to one of the header field name text, and the second string value
+corresponds to the contents of the header field body. Because a single header
+field can have multiple entries in a message envelope, more than one header may
+be returned in this vector.
+.br
+ 
+NOTE: This container must be empty (have no elements) before calling this
+method; after the call returns, it is the responsibility of the caller to
+destroy the container when the information in it is no longer needed.
+.LI "\f3hdr\fP (\f3const char*\fP)"
+.br
+The text of the header field to retrieve from the message.
+.LI "\f3msgnum\fP (\f3const SdmMessageNumber\fP)"
+.br
+Message number of the single message to retrieve the header from.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+
+.\"
+.SS \f3GetMessageHeader\fP
+(\f3err\fP, \f3r_copiesof_hdr\fP, \f3hdr\fP, \f3startmsgnum\fP, \f3endmsgnum\fP)
+.PP
+Get one header specified by header name text from a range of messages in a message
+store. Return the header by header field name text and header field body text.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_copiesof_hdr\fP (\f3SdmStrStrLL&\fP)"
+.br
+The header as specified by the header field name text for all messages in the
+specified range are returned in this container. The container provides a "list
+of lists", where each entry in the vector corresponds to the list of headers
+returned for a single message. The first element in the vector corresponds to
+the first message in the range, with the last element in the vector.
+corresponding to the last message in the range. Because a single header field
+can have multiple entries in a message envelope, more than one header may be
+returned in this vector.
+.br
+
+NOTE: This container must be empty (have no elements) before calling this
+method; after the call returns, it is the responsibility of the caller to
+destroy the contents of the container when the information in it is no longer
+needed.
+.br
+
+SPECIAL NOTE: This container is a vector of pointers, with each pointer
+addressing a vector of objects corresponding to headers retrieved from a single
+message. The contents of the vector are NOT automatically destroyed when the
+vector itself is destroyed. The owner must make provisions for destroying the
+contents; otherwise, a memory leak will occur when the vector itself is
+destroyed.
+.LI "\f3hdr\fP (\f3const SdmString&\fP)"
+.br
+The character string of the header field to retrieve from the range of messages.
+.LI "\f3startmsgnum\fP (\f3const SdmMessageNumber\fP)"
+.br
+Message number of the first message in the message store to retrieve the header
+from.
+.LI "\f3endmsgnum\fP (\f3const SdmMessageNumber\fP)"
+.br
+Message number of the last message in the message store to retrieve the header
+from.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+
+.\"
+.SS \f3GetMessageHeader\fP
+(\f3err\fP, \f3r_copiesof_hdr\fP, \f3hdr\fP, \f3startmsgnum\fP, \f3endmsgnum\fP)
+.PP
+Get one header specified by header name character string from a range of messages in a message
+store. Return the header by header field name text and header field body text.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_copiesof_hdr\fP (\f3SdmStrStrLL&\fP)"
+.br
+The header as specified by the header field name character string for all messages in the
+specified range are returned in this container. The container provides a "list
+of lists", where each entry in the vector corresponds to the list of headers
+returned for a single message. The first element in the vector corresponds to
+the first message in the range, with the last element in the vector.
+corresponding to the last message in the range. Because a single header field
+can have multiple entries in a message envelope, more than one header may be
+returned in this vector.
+.br
+
+NOTE: This container must be empty (have no elements) before calling this
+method; after the call returns, it is the responsibility of the caller to
+destroy the contents of the container when the information in it is no longer
+needed.
+.br
+
+SPECIAL NOTE: This container is a vector of pointers, with each pointer
+addressing a vector of objects corresponding to headers retrieved from a single
+message. The contents of the vector are NOT automatically destroyed when the
+vector itself is destroyed. The owner must make provisions for destroying the
+contents; otherwise, a memory leak will occur when the vector itself is
+destroyed.
+.LI "\f3hdr\fP (\f3const char*\fP)"
+.br
+The character string of the header field to retrieve from the range of messages.
+.LI "\f3startmsgnum\fP (\f3const SdmMessageNumber\fP)"
+.br
+Message number of the first message in the message store to retrieve the header
+from.
+.LI "\f3endmsgnum\fP (\f3const SdmMessageNumber\fP)"
+.br
+Message number of the last message in the message store to retrieve the header
+from.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+
+.\"
+.SS \f3GetMessageHeader\fP
+(\f3err\fP, \f3r_copiesof_hdr\fP, \f3hdr\fP, \f3msgnums\fP)
+.PP
+Get one header specified by header name text from a list of messages in a message
+store. Return the header by header field name text and header field body text.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_copiesof_hdr\fP (\f3SdmStrStrLL&\fP)"
+.br
+The header as specified by the header field name text for all messages in the specified
+list are returned in this container. The container provides a "list of lists", where each
+entry in the vector corresponds to the list of headers returned for a single message. The
+first element in the vector corresponds to the first message in the list, with the last
+element in the vector.  corresponding to the last message in the list. There is a one to
+one correspondence in the indices between the message number list and the message headers
+returned list. Because a single header field can have multiple entries in a message
+envelope, more than one header may be returned in this vector.
+.br
+
+NOTE: This container must be empty (have no elements) before calling this
+method; after the call returns, it is the responsibility of the caller to
+destroy the contents of the container when the information in it is no longer
+needed.
+.br
+
+SPECIAL NOTE: This container is a vector of pointers, with each pointer addressing a
+vector of objects corresponding to headers retrieved from a single message. The contents
+of the vector are NOT automatically destroyed when the vector itself is destroyed. The
+owner must make provisions for destroying the contents; otherwise, a memory leak will
+occur when the vector itself is destroyed.
+.LI "\f3hdr\fP (\f3const SdmString&\fP)"
+.br
+The text of the header field to retrieve from the list of messages.
+.LI "\f3msgnums\fP (\f3const SdmMessageNumberL&\fP)"
+.br
+A list containing the message numbers of the messages to retrieve the header from.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+
+.SS \f3GetMessageHeader\fP
+(\f3err\fP, \f3r_copiesof_hdr\fP, \f3hdr\fP, \f3msgnums\fP)
+.PP
+Get one header specified by header name character string from a list of messages in a message
+store. Return the header by header field name text and header field body text.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_copiesof_hdr\fP (\f3SdmStrStrLL&\fP)"
+.br
+The header as specified by the header field name character string for all messages in the specified
+list are returned in this container. The container provides a "list of lists", where each
+entry in the vector corresponds to the list of headers returned for a single message. The
+first element in the vector corresponds to the first message in the list, with the last
+element in the vector.  corresponding to the last message in the list. There is a one to
+one correspondence in the indices between the message number list and the message headers
+returned list. Because a single header field can have multiple entries in a message
+envelope, more than one header may be returned in this vector.
+.br
+
+NOTE: This container must be empty (have no elements) before calling this
+method; after the call returns, it is the responsibility of the caller to
+destroy the contents of the container when the information in it is no longer
+needed.
+.br
+
+SPECIAL NOTE: This container is a vector of pointers, with each pointer addressing a
+vector of objects corresponding to headers retrieved from a single message. The contents
+of the vector are NOT automatically destroyed when the vector itself is destroyed. The
+owner must make provisions for destroying the contents; otherwise, a memory leak will
+occur when the vector itself is destroyed.
+.LI "\f3hdr\fP (\f3const char*\fP)"
+.br
+The character string of the header field to retrieve from the list of messages.
+.LI "\f3msgnums\fP (\f3const SdmMessageNumberL&\fP)"
+.br
+A list containing the message numbers of the messages to retrieve the header from.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+
+.SS \f3GetMessageHeaders\fP
+(\f3err\fP, \f3r_hdr\fP, \f3msgnum\fP)
+.PP
+Get all headers from a single message in a message store. Return the headers
+by header field name text and header field body text.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_hdr\fP (\f3SdmStrStrL&\fP)"
+.br
+All headers in the message are returned in this container. The container is a
+vector of String value pairs, where each entry in the vector corresponds to a
+single header in the message. The first string value corresponds to one of the
+header field name text, and the second string value corresponds to the contents
+of the header field body.
+.br
+
+NOTE: This container must be empty (have no elements) before calling this
+method; after the call returns, it is the responsibility of the caller to
+destroy the container when the information in it is no longer needed.
+.LI "\f3msgnum\fP (\f3const SdmMessageNumber\fP)"
+.br
+Message number of single message to retrieve headers from.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetMessageHeaders\fP
+(\f3err\fP, \f3r_copiesof_hdr\fP, \f3startmsgnum\fP, \f3endmsgnum\fP)
+.PP
+Get all headers from a range of messages in a message store. Return the headers
+by header field name text and header field body text.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_copiesof_hdr\fP (\f3SdmStrStrLL&\fP)"
+.br
+All header for all messages in the specified range are returned in this
+container. The container provides a "list of lists", where each entry in the
+vector corresponds to the list of headers returned for a single message. The
+first element in the vector corresponds to the first message in the range, with
+the last element in the vector corresponding to the last message in the range.
+.br
+
+NOTE: This container must be empty (have no elements) before calling this
+method; after the call returns, it is the responsibility of the caller to
+destroy the contents of the container when the information in it is no longer
+needed.
+.br
+
+SPECIAL NOTE: This container is a vector of pointers, with each pointer
+addressing a vector of objects corresponding to headers retrieved from a single
+message. The contents of the vector are NOT automatically destroyed when the
+vector itself is destroyed. The owner must make provisions for destroying the
+contents; otherwise, a memory leak will occur when the vector itself is
+destroyed.
+.LI "\f3startmsgnum\fP (\f3const SdmMessageNumber\fP)"
+.br
+Message number of the first message in the message store to retrieve the headers
+from.
+.LI "\f3endmsgnum\fP (\f3const SdmMessageNumber\fP)"
+.br
+Message number of the last message in the message store to retrieve the headers
+from.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetMessageHeaders\fP
+(\f3err\fP, \f3r_copiesof_hdr\fP, \f3msgnums\fP)
+.PP
+Get all headers from a list of messages in a message store. Return the headers by header
+field name text and header field body text.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_copiesof_hdr\fP (\f3SdmStrStrLL&\fP)"
+.br
+All header for all messages in the specified range are returned in this
+container. The container provides a "list of lists", where each entry in the
+vector corresponds to the list of headers returned for a single message. The
+first element in the vector corresponds to the first message in the range, with
+the last element in the vector corresponding to the last message in the range.
+.br
+
+NOTE: This container must be empty (have no elements) before calling this
+method; after the call returns, it is the responsibility of the caller to
+destroy the contents of the container when the information in it is no longer
+needed.
+.br
+
+SPECIAL NOTE: This container is a vector of pointers, with each pointer
+addressing a vector of objects corresponding to headers retrieved from a single
+message. The contents of the vector are NOT automatically destroyed when the
+vector itself is destroyed. The owner must make provisions for destroying the
+contents; otherwise, a memory leak will occur when the vector itself is
+destroyed.
+.LI "\f3msgnums\fP (\f3const SdmMessageNumberL&\fP)"
+.br
+A list containing the message numbers of the messages to retrieve the headers from.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetMessageHeaders\fP
+(\f3err\fP, \f3r_hdrs\fP, \f3hdrs\fP, \f3msgnum\fP)
+.PP
+Get a list of headers specified by header name text from a single message in a message
+store. Return the headers by header field name text and header field body text.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_hdrs\fP (\f3SdmStrStrL&\fP)"
+.br
+The headers as specified by the header field name text vector are returned in this
+container. The container is a vector of String value pairs, where each entry in the vector
+corresponds to a single header in the message. The first string value corresponds to one
+of the header field name text, and the second string value corresponds to the contents of
+the header field body.
+.br
+
+NOTE: This container must be empty (have no elements) before calling this
+method; after the call returns, it is the responsibility of the caller to
+destroy the container when the information in it is no longer needed.
+.LI "\f3hdrs\fP (\f3const SdmStringL&\fP)"
+.br
+A vector of strings containing the text of the header fields to retrieve from the message.
+.LI "\f3msgnum\fP (\f3const SdmMessageNumber\fP)"
+.br
+Message number of the single message to retrieve the headers from.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetMessageHeaders\fP
+(\f3err\fP, \f3r_copiesof_hdrs\fP, \f3hdrs\fP, \f3startmsgnum\fP, \f3endmsgnum\fP)
+.PP
+Get a list of headers specified by header name text from a range of messages in a message
+store. Return the headers by header field name text and header field body text.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_copiesof_hdrs\fP (\f3SdmStrStrLL&\fP)"
+.br
+The headers as specified by the header field name text vector for all messages in the
+specified range are returned in this container. The container provides a "list of lists",
+where each entry in the vector corresponds to the list of headers returned for a single
+message. The first element in the vector corresponds to the first message in the range,
+with the last element in the vector corresponding to the last message in the range.
+.br
+
+NOTE: This container must be empty (have no elements) before calling this
+method; after the call returns, it is the responsibility of the caller to
+destroy the contents of the container when the information in it is no longer
+needed.
+.br
+
+SPECIAL NOTE: This container is a vector of pointers, with each pointer addressing a
+vector of objects corresponding to headers retrieved from a single message. The contents
+of the vector are NOT automatically destroyed when the vector itself is destroyed. The
+owner must make provisions for destroying the contents; otherwise, a memory leak will
+occur when the vector itself is destroyed.
+.LI "\f3hdrs\fP (\f3const SdmStringL&\fP)"
+.br
+A vector of strings containing the text of the header fields to retrieve from
+the range of messages.
+.LI "\f3startmsgnum\fP (\f3const SdmMessageNumber\fP)"
+.br
+Message number of the first message in the message store to retrieve the headers from.
+.LI "\f3endmsgnum\fP (\f3const SdmMessageNumber\fP)"
+.br
+Message number of the last message in the message store to retrieve the headers from.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetMessageHeaders\fP
+(\f3err\fP, \f3r_copiesof_hdrs\fP, \f3hdrs\fP, \f3msgnums\fP)
+.PP
+Get a list of headers specified by header name text from a list of messages in a message
+store. Return the headers by header field name text and header field body text.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_copiesof_hdrs\fP (\f3SdmStrStrLL&\fP)"
+.br
+The headers as specified by the header field name text vector for all messages in the
+specified list are returned in this container. The container provides a "list of lists",
+where each entry in the vector corresponds to the list of headers returned for a single
+message. The first element in the vector corresponds to the first message in the list,
+with the last element in the vector corresponding to the last message in the list.
+.br
+
+NOTE: This container must be empty (have no elements) before calling this
+method; after the call returns, it is the responsibility of the caller to
+destroy the contents of the container when the information in it is no longer
+needed.
+.br
+
+SPECIAL NOTE: This container is a vector of pointers, with each pointer addressing a
+vector of objects corresponding to headers retrieved from a single message. The contents
+of the vector are NOT automatically destroyed when the vector itself is destroyed. The
+owner must make provisions for destroying the contents; otherwise, a memory leak will
+occur when the vector itself is destroyed.
+.LI "\f3hdrs\fP (\f3const SdmStringL&\fP)"
+.br
+A vector of strings containing the text of the header fields to retrieve from
+the list of messages.
+.LI "\f3msgnums\fP (\f3const SdmMessageNumberL&\fP)"
+.br
+A list containing the message numbers of the messages to retrieve the headers from.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetMessageHeaders\fP
+(\f3err\fP, \f3r_hdr\fP, \f3hdr\fP, \f3msgnum\fP)
+.PP
+Get one or more headers specified by abstract header bit mask from a single message in a
+message store. Return the headers by header field name text and header field body text.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_hdr\fP (\f3SdmStrStrL&\fP)"
+.br
+All headers specified by the abstract header flag mask are returned in this container. The
+container is a vector of String value pairs, where each entry in the vector corresponds to
+a single header in the message. The first string value corresponds to one of the header
+field name text, and the second string value corresponds to the contents of the header
+field body.
+.br
+
+NOTE: This container must be empty (have no elements) before calling this
+method; after the call returns, it is the responsibility of the caller to
+destroy the container when the information in it is no longer needed.
+.LI "\f3hdr\fP (\f3const SdmMessageHeaderAbstractFlags\fP)"
+.br
+A bit mask representing the headers to be retrieved from the message; a bit that is
+on indicates the header should be retrieved.
+.LI "\f3msgnum\fP (\f3const SdmMessageNumber\fP)"
+.br
+Message number of the single message to retrieve the headers from.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetMessageHeaders\fP
+(\f3err\fP, \f3r_copiesof_hdr\fP, \f3hdr\fP, \f3startmsgnum\fP, \f3endmsgnum\fP)
+.PP
+Get one or more headers specified by abstract header bit mask from a range of messages in
+a message store. Return the headers by header field name text and header field body text.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_copiesof_hdr\fP (\f3SdmStrStrLL&\fP)"
+.br
+All headers specified by the abstract header flag mask for all messages in the specified
+range are returned in this container. The container provides a "list of lists", where each
+entry in the vector corresponds to the list of headers returned for a single message. The
+first element in the vector corresponds to the first message in the range, with the last
+element in the vector.  corresponding to the last message in the range.
+.br
+
+NOTE: This container must be empty (have no elements) before calling this
+method; after the call returns, it is the responsibility of the caller to
+destroy the contents of the container when the information in it is no longer
+needed.
+.br
+
+SPECIAL NOTE: This container is a vector of pointers, with each pointer addressing a
+vector of objects corresponding to headers retrieved from a single message. The contents
+of the vector are NOT automatically destroyed when the vector itself is destroyed. The
+owner must make provisions for destroying the contents; otherwise, a memory leak will
+occur when the vector itself is destroyed.
+.LI "\f3hdr\fP (\f3const SdmMessageHeaderAbstractFlags\fP)"
+.br
+A bit mask representing the headers to be retrieved from the range of messages; a bit that
+is on indicates the header should be retrieved.
+.LI "\f3startmsgnum\fP (\f3const SdmMessageNumber\fP)"
+.br
+Message number of the first message in the message store to retrieve the headers from.
+.LI "\f3endmsgnum\fP (\f3const SdmMessageNumber\fP)"
+.br
+Message number of the last message in the message store to retrieve the headers from.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetMessageHeaders\fP
+(\f3err\fP, \f3r_copiesof_hdr\fP, \f3hdr\fP, \f3msgnums\fP)
+.PP
+Get one or more headers specified by abstract header bit mask from a list of messages in a
+message store. Return the headers by header field name text and header field body text.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_copiesof_hdr\fP (\f3SdmStrStrLL&\fP)"
+.br
+All headers specified by the abstract header flag mask for all messages in the specified
+range are returned in this container. The container provides a "list of lists", where each
+entry in the vector corresponds to the list of headers returned for a single message. The
+first element in the vector corresponds to the first message in the range, with the last
+element in the vector.  corresponding to the last message in the range.
+.br
+
+NOTE: This container must be empty (have no elements) before calling this
+method; after the call returns, it is the responsibility of the caller to
+destroy the contents of the container when the information in it is no longer
+needed.
+.br
+
+SPECIAL NOTE: This container is a vector of pointers, with each pointer addressing a
+vector of objects corresponding to headers retrieved from a single message. The contents
+of the vector are NOT automatically destroyed when the vector itself is destroyed. The
+owner must make provisions for destroying the contents; otherwise, a memory leak will
+occur when the vector itself is destroyed.
+.LI "\f3hdr\fP (\f3const SdmMessageHeaderAbstractFlags\fP)"
+.br
+A bit mask representing the headers to be retrieved from the list of messages; a bit that
+is on indicates the header should be retrieved.
+.LI "\f3msgnums\fP (\f3const SdmMessageNumberL&\fP)"
+.br
+A list containing the message numbers of the messages to retrieve the headers from.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetMessageHeaders\fP
+(\f3err\fP, \f3r_hdr\fP, \f3hdr\fP, \f3msgnum\fP)
+.PP
+Get one or more headers specified by abstract header bit mask from a single message in a
+message store. Return the headers by header field name abstract type and header field body
+text.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_hdr\fP (\f3SdmIntStrL&\fP)"
+.br
+All headers specified by the abstract header flag mask are returned in this container. The
+container is a vector of Integer String value pairs, where each entry in the vector
+corresponds to a single header in the message. The integer value corresponds to one of the
+abstract header flag bits set describing the header field name, and the string value
+corresponds to the contents of the header field body.
+.br
+
+NOTE: This container must be empty (have no elements) before calling this
+method; after the call returns, it is the responsibility of the caller to
+destroy the container when the information in it is no longer needed.
+.LI "\f3hdr\fP (\f3const SdmMessageHeaderAbstractFlags\fP)"
+.br
+A bit mask representing the headers to be retrieved from the message; a bit that is on
+indicates the header should be retrieved.
+.LI "\f3msgnum\fP (\f3const SdmMessageNumber\fP)"
+.br
+Message number of the single message to retrieve the headers from.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetMessageHeaders\fP
+(\f3err\fP, \f3r_copiesof_hdr\fP, \f3hdr\fP, \f3startmsgnum\fP, \f3endmsgnum\fP)
+.PP
+Get one or more headers specified by abstract header bit mask from a range of messages in
+a message store. Return the headers by header field name abstract type and header field
+body text.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_copiesof_hdr\fP (\f3SdmIntStrLL&\fP)"
+.br
+All headers specified by the abstract header flag mask for all messages in the specified
+range are returned in this container. The container provides a "list of lists", where each
+entry in the vector corresponds to the list of headers returned for a single message. The
+first element in the vector corresponds to the first message in the range, with the last
+element in the vector corresponding to the last message in the range.
+.br
+
+NOTE: This container must be empty (have no elements) before calling this
+method; after the call returns, it is the responsibility of the caller to
+destroy the contents of the container when the information in it is no longer
+needed.
+.br
+
+SPECIAL NOTE: This container is a vector of pointers, with each pointer addressing a
+vector of objects corresponding to headers retrieved from a single message. The contents
+of the vector are NOT automatically destroyed when the vector itself is destroyed. The
+owner must make provisions for destroying the contents; otherwise, a memory leak will
+occur when the vector itself is destroyed.
+.LI "\f3hdr\fP (\f3const SdmMessageHeaderAbstractFlags\fP)"
+.br
+A bit mask representing the headers to be retrieved from the range of messages; a bit that
+is on indicates the header should be retrieved.
+.LI "\f3startmsgnum\fP (\f3const SdmMessageNumber\fP)"
+.br
+Message number of the first message in the message store to retrieve the headers from.
+.LI "\f3endmsgnum\fP (\f3const SdmMessageNumber\fP)"
+.br
+Message number of the last message in the message store to retrieve the headers from.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetMessageHeaders\fP
+(\f3err\fP, \f3r_copiesof_hdr\fP, \f3hdr\fP, \f3msgnums\fP)
+.PP
+Get one or more headers specified by abstract header bit mask from a list of messages in a
+message store. Return the headers by header field name abstract type and header field body
+text.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_copiesof_hdr\fP (\f3SdmIntStrLL&\fP)"
+.br
+All headers specified by the abstract header flag mask for all messages in the specified
+list are returned in this container. The container provides a "list of lists", where each
+entry in the vector corresponds to the list of headers returned for a single message. The
+first element in the vector corresponds to the first message in the list, with the last
+element in the vector.  corresponding to the last message in the list. There is a one to
+one correspondence in the indices between the message number list and the message headers
+returned list.
+.br
+
+NOTE: This container must be empty (have no elements) before calling this
+method; after the call returns, it is the responsibility of the caller to
+destroy the contents of the container when the information in it is no longer
+needed.
+.br
+
+SPECIAL NOTE: This container is a vector of pointers, with each pointer addressing a
+vector of objects corresponding to headers retrieved from a single message. The contents
+of the vector are NOT automatically destroyed when the vector itself is destroyed. The
+owner must make provisions for destroying the contents; otherwise, a memory leak will
+occur when the vector itself is destroyed.
+.LI "\f3hdr\fP (\f3const SdmMessageHeaderAbstractFlags\fP)"
+.br
+A bit mask representing the headers to be retrieved from the range of messages;
+a bit that is on indicates the header should be retrieved.
+.LI "\f3msgnums\fP (\f3const SdmMessageNumberL&\fP)"
+.br
+A list containing the message numbers of the messages to retrieve the headers from.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+
+
+.\"
+.SS \f3GetMessageStoreStatus\fP
+(\f3err\fP, \f3r_status\fP, \f3storeFlags\fP)
+.PP
+Retrieve the current status of a message store.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_status\fP (\f3SdmMessageStoreStatus&\fP)"
+.br
+The requested status information is returned in this container.
+.LI "\f3storeFlags\fP (\f3const SdmMessageStoreStatusFlags\fP)"
+.br
+One or more message store status flag bits that indicate which status information is to be
+retrieved from the message store. In general it is prudent to ask for only what you need,
+as some information (like the checksum) may be costly to compute.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetMessageStructure\fP
+(\f3err\fP, \f3r_structure\fP, \f3msgnum\fP)
+.PP
+Return information on the underlying structure for a single message in a message
+store. See the section on Message Structure earlier in this document for a description of
+message structures.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_structure\fP (\f3SdmDpMessageStructureL&\fP)"
+.br
+The structure of the specified message is returned in this container. The container is a
+vector of SdmDpMessageStructure objects, each one describing a component of the message.
+.br
+
+NOTE: This container must be empty (have no elements) before calling this method; after
+the call returns, it is the responsibility of the caller to destroy the container when the
+information in it is no longer needed.
+.LI "\f3msgnum\fP (\f3const SdmMessageNumber\fP)"
+.br
+Message number of the single message to retrieve the structure of.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetMessageStructure\fP
+(\f3err\fP, \f3r_copiesof_structure\fP, \f3startmsgnum\fP, \f3endmsgnum\fP)
+.PP
+Return information on the underlying structure for a range of messages in a message
+store. See the section on Message Structure earlier in this document for a description of
+message structures.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_copiesof_structure\fP (\f3SdmDpMessageStructureLL&\fP)"
+.br
+The structure for all messages in the specified range are returned in this container. The
+container provides a "list of lists", where each entry in the vector corresponds to the
+structure returned for a single message. The first element in the vector corresponds
+to the first message in the range, with the last element in the vector corresponding to
+the last message in the range.
+.br
+
+NOTE: This container must be empty (have no elements) before calling this
+method; after the call returns, it is the responsibility of the caller to
+destroy the contents of the container when the information in it is no longer
+needed.
+.br
+
+SPECIAL NOTE: This container is a vector of pointers, with each pointer addressing a
+vector of objects corresponding to the structure retrieved from a single message. The
+contents of the vector are NOT automatically destroyed when the vector itself is
+destroyed. The owner must make provisions for destroying the contents; otherwise, a memory
+leak will occur when the vector itself is destroyed.
+.LI "\f3startmsgnum\fP (\f3const SdmMessageNumber\fP)"
+.br
+Message number of the first message in the message store to retrieve the structure of.
+.LI "\f3endmsgnum\fP (\f3const SdmMessageNumber\fP)"
+.br
+Message number of the last message in the message store to retrieve the structure of.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetMessageStructure\fP
+(\f3err\fP, \f3r_copiesof_structure\fP, \f3msgnums\fP)
+.PP
+Return information on the underlying structure for a list of messages in a message
+store. See the section on Message Structure earlier in this document for a description of
+message structures.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_copiesof_structure\fP (\f3SdmDpMessageStructureLL&\fP)"
+.br
+The structure for all messages in the specified list are returned in this container. The
+container provides a "list of lists", where each entry in the vector corresponds to the
+structure returned for a single message. The first element in the vector corresponds
+to the first message in the list, with the last element in the vector corresponding to
+the last message in the list.
+.br
+
+NOTE: This container must be empty (have no elements) before calling this
+method; after the call returns, it is the responsibility of the caller to
+destroy the contents of the container when the information in it is no longer
+needed.
+.br
+
+SPECIAL NOTE: This container is a vector of pointers, with each pointer addressing a
+vector of objects corresponding to the structure retrieved from a single message. The
+contents of the vector are NOT automatically destroyed when the vector itself is
+destroyed. The owner must make provisions for destroying the contents; otherwise, a memory
+leak will occur when the vector itself is destroyed.
+.LI "\f3msgnums\fP (\f3const SdmMessageNumberL&\fP)"
+.br
+A list containing the message numbers of the messages to retrieve the structures of.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+
+.\"
+.SS \f3MoveMessage\fP
+(\f3err\fP, \f3token\fP, \f3msgnum\fP)
+.PP
+Move a single message from this message store to another message store.  
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3token\fP (\f3const SdmToken&\fP)"
+.br
+Token for the message store where the message will be moved to.
+.LI "\f3msgnum\fP (\f3const SdmMessageNumber\fP)"
+.br
+Message number of the message in this store to be moved.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3MoveMessages\fP
+(\f3err\fP, \f3token\fP, \f3startmsgnum\fP, \f3endmsgnum\fP)
+.PP
+Move a range of messages from this message store to another message store.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3token\fP (\f3const SdmToken&\fP)"
+.br
+Token for the message store where the messages will be moved to.
+.LI "\f3startmsgnum\fP (\f3const SdmMessageNumber\fP)"
+.br
+Message number of the first message in this message store to be moved.
+.LI "\f3endmsgnum\fP (\f3const SdmMessageNumber\fP)"
+.br
+Message number of the last message in this message store to be moved.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3MoveMessages\fP
+(\f3err\fP, \f3token\fP, \f3msgnums\fP)
+.PP
+Move a list of messages from this message store to another message store.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3token\fP (\f3const SdmToken&\fP)"
+.br
+Token for the message store where the messages will be moved to.
+.LI "\f3msgnums\fP (\f3const SdmMessageNumberL\fP)"
+.br
+A list containing the message numbers of the messages in this message store to
+be moved.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+
+.\"
+.SS \f3Open\fP
+(\f3err\fP, \f3r_readOnly\fP, \f3tk\fP)
+.PP
+Open an object on this data port, so that its contents may be read and manipulated. The
+object described could be a new message store, address book, etc. Appropriate action is
+taken to open the type of object specified. See SdmGlossary(3) for a comparison of Attach
+and Open.
+.PP
+Once an object is open, all methods provided by this object become available for use,
+although the capabilities of the object and the users permissions may restrict the
+operations that may be performed. For example, if a message store is opened read only,
+methods that modify the contents of a message store return an error, and methods that are
+not applicable to a message store return an error.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_readOnly\fP" (\f3SdmBoolean&\fP)"
+.br
+A boolean indicating whether or not the object was opened "in read
+only mode". For example, if you request to open a message store, this
+flag will be set to "Sdm_True" if the message store was open only with
+reading capabilities and NO writing capabilities; otherwise, this flag
+will be set to "Sdm_False" if the message store was opened with read
+and write capabilities.
+.br
+A message store would be opened in read only mode if, for example, the
+user only had read permission and no write permissions to the message
+store.
+.LI "\f3tk\fP (\f3const SdmToken&\fP)"
+.br
+A SdmToken object describing the object to be opened.
+See SdmGlossary(3) for a description of how to initialize the token.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3PerformSearch\fP
+(\f3err\fP, \f3r_msgnums\fP, \f3search\fP)
+.PP
+Search all messages in a message store and return a list of all messages that match the
+given search criteria.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_msgnums\fP (\f3SdmMessageNumberL&\fP)"
+.br
+A list of message numbers that match the given search criteria is returned in this
+container.
+.br
+
+NOTE: This container must be empty (have no elements) before calling this
+method; after the call returns, it is the responsibility of the caller to
+destroy the container when the information in it is no longer needed.
+.LI "\f3search\fP (\f3const SdmSearch&\fP)"
+.br
+A SdmSearch object that contains the criteria to search against the list of messages.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3PerformSearch\fP
+(\f3err\fP, \f3r_bool\fP, \f3search\fP, \f3msgnum\fP)
+.PP
+Search a single message in a message store and return an indication of whether or not
+the message matches the given search criteria.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_bool\fP (\f3SdmBoolean&\fP)"
+.br
+A boolean indicating whether or not the search is successful is returned in this variable;
+that is, Sdm_False if the search failed, else Sdm_True if the search is successful.
+.LI "\f3search\fP (\f3const SdmSearch&\fP)"
+.br
+A SdmSearch object that contains the criteria to search against the single message.
+.LI "\f3msgnum\fP (\f3const SdmMessageNumber\fP)"
+.br
+Message number of the single message to apply the search criteria against.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3PerformSearch\fP
+(\f3err\fP, \f3r_msgnums\fP, \f3search\fP, \f3startmsgnum\fP, \f3endmsgnum\fP)
+.PP
+Search a range of messages in a message store and return a list of all messages
+that match the given search criteria.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_msgnums\fP (\f3SdmMessageNumberL&\fP)"
+.br
+A list of message numbers that match the given search criteria is returned in
+this container.
+.br
+
+NOTE: This container must be empty (have no elements) before calling this
+method; after the call returns, it is the responsibility of the caller to
+destroy the container when the information in it is no longer needed.
+.LI "\f3search\fP (\f3const SdmSearch&\fP)"
+.br
+A SdmSearch object that contains the criteria to search against the list of messages.
+.LI "\f3startmsgnum\fP (\f3const SdmMessageNumber\fP)"
+.br
+Message number of the first message in the message store to search against.
+.LI "\f3endmsgnum\fP (\f3const SdmMessageNumber\fP)"
+.br
+Message number of the last message in the message store to search against.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3PerformSearch\fP
+(\f3err\fP, \f3r_msgnums\fP, \f3search\fP, \f3msgnums\fP)
+.PP
+Search a list of messages in the message store and return an indication of whether
+or not the messages match the given search criteria.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_msgnums\fP (\f3SdmMessageNumberL&\fP)"
+.br
+A list of message numbers that match the given search criteria is returned in
+this container.
+.br
+
+NOTE: This container must be empty (have no elements) before calling this
+method; after the call returns, it is the responsibility of the caller to
+destroy the container when the information in it is no longer needed.
+.LI "\f3search\fP (\f3const SdmSearch&\fP)"
+.br
+A SdmSearch object that contains the criteria to search against the list of messages.
+.LI "\f3msgnums\fP (\f3const SdmMessageNumberL&\fP)"
+.br
+A list containing the message numbers of the messages to perform the search on.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3Reconnect\fP
+(\f3err\fP)
+.PP
+FUTURE IMPLEMENTATION: Reconnect the object to the server that provides 
+service for the object. The object must
+currently be in a disconnected state, and the object server that provides service for the
+object must support disconnect and reconnect protocols (such as a message store using
+IMAP4).
+.PP
+Upon successful reconnection, any transactions recorded (cached) while the object was
+disconnected from the server will be played back so that the local state of the objects
+contents and the remote servers state of the objects contents are synchronized.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3RemoveFromSubscribedNamespace\fP
+(\f3err\fP, \f3name\fP)
+.PP
+Remove an object from the list of "subscribed to" objects.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3name\fP (\f3const SdmString&\fP)"
+.br
+The full path name of the object to remove (as returned from ScanSubscribedNamespace or
+ScanNamespace).
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3RemoveMessageHeader\fP
+(\f3err\fP, \f3header\fP, \f3msgnum\fP)
+.PP
+Remove specified header from the message.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)\fP"
+.br
+Error container, used to store return result code.
+.LI "\f3header\fP (\f3const SdmString&\fP)"
+.br
+The text describing the header field to be added.
+.LI "\f3msgnum\fP (\f3SdmMessageNumber\fP)"
+.br
+Message number of the message to remove this header from.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+
+.\"
+.SS \f3ReplaceMessageHeader\fP
+(\f3err\fP, \f3header\fP, \f3newvalue\fP, \f3msgnum\fP)
+.PP
+Replace the specified header from the message, deleting any previous
+values set for the same header.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)\fP"
+.br
+Error container, used to store return result code.
+.LI "\f3header\fP (\f3const SdmString&\fP)"
+.br
+The text describing the header field to be added.
+.LI "\f3newvalue\fP (\f3const SdmString&\fP)"
+.br
+The text for the value of the header to replace.
+.LI "\f3msgnum\fP (\f3SdmMessageNumber\fP)"
+.br
+Message number of the message to replace this header for.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+
+.\"
+.SS \f3Rename\fP
+(\f3err\fP, \f3name\fP)
+.PP
+Change the name of the object. If the object is a message store, the message store name is
+changed, so that the next time the message store is to be opened, this new name must be
+used instead of the existing (old) name. Appropriate action is taken for other types of
+objects.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3name\fP (\f3const SdmString&\fP)"
+.br
+The full path name of the new name for the object (as returned from
+ScanNamespace).
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3SaveMessageStoreState\fP
+(\f3err\fP, \f3r_nummessages\fP)
+.PP
+Causes any changes made to the message store to be written
+to the actual storage.  Returns the number of 
+new messages that have been placed in the message store
+since the last call to save the message store or since the
+last call to CheckForNewMessages.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_nummessages\fP (\f3SdmMessageNumber&\fP)"
+.br
+The number of new messages in the object since the last time SaveMessageStoreState
+or CheckForNewMessages was made is returned in this variable. The value of zero 
+means no new messages are available.
+ 
+Even though the return value is not a message number per-se, the return value is declared
+type SdmMessageNumber (as opposed to type int or long) because type SdmMessageNumber
+represents the maximum value that a message number may be, and the number of new messages
+in an object could be arbitrarily large.
+.PP
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+
+
+.\"
+.SS \f3ScanNamespace\fP
+(\f3err\fP, \f3r_names\fP, \f3reference\fP, \f3pattern\fP)
+.PP
+Scan the regular namespace and return a list of names that match the reference and
+pattern names provided.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_names\fP (\f3SdmIntStrL&\fP)"
+.br
+A list of names that match the given reference and pattern is returned in this
+container. The container is a vector of Integer String value pairs, where each entry
+in the vector corresponds to a single name retrieved. The integer value is of type
+"SdmNamespaceFlag" and describes attributes about the entry. The string value is the
+full name of the name returned.
+.br
+
+NOTE: This container must be empty (have no elements) before calling this
+method; after the call returns, it is the responsibility of the caller to
+destroy the container when the information in it is no longer needed.
+.LI "\f3reference\fP (\f3const SdmString&\fP)"
+.br
+The reference name to scan for.
+.LI "\f3pattern\fP (\f3const SdmString&\fP)"
+.br
+The pattern to scan for.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3ScanSubscribedNamespace\fP
+(\f3err\fP, \f3r_names\fP, \f3reference\fP, \f3pattern\fP)
+.PP
+Scan the subscribed namespace and return a list of names that match the reference and
+pattern names provided.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_names\fP (\f3SdmIntStrL&\fP)"
+.br
+A list of names that match the given reference and pattern is returned in this
+container. The container is a vector of Integer String value pairs, where each entry
+in the vector corresponds to a single name retrieved. The integer value is of type
+"SdmNamespaceFlag" and describes attributes about the entry. The string value is the
+full name of the name returned. [IS THIS TRUE??]
+.br
+
+NOTE: This container must be empty (have no elements) before calling this
+method; after the call returns, it is the responsibility of the caller to
+destroy the container when the information in it is no longer needed.
+.LI "\f3reference\fP (\f3const SdmString&\fP)"
+.br
+The reference name to scan for.
+.LI "\f3pattern\fP (\f3const SdmString&\fP)"
+.br
+The pattern to scan for.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3SetMessageAttribute\fP
+(\f3err\fP, \f3attribute\fP, \f3attribute_value\fP, \f3msgnum\fP, \f3mcmp\fP)
+.PP
+Set an attribute (specified by attribute name text) in this message
+body, deleting any previous values set for the same attribute field.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3attribute\fP (\f3const SdmString&\fP)"
+.br
+The name of the attribute field to set in the message body.
+.LI "\f3attribute_value\fP (\f3const SdmString&\fP)"
+.br
+A string value to set the attribute to.
+.LI "\f3msgnum\fP (\f3const SdmMessageNumber\fP)"
+Message number of the single message to set the attribute for.
+.LI "\f3mcmp\fP (\f3const SdmDpMessageComponent&\fP)"
+.br
+The message component describing the message body of the specified message for
+setting the attribute to. This component is retrieved from and entry of the
+message structure for this message returned from the GetMessageStructure call.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3SetMessageAttribute\fP
+(\f3err\fP, \f3attribute\fP, \f3attribute_value\fP, \f3msgnum\fP, \f3mcmp\fP)
+.PP
+Set an attribute (specified by abstract attribute flag bit) in this
+message body, deleting any previous values set for the same attribute field.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3attribute\fP (\f3const SdmMessageAttributeAbstractFlags\fP)"
+.br
+A bit mask representing the attribute field to be set in the message body;
+a bit that is on indicates the attribute should be set.
+.LI "\f3attribute_value\fP (\f3const SdmString&\fP)"
+.br
+A string value to set the attribute to.
+.LI "\f3msgnum\fP (\f3const SdmMessageNumber\fP)"
+Message number of the single message to set the attribute for.
+.LI "\f3mcmp\fP (\f3const SdmDpMessageComponent&\fP)"
+.br
+The message component describing the message body of the specified message for
+setting the attribute to. This component is retrieved from and entry of the
+message structure for this message returned from the GetMessageStructure call.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+
+.\"
+.SS \f3SetMessageBodyStructure\fP
+(\f3err\fP, \f3msgstr\fP, \f3msgnum\fP, \f3mcmp\fP)
+.PP
+Set the information on the underlying structure for a single message body in a message.
+This method allows you to set the disposition (inline,
+attachment) for the data, file name, message description,
+unix mode, and/or message id for the specified message body.
+
+See the section on Message Structure earlier in this document for a description of
+message structures.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3msgstr\fP (\f3const SdmDpMessageStructure&\fP)"
+.br
+The structure containing the characteristics to set this body part to.
+.LI "\f3msgnum\fP (\f3SdmMessageNumber\fP)"
+Message number of the single message containing the message body
+whose structure is being set.
+.LI "\f3mcmp\fP (\f3const SdmDpMessageComponent&\fP)"
+.br
+The message component describing the message body of the specified message to
+set the structure for. This component is retrieved from and entry of the
+message structure for this message returned from the GetMessageStructure call.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3SetMessageContents\fP
+(\f3err\fP, \f3contents\fP, \f3msgnum\fP, \f3mcmp\fP)
+.PP
+Set the contents for a component of a message. 
+This method operates on a specific component of a single message.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_contents\fP (\f3SdmContentBuffer&\fP)"
+A string value to set the contents of the specified component to.
+.LI "\f3msgnum\fP (\f3const SdmMessageNumber\fP)"
+.br
+Message number of the message that contains the specified component
+to be set.
+.LI "\f3mcmp\fP (\f3const SdmDpMessageComponent&\fP)"
+.br
+The message component describing the message body of the specified message to
+set the contents to. This component is retrieved from and entry of the
+message structure for this message returned from the GetMessageStructure call.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+
+.SS \f3SetMessageFlagValues\fP
+(\f3err\fP, \f3flagValue\fP, \f3aflags\fP, \f3msgnum\fP)
+.PP
+Set one or more flags associated with a single message in a message store.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3flagValue\fP (\f3const SdmBoolean\fP)"
+.br
+A boolean value to set the flags to: Sdm_False for clear, Sdm_True for set.
+.LI "\f3aflags\fP (\f3const SdmMessageFlagAbstractFlags\fP)"
+.br
+A bit mask representing the flags to be set from the message; a bit that is on
+indicates the flag should be set. A bit that is off indicates the flag should
+not be changed from its current value.
+.LI "\f3msgnum\fP (\f3const SdmMessageNumber\fP)"
+.br
+Message number of the single message to set the indicated flags on.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3SetMessageFlagValues\fP
+(\f3err\fP, \f3flagValue\fP, \f3aflags\fP, \f3startmsgnum\fP, \f3endmsgnum\fP)
+.PP
+Set one or more flags associated with a range of messages in the message store.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3flagValue\fP (\f3const SdmBoolean\fP)"
+.br
+A boolean value to set the flags to: Sdm_False for clear, Sdm_True for set.
+.LI "\f3aflags\fP (\f3const SdmMessageFlagAbstractFlags\fP)"
+.br
+A bit mask representing the flags to be set from the range of messages; a
+bit that is on indicates the flag should be set. A bit that is off indicates
+the flag should not be changed from its current value.
+.LI "\f3startmsgnum\fP (\f3const SdmMessageNumber\fP)"
+.br
+Message number of the first message in the message store to set the indicated
+flags on.
+.LI "\f3endmsgnum\fP (\f3const SdmMessageNumber\fP)"
+.br
+Message number of the last message in the message store to set the indicated
+flags on.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3SetMessageFlagValues\fP
+(\f3err\fP, \f3flagValue\fP, \f3aflags\fP, \f3msgnums\fP)
+.PP
+Set one or more flags associated with a list of messages in the message store.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3flagValue\fP (\f3const SdmBoolean\fP)"
+.br
+A boolean value to set the flags to: Sdm_False for clear, Sdm_True for set.
+.LI "\f3aflags\fP (\f3const SdmMessageFlagAbstractFlags\fP)"
+.br
+A bit mask representing the flags to be set from the list of messages; a bit
+that is on indicates the flag should be set. A bit that is off indicates the
+flag should not be changed from its current value.
+.LI "\f3msgnums\fP (\f3const SdmMessageNumberL&\fP)"
+.br
+A list containing the message numbers of the messages to set the indicated flags on.
+.PP
+.RE
+.nr )J 0
+
+.\"
+.SS SetMessageHeaders
+(\f3err\fP, \f3headers\fP, \f3msgnum\fP)
+.PP
+Remove all the existing headers in the message and set the
+the headers to those in the specified header list.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3headers\fP (\f3SdmStrStrL&\fP)"
+.br
+A list containing the headers to set this envelope to.
+This list should be a vector of String value pairs, where each
+entry in the vector corresponds to a single header in the message. The first
+string value corresponds to one of the header field name text, and the second
+string value corresponds to the contents of the header field body.
+.LI "\f3msgnum\fP (\f3const SdmMessageNumber\fP)"
+.br
+Message number of the single message to set the headers for.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.\"
+.PP
+.RE
+.nr )J 0
+
+.\"
+.SS \f3Submit\fP
+(\f3err\fP, \f3r_response\fP, \f3format\fP, \f3dataport\fP, \f3msgnum\fP)
+.PP
+Submit a message to the given trasport.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_response\fP (\f3SdmDeliveryResponse&\fP)"
+.br
+Result of the submit.  The information about the
+addressees and transports that successfully got the
+message submitted is placed in the delivery response.
+.LI "\f3format\fP (\f3const SdmMsgFormat\fP)"
+.br
+The format of how the message is to be sent (eg. Mime, SunV3).
+.LI "\f3dataport\fP (\f3SdmDataPort&\fP)"
+.br
+The data port for the trasport to be used for sending the message.
+.LI "\f3msgnum\fP (\f3SdmMessageNumber\fP)"
+.br
+Message number of the message in this message store to be sent.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SH "SEE ALSO"
+.na
+.BR SdmError (3),
+.BR SdmIntStr (3),
+.BR SdmIntStrL (3),
+.BR SdmIntStrLL (3),
+.BR SdmGlossary (3),
+.BR SdmIntro (3),
+.BR SdmStrStr (3),
+.BR SdmStrStrL (3),
+.BR SdmStrStrLL (3),
+.BR SdmToken (3)

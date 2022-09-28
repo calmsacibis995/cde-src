@@ -1,0 +1,244 @@
+.\" $Header: Rlog.1,v 1.2 93/12/08 09:31:38 lam_usl_summit Exp $
+.TH Rlog 1 "" "" HP-UX
+.ds )H Hewlett-Packard Company CV
+.ds ]W June 1993
+.SH NAME
+Rlog \- RCS log access with remote capabilities.
+.SH SYNOPSIS
+.B Rlog
+.RI [ \|options\| ]
+.I file ...
+.SH DESCRIPTION
+.I Rlog
+is a perl front-end to the
+.I rlog
+.SM RCS
+program
+and is used exactly like the original RCS executable.
+.I Rlog
+prints information about
+.SM RCS
+files.
+Files ending in
+.I ,v
+are
+.SM RCS
+files; all others are working files.
+If a working file is given,
+.I Rlog
+tries to find the corresponding
+.SM RCS
+file first in directory
+.IR ./RCS ,
+then in the current directory, as explained in
+.IR Rcsintro (1).
+.PP
+.I Rlog
+prints the following information for each
+.SM RCS
+file:
+.SM RCS
+file name, working file name, head (i.e., the number
+of the latest revision on the trunk), access list, locks,
+symbolic names, suffix, total number of revisions,
+number of revisions selected for printing, and
+descriptive text.
+This is followed by entries for the selected revisions in
+reverse chronological order for each branch.
+For each revision,
+.I Rlog
+prints revision number, author, date/time, state, number of
+lines added/deleted (with respect to the previous revision),
+locker of the revision (if any), and log message.
+Without options,
+.I Rlog
+prints complete information.
+The options below restrict this output.
+.SS Options
+.I Rlog
+recognizes the following options:
+.RS
+.TP 15
+.I -ddates
+Print information about revisions
+whose check-in date and time fall within the ranges
+given by the semicolon-separated list of
+.IR dates .
+A range of the form
+.IC d1 < d2
+or
+.IC d2 > d1
+selects the revisions that were deposited between
+.I d1
+and
+.I d2
+(inclusive).
+A range of the form
+.I < d
+or
+.IC d >
+selects all revisions dated
+.I d
+or earlier.
+A range of the form
+.IC d <
+or
+.I > d
+selects all revisions dated
+.I d
+or later.
+A range of the form
+.I d
+selects the single, latest revision dated
+.I d
+or earlier.
+The date/time strings
+.IR d ,
+.IR d1 ,
+and
+.I d2
+are in the free format explained in
+.IR co (1).
+Quoting is normally necessary, especially for
+.I <
+and
+.IR > .
+Note that the separator is a semicolon.
+.TP
+.I -h
+Print only
+.SM RCS
+file name, working file name, head,
+access list, locks, symbolic names, and suffix.
+.TP
+.IR -l [\|\f2lockers\fP\|]
+Print information about locked revisions.
+If the comma-separated list
+.I lockers
+of login names is given,
+only the revisions
+locked by the given login names are printed.
+If the list is omitted, all locked revisions are printed.
+.TP
+.I -L
+Ignore
+.SM RCS
+files that have no locks set; convenient in combination with
+.IR -R ,
+.IR -h ,
+or
+.IR -l .
+.TP
+.I -r[revisions]
+Print information about revisions given in the comma-separated list
+.I revisions
+of revisions and ranges.
+A range
+.IR rev1 - rev2
+means revisions
+.I rev1
+to
+.I rev2
+on the same branch,
+.I - rev
+means revisions from the beginning of the branch up to and including
+.IR rev ,
+and
+.IC rev -
+means revisions starting with
+.I rev
+to the head of the branch containingw
+.IR rev .
+An argument that is a branch means all revisions on that branch.
+A range of branches means all revisions on the branches in that range.
+.TP
+.I -R
+Print only the name of the
+.SM RCS
+file; convenient for translating a working file name into an
+.SM RCS
+file name.
+.TP
+.I -sstates
+Print information about revisions
+whose state attributes match one of the states
+given in the comma-separated list
+.IR states .
+.TP
+.I -t
+Print the same as
+.IR -h ,
+plus the descriptive text.
+.TP
+.IR -w [\|\f2logins\fP\|]
+Prints information about revisions checked in by users
+whose login names appearing in the comma-separated list
+.IR logins .
+If
+.I logins
+is omitted, the user's login is assumed.
+.RE
+.PP
+.I Rlog
+prints the intersection of the revisions selected with the options
+.IR -d ,
+.IR -l ,
+.IR -s ,
+.IR -w ,
+and
+.IR -r .
+.SH USING PATHS IN RCS
+When using the regular RCS commands(
+.IR Ci, 
+.IR Co, 
+.IR Rcs, 
+.IR Rlog, 
+.IR Rcsdiff),
+You have the ability to control which source file(the regular file
+you are working with) and RCS file(the RCS/filename,v version of the
+regular file) are used for the command. E.g.
+.nf 
+PATH                               FILES USED by RCS
+io.c                               ./io.c ./RCS/io.c,v
+RCS/io.c,v                         ./io.c ./RCS/io.c,v
+somepath/RCS/io.c,v                ./io.c somepath/RCS/io.c,v
+apath/io.c apath/RCS/io.c,v        apath/io.c apath/RCS/io.c,v
+apath/io.c anotherpath/RCS/io.c,v  apath/io.c anotherpath/RCS/io.c,v
+apath/io.c                         error
+.fi
+.SH EXAMPLES
+Print the names of all
+.SM RCS
+files 
+that have locks:
+.IP
+.I "Rlog -L -R * or better Rlog -L -R RCS/*"
+.PP
+Print the headers of those files:
+.IP
+.I "Rlog -L -h *"
+.PP
+Print the headers plus the log messages of the locked revisions:
+.IP
+.I "Rlog -L -l *
+.PP
+Print complete log information:
+.IP
+.I Rlog *
+.PP
+Print complete log information on io.c and /x/cdesrc/util/new.c:
+.IP
+.I Rlog io.c /x/cdesrc/util/RCS/new.c,v
+.SH AUTHOR
+.I Rlog
+was developed by Marc Ayotte & Ron Voll,
+WTG-CV, Hewlett-Packard.
+.I rlog
+was developed by Walter F. Tichy.
+.SH SEE ALSO
+Co(1),
+Rcs(1), Rcsdiff(1),
+Ci(1),
+Cib(1),
+Rcslocks(1), Rls(1),
+Rcsfile(1), RcsIntro(1).

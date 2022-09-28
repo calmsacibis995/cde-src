@@ -1,0 +1,106 @@
+.\" $Header: Rcslocks.1,v 1.1 93/12/06 16:36:59 xbuild_hp_cv Exp $
+.\" @(#) Rcslocks.1 1.1  @(#)Rcslocks.1	1.1  12/11/85  1   
+.TH RCSLOCKS 1 "" "" HP-UX
+.ad b
+.SH NAME
+Rcslocks \- provides listing of locked RCS files
+.SH SYNOPSIS
+\fBRcslocks\fR [\fB\-help\fR] [\fB\-v\fR] [\fB\-u\fR user \
+[\fB\-u\fR user2] ...] [\fB\-d\fR directory1] ...] \ 
+[\fB\-d\fR directory2] ...] [files ...]
+.PP
+.SH DESCRIPTION
+.I  Rcslocks
+is a program which reads the header information of RCS files to 
+determine and list those files which are locked.  If no filenames are provided
+as arguments, 
+.I  Rcslocks
+will search the local RCS directory. This command has been extended to
+check if the RCS vault(s) accessed are accessible by the local machine.
+If not, the RCS vault is assumed to be in remote shared source and an
+attempt is made to run the command remotely. In addition, Rls has been
+extended to include the 
+.I -d
+option which allows you to list directories where you wish the command
+executed. The 
+.I -d
+option cannot be used if you list filenames on the command line.
+.PP
+The command line options are:
+.TP 15
+.I \-help
+Display usage message and exit.
+.TP
+.I \-v
+Verbose listing, which shows the name of the user who has the locked file
+checked\-out.
+.TP
+.I \-u username
+.I Rcslocks
+will only list those files which are checked out by the user(s) specified.
+.TP
+.I \-d directory
+.I Rcslocks
+usually lists files only in the current directory. If the 
+.I -d 
+option is used, you can specify listings from multiple
+directories.  However, you cannot ask for listings on individual files
+if 
+.I -d
+is used. This option normally prints the directory name to stderr before
+listing output. To suppress this use 
+.IR -q.
+.TP
+.I \-q
+This option suppress the printing of the directory name to stderr if the
+.I -d 
+option is used.
+.TP
+.I filename
+If one or more filenames are listed as arguments, then
+.I Rcslocks
+will examine only the files listed as arguments to see if they are locked.
+A path can be provided for
+RCS files which are provided as an argument, though the output will
+not contain path information. Listing filenames and using the
+.I -d
+option is an error.
+.SH EXAMPLES
+The following command lists
+.I stuff (jane)
+to standard out if the file
+.I stuff
+is locked by user
+.I jane
+\.
+.IP
+.I Rcslocks \-v /users/george/etc/RCS/stuff,v
+.PP
+Print lock information for george and fred_hp_cv in the directories
+somedir and otherdir:
+.IP
+.I Rcslocks -u george -u fred_hp_cv -d somedir -d otherdir
+.SH DEPENDENCIES
+.I Rcslocks
+is dependent on a particular format of RCS ",v" files.
+.SH DIAGNOSTICS
+Error messages are provided when
+.I Rcslocks
+is unable to read the RCS directory or individual RCS files.  Error messages
+are also generated when 
+.I Rcslocks
+is unable to interpret the RCS file header information.
+.SH WARNINGS
+.I Rcslocks
+.SH AUTHOR 
+.I Rcslocks
+was developed by Courtney Loomis and extended to a remote command
+by Marc Ayotte
+Hewlett-Packard Company, WTG-CV, Corvallis.
+.SH SEE ALSO
+Co(1), 
+Ci(1), 
+Cib(1),
+Rcsdiff(1), Rcsintro(5), Rlog(1), Rls(1).
+.SH INTERNATIONAL SUPPORT
+Rcslocks: 8-bit filenames.

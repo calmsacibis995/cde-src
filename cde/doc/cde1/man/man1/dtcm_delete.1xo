@@ -1,0 +1,276 @@
+.TH dtcm_delete 1 "8 May 1995"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.SH NAME
+dtcm_delete \- delete appointments from the calendar database
+.SH SYNOPSIS
+.yS
+dtcm_delete
+[\-c\0\f2calendar\fP]
+[\-d\0\f2date\fP]
+[\-v\0\f2view\fP]
+.yE
+.SH DESCRIPTION
+The
+.Cm dtcm_delete
+utility is a non-GUI interface to the Cde calendar and appointment services,
+used to delete appointments from the calendar
+.cde database via the RPC daemon
+.cde .Cm rpc.cmsd 1.
+.xo database.
+Appointments are deleted one at a time.
+Each of the components of an
+appointment is specified using one of the command-line options.
+The current list of appointments for the specified date
+(see the
+.B \-d
+and
+.B \-v
+options) is displayed,
+numbered sequentially starting with 1.
+The user is prompted for the number to delete.
+Once an appointment
+is deleted, the list of remaining appointments is redisplayed.
+At this point
+the user can specify another number, or just
+.tK carriage-return
+to quit.
+.SH OPTIONS
+.xos
+The
+.Cm dtcm_delete
+utility supports the \*(Zu.
+.xoe
+The following options are available:
+.VL 6
+.LI \f3\-c\0\f2calendar\f1
+.br
+Specify the name of the target calendar.
+Calendar names
+.xo are implementation-dependent, but
+typically take the form
+.IR user @\c
+.IR hostname ,
+where
+.I user
+is a user's login name and
+.I hostname
+is the host machine name.
+.cde An example is
+.cde .BR felix@cat .
+If no target calendar is specified,
+the calendar defaults to
+the current user at the current host machine.
+.LI \f3\-d\0\f2date\f1
+.br
+Specify the date for the appointment(s) to be deleted.
+The
+.I date
+is specified using the form
+.IR mm /\c
+.IR dd /\c
+.IR yy ,
+where
+.IR mm ,
+.I dd
+and
+.I yy
+are the two-digit month, day and year modulo 100, respectively.
+.cdes
+Certain other references such as
+``today,'' ``Tuesday,'' ``tomorrow,'' etc.
+are correctly calculated.
+.cdee
+If no date is specified,
+.I date
+defaults to today's date.
+.LI \f3\-v\0\f2view\f1
+.br
+Specify the view span of appointments to display.
+The
+.I view
+option-argument can be:
+.VL 10
+.LI \f3day\fP
+Display all appointments for the given date (see
+.B \-d
+option).
+.LI \f3week\fP
+Display the full week that contains the given date,
+starting with Sunday.
+.LI \f3month\fP
+Display the entire month that contains the given date.
+.LE
+.LE
+.SH OPERANDS
+None.
+.SH STDIN
+The standard input is used to receive user
+replies to the list of appointments to be deleted.
+.SH "INPUT FILES"
+None.
+.SH "ENVIRONMENT VARIABLES"
+The following environment variables affect the execution of
+.Cm dtcm_delete :
+.VL 15
+.LI \f2LANG\fP
+Provide a default value for the internationalization variables
+that are unset or null.
+If
+.I LANG
+is unset or null, the corresponding value from the
+implementation-specific default locale will be used.
+If any of the internationalization variables contains an invalid setting, the
+utility behaves as if none of the variables had been defined.
+.LI \f2LC_ALL\fP
+If set to a non-empty string value,
+override the values of all the other internationalization variables.
+.LI \f2LC_MESSAGES\fP
+Determine the locale that is used to affect
+the format and contents of diagnostic
+messages written to standard error
+and informative messages written to standard output.
+.LI \f2NLSPATH\fP
+Determine the location of message catalogues
+for the processing of
+.IR LC_MESSAGES .
+.LE
+.SH "RESOURCES"
+None.
+.SH "ASYNCHRONOUS EVENTS"
+.xo Default.
+.cde The
+.cde .Cm dtcm_delete
+.cde utility takes the standard action for all signals.
+.SH STDOUT
+The standard output contains the list of appointments to be
+.cde deleted.
+.xo deleted, in an unspecified format.
+.SH STDERR
+Used only for diagnostic messages.
+.SH "OUTPUT FILES"
+None.
+.SH "EXTENDED DESCRIPTION"
+None.
+.SH "EXIT STATUS"
+The following exit values are returned:
+.VL 4
+.LI \h"\w'>'u"0
+Successful completion.
+.LI >0
+An error occurred.
+.LE
+.SH "CONSEQUENCES OF ERRORS"
+Default.
+.cdes
+.SH FILES
+.TP 20
+.B /usr/spool/calendar/callog.username
+.TP
+.BR /usr/dt/bin/rpc.cmsd
+.cdee
+.SH "APPLICATION USAGE"
+None.
+.SH EXAMPLES
+.xo None.
+.cdes
+The simplest form of
+.Cm dtcm_delete
+has no arguments:
+.Cs I
+\f1dtcm_delete\fP
+Appointments for Tuesday September 25, 1990:
+        1) Appointment
+        2) 10:30am-10:45am Morning Tea
+        3) 2:00pm-3:00pm Staff meeting
+        4) 4:30pm-5:30pm Phone home
+Item to delete (number)? \f12\fP
+.sp 0.5v
+Appointments for Tuesday September 25, 1990:
+        1) Appointment
+        2) 2:00pm-3:00pm Staff meeting
+        3) 4:30pm-5:30pm Phone home
+.sp 0.5v
+Item to delete (number)?
+.Ce
+.P
+To delete at a specific date:
+.Cs I
+\f1dtcm_delete \-d 09/26/90\fP
+Appointments for Wednesday September 26, 1990:
+        1) 11:00am-12:00pm Appointment
+        2) 11:30am-12:30pm Group Lunch
+        3) 4:00pm-5:00pm Tech Interview
+.sp 0.5v
+Item to delete (number)? \f11\fP
+.sp 0.5v
+Appointments for Wednesday September 26, 1990:
+        1) 11:30am-12:30pm Group Lunch
+        2) 4:00pm-5:00pm Tech Interview
+.sp 0.5v
+Item to delete (number)?
+.Ce
+.P
+To delete from a specific target calendar:
+.Cs I
+\f1dtcm_delete \-c felix@cat\fP
+Appointments for Tuesday September 25, 1990:
+        1) Appointment
+        2) 10:15am-10:30am Coffee
+        3) 11:15am-11:30am Doughnuts
+        4) 2:00pm-2:15pm Coffee
+        5) 3:30pm-3:45pm Snack
+        6) 4:30pm-4:45pm Coffee
+.sp 0.5v
+Item to delete (number)? \f15\fP
+.sp 0.5v
+Appointments for Tuesday September 25, 1990:
+        1) Appointment
+        2) 10:15am-10:30am Coffee
+        3) 11:15am-11:30am Doughnuts
+        4) 2:00pm-2:15pm Coffee
+        5) 4:30pm-4:45pm Coffee
+.sp 0.5v
+Item to delete (number)?
+.Ce
+.P
+To delete multiple appointments:
+.Cs I
+\f1dtcm_delete\fP
+Appointments for Tuesday September 25, 1990:
+        1) Appointment
+        2) 10:15am-10:30am Coffee
+        3) 11:15am-11:30am Doughnuts
+        4) 2:00pm-2:15pm Coffee
+        5) 3:30pm-3:45pm Snack
+        6) 4:30pm-4:45pm Coffee
+.sp 0.5v
+Item to delete (number)? \f15\fP
+.sp 0.5v
+Appointments for Tuesday September 25, 1990:
+        1) Appointment
+        2) 10:15am-10:30am Coffee
+        3) 11:15am-11:30am Doughnuts
+        4) 2:00pm-2:15pm Coffee
+        5) 4:30pm-4:45pm Coffee
+.sp 0.5v
+Item to delete (number)? \f13\fP
+.sp 0.5v
+Appointments for Tuesday September 25, 1990:
+        1) Appointment
+        2) 10:15am-10:30am Coffee
+        3) 2:00pm-2:15pm Coffee
+        4) 4:30pm-4:45pm Coffee
+.sp 0.5v
+Item to delete (number)?
+.Ce
+.cdee
+.SH "SEE ALSO"
+.cde .Cm rpc.cmsd 1,
+.cde .Cm dtcm 1,
+.Cm dtcm_editor 1,
+.Cm dtcm_insert 1,
+.Cm dtcm_lookup 1.

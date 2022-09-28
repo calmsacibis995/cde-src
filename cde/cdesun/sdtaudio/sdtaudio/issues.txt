@@ -1,0 +1,125 @@
+1. Unresolved Issues
+
+- showing the wave window causes the file to be rewound which screws
+up the playback of sounds.  It resets the location of play and it
+breaks the index calculation.  (tkr)
+
+- The code for displaying position also needs to update the pointer in
+the wave window once that is implemented.  That code should probably
+be moved in an update_position function. (tkr)
+
+- recording isn't fully tested. (tkr)
+
+- the gain calculation code makes a lot of alignment assumptions.  The
+code in play_block should probably do all it's work in terms of frames
+so that we can be sure that all the alignment stuff will work.
+There's also probably some state that should reside in SAStream.  (tkr)
+
+- Bug on SaveAs popup if you get an error while saving, the OK button
+  stays pressed in (jn).
+
+- Need a function in SAFile that returns the sample number? (jn)
+
+- In sdtaudio, should the info dialog display the actual file format
+  or what we really converted the data to before playing?   
+  What about the wave display data? (jn)
+
+- AIFC not supported - decoding this compressed aiff is complicated. 
+  Low priority (jn).
+
+- XmNmnemonics are all hard-coded in the sdtaudio code, but this
+  won't work in other locales.  Need to make an app-defaults file. (jf);
+
+- All dialogs are real ugly, buttons not lined up or centered at bottom,
+  some buttons are too close to edges, etc.
+
+- When starting and stopping playing, sometimes data is left behind in the
+  stream which gets fed into the device the next time the stream starts.
+  closing the stream should probably flush the SABuffer.  (tkr)
+
+
+2. Resolved Issues
+
+- Use SAFormat in SAFile?  Then remove the encoding2saencoding
+  temporary functions in safile.h. (jn) 
+
+- The SAConvert* will probably have to change to accommodate streams
+  so that 8-bit (wav) linear can convert to something that the
+  device supports, for example. Talk to Tom about this.  (jn)
+
+- Add support for 4-bit G721. (jn)
+
+- Need to take into account the flags field on SAFormat for 
+  endian-ness, signed/unsigned when converting the data.  Makes
+  some assumptions right now. (jn).
+
+- Need to test on SS2, or other sparc audio devices (jn).
+  Not too interesting here.  Just made sure it returned error
+  if ~8000 ulaw, alaw.
+
+- Can SAFileAdjust work differently?  Maybe you could set it to a
+magic value and SAFileClose could figure out the right value and
+update it. (tkr)
+  I agree, not a good interface.  I'll stop by to talk to you about this 
+  more. (jn)  
+  Got rid of it and flushing header in SAFileClose(). (jn)
+
+- SaveAs needs more testing on other formats. (jn)
+  The following should work so far.
+ 
+  Original Data:         	Save To:	Data format it saves to:
+  -------------		 	-------		-----------------------
+  8-bit ulaw Sun         	Sun (Tested)	8-bit ulaw
+                         	Wav (Tested)    8-bit linear, unsigned
+                         	Aiff (Tested)   8-bit linear, signed
+
+  8-bit linear Wav unsigned   	Sun (Tested)    8-bit ulaw
+	           		Wav (Tested)    8-bit linear, unsigned
+				Aiff (Tested)   8-bit linear, signed
+
+  8-bit linear Aiff signed      Sun (Tested)    8-bit ulaw
+				Wav (Tested)	8-bit linear, unsigned
+				Aiff (Tested)   8-bit linear, signed
+
+  16-bit linear sun		Sun (Tested)	16-bit linear
+				Wav (Tested)    16-bit linear
+				Aiff (Tested)   16-bit linear
+
+  16-bit linear wav		Sun (Tested)    16-bit linear
+				Wav (Tested)    16-bit linear
+				Aiff (Tested)   16-bit linear
+
+  16-bit linear aiff		Sun (Tested)    16-bit linear
+                                Wav (Tested)    16-bit linear
+                                Aiff (Tested)   16-bit linear
+
+  4-bit G.721 linear Sun        Sun (Tested)    8-bit ulaw
+                                Wav (Tested)    8-bit linear, unsigned
+                                Aiff (Tested)   8-bit linear, signed
+
+  8-bit linear Alaw		Sun (Tested)	8-bit ulaw
+				Wav (Tested)	8-bit linear, unsigned
+                                Aiff (Tested)   8-bit linear, signed
+
+- Need to convert 2 channels, 8 bit data to 1 channel so that it
+  will play on our devices for Alaw format.
+  Lower priority, not a common format (8K alaw, 2 channels). (jn)
+
+- Suggestion to take the *.au filter out of the open file selection box
+  since we play *.wav and *.aiff.  Users may think that's all we
+  support is .au.  (jf?)
+
+- Odd sampling rates don't play yet.  For example, I have a file that
+  is sampled at 22254 hz (/home/nakata/audio/basia.au) that sounds OK if
+  played at 22050.  Should we attempt to play these?  Audiotool does.
+
+- When sdtaudio plays a file, it opens the file, but I never
+  see where the file is closed.  (jf).
+
+
+
+--------------------------------
+Reminder notes:
+
+sample_size = bytes_per_unit
+frame_size = channels * bytes_per_unit

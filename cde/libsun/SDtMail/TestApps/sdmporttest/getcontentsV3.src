@@ -1,0 +1,28 @@
+/* @(#)getcontentsV3.src	1.2 97/04/29 SMI */
+
+token create token1
+#include "setup.src"
+token set token1 serviceoption messagestorename /tmp/test.mbx
+
+! /usr/bin/rm -f /tmp/test.mbx /tmp/.test.mbx_* /tmp/.test.mbx_dt_index
+! /usr/bin/cp test4.mbx /tmp/test.mbx
+! /usr/bin/chmod 660 /tmp/test.mbx
+
+/**/# Create, startup and open a dataport
+port create port1
+port startup port1
+port open port1 token1
+
+port getstatus port1
+port getstructure port1
+port getcontents port1 1 -S -F /tmp/sdmtest.out 0.1.1	// Expected Sum: 29733 241
+
+! /usr/bin/file /tmp/sdmtest.out
+! /usr/bin/rm /tmp/sdmtest.out
+
+/**/# Close the port and exit
+port close port1
+port shutdown port1
+port delete port1
+
+quit

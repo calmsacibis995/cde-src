@@ -1,0 +1,97 @@
+.TH DtEditorChange 3 "8 August 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.\" *************************************************************************
+.SH NAME
+DtEditorChange \- change one or all occurrences of a string in a DtEditor widget
+.SH SYNOPSIS
+.yS
+#include <Dt/Editor.h>
+.sp 0.5v
+.ta \w'Boolean DtEditorChange('u
+Boolean DtEditorChange(Widget \f2widget\fP,
+	DtEditorChangeValues *\f2findChangeStrings\fP,
+	unsigned int \f2instanceToChange\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn DtEditorChange
+function replaces the next occurrence of a string, all occurrences of
+the string, or the currently selected text in a DtEditor widget with a
+replacement string.
+The string to search for and the value to
+change it to can be the last values entered in the Find/Change
+dialog (see
+.Fn DtEditorInvokeFindChangeDialog 3)
+or passed as arguments to
+.Fn DtEditorChange .
+.P
+The search begins at the insertion cursor.
+If the string is not found by the time the end of the document is reached,
+the search continues at the beginning of the document,
+stopping at the character before the insertion cursor.
+.P
+The
+.I widget
+argument specifies the DtEditor widget ID.
+.P
+The
+.I findChangeStrings
+argument specifies the string to change and the replacement value.
+If
+.I findChangeStrings
+is
+.Cn NULL ,
+.Fn DtEditorChange
+uses the last string specified in the Find and Change To fields
+of the Find/Change dialog.
+If the
+.I instanceToChange
+argument is
+.Cn DtEDITOR_CURRENT_SELECTION ,
+the Find field of
+.B DtEditorChangeValues
+is ignored.
+.P
+If the
+.I instanceToChange
+argument
+is set to
+.Cn DtEDITOR_NEXT_OCCURRENCE ,
+.Fn DtEditorChange
+replaces the next occurrence (relative to the
+insertion cursor) of the find string.
+If this argument is set to
+.Cn DtEDITOR_ALL_OCCURRENCES ,
+all instances of the find string are changed.
+If this argument ia set to
+.Cn DtEDITOR_CURRENT_SELECTION ,
+the Find field of
+.BR DtEditorChangeValues ,
+is ignored and the currently selected text is replaced.
+.cde .P
+.cde For a complete definition of the DtEditor widget
+.cde and its associated resources, see
+.cde .Fn DtEditor 3.
+.P
+For a complete definition of
+.BR DtEditorChangeValues ,
+see
+.Hd Dt/Editor.h 5.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn DtEditorChange
+function returns
+True
+if the substitution occurred;
+otherwise, it returns
+False.
+.SH "SEE ALSO"
+.Hd Dt/Editor.h 5,
+.Fn DtEditor 3,
+.Fn DtEditorFind 3,
+.Fn DtEditorInvokeFindChangeDialog 3.

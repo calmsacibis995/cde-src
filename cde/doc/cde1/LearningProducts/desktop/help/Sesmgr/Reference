@@ -1,0 +1,292 @@
+<chapter id=reference>Session Manager Reference
+
+<procedure>Subtopics
+<list bullet>
+<item> <xref SEMessagesSI>
+<\list>
+
+<!-- 
+<procedure>See also
+<list bullet tight>
+* <xref HowSessionMgrWorksSI>.
+<\list>
+
+[MODULE SessionManagerResourcesSI SErres.SIa]
+<s1 id=SessionManagerResourcesSI>Session Manager Resources
+
+``Dtsession*alarmTime''
+
+<p indent>Specifies (in seconds) the amount of time before the lock dialog
+	  is removed from the screen.  When the display is locked, the
+	  pointer shows a lock cursor, and a dialog appears which asks for
+	  the user password.  If no activity from the pointer or keyboard
+	  is detected for ``alarmTime'' seconds, the dialog is removed from
+	  the screen.  The lock dialog is redisplayed as soon as a pointer
+	  or keyboard event is detected.  An ``alarmTime'' of 0 leaves the
+	  lock dialog in place for the entire time the display is locked.
+	  The default value is 10 seconds.
+
+``Dtsession*colorUse''
+
+<p indent>This resource specifies the number of colors to use for the user interface.
+
+Valid types are:
+
+<lablist>
+
+\``B_W'' \ Specifies a black and white system.	The color palettes will use
+	   two color cells for the user interface.  In this configuration
+	   only two color palettes are available: BlackWhite and
+	   WhiteBlack.	These palettes cannot dynamically change.
+
+\``LOW_COLOR''\Specifies a low color system.  The color palettes will have
+	       two color sets and use a maximum of 12 color cells for the
+	       user interface, including black and white (color cells 0 and
+	       1).  The number of color cells can be reduced by using the
+	       resources ``ShadowPixmaps'' and ``ForegroundColor''.
+
+\``MEDIUM_COLOR''\ Specifies a medium color system.  The color palettes
+		   will have 4 color sets and use a maximum of 22 color
+		   cells for the user interface, including black and white
+		   (color cells 0 and 1).  The number of color cells can be
+		   reduced by using the resources ``ShadowPixmaps'' and
+		   ``ForegroundColor''.
+
+\``HIGH_COLOR'' \ Specifies a high color system.  The color palettes will
+		  have 8 color sets and use a maximum of 42 color cells for
+		  the user interface, including black and white (color
+		  cells 0 and 1).  The number of color cells can be reduced
+		  by using the resources ``ShadowPixmaps'' and
+		  ``ForegroundColor''.
+
+<\lablist>
+
+``Dtsession*coverScreen''
+
+<p indent>This resource specifies whether or not the screens of the display
+	  will be covered when the display is locked.  The default value is
+	  False, which means that the screens will not be covered.
+
+``Dtsession*dynamicColor''
+
+<p indent>This resource can have values of True or False and is used to
+	  reduce the number of color cells being used.	Once a palette has
+	  been selected and the user will not be changing palettes often,
+	  ``dynamicColor'' can be set to False.	 When the session comes up
+	  next time, the color server will use Read Only color cells that
+	  can be shared by non-Motif1.1 clients, thus reducing the total
+	  number of color cells used.  The default value is True.
+
+``Dtsession*foregroundColor''
+
+<p indent> This resource can have values of White, Black or Dynamic.
+	   ``ForegroundColor'' causes all text (foreground) to use either
+	   pixel 0 or 1 (Black or White) or to have a color cell dedicated
+	   to foreground and changes in response to the background color
+	   (Dynamic) for each ColorSet.	 If set to White or Black, the
+	   number of color cells used per ColorSet is reduced by 1.
+
+``Dtsession*keys''
+
+<p indent> This resource is a list of "keyholders" who have the ability to
+	   unlock the screen any time it is locked by the user.	 The list
+	   is a list of user id's separated by commas.
+
+``Dtsession*queryServerSettings''
+
+<p indent>This resource specifies whether Session Manager queries the
+	  server at logout for all its settings or saves only those
+	  settings set by using Style Manager.  Querying the
+	  server ensures that all settings are saved; however, there is a
+	  degradation in performance when a full query is done.	 The
+	  default value is False, which means that the server will not be
+	  queried.
+
+``Dtsession*shadowPixmaps''
+
+<p indent>On color systems, this resource can have a value of True or
+	  False.  If True, ``topShadowColor'' and ``bottomShadowColor'' use
+	  the same pixel as background and ``topShadowPixmap'' and
+	  ``bottomShadowPixmap'' are specified instead of solid color to
+	  create the 3D look.  This reduces the number of color cells per
+	  ColorSet by 2.  ``ShadowPixmaps'' defaults to True for systems
+	  with 4 or less color planes (16 or less color cells), and False
+	  for systems with more than 4 color planes.
+
+``Dtsession*wmStartupCommand''
+
+<p indent>Allows for an alternate window manager to be started at login.
+	  If this display is NULL, Dtsession starts ``dtwm''.
+	  Note that the command should not have any commands to a shell in
+	  it, and that it should not be surrounded by quotes. 
+
+``Dtsession*writeXrdbColors''
+
+<p indent>This resource should only be used if you are running non Motif
+	  1.1 clients that have color schemes that conflict with the desktop
+	  colors.  This has no impact on clients linked with the Motif 1.1
+	  library.  This resource specifies whether color resource
+	  information should be written out.  If set to False,
+	  ``background'' and ``foreground'' resources will not be written
+	  out with the values of the current palette.  This means that non
+	  Motif 1.1 clients will not get the desktop colors when they are
+	  started.  The default value is True.
+
+[MODULE SEMessagesSI SEmes.SIa]
+<s1 id=SEMessagesSI>Dialogs and Messages
+
+<procedure>&SubtopicsHeading;
+<list bullet>
+* <xref MessagingSystemFailedDE>
+* <xref CannotLogoutDE>
+* <xref ConfirmLogoutDE>
+* <xref SEConfirmLogoutWithChoiceDE>
+<\list>
+
+
+[MODULE MessagingSystemFailedDE SEbms.DEa]
+<s2 id=MessagingSystemFailedDE>The Messaging System has Failed
+<location id=bmsDeadHelp>&empty;<\location>
+
+
+Your desktop components are unable to communicate with
+each other.
+
+To fix this condition:
+
+<list order>
+
+  * Save all your work in progress.
+
+  * Exit by pressing these keys simultaneously: Ctrl+Shift+Reset
+
+<\list>
+
+This special key sequence is called the <term nogloss|reset key sequence|, 
+and returns you to the login screen.  Once there, you can log in again.
+
+
+[MODULE CannotLogoutDE SEnolog.DEa]
+<s2 id=CannotLogoutDE>You cannot logout
+<location id=logoutCompatModeHelp>&empty;<\location>
+
+
+This desktop session was started from a startup script, rather
+than by Login Manager.
+When a session is started this way, Session Manager is not
+in charge of the logout process.
+
+
+The current session is !!not!! saved.
+-->
+
+<s1 id=SEMessagesSI>Dialogs and Messages
+
+<procedure>&SubtopicsHeading;
+<list bullet>
+<item> <xref ConfirmLogoutDE>
+<item> <xref SEConfirmLogoutWithChoiceDE>
+<\list>
+
+<!-- MODULE ConfirmLogoutDE selogc.DEa -->
+<s2 id=ConfirmLogoutDE>Logout Confirmation
+<location id=logoutHelp><\location>
+
+<list bullet>
+<item> Choose OK to log out.
+<item> Choose Cancel to avoid logging out.
+<\list>
+
+<term nogloss> Exiting the Desktop Session.<\term>
+Exit means the same thing as logging out. You put your 
+desktop away. This is a good thing to do for security 
+reasons as no one can use your account or access your files.
+
+<term nogloss> Application updates you have not saved may be lost.<\term>
+Certain types of applications such as text editors, graphic editors, and 
+some word processors, may require you to save 
+before exiting your desktop . Some may have an 
+auto-save capability. It varies from application to application, 
+so you should know the saving conditions of your application.
+When in doubt, you can always save any open data files.
+In particular, be sure to save data in applications that run 
+in terminal windows.
+
+<term nogloss> Your current session will be saved and returned to 
+upon your next login.<\term>
+Starts your next session with the workspace contents exactly 
+the way it is right now, including any setting, client or 
+resource modification.
+
+<term nogloss> Items in the Trash Can will be permanently shredded.<\term>
+Items you dragged into the trash are removed as part of the
+exit process. They will NOT be there the next time you log in.
+
+<term nogloss> Continue Logout?<\term>
+This is your last chance to go back to the desktop and do
+a save or something else. Click Cancel to avoid logging out.
+
+This confirmation box is displayed because you selected
+Ask me at Logout in the Style Manager Startup dialog box.
+You can use that dialog box to change the startup setting,
+so that Session Manager automatically restores the current
+or home session.
+
+For more information about sessions see
+<link hyperlink="Stylemgr SMStartupDialogDE" JumpNewView>Style Manager<\link>
+
+<!-- MODULE SEConfirmLogoutWithChoiceDE SElogch.DEa -->
+<s2 id=SEConfirmLogoutWithChoiceDE>Logout confirmation with session choice
+<location id=logoutQueryHelp>&empty;<\location>
+
+<list bullet>
+
+<item> Choose OK Save Current to use to your current session the 
+next time you log in.
+
+<item> Choose OK Return Home to restore your home session the next 
+time you log in.  Your current session will not be saved.
+
+<item> Choose Cancel to cancel logout.
+
+<\list>
+
+<term nogloss> Exiting the Desktop Session.<\term>
+Exit means the same thing as logging out. You put your 
+desktop away. This is a good thing to do for security 
+reasons as no one can use your account or access your files.
+
+<term nogloss> Application updates you have not saved may be lost.<\term>
+Certain types of applications such as text editors, graphic editors, 
+and some word processors, may require you to save 
+before exiting your desktop. Some may have an 
+auto-save capability. It varies from application to application, 
+so you should know the saving conditions of your application.
+When in doubt, you can always save any open data files.
+In particular, be sure to save data in applications that run 
+in terminal windows.
+
+<term nogloss> You can either save your current session and return to
+it upon login, or return to your home session upon login.<\term>
+You can choose to start your next session with the workspace 
+contents exactly the way it is right now, or bring back the 
+session you previously saved as the session to which you want
+to keep returning.
+
+<term nogloss> Items in the Trash Can will be permanently shredded.<\term>
+Items you dragged into the trash are removed as part of the
+exiting process. They will NOT be there the next time you log in.
+
+<term nogloss> Continue Logout?<\term>
+This is your last chance to go back to the desktop and do
+a save or something else. Click Cancel to avoid logging out.
+
+This confirmation box is displayed because you selected
+Ask me at Logout in the Style Manager Startup dialog box.
+You can use that dialog box to change the startup setting,
+so that Session Manager automatically restores the current
+or home session.
+
+For complete information on sessions see
+<link hyperlink="Stylemgr SMStartupDialogDE" JumpNewView>Style Manager<\link>.
+

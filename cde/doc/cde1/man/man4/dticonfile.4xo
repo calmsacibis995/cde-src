@@ -1,0 +1,401 @@
+.cdes
+.TH dticonfile 4 "23 May, 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.\" *************************************************************************
+.SH NAME
+dticonfile \- icon conventions for Cde icons
+.SH SYNOPSIS
+The conventions used within the Cde for icon
+sizes, naming, location, and usage are specified.
+.SH DESCRIPTION
+.cdee
+.xos
+This section describes conventions for icon
+sizes, naming, location and usage within \*(Zx.
+.P
+.xoe
+Both X Pixmap and X Bitmap icon file formats are used within the Cde.
+X Pixmap (XPM) icons are multi-color images
+based on the XPM format developed by Arnaud Le Hors.
+A pixmap file is
+.cde an ASCII
+.xo a text
+file that can be read and modified by hand, in addition to
+using color pixmap editors (like the Cde Icon Editor).
+X Bitmap (XBM)
+icons are monochrome (two-color) images based on the official X11 Bitmap
+File Format.
+.cde Bitmap files are ASCII files;
+.cde however, the data is simply a binary representation of the bitmap,
+.xo A bitmap file is a text file that contains
+.xo a binary representation of the bitmap,
+and as such is not easily read or modified by hand.
+.cde The Cde icon editor can create and modify XBM icons.
+The icon editor has the ability to write out any icon in either
+the XPM or XBM file format.
+For a more detailed description of these
+file formats and the icon editor, see
+.cdes
+the
+.BR dtbmfile (4),
+.BR dtpmfile (4)
+and
+.Cm dticon 1
+man pages.
+.cdee
+.xos
+the \*(Zn and
+.cX iconeditsvcs .
+.xoe
+.cde .HU "File Naming"
+.xo .H 3 "File Naming"
+Cde icon file names are typically in one of the
+following forms:
+.Cs I
+\f2basename\fP.\f2format\fP
+\f2basename\fP.\f2size\fP.\f2format\fP
+.Ce
+.P
+The
+.I basename
+is the logical name of the icon.
+The basenames for icons that are installed with Cde begin with
+either
+.B Dt
+or
+.BR Fp .
+.B Dt
+is the default prefix for all Cde icons.
+The
+.B Fp
+prefix is used for icons that appear in the
+front panel when an icon other than the default
+.B Dt
+icon is desired.
+In this case, the basename is the same.
+.P
+If an additional icon is needed for the client
+.B iconImage
+(iconified client window icon), a third prefix,
+.BR Ic ,
+is used.
+.P
+The
+.I format
+is
+.B pm
+for a pixmap file and
+.B bm
+for a bitmap file.
+Size is a single letter:
+.B l
+for large,
+.B m
+for medium,
+.B s
+for small and
+.B t
+for tiny.
+Many of the
+logical icons are provided in multiple sizes for both color and monochrome.
+This allows Cde to use the optimal color and size
+combination for the specific task and configuration the user is running.
+Many bitmap icons have a mask
+associated with the icon.
+These are named
+\f2basename.size\f3_m.\f2format\f1.
+All icons are named so that the longest
+filename associated with that icon is 14 bytes or less; this allows
+it to be used on a short filename system.
+The longest filename can be
+described as \f3Dt\f2xxxxx\f3_m.l.pm\f1,
+where
+.I xxxxx
+is the logical icon name.
+.HU Example
+This is an example of icon files that might be associated with the
+icon
+.BR foo .
+The single logical icon
+.B foo
+contains tiny,
+small, medium and large bitmap icons (with mask) and pixmap icons.
+.Cs I
+Dtfoo.t.pm
+Dtfoo.t.bm
+Dtfoo.t_m.bm
+Dtfoo.s.pm
+Dtfoo.s.bm
+Dtfoo.s_m.bm
+Dtfoo.m.pm
+Dtfoo.m.bm
+Dtfoo.m_m.bm
+Dtfoo.l.pm
+Dtfoo.l.bm
+Dtfoo.l_m.bm
+.Ce
+.cde .HU "Icon Sizes"
+.xo .H 3 "Icon Sizes"
+Icons of the following sizes and with the following suffixes are supported:
+.VL 15
+.LI Large
+48\|\(mu\|48 icon with \f3.l\fP suffix
+.LI Medium
+32\|\(mu\|32 icon with \f3.m\fP suffix
+.LI Small
+24\|\(mu\|24 icon with \f3.s\fP suffix
+.LI Tiny
+16\|\(mu\|16 icon with \f3.t\fP suffix
+.LE
+.P
+The icon sizes used varies for different components, and is dependent on
+the display hardware.
+.cdes
+.HU "Table Of Icon Sizes Used"
+.TS
+center;
+cf3	cf3	cf3
+lf3w(2c)	lf3w(2c)	lf3w(2c) .
+Cde Component	HiRes,MedRes	LoRes(vga)
+_
+Front Panel	48\|\(mu\|48	32\|\(mu\|32
+FP Subpanels	32\|\(mu\|32	24\|\(mu\|24
+FP Inset FP	24\|\(mu\|24	16\|\(mu\|16
+.sp 0.5v
+WMgr ClientIcon	48\|\(mu\|48	32\|\(mu\|32
+.sp 0.5v
+File Mgr (Large)	32\|\(mu\|32	32\|\(mu\|32
+File Mgr (Small)	16\|\(mu\|16	16\|\(mu\|16
+.TE
+.HU "Icon Colors"
+These colors are used in Cde icons.
+The dynamic colors use color cells from one of the color sets
+in the user's color palette (except none, which requires no color cell).
+.P
+The eight icon color names are already included in the
+.BR rgb.txt
+file.
+The eight icon gray color names should be added to each Cde vendor's
+.BR rgb.txt .
+.P
+.TS
+center;
+cf3	cf3
+lf3w(2c)	lf3w(2c) .
+Color Name (rgb.txt)	Symbolic Name (<icon>.pm)
+_
+< dynamic >	none
+< dynamic >	background
+< dynamic >	selectColor
+< dynamic >	topShadowColor
+< dynamic >	bottomShadowColor
+.sp 0.5v
+black	iconColor1
+white	iconColor2
+red	iconColor3
+green	iconColor4
+blue	iconColor5
+yellow	iconColor6
+cyan	iconColor7
+magenta	iconColor8
+.sp 0.5v
+iconGray1	iconGray1
+iconGray2	iconGray2
+iconGray3	iconGray3
+iconGray4	iconGray4
+iconGray5	iconGray5
+iconGray6	iconGray6
+iconGray7	iconGray7
+iconGray8	iconGray8
+.TE
+.cdee
+.cde .HU "Icon File Locations"
+.xo .H 3 "Icon File Locations"
+Cde has default locations where it
+looks to find system and user icon files.
+See
+.cde the
+.cde .Cm dtappintegrate 1
+.cde manual page
+.xo .cX appintegsvcs
+for detailed information on where to install icons.
+.cdes
+See the
+.Cm dtsearchpath 1
+manual page for information on the icon lookup path.
+.HU "Icon Usage In Cde"
+Icons are used in a variety of ways within Cde.
+Following are examples of some of the general areas in which users can use
+icons to customize Cde configurations.
+A system administrator can also do this on a system- or network-wide basis.
+For more detailed information on any of these topics, see the documentation
+for that component or configuration file.
+.HU "Actions And Data Types"
+An icon is associated with an action or data type using the
+.Cn ICON
+keyword
+in the action or data type definition (located in
+.B \&.dt
+files).
+If Cde naming conventions are followed, there is no
+need to specify the path or icon suffix.
+The size and format used is determined at runtime based on the system
+configuration.
+.HU Example
+.Cs I
+ACTION 	IslandPaintOpenDoc
+{
+    ICON           Ipaint
+    WINDOW_TYPE    NO_STDIO
+    EXEC_HOST      MyMachine
+    EXEC_STRING    /usr/bin/IslandPaint %(File)Arg_1"File to open:"
+}
+.Ce
+.HU "Client Icons"
+An icon is associated with a client's iconified window through the
+iconImage window manager resource as follows:
+.Cs I
+     \f3Dtwm*\f2clientName\f3*iconImage: IconFilename\f1
+.Ce
+.P
+The icon may be a pixmap or bitmap format icon.
+Some clients do not allow their default icon to be overridden.
+.HU Example
+.Cs I
+Dtwm*IslandPaint*clientIcon: IslandPaint.bm
+.Ce
+.HU "Front Panel"
+Icons can be displayed as controls in the front panel using the
+.Cn ICON
+keyword in control definitions.
+Either pixmap- or bitmap-format icons
+can be used.
+For controls that are of type
+.B icon
+with
+.Cn MONITOR_TYPE
+set to
+.B file
+or
+.BR mail ,
+an alternate image can be specified using the
+keyword
+.Cn ALTERNATE_ICON .
+The alternate icon is used when the file size
+has grown.
+Controls of type
+.B busy
+can also have an alternate icon, which
+is cycled with the
+.Cn ICON
+to give a blinking effect.
+For controls that allow a
+.Cn PUSH_ACTION
+or a
+.Cn DROP_ACTION ,
+push or drop animation can be defined using multiple
+icons that create animation visual effects.
+.HU Example
+.Cs I
+CONTROL DirectoryTerm
+{
+    TYPE             icon
+    IMAGE            directoryTerm
+    DROP_ACTION      f.action StartDirectoryTerm
+    PUSH_ACTION      f.action StartDirectoryTerm
+    PUSH_ANIMATION   DirAnimation
+}
+.sp 0.5v
+ANIMATION DirAnimation
+{
+    ANIMATION	frame1 	300
+    ANIMATION	frame2
+    ...
+}
+.Ce
+.HU Backdrops
+The backdrop icons show up in a list in the Backdrop Dialog of the
+Style Manager.
+The user can select a single backdrop per workspace
+to be used as the background for that workspace.
+This is a visual
+clue to help the user distinguish one workspace from another.
+Backdrops
+are available in both monochrome (bitmap) and color (pixmap) format
+(all backdrops are unique; there are not bitmap and pixmap versions of
+the same backdrop).
+Although backdrops use the same file format as other
+icons, they are not used like what is typically referred to as an
+icon.
+They would be more accurately described as an image.
+The image is
+repeated (tiled) to fill the entire background of a workspace.
+This is
+not typically done with an icon.
+The Cde comes with a set of standard backdrops.
+Some are monochrome and some are in color.
+Custom backdrops can be added to system-installed
+backdrops using the Style Manager and Window Manager
+.B backdropDirectories
+resource.
+Backdrops can be either bitmap or pixmap format.
+A system
+administrator can add system-wide backdrops to the system-wide default
+backdrop directory,
+.BR /usr/dt/backdrops/C .
+.HU Example
+.Cs I
+*backdropDirectories: /users/julie/.dt/icons/myBackdrops
+.Ce
+.HU "File Manager As Icon Browser"
+The File Manager can be used as an icon browser.
+In this mode, when you
+change to a directory that contains icons (\c
+.B \&.bm
+or
+.B \&.pm
+files), each icon
+is displayed next to the icon file name.
+To enable icon browsing, copy the file
+.B /usr/dt/contrib/types/IconBrowse.dt
+into your
+.B $HOME/.dt/types
+directory.
+Then reload the action database by executing the
+.B ReloadActions
+action.
+For large icons, or on systems with little memory, this could cause delays
+on some directories.
+To disable icon browsing, remove personal copies of the
+.B IconBrowse.dt
+file and reload the action database again.
+.HU "Design Recommendations"
+In order to allow colorful icons while minimizing the number of colors used
+by the Cde, it is recommended that the colors used be
+limited to those available in the Icon Editor.
+These include the dynamic OSF/Motif widget colors, as well as a set of
+static colors and static gray colors.
+The dynamic colors include foreground, background, top shadow,
+bottom shadow, select and a transparent color.
+The static colors include
+black, white, red, blue, green, yellow, magenta and cyan.
+The static gray
+colors are eight varying shades of gray, from nearly black to nearly
+white.
+.SH "SEE ALSO"
+.BR dtpmfile (4),
+.BR dtbmfile (4),
+.Cm dticon 1,
+.BR dtfpfile (4),
+.BR dtdtfile (4),
+.BR dtactionfile (4),
+.BR dtdtsfile  (4),
+.Cm dtstyle 1,
+.BR dtenvvar (5),
+.Fn xmgeticonfilename 3.
+.cdee

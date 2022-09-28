@@ -1,0 +1,74 @@
+.TH tt_spec_create 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+tt_spec_create \- create an in-memory spec for an object
+.SH SYNOPSIS
+.yS
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'char *tt_spec_create('u
+char *tt_spec_create(const char *\f2filepath\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn tt_spec_create
+function
+creates a spec (in memory) for an object.
+.P
+The application can use the
+objid
+returned in future calls to manipulate the object.
+.P
+The
+.I filepath
+argument is the name of the file.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn tt_spec_create
+function returns the identifier for this object.
+The application can use
+.Fn tt_ptr_error 3
+to extract one of the following
+.B Tt_status
+values from the returned pointer:
+.VL 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_DBAVAIL
+.br
+The ToolTalk service could not access the
+ToolTalk database needed for this operation.
+.Lc TT_ERR_DBEXIST
+.br
+The ToolTalk service could not access the
+specified ToolTalk database in the expected place.
+.Lc TT_ERR_NOMP
+.br
+The
+.Cm ttsession 1
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_OTYPE
+.br
+The specified object type is not the name of an installed object type.
+.Lc TT_ERR_PATH
+.br
+The specified pathname included an unsearchable directory.
+.LE
+.SH "APPLICATION USAGE"
+The application should use
+.Fn tt_free 3
+to free any data stored in the address returned by the
+ToolTalk API.
+.P
+To make the object a permanent ToolTalk item or one visible to other
+processes, the creating process must call
+.Fn tt_spec_write 3.
+.SH "SEE ALSO"
+.Hd Tt/tt_c.h 5,
+.Fn tt_spec_type_set 3,
+.Fn tt_spec_write 3,
+.Fn tt_ptr_error 3,
+.Fn tt_free 3.

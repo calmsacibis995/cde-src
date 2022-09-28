@@ -1,0 +1,289 @@
+.TH DtActionCallbackProc 3 "04 April 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.\" *************************************************************************
+.SH NAME
+DtActionCallbackProc \- notify application that the status of an application has changed
+.SH SYNOPSIS
+.yS
+#include <Dt/Action.h>
+.yE
+.SH DESCRIPTION
+The
+.Hd Dt/Action.h
+header defines the
+.Fn DtActionCallbackProc
+callback prototype as follows:
+.P
+.yS
+.ta \w'typedef void (*DtActionCallbackProc)('u
+typedef void (*DtActionCallbackProc)(DtActionInvocationID \f2id\fP,
+	XtPointer \f2client_data\fP,
+	DtActionArg *\f2args\fP,
+	int \f2argCount\fP,
+	DtActionStatus \f2status\fP);
+.yE
+.P
+If registered when invoking an action with
+.Fn DtActionInvoke 3,
+a
+.Fn DtActionCallbackProc
+procedure is called
+whenever an action has a status update, such as action termination.
+Depending on
+.IR status ,
+modified action arguments may be returned using
+.IR args .
+.P
+The
+.I id
+argument specifies an invocation ID as returned by
+.Fn DtActionInvoke 3.
+.P
+The
+.I client_data
+argument specifies the client data that was
+registered with
+.Fn DtActionInvoke 3.
+.P
+The
+.I args
+argument is an array of updated action argument structures, if there are any.
+Individual arguments have their
+.I argClass
+set to one of the standard argument classes, or
+.Cn DtACTION_NULLARG ,
+to indicate that the current
+status update is not providing an update for the given argument.
+If the object has been removed (for example, dropped on the trash), the
+return
+.I argClass
+is set to
+.Cn DtACTION_NULLARG
+to indicate that it no longer exists.
+.P
+The
+.I args
+array has been allocated by
+.Fn XtMalloc 3X,
+as have any of the
+.B char*
+or
+.B void*
+elements contained in each of the
+.IR args .
+The application is responsible for calling
+.Fn XtFree 3X
+on all elements contained in each of the
+.IR args ,
+and then calling
+.Fn XtFree 3X
+on
+.IR args .
+.P
+The
+.I argCount
+argument specifies the total number of arguments
+in
+.IR args .
+This number equals the number of arguments originally provided to
+.Fn DtActionInvoke 3 .
+.P
+The
+.IR n th
+argument in the original action
+argument array corresponds to the
+.IR n th
+argument in an updated action argument array.
+.P
+The
+.I status
+argument specifies the purpose of the status update.
+The status codes listed here and in
+.Hd Dt/Action.h 5,
+may be returned in a
+.Fn DtActionCallbackProc :
+.VL 6
+.Lc DtACTION_INVOKED
+.br
+The corresponding
+.Fn DtActionInvoke 3 ,
+which is asynchronous and does not block when starting actions,
+has finished starting the requested actions.
+For all
+.Fn DtActionInvoke 3
+calls that include a
+.Fn DtactionCallbackProc ,
+this status code is guaranteed to be returned.
+When returned, no additional prompts for data will appear
+from the action service.
+.br
+.Lc DtACTION_DONE
+.br
+The actions that were the result of the original
+.Fn DtActionInvoke 3
+call have terminated normally.
+Once this status value is returned, all registered callbacks are invalidated,
+and
+.I id
+can no longer be used in subsequent action service calls.
+Returned
+.I args
+data may accompany the
+.Cn DtACTION_DONE
+status code.
+For all
+.Fn DtActionInvoke 3
+calls that include a
+.Fn DtActionCallbackProc ,
+this status code or an equivalent status code (for example,
+.Cn DtACTION_CANCELED
+or
+.Cn DtACTION_FAILED )
+is guaranteed to be returned.
+.Lc DtACTION_CANCELED
+.br
+The actions that were the result of the original
+.Fn DtActionInvoke 3
+call were canceled and have terminated normally.
+Once this status value is returned, all registered callbacks are
+invalidated, and
+.I id
+can no longer be used in subsequent
+action service calls.
+No
+.I args
+data will accompany the
+.Cn DtACTION_CANCELED
+status code.
+.Lc DtACTION_FAILED
+.br
+An error occured and a normal termination is no longer possible.
+The action service may have failed to start the
+action or lost contact with and abandoned the action.
+Once this status value is returned, an error dialog may be
+posted by the action service, all registered callbacks are
+invalidated, and
+.I id
+can no longer be used in subsequent action service calls.
+No
+.I args
+data will accompany the
+.Cn DtACTION_FAILED
+status code.
+.br
+.Lc DtACTION_STATUS_UPDATE
+.br
+The actions associated with
+.I id
+have generated a status update, such as returning modified
+.IR args .
+Updates occur in several ways.
+.P
+If several actions were started from a single
+.Fn DtActionInvoke 3,
+then as each individual action terminates, a
+.Cn DtACTION_STATUS_UPDATE
+with return
+.I args
+is returned, and when the final action
+terminates, a
+.Cn DtACTION_DONE
+or equivalent status code is returned, possibly with return arguments.
+.P
+Other actions may have the capability to generate updates
+(for example, Tooltalk-based actions doing a Media Exchange
+Deposit (Request)).
+.P
+In most cases, a
+.I DtActionArg
+argument array accompanying a
+.Cn DtACTION_STATUS_UPDATE
+only has updated data for a few of the arguments; the remaining arguments
+are set to
+.Cn DtACTION_NULLARG .
+.LE
+.SH EXAMPLES
+The following shows how a
+.Fn DtActionCallbackProc
+might be coded.
+.Cs
+DtActionCallbackProc myCallback(
+     DtActionInvocationID id,
+     XtPointer client_data,
+     DtActionArg *actionArgPtr,
+     int actionArgCount,
+     DtActionStatus status);
+{
+     extern DtActionArg *myUpdatedArgs; /* global hook for new data */
+     extern int myDoneFlag; /* global done flag */
+.sp 0.5v
+     switch (status) {
+          case DtACTION_INVOKED:
+               /*
+                * All the arguments to the original DtActionInvoke
+                * have been consumed by actions, and the actions have
+                * been started.  Among other things, we will not see
+                * any more prompts for user input.
+                */
+               break;
+          case DtACTION_DONE:
+               myUpdatedArgs = (DtActionArg *) actionArgPtr;
+               myDoneFlag = TRUE;
+               break;
+          case DtACTION_CANCELED:
+          case DtACTION_FAILED:
+               if ((actionArgCount != 0) && actionArgPtr) {
+                    /*
+                     * If not a normal shutdown, throw away returned
+                     * information.
+                     */
+                    for (i=0; i < actionArgCount; i++) {
+                         if (actionArgPtr[i].argClass == DtACTION_FILE) {
+                              XtFree(actionArgPtr[i].u.file.name);
+                         } else if (actionArgPtr[i].argClass ==
+                                    DtACTION_BUFFER) {
+                              XtFree(actionArgPtr[i].u.buffer.bp);
+                              XtFree(actionArgPtr[i].u.buffer.type);
+                              XtFree(actionArgPtr[i].u.buffer.name);
+                         }
+                    }
+                    XtFree(actionArgPtr);
+               }
+               myUpdatedArgs = (DtActionArg *) NULL;
+               myDoneFlag = FALSE;
+               break;
+          case DtACTION_STATUS_UPDATE:
+               myUpdatedArgs = (DtActionArg *) actionArgPtr;
+               myDoneFlag = FALSE;
+               break;
+          default:
+               /* ignore */
+               break;
+     }
+}
+.Ce
+.SH "SEE ALSO"
+.Hd Dt/Action.h 5,
+.Fn DtDbLoad 3,
+.Fn DtActionLabel 3,
+.Fn DtActionDescription 3,
+.Fn DtActionExists 3,
+.Fn DtActionInvoke 3,
+.cdes
+.Fn DtActionType 3,
+.Fn XtMalloc 3X,
+.Fn XtFree 3X,
+.BR dtdtfile (4).
+.cdee
+.xos
+.Fn DtActionType 3;
+.Fn XtMalloc 3X,
+.Fn XtFree 3X
+in the \*(Zt;
+.cX dtactionfile .
+.xoe

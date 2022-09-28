@@ -1,0 +1,72 @@
+#! /bin/csh
+
+#
+# @(#)printmanpage	1.1 96/04/11 SMI
+#
+# Print a manual page to a printer typeset as best as possible
+#
+
+if ("$?PRINTER" == 0) then
+  echo -n 'Enter name of printer to print to: '
+  setenv PRINTER "$<"
+endif
+
+if ($#argv == "0") then
+  echo "`basename $0`: must specify one or more names of manual pages to print"
+  exit 1
+endif
+
+@ errors = 0
+
+foreach FILE ($*)
+if (! -e "$FILE") then
+  echo "${FILE}: does not exist - cannot be printed"
+  @ errors = $errors + 1
+  continue
+endif
+if (-d "$FILE") then
+  echo "${FILE}: is a directory - cannot be printed"
+  @ errors = $errors + 1
+  continue
+endif
+if (! -f "$FILE") then
+  echo "${FILE}: not a regular file - cannot be printed"
+  @ errors = $errors + 1
+  continue
+endif
+file ${FILE} | fgrep -s -i 'roff'
+if ("${status}" != 0) then
+  echo "${FILE}: not a manual page - cannot be printed"
+  @ errors = $errors + 1
+  continue
+endif
+end
+
+if ($errors != 0) then
+  echo "errors in naming files to print: no files printed"
+  exit 1
+endif
+
+if (-x /usr/doctools/bin/troff) then
+  set TROFF="/usr/doctools/bin/troff"
+  if ( -e /usr/doctools/tmac/ansun) then
+    set MACPAC="ansun"
+  else
+    set MACPAC="an"
+  endif
+else
+  set TROFF="troff"
+  if ( -e /usr/lib/tmac/ansun) then
+    set MACPAC="ansun"
+  else
+    set MACPAC="an"
+  endif
+endif
+
+foreach FILE ($*)
+  echo "Printing manual page: ${FILE}"
+  ${TROFF} -m${MACPAC} -t ${FILE} | lp -d${PRINTER} -T troff
+end
+
+exit 1
+

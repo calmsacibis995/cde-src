@@ -1,0 +1,59 @@
+.TH tttk_message_reject 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+tttk_message_reject \- reject a message
+.SH SYNOPSIS
+.yS
+#include <Tt/tttk.h>
+.sp 0.5v
+.ta \w'Tt_status tttk_message_reject('u
+Tt_status tttk_message_reject(Tt_message \f2msg\fP,
+	Tt_status \f2status\fP,
+	const char *\f2status_string\fP,
+	int \f2destroy\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn tttk_message_reject
+function
+sets the status and status string of the
+.Cn TT_REQUEST
+.IR msg ,
+rejects the
+.IR msg ,
+and then destroys
+.I msg
+if
+.I destroy
+is True.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn tttk_message_reject
+function returns the status of the operation as one of the following
+.B Tt_status
+values:
+.VL 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_NOMP
+.br
+The
+.Cm ttsession 1
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_NOTHANDLER
+.br
+This application is not the handler for this message.
+.Lc TT_ERR_POINTER
+.br
+The pointer passed does not point to an object
+of the correct type for this operation.
+.LE
+.SH "SEE ALSO"
+.Hd Tt/tttk.h 5,
+.Fn tt_message_reject 3,
+.Fn tttk_message_fail 3,
+.Fn tttk_message_abandon 3,
+.Fn tttk_message_fail 3.

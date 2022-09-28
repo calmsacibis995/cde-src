@@ -1,0 +1,122 @@
+#!/bin/sh
+#       Copyright 1996 Sun Microsystems, Inc.
+#               All Rights Reserved
+#
+#  Prior to Solaris 2.6, /usr/dt and /usr/openwin were separate directories.
+#  This preinstall script for SUNWdtcor checks for this case and if needed,
+#  merges the /usr/dt and /usr/openwin directories before SUNWdtcor install
+#  continues.  All desktop files are now under /usr/dt and the SUNWdtcor
+#  package installs a symbolic link from /usr/openwin location to /usr/dt.
+#
+#       @(#)preinstall	1.4    96/02/22
+
+echo "SUNWdtcor preinstall check begins"
+
+if [ -d $BASEDIR/dt -a -d $BASEDIR/openwin ]
+then
+   echo "   found dt directory and openwin directory";
+
+   cd $BASEDIR/dt; 
+   dt_pwd=`/usr/bin/pwd`;
+   echo "   dt directory path = $dt_pwd";
+
+   cd $BASEDIR/openwin;
+   ow_pwd=`/usr/bin/pwd`;
+   echo "   ow directory path = $ow_pwd";
+
+   cd $BASEDIR;
+
+   if [ $dt_pwd = $ow_pwd ]
+   then
+	echo "   dt & ow correctly sharing one filesytem"
+	echo "SUNWdtcor preinstall check complete"
+        exit 0
+   fi
+fi 
+
+if [ -d $BASEDIR/dt -a ! -d $BASEDIR/openwin ] 
+then
+   echo "   found dt directory and no openwin directory"
+
+   if [ -h $BASEDIR/openwin -o -f $BASEDIR/openwin ]
+   then
+	echo "   found invalid /usr/openwin file, removing it"
+	/usr/bin/rm $BASEDIR/openwin
+   fi
+
+   echo "   renaming dt directory to openwin directory" 
+   /usr/bin/mv $BASEDIR/dt $BASEDIR/openwin
+
+   echo "SUNWdtcor preinstall check complete"
+   exit 0
+fi 
+
+if [ -d $BASEDIR/openwin -a ! -d $BASEDIR/dt ] 
+then
+   echo "   found openwin directory and no dt directory"
+
+   if [ -h $BASEDIR/dt -o -f $BASEDIR/dt ]
+   then
+	echo "   found invalid /usr/dt file, removing it"
+	/usr/bin/rm $BASEDIR/dt 
+   fi
+
+   echo "SUNWdtcor preinstall check complete"
+   exit 0
+fi
+
+if [ ! -d $BASEDIR/openwin -a ! -d $BASEDIR/dt ] 
+then
+   echo "   no openwin directory and no dt directory"
+
+   if [ -h $BASEDIR/dt -o -f $BASEDIR/dt ]
+   then
+	echo "   found invalid /usr/dt file, removing it"
+	/usr/bin/rm $BASEDIR/dt 
+   fi
+
+   if [ -h $BASEDIR/openwin -o -f $BASEDIR/openwin ]
+   then
+	echo "   found invalid /usr/openwin file, removing it"
+	/usr/bin/rm $BASEDIR/openwin
+   fi
+
+   echo "SUNWdtcor preinstall check complete"
+   exit 0
+fi
+
+echo "   remove duplicate ToolTalk files"
+
+/usr/bin/rm -f $BASEDIR/dt/bin/rpc.ttdbserver >/dev/null 2>&1
+/usr/bin/rm -f $BASEDIR/dt/bin/rpc.ttdbserverd >/dev/null 2>&1
+/usr/bin/rm -f $BASEDIR/dt/bin/tt_type_comp >/dev/null 2>&1
+/usr/bin/rm -f $BASEDIR/dt/bin/ttce2xdr >/dev/null 2>&1
+/usr/bin/rm -f $BASEDIR/dt/bin/ttcp >/dev/null 2>&1
+/usr/bin/rm -f $BASEDIR/dt/bin/ttdbck >/dev/null 2>&1
+/usr/bin/rm -f $BASEDIR/dt/bin/ttmv >/dev/null 2>&1
+/usr/bin/rm -f $BASEDIR/dt/bin/ttrm >/dev/null 2>&1
+/usr/bin/rm -f $BASEDIR/dt/bin/ttrmdir >/dev/null 2>&1
+/usr/bin/rm -f $BASEDIR/dt/bin/ttsession >/dev/null 2>&1
+/usr/bin/rm -f $BASEDIR/dt/bin/ttsnoop >/dev/null 2>&1
+/usr/bin/rm -f $BASEDIR/dt/bin/tttar >/dev/null 2>&1
+/usr/bin/rm -f $BASEDIR/dt/bin/tttrace >/dev/null 2>&1
+
+/usr/bin/rm -f $BASEDIR/dt/lib/libtt.so >/dev/null 2>&1
+/usr/bin/rm -f $BASEDIR/dt/lib/libtt.so.2 >/dev/null 2>&1
+
+/usr/bin/rm -f $BASEDIR/dt/share/include/Tt/tt_c.h >/dev/null 2>&1
+/usr/bin/rm -f $BASEDIR/dt/share/include/Tt/tttk.h >/dev/null 2>&1
+
+
+echo "   merge existing dt directory contents into existing openwin directory"
+
+cd $BASEDIR/dt
+/usr/bin/find . -depth -print | 
+	/usr/bin/cpio -pdlmu $BASEDIR/openwin >/dev/null 2>&1
+cd $BASEDIR
+
+echo "   remove old dt directory"
+
+/usr/bin/rm -rf $BASEDIR/dt
+
+echo "SUNWdtcor preinstall check complete"

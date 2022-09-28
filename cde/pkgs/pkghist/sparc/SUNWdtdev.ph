@@ -1,0 +1,4 @@
+PKG=SUNWdtdev
+ARCH=sparc
+VERSION=1000
+PKGRM=yes

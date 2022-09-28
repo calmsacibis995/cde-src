@@ -1,0 +1,183 @@
+.\" $Header: Rcsdiff.1,v 1.2 93/07/12 17:48:46 xbuild_hp_cv Exp $
+.TH Rcsdiff 1 "" "" HP-UX
+.ds )H Hewlett-Packard Company OSSD-CV
+.ds ]W June 1993
+.SH NAME
+Rcsdiff \- OSSD-CV RCS diff tool with remote capabilities.
+.SH SYNOPSIS
+.B Rcsdiff
+.RI [ \|options\| ]
+.I file ...
+.SH DESCRIPTION
+.I Rcsdiff
+is a perl front-end to the
+.I rcsdiff
+.SM RCS
+program
+and is used exactly like the original RCS executable except for one
+difference. If you run the tool in a directory other than the directory
+with the RCS vault, you must specify a full path name to the ,v file.
+See examples below. It is most commonly used with no options or the
+.I -r
+option.
+.I Rcsdiff
+compares two revisions of each given
+.SM RCS
+file and creates output very similar to
+.I diff
+(see
+.IR diff (1)).
+A file name ending in
+.I ,v
+is an
+.SM RCS
+file name, otherwise it is a working file name.
+.I Rcsdiff
+derives the working file name from the
+.SM RCS
+file name and vice versa, as explained in
+.IR rcsintro (5).
+Pairs consisting of both an
+.SM RCS
+and a working file name can also be specified.
+.PP
+.I Rcsdiff
+recognizes the following options:
+.RS
+.TP 6
+.I -p
+This option is only useful when the RCS directory is remote. It has the
+same effect as sending stderr output to /dev/null.  This is useful when
+using the diffs described below as input to patch programs or other
+commands.
+.TP
+.I -b
+Same as described in
+.IR diff (1);
+.TP
+.I -e
+Same as described in
+.IR diff (1);
+.TP
+.I -f
+Same as described in
+.IR diff (1);
+.TP
+.I -h
+Same as described in
+.IR diff (1);
+.TP
+.I -n
+Generate an edit script of the format used by
+.SM RCS.
+.TP
+.IR -c [\|\f2n\fP\|]
+Generate a diff with lines of context.
+The default is to present 3 lines of context.
+To change, specify
+.IR n ;
+for example,
+.I -c10
+gives 10 lines of context.
+.IP
+.I -c
+modifies the output format slightly from the normal
+.IR diff (1)
+output.
+The ``context'' output begins
+with identification of the files involved
+and their creation dates,
+then each change is separated by a line with a dozen
+.I *
+(asterisks).
+Lines removed from
+.I file1
+are marked with
+.I -
+(dashes); those added to
+.I file2
+with
+.I +
+(pluses).
+Lines that are changed from one file to the
+other are marked in both files with
+.I !
+(exclamation marks).
+.RE
+.PP
+If both
+.I rev1
+and
+.I rev2
+are omitted,
+.I Rcsdiff
+compares the latest revision on the trunk
+with the contents of the corresponding working file.
+This is useful for determining what was changed since the last check-in.
+.PP
+If
+.I rev1
+is given, but
+.I rev2
+is omitted,
+.I Rcsdiff
+compares revision
+.I rev1
+of the
+.SM RCS
+file with the contents of the corresponding working file.
+.PP
+If both
+.I rev1
+and
+.I rev2
+are given,
+.I Rcsdiff
+compares revisions
+.I rev1
+and
+.I rev2
+of the
+.SM RCS
+file.
+.PP
+Both
+.I rev1
+and
+.I rev2
+can be given numerically or symbolically.
+.SH EXAMPLES
+Compare the latest trunk revision of
+.SM RCS
+file
+.I f.c,v
+and the contents of working file
+.IR f.c :
+.IP
+.I Rcsdiff  f.c
+.PP
+Compare revision 1.1 of f.c with revision 1.3:
+.IP
+.I Rcsdiff -r1.1 -r1.3 f.c
+.PP
+Do the same from any directory assuming f.c's RCS vault  is in 
+/users/somedir:
+.IP
+.I Rcsdiff -r1.1 -r1.3 /users/somedir/RCS/f.c,v
+.SH AUTHOR
+.I Rcsdiff
+was developed by Marc Ayotte & Ron Voll,
+OSSD-CV, Hewlett-Packard.
+.I rcsdiff
+was developed by Walter F. Tichy.
+.SH SEE ALSO
+Ci(1),
+Co(1),
+Diff(1),
+Ident(1),
+Rcs(1),
+Rcsmerge(1),
+Rcslocks(1),
+Rlog(1),
+Rcsfile(4),
+Rcsintro(5).

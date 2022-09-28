@@ -1,0 +1,191 @@
+#ifdef HPArchitecture  
+VENDOR_ARG = -h
+#endif
+
+#ifdef RsArchitecture
+VENDOR_ARG = -i
+#endif
+
+#ifdef SunArchitecture
+VENDOR_ARG = -s
+#endif
+
+#ifdef USLArchitecture
+VENDOR_ARG = -u
+#endif
+
+
+SRCS_ACTION = \
+	dtactionfile.4xo\
+	dtdtfile.4xo
+
+SRCS_CM = \
+	dtcm_archive.4xo \
+	dtcm_entry.4xo
+
+SRCS_DND = \
+	DtDndProtocol.4xo
+
+SRCS_DATATYPE = \
+	dtdtsfile.4xo
+
+SRCS_FRONTPANEL = \
+	dtfpfile.4xo 
+
+SRCS_HELP = \
+	dthelptagdtd.4xo\
+	dthffile.4xo\
+	dtsdldtd.4xo\
+	dtsdlfile.4xo 
+
+SRCS_ICONS = \
+	dticonfile.4xo \
+	dtbmfile.4xo \
+	dtdpfile.4xo \
+	dtpmfile.4xo
+
+SRCS_MISC = \
+	dtresourcesfile.4xo \
+	dtspcdenv.4xo \
+	dtwmrc.4xo
+
+SRCS = \
+	$(SRCS_ACTION) \
+	$(SRCS_CM) \
+	$(SRCS_HELP) \
+	$(SRCS_DND) \
+	$(SRCS_DATATYPE) \
+	$(SRCS_FRONTPANEL) \
+	$(SRCS_ICONS) \
+	$(SRCS_MISC)
+
+OBJS_CM = \
+	dtcm_archive.4 \
+	dtcm_entry.4
+
+OBJS_ACTION = \
+	dtactionfile.4\
+	dtdtfile.4
+
+OBJS_DND = \
+	DtDndProtocol.4
+
+OBJS_DATATYPE = \
+	dtdtsfile.4 
+
+OBJS_FRONTPANEL = \
+	dtfpfile.4 
+
+OBJS_HELP = \
+	dthelptagdtd.4\
+	dthffile.4\
+	dtsdldtd.4\
+	dtsdlfile.4
+
+OBJS_ICONS = \
+	dticonfile.4 \
+	dtbmfile.4 \
+	dtdpfile.4 \
+	dtpmfile.4 
+
+OBJS_MISC = \
+	dtresourcesfile.4 \
+	dtspcdenv.4 \
+	dtwmrc.4
+
+OBJS = \
+	$(OBJS_ACTION) \
+	$(OBJS_CM) \
+	$(OBJS_HELP) \
+	$(OBJS_DND) \
+	$(OBJS_DATATYPE) \
+	$(OBJS_FRONTPANEL) \
+	$(OBJS_ICONS) \
+	$(OBJS_MISC)
+
+DT2MAN = ../tools/dt2man
+
+MANROFF = /usr/bin/troff -man
+
+
+all:: $(OBJS)
+
+actionall:: $(OBJS_ACTION)
+
+cmall:: $(OBJS_CM)
+
+helpall:: $(OBJS_HELP)
+
+iconsall:: $(OBJS_ICONS)
+
+frontpanelall:: $(OBJS_FRONTPANEL)
+
+dndall:: $(OBJS_DND)
+
+datatypeall:: $(OBJS_DATATYPE)
+
+miscall:: $(OBJS_MISC)
+
+
+.SUFFIXES: .4xo .4
+
+.4xo.4:
+	$(RM) $@
+	$(DT2MAN) $(VENDOR_ARG) $? >$@
+
+clean::
+	$(RM) $(OBJS)
+
+actionclean::
+	$(RM) $(OBJS_ACTION)
+
+cmclean::
+	$(RM) $(OBJS_CM)
+
+helpclean::
+	$(RM) $(OBJS_HELP)
+
+dndclean::
+	$(RM) $(OBJS_DND)
+
+datatypeclean::
+	$(RM) $(OBJS_DATATYPE)
+
+iconsclean::
+	$(RM) $(OBJS_ICONS)
+
+frontpanelclean::
+	$(RM) $(OBJS_FRONTPANEL)
+
+miscclean::
+	$(RM) $(OBJS_MISC)
+
+depend::
+
+includes::
+
+
+actionprint::	actionall
+	$(TBL) $(OBJS_ACTION) | $(MANROFF)
+
+cmprint::	cmall
+	$(TBL) $(OBJS_CM) | $(MANROFF)
+
+helpprint::	helpall
+	$(TBL) $(OBJS_HELP) | $(MANROFF)
+
+dndprint::	dndall
+	$(TBL) $(OBJS_DND) | $(MANROFF)
+
+frontpanelprint::	frontpanelall
+	$(TBL) $(OBJS_FRONTPANEL) | $(MANROFF)
+
+iconsprint::	iconsall
+	$(TBL) $(OBJS_ICONS) | $(MANROFF)
+
+datatypeprint::	datatypeall
+	$(TBL) $(OBJS_DATATYPE) | $(MANROFF)
+
+miscprint::	miscall
+	$(TBL) $(OBJS_MISC) | $(MANROFF)
+

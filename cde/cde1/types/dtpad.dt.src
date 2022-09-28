@@ -1,0 +1,102 @@
+\###############################################################################
+\#
+\#     dtpad.dt
+\#
+\#     Actions used with the DT Text Editor (dtpad)
+\#
+\#    (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+\#    (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+\#    (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+\#    (c) Copyright 1993, 1994, 1995 Novell, Inc.
+\#
+\#     $XConsortium: dtpad.dt.src /main/cde1_maint/4 1995/10/31 11:44:41 rcs $
+\#
+\###############################################################################
+set DtDbVersion=1.0
+
+\###############################################################################
+\#
+%|nls-10-#\# WARNING:...#|
+\#
+\###############################################################################
+
+\###################################################################
+\#
+%|nls-11-#\# Data Attributes#|
+\#
+\###################################################################
+DATA_ATTRIBUTES TEXTFILE
+{
+        ACTIONS         Open,Print
+        ICON            Dtdata
+        IS_TEXT         true
+        NAME_TEMPLATE   %s.txt
+        MIME_TYPE	text/plain
+        SUNV3_TYPE      text
+        MEDIA           C_STRING
+        DESCRIPTION     %|nls-5001-#A#|
+        TYPE_LABEL      %|nls-31055-#TEXTFILE#|
+}
+DATA_CRITERIA TEXTFILE1
+{
+        DATA_ATTRIBUTES_NAME TEXTFILE
+        MODE            f&!x
+        NAME_PATTERN    *.txt
+}
+\###################################################################
+\#
+%|nls-5006-#\# WARNING WARNING#|
+\#
+\###################################################################
+DATA_CRITERIA TEXTFILE2
+{
+        DATA_ATTRIBUTES_NAME TEXTFILE
+        MODE            f&!x
+        NAME_PATTERN    text
+}
+ACTION Print
+{
+        LABEL           %|nls-2-Print|
+        ARG_TYPE        TEXTFILE
+        TYPE            COMMAND
+        WINDOW_TYPE     NO_STDIO
+        EXEC_STRING     /usr/dt/bin/dtlp "%Arg_1%"
+}
+
+\###############################################################################
+\###############################################################################
+\#
+%|nls-12-#\# Actions#|
+\#
+\###############################################################################
+\#####################
+\#
+%|nls-5002-# PRINT actions|
+\#
+\#####################
+\#
+%|nls-5005-# The|
+\#
+\#####################
+ACTION PRINT_DTPAD_TEMPFILE
+{
+	TYPE		COMMAND
+	WINDOW_TYPE	NO_STDIO
+	EXEC_STRING 	/usr/dt/bin/dtlp -u "%(String)Arg_2%" -e "%(File)Arg_1%"
+}
+
+\######################
+\#
+%|nls-5003-# Editing|
+\#
+\######################
+ACTION Dtpad
+{
+	LABEL		%|nls-5007-#Text Editor#|
+        ICON            Dtpenpd
+	TYPE		MAP
+	MAP_ACTION	DtTTMediaOpen
+	DESCRIPTION	%|nls-5008-#The#|
+}
+
+\########################### EOF ##############################################

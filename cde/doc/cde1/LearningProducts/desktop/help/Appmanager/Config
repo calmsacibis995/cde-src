@@ -1,0 +1,461 @@
+<chapter id=ConfigureAppManager>Administering and Configuring Application Manager
+
+The icons in the Application Manager are representations for
+actions.  Each icon is an executable file with the same name
+as the action.  
+
+The action definition defines what happens when the user double-clicks
+the icon or drops a file on it.
+
+
+<list bullet>
+
+* For information on creating actions, see 
+  <link hyperlink="Misctopic CreatingActionsCI" Jump>Creating Actions<\link>.
+
+* For information on administering the database of actions, see
+  <link hyperlink="Misctopic ActionObjectsDatabase" Jump>More About the
+Objects/Actions Database<\link>.
+
+* For information on configuring systems to use remote applications, see
+  <link hyperlink="Misctopic NetworkExecution" Jump>Distributed Computing on the Desktop<\link>.
+
+<\list>
+
+
+
+<s1 id=AdministeringAppMgr>Directory Locations of Application Manager Applications
+
+<procedure>The Top-Level Application Manager Directory
+
+There is a separate Application Manager for each user on the system.
+The directory location of the top-level application window is
+``/%%HomeDirectory%%/.dt/ApplicationManager''.  !!The top-level
+directory is not writable by the user!!.
+
+
+<procedure>Built-in Applications
+
+Some of the directories at the top level of the Application Manager
+are containers for built-in applications.  These directories are
+links to directories in ``/opt/dt/appmanager/C''. 
+
+
+
+<procedure>Other Registered Applications
+
+The top-level Application Manager window also contains directories
+for other system-wide applications.  These directories are links
+to directories in ``/etc/opt/dt/appconfig/appmanager''.
+
+
+<s1 id=RegisteringApps>Registering Applications in Application Manager
+
+
+This section describes how Desktop applications are registered
+and automatically added to the Application Manager.
+
+<procedure>The Installed Application Files
+
+Application files are generally installed into ``/opt/%%application%%''.
+If the application is desktop-smart, it includes the following desktop
+configuration files:
+
+<list bullet>
+*  ``/opt/%%app%%/dt/appconfig/C/*.dt''. Files containing action and
+  object-type definitions.
+
+* ``/opt/%%app%%/dt/appconfig/help/C/%%help_files%%''. Files
+containing the online help for the application.
+
+* ``/opt/%%app%%/dt/appconfig/icons/C/%%icon_files%%''. Bitmap and
+pixmap files for the application's icons.
+
+* ``/opt/%%app%%/dt/appconfig/appmanager/C/%%appmgr_dir%%/%%app_files%%''.
+
+where %%appmgr_dir%% is the application group (directory) that appears in
+the Application Manager, and %%app_files%% are the files in that
+directory&emdash;usually including an application (action icon) and a
+README file.
+
+<\list>
+
+<procedure>Integrated Application Files
+
+When an application is installed, links are created between its installed
+files and directories along search paths where the desktop looks
+for application files.
+
+<list bullet>
+*  Links to ``/opt/%%app%%/dt/appconfig/types/C/*.dt'' are placed in
+   ``/etc/opt/dt/appconfig/types/C''.
+   This directory is on the database search path
+   (DTDATABASESEARCHPATH).
+
+
+* Links to ``/opt/%%app%%/dt/appconfig/help/C/%%help_files%%'' are
+   placed in
+   ``/etc/opt/dt/appconfig/help/C''.  This directory is
+   on the help search path (DTHELPSEARCHPATH).
+
+* Links to ``/opt/%%app%%/dt/appconfig/icons/C/%%icon_files%%'' are place
+   in    ``/etc/opt/dt/appconfig/icons/C''.   This directory is 
+   on the icon search path (DTICONSEARCHPATH).
+
+* A link to ``/opt/%%app%%/dt/appconfig/appmanager/C/%%appmgr_dir%%''  is
+placed in ``/etc/opt/dt/appconfig/appmanager/C''.  This directory is on the
+application search path (DTAPPSEARCHPATH).
+
+<\list>
+
+
+<procedure>Top Level Application Manager Directories
+
+When the user logs in, a link to each directory
+in ``/etc/opt/dt/appconfig/C'' is created in
+``/%%HomeDirectory%%/.dt/ApplicationManager''.
+
+
+<s1 id=ReorganizeAppManager>To Add a Desktop Application Server
+
+When you add a desktop application server to a system, all of its
+registered applications become available to the local system.
+The applications on the application server are registered under
+``/etc/opt/dt/appconfig'' and are linked at login time to 
+``/%%HomeDirectory%%/.dt/ApplicationManager''.
+
+<s1 id=IntegrateAppIntoCDE>Integrating an Application into the Desktop
+
+This section explains
+how CDE handles
+application integration.
+
+<procedure>Basic Steps
+There are three basic steps for integrating a
+new or existing application onto the CDE desktop:
+
+<list bullet loose>
+
+* Create appropriate configuration files for the application.
+  See:
+
+	<list bullet tight>
+	*  <xref ConfigurationFiles>
+	* <xref FileNameRequirements>
+	* <xref ActionDatatypes>
+	* <xref AppIcons>
+	<\list>
+
+* Put these files into a specified directory structure.
+  See:
+	<list bullet tight>
+	* <xref LocationsOfFiles>
+	* <xref AppManagerConfig>
+	<\list>
+
+* Run ``dtappintegrate''. See <xref RunningDtAppIntegrate>.
+
+<\list>
+
+
+
+<s2 id=ConfigurationFiles>Application Files
+
+The ``dtappintegrate'' script expects to find files in
+certain specified locations.
+
+<procedure>Desktop Configuration Files
+Configuration files include:
+
+<list bullet loose>
+
+* Icon files for the application and its data files.
+
+* Action and filetype definition files (''*.dt'')
+
+* Application help files, if they exist.
+
+* The Application folder and its contents.
+
+<\list>
+
+<procedure>System Configuration Files
+
+System configuration files vary among vendors and must be handled
+by the application separately. System configuration files include:
+
+<list loose>
+* Message catalogs
+
+* X11 app-defaults files
+
+* UNIX man pages
+
+* Application-specific bitmaps
+<\list>
+
+
+<note>
+Application hosts that support the System V.4 file system expect
+all static application data (including binaries and man pages) to
+be loaded under one application root directory.
+<\note>
+
+
+<s2 id=LocationsOfFiles>Where to Place Application Files
+
+<procedure>The Application Root
+
+All the CDE files should be installed according to System V.4 policies
+and guidelines. Considerable flexibility is allowed in deciding
+where under the ''/opt'' (or application root) directory the static
+application tree is placed. Wherever the CDE files are installed
+is referred to as the top, or !!App_Root!!,
+of the application tree.
+
+<note>
+!!App_Root!! is a
+syntactical convention only; it is not used by the run-time
+environment.
+
+<\note>
+
+<procedure>Files Stucture Under App_Root
+
+CDE requires that four key subdirectories be
+established under !!App_Root!!:
+
+<list bullet>
+
+* ``%%App_Root%%/dt/appconfig/types/%%lang%%'' contains action, data type,
+and Front Panel definition files.
+
+* ``%%App_Root%%/dt/appconfig/appmanager/%%lang%%'' contains
+   application group files.
+
+* ``%%App_Root%%/dt/appconfig/icons/%%lang%%'' contains icons used by
+  the CDE managers.
+
+* ``%%App_Root%%/dt/appconfig/help/%%lang%%'' contains application
+  help.
+
+<\list>
+
+
+All configuration files and subdirectories are placed under a
+common top (''&<App_Root>/dt/appconfig'') and should always
+include the default language subdirectory C.
+
+<procedure>Example
+
+Am application named ``Spreadsheet'' is installed with 
+!!App_Root!!=''/opt/SpreadSheet''.
+Its default-language icons would be placed in:
+
+<list bullet tight>
+* Bitmaps: ``/opt/SpreadSheet/dt/appconfig/icons/C/*.bm''
+* Pixmaps: ``/opt/SpreadSheet/dt/appconfig/icons/C/*.pm''
+<\list>
+
+
+
+<s2 id=AppIcons>Application Icons
+
+CDE supports four pixel sizes of application icons:
+
+<lablist>
+<labheads>\Size\Naming Convention
+\48&times;48\	!!name!!.l.bm and !!name!!.l.pm
+\32&times;32\	!!name!!.m.bm and !!name!!.m.pm
+\24&times;24\	!!name!!.s.bm and !!name!!.s.pm
+\16&times;16\	!!name!!.t.bm and !!name!!.t.pm
+<\lablist>
+
+For example, if you have an icon for a calculator (large icon in
+monochrome), the structure would be ''calc.icon.l.bm''.
+
+For each icon that is needed, a developer needs to provide both a
+black-and-white and color version of each of the 4 sizes. The
+pixmap icon files will be used by 8-bit or larger color systems.
+The bitmap files are for monochrome and less than 8-bit systems.
+If bitmap files are not provided, CDE will map the color
+specifications of the pixmap files into foreground and background
+black-and-white colors.
+
+<procedure>Example
+
+The following icon subdirectory structure should be created:
+
+<list plain tight>
+*``%%App_Root%%/dt/appconfig/icons/%%lang%%/action_icon.l.pm''
+*``%%App_Root%%/dt/appconfig/icons/%%lang%%/action_icon.m.pm''
+*``%%App_Root%%/dt/appconfig/icons/%%lang%%/action_icon.s.pm''
+*``%%App_Root%%/dt/appconfig/icons/%%lang%%/action_icon.t.pm''
+*``%%App_Root%%/dt/appconfig/icons/%%lang%%/action_icon.l.bm''
+*``%%App_Root%%/dt/appconfig/icons/%%lang%%/action_icon.m.bm''
+*``%%App_Root%%/dt/appconfig/icons/%%lang%%/action_icon.s.bm''
+*``%%App_Root%%/dt/appconfig/icons/%%lang%%/action_icon.t.bm''
+*``%%App_Root%%/dt/appconfig/icons/%%lang%%/data_icon.l.pm''
+...        
+*``%%App_Root%%/dt/appconfig/icons/%%lang%%/data_icon.t.bm''
+...
+*``%%App_Root%%/dt/appconfig/icons/%%lang%%/app_group.l.pm''
+...
+*``%%App_Root%%/dt/appconfig/icons/%%lang%%/app_group.t.bm''
+<\list>
+
+<s2 id=ActionDatatypes>Actions and Data Types
+
+Action and data type definitions must be stored in a file with a
+''.dt'' extension. In most cases, only one ''.dt'' file per
+application package is required.  See
+<link hyperlink="Misctopic CreatingActionsCI" Jump>Creating Actions<\link>
+and <link hyperlink="Misctopic CreatingFiletypesCI" Jump>Creating Data Types<\link>.
+
+The ''.dt'' file specifies the following information:
+
+<list bullet loose>
+* Icons to be used for the action and data files.
+
+* An execution string that launches the application.
+
+* Data typing patterns used to recognize application-specific
+datafiles.
+
+* Actions for each application data type
+
+<\list>
+
+<procedure>Location of Database Files
+The ''.dt'' files should reside in the following subdirectory
+structure:
+
+<ex>
+%%App_Root%%/dt/appconfig/types/%%lang%%/%%appname%%.dt
+<\ex>
+
+<procedure>Example
+This is an example of a .dt file:
+
+<ex smaller>
+#  MyApplication.dt
+#  Action and DataType definitions 
+
+# Action definitions
+
+ACTION MyApplication
+{
+        TYPE            COMMAND
+        WINDOW_TYPE     NO_STDIO
+        EXEC_STRING     myapp
+        SMALL_ICON      myappactn.s
+        LARGE_ICON      myappactn.l
+        DESCRIPTION     This is a description of MyApplication.
+}
+
+ACTION Open
+{
+        ARG_TYPE        MYAPPFILE
+        TYPE            MAP             MyApplication
+}
+
+# Data Type definitions
+
+DATA_ATTRIBUTES MYAPPFILE
+{
+        ACTIONS         Open
+        SMALL_ICON      myappfile.s
+        LARGE_ICON      myappfile.l
+        DESCRIPTION     This is a file that MyApplication might \
+                        use as input.  All files that have an \
+                        extension of .my fit this category.
+}
+
+DATA_CRITERIA MYAPPFILE1
+{
+        DATA_ATTRIBUTES_NAME MYAPPFILE1
+        MODE                 !d
+        NAME_PATTERN         *.my
+}
+<\ex>
+
+<s2 id=AppManagerConfig>The Application Group and Application Manager
+
+The Application Group directory is directory that appears
+in the Application Manager.  It's location is:
+
+<ex>
+%%App_Root%%/dt/appconfig/appmanager/%%lang%%/ApplicationGroup''
+<\ex>
+
+The subdirectory structure can be arbitrarily deep;
+however, it should include the following components:
+
+<lablist>
+
+\!!MyApplication!!\ This is the file that creates the action icon.  
+                    It must be an executable file with the same
+                    name as the action.  Its contents do not
+                    matter (it can be 0 bytes in length), but by
+                     convention it 
+		    should contain a text string saying that it is
+		    the action file for the specified action.
+
+
+\README\	     A file describing your product, called README (must be all caps)
+	
+\!!myappfile1!!, !!myappfile2!! \ Examples and samples.
+
+<\lablist>
+
+
+
+<s2 id=AppSpecificHelpFiles>Files for Application-Specific Help
+
+If an application uses the CDE online help system to present help
+either through the application or in a standalone help volume, the
+help files must be located in:
+
+<ex>
+%%App_Root%%/dt/appconfig/help/%%lang%%
+<\ex>
+
+Help family files are required only if you want to view the help
+volume outside the application.
+
+<s2 id=FileNameRequirements>File Naming Requirements
+
+To maintain consistency, file names must be unique across the
+entire application space of a given session. For example, if a
+session accesses only one file system for its applications,
+application file names must be unique only within that file system.
+If a session accesses multiple application servers, uniqueness is
+assumed across all applications available on those servers.
+
+<s2 id=RunningDtAppIntegrate>Running the dtappintegrate Command
+
+The ''dtappintegrate'' command registers the application
+with the CDE by linking the application configuration files from
+application-specific locations to system locations, updating the
+system's types database, and registering the application's help
+volumes.
+
+
+The ''dtappintegrate''
+script creates symbolic links from ``%%App_Root%%/dt/appconfig/*'' to:
+
+	<list plain tight>
+	* ``/etc/opt/dt/appconfig/types/%%lang%%''
+	* ``/etc/opt/dt/appconfig/icons/%%lang%%''
+	* ``/etc/opt/dt/appconfig/appmanager/%%lang%%''
+	* ``/etc/opt/dt/appconfig/help/%%lang%%''
+	<\list>
+
+       and then registers the application help volumes.
+
+
+
+
+
+
+

@@ -1,0 +1,643 @@
+.de LI
+.\" simulate -mm .LIs by turning them into .TPs
+.TP \\n()Jn
+\\$1
+..
+.de Lc
+.\" version of .LI that emboldens its argument
+.TP \\n()Jn
+\s-1\f3\\$1\f1\s+1
+..
+.TH SdmSession 3 "07/03/96"
+.BH "07/03/96"
+.\" @(#)SdmSession.3	1.16 96/07/03 SMI
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994, 1995, 1996 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994, 1995, 1996 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994, 1995, 1996 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994, 1995, 1996 Novell, Inc.
+.SH NAME
+SdmSession \- Establish session to manage a group of activities
+.SH SYNOPSIS
+.\"
+.SS Includes
+.ft 3
+.nf
+#include <Sdtmail.hh>
+#include <Session.hh>
+.\"
+.SS Creation
+.ft 3
+.nf
+.sp 0.5v
+.ta \w'SdmConnection con.SdmSessionFactory('u
+SdmConnection con.SdmSessionFactory(SdmError& \f2err\fP,
+	SdmSession*& \f2r_session\fP, 
+	const SdmDefs::SessionType \f2st\fP);
+.fi
+.ft 1
+.\"
+.SS Methods
+.ft 3
+.nf
+.sp 0.5v
+.ta \w'SdmErrorCode CancelPendingOperations('u
+SdmErrorCode CancelPendingOperations(SdmError& \f2err\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode GetServiceFunction('u
+SdmErrorCode GetServiceFunction(SdmError& \f2err\fP,
+	SdmServiceFunction*& \f2r_serviceFunc\fP,
+	SdmDefs::ServiceFuncType \f2sft\fP);
+.PP
+.ft 3
+.ta \w'SdmDefs::SessionType GetType('u
+SdmDefs::SessionType  GetType() const;
+.PP
+.ft 3
+.ta \w'SdmErrorCode Parent('u
+SdmErrorCode Parent(SdmError& \f2err\fP,
+	SdmConnection*& \f2r_connection\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode RegisterServiceFunction('u
+SdmErrorCode RegisterServiceFunction(SdmError& \f2err\fP,
+	const SdmServiceFunction& \f2svf\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode SdmMessageStoreFactory('u
+SdmErrorCode SdmMessageStoreFactory(SdmError& \f2err\fP,
+	SdmMessageStore*& \f2r_MessageStore\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode StartUp('u
+SdmErrorCode StartUp(SdmError& \f2err\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode ShutDown('u
+SdmErrorCode ShutDown(SdmError& \f2err\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode UnregisterServiceFunction('u
+SdmErrorCode UnregisterServiceFunction(SdmError& \f2err\fP,
+	SdmDefs::ServiceFuncType \f2sft\fP);
+.PP
+.ft 3
+.ta \w'SdmErrorCode UnregisterServiceFunction('u
+SdmErrorCode UnregisterServiceFunction(SdmError& \f2err\fP,	
+	const SdmServiceFunction& \f2svf\fP);
+.fi
+.ft 1
+.\" end of methods list
+.ta 0.25i 0.50i 0.75i 1.0i 1.25i 1.50i 1.75i 2.0i 2.5i 3.0i
+.SH DESCRIPTION
+.\"
+The SdmSession object encapsulates the concept of "a group of activities between
+a front end application and libSDtMail" as a container. There are two types of sessions
+currently supported: "incoming" and "outgoing". While the different types of
+session objects have different characteristics and address different needs, all
+provide the same interface to a front end application.
+.PP
+The SdmSession object implements a queued multi-threaded processing engine, that
+allows requests on multiple objects to be handled concurrently, providing real
+concurrency among activities under control of the SdmSession object.
+.PP
+See SdmGlossary(3) for a detailed list of general definitions.
+.SS Session Types
+There are two types of sessions that can currently be created: an "incoming"
+session, and an "outgoing" session.
+.PP
+The incoming session is used to create and startup one or more incoming
+SdmMessageStore objects, which are used to access message stores and their
+contents. This type of message store object is only allowed to access message
+stores for the purposes of message and data retrieval, and may not be used to
+access outgoing message stores or message transport services.
+.PP
+The outgoing session is used to create and startup one outgoing SdmMessageStore
+object, which is used to access the outgoing message store, new message creation
+and message transport services. It may not be used to access incoming message
+stores.
+.\"
+.SH CREATION
+A SdmSession object is never created directly by a front end application; its
+constructor is private and cannot be accessed by front end applications. A
+SdmSession object is created by invoking the SdmSessionFactory method of a
+previously created SdmConnection object.
+.PP
+The type of session determines the type of message store supported: an incoming
+session creates an incoming message store object, while an outgoing session
+creates the outgoing message store object. The following code snippet creates an
+incoming session object:
+.PP
+.nf
+	SdmError err;
+	SdmConnection* con;
+	SdmSession* ses;
+
+	con = new SdmConnection(appName);
+	if (con->StartUp(err) != Sdm_EC_Success) {
+		// connection could not be started: handle error
+	}
+	if (con->SdmSessionFactory(err, ses, SdmDefs::ST_InSession) 
+		!= Sdm_EC_Success) {
+		// session could not be created: handle error
+	}
+.fi
+.PP
+Only a single SdmSession object for each type of session can be instantiated for
+the duration of a front end applications use of libSDtMail, which will not allow
+more than one SdmSession object for each type to exist at any one time.
+.PP
+Once instantiated, a SdmSession object is in a "shutdown" state. It must be
+successfully started (via the StartUp method) before any other methods may be
+invoked.
+.PP
+Arguments to the connection SdmSessionFactory(err, r_session, st) method:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Return result code of the SdmSession constructor is returned.
+.LI "\f3r_session\fP (\f3SdmSession *\fP)"
+.br
+A pointer to a SdmSession object; upon successful completion, this
+pointer variable is filled in with a handle to the SdmSession object
+created by this call, which may then be used to manipulate it.
+.LI "\f3st\fP (\f3const SdmDefs::SessionType\fP)"
+.br
+Describes the type of session object to create and return:
+.br
+
+ST_InSession - create an incoming session
+.br
+ST_OutSession - create an outgoing session
+.PP
+.RE
+.nr )J 0
+Return value: 
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SH DESTRUCTION
+This object is destroyed automatically when the connection is shutdown; its
+destructor is private and cannot be accessed by front end applications. No
+attempt should ever be made to destroy a handle to a SdmSession object. 
+.PP
+In general, it is better practice to shut down all sessions before shutting down
+the connection that created them. This allows for some measure of error
+reporting and recovery.
+.PP
+.\"
+.SH CALLBACK HOOKS
+libSDtMail has the ability to generate solicited and unsolicited asynchronous
+responses. A front end application using libSDtMail must include some special code
+to enable this to capability to function. These responses are generated by
+objects created by a session, with the responsible session handling the delivery
+of the responses to a front end application.
+.SS "X Event Driven Applications"
+Front end applications written to run under the X window system that follow the
+X event driven paradigm need to enable libSDtMail to generate events that the X
+event handler can receive and dispatch, allowing a front end application to
+make asynchronous requests and have callback functions invoked ("solicited
+asynchronous event"), or to allow the mail mid end library to notify the
+application when specific events occur ("unsolicited asynchronous event").
+.PP
+To enable this, front end applications that follow the X event driven paradigm
+need to execute the following code once for each SdmSession object created:
+.PP
+.nf
+	SdmError err;
+	XtAppContext appcontext;	// Xt application context for this application
+	SdmSession *ses;			// Session to attach to Xt system
+
+	// Attach session to X event handler
+	SdmXtAttachSession(err, appcontext, ses);
+.fi
+.PP
+The SdmXtAttachSession call causes a link to be established between libSDtMail and
+the X event handler for the application context provided (similar to how
+XtAppAddInput or XtAppAddTimeout are used). Asynchronous events generated by the
+specified session will be sent to the X event handler for the application
+context provided. This link will remain in effect until the session object is
+destroyed.
+.SS "Stand Alone Applications"
+Stand alone front end applications need to go to more effort to allow libSDtMail to
+provide asynchronous callbacks. Two steps are required: enable ("attach") each
+session to provide asynchronous callbacks, and then catch the callbacks and
+cause them to be dispatched ("handled"). The following code is executed once for
+each SdmSession object created:
+.PP
+.nf
+	SdmError err;
+	int pipefd;				// file descriptor to look for READ/INPUT events on
+	void *calldata;			// data to be passed in to SdmHandleSessionEvent
+	SdmSession *ses;		// session to attach
+
+	// Attach session to pipe and call data
+	SdmAttachSession(err, pipefd, calldata, ses);
+.fi
+.PP
+The SdmAttachSession call causes a link to be established between libSDtMail and the
+application; this enables libSDtMail to queue up events for the application. The
+`pipefd' value is an open file descriptor that will have input events available
+whenever libSDtMail has queued up asynchronous events for the application. The
+`calldata' value is data which is ignored by the application except that it must
+be provided in a later call to libSDtMail.
+.PP
+The application must notice whenever an input event is pending on the `pipefd'
+file descriptor - this is typically done via the `poll' system call. When an
+input event is pending, the application must issue this call:
+.PP
+.nf
+	SdmHandleSessionEvent(calldata, &pipefd, id); 
+.fi
+.PP
+This causes all events queued up by libSDtMail to be processed.
+.PP
+.SH METHODS
+A few methods are provided by the SdmSession object; the primary methods allow
+the creation of message store objects. Secondary methods allow cancelling of
+outstanding operations on objects created by the session, and control of
+unsolicited asynchronous events. They are detailed below.
+.SS \f3CancelPendingOperations\fP
+(\f3err\fP)
+.PP
+This method causes all outstanding operations on this session to be
+cancelled. All pending operations on all message stores are cancelled; any
+asynchronous requests that are outstanding at the time this call is made are
+terminated, causing them to return a specific "operation cancelled" response to
+their appropriate service function callbacks.
+.PP
+Typically this method is invoked in response to the user activating some UI
+element in response to either a non-responding situation, or a situation in
+which the wrong information was requested. For example, the user presses "next"
+and the system fails to response ("hangs") because the network is down or the
+server is not responding, so instead of waiting for the situation to correct
+itself, the user hits the "stop" button instead.
+.PP
+There are CancelPendingOperations methods on the SdmConnection, SdmSession and
+SdmMessageStore objects. Invoking CancelPendingOperations on a SdmMessageStore
+object cancels operations on that message store alone. Invoking
+CancelPendingOperations on a SdmSession object cancels all operations on all
+message stores created by that session. Invoking CancelPendingOperations on a
+SdmConnection object cancels operations on all sessions created by that
+connection, and by inference cancels all operations on all message stores
+created by all sessions.
+.PP
+The choice of which object to invoke CancelPendingOperations on is strictly a
+user interface reaction issue. If the "stop UI element" is global to the
+application, then the connection method should be invoked. If it is local to a
+particular message store, then the message store method should be invoked.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Return result code of the CancelPendingOperations method.
+.PP
+.RE
+.nr )J 0
+Return value: 
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetServiceFunction\fP
+(\f3err\fP, \f3r_serviceFunc\fP, \f3sft\fP)
+.PP
+Return the service function registered for a particular type of service.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Error container, used to store return result code.
+.LI "\f3r_serviceFunc\fP (\f3SdmServiceFunction*&\fP)"
+.br
+A pointer to a SdmServiceFunction object; upon successful completion, this
+pointer variable is filled in with a handle to a SdmServiceFunction object that
+identifies the service function registered for the specified type of service.
+.LI "\f3sft\fP (\f3SdmDefs::ServiceFuncType\fP)"
+.br
+The type of service to return a service function handle on.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.br
+
+If a service function of the specified type is not registered, a
+"Sdm_EC_ServiceFunctionNotRegistered" error is returned.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3GetType\fP
+(\f3\fP)
+.PP
+Return the the type of this session.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "none."
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmDefs::SessionType)\fP"
+.br
+Returns the type of this session object.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3Parent\fP
+(\f3err\fP, \f3r_connection\fP)
+.PP
+Provide a handle to the parent connection that created this
+session. Used to access methods of the parent of this session.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Return result code of the Parent method.
+.LI "\f3r_connection\fP (\f3SdmConnection*&\fP)"
+.br
+A pointer to a SdmConnection object; upon successful completion, this
+pointer variable is filled in with a handle to the SdmConnection
+object that created this session, which may then be used to manipulate
+it.
+.PP
+.RE
+.nr )J 0
+Return value: 
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3RegisterServiceFunction\fP
+(\f3err\fP, \f3svf\fP)
+.PP
+Provide the session with a function that performs a well known service that
+the session end may call when such a service is required. Any objects created
+by the session inherit all service functions registered with it at the time
+of creation.
+.PP
+Service functions can be registered with connections, sessions and message
+stores. You would register a service function with the session if that service
+function were prepared to handle all service requests for all sessions. Finer
+granularity can be had by registering the service function with a lower level
+object (such as a session or message store).
+.PP
+For example, you might want to register a "debugging output available service
+function" with the session, whereas you might want to register a "new mail is
+available service function" with each message store that is open.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Return result code of the RegisterServiceFunction method.
+.LI "\f3svf\fP (\f3const SdmServiceFunction&\fP)"
+.br
+The service function to be registered with the session.
+.PP
+.RE
+.nr )J 0
+Return value: 
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.br
+ 
+If a service function of the specified type is registered, a
+"Sdm_EC_ServiceFunctionAlreadyRegistered" error is returned.
+
+If the type of the service function is SVF_LastInteractiveEvent,
+SVF_EnableGroupPrivilege, or SVF_DisableGropuPrivilege,
+a "Sdm_EC_InvalidServiceFunction" error
+is returned because these service functions may only be registered
+with the connection object.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3SdmMessageStoreFactory\fP
+(\f3err\fP, \f3r_MessageStore\fP)
+.PP
+Return a handle to a SdmMessageStore object, which allows a front end
+application to open and manipulate incoming message stores.
+.PP
+The type of SdmMessageStore object created depends on the type of session: an
+incoming session creates an incoming message store, and an outgoing session
+creates the outgoing message store.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Return result code of the SdmMessageStoreFactory method.
+.LI "\f3r_MessageStore\fP (\f3SdmMessageStore*&\fP)"
+.br
+A pointer to a SdmMessageStore object; upon successful completion, this pointer
+variable is filled in with a handle to the SdmMessageStore object, which may
+then be used to manipulate it.
+.PP
+.RE
+.nr )J 0
+Return value: 
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3StartUp\fP
+(\f3err\fP)
+.PP
+Initialize the session and make it ready for operation. This is the first method
+that should be invoked after the SdmSession object is created. After a
+SdmSession object is created, all methods except StartUp will return an error
+until after Startup is called.
+.PP
+This method causes the session to create the threads and queues necessary to
+support concurrent access of objects that the session may create (such as
+message stores, message transports, etc.) Additional threads and queues are
+added as necessary to support objects as the session is asked to create
+them. Upon successful startup, the session is ready to create objects and route
+requests between a front end application and the objects created.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Return result code of the StartUp method.
+.PP
+.RE
+.nr )J 0
+Return value: 
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3ShutDown\fP
+(\f3err\fP)
+.PP
+Shutdown all activities that may be in progress, and terminate and close all
+message stores and other objects that have been created by the session. This
+method causes all outstanding operations on this session to be cancelled.
+.PP
+This is typically the last method that is invoked immediately before the
+SdmSession object is destroyed, usually done right before a front end
+application exits. All message store and other objects created by this session
+are shutdown and destroyed. Upon successful shutdown, the SdmSession object is
+in a state identical to that when it was first created before the StartUp method
+was called.
+.PP
+In general, it is better to shutdown all objects starting with the lowest and
+working up the creation hierarchy (such as message stores first, then sessions,
+then the connection). This allows some type of error recovery or reporting to
+be done should the shutdown fail to succeed.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Return result code of the ShutDown method.
+.PP
+.RE
+.nr )J 0
+Return value: 
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3UnregisterServiceFunction\fP
+(\f3err\fP, \f3sft\fP)
+.PP
+Unregister a specific type service function that was previously registered with
+the session via the RegisterServiceFunction method.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Return result code of the UnregisterServiceFunction method.
+.LI "\f3sft\fP (\f3SdmDefs::ServiceFunctionType\fP)"
+.br
+The type of service function to be unregistered, as defined in Sdtmail.hh.
+.PP
+.RE
+.nr )J 0
+Return value: 
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.br
+ 
+If a service function of the specified type is not registered, a
+"Sdm_EC_ServiceFunctionNotRegistered" error is returned.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3UnregisterServiceFunction\fP
+(\f3err\fP, \f3svf\fP)
+.PP
+Unregister a specific service function that was previously registered with the
+session via the RegisterServiceFunction method.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3err\fP (\f3SdmError&\fP)"
+.br
+Return result code of the UnregisterServiceFunction method.
+.LI "\f3svf\fP (\f3const SdmServiceFunction&\fP)"
+.br
+The specific service function to be unregistered.
+.PP
+.RE
+.nr )J 0
+Return value: 
+.RS 3
+.nr )J 7
+.LI "\f3(SdmErrorCode)\fP"
+.br
+Value of return result code stored in err argument.
+.br
+ 
+If a service function of the specified type is not registered, a
+"Sdm_EC_ServiceFunctionNotRegistered" error is returned.
+.PP
+.RE
+.nr )J 0
+.SH "SEE ALSO"
+.na
+.BR SdmConnection (3),
+.BR SdmError (3),
+.BR SdmGlossary (3),
+.BR SdmIntro (3),
+.BR SdmMessageStore (3),
+.BR SdmServiceFunction (3)

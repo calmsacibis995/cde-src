@@ -1,0 +1,127 @@
+.TH Mail 4 "1 March 1996" "ToolTalk 1.3" "Desktop Services Message Sets"
+.de Lc
+.\" version of .LI that emboldens its argument
+.TP \\n()Jn
+\s-1\f3\\$1\f1\s+1
+..
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.BH "1 March 1996" 
+.IX "Mail.4" "" "Mail.4" "" 
+.SH NAME
+Mail \- compose or mail a document
+.SH SYNOPSIS
+.ft 3
+.nf
+.ta \w'[\f2file\fP] Mail('u
+[\f2file\fP] Mail(in \f2mediaType contents\fP);
+.sp 0.5v
+[\f2file\fP] Mail([out\|\(bv\|inout] \f2mediaType contents\fP
+	[in title \f2docName\fP]);
+.PP
+.fi
+.SH DESCRIPTION
+The
+.I Mail
+request causes the handler to route a document to a destination using the
+mail message handling system.
+The handler is responsible for finding routing information in the document.
+.PP
+When the
+.I contents
+argument is of mode
+.BR in ,
+the handler must deliver the document as is,
+without interacting with the user.
+.PP
+When the
+.I contents
+argument is of mode
+.B inout
+or
+.BR out ,
+the handler must allow the user to compose or edit the document
+(and any embedded routing information)
+before it is delivered.
+If the handling tool supports some form of intermediate ``save''
+operation, it must send a
+.I Deposit
+request back to the tool that initiated the
+.I Mail
+request.
+.PP
+The
+.I contents
+argument
+is the contents of the document.
+If this argument is unset
+(in other words, has a value of
+.BR (char\ *)0 ) ,
+then the contents of the document are in
+the file named in the message's
+.I file
+attribute.
+The data type
+.RI ( mediaType )
+of the
+.I contents
+argument should be
+.BR string ,
+unless nulls are valid in the given media type,
+in which case the data type must be
+.BR bytes .
+.PP
+The
+.I docName
+argument contains the name of the document.
+If the
+.I docName
+argument is absent and the
+.I file
+attribute is set,
+the file name is considered to be the title of the document.
+This string would be suitable for display in a window title bar, for example.
+.SH "APPLICATION USAGE"
+The
+.BR ttmedia_ptype_declare (3)
+function can be used to register for,
+and help process, this message.
+.PP
+This message can be sent with the
+.BR ttmedia_load (3)
+function.
+.SH ERRORS
+The ToolTalk service may return one of the following errors
+in processing the
+.I Mail
+request:
+.PP
+.RS 3
+.nr )J 6
+.Lc TT_DESKTOP_ENOENT
+.br
+The file that was alleged to contain the document does not exist.
+.Lc TT_DESKTOP_ENODATA
+.br
+The in-mode
+.I contents
+argument had no value and the
+.I file
+attribute
+of the message was not set.
+.Lc TT_MEDIA_ERR_FORMAT
+.br
+The document is not a valid instance of the media type.
+.PP
+.RE
+.nr )J 0
+.SH "SEE ALSO"
+.na
+.BR ttmedia_ptype_declare (3),
+.BR ttmedia_load (3);
+.IR Intro ,
+.I Edit
+requests.

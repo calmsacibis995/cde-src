@@ -1,0 +1,458 @@
+.de LI
+.\" simulate -mm .LIs by turning them into .TPs
+.TP \\n()Jn
+\\$1
+..
+.TH ttsession 1 "1 March 1996" "ToolTalk 1.3" "ToolTalk Commands"
+.BH "1 March 1996"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.IX "ttsession.1" "" "ttsession.1" "" 
+.SH NAME
+ttsession \- the ToolTalk message server
+.SH SYNOPSIS
+.ft 3
+.fi
+.na
+ttsession
+[\(mihNpsStv]
+[\(miE\|\(bv\|\(miX]
+[\(mia\ \f2level\fP]
+[\(mid\ \f2display\fP]
+[\(mic\ [\f2command\fP]]
+.PP
+.fi
+.SH DESCRIPTION
+The
+.BR ttsession 
+utility
+is the ToolTalk message server.
+This background process must be running
+before any messages can be sent or received.
+Each message server defines a
+.IR session .
+.PP
+The message server has no user interface and typically runs in the
+background, started either by the user's
+.B \&.xinitrc
+file or automatically
+by any program that needs to send or receive a message.
+.SH OPTIONS
+The following options are available:
+.PP
+.RS 3
+.nr )J 6
+.LI \f3\(mia\0\f2level\f1
+.br
+Set the server authentication level.
+The following
+.I level
+string values are supported:
+.PP
+.RS 9
+.nr )J 8
+.LI \f3unix\fP
+The sender and receiver must have the same user ID.
+.LI \f3des\fP
+The underlying RPC calls use
+.BR \s-1AUTH_DES\s+1 .
+.LI \f3gss\fP
+The underlying RPC calls use 
+.BR \s-1RPCSEC_GSS\s+1 .
+.LI \0
+For \f3gss\f1, additional options may be specified after an
+immediately following comma in a comma separated (without
+spaces) list of suboptions and keyword-attribute pairs:
+.RE
+.PP
+.RS 12
+.nr )J 10
+.LI \0
+\f3protect\f1={\f2access\f1,\f2integrity\f1,\f2privacy\f1}
+.br
+Specify the GSS service type. If no service type is specified,
+\f3protect\f1=\f2access\f1 is assumed.
+.RE
+.PP
+.RS 15
+.nr )J 12
+.LI \0
+\f3protect\f1=\f2access\f1
+.br
+means the GSS mechanism is used to verify that clients have the credentials of the user that started \f3ttsession\f1.
+.LI \0
+\f3protect\f1=\f2integrity\f1
+.br
+means the GSS mechanism is used to verify integrity of the data transmitted between \f3ttsession\f1 and its clients. \f3protect\f1=\f2integrity\f1 implies
+\f3protect\f1=\f2access\f1
+.LI \0
+\f3protect\f1=\f2privacy\f1
+.br
+means the Gss mechanism is used to provide privacy against the data transmitted between \f3ttsession\f1 and its clients. \f3protect\f1=\f2integrity\f1 implies
+\f3protect\f1=\f2access\f1.
+.RE
+.PP
+.RS 12
+.nr )J 10
+.LI \0
+\f3mechanism\f1=<\f2mechanism name\f1>
+.br
+Use the \f2named security mechanism\f1. If no mechanism is specifierd, \f3ttsession\f1 wil arbitrarily choose one of the installed mechanisms
+.bp
+.LI \0
+\f3qop\f1=<\f2quality of protection\f1>
+.br
+Use the named \f2quality of protection\f1. If the quality of protection is not
+specified, the default for the mechanism is used.
+.PP
+.RE
+.RS 3
+.nr )J 6
+.LI \0
+\f3EXAMPLE\f1
+.PP
+.LI \0
+To specify
+.I GSS 
+authentication using the
+.I kerberos_v5 
+mechanism and the
+.I GSS_KRB5_CONF_C_QOP_DES 
+quality of protection, start \f3ttsession\f1 as:
+.PP
+.nf
+.ft CW
+.ps -1
+      ttsession -a gss,mechanism=kerberos_v5,qop=GSS_KRB5_CONF_C_QOP_DES
+.fi
+.ps
+.PP
+.LI \0
+This assumes that the
+.I kerberos_v5
+mechanism is installed.
+.PP
+.LI \0
+Security options can be overridden on a systemwide basis via the file
+/etc/default/ttsession (ttsession_file(4)).
+.PP 
+.LI \f3\(mic\0[\f2command\f3]\f1
+.br
+Start a process tree session and run the given command.
+The
+.BR ttsession 
+utility sets the environment variable
+.I TT_SESSION
+to the name of this session.
+Any process started with this variable in the environment
+defaults to being in this session.
+If
+.I command
+is omitted,
+.BR ttsession 
+invokes the shell named by the
+.I SHELL
+environment variable.
+Everything after
+.B \(mic
+on the command line is used as the command to be executed.
+.LI \f3\(mid\0\f2display\f1
+.br
+Specify an X Windows display.
+The ToolTalk session will consist of those applications
+displaying on the named display.
+The default display is identified by the
+.I DISPLAY
+environment variable.
+.LI \f3\(miE\fP
+Read in the types from the Classing Engine database.
+If neither
+.B \(miE
+nor
+.B \(miX
+is given,
+.B \(miX
+is assumed.
+.LI \f3\(mih\fP
+Write a help message to standard error that
+describes the command syntax of
+.BR ttsession ,
+and exit.
+.LI \f3\(miN\fP
+Maximize the number of clients allowed to connect to (in other words, open
+procids in) this session by attempting to raise the limit of
+open file descriptors.
+The precise number of clients is system-dependent;
+on some systems this option may have no effect.
+On Solaris 2.6 and later,
+.BR ttsession
+always maximizes the number of clients,
+so there is no need to specify this option.
+.LI \f3\(mio\0\f2allow_unauth_types_load=<yes|no>\f1
+By default calls to tt_session_types_load(3) in the ToolTalk API will
+fail with TT_ERR_ACCESS.  The system wide default in this regard  may
+be changed via ttsession_file(4). The behavior for a particular ttsession
+may be changed via this option, if and only if the ttsession_file(4) has
+not "locked" per-ttsession changes to this option.
+.LI \f3\-p\fP
+Write the name of a new process tree session to standard output, and then
+fork a background instance of
+.BR ttsession 
+to manage this new session.
+.LI \f3\(mis\fP
+Silent.
+Do not write any warning messages to standard error.
+.LI \f3\(miS\fP
+Do not fork a background instance to manage the
+.BR ttsession 
+session.
+.LI \f3\(mit\fP
+Turn on trace mode.
+See
+.B "ASYNCHRONOUS EVENTS"
+for how to turn tracing on and off during execution.
+Tracing displays the state of a message when it is first seen by
+.BR ttsession .
+The lifetime of the message is then shown by showing the result of
+matching the message against type signatures (dispatch stage) and then
+showing the result of matching the message against any registered
+message patterns (delivery stage).
+Any attempt to send the message to
+a given process is also shown together with the success of that attempt.
+.LI \f3\(miv\fP
+Write the version number to standard output and exit.
+.LI \f3\(miX\fP
+Read in the types from the XDR format databases.  (Default)
+.PP
+.RE
+.nr )J 0
+.SH OPERANDS
+None.
+.SH STDIN
+Not used.
+.SH "INPUT FILES"
+The XDR format databases listed by the
+.B \(miX
+option are serialized ToolTalk data structures of
+an unspecified format, except that it is the same
+as the format of
+.BR tt_type_comp (1)
+output files.
+.PP
+The file /etc/default/ttsession (ttsession_file(4)) can be used to change the system-wide behavior
+of the ttsession process depending on the contents of the file.
+.SH "ENVIRONMENT VARIABLES"
+The following environment variables affect the execution of
+.BR ttsession :
+.PP
+.RS 3
+.nr )J 15
+.LI \f2CEPATH\fP
+In Classing Engine mode, this variable tells the Classing Engine
+where to find the databases that contain ToolTalk types.
+See
+.BR ce_db_build (1).
+.LI \f2DISPLAY\fP
+If
+.I TT_SESSION
+is not set and
+.I DISPLAY
+is set, then the value of
+.I DISPLAY
+will be used by all ToolTalk clients to identify the
+.BR ttsession 
+process serving their X display.
+If no such process is running, the ToolTalk
+service will auto-start one.
+.LI \0
+If
+.BR ttsession 
+is run with the
+.B \(mid
+option and
+.I DISPLAY
+is not set,
+.BR ttsession 
+sets
+.I DISPLAY
+to be the value of the
+.B \(mid
+option for itself and all processes it forks.
+This helps ToolTalk clients to find the right X display when
+they are auto-started by
+.BR ttsession .
+.LI \f2LANG\fP
+Provide a default value for the internationalization variables
+that are unset or null.
+If
+.I LANG
+is unset or null, the corresponding value from the
+implementation-specific default locale will be used.
+If any of the internationalization variables contains an invalid setting, the
+utility behaves as if none of the variables had been defined.
+.LI \f2LC_ALL\fP
+If set to a non-empty string value,
+override the values of all the other internationalization variables.
+.LI \f2LC_MESSAGES\fP
+Determine the locale that is used to affect
+the format and contents of diagnostic
+messages written to standard error
+and informative messages written to standard output.
+.LI \f2NLSPATH\fP
+Determine the location of message catalogues
+for the processing of
+.IR LC_MESSAGES .
+.LI \f2TT_ARG_TRACE_WIDTH\fP
+.br
+Specify the number of bytes of argument and context values to write when
+in trace mode.
+The default is to print the first 40 bytes.
+.LI \f2TTPATH\fP
+In XDR mode, a
+colon-separated list of directories that tells ToolTalk
+where to find the ToolTalk types databases. See
+.BR tt_type_comp (1).
+.LI \f2TTSESSION_CMD\fP
+.br
+Specify the shell command to be used by all ToolTalk clients
+for auto-starting
+.BR ttsession .
+.PP
+.RE
+.nr )J 0
+.PP
+The
+.BR ttsession 
+utility creates the following variable when it invokes another process:
+.PP
+.RS 3
+.nr )J 15
+.LI \f2TT_FILE\fP
+When
+.BR ttsession 
+invokes a tool to receive a message, it copies the file attribute
+(if any) of the message into this variable, formatted in the same
+manner as returned by the
+.BR tt_message_file (3)
+function.
+.LI \f2TT_SESSION\fP
+The
+.BR ttsession 
+utility uses this variable to communicate its session ID to the tools that
+it starts.
+The format of the variable is implementation specific.
+If this variable is set, the ToolTalk client library uses its
+value as the default session ID.
+.LI \f2TT_TOKEN\fP
+Inform the ToolTalk client library that it has been invoked by
+.BR ttsession ,
+so that the client can confirm to
+.BR ttsession 
+that it started successfully.
+The format of the variable is implementation specific.
+.PP
+.RE
+.nr )J 0
+.PP
+A tool started by
+.BR ttsession 
+must ensure that the
+.I TT_SESSION
+and
+.I TT_TOKEN
+are present in the environment of any processes it invokes.
+.SH "RESOURCES"
+None.
+.SH "ASYNCHRONOUS EVENTS"
+The
+.BR ttsession 
+utility reacts to two signals.
+If it receives the
+.BR \s-1SIGUSR1\s+1
+signal, it toggles trace mode on or off (see the
+.B \(mit
+option).
+If it receives the
+.BR \s-1SIGUSR2\s+1
+signal, it rereads the types file.
+The
+.BR ttsession 
+utility takes the standard action for all other signals.
+.SH STDOUT
+When the
+.B \(miv
+option is used,
+.BR ttsession 
+writes the version number in an unspecified format.
+When
+.B \(mip
+is used,
+.BR ttsession 
+writes the name of a new process tree session.
+.SH STDERR
+Used only for diagnostic messages and the help message written by the
+.B \(mih
+option.
+.SH "OUTPUT FILES"
+None.
+.SH "EXTENDED DESCRIPTION"
+None.
+.SH "EXIT STATUS"
+When the
+.B \(mic
+child process exits,
+.BR ttsession 
+exits with the status of the exited child.
+Otherwise, the following exit values are returned:
+.PP
+.RS 3
+.nr )J 4
+.LI 0
+Normal termination.
+Without the
+.B \(mic
+or
+.B \(miS
+options, a zero exit status means
+.BR ttsession 
+has successfully forked an instance of itself that has begun
+serving the session.
+.LI 1
+Abnormal termination.
+The
+.BR ttsession 
+utility was given invalid command line options, was interrupted by
+.BR \s-1SIGINT\s+1 ,
+or encountered some internal error.
+.LI 2
+Collision.
+Another
+.BR ttsession 
+was found to be serving the session already.
+.PP
+.RE
+.nr )J 0
+.SH "CONSEQUENCES OF ERRORS"
+The
+.BR ttsession 
+utility takes the standard action for all signals.
+.SH "APPLICATION USAGE"
+Since everything after
+.B \(mic
+on the command line is used as the command to be executed,
+.B \(mic
+should be the last option.
+.PP
+Tracing is helpful for seeing how messages are
+dispatched and delivered, but the output may be voluminous.
+.SH EXAMPLES
+None.
+.SH "SEE ALSO"
+.na
+.BR tt_type_comp (1),
+.BR tttrace (1),
+.BR tt_message_file (3),
+.BR ttsession_file (4).

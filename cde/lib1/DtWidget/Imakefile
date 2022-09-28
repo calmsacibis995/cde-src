@@ -1,0 +1,206 @@
+MODULE=DtWidget
+
+#ifndef DoNormalLib
+#define DoNormalLib NormalLibDtWidget
+#endif
+#ifndef DoSharedLib
+#define DoSharedLib SharedLibDtWidget
+#endif
+
+#include <Library.tmpl>
+
+/* General case INCLUDES DEFINES
+ * Each individual architecture may have more or less of the above.
+ * Use EXTRA_DEFINES and EXTRA_INCLUDES to add defines and includes
+ * to an individual architecture.
+ */
+
+DEFINES = -DXK_MISCELLANY -DMULTIBYTE -DI18N_MSG -DNON_OSF_FIX -DUSE_SDTSPELL
+INCLUDES =  -I. -I$(LIBSRC) -I$(XMSRC)
+
+/* The NON_OSF_FIX symbol allows libDtWidget to stay in sync with
+ * changes in libXm.
+ */
+
+#ifdef SCOArchitecture
+EXTRA_DEFINES = -DMESSAGE_CAT -DMULTIBYTE
+#endif
+
+#ifdef HPArchitecture
+EXTRA_DEFINES = -DMESSAGE_CAT -DMULTIBYTE
+EXTRA_CCOPTIONS = $(ESLIT_OPTION) /* set in hp.cf */
+#endif
+
+#if defined(RsArchitecture) 
+#  if SharedLibDtWidget
+REQUIREDLIBS =  $(XMLIB) $(XTOOLLIB) $(XLIB) $(DTSVCLIB)
+#  endif
+#  endif
+
+#if defined(ApolloArchitecture) 
+EXTRA_DEFINES = -D_MESSAGE_CAT
+EXTRA_INCLUDES = -I/bsd4.3/usr/include -I/sys5/usr/include
+#endif
+
+#if defined(HPOSFArchitecture) 
+#endif
+
+#ifdef SunArchitecture
+EXTRA_DEFINES=-DNO_REGCOMP -D_SUN_OS -D_TS_ERRNO -DSUN_CDE_PERF
+/* override $LD by the appropriate compiler */
+#if defined(REORDER_PROFILED)
+C++ = CC -pg $(BBAFLAGS)
+CC = cc -xpg $(BBAFLAGS)
+/* commented out this line for quick versioning fix: LD = cc */
+REQUIREDLIBS = $(ALL_LIBPATH) $(I18NSYSLIB) $(DTSVCLIB) $(XMLIB) $(XTOOLLIB) $(XLIB) -lc $(WIDECHARSYSLIB) -L/usr/dt/lib -lmcount -ldl
+#else
+EXTRA_CCOPTIONS = -Xc -dalign
+/* commented out this line for quick versioning fix: LD=$(CC) */
+REQUIREDLIBS = $(ALL_LIBPATH) $(DTSVCLIB) $(XMLIB) $(XTOOLLIB) $(XLIB) -lc $(WIDECHARSYSLIB) -ldl
+#endif
+
+Control.o EditAreaData.o EditMenu.o := EXTRA_CCOPTIONS = -Xa -dalign
+#endif
+
+#ifdef USLArchitecture
+EXTRA_DEFINES=-DNO_REGCOMP -DNEED_STRCASECMP
+#endif
+
+INSTALLFLAGS = $(INSTINCFLAGS)
+
+LINTLIBS = $(LINTXLIB) $(LINTXTOOL) $(LINTXM) 
+
+HEADERS1 = \
+	Icon.h \
+	IconP.h \
+	DtStrDefs.h \
+	SpinBox.h \
+	SpinBoxP.h \
+	ComboBox.h \
+	ComboBoxP.h \
+	MenuButtonP.h \
+	MenuButton.h
+
+HEADERS2 = \
+	DialogBox.h \
+	DialogBoxP.h \
+	DtMsgsP.h \
+	MacrosP.h \
+	Control.h \
+	ControlP.h \
+	View.h \
+	ViewP.h \
+	TitleBox.h \
+	TitleBoxP.h \
+	EditorP.h \
+	Editor.h
+
+
+SRCS1 = \
+	Icon.c \
+	DtStrDefs.c \
+	SpinBox.c \
+	ComboBox.c \
+	MenuButton.c
+
+SRCS2 = \
+	DialogBox.c \
+	DtMsgs.c \
+	TitleBox.c \
+	Shadow.c \
+	NewCvt.c \
+	Control.c \
+	View.c \
+	SearchCalls.c \
+	SearchDlg.c \
+	EditAreaData.c \
+	EditCalls.c \
+	EditMenu.c \
+	Editor.c
+
+OBJS1 = \
+	Icon.o \
+	DtStrDefs.o \
+	SpinBox.o \
+	ComboBox.o \
+	MenuButton.o
+
+OBJS2 = \
+	DialogBox.o \
+	DtMsgs.o \
+	TitleBox.o \
+	Shadow.o \
+	NewCvt.o \
+	Control.o \
+	View.o \
+	SearchCalls.o \
+	SearchDlg.o \
+	EditAreaData.o \
+	EditCalls.o \
+	EditMenu.o \
+	Editor.o 
+
+
+OBJS = $(OBJS1) $(OBJS2)
+SRCS = $(SRCS1) $(SRCS2)
+HEADERS= $(HEADERS1) $(HEADERS2)
+
+
+all::
+
+/* For install of developer's build environment */
+LOCAL_BINSTALL_LIBDEST = lib
+LOCAL_BINSTALL_INCLUDEDEST = include/Dt
+
+LibraryObjectRule()
+#if DoSharedLib
+#if DoNormalLib
+SharedLibraryTarget(DtWidget,$(SODTWIDGETREV),$(OBJS),shared,..)
+#else
+SharedLibraryTarget(DtWidget,$(SODTWIDGETREV),$(OBJS),.,.)
+#endif
+SharedLibraryBuildInstall(DtWidget,$(SODTWIDGETREV),$(LOCAL_BINSTALL_LIBDEST))
+InstallSharedLibrary(DtWidget,$(SODTWIDGETREV),$(USRLIBDIR))
+#endif
+#if DoNormalLib
+NormalLibraryTarget(DtWidget,$(OBJS))
+NormalLibraryBuildInstall(DtWidget,$(LOCAL_BINSTALL_LIBDEST))
+InstallLibrary(DtWidget,$(USRLIBDIR))
+#endif
+
+/* MS Compiler bug, remove when we go to USL compiler */
+#ifdef SCOArchitecture
+SpecialFlagsObjectRule(Clock, -Olegtc)
+#endif
+
+LintLibraryTarget(DtWidget,$(SRCS))
+
+MakeDirectories(install,$(INCDIR)/Dt)
+
+InstallLintLibrary(DtWidget,$(LINTLIBDIR))
+InstallMultiple($(HEADERS),$(USRINCDIR)/Dt)
+
+/********* INCLUDES ***********************************************
+ * The headers that are exported are built from the following
+ * BuildIncludes - provides export to $(TOP)/X11.
+ * BuildMultipleInstall - provides export to $(TOP)/binstall/include
+ *                        and build install packages.
+ * BuildLocalIncludes - This rule creates directories
+ *   for local includes via make includes or make localincludes
+ *   This enables users to use local -I paths to find local includes.
+ */
+BuildIncludes($(HEADERS),$(DTINCLUDEDEST),../..)
+BuildMultipleInstall($(HEADERS),$(LOCAL_BINSTALL_INCLUDEDEST))
+/* link headers to local Dt directory */
+BuildLocalIncludes($(HEADERS),Dt,..)
+
+DependTarget()
+
+MakeDirectories(install,$(INCDIR)/Dt)
+
+InstallLibrary(DtWidget,$(USRLIBDIR))
+InstallLintLibrary(DtWidget,$(LINTLIBDIR))
+InstallMultiple($(HEADERS),$(USRINCDIR)/Dt)
+
+LOCAL_CPP_DEFINES = -DCDE_INSTALLATION_TOP=$(CDE_INSTALLATION_TOP)
+CppTextRule(UNIXbindings,UNIXbindings.src,$(LOCAL_CPP_DEFINES),)

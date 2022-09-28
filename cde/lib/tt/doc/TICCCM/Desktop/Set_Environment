@@ -1,0 +1,70 @@
+.TH Set_Environment Desktop "05 Apr 1994" "SunSoft" "ToolTalk Policy"
+.SH NAME
+.PP
+Set_Environment, Get_Environment - set/get a tool's environment
+.SH SYNOPSIS
+.so ../.synopsis
+	Set_Environment(	in	string	\fIvariable\f(CW,	
+		in	string	\fIvalue\f(CW	
+		[...] );	
+	Get_Environment(	in	string	\fIvariable\f(CW,	
+		out	string	\fIvalue\f(CW	
+		[...] );
+.ft
+.fi
+.SH DESCRIPTION
+.PP
+Replace or report the value of the indicated environment variable(s).
+.SH REQUIRED ARGUMENTS
+.TP
+\f(CWstring\fR \fIvariable\fR
+The name of the environment variable to set/get.
+.TP
+\f(CWstring\fR \fIvalue\fR
+The value of the environment variable.
+.IP
+For \f(CWSet_Environment()\fR, if this argument is unset (i.e., has a
+value of \f(CW(char *)0\fR), then the
+variable should be removed from the environment.  It is not
+an error for the variable not to have existed in the first
+place.
+.IP
+For \f(CWGet_Environment()\fR, if no value -- i.e., \f(CW(char *)0\fR --
+is returned for this
+argument, then the variable was not present in the
+handler's environment.  This condition is not an error.
+.IP
+For \f(CWGet_Environment()\fR, if an empty string -- i.e., "" --
+is returned for this argument, then the variable was present in the
+handler's environment but had no value.
+.SH OPTIONAL ARGUMENTS
+.PP
+.PD 0
+.HP 8
+\f(CWstring\fR \fIvariable\fR
+.TP
+\f(CWstring\fR \fIvalue\fR
+.PD
+Extra pairs of these arguments may be included.
+.SH EXAMPLES
+.PP
+.BR ttdt_session_join ()
+can be used to register for and transparently process these messages.
+.PP
+These messages can be sent like so:
+.nf
+.ft CW
+.ps -2
+Tt_message msg = tttk_message_create( 0, TT_REQUEST, TT_SESSION,
+			the_recipient_procid, TTDT_SET_ENVIRONMENT,
+			my_callback );
+tt_message_arg_add( msg, TT_IN, Tttk_string, "PATH" );
+tt_message_arg_add( msg, TT_IN, Tttk_string, "/bin:/usr/ucb" );
+tt_message_send( msg );
+.ps
+.ft
+.fi
+.SH WARNINGS
+.PP
+\f(CWSet_Environment()\fR
+.so .edict

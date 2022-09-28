@@ -1,0 +1,603 @@
+'\" t
+.de LI
+.\" simulate -mm .LIs by turning them into .TPs
+.TP \\n()Jn
+\\$1
+..
+.\"--- 
+.\"     (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\"     (c) Copyright 1993, 1994 International Business Machines Corp.
+.\"     (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\"     (c) Copyright 1993, 1994 Novell, Inc.
+.\"--- 
+.TH dtstyle 1X "17 Feb. 1994"
+.BH "17 Feb. 1994""
+.SH NAME
+dtstyle - the CDE Style Manager
+.SH SYNOPSIS
+.sp .5
+.SS dtstyle
+NOTE: There are no style manager specific options that can be
+specified in the command line.
+.SH DESCRIPTION
+Dtstyle provides interactive customization of visual elements and
+system behavior for the desktop through the style manager.
+.P
+This component consists of the UI and supporting code that allows the
+end user to interactively customize most of the visual elements and
+system behavior for the CDE. This component also helps define some
+resource utilization conventions. The style manager's main window
+which consists of an iconic interface is invoked from the Front Panel.
+The style manager window contains icons representing customization in
+several areas.
+.sp .5
+.SS Key Supported Tasks
+.IP "\f3Colors\fP" 1..5i
+Sets the color palette that is used for window colors in the 
+workspace.
+.IP "\f3Fonts\fP" 1.5i
+Sets the application font sizes as applications are started.
+.IP "\f3Backdrop\fP" 1.5i
+Sets the backdrops for workspaces.
+.IP "\f3Keyboard\fP" 1.5i
+Sets the keyboard's key click volume and character repeat 
+capability.
+.IP "\f3Mouse\fP" 1.5i
+Sets the mouse button click settings, double-click speed, 
+pointer acceleration and pointer movement threshold. 
+.IP "\f3Audio\fP" 1.5i
+Sets the beeper volume, tone, and duration.
+.IP "\f3Screen\fP" 1.5i
+Sets the screen lock and time-out intervals, chooses the 
+screen saver client(s) to be run at time out and/or screen lock 
+and previews the selected screen saver client(s) to the user.
+.IP "\f3Window\fP" 1.5i
+Sets the window focus policy, window raise policy and 
+iconification policy (in an icon box or on the desktop).
+.IP "\f3Startup\fP" 1.5i
+Sets the session startup policy. 
+.SH OPTIONS
+There are no style manage specific options that can be set from the
+command line. 
+.SH RESOURCES
+.sp .5
+.SS Style Manager specific resources
+The style manager used the following resources to control its
+appearance and behavior. 
+.sp .5
+.TS
+center;
+cf3 cf3 cf3 cf3
+l l l l .
+
+Name	Class	Value Type	Default
+_
+writeXrdbImmediate	WriteXrdbImmediate	Boolean	true
+.TE
+.PP
+.sp .5
+.SS writeXrdbImmediate
+Controls when new font size or new mouse double-click time resources
+are used. If True, new resources are used when new clients start. If
+False, new resources are used at the next session (after logout, with
+"Resume Current Session" selected in the Startup dialog).
+
+The following resources are specified in Dtstyle (dtstyle's
+app-defaults file).
+.sp .5
+.TS
+center;
+cf3 cf3 cf3 cf3
+l l l l .
+
+Name	Class	Value Type	Default
+_
+mainRC.orientation	XmNorientation	string	HORIZONTAL
+componentList	ComponentList	string	see below*
+componentList	ComponentList	string	see below*
+secondaryColorSetId	SecondaryColorSetId	int	6
+toneScale.maximum	XmCMaximum	int	9000
+toneScale.minimum	XmCMaximum	int	82  
+durationScale.maximum	XmCMaximum	int	25
+.TE
+.sp .5
+.SS mainRC.orientation
+Controls the layout of the style manager main window. If this resource
+is set to VERTICAL then the style manager main window is displayed
+vertically.
+.sp .5
+.SS componentList
+Specifies the Style Manager components with a list of component
+keywords separated by spaces. Valid component keywords include: Color,
+Font, Backdrop, Keyboard, Mouse, Audio, Screen, Window, and Startup.
+The default componentList value is: Color Font Backdrop Keyboard Mouse
+Audio Screen Window Startup.
+.sp .5
+.SS secondaryColorSetId
+Specifies the color to be used for the menubar and all menus and
+dialogs of the dtstyle application.
+.sp .5
+.SS toneScale.maximum
+Specifies the maximum value to be used for the tone slider in the Beep
+dialog.
+.sp .5
+.SS toneScale.minimum
+Specifies the minimum value to be used for the tone slider in the Beep
+dialog.
+.sp .5
+.SS durationScale.maximum
+Specifces the maximum value to be used for the duration slider in the
+Beep dialog.
+.sp .5
+.SS fileMenu.exit.accelerator
+Specifies the accelerator key for the Exit menu option of the style
+manager main window.
+.sp .5
+.SS fileMenu.exit.acceleratorText
+Specifies the text for the accelerator key that appears next to the
+Exit menu option of the style manager main window.
+.sp .5
+.SS dtstyle Specific Resources
+The following font resources are specified in Dtstyle
+.sp .5 
+.TS
+center;
+cf3 cf3 cf3 cf3
+l l l l .
+
+Name	Class	Value Type	Default
+_
+numFonts	NumFonts	int	6
+systemFont1	SystemFont1	FontList	see SF1 below
+systemFont2	SystemFont2	FontList	see SF2 below
+systemFont3	SystemFont3	FontList	see SF3 below
+systemFont4	SystemFont4	FontList	see SF4 below
+systemFont5	SystemFont5	FontList	see SF5 below
+systemFont6	SystemFont6	FontList	see SF6 below
+systemFont7	SystemFont7	FontList	see SF7 below
+userFont1	UserFont1	FontList	see UF1 below
+userFont2	UserFont2	FontList	see UF2 below
+userFont3	UserFont3	FontList	see UF3 below
+userFont4	UserFont4	FontList	see UF4 below
+userFont5	UserFont5	FontList	see UF5 below
+userFont6	UserFont6	FontList	see UF6 below
+userFont7	UserFont7	FontList	see UF7 below
+.TE
+.PP
+.sp .5
+.SS numFonts
+Specifies the number of System/User Font alias pairs presented in the Font
+dialog. The default is 7.
+.sp .5
+.SS systemFont[1-7]
+Specifies a SystemFont alias for a particular font size that can be selected
+in the Font dialog.  
+.P
+The default system font aliases are:
+.in 0
+.P 
+SF1     -dt-interface system-medium-r-normal-xxs*-*-*-*-*-*-*-*-*:   
+.P 
+SF2     -dt-interface system-medium-r-normal-xs*-*-*-*-*-*-*-*-*:
+.P 
+SF3     -dt-interface system-medium-r-normal-s*-*-*-*-*-*-*-*-*:
+.P 
+SF4     -dt-interface system-medium-r-normal-m*-*-*-*-*-*-*-*-*:
+.P 
+SF5     -dt-interface system-medium-r-normal-l*-*-*-*-*-*-*-*-*:
+.P 
+SF6     -dt-interface system-medium-r-normal-xl*-*-*-*-*-*-*-*-*:
+.P
+SF7     -dt-interface system-medium-r-normal-xxl*-*-*-*-*-*-*-*-*:
+.PP
+.sp .5
+.SS userFont[1-6]
+Specifies a UserFont for a particular font size that can be selected
+in the Font dialog.
+.P
+The default user fonts are local specific.  For English language-US
+the defaults are:
+.in 0
+.P 
+UF1     -dt-interface user-medium-r-normal-xxs*-*-*-*-*-*-*-*-*:   
+.P 
+UF2     -dt-interface user-medium-r-normal-xs*-*-*-*-*-*-*-*-*:   
+.P 
+UF3     -dt-interface user-medium-r-normal-s*-*-*-*-*-*-*-*-*:   
+.P
+UF4     -dt-interface user-medium-r-normal-m*-*-*-*-*-*-*-*-*:   
+.P 
+UF5     -dt-interface user-medium-r-normal-l*-*-*-*-*-*-*-*-*:   
+.P 
+UF6     -dt-interface user-medium-r-normal-xl*-*-*-*-*-*-*-*-*:   
+.P
+UF7     -dt-interface user-medium-r-normal-xxl*-*-*-*-*-*-*-*-*:   
+.PP
+.sp .5
+.SS Color and backdrop resources: Global to the desktop
+The following resources are used by more than one desktop
+component. The syntax for specifying global resources is:
+*resource_id.
+.sp .5
+.TS
+center;
+cf3 cf3 cf3 cf3
+l l l l .
+
+Name	Class	Value Type	Default
+_
+colorUse	ColorUse	int	dynamic*
+dynamicColor	DynamicColor	Boolean	true
+foregroundColor	ForegroundColor	int	dynamic*
+shadowPixmaps	ShadowPixmaps	int	dynamic*
+writeXrdbColors	WriteXrdbColors	Boolean	true
+.TE
+.PP
+ NOTE: The display type determines default.
+.sp .5
+.SS ColorUse
+Specifies the number of colors to use for the user interface. The
+default value for this resource is dependant on the number of bit
+planes available in the display. However, to reduce the number of col-
+ors used by the desktop, the default color use for a high color
+display is MEDIUM_COLOR. Valid values are:
+.B B_W"
+- Specifies a black and white system. The color palettes
+use only Black and White (color cells 0 and 1) and icons are displayed
+as bitonal images. In this configuration four color palettes are
+available: Black, White, BlackWhite and WhiteBlack. These palettes do
+not dynamically change. To change a palette, the session must be
+restarted.  This resource value forces shadowPixmaps to True, and
+foregroundColor to either black or white depending on the palette
+chosen.
+.B LOW_COLOR"
+- Specifies a low color system. The color palettes use
+2 color sets and icons are displayed as bitonal images. The number of
+color cells can be further reduced by using the resources
+shadowPixmaps and foregroundColor.
+.B MEDIUM_COLOR
+- Specifies a medium color system. The color
+palettes use 4 color sets and icons are displayed as bitonal images.
+The number of color cells can be further reduced by using the
+resources shadowPixmaps and foregroundColor.
+.B HIGH_COLOR
+- Specifies a high color system. The color palettes
+use 8 color sets and icons are displayed as multi-color images. The
+number of color cells can be reduced by using the resources
+shadowPixmaps and foregroundColor.
+.sp .5
+.SS dynamicColor
+This resource can have values of True or False. dynamicColor is used
+to reduce the number of color cells being used. Once a palette has
+been selected and it is not likely to be changed, dynamicColor can be
+set to False. If set to False colors cannot be dynamically changed
+using the Style Manager. A selected palette will take effect the next
+session. The next time the session comes up, the color server uses
+Read Only color cells that can be shared by all clients, thus reducing
+the number of color cells used.
+.sp .5
+.SS foregroundColor
+This resource can have values of White, Black or Dynamic.
+foregroundColor causes all text (foreground) to use either pixel 0 or
+1 (Black or White) or to have a color cell dedicated to foreground
+that changes in response to the background color (Dynamic) for each
+ColorSet. If set to White or Black, the number of color cells used per
+ColorSet is reduced by 1.
+.sp .5
+.SS shadowPixmaps
+For color systems, this resource can have a value of True or False. If
+True, topShadowColor and bottomShadowColor use the same pixel as
+background and topShadowPixmap and bottomShadowPixmap are specified
+instead of solid color to create the 3D look. This reduces the number
+of color cells per ColorSet by 2.  shadowPixmaps defaults to True for
+systems with 4 or less color planes (16 or less color cells), and
+False for systems with more than 4 color planes.
+.sp .5
+.SS writeXrdbColors
+This resource should only be used if non desktop Motif clients are to
+be run that have color schemes that conflict with the desktop colors.
+This resource has no impact on clients linked with the desktop Motif
+library. This resource specifies whether color resource information
+should be written out. If set to False, background and foreground
+resources are not written out with the values of the current palette.
+This means that the above-mentioned clients do not get the desktop
+colors when they are started. The default value is True.
+.sp .5
+.SS Color resources: client specific
+The following resources are specified on a per client basis. The
+syntax for specifying client-specific resources is:
+client_name_or_class*resource_id.
+.sp .5
+.TS
+center;
+cf3 cf3 cf3 cf3
+l l l l .
+
+Name	Class	Value Type	Default
+_
+primaryColorSetId	PrimaryColorSetId	int	3
+secondaryColorSetId	SecondaryColorSetId	int	4
+.TE
+.PP
+.sp .5
+.SS primaryColorSetId
+This resource specifies the primary color for an application. The
+primary color is used for the main background areas of the application
+and all children of the main area. The value of this resource is a
+number from one to eight that represents a specific color set in a
+palette.
+.sp .5
+.SS secondaryColorSetId
+This resource specifies the secondary color for an application. The
+secondary color is used for the menubar and all menus and dialogs of
+the application. This allows dialogs on the screen to be visually
+associated with their parent applications by matching the dialog color
+to the menubar. The value of this resource is a number from one to
+eight that represents a specific color set in a palette.
+.sp .5
+.SS Color resources: dtwm specific
+ The following are dtwm-specific resources.
+.sp .5
+.TS
+center;
+cf3 cf3 cf3 cf3
+l l l l .
+
+Name	Class	Value Type	Default
+_
+activeColorSetId	ActiveColorSetId	int	1
+inactiveColorSetId	InactiveColorSetId	int	2
+.TE
+.PP
+.sp .5
+.SS activeColorSetId
+Specifies the active frame color for dtwm. The value of this resource
+is a number from one to eight, which represents a specific color set
+in a palette.
+.sp .5
+.SS inactiveColorSetId
+Specifies the inactive frame color for dtwm. The value of this
+resource is a number from one to eight, which represents a specific
+color set in a palette.
+.sp .5
+.SS Resources saved to xrdb by the style manager
+The following resources are written out to xrdb by the style manager.
+.sp .5
+.SS *HelpColorUse
+ color use mode for help.
+.sp .5
+.SS *ColorUse
+ color use mode.
+.sp .5
+.SS *ColorPalette
+ value of current color palette
+.sp .5
+.SS *MonochromePalette
+ value of the current palette if it is monochrome.
+.sp .5
+.SS *background
+ motif resource.
+.sp .5
+.SS *foreground
+ motif resource.
+.sp .5
+.SS Dtwm.keyboardFocusPolicy
+ motif resource.
+.sp .5
+.SS Dtwm*focusAutoRaise
+ motif resource.
+.sp .5
+.SS Dtwm*moveOpaque
+ motif resource.
+.sp .5
+.SS Dtwm*useIconBox
+ motif resource.
+.sp .5
+.SS *multiClickTime
+ motif resource.
+.sp .5
+.SS *enableBtn1Transfer
+ when set to true button 2 performs adjust operation at the next
+session.
+.sp .5
+.SS *systemFont: <systemFont[1-7]>
+ font displayed in labels and other non-editable text areas.
+.sp .5
+.SS *userFont: <userFont[1-7]>
+ font displayed in text widgets.
+.sp .5
+.SS *FontList: <systemFont[1-7]>
+ motif resource.
+.sp .5
+.SS *XmText*FontList: <userFont[1-7]>
+ motif resource.
+.sp .5
+.SS *XmTextField*FontList: <userFont[1-7]>
+ motif resource.
+.sp .5
+.SS *Font: <systemFont[1-7]>
+ motif resource.
+.sp .5
+.SS *FontSet: <systemFont[1-7]>
+ font resource.
+.sp .5
+.SS *DtEditor*textFontList: <userFont[1-7]>
+ dtpad resource.
+.SH ENVIRONMENT
+.sp .5
+.SS DTSCREENSAVERLIST
+This environment variable specifies the names of the available screen
+saver actions (separated by a blank space). Using this variable allows
+the style manager to query the actions data base and display a list of
+the available screen saver clients for the user and to invoke screen
+saver actions for preview of selected screen savers.
+.SH BROADCAST MESSAGES
+None.
+.SH PROPERTIES AND SELECTIONS
+The style manager uses X properties to communicate with the session
+manager and the window manager.
+.SH DIAGNOSTICS
+.sp .5 
+.RS
+.P
+- This will replace your home session with the current
+session. Continue?
+.RE
+Startup dialog - Message appears in a warning dialog when the user
+pushes Set Home Session...
+.sp .5 
+.RS
+.P
+- A palette named `%s' already exists. This new palette will
+overwrite the old one.  Is this what you want to do?
+.RE
+Add Palette dialog - Message appears in a warning dialog when an
+existing palette name is specified.
+.sp .5 
+.RS
+.P
+- Delete palette `%s'?
+.RE
+Delete Palette dialog - Message appears in a warning dialog when a
+palette is being deleted.
+.sp .5 
+.RS
+.P
+- The new double-click time will take effect as applications
+are restarted. Other mouse values take effect immediately.
+.RE
+Mouse dialog - Message appears in a warning dialog after the user
+selects a new double- click time and presses OK (and the resource
+*WriteXrdbImmediate is True).
+.sp .5 
+.RS
+.P
+- The new double-click time will take effect at your next
+session. Other mouse values take effect immediately.
+.RE
+Mouse dialog - Message appears in a warning dialog after the user
+selects a new double- click time and presses OK (and the resource
+*WriteXrdbImmediate is False).
+.sp .5 
+.RS
+.P
+- The right and left mouse buttons will switch function
+immediately after you push OK below. Look at the mouse visual in Style
+Manager Mouse window for indication of current handedness.
+.RE
+Mouse dialog - Message appears in a warning dialog after the user
+selects the left- handed or right-handed toggle to change mouse
+handedness.
+.sp .5 
+.RS
+.P
+- The function of the middle button will switch at your next
+session if you push OK below. Note that when the middle button is set
+to perform the adjust operation, the transfer operation is integrated
+with the select button by holding down the select button and dragging.
+.RE
+Mouse dialog - Message appears in a warning dialog after the user
+selects the transfer or adjust toggles to change the function of the
+middle button.
+.sp .5 
+.RS
+.P
+- The new Color Use value will take effect at your next
+session.
+.RE
+ColorUse dialog - Message appears in a warning dialog when the color
+use mode is changed and OK is pushed.
+.sp .5 
+.RS
+.P
+- The selected palette will take effect at your next session.
+.RE
+Color dialog - Message appears in a warning dialog when the desktop is
+running in black and White mode and a new palette is selected in the
+Color dialog.
+.SH ERROR MESSAGES
+.sp .5 
+.RS
+.P
+- You must select an item within the Style Manager.
+.RE
+Main window - Message appears in an error dialog when On Item Help is
+being used and the user clicks on an area outside of the style manager
+main window area.
+.sp .5 
+.RS
+.P
+- Couldn't open bitmap directory `%s'.
+.RE
+Backdrop dialog - Message appears in an error dialog when the bitmap
+directory could not be loaded.
+.sp .5 
+.RS
+.P
+- There are no backdrop icons available in `%s'. See your
+System Administrator or the User's Guide for more details.
+.RE
+Backdrop dialog - Message appears in an error dialog when the bitmap
+directory is empty.
+.sp .5 
+.RS
+.P
+- The palette name cannot contain these characters: :( ) [ ]
+{ } < > ! | ` / \\
+.RE
+Color dialog- Messages appear in an error dialog when the specified
+palette name is not acceptable.
+.sp .5 
+.RS
+.P
+- The palette name must be 10 characters or less.
+.RE
+Color dialog- Messages appear in an error dialog when the specified
+palette name is not acceptable.
+.sp .5 
+.RS
+.P
+- The color portion of the Style Manager will not operate
+because the color server is not running. Check $HOME/.dt/errorlog.
+.RE
+Color dialog- Messages appear in an error dialog when the color icon
+is selected and the color server is not running for some reason.
+.sp .5 
+.RS
+.P
+- The color portion of the Style Manager will not operate
+because the resource useColorObj is set to False.
+.RE
+Color dialog- Messages can be caused to appear in an error dialog by
+setting the resource *useColorObj to False and then running dtstyle
+and trying to post the Color Dialog.
+.sp .5 
+.RS
+.P
+- The color portion of the Style Manager will not operate
+because there are no palette files available. Check
+$HOME/.dt/errorlog.
+.RE
+Color dialog- Messages appears in an error dialog when the color icon
+is selected and there are no palette files to be found.
+.SH FILES
+.IP "\f3Icon files \fP"1.5i 
+Icons used in the style manger.
+.IP "\f3App-default file\fP" 1.5i 
+Dtstyle - contains application
+resources for the style manager.
+.IP "\f3Palette files\fP" 1.5i 
+Files that contain the default and
+customized palettes.
+.IP "\f3Backdrop file\fP" 1.5i 
+Files containing the data for backdrop
+customization.
+.SH SEE ALSO
+.IP "\f3Dtsession\fP" 1.5i 
+Acts as a color server and runs the screen
+saver clients.
+.IP "\f3Dtwm\fP" 1.5i 
+The window manager can be restarted when certain
+environment customization operations are performed so that changes can
+take effect.
+

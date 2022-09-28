@@ -1,0 +1,33 @@
+XCOMM @(#)Imakefile	1.1 96/07/11 SMI
+XCOMM Copyright (c) 1996 Sun Microsystems, Inc.
+
+/*
+ * Imakefile for creating binstall links to a reference LCL install
+ */
+
+#ifndef UseReferenceLCLib
+#define UseReferenceLCLib	YES
+#endif
+
+REFERENCE_PKGNAME	= RefLCLib
+REFERENCE_PKGBASE	= /
+REFERENCE_PKGDIR	= lcl
+
+#include <sun/Reference.tmpl>
+
+LCL_INCDIR		= lcl
+LCL_HEADERS		= lcl.h
+
+LCL_LIBRARY		= liblcl.a
+
+all::
+
+#if UseReferenceLCLib
+
+ReferencePublicHeadersList($(LCL_HEADERS),$(LCL_INCDIR))
+
+ReferenceArchiveLibrary($(LCL_LIBRARY))
+
+#endif /* UseReferenceLCLib */
+
+depend::

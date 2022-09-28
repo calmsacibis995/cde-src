@@ -1,0 +1,209 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+.\" *************************************************************************
+.\" **
+.\" ** (c) Copyright 1993,1994 Hewlett-Packard Company 
+.\" **      All Rights Reserved.
+.\" **
+.\" ** (c) Copyright 1993,1994 International Business Machines Corp. 
+.\" **      All Rights Reserved.
+.\" **  
+.\" ** (c) Copyright 1993,1994 Sun Microsystems, Inc.
+.\" **      All Rights Reserved.
+.\" **
+.\" **
+.\" *************************************************************************
+.\"---
+.\".TH _title _#S_ "_dd_ _Month_ _19yy_"
+.TH DtActionStatusUpdateCallbackProc 3 "04 April 1994"
+.\".BH "_dd_ _Month_ -_19yy_"
+.BH \*(DT 
+.\"---
+.\"---------------------------------------------------------------------------
+.SH NAME
+DtActionStatusUpdateCallbackProc(3) \(em  a callback proc for action updates.
+.\"---
+.\"---------------------------------------------------------------------------
+.\"---
+.\"--- SYNOPSIS 
+.\"--- This section is a syntax diagram.  Use the following lines for pages in
+.\"--- manual Sections 1, 1M, 5 and 8:
+.\"---
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <X11/Intrinsic.h> 
+\&#include <Dt/Action.h>
+.sp \n(PDu
+typedef void (*DtActionStatusUpdateCallbackProc) (
+.ta .5i 1.75i
+.nf
+	DtActionInvocationID  \fIid\fP,
+	XtPointer             \fIclient_data\fP,
+	int                   \fIactionArgCount\fP,
+	ActionArgp            \fIactionArgPtr\fP,
+	DtActionStatus        \fIstatus\fP)
+.wH
+.fi
+.iE
+.sE
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- DESCRIPTION 
+.\"--- This section tells concisely what the command (function, device or
+.\"--- file format) does and includes the parameter list. 
+.\"---
+.SH DESCRIPTION
+If registered when invoking an action with \fBDtActionInvoke\fP, a
+\fBDtActionStatusUpdateCallbackProc\fP procedure will be called
+whenever an action has a status update, such as action termination.
+Depending on \fIstatus\fP, modified action arguments may be returned
+using \fIactionArgPtr\fP.
+.IP \fIid\fP
+Specifies an invocation ID, as returned by \fBDtActionInvoke\fP.
+.IP \fIclient_data\fP
+Specifies the client data that was registered with this procedure
+in \fBDtActionInvoke\fP.
+.IP \fIactionArgCount\fP
+Specifies the total number of arguments in \fIactionArgPtr\fP.  This
+number will equal the number of arguments originally provided to
+\fBDtActionInvoke\fP.  The n-th argument in the original action
+argument array will correspond to the n-th argument in an updated
+action argument array.
+.IP \fIactionArgPtr\fP
+If one or more action arguments are updated, \fIactionArgPtr\fP will
+be a new array of updated action argument structures.  Individual
+arguments will have their \fIargClass\fP set to one of the standard
+argument classes, or \fBDtACTION_NULLARG\fP, to indicate that the current
+status update is not providing an update for the given argument.
+
+If the object has been removed (e.g. dropped on the trash), the
+return \fIargClass\fP will be set to \fBDtACTION_NULLARG\fP to indicate
+that it no longer exists.
+
+Note that the \fIactionArgPtr\fP array has been allocated by XtMalloc(),
+as have any of the char* or void* elements contained therein. The
+user is responsible for calling XtFree() on all elements contained
+therein, and then calling XtFree() on \fIactionArgPtr\fP.
+.IP \fIstatus\fP
+Specifies the purpose of the status update. The following \fIstatus\fP
+values are currently supported:
+
+\fBDtACTION_DONE\fP - the action(s) that were the result of the original
+\fBDtActionInvoke\fP call have terminated normally.  Once this status
+value is returned, all registered callbacks will be invalidated, and
+\fIDtActionInvocationID\fP will no longer be valid.
+
+If \fBDtACTION_DONE\fP results from a \fBDtActionQuit\fP, then
+\fBTT_MSG(TT_REQUEST)\fP's actions have honored the Quit Request
+as specified in the Tooltalk desktop services message set, and
+\fBCOMMAND\fP actions have responded likewise.
+
+\fBDtACTION_DONE_FORCED\fP - similar to \fBDtACTION_DONE\fP except
+that the action(s) did not terminate correctly or were forcably
+quit. Once this status value is returned, all registered callbacks
+will be invalidated, and \fIDtActionInvocationID\fP will no longer
+be valid.  Returned data only reflects the state of the data when
+\fBDtActionStatusUpdateCallbackProc\fP was called.
+
+\fBDtACTION_DONE_DROPPED\fP - similar to \fBDtACTION_DONE_FORCED\fP
+except that the action(s) have actually been abandoned by libDtSvc
+and may continue to live on in an orphaned state.   Such actions may
+have to be terminated from outside libDtSvc manually (e.g. closing
+an edit action by using its Exit menu option).
+
+\fBDtACTION_STATUS_UPDATE\fP - the action(s) have provided a data
+update.   Currently this status can only be generated by
+\fBTT_MSG(TT_REQUEST)\fP's that conform to the Tooltalk
+Document and Media Exchange Message Set, and corresponds to
+a check-point save.
+
+Additional status values may be introduced in the future.
+.\"---
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- EXAMPLES
+.\"--- This section gives examples of how to use the command (function
+.\"--- or file format).  Always preface an example with an introduction.
+.\"--- If there are multiple examples, use separate subsection headings
+.\"--- for each _example-type_.  Otherwise, omit these headings.
+.\"---
+.SH EXAMPLES
+.P
+The following is a code sample.  If the action(s) is terminated, then
+the resulting return-able arguments will be held suspect and tossed.
+If the action(s) completes normally, then returnable results will be
+kept.
+.nf
+
+DtActionStatusUpdateCallbackProc myCallback(
+     DtActionInvocationID id;
+     XtPointer            client_data;
+     int                  actionArgCount;
+     ActionArgp           actionArgPtr;
+     int                  status);
+{
+     extern ActionArgp actionArgPtr;	/* global hook for new data */
+     extern int        myDoneFlag;	/* global done flag */
+
+     switch (status) {
+          DtACTION_DONE:
+               myUpdatedArgs = (ActionArgp) actionArgPtr;
+               myDoneFlag = TRUE;
+               break;
+
+          DtACTION_DONE_FORCED:
+          DtACTION_DONE_DROPPED:
+               if ( (actionArgCount != 0) && actionArgPtr ) {
+                    /*
+                     * I know my sample action is not good about providing
+                     * clean action updates when aborted, therefore, just
+                     * toss any returned data.
+                     */
+                    for ( i=0; i < actionArgCount; i++ ) {
+                         if (actionArgPtr[i].argClass == DtACTION_FILE) {
+                              XtFree( actionArgPtr[i].name );
+                              XtFree( actionArgPtr[i].host );
+                         }
+                         else if (actionArgPtr[i].argClass == DtACTION_BUFFER) {
+                              XtFree( actionArgPtr[i].bp );
+                              XtFree( actionArgPtr[i].type );
+                         }
+                    }
+                    XtFree( actionArgPtr );
+               }
+               myUpdatedArgs = (ActionArgp) NULL;
+               myDoneFlag = FALSE;
+               break;
+
+          DtACTION_STATUS_UPDATE:
+               myUpdatedArgs = (ActionArgp) actionArgPtr;
+               myDoneFlag = FALSE;
+               break;
+
+          default:
+               /* ignore */
+               break;
+     }
+}
+
+.sp
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- SEE ALSO
+.\"--- This section lists references to other man pages, sample files, etc.
+.\"---
+.SH "SEE ALSO"
+.BR  DtDbLoad(3),
+.BR  DtActionLabel(3),
+.BR  DtActionDescription(3),
+.BR  DtActionExists(3),
+.BR  DtActionInvoke(3),
+.BR  DtActionQuit(3),
+.BR  DtActionQuitType(3),
+.BR  dtdtfile(4)
+

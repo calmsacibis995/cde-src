@@ -1,0 +1,34 @@
+XCOMM @(#)Imakefile	1.2 96/05/13 SMI
+XCOMM Copyright (c) 1996 Sun Microsystems, Inc.
+
+LIBTOPDIR = ..
+LIBCURDIR = DataStore
+
+#include "../ImakeSdm.tmpl"
+#include <Library.tmpl>
+
+HEADERS  = \
+	OutgoingStore.hh
+
+SRCS     = \
+	MessageStore.cc \
+	OutgoingStore.cc \
+	Server.cc
+
+OBJS     = \
+	MessageStore.o \
+	OutgoingStore.o \
+	Server.o
+
+INCLUDES = $(SDMINCLUDES)
+DEFINES  = $(SDMDEFINES)
+
+LibraryObjectRule()
+
+AllTarget($(OBJS))
+
+SdmObjectListTarget($(LIBCURDIR),$(OBJS))
+
+SdmTestLibraryTarget($(LIBCURDIR),$(OBJS))
+
+DependTarget()

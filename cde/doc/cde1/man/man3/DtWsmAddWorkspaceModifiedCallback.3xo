@@ -1,0 +1,123 @@
+.TH DtWsmAddWorkspaceModifiedCallback 3 "20 Apr 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.\" *************************************************************************
+.SH NAME
+DtWsmAddWorkspaceModifiedCallback \- add a callback to be called when any workspace is changed
+.SH SYNOPSIS
+.yS
+#include <Dt/Wsm.h>
+.sp 0.5v
+.ta \w'DtWsmAddWorkspaceModifiedCallback('u
+DtWsmCBContext
+DtWsmAddWorkspaceModifiedCallback(Widget \f2widget\fP,
+	DtWsmWsModifiedProc \f2ws_change\fP,
+	Pointer \f2client_data\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn DtWsmAddWorkspaceModifiedCallback
+function works with the
+.xos
+workspace manager
+.xoe
+.cdes
+Cde
+workspace manager,
+.Cm dtwm 1,
+.cdee
+and registers a function to be called when a workspace is added,
+deleted or modified.
+.P
+The
+.I widget
+argument is a realized widget.
+.P
+The
+.I ws_change
+argument is the procedure to be called when a workspace is
+modified.
+.P
+The
+.I client_data
+argument points to arbitrary client data to be
+passed back to
+.IR ws_change .
+.P
+The
+header defines the
+.B DtWsmWsModifiedProc
+callback prototype as follows:
+.br
+.Cs I
+.ta \w'typedef void (*DtWsmWsModifiedProc)('u
+typedef void (*DtWsmWsModifiedProc)(Widget \f2widget\fP,
+	Atom \f2aWorkspace\fP,
+	DtWsmWsReason \f2reason\fP,
+	Pointer \f2client_data\fP);
+.Ce
+.P
+The
+.I widget
+argument is the ID of the widget to be registered with the callback.
+.P
+The
+.I aWorkspace
+argument is the name of the new current workspace
+(converted to an X atom).
+.P
+The
+.I reason
+argument is a type of modification:
+.VL 6
+.Lc DtWSM_REASON_ADD
+.br
+A new workspace was added.
+.Lc DtWSM_REASON_BACKDROP
+.br
+The backdrop for the workspace changed.
+.Lc DtWSM_REASON_CURRENT
+.br
+A different workspace was made the current workspace.
+.Lc DtWSM_REASON_DELETE
+.br
+A workspace was deleted.
+.Lc DtWSM_REASON_TITLE
+.br
+The workspace title changed.
+.LE
+.P
+The
+.I client_data
+argument points to the client data to be
+registered with the callback.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn DtWsmAddWorkspaceModifiedCallback
+function returns a workspace callback registration context.
+.SH "APPLICATION USAGE"
+The
+.Fn DtWsmAddWorkspaceModifiedCallback
+function returns a registration context that the application
+must save in order to remove this callback later.
+.P
+.Fn DtWsmAddWorkspaceModifiedCallback
+requires a window; thus, a gadget is not acceptable for the
+.I widget
+argument.
+.P
+The
+.Fn DtWsmRemoveWorkspaceCallback 3
+function needs a registration context to remove the callback.
+.SH "SEE ALSO"
+.Hd Dt/Wsm.h 5,
+.cdes
+.Cm dtwm 1,
+.cdee
+.Fn DtWsmGetWorkspaceInfo 3,
+.Fn DtWsmGetWorkspaceList 3,
+.Fn DtWsmRemoveWorkspaceCallback 3.

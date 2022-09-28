@@ -1,0 +1,5170 @@
+.TH dtksh 1 "15 Jul 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.SH NAME
+dtksh \- shell command language interpreter with access to many X, Xt, Xm and Cde functions
+.SH SYNOPSIS
+.yS
+dtksh
+[\-abCefimnuvx]
+[\-o\0\f2option\fP]
+[+abCefmnuvx]
+[+o\0\f2option\fP]
+[\f2command_file\fP
+[\f2argument\fP...]]
+.yE
+.P
+.yS
+dtksh
+[\-abCefimnuvx]
+[\-o\0\f2option\fP]
+[+abCefmnuvx]
+[+o\0\f2option\fP]
+\f2command_string\fP
+[\f2command_name\fP
+[\f2argument\fP...]]
+.yE
+.P
+.yS
+dtksh
+\-s
+[\-abCefimnuvx]
+[\-o\0\f2option\fP]
+[+abeCefmnuvx]
+[+o\0\f2option\fP]
+[\f2argument\fP...]]
+.yE
+.SH DESCRIPTION
+The
+.Cm dtksh
+utility is a version of the
+.xo .Cm sh
+.xo utility (defined in the \*(ZC)
+.cde KornShell
+extended to support:
+.VL 3
+.LI \(bu
+Access to many X, Xt and Motif facilities
+from within a shell script
+.LI \(bu
+Fully localized shell scripts
+.LI \(bu
+Access to the Cde application help system
+.LI \(bu
+Customization of script-based GUI attributes (such as font and colors)
+using the Cde customization tool
+.LI \(bu
+Response to session-management
+.B "Save state"
+directives
+.LI \(bu
+Response to window-management
+.B Close
+directives
+.LI \(bu
+Access to most of the Cde Desktop Services Message Set
+.LI \(bu
+Access to many of the Cde Data Typing API functions
+.LI \(bu
+Access to the Cde Action API functions
+.LE
+.SH OPTIONS
+See
+.cde .Cm sh 1.
+.xo .Cm sh
+.xo in the \*(ZC.
+.SH OPERANDS
+See
+.cde .Cm sh 1.
+.xo .Cm sh
+.xo in the \*(ZC.
+.SH RESOURCES
+The
+.Cm dtksh
+interpreter has no relevant resources outside of those
+that affect the various widgets that can be instantiated from
+within a
+.Cm dtksh
+script.
+Refer to the manual page of the relevant
+widget for information on the resources that apply to that widget.
+.SH STDIN
+See
+.cde .Cm sh 1.
+.xo .Cm sh
+.xo in the \*(ZC.
+.SH "INPUT FILES"
+See
+.cde .Cm sh 1.
+.xo .Cm sh
+.xo in the \*(ZC.
+.SH "ENVIRONMENT VARIABLES"
+The following information describes the environment variables
+that
+.Cm dtksh
+uses that are in addition to those documented in the
+manual page for the
+.Cm sh
+command language interpreter.
+.br
+.HU "Immediate Return Value (\^\-\^)"
+Many of the category 3 commands (as described in
+.cde the
+.cde .B "Return Values From Built-in Commands"
+.cde section)
+.xo .cX dtkshretval )
+return a single value using an environment
+variable specified as the first argument to the command
+(in the synopses for these special commands,
+the first argument has the name
+.IR variable ).
+If this return value
+is immediately used in an expression, the special environment variable ``\-''
+can be used in place of a variable name.
+When
+.Cm dtksh
+encounters ``\-'' as the
+name of the environment variable in which the return value is to be
+returned, it returns the result as the value of the command.
+This allows the shell script to embed the command call in another command
+call.
+(This feature works only for commands that return a single value; the
+value is the first argument and the argument has the name
+.IR variable ).
+For example:
+.Cs I
+XtDisplay DISPLAY $FORM
+XSync $DISPLAY true
+.Ce
+.P
+can be replaced by the equivalent:
+.Cs I
+XSync $(XtDisplay "\-" $FORM) true
+.Ce
+.P
+The reference to
+.I $DISPLAY
+is replaced with the value returned by the call to
+.Cm XtDisplay .
+This capability is available for all category 3 commands except those that
+create a widget, those that return more than a single value and those
+whose first argument is not named
+.IR variable .
+Commands that do not accept
+``\-'' as the environment variable name include:
+.Cm XtInitialize ,
+.Cm XtCreateApplicationShell ,
+.Cm XtCreatePopupShell ,
+.Cm XtCreateManagedWidget
+and
+.Cm XtCreateWidget ;
+all commands of the form:
+.Cs I
+XmCreate...()
+.Ce
+.P
+and most commands of the form:
+.Cs I
+tt_...()
+.Ce
+.HU "Variables Set By XtInitialize"
+The
+.Cm XtInitialize
+command sets the following variables:
+.Cs I
+.I DTKSH_APPNAME
+.I DTKSH_ARGV
+.I DTKSH_TOPLEVEL
+.Ce
+.HU "Callback Context Variables"
+An application registers a callback with a widget to specify which condition
+it is interested in, and what action should occur when that condition occurs.
+The action can be any arbitrary
+.Cm dtksh
+command line.
+For example:
+.Cs I
+XtAddCallback $WIDGET activateCallback "ActivateProc"
+XtAddCallback $WIDGET activateCallback "XtSetSensitive $BUTTON false"
+.Ce
+.P
+A callback needs to be passed some context so it can determine what
+condition led to its call.
+For a C procedure, this information is typically passed in a
+.I call_data
+structure.
+For example, a Scale widget invoking a
+.B valueChangedCallback
+passes in
+.I call_data
+an instance of the following structure:
+.Cs I
+typedef struct {
+	int	reason;
+	XEvent	*event;
+	int	value;
+} XmScaleCallbackStruct;
+.Ce
+.P
+The C application's callback does something like:
+.Cs I
+if (scaleCallData->reason == XmCR_VALUE_CHANGED) {
+	eventType = scaleCallData->event->type;
+	display = scaleCallData->event->xany.display;
+}
+.Ce
+.P
+Similarly in
+.Cm dtksh ,
+when a callback is invoked, the following special
+environment variables are set up before the callback command executes:
+.VL 6
+.LI \f2CB_WIDGET\fP
+.br
+Set to the widget handle for the widget invoking the callback.
+.LI \f2CB_CALL_DATA\fP
+.br
+Set to the address of the
+.I call_data
+structure passed by
+the widget to the callback, but its usefulness lies in the nested
+sub-variables associated with it.
+.LE
+.P
+The
+.I CB_CALL_DATA
+environment variable represents a pointer to a structure;
+access to its fields uses a syntax similar to the C code.
+Nested environment
+variables are defined, named the same as the fields of the structure (but
+folded to all upper case), and use a dot to indicate containment of an
+element in a structure.
+Thus, the preceding C code, to access the
+.I call_data
+provided by the Scale widget, translates to:
+.Cs I
+if [${CB_CALL_DATA.REASON} = "CR_VALUE_CHANGED"]; then
+	eventType=${CB_CALL_DATA.EVENT.TYPE}
+	display=${CB_CALL_DATA.EVENT.XANY.DISPLAY}
+fi
+.Ce
+.P
+The same is true of the event structure within the
+.I call_data
+structure.
+.P
+For most callback structures, the shell script is able to reference any of
+the fields defined for the particular callback structure, using the
+technique previously described in this
+.cde manual page.
+.xo section.
+In most cases, the shell script is not able to
+alter the values of the fields within these structures.
+The exception to this is the
+.IR XmTextVerifyCallbackStruct ,
+available during the
+.IR losingFocusCallback ,
+the
+.I modifyVerifyCallback
+and the
+.I motionVerifyCallback
+for the text widget.
+The
+.Cm dtksh
+utility supports the modification of certain
+fields within this structure, to the extent that it is supported by Motif.
+The
+following fields within the callback structure can be modified:
+.Cs I
+.I CB_CALL_DATA.DOIT
+.I CB_CALL_DATA.STARTPOS
+.I CB_CALL_DATA.ENDPOS
+.I CB_CALL_DATA.TEXT.PTR
+.I CB_CALL_DATA.TEXT.LENGTH
+.I CB_CALL_DATA.TEXT.FORMAT
+.Ce
+.P
+An example of how these fields can be modified:
+.Cs I
+CB_CALL_DATA.DOIT="false"
+CB_CALL_DATA.TEXT.PTR="*"
+CB_CALL_DATA.TEXT.LENGTH=1
+.Ce
+.HU "Event Handler Context Variables"
+As with callbacks, an application registers event handlers with a widget to
+specify what action should occur when one of the specified events occurs.
+Again, the action can be any arbitrary
+.Cm dtksh
+command line.
+For example:
+.Cs I
+XtAddEventHandler $W "Button2MotionMask" false "ActivateProc"
+XtAddEventHandler $W "ButtonPressMask|ButtonReleaseMask" \e
+	false "echo action"
+.Ce
+Just as with callbacks, two environment variables are defined to provide
+context to the event handler:
+.VL 6
+.LI \f2EH_WIDGET\fP
+.br
+Set to the widget handle for the widget for
+which the event handler is registered.
+.LI \f2EH_EVENT\fP
+.br
+Set to the address of the
+.B XEvent
+that triggered the event handler.
+.LE
+.P
+Access to the fields within the
+.B XEvent
+structure is the same as for the
+.I CB_CALL_DATA
+environment variable previously described in this
+.cde manual page.
+.xo section.
+For example:
+.Cs I
+if [${EH_EVENT.TYPE} = "ButtonPress"]; then
+	echo X = ${EH_EVENT.XBUTTON.X}
+	echo Y = ${EH_EVENT.XBUTTON.Y}
+elif [${EH_EVENT.TYPE} = "KeyPress"]; then
+	echo X = ${EH_EVENT.XKEY.X}
+	echo Y = ${EH_EVENT.XKEY.Y}
+fi
+.Ce
+.HU "Translation Context Variables"
+Xt provides for event translations to be registered for a widget; their
+context is provided in the same way as with event handlers.
+The two variables defined for translation commands are:
+.VL 6
+.LI \f2TRANSLATION_WIDGET\fP
+.br
+Set to the widget handle for the widget for which the
+translation is registered.
+.LI \f2TRANSLATION_EVENT\fP
+.br
+Set to the address of the
+.B XEvent
+that triggered the translation.
+.LE
+.P
+Dot-notation provides access to the fields of the event:
+.Cs I
+echo Event type = ${TRANSLATION_EVENT.TYPE}
+echo Display = ${TRANSLATION_EVENT.XANY.DISPLAY}
+.Ce
+.HU "Workspace Callback Context Variables"
+An application can register a callback function that is invoked any time the
+user changes to a new workspace.
+When the callback is
+invoked, the following two special environment variables are set, and
+can be accessed by the shell callback code:
+.VL 6
+.LI \f2CB_WIDGET\fP
+.br
+Set to the widget handle for the widget invoking the callback.
+.LI \f2CB_CALL_DATA\fP
+.br
+Set to the X atom that uniquely identifies the new workspace.
+This can be converted to its string representation using the
+.Cm XmGetAtomName
+command.
+.LE
+.HU "Accessing Event Subfields"
+The
+.B XEvent
+structure has many different configurations based on the event's type.
+The
+.Cm dtksh
+utility provides access only to the most frequently used
+.BR XEvent s.
+Any of the other standard
+.BR XEvent s
+are accessed using the event type
+.Cn XANY ,
+followed by any of the subfields defined by the
+.B XANY
+event structure,
+which includes the following subfields:
+.Cs I
+${TRANSLATION_EVENT.XANY.TYPE}
+${TRANSLATION_EVENT.XANY.SERIAL}
+${TRANSLATION_EVENT.XANY.SEND_EVENT}
+${TRANSLATION_EVENT.XANY.DISPLAY}
+${TRANSLATION_EVENT.XANY.WINDOW}
+.Ce
+.P
+The
+.Cm dtksh
+utility supports full access to all of the event fields for the
+following event types:
+.Cs I
+.Cn XANY
+.Cn XBUTTON
+.Cn XEXPOSE
+.Cn XNOEXPOSE
+.Cn XGRAPHICSEXPOSE
+.Cn XKEY
+.Cn XMOTION
+.Ce
+.P
+The following examples show how the subfields for the previously listed
+event types are accessed:
+.Cs I
+${TRANSLATION_EVENT.XBUTTON.X}
+$(CB_CALL_DATA.EVENT.XKEY.STATE}
+${EH_EVENT.XGRAPHICSEXPOSE.WIDTH}
+.Ce
+.HU "Input Context Variables"
+Xt provides the
+.Fn XtAddInput 3X
+facility that allows an application
+to register interest in activity on a particular file descriptor.
+This generally includes data available for reading,
+the file descriptor being ready for
+writing, and exceptions on the file descriptor.
+If programming in C, the application provides a handler function that
+is invoked when the activity occurs.
+When reading data from the file
+descriptor, it is up to the handler to
+read the data from the input source and handle character escaping and
+line continuations.
+.P
+The
+.Cm dtksh
+utility also supports the
+.Fn XtAddInput 3X
+facility, but has limited its functionality to reading data, and has taken the
+reading function
+a step further to make it easier for shell programmers to use.
+By default, when a shell script registers interest in a file descriptor,
+.Cm dtksh
+invokes the shell script's input handler only when a complete line of
+text has been received.
+A complete line of text is defined to be a line
+terminated either by an unescaped
+.tK newline
+character, or by end-of-file.
+The input handler is also called if no data is available
+and end-of-file is reached.
+This gives the handler the opportunity to use
+.Fn XtRemoveInput 3X
+to remove the input source, and to close the file descriptor.
+.P
+The advantage of this default behavior is that input handlers
+do not need to do escape processing or
+handle line continuations.
+The disadvantage is that it assumes that all
+of the input is line-oriented and contains no binary information.
+If the input source does contain binary information, or if the input handler
+wants to read the data from the input source directly,
+.Cm dtksh
+also supports a raw input mode.
+In raw mode,
+.Cm dtksh
+does not read any of the
+data from the input source.
+Any time
+.Cm dtksh
+is notified that input is
+available on the input source, it invokes the shell script's input
+handler.
+It then becomes the handler's responsibility to read the incoming
+data, to perform any required buffering and escape processing, and to detect
+when end-of-file is reached (so that the input source can be
+removed and the file descriptor closed).
+.P
+Whether the input handler is configured to operate in the default
+mode or in raw mode,
+.Cm dtksh
+sets up several environment variables before
+calling the shell script's input handler.
+These environment variables
+provide the input handler with everything needed to handle the incoming
+data:
+.VL 6
+.LI \f2INPUT_LINE\fP
+.br
+If operating in the default mode, this variable
+contains the next complete line
+of input available from the input source.
+If
+.I INPUT_EOF
+is set to
+True,
+there is no data in this buffer.
+If operating in raw mode,
+this environment variable always contains an empty string.
+.LI \f2INPUT_EOF\fP
+.br
+If operating in the default mode, this variable
+is set to False any time
+.I INPUT_LINE
+contains data, and is set to
+True
+when end-of-file is reached.
+When end-of-file is reached, the input
+handler for the shell script should unregister the input source
+and close the file descriptor.
+If operating in raw mode,
+.I INPUT_EOF
+is always set to False.
+.LI \f2INPUT_SOURCE\fP
+.br
+Indicates the file descriptor for which input is available.
+If operating
+in raw mode, this file descriptor is used to obtain the pending
+input.
+The file descriptor is also used to close the input source when
+it is no longer needed.
+.LI \f2INPUT_ID\fP
+.br
+Indicates the ID returned by
+.Cm XtAddInput
+when the input source was originally registered.
+This information is needed in order to remove the
+input source using
+.Cm XtRemoveInput .
+.LE
+.SH "ASYNCHRONOUS EVENTS"
+Default.
+.SH STDOUT
+See
+.cde .Cm sh 1.
+.xo .Cm sh
+.xo in the \*(ZC.
+.SH STDERR
+See
+.cde .Cm sh 1.
+.xo .Cm sh
+.xo in the \*(ZC.
+.SH "OUTPUT FILES"
+None.
+.SH "EXTENDED DESCRIPTION"
+The capabilities described here are extensions to those of the
+.Cm sh
+command language interpreter.
+See
+.cde .Cm sh 1.
+.xo .Cm sh
+.xo in the \*(ZC.
+The following subsections give a synopsis of each of the built-in commands
+added by
+.Cm dtksh
+to
+.Cm sh .
+In general, argument ordering and types are the same as for
+corresponding C procedures, with exceptions noted.
+For more detail on the
+functionality and arguments of a command, see the standard documentation for
+the corresponding X11, Xt, Motif or Desktop Services procedure.
+.P
+In definitions listed in this document, arguments named
+.IR variable ,
+.IR variable2 ,
+.I variable3
+and so on,
+indicate that the shell script must
+supply the name of an environment variable,
+into which some value is returned.
+.P
+All of the Xt commands used to create a new widget require that the widget
+class for the new widget be specified.
+The widget (or gadget) class name is
+the standard class name provided by Motif.
+For example, the class name for a
+Motif pushbutton widget is
+.IR XmPushButton ,
+while the class name for the Motif
+label gadget is
+.IR XmLabelGadget .
+Commands that use their exit status to
+return a Boolean value (which can be used directly as part of
+an
+.I if
+statement) are noted as such.
+.P
+Arguments enclosed within [] are optional.
+.HU "Dtksh Built-in Xlib Commands"
+.yS
+XBell \f2display volume\fP
+.yE
+.P
+.yS
+XClearArea \f2display drawable\fP [\f2optional GC arguments\fP]
+\f2x y width height exposures\fP
+.yE
+.P
+.yS
+XClearWindow \f2display drawable\fP
+.yE
+.P
+.yS
+XCopyArea \f2display src dest srcX srcY width height destX destY
+[\f2optional GC arguments\fP]
+.yE
+.P
+.yS
+XDefineCursor \f2display window cursor\fP
+.yE
+.P
+.yS
+XDrawArc \f2display drawable\fP [\f2optional GC arguments\fP]
+\f2x y width height angle1 angle2\fP
+.yE
+.P
+.yS
+XDrawLine \f2display drawable\fP [\f2optional GC arguments\fP]
+\f2x1 y1 x2 y2\fP
+.yE
+.P
+.yS
+XDrawLines
+\f2display drawable\fP
+[\f2\-coordinateMode\fP]
+[\f2optional GC arguments\fP]
+\f2x1 y1 x2 y2\fP [\f2x3 y3\0...\f1]
+.yE
+.P
+.VL 6
+The
+.I coordinateMode
+operand
+is either
+.B CoordModeOrigin
+or
+.BR CoordModePrevious .
+.LE
+.P
+.yS
+XDrawPoint
+\f2display drawable\fP
+[\f2optional GC arguments\fP]
+\f2x y\fP
+.yE
+.P
+.yS
+XDrawPoints
+\f2display drawable\fP
+[\f2\-coordinateMode\fP]
+[\f2optional GC arguments\fP]
+\f2x1 y1\fP
+[\f2x2 y2 x3 y3\0...\fP]
+.yE
+.P
+.VL 6
+The
+.I coordinateMode
+operand
+is either
+.B CoordModeOrigin
+or
+.BR CoordModePrevious .
+.LE
+.P
+.yS
+XDrawRectangle
+\f2display drawable\fP
+[\f2optional GC arguments\fP]
+\f2x y width height\fP
+.yE
+.P
+.yS
+XDrawSegments
+\f2display drawable\fP
+[\f2optional GC arguments\fP]
+\f2x1 y1 x2 y2\fP [\f2x3 y3 x4 y4\0...\fP]
+.yE
+.P
+.yS
+XDrawString
+\f2display drawable\fP
+[\f2optional GC arguments\fP]
+\f2x y string\fP
+.yE
+.P
+.yS
+XDrawImageString
+\f2display drawable\fP
+[\f2optional GC arguments\fP]
+\f2x y string\fP
+.yE
+.P
+.yS
+XFillArc
+\f2display drawable\fP
+[\f2optional GC arguments\fP]
+\f2x y width height angle1 angle2\fP
+.yE
+.P
+.yS
+XFillPolygon
+\f2display drawable\fP
+[\f2\-shape\fP]
+[\f2\-coordinateMode\fP]
+[\f2optional GC arguments\fP]
+\f2x1 y1 x2 y2\0...\fP
+.yE
+.P
+.VL 6
+The
+.I shape
+operand
+is one of
+.BR Complex ,
+.B Convex
+or
+.BR Nonconvex ,
+and where
+.I coordinateMode
+is either
+.B CoordModeOrigin
+or
+.BR CoordModePrevious .
+.LE
+.P
+.yS
+XFillRectangle
+\f2display drawable\fP
+[\f2optional GC arguments\fP]
+\f2x y width height\fP
+.yE
+.P
+.yS
+XFlush
+\f2display\fP
+.yE
+.P
+.yS
+XHeightOfScreen
+\f2variable screen\fP
+.yE
+.P
+.yS
+XRaiseWindow
+\f2display window\fP
+.yE
+.P
+.yS
+XRootWindowOfScreen
+\f2variable screen\fP
+.yE
+.P
+.yS
+XSync
+\f2display discard\fP
+.yE
+.P
+.VL 6
+The
+.I discard
+operand
+is either
+True
+or
+False.
+.LE
+.P
+.yS
+XTextWidth
+\f2variable fontName string\fP
+.yE
+.P
+.VL 6
+The
+.Cm XTextWidth
+command differs from the C procedure; it takes the name of a
+font instead of a pointer to a font structure.
+.LE
+.P
+.yS
+XUndefineCursor
+\f2display window\fP
+.yE
+.P
+.yS
+XWidthOfScreen
+\f2variable screen\fP
+.yE
+.HU "Built-in XtIntrinsic Commands"
+.yS
+XtAddCallback
+\f2widgetHandle callbackName dtksh-command\fP
+.yE
+.P
+.VL 6
+The
+.I callbackName
+operand
+is one of the standard Motif or Xt callback names,
+with the Xt or Xm prefix omitted; for example,
+.IR activateCallback .
+.LE
+.P
+.yS
+XtAddEventHandler
+\f2widgetHandle eventMask nonMaskableFlag dtksh-command\fP
+.yE
+.P
+.VL 6
+The
+.I eventMask
+operand
+is of the form
+.IR mask |\c
+.IR mask |\c
+.I mask
+and the
+.I mask
+component is any of the standard set of
+.B XEvent
+masks; for example,
+.IR ButtonPressMask ,
+where
+.I nonMaskableFlag
+is either
+True
+or
+False.
+.LE
+.P
+.yS
+XtAddInput
+\f2variable\fP
+[\f2-r\fP]
+\f2fileDescriptor dtksh-command\fP
+.yE
+.P
+.VL 6
+The
+.Cm XtAddInput
+command registers the indicated file descriptor with the
+X Toolkit as an alternative input source (that is, for reading).
+The input handler for the shell script
+is responsible for unregistering the input source when it is no longer needed,
+and also to close the file descriptor.
+If the
+.B \-r
+option is specified (raw mode),
+.Cm dtksh
+does not
+automatically read any of the data available from the input source; it
+is up to the specified
+.Cm dtksh
+command to read all data.
+If the
+.B \-r
+option is not specified, the specified
+.Cm dtksh
+command is
+invoked only when a full line has been read (that is, a line terminated by
+either an unescaped
+.tK newline
+character, or end-of-file) and when
+end-of-file is reached.
+The raw mode is useful for handlers
+expecting to process non-textual data, or for handlers not wanting
+.Cm dtksh
+to automatically read in a line of data.
+When end-of-file is
+detected, it is the responsibility of the input handler for the shell script
+to use
+.Cm XtRemoveInput
+to remove the input source, and to close the file descriptor,
+if necessary.
+In all cases, several environment variables are set up for the
+handler to use.
+These include the following:
+.VL 6
+.LI \f2INPUT_LINE\fP
+.br
+Empty if raw mode; otherwise, contains next line to be processed.
+.LI \f2INPUT_EOF\fP
+.br
+Set to
+True
+if end-of-file reached; otherwise, set to
+False.
+.LI \f2INPUT_SOURCE\fP
+.br
+File descriptor associated with this input source.
+.LI \f2INPUT_ID\fP
+.br
+ID associated with this input handler; returned by
+.Cm XtAddInput .
+.LE
+.LE
+.P
+.yS
+XtAddTimeOut
+\f2variable interval dtksh-command\fP
+.yE
+.P
+.yS
+XtAddWorkProc
+\f2variable dtksh-command\fP
+.yE
+.P
+.VL 6
+In
+.Cm dtksh ,
+the
+.I dtksh-command
+is typically a
+.Cm dtksh
+function name.
+Like regular
+work procedures, this function is expected to return a value indicating
+whether the work procedure wants to be called again, or whether it has
+completed its work and can be automatically unregistered.
+If the
+.Cm dtksh
+function
+returns zero, the work procedure remains registered; any other value
+causes the work procedure to be automatically unregistered.
+.LE
+.P
+.yS
+XtAugmentTranslations
+\f2widgetHandle translations\fP
+.yE
+.P
+.yS
+XtCreateApplicationShell
+\f2variable applicationName widgetClass\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XtCallCallbacks
+\f2widgetHandle callbackName\fP
+.yE
+.P
+.VL 6
+The
+.I callbackName
+operand
+is one of the standard Motif or Xt callback names,
+with the Xt or Xm prefix omitted; for example,
+.IR activateCallback .
+.LE
+.P
+.yS
+XtClass
+\f2variable widgetHandle\fP
+.yE
+.P
+.VL 6
+The command returns
+the name of the widget class associated with the passed-in widget handle.
+.LE
+.P
+.yS
+XtCreateManagedWidget
+\f2variable widgetName widgetClass parentWidgetHandle\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XtCreatePopupShell
+\f2variable widgetName widgetClass parentWidgetHandle\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XtCreateWidget
+\f2variable widgetName widgetClass parentWidgetHandle\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XtDestroyWidget
+\f2widgetHandle\fP
+[\f2widgetHandle\0...\fP]
+.yE
+.P
+.yS
+XtDisplay
+\f2variable widgetHandle\fP
+.yE
+.P
+.yS
+XtDisplayOfObject
+\f2variable widgetHandle\fP
+.yE
+.P
+.yS
+XtGetValues
+\f2widgetHandle resource:variable1\fP
+[\f2resource:variable2\0...\fP]
+.yE
+.P
+.yS
+XtHasCallbacks
+\f2variable widgetHandle callbackName\fP
+.yE
+.P
+.VL 6
+The
+.I callbackName
+operand
+is one of the standard Motif or Xt callback names, with
+the Xt or Xm prefix omitted: for example,
+.I activateCallback
+variable
+is set to one of the strings
+.BR CallbackNoList ,
+.B CallbackHasNone
+or
+.BR CallbackHasSome .
+.LE
+.P
+.yS
+XtInitialize
+\f2variable shellName applicationClassName applicationName arguments\fP
+.yE
+.P
+.VL 6
+Similar to a typical Motif-based program, the
+.I arguments
+argument is used
+to reference any command-line arguments that might have been specified by
+the shell script user; these are typically referred using the shell
+syntax of
+.IR $@ .
+The
+.I applicationName
+argument is listed because
+.I $@
+does
+not include
+.IR $0 .
+The
+.I applicationName
+and
+.I arguments
+are used to build the argument list passed to the
+.Cm XtInitialize
+command.
+Upon completion,
+the environment variable
+.I DTKSH_ARGV
+is set to the argument list as returned
+by the
+.Cm XtInitialize
+command; the
+.I DTKSH_TOPLEVEL
+environment variable is set to the widget handle of the widget created by
+.Cm XtInitialize ,
+and the
+.I DTKSH_APPNAME
+environment variable is set to the value of the
+.I applicationName
+argument.
+The command returns
+a value that can be used in a conditional.
+.LE
+.P
+.yS
+XtIsManaged
+\f2widgetHandle\fP
+.yE
+.P
+.VL 6
+The command returns
+a value that can be used in a conditional.
+.LE
+.P
+.yS
+XtIsSubclass
+\f2widgetHandle widgetClass\fP
+.yE
+.P
+.VL 6
+The
+.I widgetClass
+operand
+is the name of a widget class.
+The command returns
+a value that can be used in a conditional.
+.LE
+.P
+.yS
+XtNameToWidget
+\f2variable referenceWidget name\fP
+.yE
+.P
+.yS
+XtIsRealized
+\f2widgetHandle\fP
+.yE
+.P
+.VL 6
+The command returns
+a value that can be used in a conditional.
+.LE
+.P
+.yS
+XtIsSensitive
+\f2widgetHandle\fP
+.yE
+.P
+.VL 6
+The command returns
+a value that can be used in a conditional.
+.LE
+.P
+.yS
+XtIsShell
+\f2widgetHandle\fP
+.yE
+.P
+.VL 6
+The command returns
+a value that can be used in a conditional.
+.LE
+.P
+.yS
+XtLastTimestampProcessed
+\f2variable display\fP
+.yE
+.P
+.yS
+XtMainLoop
+.yE
+.P
+.yS
+XtManageChild
+\f2widgetHandle\fP
+.yE
+.P
+.yS
+XtManageChildren
+\f2widgetHandle\fP
+[\f2widgetHandle\0...\fP]
+.yE
+.P
+.yS
+XtMapWidget
+\f2widgetHandle\fP
+.yE
+.P
+.yS
+XtOverrideTranslations
+\f2widgetHandle translations\fP
+.yE
+.P
+.yS
+XtParent
+\f2variable widgetHandle\fP
+.yE
+.P
+.yS
+XtPopdown
+\f2widgetHandle\fP
+.yE
+.P
+.yS
+XtPopup
+\f2widgetHandle grabType\fP
+.yE
+.P
+.VL 6
+The
+.I grabType
+operand
+is one of the strings
+.BR GrabNone ,
+.B GrabNonexclusive
+or
+.BR GrabExclusive .
+.LE
+.P
+.yS
+XtRealizeWidget
+\f2widgetHandle\fP
+.yE
+.P
+.yS
+XtRemoveAllCallbacks
+\f2widgetHandle callbackName\fP
+.yE
+.P
+.VL 6
+The
+.I callbackName
+operand
+is one of the standard Motif or Xt callback names,
+with the Xt or Xm prefix omitted; for example,
+.IR activateCallback .
+.LE
+.P
+.yS
+XtRemoveCallback
+\f2widgetHandle callbackName dtksh-command\fP
+.yE
+.P
+.VL 6
+The
+.I callbackName
+operand
+is one of the standard Motif or Xt callback names,
+with the Xt or Xm prefix omitted; for example,
+.IR activateCallback .
+As with traditional Xt callbacks, when a callback is removed, the
+same
+.Cm dtksh
+command string must be specified as was specified when the callback
+was originally registered.
+.LE
+.P
+.yS
+XtRemoveEventHandler
+\f2widgetHandle eventMask nonMaskableFlag dtksh-command\fP
+.yE
+.P
+.VL 6
+The
+.I eventMask
+operand
+is of the form
+.IR mask |\c
+.IR mask |\c
+.I mask
+and the
+.I mask
+component is any of the standard set of
+.B XEvent
+masks; for example,
+.IR ButtonPressMask ,
+where
+.I nonMaskableFlag
+is either
+True
+or
+False.
+As with traditional Xt event handlers, when an event handler is
+removed, the same
+.IR eventMask ,
+.I nonMaskableFlag
+setting and
+.Cm dtksh
+command string must be specified as was specified when the event handler
+was originally registered.
+.LE
+.P
+.yS
+XtRemoveInput
+\f2inputId\fP
+.yE
+.P
+.VL 6
+The
+.I inputId
+operand
+is the handle returned in the specified environment
+variable when the alternative input source was registered using the
+.Cm XtAddInput
+command.
+.LE
+.P
+.yS
+XtRemoveTimeOut
+\f2timeoutId\fP
+.yE
+.P
+.VL 6
+The
+.I timeoutId
+operand
+is the handle returned in the specified environment
+variable when the timeout was registered using the
+.Cm XtAddTimeOut
+command.
+.LE
+.P
+.yS
+XtRemoveWorkProc
+\f2workprocId\fP
+.yE
+.P
+.VL 6
+The
+.I workprocId
+operand
+is the handle returned in the specified environment
+variable when the work procedure was registered using the
+.Cm XtAddWorkProc
+command.
+.LE
+.P
+.yS
+XtScreen
+\f2variable widgetHandle\fP
+.yE
+.P
+.yS
+XtSetSensitive
+\f2widgetHandle state\fP
+.yE
+.P
+.VL 6
+The
+.I state
+operand
+is either
+True
+or
+False.
+.LE
+.P
+.yS
+XtSetValues
+\f2widgetHandle resource:value\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XtUninstallTranslations
+\f2widgetHandle\fP
+.yE
+.P
+.yS
+XtUnmanageChild
+\f2widgetHandle\fP
+.yE
+.P
+.yS
+XtUnmanageChildren
+\f2widgetHandle\fP
+[\f2widgetHandle\0...\fP]
+.yE
+.P
+.yS
+XtUnmapWidget
+\f2widgetHandle\fP
+.yE
+.P
+.yS
+XtUnrealizeWidget
+\f2widgetHandle\fP
+.yE
+.P
+.yS
+XtWindow
+\f2variable widgetHandle\fP
+.yE
+.HU "Built-in Motif Commands"
+.yS
+XmAddWMProtocolCallback
+\f2widgetHandle protocolAtom dtksh-command\fP
+.yE
+.P
+.VL 6
+The
+.I protocolAtom
+operand
+is typically obtained using the
+.Cm XmInternAtom
+command.
+.LE
+.P
+.yS
+XmAddWMProtocols
+\f2widgetHandle protocolAtom\fP
+[\f2protocolAtom\0...\fP]
+.yE
+.P
+.VL 6
+The
+.I protocolAtom
+operand
+is typically obtained using the
+.Cm XmInternAtom
+command.
+.LE
+.P
+.yS
+XmCommandAppendValue
+\f2widgetHandle string\fP
+\f2XmCommandError widgetHandle errorString\fP
+.yE
+.P
+.yS
+XmCommandGetChild
+\f2variable widgetHandle childType\fP
+.yE
+.P
+.VL 6
+The
+.I childType
+operand
+is one of the strings:
+.Cs I
+.Cn DIALOG_COMMAND_TEXT
+.Cn DIALOG_PROMPT_LABEL
+.Cn DIALOG_HISTORY_LIST
+.Cn DIALOG_WORK_AREA
+.Ce
+.LE
+.P
+.yS
+XmCommandSetValue
+\f2widgetHandle commandString\fP
+.yE
+.P
+.yS
+XmCreateArrowButton
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreateArrowButtonGadget
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreateBulletinBoard
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreateBulletinBoardDialog
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreateCascadeButton
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreateCascadeButtonGadget
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreateCommand
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreateDialogShell
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreateDrawingArea
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreateDrawnButton
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreateErrorDialog
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreateFileSelectionBox
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreateFileSelectionDialog
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreateForm
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreateFormDialog
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreateFrame
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreateInformationDialog
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreateLabel
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreateLabelGadget
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreateList
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreateMainWindow
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreateMenuBar
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreateMenuShell
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreateMessageBox
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreateMessageDialog
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreateOptionMenu
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreatePanedWindow
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreatePopupMenu
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreatePromptDialog
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreatePulldownMenu
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreatePushButton
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreatePushButtonGadget
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreateQuestionDialog
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreateRadioBox
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreateRowColumn
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreateScale
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreateScrollBar
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreateScrolledList
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreateScrolledText
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreateScrolledWindow
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreateSelectionBox
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreateSelectionDialog
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreateSeparator
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreateSeparatorGadget
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreateText
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreateTextField
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreateToggleButton
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreateToggleButtonGadget
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreateWarningDialog
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreateWorkArea
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmCreateWorkingDialog
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+XmFileSelectionDoSearch
+\f2widgetHandle directoryMask\fP
+.yE
+.P
+.yS
+XmFileSelectionBoxGetChild
+\f2variable widgetHandle childType\fP
+.yE
+.P
+.VL 6
+The
+.I childType
+operand
+is one of the strings:
+.Cs I
+.Cn DIALOG_APPLY_BUTTON
+.Cn DIALOG_CANCEL_BUTTON
+.Cn DIALOG_DEFAULT_BUTTON
+.Cn DIALOG_DIR_LIST
+.Cn DIALOG_DIR_LIST_LABEL
+.Cn DIALOG_FILTER_LABEL
+.Cn DIALOG_FILTER_TEXT
+.Cn DIALOG_HELP_BUTTON
+.Cn DIALOG_LIST
+.Cn DIALOG_LIST_LABEL
+.Cn DIALOG_OK_BUTTON
+.Cn DIALOG_SEPARATOR
+.Cn DIALOG_SELECTION_LABEL
+.Cn DIALOG_TEXT
+.Cn DIALOG_WORK_AREA
+.Ce
+.LE
+.P
+.yS
+XmGetAtomName
+\f2variable display atom\fP
+.yE
+.P
+.yS
+XmGetColors
+\f2widgetHandle background variable variable2 variable3 variable4\fP
+.yE
+.P
+.VL 6
+The
+.Cm XmGetColors
+command differs from the C procedure in that it takes a
+.I widgetHandle
+instead of a screen pointer and a colormap.
+.LE
+.P
+.yS
+XmGetFocusWidget
+\f2variable widgetHandle\fP
+.yE
+.P
+.yS
+XmGetPostedFromWidget
+\f2variable widgetHandle\fP
+.yE
+.P
+.yS
+XmGetTabGroup
+\f2variable widgetHandle\fP
+.yE
+.P
+.yS
+XmGetTearOffControl
+\f2variable widgetHandle\fP
+.yE
+.P
+.yS
+XmGetVisibility
+\f2variable widgetHandle\fP
+.yE
+.P
+.yS
+XmInternAtom
+\f2variable display atomString onlyIfExistsFlag\fP
+.yE
+.P
+.VL 6
+The
+.I onlyIfExistsFlag
+operand
+can be set to either
+True
+or
+False.
+.LE
+.P
+.yS
+XmIsTraversable
+\f2widgetHandle\fP
+.yE
+.P
+.VL 6
+The command returns
+a value that can be used in a conditional.
+.LE
+.P
+.yS
+XmListAddItem
+\f2widgetHandle position itemString\fP
+.yE
+.P
+.VL 6
+The ordering of the arguments to the
+.Cm XmListAddItem
+command differs from the corresponding C function.
+.LE
+.P
+.yS
+XmListAddItems
+\f2widgetHandle position itemString\fP [\f2itemString\0...\fP]
+.yE
+.P
+.VL 6
+The ordering of the arguments to the
+.Cm XmListAddItems
+command differs from the corresponding C function.
+.LE
+.P
+.yS
+XmListAddItemsUnselected
+\f2widgetHandle position itemString\fP
+[\f2itemString\0...\fP]
+.yE
+.P
+.VL 6
+The ordering of the arguments to the
+.Cm XmListAddItemsUnselected
+command differs from the corresponding C function.
+.LE
+.P
+.yS
+XmListAddItemUnselected
+\f2widgetHandle position itemString\fP
+.yE
+.P
+.VL 6
+The ordering of the arguments to the
+.Cm XmListAddItemUnselected
+command differs from the corresponding C function.
+.LE
+.P
+.yS
+XmListDeleteAllItems
+\f2widgetHandle\fP
+.yE
+.P
+.yS
+XmListDeleteItem
+\f2widgetHandle itemString\fP
+.yE
+.P
+.yS
+XmListDeleteItems
+\f2widgetHandle itemString\fP
+[\f2itemString\0...\fP]
+.yE
+.P
+.yS
+XmListDeleteItemsPos
+\f2widgetHandle itemCount position\fP
+.yE
+.P
+.yS
+XmListDeletePos
+\f2widgetHandle position\fP
+.yE
+.P
+.yS
+XmListDeletePositions
+\f2widgetHandle position\fP
+[\f2position\0...\fP]
+.yE
+.P
+.yS
+XmListDeselectAllItems
+\f2widgetHandle\fP
+.yE
+.P
+.yS
+XmListDeselectItem
+\f2widgetHandle itemString\fP
+.yE
+.P
+.yS
+XmListDeselectPos
+\f2widgetHandle position\fP
+.yE
+.P
+.yS
+XmListGetSelectedPos
+\f2variable widgetHandle\fP
+.yE
+.P
+.VL 6
+The command returns
+in
+.I variable
+a comma-separated list of indices.
+The command returns
+a value that can be used in a conditional.
+.LE
+.P
+.yS
+XmListGetKbdItemPos
+\f2variable widgetHandle\fP
+.yE
+.P
+.yS
+XmListGetMatchPos
+\f2variable widgetHandle itemString\fP
+.yE
+.P
+.VL 6
+The command returns
+in
+.I variable
+a comma-separated list of indices.
+The command returns
+a value that can be used in a conditional.
+.LE
+.P
+.yS
+XmListItemExists
+\f2widgetHandle itemString\fP
+.yE
+.P
+.VL 6
+The command returns
+a value that can be used in a conditional.
+.LE
+.P
+.yS
+XmListItemPos
+\f2variable widgetHandle itemString\fP
+.yE
+.P
+.yS
+XmListPosSelected
+\f2widgetHandle position\fP
+.yE
+.P
+.VL 6
+The command returns
+a value that can be used in a conditional.
+.LE
+.P
+.yS
+XmListPosToBounds
+\f2widgetHandle position variable variable2 variable3 variable4\fP
+.yE
+.P
+.VL 6
+The command returns
+a value that can be used in a conditional.
+.LE
+.P
+.yS
+XmListReplaceItemsPos
+\f2widgetHandle position itemString\fP
+[\f2itemString\0...\fP]
+.yE
+.P
+.VL 6
+The ordering of the arguments to the
+.Cm XmListReplaceItemsPos
+command differs from the corresponding C function.
+.LE
+.P
+.yS
+XmListReplaceItemsPosUnselected
+\f2widgetHandle position itemString\fP
+[\f2itemString\0...\fP]
+.yE
+.P
+.VL 6
+The ordering of the arguments to the
+.Cm XmListReplaceItemsPosUnselected
+command differs from the corresponding C function.
+.LE
+.P
+.yS
+XmListSelectItem
+\f2widgetHandle itemString notifyFlag\fP
+.yE
+.P
+.VL 6
+The
+.I notifyFlag
+operand
+can be set to either
+True
+or
+False.
+.LE
+.P
+.yS
+XmListSelectPos
+\f2widgetHandle position notifyFlag\fP
+.yE
+.P
+.VL 6
+The
+.I notifyFlag
+operand
+can be set to either
+True
+or
+False.
+.LE
+.P
+.yS
+XmListSetAddMode
+\f2widgetHandle state\fP
+.yE
+.P
+.VL 6
+The
+.I state
+operand
+can be set to either
+True
+or
+False.
+.LE
+.P
+.yS
+XmListSetBottomItem
+\f2widgetHandle itemString\fP
+.yE
+.P
+.yS
+XmListSetBottomPos
+\f2widgetHandle position\fP
+.yE
+.P
+.yS
+XmListSetHorizPos
+\f2widgetHandle position\fP
+.yE
+.P
+.yS
+XmListSetItem
+\f2widgetHandle itemString\fP
+.yE
+.P
+.yS
+XmListSetKbdItemPos
+\f2widgetHandle position\fP
+.yE
+.P
+.VL 6
+The command returns
+a value that can be used in a conditional.
+.LE
+.P
+.yS
+XmListSetPos
+\f2widgetHandle position\fP
+.yE
+.P
+.yS
+XmListUpdateSelectedList
+\f2widgetHandle\fP
+.yE
+.P
+.yS
+XmMainWindowSep1
+\f2variable widgetHandle\fP
+.yE
+.P
+.yS
+XmMainWindowSep2
+\f2variable widgetHandle\fP
+.yE
+.P
+.yS
+XmMainWindowSep3
+\f2variable widgetHandle\fP
+.yE
+.P
+.yS
+XmMainWindowSetAreas
+\f2widgetHandle menuWidgetHandle commandWidgetHandle
+horizontalScrollbarWidgetHandle verticalScrollbarWidgetHandle
+workRegionWidgetHandle\fP
+.yE
+.P
+.yS
+XmMenuPosition
+\f2widgetHandle eventHandle\fP
+.yE
+.P
+.VL 6
+The
+.I eventHandle
+operand
+refers to an
+.B XEvent
+that has typically been obtained
+by accessing the
+.IR CB_CALL_DATA.EVENT ,
+.I EH_EVENT
+or
+.I TRANSLATION_EVENT
+environment variables.
+.LE
+.P
+.yS
+XmMessageBoxGetChild
+\f2variable widgetHandle childType\fP
+.yE
+.P
+.VL 6
+The
+.I childType
+operand
+is one of the strings:
+.Cs I
+.Cn DIALOG_CANCEL_BUTTON
+.Cn DIALOG_DEFAULT_BUTTON
+.Cn DIALOG_HELP_BUTTON
+.Cn DIALOG_MESSAGE_LABEL
+.Cn DIALOG_OK_BUTTON
+.Cn DIALOG_SEPARATOR
+.Cn DIALOG_SYMBOL_LABEL
+.Ce
+.LE
+.P
+.yS
+XmOptionButtonGadget
+\f2variable widgetHandle\fP
+.yE
+.P
+.yS
+XmOptionLabelGadget
+\f2variable widgetHandle\fP
+.yE
+.P
+.yS
+XmProcessTraversal
+\f2widgetHandle direction\fP
+.yE
+.P
+.VL 6
+The
+.I direction
+operand
+is one of the strings:
+.Cs I
+.Cn TRAVERSE_CURRENT
+.Cn TRAVERSE_DOWN
+.Cn TRAVERSE_HOME
+.Cn TRAVERSE_LEFT
+.Cn TRAVERSE_NEXT
+.Cn TRAVERSE_NEXT_TAB_GROUP
+.Cn TRAVERSE_PREV
+.Cn TRAVERSE_PREV_TAB_GROUP
+.Cn TRAVERSE_RIGHT
+.Cn TRAVERSE_UP
+.Ce
+The command returns
+a value that can be used in a conditional.
+.LE
+.P
+.yS
+XmRemoveWMProtocolCallback
+\f2widgetHandle protocolAtom dtksh-command\fP
+.yE
+.P
+.VL 6
+The
+.I protocolAtom
+operand
+is typically obtained using the
+.Cm XmInternAtom
+command.
+As with traditional WM callbacks, when a callback is
+removed, the same
+.Cm dtksh
+command string must be specified as was specified
+when the callback was originally registered.
+.LE
+.P
+.yS
+XmRemoveWMProtocols
+\f2widgetHandle protocolAtom\fP
+[\f2protocolAtom\0...\fP]
+.yE
+.P
+.VL 6
+The
+.I protocolAtom
+operand
+is typically obtained using the
+.Cm XmInternAtom
+command.
+.LE
+.P
+.yS
+XmScaleGetValue
+\f2widgetHandle variable\fP
+.yE
+.P
+.yS
+XmScaleSetValue
+\f2widgetHandle value\fP
+.yE
+.P
+.yS
+XmScrollBarGetValues
+\f2widgetHandle variable variable2 variable3 variable4\fP
+.yE
+.P
+.yS
+XmScrollBarSetValues
+\f2widgetHandle value sliderSize increment pageIncrement notifyFlag\fP
+.yE
+.P
+.VL 6
+The
+.I notifyFlag
+operand
+can be set to either
+True
+or
+False.
+.LE
+.P
+.yS
+XmScrollVisible
+\f2widgetHandle widgetHandle leftRightMargin topBottomMargin\fP
+.yE
+.P
+.yS
+XmSelectionBoxGetChild
+\f2variable widgetHandle childType\fP
+.yE
+.P
+.VL 6
+The
+.I childType
+operand
+is one of the strings:
+.Cs I
+.Cn DIALOG_CANCEL_BUTTON
+.Cn DIALOG_DEFAULT_BUTTON
+.Cn DIALOG_HELP_BUTTON
+.Cn DIALOG_APPLY_BUTTON
+.Cn DIALOG_LIST
+.Cn DIALOG_LIST_LABEL
+.Cn DIALOG_OK_BUTTON
+.Cn DIALOG_SELECTION_LABEL
+.Cn DIALOG_SEPARATOR
+.Cn DIALOG_TEXT
+.Cn DIALOG_WORK_AREA
+.Ce
+.LE
+.P
+.yS
+XmTextClearSelection
+\f2widgetHandle time\fP
+.yE
+.P
+.VL 6
+The
+.I time
+operand
+is typically either obtained from within an
+.BR XEvent ,
+or from a call to the
+.Cm XtLastTimestampProcessed
+command.
+.LE
+.P
+.yS
+XmTextCopy
+\f2widgetHandle time\fP
+.yE
+.P
+.VL 6
+The
+.I time
+operand
+is typically either obtained from within an
+.BR XEvent ,
+or from a call to the
+.Cm XtLastTimestampProcessed
+command.
+The command returns
+a value that can be used in a conditional.
+.LE
+.P
+.yS
+XmTextCut
+\f2widgetHandle time\fP
+.yE
+.P
+.VL 6
+The
+.I time
+operand
+is typically either obtained from within an
+.BR XEvent ,
+or from a call to the
+.Cm XtLastTimestampProcessed
+command.
+The command returns
+a value that can be used in a conditional.
+.LE
+.P
+.yS
+XmTextDisableRedisplay
+\f2widgetHandle\fP
+.yE
+.P
+.yS
+XmTextEnableDisplay
+\f2widgetHandle\fP
+.yE
+.P
+.yS
+XmTextFindString
+\f2widgetHandle startPosition string direction variable\fP
+.yE
+.P
+.VL 6
+The
+.I direction
+operand
+is one of the strings
+.Cn TEXT_FORWARD
+or
+.Cn TEXT_BACKWARD .
+The command returns
+a value that can be used in a conditional.
+.LE
+.P
+.yS
+XmTextGetBaseline
+\f2variable widgetHandle\fP
+.yE
+.P
+.yS
+XmTextGetEditable
+\f2widgetHandle\fP
+.yE
+.P
+.VL 6
+The command returns
+a value that can be used in a conditional.
+.LE
+.P
+.yS
+XmTextGetInsertionPosition
+\f2variable widgetHandle\fP
+.yE
+.P
+.yS
+XmTextGetLastPosition
+\f2variable widgetHandle\fP
+.yE
+.P
+.yS
+XmTextGetMaxLength
+\f2variable widgetHandle\fP
+.yE
+.P
+.yS
+XmTextGetSelection
+\f2variable widgetHandle\fP
+.yE
+.P
+.yS
+XmTextGetSelectionPosition
+\f2widgetHandle variable variable2\fP
+.yE
+.P
+.VL 6
+The command returns
+a value that can be used in a conditional.
+.LE
+.P
+.yS
+XmTextGetString
+\f2variable widgetHandle\fP
+.yE
+.P
+.yS
+XmTextGetTopCharacter
+\f2variable widgetHandle\fP
+.yE
+.P
+.yS
+XmTextInsert
+\f2widgetHandle position string\fP
+.yE
+.P
+.yS
+XmTextPaste
+\f2widgetHandle\fP
+.yE
+.P
+.VL 6
+The command returns
+a value that can be used in a conditional.
+.LE
+.P
+.yS
+XmTextPosToXY
+\f2widgetHandle position variable variable2\fP
+.yE
+.P
+.VL 6
+The command returns
+a value that can be used in a conditional.
+.LE
+.P
+.yS
+XmTextRemove
+\f2widgetHandle\fP
+.yE
+.P
+.VL 6
+The command returns
+a value that can be used in a conditional.
+.LE
+.P
+.yS
+XmTextReplace
+\f2widgetHandle fromPosition toPosition string\fP
+.yE
+.P
+.yS
+XmTextScroll
+\f2widgetHandle lines\fP
+.yE
+.P
+.yS
+XmTextSetAddMode
+\f2widgetHandle state\fP
+.yE
+.P
+.VL 6
+The
+.I state
+operand
+can be set to either
+True
+or
+False.
+.LE
+.P
+.yS
+XmTextSetEditable
+\f2widgetHandle editableFlag\fP
+.yE
+.P
+.VL 6
+The
+.I editableFlag
+operand
+can be set to either
+True
+or
+False.
+.LE
+.P
+.yS
+XmTextSetHighlight
+\f2widgetHandle leftPosition rightPosition mode\fP
+.yE
+.P
+.VL 6
+The
+.I mode
+operand
+is one of the strings:
+.Cs I
+.Cn HIGHLIGHT_NORMAL
+.Cn HIGHLIGHT_SELECTED
+.Cn HIGHLIGHT_SECONDARY_SELECTED
+.Ce
+.LE
+.P
+.yS
+XmTextSetInsertionPosition
+\f2widgetHandle position\fP
+.yE
+.P
+.yS
+XmTextSetMaxLength
+\f2widgetHandle maxLength\fP
+.yE
+.P
+.yS
+XmTextSetSelection
+\f2widgetHandle firstPosition lastPosition time\fP
+.yE
+.P
+.VL 6
+The
+.I time
+operand
+is typically either obtained from within an
+.BR XEvent ,
+or
+from a call to the
+.Cm XtLastTimestampProcessed
+command.
+.LE
+.P
+.yS
+XmTextSetString
+\f2widgetHandle string\fP
+.yE
+.P
+.yS
+XmTextSetTopCharacter
+\f2widgetHandle topCharacterPosition\fP
+.yE
+.P
+.yS
+XmTextShowPosition
+\f2widgetHandle position\fP
+.yE
+.P
+.yS
+XmTextXYToPos
+\f2variable widgetHandle x y\fP
+.yE
+.P
+.yS
+XmTextFieldClearSelection
+\f2widgetHandle time\fP
+.yE
+.P
+.VL 6
+The
+.I time
+operand
+is typically either obtained from within an
+.BR XEvent ,
+or from a call to the
+.Cm XtLastTimestampProcessed
+command.
+.LE
+.P
+.yS
+XmTextFieldGetBaseline
+\f2variable widgetHandle\fP
+.yE
+.P
+.yS
+XmTextFieldGetEditable
+\f2widgetHandle\fP
+.yE
+.P
+.VL 6
+The command returns
+a value that can be used in a conditional.
+.LE
+.P
+.yS
+XmTextFieldGetInsertionPosition
+\f2variable widgetHandle\fP
+.yE
+.P
+.yS
+XmTextFieldGetLastPosition
+\f2variable widgetHandle\fP
+.yE
+.P
+.yS
+XmTextFieldGetMaxLength
+\f2variable widgetHandle\fP
+.yE
+.P
+.yS
+XmTextFieldGetSelection
+\f2variable widgetHandle\fP
+.yE
+.P
+.yS
+XmTextFieldGetSelectionPosition
+\f2widgetHandle variable variable2\fP
+.yE
+.P
+.VL 6
+The command returns
+a value that can be used in a conditional.
+.LE
+.P
+.yS
+XmTextFieldGetString
+\f2variable widgetHandle\fP
+.yE
+.P
+.yS
+XmTextFieldInsert
+\f2widgetHandle position string\fP
+.yE
+.P
+.yS
+XmTextFieldPosToXY
+\f2widgetHandle position variable variable2\fP
+.yE
+.P
+.VL 6
+The command returns
+a value that can be used in a conditional.
+.LE
+.P
+.yS
+XmTextFieldRemove
+\f2widgetHandle\fP
+.yE
+.P
+.VL 6
+The command returns
+a value that can be used in a conditional.
+.LE
+.P
+.yS
+XmTextFieldReplace
+\f2widgetHandle fromPosition toPosition string\fP
+.yE
+.P
+.yS
+XmTextFieldSetEditable
+\f2widgetHandle editableFlag\fP
+.yE
+.P
+.VL 6
+The
+.I editableFlag
+operand
+can be set to either
+True
+or
+False.
+.LE
+.P
+.yS
+XmTextFieldSetHighlight
+\f2widgetHandle leftPosition rightPosition mode\fP
+.yE
+.P
+.VL 6
+The
+.I mode
+operand
+is one of the strings:
+.Cs I
+.Cn HIGHLIGHT_NORMAL
+.Cn HIGHLIGHT_SELECTED
+.Cn HIGHLIGHT_SECONDARY_SELECTED
+.Ce
+.LE
+.P
+.yS
+XmTextFieldSetInsertionPosition
+\f2widgetHandle position\fP
+.yE
+.P
+.yS
+XmTextFieldSetMaxLength
+\f2widgetHandle maxLength\fP
+.yE
+.P
+.yS
+XmTextFieldSetSelection
+\f2widgetHandle firstPosition lastPosition time\fP
+.yE
+.P
+.VL 6
+The
+.I time
+operand
+is typically either obtained from within an
+.BR XEvent ,
+or
+from a call to the
+.Cm XtLastTimestampProcessed
+command.
+.LE
+.P
+.yS
+XmTextFieldSetString
+\f2widgetHandle string\fP
+.yE
+.P
+.yS
+XmTextFieldShowPosition
+\f2widgetHandle position\fP
+.yE
+.P
+.yS
+XmTextFieldXYToPos
+\f2variable widgetHandle x y\fP
+.yE
+.P
+.yS
+XmTextFieldCopy
+\f2widgetHandle time\fP
+.yE
+.P
+.VL 6
+The
+.I time
+operand
+is typically either obtained from within an
+.BR XEvent ,
+or from a call to the
+.Cm XtLastTimestampProcessed
+command.
+The command returns
+a value that can be used in a conditional.
+.LE
+.P
+.yS
+XmTextFieldCut
+\f2widgetHandle time\fP
+.yE
+.P
+.VL 6
+The
+.I time
+operand
+is typically either obtained from within an
+.B XEvent
+or from a call to the
+.Cm XtLastTimestampProcessed
+command.
+The command returns
+a value that can be used in a conditional.
+.LE
+.P
+.yS
+XmTextFieldPaste
+\f2widgetHandle\fP
+.yE
+.P
+.VL 6
+The command returns
+a value that can be used in a conditional.
+.LE
+.P
+.yS
+XmTextFieldSetAddMode
+\f2widgetHandle state\fP
+.yE
+.P
+.VL 6
+The
+.I state
+operand
+can be set to either
+True
+or
+False.
+.LE
+.P
+.yS
+XmToggleButtonGadgetGetState
+\f2widgetHandle\fP
+.yE
+.P
+.VL 6
+The command returns
+a value that can be used in a conditional.
+.LE
+.P
+.yS
+XmToggleButtonGadgetSetState
+\f2widgetHandle state notifyFlag\fP
+.yE
+.P
+.VL 6
+The
+.I state
+operand
+can be set to either
+True
+or
+False.
+The
+.I notifyFlag
+operand
+can be set to either
+True
+or
+False.
+.LE
+.P
+.yS
+XmToggleButtonGetState
+\f2widgetHandle\fP
+.yE
+.P
+.VL 6
+The command returns
+a value that can be used in a conditional.
+.LE
+.P
+.yS
+XmToggleButtonSetState
+\f2widgetHandle state notifyFlag\fP
+.yE
+.P
+.VL 6
+The
+.I state
+operand
+can be set to either
+True
+or
+False.
+The
+.I notifyFlag
+operand
+can be set to either
+True
+or
+False.
+.LE
+.P
+.yS
+XmUpdateDisplay
+\f2widgetHandle\fP
+.yE
+.HU "Built-in Cde Application Help Commands"
+.yS
+DtCreateHelpQuickDialog
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+DtCreateHelpDialog
+\f2variable parentWidgetHandle name\fP
+[\f2resource:value\0...\fP]
+.yE
+.P
+.yS
+DtHelpQuickDialogGetChild
+\f2variable widgetHandle childType\fP
+.yE
+.P
+.VL 6
+The
+.I childType
+operand
+is one of the strings:
+.Cs I
+.Cn HELP_QUICK_OK_BUTTON
+.Cn HELP_QUICK_PRINT_BUTTON
+.Cn HELP_QUICK_HELP_BUTTON
+.Cn HELP_QUICK_SEPARATOR
+.Cn HELP_QUICK_MORE_BUTTON
+.Cn HELP_QUICK_BACK_BUTTON
+.Ce
+.LE
+.P
+.yS
+DtHelpReturnSelectedWidgetId
+\f2variable widgetHandle variable2\fP
+.yE
+.P
+.VL 6
+The
+.I variable
+operand
+is set to one of the strings:
+.Cs I
+.Cn HELP_SELECT_VALID
+.Cn HELP_SELECT_INVALID
+.Cn HELP_SELECT_ABORT
+.Cn HELP_SELECT_ERROR
+.Ce
+and
+.I variable2
+is set to the
+.I widgetHandle
+for the selected widget.
+.LE
+.P
+.yS
+DtHelpSetCatalogName
+\f2catalogName\fP
+.yE
+.HU "Built-in Localization Commands"
+.yS
+catopen
+\f2variable catalogName\fP
+.yE
+.P
+.VL 6
+Opens the indicated message catalog, and returns the catalog ID in the
+environment variable specified by
+.IR variable .
+If a shell script needs
+to close the file descriptor associated with a message catalog, the catalog
+ID must be closed using the
+.Cm catclose
+command.
+.LE
+.P
+.yS
+catgets
+\f2variable catalogId setNumber messageNumber defaultMessageString\fP
+.yE
+.P
+.VL 6
+Attempts to extract the requested message string from the message catalog
+associated with the
+.I catalogId
+argument.
+If the message string cannot
+be located, the default message string is returned.
+In either case,
+the returned message string is placed into the environment variable indicated
+by
+.IR variable .
+.LE
+.P
+.yS
+catclose
+\f2catalogId\fP
+.yE
+.P
+.VL 6
+Closes the message catalog associated with the indicated
+.IR catalogId .
+.LE
+.HU "Built-in Session Management Commands"
+.yS
+DtSessionRestorePath
+\f2widgetHandle variable sessionFile\fP
+.yE
+.P
+.VL 6
+Given the filename for the session file (excluding any path information),
+this command returns the full pathname for the session file in the environment
+variable indicated by
+.IR variable .
+The command returns
+a value that can be used in a conditional, indicating whether the
+command succeeded.
+.LE
+.P
+.yS
+DtSessionSavePath
+\f2widgetHandle variable variable2\fP
+.yE
+.P
+.VL 6
+The full pathname for the session file is returned in environment variable
+indicated by
+.IR variable .
+The filename portion of the session file
+(excluding any path information) is returned in the environment variable
+indicated by
+.IR variable2 .
+The command returns
+a value that can be used in a conditional, indicating whether the
+command succeeded.
+.LE
+.P
+.yS
+DtShellIsIconified
+\f2widgetHandle\fP
+.yE
+.P
+.VL 6
+The command returns
+a value that can be used in a conditional.
+.LE
+.P
+.yS
+DtSetStartupCommand
+\f2widgetHandle commandString\fP
+.yE
+.P
+.VL 6
+Part of the session management process is telling the session manager how to
+restart the application the next time the user reopens the session.
+This command passes along the specified command string to the session manager.
+The widget handle should refer to an application shell.
+.LE
+.P
+.yS
+DtSetIconifyHint
+\f2widgetHandle iconifyHint\fP
+.yE
+.P
+.VL 6
+The
+.I iconifyHint
+operand
+can be set to either
+True
+or
+False.
+This command sets the initial iconified state for a shell window.
+This command only works if the window associated with the widget has
+not yet been realized.
+.LE
+.HU "Built-in Workspace Management Commands"
+.yS
+DtWsmAddCurrentWorkspaceCallback
+\f2variable widgetHandle dtksh-command\fP
+.yE
+.P
+.VL 6
+This command evaluates the specified
+.Cm dtksh
+command whenever the
+user changes workspaces.
+The handle associated with this callback
+is returned in the environment variable indicated by
+.IR variable .
+The widget indicated by
+.I widgetHandle
+should be a shell widget.
+.LE
+.P
+.yS
+DtWsmRemoveWorkspaceCallback
+\f2callback-handle\fP
+.yE
+.P
+.VL 6
+The
+.I callback-handle
+must be a handle that was returned by
+.Cm DtWsmAddCurrentWorkspaceCallback .
+.LE
+.P
+.yS
+DtWsmGetCurrentWorkspace
+\f2display rootWindow variable\fP
+.yE
+.P
+.VL 6
+This command returns the X atom representing the user's current
+workspace in the environment variable indicated by
+.IR variable .
+The
+.Cm XmGetAtomName
+command maps the X atom into its string representation.
+.LE
+.P
+.yS
+DtWsmSetCurrentWorkspace
+\f2widgetHandle workspaceNameAtom\fP
+.yE
+.P
+.VL 6
+This command changes the user's current workspace to the workspace
+indicated by
+.IR workspaceNameAtom .
+The command returns
+a value that can be used in a conditional, indicating whether the
+command succeeded.
+.LE
+.P
+.yS
+DtWsmGetWorkspaceList
+\f2display rootWindow variable\fP
+.yE
+.P
+.VL 6
+This command returns in
+.I variable
+a string of comma-separated X atoms,
+representing
+the current set of workspaces defined for the user.
+The command returns
+a value that can be used in a conditional, indicating whether the
+command succeeded.
+.LE
+.P
+.yS
+DtWsmGetWorkspacesOccupied
+\f2display window variable\fP
+.yE
+.P
+.VL 6
+This command returns a string of comma-separated X atoms, representing
+the current set of workspaces occupied by the indicated shell window in the
+environment variable indicated by
+.IR variable .
+The command returns
+a value that can be used in a conditional, indicating whether the
+command succeeded.
+.LE
+.P
+.yS
+DtWsmSetWorkspacesOccupied
+\f2display window workspaceList\fP
+.yE
+.P
+.VL 6
+This command moves the indicated shell window to the set of workspaces
+indicated by the string
+.IR workspaceList ,
+which must be a comma-separated list of X atoms.
+.LE
+.P
+.yS
+DtWsmAddWorkspaceFunctions
+\f2display window\fP
+.yE
+.P
+.yS
+DtWsmRemoveWorkspaceFunctions
+\f2display window\fP
+.yE
+.P
+.yS
+DtWsmOccupyAllWorkspaces
+\f2display window\fP
+.yE
+.P
+.yS
+DtWsmGetCurrentBackdropWindows
+\f2display rootWindow variable\fP
+.yE
+.P
+.VL 6
+This command returns in
+.I variable
+a string of comma-separated window IDs
+representing the set of root backdrop windows.
+.LE
+.HU "Built-in Action Commands"
+The set of commands in this section provides the programmer with the tools
+for loading the action databases, querying information about actions defined
+in the databases, and requesting that an action be initiated.
+.P
+.yS
+DtDbLoad
+.yE
+.P
+.VL 6
+This command reads in the action and data types databases.
+It must be called before any of the other Action
+or Data Typing Commands.
+The shell script should also use the
+.Cm DtDbReloadNotify
+command so that the shell script can be
+notified if new databases must be loaded.
+.LE
+.P
+.yS
+DtDbReloadNotify
+\f2dtksh-command\fP
+.yE
+.P
+.VL 6
+The specified
+.Cm dtksh
+command is executed
+when the notification is received.
+Typically, the
+.Cm dtksh
+command includes
+a call to the
+.Cm DtDbLoad
+command.
+.LE
+.P
+.yS
+DtActionExists
+\f2actionName\fP
+.yE
+.P
+.VL 6
+The command returns
+a value that can be used in a conditional.
+.LE
+.P
+.yS
+DtActionLabel
+\f2variable actionName\fP
+.yE
+.P
+.VL 6
+If the action does not exist, then an empty string is
+returned.
+.LE
+.P
+.yS
+DtActionDescription
+\f2variable actionName\fP
+.yE
+.P
+.VL 6
+This command returns an empty string if the action is not
+defined, or if the
+.Cn DESCRIPTION
+attribute is not specified.
+.LE
+.P
+.yS
+DtActionInvoke
+\f2widgetHandle actionName termOpts execHost contextDir useIndicator\fP
+\f2dtksh-command\fP
+[FILE \f2fileName\fP]\0...
+.yE
+.P
+.VL 6
+The [FILE
+.IR fileName ]
+couplets can be used to specify file
+arguments to be used by
+.Cm DtActionInvoke
+when invoking the specified action.
+The
+.I dtksh-command
+argument
+.cde is not supported in Cde 1.0, and should be
+.xo must be
+specified as a null ("\|") value.
+.LE
+.HU "Built-in Data Typing Commands"
+.yS
+DtDtsLoadDataTypes
+.yE
+.P
+.VL 6
+This command should be invoked before any of the other data typing commands.
+.LE
+.P
+.yS
+DtDtsFileToDataType
+\f2variable filePath\fP
+.yE
+.P
+.VL 6
+This command returns the name of the data type associated with the file
+indicated by the
+.I filePath
+argument in the
+.I variable
+argument.
+The
+.I variable
+argument is set to an empty string if the file cannot be typed.
+.LE
+.P
+.yS
+DtDtsFileToAttributeValue
+\f2variable filePath attrName\fP
+.yE
+.P
+.VL 6
+This command returns the string representing the value of the specified
+attribute for the data type associated with the indicated file in the
+.I variable
+argument.
+If the
+attribute is not defined, or if the file cannot be typed, the
+.I variable
+argument is set to an empty string.
+.LE
+.P
+.yS
+DtDtsFileToAttributeList
+\f2variable filePath\fP
+.yE
+.P
+.VL 6
+This command returns the space-separated list of attribute names defined
+for the data type associated with the indicated file in the
+.I variable
+argument.
+A shell script
+queries the individual values for the attributes using the
+.Cm DtDtsFileToAttributeValue
+command.
+The
+.I variable
+argument is set
+to an empty string if the file cannot be typed.
+This command differs from the corresponding C function
+in that it only returns the names of the defined attributes and not their
+values.
+.LE
+.P
+.yS
+DtDtsDataTypeToAttributeValue
+\f2variable dataType attrName optName\fP
+.yE
+.P
+.VL 6
+This command returns the string representing the value of the specified
+attribute for the indicated data type in
+.IR variable .
+If the attribute is not defined, or
+if the indicated data type does not exist, the
+.I variable
+argument
+is set to an empty string.
+.LE
+.P
+.yS
+DtDtsDataTypeToAttributeList
+\f2variable dataType optName\fP
+.yE
+.P
+.VL 6
+This command returns the space-separated list of attribute names defined
+for the indicated data type in
+.IR variable .
+A shell script queries the individual values for the attributes using the
+.Cm DtDtsDataTypeToAttributeValue
+command.
+The
+.I variable
+argument is set to an empty string if the data type is
+not defined.
+This command differs from the corresponding C function
+in that it only returns the names of the defined attributes,
+and not their values.
+.LE
+.P
+.yS
+DtDtsFindAttribute
+\f2variable name value\fP
+.yE
+.P
+.VL 6
+This command returns a space-separated list of data type names whose
+attribute, indicated by the
+.I name
+argument, has the value indicated by the
+.I value
+argument.
+If an error occurs, the
+.I variable
+argument
+is set to an empty string.
+.LE
+.P
+.yS
+DtDtsDataTypeNames
+\f2variable\fP
+.yE
+.P
+.VL 6
+This command returns a space-separated list representing all of the data types
+currently defined in the data types database.
+If an error occurs, the
+.I variable
+argument is set to an empty string.
+.LE
+.P
+.yS
+DtDtsSetDataType
+\f2variable filePath dataType override\fP
+.yE
+.P
+.VL 6
+The
+.I variable
+argument is set to the resultant saved data type for the
+directory.
+.LE
+.P
+.yS
+DtDtsDataTypeIsAction
+\f2dataType\fP
+.yE
+.P
+.VL 6
+The command returns
+a value that can be used in a conditional.
+.LE
+.HU "Built-in Cde Desktop Services Message Set Commands"
+The following set of commands implement a subset of the Desktop
+Services Message Set, allowing shell script participation in the
+Desktop Services protocol.
+Many of the ToolTalk commands differ slightly from their associated C
+programming call.
+For ToolTalk commands that typically
+return a pointer, a C application can validate that pointer by calling the
+.Fn tt_ptr_error
+function; this C function call returns a
+.B Tt_status
+value,
+which indicates whether the pointer was valid, and if not, why it was not.
+In
+.Cm dtksh ,
+all of the Desktop Services Message Set Commands that
+return a pointer also return the associated
+.B Tt_status
+value for the pointer
+automatically; this saves the shell script from needing to make an
+additional call to check the validity of the original pointer.
+In the case
+of a pointer error occurring,
+.Cm dtksh
+returns an empty string for the pointer
+value, and sets the
+.B Tt_status
+code accordingly.
+The
+.B Tt_status
+value is returned in the
+.I status
+argument.
+The
+.B Tt_status
+value is a string representing the error, and can assume any of the
+values shown in
+.cde the manual page for
+.Hd Tt/tt_c.h 5.
+.P
+Some of the commands take a message scope as an argument.
+For these commands, the
+.I scope
+argument can be set to a string representing
+any of the constants documented for
+.Cm tt_message_scope 1,
+and
+in the manual pages for the individual ToolTalk functions.
+.P
+.yS
+tt_file_netfile
+\f2variable status file name\fP
+.yE
+.P
+.yS
+tt_netfile_file
+\f2variable status netfile name\fP
+.yE
+.P
+.yS
+tt_host_file_netfile
+\f2variable status host file name\fP
+.yE
+.P
+.yS
+tt_host_netfile_file
+\f2variable status host netfile name\fP
+.yE
+.P
+.yS
+ttdt_open
+\f2variable status variable2 toolname vendor version sendStarted\fP
+.yE
+.P
+.VL 6
+This command returns in the
+.I variable
+argument the
+.I procId
+associated with the connection.
+It returns the file descriptor associated with the connection in
+.IR variable2 ;
+this file descriptor can be used in registering an
+alternative Xt input handler via the
+.Cm XtAddInput
+command.
+The
+.I sendStarted
+argument is True or False.
+Any
+.I procIds
+returned by
+.Cm ttdt_open
+contain embedded spaces.
+To prevent
+.Cm dtksh
+from interpreting the
+.I procId
+as multiple arguments (versus a single argument with
+embedded spaces), references to the environment
+variable containing the
+.I procId
+must be within double quotes, as shown:
+.Cs I
+ttdt_close STATUS "$PROC_ID" "" True
+.Ce
+.LE
+.P
+.yS
+tttk_Xt_input_handler
+\f2procId source id\fP
+.yE
+.P
+.VL 6
+In order for the ToolTalk messages to be received and processed, the shell
+script must register an Xt input handler for the file descriptor returned by
+the call to
+.Cm ttdt_open .
+The Xt input handler is registered using the
+.Cm XtAddInput
+command, and the handler must be registered as a raw input
+handler.
+The input handler that the shell script registers should invoke
+.Cm tttk_Xt_input_handler
+to get the message received and processed.
+The
+following code block demonstrates how this is done:
+.Cs I
+ttdt_open PROC_ID STATUS FID "Tool" "HP" "1.0" True
+XtAddInput INPUT_ID \-r $FID "ProcessTTInput \e"$PROC_ID\e""
+ProcessTTInput()
+{
+	tttk_Xt_input_handler $1 $INPUT_SOURCE $INPUT_ID
+}
+.Ce
+.P
+Refer to the description of the
+.Cm XtAddInput
+command for more details about
+alternative Xt input handlers.
+This command can be specified as an alternative Xt input handler, using the
+.Cm XtAddInput
+command.
+The
+.I procId
+value should be that which was
+returned by the
+.Cm ttdt_open
+command.
+When registering
+.Cm tttk_Xt_input_handler
+as an alternative Xt input handler, it must be registered as a raw handler
+to prevent
+.Cm dtksh
+from automatically breaking up the input into lines.
+This can be done as follows:
+.Cs I
+XtAddInput returnId \-r $tt_fd \e
+	"tttk_Xt_input_handler \e"$procId\e""
+.Ce
+.P
+The \e" characters before and after the reference to the
+.I procId
+environment variable are necessary to protect the embedded spaces in the
+.I procId
+environment variable.
+.LE
+.P
+.yS
+ttdt_close
+\f2status procId newProcId sendStopped\fP
+.yE
+.P
+.VL 6
+This command closes the indicated communications connection, and optionally
+sends a
+.I Stopped
+notice, if the
+.I sendStopped
+argument is set to
+True.
+Because the
+.I procId
+returned by the call to
+.Cm ttdt_open
+contains embedded
+spaces, it must be enclosed
+within double quotes, as shown:
+.Cs I
+ttdt_close STATUS "$PROC_ID" "$NEW_PROC_ID" False
+.Ce
+.LE
+.P
+.yS
+ttdt_session_join
+\f2variable status sessId shellWidgetHandle join\fP
+.yE
+.P
+.VL 6
+This command joins the session indicated by the
+.I sessId
+argument.
+If the
+.I sessId
+argument does not specify a value (that is,
+it is an empty string), then the default session is joined.
+If the
+.I shellWidgetHandle
+argument specifies a widget handle
+(that is, it is not an empty string), then it should refer to a
+mappedWhenManaged applicationShellWidget.
+The
+.I join
+argument is
+True
+or
+False.
+This command returns an opaque pattern handle in the
+.I variable
+argument;
+this handle can be destroyed using the
+.Cm ttdt_session_quit
+command when it is no longer needed.
+.LE
+.P
+.yS
+ttdt_session_quit
+\f2status sessId sessPatterns quit\fP
+.yE
+.P
+.VL 6
+This command destroys the message patterns specified by the
+.I sessPatterns
+argument, and, if the
+.I quit
+argument is set to
+True,
+it quits the session indicated by the
+.I sessId
+argument, or it quits the default session if
+.I sessId
+is empty.
+.LE
+.P
+.yS
+ttdt_file_join
+\f2variable status pathName scope join dtksh-command\fP
+.yE
+.P
+.VL 6
+An opaque pattern handle is returned in the
+.I variable
+argument;
+this should be destroyed by calling
+.Cm ttdt_file_quit
+when there is no interest
+in monitoring messages for the indicated file.
+The requested
+.I dtksh-command
+is evaluated any time a message
+is received for the indicated file.
+When this
+.I dtksh-command
+is evaluated, the following environment variables are defined, and provide
+additional information about the received message:
+.VL 6
+.LI \f2DT_TT_MSG\fP
+.br
+The opaque handle for the incoming message.
+.LI \f2DT_TT_OP\fP
+.br
+The string representing the operation to be performed; that is,
+.Cn TTDT_DELETED ,
+.Cn TTDT_MODIFIED ,
+.Cn TTDT_REVERTED ,
+.Cn TTDT_\%MOVED
+or
+.Cn TTDT_SAVED .
+.LI \f2DT_TT_PATHNAME\fP
+.br
+The pathname for the file to which this message pertains.
+.LI \f2DT_TT_SAME_EUID_EGID\fP
+.br
+Set to
+True
+if the message was sent by an application operating with
+the same effective user ID and effective group ID as this process.
+.LI \f2DT_TT_SAME_PROCID\fP
+.br
+Set to
+True
+if the message was sent by an application with the same
+.I procId
+(as returned by
+.Cm ttdt_open ).
+.LE
+.P
+When the callback completes, it must indicate whether the passed-in message
+was consumed (replied-to, failed or rejected).
+If the callback returns the
+message (as passed in the
+.I DT_TT_MSG
+environment variable),
+it is assumed that the message was not consumed.
+If the message was
+consumed, the callback should return zero, or one of the values returned
+by the
+.Cm tt_error_pointer
+command.
+The callback can return its value in the
+following fashion:
+.Cs I
+return $DT_TT_MSG (or) return 0
+.Ce
+.LE
+.P
+.yS
+ttdt_file_quit
+\f2status patterns quit\fP
+.yE
+.P
+.VL 6
+This command destroys the message patterns specified by the
+.I patterns
+argument, and also unregisters interest in the pathname that was passed
+to the
+.Cm ttdt_file_join
+command if
+.I quit
+is set to
+True;
+the
+.I patterns
+argument should be the value returned by a call to the
+.Cm ttdt_file_join
+command.
+.LE
+.P
+.yS
+ttdt_file_event
+\f2status op patterns send\fP
+.yE
+.P
+.VL 6
+This command creates, and optionally sends, a ToolTalk notice announcing
+an event pertaining to a file.
+The file is indicated by the pathname passed to the
+.Cm ttdt_file_join
+command when
+.I patterns
+was created.
+The
+.I op
+argument indicates what should be announced for the indicated file, and can
+be set to
+.Cn TTDT_MODIFIED ,
+.Cn TTDT_SAVED
+or
+.Cn TTDT_REVERTED .
+If
+.I op
+is set to
+.Cn TTDT_MODIFIED ,
+this command registers to handle
+.IR Get_Modified ,
+.I Save
+and
+.I Revert
+messages in the scope specified when the
+.I patterns
+was created.
+If
+.I op
+is set to
+.Cn TTDT_SAVED
+or
+.Cn TTDT_REVERTED ,
+this command
+unregisters from handling
+.IR Get_Modified ,
+.I Save
+and
+.I Revert
+messages for this file.
+If the
+.I send
+argument is set to
+True,
+the indicated message is sent.
+.LE
+.P
+.yS
+ttdt_Get_Modified
+\f2pathName scope timeout\fP
+.yE
+.P
+.VL 6
+This commands sends a
+.I Get_Modified
+request in the indicated scope, and
+waits for a reply, or for the specified
+.I timeout
+(in milliseconds) to
+elapse.
+It returns a value that can be used in a conditional.
+A value of
+True
+is returned if an affirmative reply is received within the specified
+.IR timeout ;
+otherwise,
+False
+is returned.
+.LE
+.P
+.yS
+ttdt_Save
+\f2status pathName scope timeout\fP
+.yE
+.P
+.VL 6
+This command sends a
+.I Save
+request in the indicated scope, and waits for a
+reply, or for the indicated
+.I timeout
+(in milliseconds) to elapse.
+A status of
+.B TT_OK
+is
+returned if an affirmative reply is received before the
+.I timeout
+elapses;
+otherwise, a
+.B Tt_status
+error value is returned.
+.LE
+.P
+.yS
+ttdt_Revert
+\f2status pathName scope timeout\fP
+.yE
+.P
+.VL 6
+This command sends a
+.I Revert
+request in the indicated scope, and waits for a
+reply, or for the indicated
+.I timeout
+(in milliseconds) to elapse.
+A status of
+.B TT_OK
+is
+returned if an affirmative reply is received before the
+.I timeout
+elapses; otherwise, a
+.B Tt_status
+error value is returned.
+.LE
+.P
+The following commands are typically used by the callback registered with the
+.Cm ttdt_file_join
+command.
+They serve as the mechanism for consuming and
+destroying a message.
+A message is consumed by either rejecting, failing or
+replying to it.
+The
+.I tt_error_pointer
+is used by the callback to get a return pointer
+for indicating an error condition.
+.P
+.yS
+tt_error_pointer
+\f2variable ttStatus\fP
+.yE
+.P
+.VL 6
+This command returns a magic value, which is used by ToolTalk to represent
+an invalid pointer.
+The magic value returned depends on the
+.I ttStatus
+value passed in.
+Any of the valid
+.B Tt_status
+values can be specified.
+.LE
+.P
+.yS
+tttk_message_destroy
+\f2status msg\fP
+.yE
+.P
+.VL 6
+This command destroys any patterns that may have been stored on the
+message indicated by the
+.I msg
+argument, and then it destroys the message.
+.LE
+.P
+.yS
+tttk_message_reject
+\f2status msg msgStatus msgStatusString destroy\fP
+.yE
+.P
+.VL 6
+This command sets the status and the status string for the indicated
+request message, and then rejects the message.
+It then destroys the passed-in message if the
+.I destroy
+argument is set to
+True.
+This
+command is one way in which the callback specified with the
+.Cm ttdt_file_join
+command consumes a message.
+After rejecting the message, it is typically safe to destroy the message
+using
+.Cm tttk_message_destroy .
+.LE
+.P
+.yS
+tttk_message_fail
+\f2status msg msgStatus msgStatusString destroy\fP
+.yE
+.P
+.VL 6
+This command sets the status and the status string for the indicated
+request message, and then it fails the message.
+It destroys
+the passed-in message if the
+.I destroy
+argument is set to
+True.
+This command
+is one way in which the callback specified with the
+.Cm ttdt_file_join
+command consumes a message.
+After failing the message, it is typically safe to destroy the message, using
+.Cm tttk_message_destroy .
+.LE
+.P
+.yS
+tt_message_reply
+\f2status msg\fP
+.yE
+.P
+.VL 6
+This command informs the ToolTalk service that the shell script has handled
+the message specified by the
+.I msg
+argument.
+After replying to a message, it is typically safe to destroy
+the message using the
+.Cm tttk_message_destroy
+command.
+.LE
+.HU "Listing Widget Information"
+The
+.I DtWidgetInfo
+command provides the shell programmer a mechanism for
+obtaining information about the current set of instantiated widgets and
+their resources; the information is written to the standard output.
+This provides useful
+debugging information by including:
+.VL 3
+.LI \(bu
+The list of instantiated widgets, including:
+the name, class and parent of the widget;
+a handle for the widget;
+the name of the environment variable supplied when the widget was created;
+the state of the widget.
+.LI \(bu
+The list of resources supported by a particular widget class.
+.LI \(bu
+The list of constraint resources supported by a particular widget class.
+.LE
+.P
+.I DtWidgetInfo
+is called by using any of the following syntaxes; all of the
+arguments are optional:
+.P
+.yS
+DtWidgetInfo
+[\f2widgetHandle\fP | \f2widgetName\fP]
+.yE
+.P
+.VL 6
+If no arguments are supplied, information about all existing widgets is
+written to standard output;
+the information includes the name, the handle, the environment
+variable, the parent, the widget class and the state.
+If arguments are
+supplied, they should be either widget handles, or the names of existing
+widgets; in this case, the information is written
+only for the requested set of widgets.
+.LE
+.P
+.yS
+DtWidgetInfo
+\-r [\f2widgetHandle\fP | \f2widgetClass\fP]
+.yE
+.P
+.VL 6
+If no arguments are supplied, the list of supported resources is
+written to standard output for all available widget classes.
+If arguments are supplied,
+they should be either widget handles, or the widget class names; in this
+case, the information is written only for the requested set of widgets or
+widget classes.
+.LE
+.P
+.yS
+DtWidgetInfo
+\-R [\f2widgetHandle\fP | \f2widgetClass\fP]
+.yE
+.P
+.VL 6
+If no arguments are supplied, the list of supported constraint resources,
+if any, is written to standard output for all available widget classes.
+If arguments are
+supplied, they should be either widget handles, or the widget class
+names; in this case, the information is written only for the requested set of
+widgets or widget classes.
+.LE
+.P
+.yS
+DtWidgetInfo
+\-c [\f2widgetClass\fP]
+.yE
+.P
+.VL 6
+If no arguments are supplied, the list of supported widget class names
+is written to standard output.
+If arguments are supplied,
+.Cm dtksh
+writes the widget class
+name (if it is defined);
+otherwise, it writes an error message to standard error.
+.LE
+.P
+.yS
+DtWidgetInfo
+\-h [\f2widgetHandle\fP]
+.yE
+.P
+.VL 6
+If no arguments are supplied, the list of active widget
+handles is written to standard output.
+If arguments are supplied, they should represent widget handles, in which
+case the name of the associated widget is written to standard output.
+.LE
+.HU "Convenience Functions"
+The Cde system includes a file of
+.Cm dtksh
+convenience functions.
+This file is itself a shell script containing shell functions that may be
+useful to a shell programmer.
+.cdes
+The shell functions perform frequently used operations.
+These include functions
+for quickly creating certain kinds of dialogs (help, error, warning and so on), and
+a function for easily creating a collection of buttons and functions that
+make it easier to configure the constraint resources for a child of a form
+widget.
+It is not a requirement that shell script writers use these
+convenience functions; they are supplied to make it easier for developers
+to write shorter and more readable shell scripts.
+.cdee
+.P
+Before a shell script can access these functions, the shell script
+must first include the file containing the convenience functions.
+The convenience functions are located in the file
+.BR /usr/dt/lib/dtksh/DtFuncs.dtsh ,
+and are included in a shell script using the following notation:
+.Cs I
+\&. /usr/dt/lib/dtksh/DtFuncs.dtsh
+.Ce
+.HU "DtkshAddButtons"
+This convenience function adds one or more buttons of the
+same kind into a composite widget.
+Most frequently, it is used to add a
+collection of buttons into a menupane or menubar.
+.P
+.yS
+DtkshAddButtons
+\f2parent widgetClass label1 callback1\fP [\f2label2 callback2\0...\fP]
+.yE
+.P
+.yS
+DtkshAddButtons
+[\f2\-w\fP] \f2parent widgetClass variable1 label1 callback1\fP
+[\f2variable2 label2 callback2\0...\fP]
+.yE
+.P
+The
+.B \-w
+option indicates that the convenience function should return the
+widget handle for each of the buttons it creates.
+The widget handle is
+returned in the specified environment variable.
+The
+.I widgetClass
+argument
+can be set to any one of the following, and defaults to
+.Cm XmPushButtonGadget ,
+if not specified:
+.Cs I
+.Cm XmPushButton
+.Cm XmPushButtonGadget
+.Cm XmToggleButton
+.Cm XmToggleButtonGadget
+.Cm XmCascadeButton
+.Cm XmCascadeButtonGadget
+.Ce
+.P
+Examples:
+.Cs I
+DtkshAddButtons $MENU XmPushButtonGadget Open do_Open Save \e
+	do_Save Quit exit
+.sp 0.5v
+DtkshAddButtons \-w $MENU XmPushButtonGadget B1 Open \e
+	do_Open B2 Save do_Save
+.Ce
+.HU "DtkshSetReturnKeyControls"
+This convenience function configures a text widget (within a form widget),
+so the
+.tK carriage-return
+key does not activate the default button within the form.
+Instead, the
+.tK carriage-return
+key moves the focus to the next text widget within the
+form.
+This is useful if a window, containing a series of text
+widgets and the default button, should not be activated until the user
+presses the
+.tK carriage-return
+key while the focus is in the last text widget.
+.P
+.yS
+DtkshSetReturnKeyControls
+\f2textWidget nextTextWidget formWidget defaultButton\fP
+.yE
+.P
+The
+.I textWidget
+argument specifies the widget to be configured so it catches
+the
+.tK carriage-return
+key, and forces the focus to move to the next text widget
+(as indicated by the
+.I nextTextWidget
+argument).
+The
+.I formWidget
+argument specifies the form containing the default button,
+and must be the parent of the two text widgets.
+The
+.I defaultButton
+argument indicates which component to treat as the default button within
+the form widget.
+.P
+Examples:
+.Cs I
+DtkshSetReturnKeyControls $TEXT1 $TEXT2 $FORM $OK
+.sp 0.5v
+DtkshSetReturnKeyControls $TEXT2 $TEXT3 $FORM $OK
+.Ce
+.HU "DtkshUnder, DtkshOver, DtkshRightOf, DtkshLeftOf"
+These convenience functions simplify the specification of certain classes of
+form constraints.
+They provide a convenient way of attaching a component to
+one edge of another component.
+They are used when constructing the resource list for a widget.
+This behavior is accomplished using the
+.Cn ATTACH_WIDGET
+constraint.
+.P
+.yS
+DtkshUnder \f2widgetId\fP [\f2offset\fP]\f1
+.yE
+.P
+.yS
+DtkshOver \f2widgetId\fP [\f2offset\fP]\f1
+.yE
+.P
+.yS
+DtkshRightOf \f2widgetId\fP [\f2offset\fP]\f1
+.yE
+.P
+.yS
+DtkshLeftOf \f2widgetId\fP [\f2offset\fP]\f1
+.yE
+.P
+The
+.I widgetId
+argument specifies the widget to which the current
+component is to be attached.
+The
+.I offset
+value is optional, and defaults to zero, if not specified.
+.P
+Example:
+.Cs I
+XtCreateManagedWidget BUTTON4 button4 pushButton $FORM \e
+	labelString:"Exit" $(DtkshUnder $BUTTON2) \e
+	$(DtkshRightOf $BUTTON3)
+.Ce
+.HU "DtkshFloatRight, DtkshFloatLeft, DtkshFloatTop, DtkshFloatBottom"
+These convenience functions simplify the specification of certain classes of
+form constraints.
+They provide a convenient way of positioning a component,
+independent of the other components within the form.
+As the form grows or
+shrinks, the component maintains its relative position within the form.
+The
+component may still grow or shrink, depending on the other form constraints
+specified for the component.
+This behavior is accomplished using the
+.Cn ATTACH_POSITION
+constraint.
+.P
+.yS
+DtkshFloatRight [\f2position\fP]
+.yE
+.P
+.yS
+DtkshFloatLeft [\f2position\fP]
+.yE
+.P
+.yS
+DtkshFloatTop [\f2position\fP]
+.yE
+.P
+.yS
+DtkshFloatBottom [\f2position\fP]
+.yE
+.P
+The optional
+.I position
+argument specifies the relative position to which the
+indicated edge of the component is positioned.
+A default position is used,
+if one is not specified.
+.P
+Example:
+.Cs I
+XtCreateManagedWidgetBUTTON1 button1 pushButton \e
+	$FORM labelString:"Ok" $(DtkshUnder $SEPARATOR) \e
+	$(DtkshFloatLeft 10) $(DtkshFloatRight 40)
+.Ce
+.HU "DtkshAnchorRight, DtkshAnchorLeft, DtkshAnchorTop, DtkshAnchorBottom"
+These convenience functions simplify the specification of certain classes of
+form constraints.
+They provide a convenient way of attaching a component to
+one of the edges of a form widget in such a fashion that, as the form grows
+or shrinks, the component's position does not change.
+However, depending on
+the other form constraints set on this component, the component may still
+grow or shrink in size.
+This behavior is accomplished using the
+.Cn ATTACH_FORM
+constraint.
+.P
+.yS
+DtkshAnchorRight [\f2offset\fP]
+.yE
+.P
+.yS
+DtkshAnchorLeft [\f2offset\fP]
+.yE
+.P
+.yS
+DtkshAnchorTop [\f2offset\fP]
+.yE
+.P
+.yS
+DtkshAnchorBottom [\f2offset\fP]
+.yE
+.P
+The optional
+.I offset
+argument specifies how far from the edge of the form
+widget the component should be positioned.
+If an offset is not specified,
+zero is used.
+.P
+Example:
+.Cs I
+XtCreateManagedWidget BUTTON1 button1 pushButton \e
+	$FORM labelString:"Ok" $(DtkshUnder $SEPARATOR) \e
+	$(DtkshAnchorLeft 10) $(DtkshAnchorBottom 10)
+.Ce
+.HU "DtkshSpanWidth, DtkshSpanHeight"
+These convenience functions simplify the specification of certain classes of
+form constraints.
+They provide a convenient way of configuring a component
+such that it spans either the full height or width of the form widget.
+This
+behavior is accomplished by attaching two edges of the component (top and
+bottom for
+.Cm DtkshSpanHeight ,
+and left and right for
+.Cm DtkshSpanWidth )
+to the form widget.
+The component typically resizes whenever the form widget is resized.
+The
+.Cn ATTACH_FORM
+constraint is used for all attachments.
+.P
+.yS
+DtkshSpanWidth [\f2leftOffset rightOffset\fP]
+.yE
+.P
+.yS
+DtkshSpanHeight [\f2topOffset bottomOffset\fP]
+.yE
+.P
+The optional
+.I offset
+arguments specify how far from the edges of the form
+widget the component should be positioned.
+If an offset is not specified, zero is used.
+.P
+Example:
+.Cs I
+XtCreateManagedWidget SEP sep separator $FORM $(DtkshSpanWidth 1 1)
+.Ce
+.HU "DtkshDisplayInformationDialog, DtkshDisplayQuestionDialog, DtkshDisplay\%Warning\%Dialog, DtkshDisplayWorkingDialog, DtkshDisplayErrorDialog"
+These convenience functions create a single instance of each of the Motif
+feedback dialogs.
+If an instance of the requested type of dialog already
+exists, it is reused.
+The parent of the dialog is obtained from the
+environment variable,
+.IR TOPLEVEL ,
+which should be set by the calling shell
+script, and then should not be changed.
+The handle for the requested dialog
+is returned in one of the following environment variables:
+.Cs I
+\f2DTKSH_ERROR_DIALOG_HANDLE\fP
+\f2DTKSH_QUESTION_DIALOG_HANDLE\fP
+\f2DTKSH_WORKING_DIALOG_HANDLE\fP
+\f2DTKSH_WARNING_DIALOG_HANDLE\fP
+\f2DTKSH_INFORMATION_DIALOG_HANDLE\fP
+.Ce
+.P
+When attaching callbacks to the dialog buttons, the
+application should not destroy the
+dialog; it should simply unmanage the dialog so that it
+can be used again later.
+If it is necessary to destroy the dialog, the associated environment
+variable should also be cleared, so the convenience function does
+not attempt to reuse the dialog.
+.P
+.yS
+DtkshDisplay*Dialog title message [\f2okCallback closeCallback \e
+	helpCallback dialogStyle\fP]
+.yE
+.P
+The Ok button is always managed, and by default unmanages the dialog.
+The Cancel and Help buttons are only managed when a callback is
+supplied for them.
+The
+.I dialogStyle
+argument accepts any of the
+standard resource settings supported by the associated bulletin board
+resource.
+.P
+Example:
+.Cs
+DtkshDisplayErrorDialog "Read Error" "Unable to read the file" \e
+	"OkCallback" "CancelCallback" "" DIALOG_PRIMARY_APPLICATION_MODAL
+.Ce
+.HU "DtkshDisplayQuickHelpDialog, DtkshDisplayHelpDialog"
+These convenience functions create a single instance of each of the help
+dialogs.
+If an instance of the requested type of help dialog already exists,
+it is reused.
+The parent of the dialog is obtained from the environment
+variable,
+.IR TOPLEVEL ,
+which should be set by the calling shell script, and
+then should not be changed.
+The handle for the requested dialog is returned
+in one of the following environment variables:
+.Cs I
+\f2DTKSH_HELP_DIALOG_HANDLE\fP
+\f2DTKSH_QUICK_HELP_DIALOG_HANDLE\fP
+.Ce
+.P
+If it is necessary to destroy a help dialog,
+the application should also clear the associated
+environment variable, so that the convenience function does not attempt to
+reuse the dialog.
+.P
+.yS
+DtkshDisplay*HelpDialog title helpType helpInformation [\f2locationId\fP]
+.yE
+.P
+The meaning of the arguments depends on the value specified for the
+.I helpType
+argument.
+The meanings are explained in the following table:
+.TS
+.xo center, box, tab(@);
+.xo cf4 | cf4 | cf4
+.xo l | l | l .
+.cde center, tab(@);
+.cde cf2 cf2 cf2
+.cde lf3 l l .
+helpType@helpInformation@locationId
+_
+HELP_TYPE_DYNAMIC_STRING@help string@<not used>
+HELP_TYPE_FILE@help file name@<not used>
+HELP_TYPE_MAN_PAGE@manual page name@<not used>
+HELP_TYPE_STRING@help string@<not used>
+HELP_TYPE_TOPIC@help volume name@help topic location ID
+.TE
+.P
+Example:
+.Cs I
+DtkshDisplayHelpDialog "Help On Dtksh" HELP_TYPE_FILE "helpFileName"
+.Ce
+.HU "Dtksh App-Defaults File"
+The
+.Cm dtksh
+app-defaults file, named
+.BR Dtksh ,
+is in a location based on the
+following path description:
+.Cs I
+/usr/dt/app-defaults/<LANG>
+.Ce
+.P
+The only information contained in this app-defaults file
+is the inclusion of the standard desktop base app-defaults file.
+The contents of the
+.B dtksh
+app-defaults file is as follows:
+.Cs I
+#include "Dt"
+.Ce
+.HU "Non-String Values"
+The C bindings of the interfaces to X, Xt and Motif include many non-string
+values defined in headers.
+For example, the constraint values
+for a child of a form widget are declared, such as
+.Cn XmATTACH_FORM ,
+with an Xt or
+Xm prefix followed by a descriptive name.
+Equivalent values are specified in
+.Cm dtksh
+by omitting the prefix, just as in an app-defaults file.
+For example:
+.Cn XmDIALOG_COMMAND_TEXT
+becomes
+.Cn DIALOG_COMMAND_TEXT ;
+.Cn XtATTACH_\%FORM
+becomes
+.Cn ATTACH_FORM .
+.P
+A Boolean value can be specified as an argument to a
+.Cm dtksh
+command using the
+words
+.B True
+or
+.BR False ;
+case is not significant.
+.HU "Return Values From Built-in Commands"
+.xR5 dtkshretval
+Graphical commands in
+.Cm dtksh
+fall into one of four categories, based on the
+definition of the corresponding C function in a windowing library:
+.VL 3
+.LI 1.
+The function returns no values.
+Example:
+.Cm XtMapWidget .
+.LI 2.
+The function is void, but returns one or more values through reference
+arguments.
+Example:
+.Cm XmGetColors .
+.LI 3.
+The function returns a non-Boolean value.
+Example:
+.Cm XtCreateManagedWidget .
+.LI 4.
+The function returns a Boolean value.
+Example:
+.Cm XtIsSensitive .
+.LE
+.P
+A category 1 command follows the calling sequence of its corresponding C
+function exactly; the number and order of arguments can be determined by
+looking at the standard documentation for the function.
+Example:
+.Cs I
+XtMapWidget $FORM
+.Ce
+.P
+A category 2 command also generally follows the calling sequence as its
+corresponding C function.
+Where a C caller would pass in a pointer to a
+variable in which a value is returned, the
+.Cm dtksh
+command returns a value in
+an environment variable.
+Example:
+.Cs I
+XmGetColors $FORM $BG FOREGROUND TOPSHADOW BOTTOMSHADOW SELECT
+echo "Foreground color = " $FOREGROUND
+.Ce
+.P
+A category 3 command differs slightly from its corresponding C function.
+Where the C function returns its value as the value of the procedure call,
+a
+.Cm dtksh
+command requires an additional argument, which is always the first
+argument, and is the name of an environment variable into which the return
+value is placed.
+Example:
+.Cs I
+XmTextGetString TEXT_VALUE $TEXT_WIDGET
+echo "The value of the text field is "$TEXT_VALUE
+.Ce
+.P
+A category 4 command returns a Boolean value that can be used in a
+conditional expression, just as with the corresponding C function.
+If the C function
+also returns values through reference variables (as in category 2), the
+.Cm dtksh
+command also uses variable names for the corresponding arguments.
+Example:
+.Cs I
+if XmIsTraversable $PUSH_BUTTON; then
+	echo "The pushbutton is traversable"
+else
+	echo "The pushbutton is not traversable"
+fi
+.Ce
+.P
+Generally, the order and type of arguments passed to a command matches those
+passed to the corresponding C function, except as noted for category 3
+commands.
+Other exceptions are described in the applicable command descriptions.
+.HU "Widget Handles"
+Where a C function returns a widget handle, the corresponding
+.Cm dtksh
+commands set an environment variable equal to the widget handle.
+These are
+category 3 commands; they take as one of their arguments the name of an
+environment variable in which to return the widget handle.
+.cdes
+(This is an
+ASCII string used by
+.Cm dtksh
+to access the actual widget pointer.)
+.cdee
+For example,
+either of the following commands could be used to create a new form widget;
+in both cases, the widget handle for the new form widget is returned in the
+environment variable
+.IR FORM :
+.Cs I
+XtCreateManagedWidget FORM name XmForm $PARENT
+.sp 0.5v
+XmCreateForm FORM $PARENT name
+.Ce
+.P
+After either of the above commands,
+.I $FORM
+can be used to reference the form widget.
+For instance, to create a label widget within the form widget just
+created, the following command could be used:
+.Cs I
+XmCreateLabel LABEL $FORM namelabelString:"Hi Mom" \e
+	topAttachment:ATTACH_FORM leftAttachment:ATTACH_FORM
+.Ce
+.P
+There is a special widget handle called
+.Cn NULL ,
+provided for cases where
+a shell script may need to specify a
+.Cn NULL
+widget.
+For example, the following disables the
+.B defaultButton
+resource for a form widget:
+.Cs I
+XtSetValues $FORM defaultButton:NULL
+.Ce
+.HU "Widget Resources"
+Some of the Xt and Motif commands allow the shell script to pass in a
+variable number of arguments, representing resource and value pairs.
+This is similar to the
+.I arglist
+passed in to the corresponding Xt or Motif C function.
+Examples of these commands include any of the commands used to create a
+widget, and the
+.Cm XtSetValues
+command.
+In
+.Cm dtksh ,
+resources are specified by a
+string with the following syntax:
+.IR resource :\c
+.IR value .
+.P
+The name of the resource is given in the resource portion of the string; it
+is constructed by taking the corresponding Xt or Motif resource name and
+omitting the Xt or Xm prefix.
+The value to be assigned to the resource
+is given in the value portion of the string.
+The
+.Cm dtksh
+utility automatically converts
+the value string to an appropriate internal representation.
+For example:
+.Cs I
+XtSetValues $WIDGET height:100 width:200 resizePolicy:RESIZE_ANY
+XmCreateLabel LABEL $PARENT myLabel labelString:"Close Dialog"
+.Ce
+.P
+When widget resources are retrieved using
+.Cm XtGetValues ,
+the return value has the same syntax.
+For example:
+.Cs I
+XtGetValues $WIDGET height:HEIGHT resizePolicy:POLICY \e
+	sensitive:SENSITIVE
+echo $HEIGHT
+echo $POLICY
+echo $SENSITIVE
+.Ce
+.P
+Certain types of resource values have special representation.
+These include string tables and bit masks.
+For instance, the XmList widget allows a string
+table to be specified both for the items and the
+.B selectedItems
+resources.
+In
+.Cm dtksh ,
+a string table is represented as a comma-separated list of strings,
+which is compatible with how Motif handles them from a resource file.
+When a resource that returns a string table is queried using
+.Fn XtGetValues 3X,
+the resulting value is again a comma-separated set of strings.
+A resource that expects a bit mask value to be passed in, expects the
+mask to be specified as a string composed of the various mask values
+separated by the ``|'' character.
+When a resource that returns a bit mask is
+queried, the return value also is a string representing the enabled
+bits, separated by the ``|'' character.
+For example, the following sets the
+.B mwmFunctions
+resource for the
+.I VendorShell
+widget class:
+.Cs I
+XtSetValues mwmFunctions MWM_FUNC_ALL|MWM_FUNC_RESIZE
+.Ce
+.HU "Unsupported Resources"
+The
+.Cm dtksh
+utility supports most of the
+resources provided by Motif;
+however, there are certain resources that
+.Cm dtksh
+does not support.
+The list of unsupported resources follows.
+Several of these resources can be specified at widget creation time by
+using
+.Cm XtSetValues ,
+but cannot be retrieved using
+.Cm XtGetValues ;
+these are indicated by the asterisk (\f3*\fP) following the resource name.
+.VL 6
+.LI "All Widget And Gadget Classes:"
+.br
+Any font list resource (\f3*\fP)
+.br
+Any pixmap resource (\f3*\fP)
+.LI \f2Composite:\fP
+.br
+.I insertPosition
+.br
+children
+.LI \f2Core:\fP
+.br
+accelerators
+.br
+translations (\f3*\fP)
+.br
+colormap
+.LI \f2XmText:\fP
+.br
+.I selectionArray
+.br
+.I selectionArrayCount
+.LI \f2ApplicationShell:\fP
+.br
+.I argv
+.LI \f2WMShell:\fP
+.br
+.I iconWindow
+.br
+.I windowGroup
+.LI \f2Shell:\fP
+.br
+.I createPopupChildrenProc
+.LI \f2XmSelectionBox:\fP
+.br
+.I textAccelerators
+.LI "\f2Manager, Primitive \f1and\f2 Gadget Subclasses:\f1"
+.br
+.I userData
+.LI \f2XmFileSelectionBox:\fP
+.br
+.I dirSearchProc
+.br
+.I fileSearchProc
+.br
+.I qualifySearchDataProc
+.LE
+.SH "EXIT STATUS"
+See
+.cde .Cm sh 1.
+.xo .Cm sh
+.xo in the \*(ZC.
+.SH "CONSEQUENCES OF ERRORS"
+See
+.cde .Cm sh 1.
+.xo .Cm sh
+.xo in the \*(ZC.
+.SH "APPLICATION USAGE"
+.HU "Initializing The Toolkit Environment"
+Before any of the Xlib, Xt or Motif commands can be invoked, the shell
+script must first initialize the Xt toolkit by invoking the
+.Cm XtInitialize
+command, which returns an application shell widget.
+.Cm XtInitialize ,
+as with all of the commands that return a widget handle,
+returns the widget
+handle in the environment variable named in its first argument.
+For example:
+.Cs I
+XtInitialize TOPLEVEL myShellName Dtksh $0$@
+.Ce
+.P
+Shell script writers should invoke the
+.Cm XtInitialize
+command as one of the first commands within a
+.Cm dtksh
+shell script.
+This
+allows
+.Cm dtksh
+to locate its message catalog and the correct app-defaults file.
+If a shell error occurs before
+.Cm XtInitialize
+has been called, it is possible that unlocalized error messages may be
+displayed.
+The
+.Cm dtksh
+utility provides a default app-defaults file to use if the call to
+.Cm XtInitialize
+specifies an application class name of
+.IR Dtksh .
+This app-defaults file loads in the standard set of desktop
+application default values, so that these applications have
+a consistent look with other desktop applications.
+.cdes
+.HU "Responding to a Window Manager Close Notice"
+When the user selects the Close item on the window manager menu for an
+application, the application is terminated unless it has arranged to catch
+the Close notification.
+Multiple windows managed by the application
+disappear, and application data may be left in an undesirable state.
+To avoid this,
+.Cm dtksh
+provides for catching and handling the Close notification.
+The application must:
+.VL 3
+.LI \(bu
+Define a procedure to handle the Close notification
+.LI \(bu
+Request notification when Close is selected
+and override the response, so the application is not shut down
+.LE
+.P
+The following code illustrates this processing:
+.Cs I
+# This is the `callback' invoked when the user selects
+# the `Close' menu item
+WMCallback()
+{
+	echo "User has selected the Close menu item"
+}
+.sp 0.5v
+# Create the toplevel application shell
+XtInitialize TOPLEVEL test Dtksh "$@"
+XtDisplay DISPLAY $TOPLEVEL
+.sp 0.5v
+# Request notification when the user selects the `Close'
+# menu item
+XmInternAtom DELETE_ATOM $DISPLAY "WM_DELETE_WINDOW" false
+XmAddWMProtocolCallback $TOPLEVEL $DELETE_ATOM "WMCallback"
+.sp 0.5v
+# Ask Motif to not automatically close down your
+# application window
+XtSetValues $TOPLEVEL deleteResponse:DO_NOTHING
+.Ce
+.HU "Responding to a Session Management Save State Notice"
+Session management facilities allow applications to save their current state
+when the user terminates the current session, so that when the user later
+restarts the session, an application returns to the state it was in.
+In
+.Cm dtksh
+this is accomplished by setting up a handler analogously to handling
+a Close notification.
+If no such handler is set up, the application has
+to be restarted manually in the new session, and does not retain any
+state.
+To set up a handler to save state, the application must do the following:
+.VL 3
+.LI \(bu
+Define functions to save state at end-of-session, and restore it on start-up.
+.LI \(bu
+Register interest in the session management notification.
+.LI \(bu
+Register the function to save state.
+.LI \(bu
+Determine if saved state should be restored at start-up.
+.LE
+.P
+The following code illustrates this process:
+.Cs
+.S -1
+#! /usr/dt/bin/dtksh
+# Function invoked when the session is being ended by the user
+SessionCallback()
+{
+	# Get the name of the file into which we should save our
+	# session information
+	if DtSessionSavePath $TOPLEVEL PATH SAVEFILE; then
+		exec 9>$PATH
+.sp 0.5v
+		# Save off whether we are currently in an iconified state
+		if DtShellIsIconified $TOPLEVEL ; then
+			print \-u9 `Iconified'
+		else
+			print \-u9 `Deiconified'
+		fi
+.sp 0.5v
+		# Save off the list of workspaces we currently reside in
+		if DtWsmGetWorkspacesOccupied $(XtDisplay "\-" $TOPLEVEL)
+				$(XtWindow "\-" $TOPLEVEL)
+				CURRENT_WS_LIST ;
+		then
+			# Map the comma-separated list of atoms into
+			# their string representation
+			oldIFS=$IFS
+			IFS=","
+			for item in $CURRENT_WS_LIST;
+			do
+				XmGetAtomName NAME $(XtDisplay "\-" $TOPLEVEL)
+					$item
+				print \-u9 $NAME
+			done
+			IFS=$oldIFS
+		fi
+.sp 0.5v
+		exec 9<&-
+.sp 0.5v
+		# Let the session manager know how to invoke us when
+		# the session is restored
+		DtSetStartupCommand $TOPLEVEL
+			"/usr/dt/contrib/dtksh/SessionTest $SAVEFILE"
+	else
+		echo "DtSessionSavePath FAILED!!"
+		exit \-3
+	fi
+}
+.sp 0.5v
+# Function invoked during a restore session; restores the
+# application to its previous state
+RestoreSession()
+{
+	# Retrieve the path where our session file resides
+	if DtSessionRestorePath $TOPLEVEL PATH $1; then
+		exec 9<$PATH
+		read \-u9 ICONIFY
+.sp 0.5v
+		# Extract and restore our iconified state
+		case $ICONIFY in
+			Iconified) DtSetIconifyHint $TOPLEVEL True;;
+			*) DtSetIconifyHint $TOPLEVEL False;
+		 esac
+.sp 0.5v
+		# Extract the list of workspaces we belong in, convert
+		# them to atoms, and ask the workspace manager to relocate
+		# us to those workspaces
+		WS_LIST=""
+		while read \-u9 NAME
+		do
+			XmInternAtom ATOM $(XtDisplay "\-" $TOPLEVEL)
+					$NAME False
+			if [ ${#WS_LIST} \-gt 0 ]; then
+				WS_LIST=$WS_LIST,$ATOM
+			else
+				WS_LIST=$ATOM
+			fi
+		done
+.sp 0.5v
+		DtWsmSetWorkspacesOccupied $(XtDisplay "-" $TOPLEVEL)
+				$(XtWindow "-" $TOPLEVEL) $WS_LIST
+.sp 0.5v
+		exec 9<&-
+	 else
+		echo "DtSessionRestorePath FAILED!!"
+		exit \-3
+	fi
+}
+################## Create the Main UI #######################
+XtInitialize TOPLEVEL wmProtTest Dtksh "$@"
+XtCreateManagedWidget DA da XmDrawingArea $TOPLEVEL
+XtSetValues $DA height:200 width:200
+XmInternAtom SAVE_SESSION_ATOM $(XtDisplay "\-" $TOPLEVEL)
+		"WM_SAVE_YOURSELF" False
+.sp 0.5v
+# If a command-line argument was supplied, then treat it as the
+# name of the session file
+if (( $# > 0))
+then
+	# Restore to the state specified in the passed-in session file
+	XtSetValues $TOPLEVEL mappedWhenManaged:False
+	XtRealizeWidget $TOPLEVEL
+	XSync $(XtDisplay "-" $TOPLEVEL) False
+	RestoreSession $1
+	XtSetValues $TOPLEVEL mappedWhenManaged:True
+	XtPopup $TOPLEVEL GrabNone
+else
+	# This is not a session restore, so come up in the default state
+	XtRealizeWidget $TOPLEVEL
+	XSync $(XtDisplay "-" $TOPLEVEL) False
+fi
+.sp 0.5v
+# Register the fact that we are interested in participating in
+# session management
+XmAddWMProtocols $TOPLEVEL $SAVE_SESSION_ATOM
+XmAddWMProtocolCallback $TOPLEVEL $SAVE_SESSION_ATOM
+			SessionCallback
+.sp 0.5v
+XtMainLoop
+.S +1
+.Ce
+.cdee
+.HU "Cooperating with WorkSpace Management"
+The
+.Cm dtksh
+utility provides access to all of the major workspace management functions of
+the desktop libraries, including functions for:
+.VL 3
+.LI \(bu
+Querying and setting the set of
+workspaces with which an application is associated.
+.LI \(bu
+Querying the list of all workspaces.
+.LI \(bu
+Querying and setting the current workspace.
+.LI \(bu
+Requesting that an application be notified any time the user
+changes to a different workspace.
+.LE
+.P
+From a user's perspective, workspaces are identified by a set of names, but
+from the workspace manager's perspective, workspaces are identified by X atoms.
+Whenever the shell script asks for a list of workspace identifiers, a string
+of X atoms is returned; if more than one X atom is present, the
+list is comma-separated.
+.P
+The workspace manager expects that the shell
+script uses the same format when passing workspace identifiers back to it.
+During a given session, it is safe for the shell script to work with the
+X atoms since they remain constant over the lifetime of the session.
+However, as was shown in the Session Management shell script example, if the
+shell script is going to save and restore workspace identifiers, the
+workspace identifiers must
+be converted from their X atom representation to a string before they are
+saved.
+Then, when the session is restored, the shell script needs to
+remap the names into X atoms before passing the information on to the
+workspace manager.
+Mapping between X atoms and strings and between strings
+and X atoms uses the following two commands:
+.Cs I
+XmInternAtom ATOM $DISPLAY $WORKSPACE_NAME false
+XmGetAtomName NAME $DISPLAY $ATOM
+.Ce
+.HU "Creating Localized Shell Scripts"
+Scripts written for
+.Cm dtksh
+are internationalized, and then localized, in a process very
+similar to C applications.
+All strings that may be presented to the user are
+identified in the script; a post-processor extracts the strings from the
+script, and from them builds a catalog, which can then be translated to
+any desired locale.
+When the script executes, the current locale determines
+which message catalog is searched for strings to display.
+When a string is
+to be presented, it is identified by a message-set ID (corresponding to the
+catalog), and a message number within the set; these values determine what
+text the user sees.
+The following code illustrates the process:
+.Cs I
+# Attempt to open our message catalog
+catopen MSG_CAT_ID "myCatalog.cat"
+.sp 0.5v
+# The localized button label is in set 1, and is message # 2
+XtCreatePushButton OK $PARENT ok
+labelString:$(catgets $MSG_CAT_ID 1 2 "OK")
+.sp 0.5v
+# The localized button label is in set 1, and is message #3
+XtCreatePushButton CANCEL $PARENT cancel
+labelString:$(catgets $MSG_CAT_ID 1 3 "Cancel")
+.sp 0.5v
+# Close the message catalog, when no longer needed
+catclose $MSG_CAT_ID
+.Ce
+.P
+The file descriptor returned by
+.Cm catopen
+must be closed using
+.Cm catclose ,
+and not using the
+.Cm sh
+.Cm exec
+command.
+.HU "Using the dtksh Utility to Access X Drawing Functions"
+The commands of the
+.Cm dtksh
+utility include standard Xlib drawing functions to draw lines,
+points, segments, rectangles, arcs and polygons.
+In the standard C programming
+environment, these functions take a graphics context, or GC as an argument,
+in addition to the drawing data.
+In
+.Cm dtksh
+drawing functions, a collection of
+GC options are specified in the argument list to the command.
+By default, the drawing commands create a GC that is used for that
+specific command and then discarded.
+If the script specifies the
+.B \-gc
+option,
+the name of the graphics context object can be passed to the command; this GC
+is used in interpreting the command, and the variable is updated
+with any modifications to the GC performed by the command.
+.VL 6
+.LI "\f3\-gc \f2GC\f1"
+.br
+.I GC
+is the name of an environment variable that has not yet
+been initialized, or which has been left holding a graphic context by a
+previous drawing command.
+If this option is specified, it must be the first
+.I GC
+option specified.
+.LI "\f3\-foreground \f2color\f1"
+.br
+Foreground color, which can be either the name
+of a color or a pixel number.
+.LI "\f3\-background \f2color\f1"
+.br
+Background color, which can be either the name
+of a color or a pixel number.
+.LI "\f3\-font \f2font name\f1"
+.br
+Name of the font to be used.
+.LI "\f3\-line_width \f2number\f1"
+.br
+Line width to be used during drawing.
+.LI "\f3\-function \f2drawing function\f1"
+.br
+Drawing function, which can be any of the following:
+.BR xor ,
+.BR or ,
+.BR clear ,
+.BR and ,
+.BR copy ,
+.BR noop ,
+.BR nor ,
+.BR nand ,
+.BR set ,
+.BR invert ,
+.BR equiv ,
+.BR andReverse ,
+.B orReverse
+or
+.BR copyInverted .
+.LI "\f3\-line_style \f2style\f1"
+.br
+Line style, which can be any of the following:
+.BR LineSolid ,
+.B LineDoubleDash
+or
+.BR LineOnOffDash .
+.LE
+.HU "Setting Widget Translations:
+The
+.Cm dtksh
+utility provides mechanisms for augmenting, overriding and removing
+widget
+translations, much as in the C programming environment.
+In C, an application
+installs a set of translation action procedures, which can then be attached
+to specific sequences of events (translations are composed of an event
+sequence and the associated action procedure).
+Translations within
+.Cm dtksh
+are handled in a similar fashion, except only a single action procedure is
+available.
+This action procedure, named
+.IR ksh_eval ,
+interprets any arguments
+passed to it as
+.Cm dtksh
+commands, and evaluates them when the translation is
+triggered.
+The following shell script segment gives an example of how
+translations can be used:
+.Cs I
+BtnDownProcedure()
+{
+  echo "Button Down event occurred in button "$1
+}
+XtCreateManagedWidget BUTTON1 button1 XmPushButton $PARENT
+  labelString:"Button 1"
+  translations:'#augment
+      <EnterNotify>:ksh_eval("echo Button1 entered")
+      <Btn1Down>:ksh_eval("BtnDownProcedure 1")'
+XtCreateManagedWidget BUTTON2 button2 XmPushButton $PARENT
+  labelString:"Button 2"
+XtOverrideTranslations $BUTTON2
+         '#override
+      <Btn1Down>:ksh_eval("BtnDownProcedure 2")'
+.Ce
+.SH EXAMPLES
+None.
+.SH "SEE ALSO"
+.cde .Cm sh 1,
+.cde .Cm ksh93 1.
+.xo .Cm sh
+.xo in the \*(ZC.

@@ -1,0 +1,137 @@
+XCOMM $XConsortium: ibmLib.rules /main/cde_cst0/cde1_maint/6 1995/11/03 19:34:42 drk $
+
+/*
+ * AIX shared library rules
+ */
+
+#ifndef ForceNormalLib
+#define ForceNormalLib NO
+#endif
+#ifndef SharedDataSeparation
+#define SharedDataSeparation NO
+#endif
+#ifndef SharedCodeDef
+#define SharedCodeDef -DSHAREDCODE
+#endif
+#ifndef SharedLibraryDef
+#define SharedLibraryDef -DAIXSHLIB
+#endif
+#ifndef ShLibIncludeFile
+#define ShLibIncludeFile <ibmLib.tmpl>
+#endif
+#ifndef SharedLibraryLoadFlags
+#define SharedLibraryLoadFlags -bhalt\:4 -bloadmap\:$@.map -bE\:$@.syms -bM\:SRE $(LOADLIBPATH)
+#endif
+#ifndef PositionIndependentCFlags
+#define PositionIndependentCFlags -bM\:SRE
+#endif
+#ifndef ExtraLoadFlags
+#define ExtraLoadFlags -bnodelcsect -bloadmap\:$@.map $(LOADLIBPATH)
+#endif
+
+/*
+ * InstallSharedLibrary - generate rules to install the shared library.
+ */
+#ifndef InstallSharedLibrary
+#define InstallSharedLibrary(libname,rev,dest)				@@\
+InstallLibrary(libname,dest)
+#endif /* InstallSharedLibrary */
+
+/*
+ * InstallSharedLibraryData - generate rules to install the shared library data
+ */
+#ifndef InstallSharedLibraryData
+#define InstallSharedLibraryData(libname,rev,dest)
+#endif /* InstallSharedLibraryData */
+
+
+
+#ifndef AddExportList
+#if UseExportLists
+#define AddExportList(down,up,lib,exportlist,solist) \
+	@-$(RM) $@.syms;						@@\
+	@if [ -f exportlist ]; then \					@@\
+	    $(CPP) exportlist >$@.list ; \				@@\
+	    $(EXPORTLISTGEN) lib $@.list > $@.syms; \			@@\
+	    $(RM) $@.list ; \						@@\
+	else \								@@\
+	    dump -g $@~ | awk '$$1 ~ /[0-9][0-9]/ && $$2 !~ /^[\.]/ {print $$2}' > $@.syms; \	@@\
+	fi;								@@\
+	@if [ -f $@.aix-syms ]; then \					@@\
+	    cat $@.aix-syms >> $@.syms; \				@@\
+	fi;
+#else
+#define AddExportList(down,up,lib, exportlist, solist) \
+	@-$(RM) $@.syms;						@@\
+	dump -g $@~ | awk '$$1 ~ /[0-9][0-9]/ && $$2 !~ /^[\.]/ {print $$2}' > $@.syms  @@\
+	@if [ -f $@.aix-syms ]; then \					@@\
+	    cat $@.aix-syms >> $@.syms; \				@@\
+	fi;
+#endif /* UseExportLists */
+#endif /* AddExportList */
+
+/*
+ * NormalSharedLibraryTarget - generate rules to create a shared library;
+ * build it into a different name so that the we do not hose people by having
+ * the library gone for long periods.
+ */
+#ifndef NormalSharedLibraryTarget
+#define NormalSharedLibraryTarget(libname,rev,solist)                   @@\
+SharedLibraryTarget(libname,rev,solist,shared,..)
+#endif /* NormalSharedLibraryTarget */ 
+
+/*
+ * IBM uses an unusual shared object file name in some librares. 
+ * Duplicate this behavior to preserve compatibility with IBM's libraries.
+ */
+#ifndef SharedLibraryTarget
+#define SharedLibraryTarget(libname,rev,solist,down,up)			@@\
+AllTarget(Concat(lib,libname.a))					@@\
+                                                                        @@\
+Concat(lib,libname.a):  solist $(UNSHAREDOBJS)				@@\
+	shrobjname=$(Concat(libname,SHROBJNAME)) && $(RM) $@~ $${shrobjname:-shr.o}	@@\
+	$(AR) $@~ solist						@@\
+	AddExportList(down,up,$@~, Concat(lib,libname.elist), solist)	@@\
+	shrobjname=$(Concat(libname,SHROBJNAME)) && $(LD) -o $${shrobjname:-shr.o} $@~ -H512 -T512 $(SHLIBLDFLAGS) $(REQUIREDLIBS) -lc -lm $(LOADLIBPATH)	@@\
+	$(RM) $@~							@@\
+	shrobjname=$(Concat(libname,SHROBJNAME)) && $(AR) $@~ $${shrobjname:-shr.o} $(UNSHAREDOBJS)	@@\
+	shrobjname=$(Concat(libname,SHROBJNAME)) && $(RM) $@.syms $@ $${shrobjname:-shr.o}		@@\
+	$(MV) $@~ $@							@@\
+									@@\
+loadlib/**/libname.a:							@@\
+	shrobjname=$(Concat(libname,SHROBJNAME)) && $(RM) $@~ $${shrobjname:-shr.o}			@@\
+	$(AR) $@~ solist						@@\
+	AddExportList(down,up,$@~, Concat(lib,libname.elist), solist)	@@\
+	shrobjname=$(Concat(libname,SHROBJNAME)) && $(LD) -o $${shrobjname:-shr.o} $@~ -H512 -T512 $(SHLIBLDFLAGS) $(REQUIREDLIBS) -lc -lm $(LOADLIBPATH)	@@\
+	$(RM) $@~							@@\
+	shrobjname=$(Concat(libname,SHROBJNAME)) && $(AR) $@~ $${shrobjname:-shr.o} $(UNSHAREDOBJS)	@@\
+	shrobjname=$(Concat(libname,SHROBJNAME)) && $(RM) $@.syms $@ $${shrobjname:-shr.o}		@@\
+	$(MV) $@~ $@							@@\
+									@@\
+clean::									@@\
+	$(RM) Concat(lib,libname.a)
+
+#endif /* SharedLibraryTarget */
+
+/*
+ * SharedLibraryDataTarget - generate rules to create shlib data file;
+ */
+#ifndef SharedLibraryDataTarget
+#define SharedLibraryDataTarget(libname,rev,salist)
+#endif /* SharedLibraryTarget */
+
+/* SharedLibraryBuildInstall - install an archived library to a destination.
+ * Remove it first if you can. If not, move them to file~.
+ */
+#ifndef SharedLibraryBuildInstall
+#define SharedLibraryBuildInstall(libname,rev,dest)			@@\
+$(INST_STEP)::								@@\
+	MakeDir($(BINSTALLPATH)/dest)					@@\
+	@if [ -f Concat($(BINSTALLPATH)/dest/lib,libname.a) ];then \	@@\
+	  $(RM) Concat($(BINSTALLPATH)/dest/lib,libname.a) || \		@@\
+	  $(MV) Concat($(BINSTALLPATH)/dest/lib,libname.a) Concat(Concat($(BINSTALLPATH)/dest/lib,libname.a),~);fi	@@\
+	$(BINSTALL) -f $(BINSTALLPATH)/dest Concat(lib,libname.a)	@@\
+									@@\
+LinkBuildFileList($(BUILDINCTOP),includes,Concat(lib,libname.a),$(BINSTALLPATH),dest,$(CURRENT_DIR))
+#endif /* SharedLibraryBuildInstall */
+

@@ -1,0 +1,78 @@
+# %%  (c) Copyright 1993, 1994 Hewlett-Packard Company			
+# %%  (c) Copyright 1993, 1994 International Business Machines Corp.	
+# %%  (c) Copyright 1993, 1994 Sun Microsystems, Inc.			
+# %%  (c) Copyright 1993, 1994 Novell, Inc. 				
+# %%  $Revision: $ 			 				
+# @(#)SunMakefile	1.14 93/07/31
+# The ToolTalk man page directory Makefile
+#
+# Copyright (c) 1991 by Sun Microsystems, Inc.
+#
+
+TT_DIR = ..
+
+THIS_DIR = man
+
+# This makefile only installs the man pages.  We don't bother
+# descending into subdirs since it's just as easy to keep the list
+# here.
+
+# But we do have to descend for sccs clean, which is handled as a
+# special case.
+
+MAN_SUBDIRS = man1 man3 man6 man1m man4
+
+include $(TT_DIR)/SunMakefile-head.mk
+
+# NOTE: if you add a new manpage (or even if you make changes)
+# run /usr/dist/local/share/doctools/bin/doclint.man
+# on the manpage to check for constructs that bother AnswerBook.
+
+MANPAGES =	man1/tt_type_comp.1 \
+		man1/ttcp.1 \
+		man1/ttmv.1 \
+		man1/ttrm.1 \
+		man1/ttrmdir.1 \
+		man1/ttsession.1 \
+		man1/tttar.1 \
+		man1/tttrace.1 \
+		man3/ttapi.3 \
+		man6/edit_demo.6 \
+		man6/ttsample1.6 \
+		man6/ttsnoop.6 \
+		man6/CoEd.6 \
+		man1m/rpc.ttdbserverd.1m \
+		man1m/ttdbck.1m \
+		man1m/ttce2xdr.1m \
+		man1m/ttdbserverd.1m \
+		man4/tttracefile.4
+INIT_DEPENDENCIES = $(MANPAGES)
+
+INSTALL_ALL_VARIANTS	=	$(VARIANTS:X%=Install%)
+INSTALL_MAN_DIR		=	$(INSTALL_DIR)/share/man
+$(INSTALL_ALL_VARIANTS)::	$(MANPAGES:%=$(INSTALL_MAN_DIR)/%)
+
+$(INSTALL_MAN_DIR)/man1/%:	man1/%
+		$(TTINSTALL) $(INSTALL_MAN_DIR)/man1 man1/$(@F)
+
+$(INSTALL_MAN_DIR)/man1m/%:	man1m/%
+		$(TTINSTALL) $(INSTALL_MAN_DIR)/man1m man1m/$(@F)
+
+$(INSTALL_MAN_DIR)/man3/%:	man3/%
+		$(TTINSTALL) $(INSTALL_MAN_DIR)/man3 man3/$(@F)
+
+$(INSTALL_MAN_DIR)/man4/%:	man4/%
+		$(TTINSTALL) $(INSTALL_MAN_DIR)/man4 man4/$(@F)
+
+$(INSTALL_MAN_DIR)/man6/%:	man6/%
+		$(TTINSTALL) $(INSTALL_MAN_DIR)/man6 man6/$(@F)
+
+Sccs-clean::	$$(MAN_SUBDIRS:%=sccs-clean-%)
+
+sccs-clean-%:	FRC
+	@cd $(@:sccs-clean-%=%) ; \
+	sccs clean; \
+	cd ..;
+
+
+include $(TT_DIR)/SunMakefile-tail.mk

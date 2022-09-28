@@ -1,0 +1,857 @@
+.de LI
+.\" simulate -mm .LIs by turning them into .TPs
+.TP \\n()Jn
+\\$1
+..
+.de Lc
+.\" version of .LI that emboldens its argument
+.TP \\n()Jn
+\s-1\f3\\$1\f1\s+1
+..
+.TH SdmString 3 "07/11/96"
+.BH "07/11/96"
+.\" @(#)SdmString.3	1.12 96/07/11 SMI
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994, 1995, 1996 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994, 1995, 1996 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994, 1995, 1996 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994, 1995, 1996 Novell, Inc.
+.SH NAME
+SdmString \- smart character string
+.SH SYNOPSIS
+.\"
+.SS Includes
+.ft 3
+.nf
+#include <Sdtmail.hh>
+.\"
+.SS Creation
+.ft 3
+.nf
+.sp 0.5v
+.ta \w'new SdmString('u
+new SdmString();
+.PP
+.ft 3
+.ta \w'new SdmString('u
+new SdmString(const SdmString& \f2string\fP);
+.PP
+.ft 3
+.ta \w'new SdmString('u
+new SdmString (const char* \f2charString\fP);
+.PP
+.ft 3
+.ta \w'new SdmString('u
+new SdmString(char \f2initChar\fP, 
+	SdmStringLength \f2stringLength\fP);
+.PP
+.ft 3
+.ta \w'new SdmString('u
+new SdmString(const char* \f2string\fP, 
+	SdmStringLength \f2stringLength\fP);
+.fi
+.ft 1
+.\"
+.SS Operators
+.nf
+.PP
+.ft 3
+SdmString& operator= (const SdmString& \f2string\fP);
+.PP
+.ft 3
+SdmString& operator= (const char* \f2string\fP);
+.PP
+.ft 3
+SdmString operator+ (const SdmString& \f2string\fP) const;
+.PP
+.ft 3
+SdmString operator+ (const char* \f2string\fP) const;
+.PP
+.ft 3
+SdmString operator+= (const SdmString& \f2string\fP);
+.PP
+.ft 3
+SdmString operator+= (const char* \f2string\fP);
+.PP
+.ft 3
+int operator< (const SdmString& \f2string\fP) const;
+.PP
+.ft 3
+int operator< (const char* \f2string\fP) const;
+.PP
+.ft 3
+int operator> (const SdmString& \f2string\fP) const;
+.PP
+.ft 3
+int operator> (const char* \f2string\fP) const;
+.PP
+.ft 3
+int operator<= (const SdmString& \f2string\fP) const;
+.PP
+.ft 3
+int operator<= (const char* \f2string\fP) const;
+.PP
+.ft 3
+int operator>= (const SdmString& \f2string\fP) const;
+.PP
+.ft 3
+int operator>= (const char* \f2string\fP) const;
+.PP
+.ft 3
+int operator== (const SdmString& \f2string\fP) const;
+.PP
+.ft 3
+int operator== (const char* \f2string\fP) const;
+.PP
+.ft 3
+int operator!= (const SdmString& \f2string\fP) const;
+.PP
+.ft 3
+int operator!= (const char* \f2string\fP) const;
+.PP
+.ft 3
+int operator! () const;
+.PP
+.ft 3
+char operator() (SdmStringLength \f2index\fP) const;
+.PP
+.ft 3
+char& operator() (SdmStringLength \f2index\fP);
+.PP
+.ft 3
+.ta \w'SdmString operator() ('u
+SdmString operator() (SdmStringLength \f2index\fP, 
+	SdmStringLength \f2length\fP) const; 
+.PP
+.ft 3
+operator const char* () const;
+.fi
+.ft 1
+.\"
+.SS Methods
+.ft 3
+.nf
+.sp 0.5v
+.ta \w'SdmComparisonValue CaseCompare('u
+SdmComparisonValue CaseCompare(const SdmString& \f2string\fP) const
+.PP
+.ft 3
+.ta \w'SdmStringLength CaseFind'u
+SdmStringLength CaseFind(const SdmString& \f2string,\fP 
+	unsigned int \f2nth_match\fP = 0) const
+.PP
+.ft 3
+.ta \w'void ConvertToLowerCase('u
+void ConvertToLowerCase()
+.PP
+.ft 3
+.ta \w'void ConvertToUpperCase('u
+void ConvertToUpperCase()
+.PP
+.ft 3
+.ta \w'SdmStringLength Find'u
+SdmStringLength Find(const SdmString& \f2string,\fP 
+	unsigned int \f2nth_match\fP = 0,
+	SdmComparisonMode caseChk = \f2Sdm_Sensitive\fP) const
+.PP
+.ft 3
+.ta \w'SdmStringLength Length'u
+SdmStringLength Length() const
+.PP
+.ft 3
+.ta \w'void Print'u
+void Print() const
+.PP
+.ft3
+.ta \w'void SetRange('u
+void SetRange(SdmStringLength \f2position\fP, char *\f2string\fP)
+.PP
+.ft 3
+.ta \w'void StripCharacter('u
+void StripCharacter(char \f2theChar\fP)
+.fi
+.ft 1
+.\"
+.SS Static Methods
+.ft 3
+.nf
+.sp 0.5v
+.ta \w'SdmComparisonValue Compare('u
+SdmComparisonValue Compare(const SdmString& \f2string\fP,
+        const SdmString& \f2string\fP,
+        SdmString::SdmComparisonMode caseChk
+        = \f2SdmString::Sdm_Sensitive\fP)
+.PP
+.ft 3
+.ta \w'SdmComparisonValue Compare('u
+SdmComparisonValue Compare(const SdmString& \f2string\fP,
+        const char *\f2string\fP,
+        SdmString::SdmComparisonMode caseChk
+        = \f2SdmString::Sdm_Sensitive\fP)
+.PP
+.ft 3
+.ta \w'SdmComparisonValue Compare('u
+SdmComparisonValue Compare(const char *\f2string\fP,
+        const SdmString& \f2string\fP,
+        SdmString::SdmComparisonMode caseChk
+        = \f2SdmString::Sdm_Sensitive\fP)
+.PP
+.ft 3
+.ta \w'SdmComparisonValue Compare('u
+SdmComparisonValue Compare(const char *\f2string\fP,
+        const char *\f2string\fP,
+        SdmString::SdmComparisonMode caseChk
+        = \f2SdmString::Sdm_Sensitive\fP)
+.PP
+.ft3
+.ta \w'void StripCharacter('u
+void StripCharacter(char* \f2string\fP, char \f2theChar\fP)
+.fi
+.ft 1
+.\" end of methods list
+.ta 0.25i 0.50i 0.75i 1.0i 1.25i 1.50i 1.75i 2.0i 2.5i 3.0i
+.SH DESCRIPTION
+The SdmString object implements a 'smart string'. It allows for smart organization of the
+system's string data. It is an implementation of the counted pointer idiom. This idiom
+provides for reference counting and has the advantages of concrete data types: it can be
+passed as parameters, assigned, created, destroyed, etc. In all cases a "character string"
+is a series of bytes that is null terminated except for the case of a NULL string where
+the value is NULL.
+.SS Storage Allocation
+When a SdmString object is first assigned a character string, it allocates new storage for
+that string and copies the string into that storage. If copies of the string object are
+made, only references to the string itself are returned, as opposed to making actual
+copies of the data. Only when the last such reference to the actual data is deleted will
+the data itself be released from storage.
+.SS Copy on Write
+Whenever the data in a string object is changed, a private copy is made; any other
+pre-existing copies retain a pointer to the original unchanged data. This is referred to
+as 'copy on write'.
+.SS Search Engine
+The SdmString object provides a powerful search engine that allows a substring to be
+quickly found even in very large strings. It includes optimizations that allow it to be
+efficiently used to search for a substring among multiple strings.
+.SS Maximum Length
+This maximum length of a string, and the maximum index that can be represented within a
+string, is controlled by the \f2SdmStringLength\fP typedef. It is currently an unsigned long, so
+strings can currently be a maximum of 2^32, or 4,294,967,296 bytes.
+.\"
+.SH CREATION
+There are a number of ways to create an SdmString object. 
+.SS Empty String
+You can call the SdmString constructor with no arguments:
+.PP
+.nf
+	SdmString* str = new SdmString();
+	SdmString str();
+.fi
+.PP
+This creates a new string object that has a null (empty) string.
+.SS Existing Char*
+You can call the SdmString constructor with a constant character pointer:
+.PP
+.nf
+	SdmString* str = new SdmString(const char* charString);
+	SdmString str(const char* charString);
+
+For example:
+
+	SdmString* str = new SdmString("this is a test string");
+	SdmString str("another string initialized");
+.fi
+.PP
+This creates a new string object that has an initial value of the character string
+given as the argument to the constructor; new storage is allocated and the given null
+terminated character string data is copied into the new string object.
+.SS Existing SdmString
+You can call the SdmString constructor with an existing SdmString object:
+.PP
+.nf
+	SdmString* str = new SdmString(const SdmString& string);
+	SdmString str(const SdmString& string);
+.fi
+.PP
+This creates a new string object that is a referenced copy of the original; that is,
+new storage is not allocated, but rather another reference to the same data is made.
+.SS Fill Char and Length
+You can call the SdmString constructor with a fill character and length:
+.PP
+.nf
+	SdmString* str = new SdmString(char initChar, SdmStringLength stringLength);
+	SdmString str(char initChar, SdmStringLength stringLength);
+	void str.SetRange (SdmStringLength position, SdmString substr);
+.fi
+.PP
+This creates a new string object that has the indicated length and is prefilled with the
+given initialization character.  The SetRange method can be used to copy a substring
+into a string starting at the given position.
+.SS Existing Char* and Length
+You can call the SdmString constructor with a constant character pointer and length:
+.PP
+.nf
+	SdmString* str = new SdmString(const char* charString, SdmStringLength stringLength);
+	SdmString str(const char* charString, SdmStringLength stringLength);
+ 
+For example:
+ 
+	const char *buffer = "text one.\\0 text two.\\0";
+	SdmString* str = new SdmString(buffer, 21);
+	SdmString str(buffer, 21);
+.fi
+.PP
+This creates a new string object that has the indicated length and is prefilled with
+the characters in the given character string data.  Using this constructor allows
+one to create strings that contain null characters ('\0') within it.
+.\"
+.SH DESTRUCTION
+An SdmString object can be destroyed like any other object. If it is the last reference to
+the underlying data, the data itself is released from storage; otherwise, just the string
+reference object is destroyed.
+.\"
+.SH SEARCH ENGINE
+The SdmString object provides a powerful substring search engine that allows for fast
+efficient searches. This engine is referred to as the BoyerMoore search engine, named
+after the people who authored the original search algorithm. It achieves its efficiency by
+reducing the substring to be searched for into an efficient search pattern that can be
+quickly scanned for in a target string.
+.SS Find
+The Find method provides a quick interface to this engine. It is inefficient when
+searching for the same substring multiple times either in the same string or in multiple
+strings, because the pattern to be searched for is processed into a search pattern each
+time Find is called. Nonetheless, it is useful for quick searches. You pass in the
+substring to be search for, which occurrence of the substring you want to find, and
+whether case is significant. The search is performed and the results returned.
+.PP
+For more details, see the section on Find() below under Methods.
+.\"
+.SH OPERATORS
+Many of the standard C operators are overloaded to function with string objects.
+.SS Comparison
+(\f3<  >  <=  >=  ==  != !\fP)
+.PP
+Strings can be compared against each other or against ordinary C character strings (char
+*) using the standard C comparison operators; comparisons are "case sensitive". If a case
+insensitive comparison is needed, the Compare or CaseCompare methods must be used. 
+The boolean ! operator is true if the string is zero length (empty).
+All of the following are valid:
+.PP
+.nf
+		SdmString s1, s2;
+		char *cp1;
+
+		s1 == s2	s1 == cp1
+		s1 < s2		s1 < cp1
+		s1 <= s2	s1 < cp1
+		s1 > s2		s1 > cp1
+		s1 >= s2	s1 >= cp1
+		s1 != s2		s1 != cp1
+		!s1
+.fi
+.SS Assignment
+(\f3=  +  +=\fP)
+.PP
+Strings can be assigned to, added together, or added to. All of the following are valid:
+.PP
+.nf
+		SdmString s1, s2, s3;
+		const char* cp1;
+
+		s3 = s1;				s3 = cp1;
+		s3 = s1 + s2;		s3 = s1 + cp1;
+		s3 += s1;			s3 += cp1;
+.fi
+.SS Indexing
+((\f3index\fP) (\f3index\fP , \f3length\fP))
+.PP
+Strings can be indexed to retrieve or modify individual characters, or
+to retrieve and create a separate substring from within the string:
+.PP
+.nf
+		SdmString s1, s2;
+		char c1;
+
+		c1 = s1(3);			// return 3rd character from string s1
+		s1(3) = c1;			// set 3rd character in string s1 to c1
+		s2 = s1(3, 20);		// create string s2 from string s1 chars 3 thru 20
+.fi
+.SS Conversion
+(\f2const char*\fP)
+.PP
+A const char* pointer to a string can be retrieved so that the contents of the string can
+be used wherever a const char* is expected:
+.PP
+.nf
+		SdmString s1;
+		const char* cp1;
+
+		cp1 = (const char*)s1;
+		printf("%s\n", cp1);
+.fi
+.SH COMPARISONS
+Several operators and methods provided by the SdmString object allow for a comparison of
+contents against another string. The following rules and conventions apply.
+.SS Collating Sequence
+All comparisons assume the "C" locale and use US-ASCII for the collating sequence.
+.SS Comparison Results
+The results of any direct comparison method (i.e. CaseCompare, Compare) is one of the
+following:
+.PP
+.nf
+		SdmString::Sdm_Less
+		SdmString::Sdm_Equal
+		SdmString::Sdm_Greater
+.fi
+.PP
+These return values indicate whether the target string is less than, equal to, or greater
+than the string object being compared, respectively.
+.SS Case Sensitivity
+The default for all comparison operators is to take case into consideration when comparing
+two strings. In addition, several methods provide the ability to override this and ignore
+case, but they default to considering case if this is not specified. A few methods (those
+that begin with the word "Case") ignore case when comparing.
+.PP
+For those methods that allow the case sensitivity to be specified, the following values
+are accepted:
+.PP
+.nf
+		SdmString::Sdm_Sensitive	- case is considered
+		SdmString::Sdm_Ignore		- case is ignored
+.fi
+.\"
+.SH METHODS
+The following methods are provided to operate on the character string contained within
+the SdmString object.
+.\"
+.SS \f3CaseCompare\fP
+(\f3string\fP)
+
+This method provides for comparing this string to another SdmString object in an identical
+manner to Compare except that case is always ignored.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3string\fP (\f3const SdmString&\fP)"
+.br
+The string to object to compare against this string.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmComparisonValue)\fP"
+.br
+Value of comparison (see "Comparison Results" above.)
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3CaseFind\fP
+(\f3string\fP, \f3nth_match\fP)
+
+This method provides for searching for a substring within this string in an identical manner
+to Find except that case is always ignored.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3string\fP (\f3const SdmString&\fP)"
+.br
+The substring to be searched for within this string.
+.LI "\f3nth_match\fP (\f3unsigned int\fP)"
+.br
+The occurrence of the substring to be found. Specify 1 to find the first substring, 2 to
+find the second, etc.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmStringLength)\fP"
+.br
+The character index into the string where the substring is found; Sdm_NPOS is returned if
+the substring is not found in the string.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3Compare\fP
+(\f3firstString\fP, \f3secondString\fP, \f3caseChk\fP)
+
+Compares two string objects and returns the comparison value indicating whether
+the first string is equal to, greater than, or less than the second string.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3firstString\fP (\f3const SdmString&\fP)"
+.br
+The first string object used in the comparison.
+.LI "\f3secondString\fP (\f3const SdmString&\fP)"
+.br
+The second string object used in the comparison.
+.LI "\f3caseChk\fP (\f3SdmString::SdmComparisonMode\fP)"
+.br
+An optional argument that indicates how case is to be treated (see "Case Sensitivity"
+above).  If this argument is not provided, the default is to consider case in the
+comparison (Sdm_Sensitive).
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmComparisonValue)\fP"
+.br
+Value of comparison (see "Comparison Results" above.)
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3Compare\fP
+(\f3firstString\fP, \f3secondString\fP, \f3caseChk\fP)
+ 
+Compares a string object and a character string and returns the comparison 
+value indicating whether the string object is equal to, greater than, or less 
+than the character string.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3firstString\fP (\f3const SdmString&\fP)"
+.br
+The string object used in the comparison.
+.LI "\f3secondString\fP (\f3const char*\fP)"
+.br
+The constant character string used in the comparison.
+.LI "\f3caseChk\fP (\f3SdmString::SdmComparisonMode\fP)"
+.br
+An optional argument that indicates how case is to be treated (see "Case Sensitivity"
+above).  If this argument is not provided, the default is to consider case in the
+comparison (Sdm_Sensitive).
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmComparisonValue)\fP"
+.br
+Value of comparison (see "Comparison Results" above.)
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3Compare\fP
+(\f3firstString\fP, \f3secondString\fP, \f3caseChk\fP)
+ 
+Compares a character string and a string object and returns the comparison
+value indicating whether the character string is equal to, greater than, or less
+than the string object.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3firstString\fP (\f3const char*\fP)"
+.br
+The constant character string used in the comparison.
+.LI "\f3secondString\fP (\f3const SdmString&\fP)"
+.br
+The string object used in the comparison.
+.LI "\f3caseChk\fP (\f3SdmString::SdmComparisonMode\fP)"
+.br
+An optional argument that indicates how case is to be treated (see "Case Sensitivity"
+above).  If this argument is not provided, the default is to consider case in the
+comparison (Sdm_Sensitive).
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmComparisonValue)\fP"
+.br
+Value of comparison (see "Comparison Results" above.)
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3Compare\fP
+(\f3firstString\fP, \f3secondString\fP, \f3caseChk\fP)
+ 
+Compares two character strings and returns the comparison
+value indicating whether the first character string is equal to, greater than, or less
+than the second character string.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3firstString\fP (\f3const char*\fP)"
+.br
+The first constant character string used in the comparison.
+.LI "\f3secondString\fP (\f3const char*\fP)"
+.br
+The second constant character string used in the comparison.
+.LI "\f3caseChk\fP (\f3SdmString::SdmComparisonMode\fP)"
+.br
+An optional argument that indicates how case is to be treated (see "Case Sensitivity"
+above).  If this argument is not provided, the default is to consider case in the
+comparison (Sdm_Sensitive).
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmComparisonValue)\fP"
+.br
+Value of comparison (see "Comparison Results" above.)
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3ConvertToLowerCase\fP
+()
+
+This method converts any upper case characters in the string to lower case so
+that all alphabetic characters in the string are in lower case.
+.PP
+If a conversion is done (that is, if any upper case characters are present in
+the string) then a private (new) copy of the string is made before changing
+those characters to lower case. Thus, this conversion does not affect any 
+other copies of this string, which retain their original (unconverted) contents.
+.PP
+.nf
+		SdmString s1("test CASE");
+		SdmString s2(s1);
+
+		// Before this statement, s1 and s2 both reference the
+		// same string with the contents of "test CASE"
+
+		s1.ConvertToLowerCase()
+
+		// now s1 points to a new string "test case", while
+		// s2 continues to point to the original "test CASE" string
+.fi
+.\"
+.SS \f3ConvertToUpperCase\fP
+()
+
+This method converts any lower case characters in the string to upper case so
+that all alphabetic characters in the string are in upper case.
+.PP
+If a conversion is done (that is, if any lower case characters are present in
+the string) then a private (new) copy of the string is made before changing
+those characters to upper case. Thus, this conversion does not affect any 
+other copies of this string, which retain their original (unconverted) contents.
+.PP
+.nf
+		SdmString s1("test CASE");
+		SdmString s2(s1);
+
+		// Before this statement, s1 and s2 both reference the
+		// same string with the contents of "test CASE"
+
+		s1.ConvertToUpperCase()
+
+		// now s1 points to a new string "TEST CASE", while
+		// s2 continues to point to the original "test CASE" string
+.fi
+.\"
+.SS \f3Find\fP
+(\f3string\fP, \f3nth_match\fP, \f3caseChk\fP)
+
+Find a given occurrence of a specified substring within this string. 
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3string\fP (\f3const SdmString&\fP)"
+.br
+The substring to be searched for within this string.
+.LI "\f3nth_match\fP (\f3unsigned int\fP)"
+.br
+The occurrence of the substring to be found. Specify 1 to find the first substring, 2 to
+find the second, etc.
+.LI "\f3caseChk\fP (\f3SdmString::SdmComparisonMode\fP)"
+.br
+An optional argument that indicates how case is to be treated (see "Case Sensitivity"
+above).  If this argument is not provided, the default is to consider case in the
+search (Sdm_Sensitive).
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmStringLength)\fP"
+.br
+The character index into the string where the substring is found; Sdm_NPOS is returned if
+the substring is not found in the string.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3Length\fP
+()
+ 
+Return the length of character string.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "none."
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(SdmStringLength)\fP"
+.br
+The length of the character string is returned.
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3Print\fP
+()
+ 
+Print the character string to standard output (using "cout <<").
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "none."
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "none."
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3SetRange\fP
+(\f3position\fP, \f3string\fP)
+ 
+Copy a given substring into the string starting at the specified position.
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3position\fP (\f3SdmStringLength\fP)"
+.br
+The position in this string object where the substring is to be copied to.
+.LI "\f3string\fP (\f3char *\fP)"
+.br
+The substring to be copied into this string object.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "none."
+.PP
+.RE
+.nr )J 0
+.\"
+.SS \f3StripCharacter\fP
+(\f3theChar\fP)
+ 
+Removes all occurrences of the given character from this string.
+.PP
+.nf
+For example:
+
+	SdmString s1("abracadabra");
+	s1.StripCharacter('a');
+	// The resulting string will now contain "brcdbr"
+
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3theChar\fP (\f3char\fP)"
+.br
+The character to be removed from the string.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(int)\fP"
+.br
+The number of characters removed from the string.
+.PP
+.RE
+.nr )J 0
+.PP
+.fi
+.\"
+.SS \f3StripCharacter\fP
+(\f3string\fP, \f3theChar\fP)
+ 
+Removes all occurrences of the given character from the given  string.
+.PP
+.nf
+For example:
+ 
+        SdmString s1("abracadabra");
+        SdmString::StripCharacter(s1, 'a');
+        // The resulting string will now contain "brcdbr"
+ 
+.PP
+Arguments:
+.PP
+.RS 3
+.nr )J 6
+.LI "\f3string\fP (\f3char*\fP)"
+.br
+The string to be stripped of the character.
+.LI "\f3theChar\fP (\f3char\fP)"
+.br
+The character to be removed from the given string.
+.PP
+.RE
+.nr )J 0
+Return value:
+.RS 3
+.nr )J 7
+.LI "\f3(int)\fP"
+.br
+The number of characters removed from the string.
+.PP
+.RE
+.nr )J 0
+ 
+.PP
+.fi
+.\"
+.RE
+.nr )J 0
+.SH "SEE ALSO"
+.na
+.BR SdmStrStr (3),
+.BR SdmStrStrL (3),
+.BR SdmStrStrLL (3),
+.BR SdmIntStr (3),
+.BR SdmIntStrL (3),
+.BR SdmIntStrLL (3)

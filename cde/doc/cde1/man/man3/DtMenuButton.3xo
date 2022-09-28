@@ -1,0 +1,303 @@
+.TH DtMenuButton 3 "7 Jun 94"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.SH NAME
+DtMenuButton \- the MenuButton widget class
+.SH SYNOPSIS
+.yS
+#include <Dt/MenuButton.h>
+.yE
+.SH DESCRIPTION
+The DtMenuButton widget is a command widget that complements the menu
+cascading functionality of an XmCascadeButton widget.
+As a complement to the XmCascadeButton widget,
+DtMenuButton can only be instantiated outside a MenuPane;
+the application must use XmCascadeButton widget inside a MenuPane.
+.P
+The DtMenuButton widget belongs to a subclass of the XmLabel class.
+Visually, the DtMenuButton widget consists of a label string and a menu glyph.
+The menu glyph always appears on the right end of the widget and,
+by default, is a downward pointing arrow.
+.P
+The DtMenuButton widget has an implicitly created submenu attached to it.
+The submenu is a popup MenuPane and has this DtMenuButton widget as
+its parent.
+The name of the implicitly created submenu is obtained by adding
+.B submenu_
+as a prefix to the name of this DtMenuButton widget.
+The widget ID of the submenu can be obtained by doing an
+.Fn XtGetValues
+on the
+.B DtNsubMenuId
+resource of this DtMenuButton widget.
+The implicitly created submenu must not be destroyed by the user of this
+widget.
+.P
+The submenu can be popped up by pressing the menu post Button
+(see the
+.B XmNmenuPost
+resource of the
+.cde .I XmRowColumn (3X)
+.cde widget)
+.xo XmRowColumn widget)
+anywhere on the DtMenuButton widget.
+.P
+Widget subclassing is not supported for the DtMenuButton widget class.
+.HU "Classes"
+The DtMenuButton widget inherits behavior and resources from the
+.IR Core ,
+.IR Composite ,
+.I XmPrimitive
+and
+.I XmLabel
+classes.
+.P
+The class pointer is
+.BR dtMenuButtonWidgetClass .
+.P
+The class name is
+.IR DtMenuButtonWidget .
+.HU "New Resources"
+The following table defines a set of widget resources used by the application
+to specify data.
+The application can also set the resource values for the
+inherited classes to set attributes for this widget.
+To reference a resource by name or by class in a
+.B \&.Xdefaults
+file, the application must remove the
+.B DtN
+or
+.B DtC
+prefix and use the remaining letters.
+To specify one of the defined
+values for a resource in a
+.B \&.Xdefaults
+file, the application must remove the
+.B Dt
+prefix and use
+the remaining letters (in either lower case or upper case,
+but including any underscores between words).
+The codes in the access column indicate if the given resource can be
+set at creation time (C),
+set by using
+.Fn XtSetValues
+(S), retrieved by using
+.Fn XtGetValues
+(G), or is not applicable (N/A).
+.P
+.cde .ne 10
+.DS
+.S -1
+.TS
+.xo expand box tab(@);
+.cde expand tab(@);
+cf3 ssss
+.xo lf3 1 | lf3 1 | lf3 1 | lf3 1 | lf3
+.xo lf3 1 | lf3 1 | lf3 1 | l   1 | l .
+.cde lf3 1 lf3 1 lf3 1 lf3 1 lf3
+.cde lf3 1 lf3 1 lf3 1 l   1 l .
+DtMenuButton Resource Set
+_
+Name@Class@Type@Default@Access
+_
+DtNcascadingCallback@DtCCallback@XtCallbackList@NULL@C
+DtNcascadePixmap@DtCPixmap@Pixmap@XmUNSPECIFIED-@CSG
+@@@   _PIXMAP
+DtNsubMenuId@DtCMenuWidget@Widget@NULL@SG
+.TE
+.S +1
+.DE
+.VL 6
+.LI "\f3DtNcascadingCallback\fP"
+.br
+Specifies the list of callbacks that is called before the popping up of
+the attached submenu.
+The reason for the callback is
+.Cn DtCR_CASCADING .
+.LI "\f3DtNcascadePixmap\fP"
+.br
+Specifies the pixmap displayed as the menu glyph.
+If no pixmap is specified, a downward pointing arrow is displayed.
+.LI "\f3DtNsubMenuId\fP"
+.br
+Specifies the widget ID of the popup MenuPane to be associated with this
+DtMenuButton widget.
+The popup MenuPane must be created with this DtMenuButton as its parent.
+This resource cannot be specified at the time of widget creation.
+The implicit submenu is automatically destroyed by
+DtMenuButton when this resource is set.
+.LE
+.HU "Inherited Resources"
+The DtMenuButton widget
+inherits behavior and resources from the following named superclasses.
+For a complete description of each resource, see the
+.cde man page
+.xo entry in \*(ZM
+for that superclass.
+.P
+.cde .ne 10
+.DS
+.S -1
+.TS
+.xo expand box tab(@);
+.cde expand tab(@);
+cf3 ssss
+.xo lf3 1 | lf3 1 | lf3 1 | lf3 1 | lf3
+.xo lf3 1 | lf3 1 | lf3 1 | l   1 | l .
+.cde lf3 1 lf3 1 lf3 1 lf3 1 lf3
+.cde lf3 1 lf3 1 lf3 1 l   1 l .
+XmLabel Resource Set
+_
+Name@Class@Type@Default@Access
+_
+XmNaccelerator@XmCAccelerator@String@NULL@CSG
+XmNacceleratorText@XmCAcceleratorText@XmString@NULL@CSG
+XmNalignment@XmCAlignment@unsigned char@dynamic@CSG
+XmNfontList@XmCFontList@XmFontList@dynamic@CSG
+XmNlabelInsensitive-@XmCLabelInsensitive-@Pixmap@XmUNSPECIFIED-@CSG
+   Pixmap@   Pixmap@@   _PIXMAP
+XmNlabelPixmap@XmCLabelPixmap@Pixmap@XmUNSPECIFIED-@CSG
+@@@   _PIXMAP
+XmNlabelString@XmCXmString@XmString@dynamic@CSG
+XmNlabelType@XmCLabelType@unsigned char@XmSTRING@CSG
+XmNmarginBottom@XmCMarginBottom@Dimension@0@CSG
+XmNmarginHeight@XmCMarginHeight@Dimension@2@CSG
+XmNmarginLeft@XmCMarginLeft@Dimension@0@CSG
+XmNmarginRight@XmCMarginRight@Dimension@0@CSG
+XmNmarginTop@XmCMarginTop@Dimension@0@CSG
+XmNmarginWidth@XmCMarginWidth@Dimension@2@CSG
+XmNmnemonic@XmCMnemonic@KeySym@NULL@CSG
+XmNmnemonicCharSet@XmCMnemonicCharSet@String@XmFONTLIST-@CSG
+@@@   _DEFAULT_TAG
+XmNrecomputeSize@XmCRecomputeSize@Boolean@True@CSG
+XmNstringDirection@XmCStringDirection@XmStringDirection@dynamic@CSG
+.TE
+.S +1
+.DE
+.P
+.cde .ne 10
+.DS
+.S -1
+.TS
+.xo expand box tab(@);
+.cde expand tab(@);
+cf3 ssss
+.xo lf3 1 | lf3 1 | lf3 1 | lf3 1 | lf3
+.xo lf3 1 | lf3 1 | lf3 1 | l   1 | l .
+.cde lf3 1 lf3 1 lf3 1 lf3 1 lf3
+.cde lf3 1 lf3 1 lf3 1 l   1 l .
+XmPrimitive Resource Set
+_
+Name@Class@Type@Default@Access
+_
+XmNbottom-@XmCBottom-@Pixel@dynamic@CSG
+   ShadowColor@   ShadowColor
+XmNbottom-@XmCBottom-@Pixmap@XmUNSPECIFIED-@CSG
+   ShadowPixmap@   ShadowPixmap@@   _PIXMAP
+XmNforeground@XmCForeground@Pixel@dynamic@CSG
+XmNhelpCallback@XmCCallback@XtCallbackList@NULL@C
+XmNhighlightColor@XmCHighlightColor@Pixel@dynamic@CSG
+XmNhighlightOnEnter@XmCHighlightOnEnter@Boolean@False@CSG
+XmNhighlightPixmap@XmCHighlightPixmap@Pixmap@dynamic@CSG
+XmNhighlightThickness@XmCHighlightThickness@Dimension@0@CSG
+XmNnavigationType@XmCNavigationType@XmNavigationType@XmNONE@CSG
+XmNshadowThickness@XmCShadowThickness@Dimension@0@CSG
+XmNtopShadowColor@XmCTopShadowColor@Pixel@dynamic@CSG
+XmNtopShadowPixmap@XmCTopShadowPixmap@Pixmap@dynamic@CSG
+XmNtraversalOn@XmCTraversalOn@Boolean@False@CSG
+XmNunitType@XmCUnitType@unsigned char@dynamic@CSG
+XmNuserData@XmCUserData@XtPointer@NULL@CSG
+.TE
+.S +1
+.DE
+.P
+.cde .ne 10
+.DS
+.S -1
+.TS
+.xo expand box tab(@);
+.cde expand tab(@);
+cf3 ssss
+.xo lf3 1 | lf3 1 | lf3 1 | lf3 1 | lf3
+.xo lf3 1 | lf3 1 | lf3 1 | l   1 | l .
+.cde lf3 1 lf3 1 lf3 1 lf3 1 lf3
+.cde lf3 1 lf3 1 lf3 1 l   1 l .
+Core Resource Set
+_
+Name@Class@Type@Default@Access
+_
+XmNaccelerators@XmCAccelerators@XtAccelerators@dynamic@CSG
+XmNancestorSensitive@XmCSensitive@Boolean@dynamic@G
+XmNbackground@XmCBackground@Pixel@dynamic@CSG
+XmNbackgroundPixmap@XmCPixmap@Pixmap@XmUNSPECIFIED-@CSG
+@@@   _PIXMAP
+XmNborderColor@XmCBorderColor@Pixel@XtDefaultForeground@CSG
+XmNborderPixmap@XmCPixmap@Pixmap@XmUNSPECIFIED-@CSG
+@@@   _PIXMAP
+XmNborderWidth@XmCBorderWidth@Dimension@0@CSG
+XmNcolormap@XmCColormap@Colormap@dynamic@CG
+XmNdepth@XmCDepth@int@dynamic@CG
+XmNdestroyCallback@XmCCallback@XtCallbackList@NULL@C
+XmNheight@XmCHeight@Dimension@dynamic@CSG
+XmNinitialResources-@XmCInitialResources-@Boolean@True@C
+   Persistent@   Persistent
+XmNmappedWhen-@XmCMappedWhen-@Boolean@True@CSG
+   Managed@   Managed
+XmNscreen@XmCScreen@Screen *@dynamic@CG
+XmNsensitive@XmCSensitive@Boolean@True@CSG
+XmNtranslations@XmCTranslations@XtTranslations@dynamic@CSG
+XmNwidth@XmCWidth@Dimension@dynamic@CSG
+XmNx@XmCPosition@Position@0@CSG
+XmNy@XmCPosition@Position@0@CSG
+.TE
+.S +1
+.DE
+.HU "Callback Information"
+A pointer to the following structure is passed to each DtMenuButton callback:
+.Cs I
+typedef struct {
+	int 	\f2reason\fP;
+	XEvent	*\f2event\fP;
+} XmAnyCallbackStruct;
+.Ce
+.P
+The
+.I reason
+argument indicates why the callback was invoked; it is always
+.Cn DtCR_CASCADING
+when the
+.B DtNcascadingCallback
+is issued.
+.P
+The
+.I event
+argument points to the
+.B XEvent
+that triggered the callback or
+.Cn NULL
+if the callback was not triggered by an
+.BR XEvent .
+.SH "SEE ALSO"
+.cdes
+.Fn DtCreateMenuButton 3X,
+.IR Core (3X),
+.IR XmLabel (3X),
+.IR XmPrimitive (3X),
+.IR XmRowColumn (3X),
+.Fn XtGetValues 3X,
+.Fn XtSetValues 3X.
+.cdee
+.xos
+.Fn DtCreateMenuButton 3X;
+.IR Core ,
+.IR XmLabel ,
+.IR XmPrimitive ,
+.IR XmRowColumn ,
+in the \*(ZM;
+.Fn XtGetValues ,
+.Fn XtSetValues
+in the \*(Zt.
+.xoe

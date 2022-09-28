@@ -1,0 +1,162 @@
+
+
+  This document describes the NEW Functions and Interfaces
+introduced to support the MT-safe version of c-client library.
+
+
+1. A general statement on "stream":
+
+  In order to make the c-client library MT-safe, we converted  
+the global variables (a commonly shared variables by Multi-
+threads) onto the stream. Because the stream is locally allocated
+on the stack, the "globals" are no longer in shared-memories. 
+Because of this design change, the implementation required
+passing the stream onto all routines which need to access these
+"globals".  In order to do this, a few new functions have been 
+introduced and some of the existing function interfaces also 
+changed. Mainly, functions did not have a stream may now have a 
+stream being passed.
+
+ These changes impose the c-client users passing a non-nil stream
+in all the c-client function calls which require one.
+
+2. New functions:
+
+2.1  MAILSTREAM *mail_stream_create(void *udata,
+                       int (*set_ttlock)(char *mailbox, void *userdata),
+                       int (*clear_ttlock)(char *mailbox, void *userdata),
+                       int (*set_group_access)(void),
+                       int (*clear_group_access)(void))
+
+  These five parameters which were previously passed in mail_open
+have been moved to here. Identical to the way mail_open used to be 
+called, this function can be called with NIL pointers.  For instance, 
+mail_stream_create(NIL,NIL,NIL,NIL,NIL).
+
+  You will need to make this function call before calling any c-client
+functions which require a stream. Then the stream needs to be passed
+to your subsequent c-client library calls. 
+
+  For instance, myusername_full now requires a stream. The way to call
+this correctly is to first call mail_stream_create then myusername_full 
+with the stream being passed in as follows:
+
+stream = mail_stream_create((void*)imapdvars,NIL,NIL,NIL,NIL);
+s = myusername_full (&i,stream);
+
+  If a stream already exists, you no longer have to make a mail_stream_create
+call; you can just use the existing stream.
+
+  NOTE: you can not pass a NIL stream in any c-client functions which 
+require a stream. 
+
+2.2  Mail_open has been changed to:
+MAILSTREAM *mail_open (MAILSTREAM *stream,char *name,long options)
+
+  In order to call mail_open correctly, mail_stream_create needs to
+be called first. Then user needs to pass the CREATED stream to mail_open.
+Depending on your application, if a stream already exists and it is
+appropriated to use it, you then do not have to call mail_stream_create
+again. 
+
+2.3  void mail_stream_flush (MAILSTREAM *stream)
+
+  This function is used to free the "global" parameters on the stream
+which was created by mail_stream_create.  Normally you do not need
+to call this function, since mail_close_full will do the work for you.
+But if the stream was CREATED but not OPENED, you should use this function
+to flush the "globals" on the stream to avoid memory leaks.  In other words,
+the streams which previously do not need to be closed have to be flushed now.  
+
+  To identify whether a stream is CREATED or OPENED, use the variable
+"stream->stream_status" in your application.  You can test the status of 
+the stream by using the following statement:
+
+	if (stream->stream_status & S_OPENED) mail_close(stream)
+	else mail_stream_flush(stream);  
+
+2.4  void mail_stream_setNIL (MAILSTREAM *stream )
+
+  This function sets the stream_status to S_NILCALL. "S_NILCALL"
+is one of the stream status flags which defines the stream to be
+a "nil" stream.  This is used in routines which test whether a
+stream is a nil stream or not. This is a c-client internal routine.
+User needs to be cautious when calling it.
+
+2.5  void mail_stream_unsetNIL (MAILSTREAM *stream )
+  
+  Contrary to the above call, this function clears the stream_status
+on S_NILCALL flag.  This is a c-client internal routine.  User needs
+to be cautious when calling it.
+
+2.6 void mail_global_init( MAILSTREAM *stream)
+
+  Initialize the mail global variables on the stream. This routine is 
+transparent to the c-client users.  User should never call it directly.
+
+2.7 void mail_global_free(MAILSTREAM *stream)
+
+  Free the mail global variables on the stream. This routine is transparent 
+to the c-client users. User should never call it directly.
+
+2.8 void env_global_init(MAILSTREAM *stream)
+
+  Initialize the env global variables on the stream. This routine is 
+transparent to the c-client users.  User should never call it directly.
+  
+2.9 void env_global_free(MAILSTREAM *stream)
+
+  Free the env global variables on the stream. This routine is transparent 
+to the c-client users. User should never call it directly.
+
+2.10 void tcp_global_init(MAILSTREAM *stream)
+
+  Initialize the tcp global variables on the stream. This routine is transparent 
+to the c-client users. User should never call it directly.
+
+2.11 void tcp_global_free(MAILSTREAM *stream)
+
+  Free the tcp global variables on the stream. This routine is transparent 
+to the c-client users. User should never call it directly.
+
+2.12  void (*global_init) (MAILSTREAM *stream );
+
+  This is a new static routine defined on the DRIVER data structure.
+Each driver has a corresponding routine attach to it. The routine is 
+again transparent to the c-client users. User should never call it directly.
+
+2.13  void (*global_free) (MAILSTREAM *stream );
+
+  This is a new static routine defined on the DRIVER data structure.
+Each driver has a corresponding routine attach to it. The call is again
+transparent to the c-client users. User should never call it directly.
+
+3. Interface changes:
+
+  A number of routines which did not require a stream have a stream
+as a parameter now. For example, 
+char *myusername_full (unsigned long *flags, MAILSTREAM *stream)
+
+  You can identify these changes from the header files. This means your 
+compilation may fail if you use the existing interface. The correct 
+thing to do is to pass a non-nil stream. Again if the stream does not
+exist, you should call mail_stream_create to create one.  This should 
+fix your compilation problems.
+
+4. Stream_status usage:
+
+  As previously mentioned, a new variable "stream_status" has been
+introduced on the stream. An example of how to use it is as follows:
+
+      mail_stream_setNIL(stream);
+      mail_parameters (stream,SET_RECORDSUBDIR, (void *)subdir);
+      mail_stream_unsetNIL(stream);
+
+  This means the stream was set to a "nil" stream and un-set after
+the mail_parameters call.
+   
+5. Issue/Comment/Supports
+
+  If you have any questions, please contact Calvin Lin, @85379
+or clin@Eng.
+

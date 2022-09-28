@@ -1,0 +1,143 @@
+XCOMM   $XConsortium: Imakefile /main/cde1_maint/4 1995/10/09 11:46:42 pascale $
+XCOMM
+
+/* this will need to go eventually into the Project.tmpl file... */
+#ifndef	SharedLibDtTerm
+#define	SharedLibDtTerm HasSharedLibraries
+#endif
+
+#ifndef	NormalLibDtTerm
+#define	NormalLibDtTerm (!SharedLibDtTerm | ForceNormalLib)
+#endif
+/*****************************************************************/
+
+#ifndef DoNormalLib
+#define DoNormalLib NormalLibDtTerm
+#endif
+
+#ifndef	DoSharedLib
+#define	DoSharedLib SharedLibDtTerm
+#endif
+
+#ifndef	DoDebugLib
+#define	DoDebugLib DebugLibDtTerm
+#endif
+
+#ifndef	DoProfileLib
+#define	DoProfileLib ProfileLibDtTerm
+#endif
+
+#include <Library.tmpl>
+
+#ifdef  AlphaArchitecture
+/* Define this macro too even if none are used for now 04/26/95 */
+DEFINES = -DALPHA_ARCHITECTURE
+#endif
+
+#ifdef	Build_HpVue
+EXTRA_DEFINES = -DBUILD_HPVUE -DHPVUE
+#endif	/* Build_HpVue */
+
+#ifdef  HPArchitecture
+DEFINES = -DHP_ARCHITECTURE
+#endif
+
+#ifdef  IBMArchitecture
+DEFINES = -DIBM_ARCHITECTURE
+#endif
+
+#ifdef  SunArchitecture
+DEFINES = -DSUN_ARCHITECTURE
+EXTRA_CCOPTIONS = -xstrconst -dalign
+#endif
+
+#ifdef  USLArchitecture
+DEFINES = -DUSL_ARCHITECTURE
+#endif
+
+#ifdef  UXPArchitecture
+DEFINES = -DUXP_ARCHITECTURE
+#endif
+
+DEFINES =
+INCLUDES = -I. -I.. -I$(DTINCLUDESRC) -I../TermPrim
+
+LINTLIBS = $(LINTXLIB) $(LINTXTOOL) $(LINTXM)
+
+UTILDIR = ../util
+
+SRCS1 = \
+	Term.c \
+	TermAction.c \
+	TermBuffer.c \
+	TermColor.c \
+	TermEnhance.c \
+	TermFunction.c \
+	TermFunctionKey.c \
+	TermLineData.c \
+	TermParse.c \
+	TermParseTable.c \
+	TermVersion.c
+
+OBJS1 = \
+	Term.o \
+	TermAction.o \
+	TermBuffer.o \
+	TermColor.o \
+	TermEnhance.o \
+	TermFunction.o \
+	TermFunctionKey.o \
+	TermLineData.o \
+	TermParse.o \
+	TermParseTable.o \
+	TermVersion.o
+
+SRCS = $(SRCS1)
+OBJS = $(OBJS1)
+
+LibraryObjectRule()
+all:: $(OBJS)
+
+LintLibraryTarget(DtTerm,$(SRCS))
+
+/* On HP must make lineToData a fully archived client for 
+ * cross-compiling on older architectures.
+ */
+#ifdef HPArchitecture
+EXTRA_LOCAL_LDFLAGS=-Wl,-a,archive
+#endif
+TermLineData.c: TermLineData.data $(UTILDIR)/lineToData.c
+	$(RM) $@
+	-$(CC) -o lineToData $(UTILDIR)/lineToData.c $(CFLAGS) $(LOCAL_LDFLAGS) $(EXTRA_LOCAL_LDFLAGS) $(LDLIBS)
+	./lineToData -p _DtTerm -f TermLineData.data >,TermLineData.c
+	$(MV) ,TermLineData.c TermLineData.c 
+	$(RM) ./lineToData ,TermLineData.c
+
+depend:: TermLineData.c
+
+DependTarget()
+
+HEADERS = Term.h
+
+/********* INCLUDES ***********************************************
+ * The headers that are exported are built from the following
+ * BuildIncludes - provides export to $(TOP)/X11.
+ * BuildMultipleInstall - provides export to $(TOP)/binstall/include
+ *                        and build install packages.
+ * BuildLocalIncludes - This rule creates directories
+ *   for local includes via make includes or make localincludes
+ *   This enables users to use local -I paths to find local includes.
+ */
+BuildLocalIncludes($(HEADERS),../Dt,../Term)
+
+#ifndef	Build_HpVue
+/* link headers to X11/cde* directory */
+LOCAL_BINSTALL_INCLUDEDEST = include/Dt
+BuildIncludes($(HEADERS),$(DTINCLUDEDEST),../..)
+BuildMultipleInstall($(HEADERS),$(LOCAL_BINSTALL_INCLUDEDEST))
+#endif	/* Build_HpVue */
+
+includes::
+
+clean::
+	$(RM) TermLineData.c

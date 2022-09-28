@@ -1,0 +1,160 @@
+XCOMM $XConsortium: msg.C.tmpl /main/cde1_maint/1 1995/12/04 17:09:26 barstow $
+
+#if UseAltBuildScheme
+MKCATTOOL = $(BINSTALL_BINDIR)/mkcatdefs
+#else
+MKCATTOOL = $(TOP)/cdeTools/MSGTools/mkcatdefs/mkcatdefs
+#endif
+
+#ifdef RsArchitecture
+SHELL=/bin/ksh
+#endif
+
+.SUFFIXES: .msg .cat
+
+.msg.cat:
+	$(MAKEMESSCAT) $(MAKEMESSCAT_OPTIONS) $@ $(LANG)
+
+
+#define PassCDebugFlags 'CDEBUGFLAGS=$(CDEBUGFLAGS)'
+
+#ifdef SunArchitecture
+.NO_PARALLEL:
+#endif
+
+OBJS= \
+      DtHelp.cat	\
+      dtact.cat		\
+      dtcalc.cat	\
+      dtcopy.cat	\
+      dtcreate.cat	\
+      dtfile.cat	\
+      dthello.cat	\
+      dthelpgen.cat	\
+      dthelpprint.cat	\
+      dtsession.cat	\
+      dticon.cat	\
+      dtksh.cat		\
+      dtlogin.cat	\
+      dtlp.cat		\
+      dtscreen.cat	\
+      dtterm.cat	\
+      DtWidget.cat	\
+      dtwm.cat		\
+      dt.cat		\
+      dtpad.cat		\
+      dtstyle.cat	\
+      dttypes.cat	\
+      dtconfig.cat	\
+      dtbuilder.cat	\
+      dtcodegen.cat	\
+      DtMail.cat	\
+      dtmailopts.cat	\
+      libDtMail.cat	\
+      MotifApp.cat	\
+      dtcm.cat		\
+      dtprintinfo.cat	\
+      SUNW_TOOLTALK.cat	\
+      Xm.cat
+
+#if SunCDE
+EXTRA_OBJS = \
+      sdtcm_convert.cat \
+      sdtcm_admin.cat \
+      sdtgilcvt.cat \
+      sdtimage.cat \
+      sdtimage_snap.cat \
+      sdtfprop.cat \
+      sdtformat_floppy.cat \
+      sdt_firstlogin.cat \
+      sdtaudio.cat \
+      sdtactrl.cat \
+      SDtMail.cat \
+      SDtSpell.cat
+#endif /* SunCDE */
+
+all:: $(OBJS) $(EXTRA_OBJS)
+
+Xm.cat:		Xm.msg
+	$(RM) Xm.cat
+	$(MKCATTOOL) Xm Xm.msg > _Xm.msg
+	gencat Xm.cat _Xm.msg
+	$(RM) _Xm.msg Xm_msg.h
+
+clean::
+	$(RM) $(OBJS)
+
+#if SunCDE
+clean::
+	$(RM) $(EXTRA_OBJS)
+#endif /* SunCDE */
+
+FileLinkRule($(CDELIBSRC)/DtHelp/DtHelp.msg,DtHelp.msg)
+FileLinkRule($(CDESRC)/dtaction/dtact.msg,dtact.msg)
+FileLinkRule($(CDESRC)/dtcalc/dtcalc.msg,dtcalc.msg)
+FileLinkRule($(CDESRC)/dtfile/dtcopy/dtcopy.msg,dtcopy.msg)
+FileLinkRule($(CDESRC)/dtcreate/dtcreate.msg,dtcreate.msg)
+FileLinkRule($(CDESRC)/dtfile/dtfile.msg,dtfile.msg)
+FileLinkRule($(CDESRC)/dthello/dthello.msg,dthello.msg)
+FileLinkRule($(CDESRC)/dthelp/dthelpgen/dthelpgen.msg,dthelpgen.msg)
+FileLinkRule($(CDESRC)/dthelp/dthelpprint/dthelpprint.msg,dthelpprint.msg)
+FileLinkRule($(CDESRC)/dticon/dticon.msg,dticon.msg)
+FileLinkRule($(CDESRC)/dtksh/dtksh.msg,dtksh.msg)
+FileLinkRule($(CDESRC)/dtlogin/dtlogin.msg,dtlogin.msg)
+FileLinkRule($(CDESRC)/dtprintegrate/dtlp.msg,dtlp.msg)
+FileLinkRule($(CDESRC)/dtpad/dtpad.msg,dtpad.msg)
+FileLinkRule($(CDESRC)/dtscreen/dtscreen.msg,dtscreen.msg)
+FileLinkRule($(CDESRC)/dtsession/dtsession.msg,dtsession.msg)
+FileLinkRule($(CDESRC)/dtstyle/dtstyle.msg,dtstyle.msg)
+FileLinkRule($(CDESRC)/dtterm/dtterm.msg,dtterm.msg)
+FileLinkRule($(TOP)/cde1/util/dttypes/dttypes.msg,dttypes.msg)
+FileLinkRule($(CDELIBSRC)/DtWidget/DtWidget.msg,DtWidget.msg)
+FileLinkRule($(CDESRC)/dtwm/dtwm.msg,dtwm.msg)
+FileLinkRule($(CDELIBSRC)/DtSvc/dtsvc.msg,dt.msg)
+FileLinkRule($(CDESRC)/dtconfig/dtconfig.msg,dtconfig.msg)
+FileLinkRule($(CDESRC)/dtappbuilder/src/ab/dtbuilder.msg,dtbuilder.msg)
+FileLinkRule($(CDESRC)/dtappbuilder/src/abmf/dtcodegen.msg,dtcodegen.msg)
+FileLinkRule($(CDESRC)/dtappbuilder/src/libABil/libABil.msg,libABil.msg)
+FileLinkRule($(CDESRC)/dtappbuilder/src/libABobjXm/libABobjXm.msg,libABobjXm.msg)
+FileLinkRule($(CDESRC)/dtappbuilder/src/libAButil/libAButil.msg,libAButil.msg)
+FileLinkRule($(CDESRC)/dtmail/dtmail/DtMail.msg,DtMail.msg)
+FileLinkRule($(CDESRC)/dtmail/dtmail/dtmailopts.msg,dtmailopts.msg)
+FileLinkRule($(CDESRC)/dtmail/libDtMail/Common/libDtMail.msg,libDtMail.msg)
+FileLinkRule($(CDESRC)/dtmail/MotifApp/MotifApp.msg,MotifApp.msg)
+FileLinkRule($(CDESRC)/dtcm/dtcm/dtcm.msg,dtcm.msg)
+FileLinkRule($(CDESRC)/dtprintinfo/dtprintinfo.msg,dtprintinfo.msg)
+FileLinkRule($(TOP)/lib/tt/SUNW_TOOLTALK.msg,SUNW_TOOLTALK.msg)
+FileLinkRule($(TOP)/lib/Xm/Xm.msg,Xm.msg)
+
+#if SunCDE
+FileLinkRule($(CDESRC)/dtappbuilder/src/sdtgilcvt/sdtgilcvt.msg,sdtgilcvt.msg)
+FileLinkRule($(CDESRC)/dtcm/server/sdtcm_convert.msg,sdtcm_convert.msg)
+FileLinkRule($(CDESRC)/dtcm/admin/sdtcm_admin.msg,sdtcm_admin.msg)
+FileLinkRule($(SUNCDESRC)/sdtaudio/sdtaudio/sdtaudio.msg,sdtaudio.msg)
+FileLinkRule($(SUNCDESRC)/sdtaudio/sdtactrl/sdtactrl.msg,sdtactrl.msg)
+FileLinkRule($(SUNCDESRC)/sdtimage/sdtimage.msg,sdtimage.msg)
+FileLinkRule($(SUNCDESRC)/sdtimage/sdtimage_snap.msg,sdtimage_snap.msg)
+FileLinkRule($(SUNCDESRC)/sdtfile/sdtfprop/sdtfprop.msg,sdtfprop.msg)
+FileLinkRule($(SUNCDESRC)/sdtfile/sdtformat_floppy/sdtformat_floppy.msg,sdtformat_floppy.msg)
+FileLinkRule($(SUNCDESRC)/sdtlogin/sdt_firstlogin/sdt_firstlogin.msg,sdt_firstlogin.msg)
+FileLinkRule($(SUNCDESRC)/sdtmail/sdtmail/DtMail.msg,DtMail.msg)
+FileLinkRule($(SUNCDESRC)/sdtmail/sdtmail/dtmailopts.msg,dtmailopts.msg)
+FileLinkRule($(SUNLIBSRC)/SDtMail/SDtMail.msg,SDtMail.msg)
+FileLinkRule($(SUNLIBSRC)/SDtSpell/SDtSpell.msg,SDtSpell.msg)
+#endif /* SunCDE */
+
+#if SunCDE
+dtcodegen.cat dtbuilder.cat sdtgilcvt.cat: libAButil.msg libABobjXm.msg libABil.msg 
+	$(RM) $@
+	$(MAKEMESSCAT) $(MAKEMESSCAT_OPTIONS) $(@:.cat=.msg) \
+	libAButil.msg libABobjXm.msg libABil.msg $(LANG)
+#endif /* SunCDE */
+
+clean::
+	for i in *.msg; do \
+		[ -z $$i ] && continue; \
+		[ -h $$i ] && $(RM) $$i; \
+	done; true; 
+
+
+depend::

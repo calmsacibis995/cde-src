@@ -1,0 +1,392 @@
+#!/usr/local/bin/perl
+
+eval "exec /usr/local/bin/perl -S $0 $*"
+    if $running_under_some_shell;
+
+#### PLACE REMOTELY
+########################################################
+# required files
+########################################################
+# Add the test directory to the locations to search for
+# libraries.
+push(@INC,"/x/cdesrc/admin/BuildTools/rcs_tools");
+require 'RcsU.pl';
+require 'RcsSock.pl';
+
+########################################################
+# define variables
+########################################################
+&InitializeVariables();
+
+#######################################################
+# define local subroutines
+#######################################################
+
+# routine for clean shutdown on error
+sub abort {
+  &sock'close_all;
+  die " ended unexpectedly, but shut down cleanly\n";
+}
+
+sub dokill {
+	&sock'close_all;		
+	exit;
+}
+
+sub GetRcsDir {
+   $realRCSdir = "RCS";
+	if (! -l "RCS") {
+		die "	must be in a directory with an RCS symlink";
+	}
+	else {
+   	while (defined($tmpRCSdir = readlink($realRCSdir))) {
+     	 $realRCSdir = $tmpRCSdir;
+   	}
+   	if (opendir(BOGUSHANDLE,"RCS")){
+      	$DoProcessLocalFiles = "true";
+      	closedir(BOGUSHANDLE);
+   	}
+   }
+	$realDir = $realRCSdir;
+	$realDir =~ s%\/RCS$%%;
+	return $realRCSdir;
+	
+}
+
+
+########################################################
+# Catch signals
+########################################################
+$SIG{'INT'} = 'dokill';
+
+##############################################################
+# argument processing - this must be specific for each command
+##############################################################
+
+#
+# get the files and do appropriate error checking
+# see if the files are local or remote
+#
+# for some reason while(@ARGV) cannot be in a subroutine
+while ( @ARGV ) {
+	$tstfile=shift;
+	$tmp = $tstfile;
+	if ("$tmp" ne "RCS")  {
+		$_ = $tmp;
+		if ((m%\.xwd%) || (m%\.tif%) || (m%\.bm%) || (m%\.pm%)) {
+			push(@allFiles, $tstfile);
+		}
+		else {
+			print STDERR "	File $tmp NOT processed\n";
+			print STDERR "	files must end in .xwd, .tif, .bm, or .pm\n";
+		}
+	}
+}
+
+if (! defined(@allFiles)) {
+	print STDERR "\n	NO FILES to Process \n\n";
+	exit 1;
+}
+
+#
+# get the RCS directory and the parent directory
+#
+$rcsDir = &GetRcsDir();
+
+####################################################################
+# debug argument processing
+####################################################################
+if ( $Debug ) {
+	print "rhost= $rhost\n";
+	print "port= $port\n";
+	print "allFiles= \"@allFiles\"\n";
+}
+
+
+##################################################################
+# Process the local files
+# Run local Rcs commands
+##################################################################
+
+if (DoProcessLocalFiles) {
+	if (! -d "$realDir") {
+		die "\n	Directory $realDir does not exist\n";
+	}
+	else {
+		system "/x/toolsrc/BuildTools/rcs_tools/old/putbinaries $realDir @allFiles";
+			
+	}
+}
+	
+if (defined(@allRemoteExchangeFiles)) {
+	
+	
+	##################################################################
+	# Open the connection
+	##################################################################
+	($SOCK_HANDLE = &sock'open($rhost,$port)) || 
+		die "   Connect to \"$rhost\" failed: $!";
+	
+	
+	select(STDOUT); $| =1;
+	#select(STDERR); $| =1;
+	#select($SOCK_HANDLE); $| =1;
+	
+	#
+	# Pass the basic command string
+	#
+	# Comment out for now to work with existing server assumptions.
+	print $SOCK_HANDLE  "USER: $userName\n";
+	print "$RemoteRcsPrg @allRemoteExchangeFiles\n" if $Debug;
+	print $SOCK_HANDLE "$RemoteRcsPrg @allRemoteExchangeFiles\n";
+	print "$RemoteRcsPrg @allRemoteExchangeFiles\n" if $Debug;
+	
+	
+	# get information about the files existence, whether it was executable
+	# on the destination and whether it is locked by the user.
+	while (<$SOCK_HANDLE>) {
+	if (/^>>### BEGIN FILE STATS ###<<$/) {
+		NEXTSTAT:
+		while( <$SOCK_HANDLE> ) {
+			if (/^>>### END FILE STATS ###<<$/) {	
+				last;
+			}
+			$holder = $_;
+			chop($holder);
+			push(@FileExistsRemotely,$holder);
+			$holder = <$SOCK_HANDLE>;
+			chop($holder);
+			push(@FileIsExecutableRemotely,$holder);
+			$holder = <$SOCK_HANDLE>;
+			chop($holder);
+			push(@FileIsLockedByUser,$holder);
+		}
+		last;
+	}
+	else {
+		print ;
+	}
+	}
+	
+	
+	if (! defined(@FileExistsRemotely) ||
+		! defined(@FileIsExecutableRemotely) ||
+		! defined(@FileIsLockedByUser)) {
+		print "\n	Cannot stat remote source server. Either the server is down\n";
+		print "	or your RCS directory is a symlink to nowhere.\n\n";
+		&dokill();
+		exit;
+	}
+	
+	print "FileExist = @FileExistsRemotely\n" if $Debug;
+	print "FileIsExecutable = @FileIsExecutableRemotely\n" if $Debug;
+	print "FileIsLockedByUser = @FileIsLockedByUser\n" if $Debug;
+	
+	
+	#cycle through files, ask for input if necessary and check in
+	$firstLog = 1;
+	$cryptdir = "/tmp/crypt$$";
+	if ( $needEncryption) {
+		if (! mkdir("$cryptdir",0755)) {
+			print "	Cannot create local encryption directory $cryptdir\n";
+			print "	This is needed for file encryption.\n";
+			print "	Contact your RCS administrator\n";
+			&dokill();
+			exit;
+		}
+	}
+	
+	NEXTFILE:
+	while (@remoteCommaVFiles) {
+		$currentRemoteFile = shift(@remoteCommaVFiles);
+		$currentLocalFile = shift(@remoteExchangeFiles);
+		$doesExist = shift(@FileExistsRemotely);
+		$isExecutable = shift(@FileIsExecutableRemotely);
+		$isLocked = shift(@FileIsLockedByUser);
+		print "doesExist = $doesExist\n" if $Debug;
+		print "isExecutable = $isExecutable\n" if $Debug;
+		print "isLocked = $isLocked\n" if $Debug;
+
+		#
+		# set to determine whether RCS vault file should be made
+		# executable. This will happen in 2 cases;
+		# 1) -E specified.
+		# 2) new file and local version is executable
+		#
+		$remoteFileMustBeExecutable = 0;
+		if ($IsDashEOption) {
+			$remoteFileMustBeExecutable = 1;
+		}
+	
+		#
+		# remoteRcsArgs is reset for each file and each file may have
+		# slightly different options (e.g. -E added for executable new files)
+		# extraRemoteArgs will apply to every file checked in
+		#
+		@remoteRcsArgs = (@RcsArgs);
+		print "IsDashMOption = $IsDashMOption\n" if $Debug;
+		if ($doesExist) {
+			$UseInputDashTOption = 0;
+			if (! $isLocked) {
+				print "	File $currentLocalFile is not locked by user $userName\n";
+				next NEXTFILE;
+			}
+			else { # user has the lock
+				# if file exists ignore -t option
+				# get the message
+				if (! $IsDashMOption) {
+					if ($firstLog) { # if first time, prompt for log
+						$firstLog = 0;
+						@stdinMsg = &GetLogMsg($currentLocalFile, "log message");
+					}
+					else { # after first time, ask for log message reuse
+						print "	<-- $currentLocalFile -->\n"; 
+						print "reuse log message of previous file? [yn](y):";
+						chop($_=<STDIN>);	
+						if ( /^[nN]/ ) { # prompt
+							@stdinMsg = &GetLogMsg($currentLocalFile, "log message");
+						}
+					}
+					@dashMMessage = (@stdinMsg);
+				}
+			}
+		}
+		else { #file is a new file
+			if (! $IsDashTOption && ! $IsDashMOption){ #prompt for descriptive text
+				$UseInputDashTOption = 1;
+				@txtDesc = &GetLogMsg($currentLocalFile, "description");
+			}
+			if (($IsDashTOption || $UseInputDashTOption)) {
+				push(@remoteRcsArgs,"-t" . $descriptionFile);
+			}
+			#
+			# if the new file is executable, need to chmod +x the
+			# file on the server side before checking in.
+			#
+			if (-x $currentLocalFile) {
+				push(@remoteRcsArgs,"-E");
+				$remoteFileMustBeExecutable = 1;
+			}
+		}
+		print "RcsArgs = @RcsArgs\n" if $Debug;
+		print "RemoteRcsArgs = @remoteRcsArgs\n" if $Debug;
+		print "extraRemoteArgs = @extraRemoteArgs\n" if $Debug;
+		print "TextDesc = @txtDesc\n" if $Debug;
+		print "stdinMsg = @stdinMsg\n" if $Debug;
+		print "dashMMessage = @dashMMessage\n" if $Debug;
+	
+		# signal beginning of individual file check in
+		print $SOCK_HANDLE ">>### BEGIN INDIVIDUAL FILE CHECK IN ###<<\n";
+	
+		# send the ci file
+		# encrypt if necessary
+		if ($needEncryption) {
+			$cryptfile = "${currentLocalFile}.N";
+			$uufile = "${cryptdir}/${currentLocalFile}.N.uu";
+			if (! open(CRYPTFILE,"|crypt desZthPl |uuencode $cryptfile >$uufile")) {
+				print "	ERROR: Cannot open: \"$uufile\" $! \n";
+				next NEXTFILE;
+			}
+			if (! open(TMPCIFILE,$currentLocalFile)) {
+				print "	ERROR: Cannot open: \"$currentLocalFile\" $! \n";
+				next NEXTFILE;
+			}
+			while (<TMPCIFILE>){
+				print CRYPTFILE $_;
+			}
+			close TMPCIFILE;
+			close CRYPTFILE;
+
+			if ((! -s $uufile) || (! open(CIFILE,$uufile))) {
+				print "	ERROR: Cannot open: encryption file \"$uufile\" $! \n";
+				next NEXTFILE;
+			}
+		}
+		else { # no encryption
+			if (! open(CIFILE,$currentLocalFile)) {
+				print "	ERROR: Cannot open: \"$currentLocalFile\" $! \n";
+				next NEXTFILE;
+			}
+		}
+			
+		# push the command
+		print "$RemoteRcsPrg @remoteRcsArgs @extraRemoteArgs $currentLocalFile $currentRemoteFile\n" if $Debug;
+		print $SOCK_HANDLE "$RemoteRcsPrg @remoteRcsArgs @extraRemoteArgs $currentLocalFile $currentRemoteFile\n";
+	
+	
+		print $SOCK_HANDLE ">>### BEGIN FILE SEND: ###<<\n";
+		
+		if ($needEncryption) {
+			print "Sending \"$cryptfile\"\n" if $Debug;
+			print $SOCK_HANDLE "$cryptfile\n";
+		}
+		else {
+			print "Sending \"$currentLocalFile\"\n" if $Debug;
+			print $SOCK_HANDLE "$currentLocalFile\n";
+		}
+
+		while (<CIFILE>) {
+			print $SOCK_HANDLE $_;
+		}
+		close(CIFILE);
+		print $SOCK_HANDLE ">>### END FILE SEND: ###<<\n";
+	
+		# send the message don't use if -t specified
+		if ( defined(@dashMMessage) ) {
+			print $SOCK_HANDLE ">>### BEGIN FILE SEND: ###<<\n";
+			print $SOCK_HANDLE "$messagefile\n";
+			print $SOCK_HANDLE "@dashMMessage\n";
+			print $SOCK_HANDLE ">>### END FILE SEND: ###<<\n";
+		}
+	
+		# send the text description if there is one
+		if ( defined(@txtDesc) ) {
+			print $SOCK_HANDLE ">>### BEGIN FILE SEND: ###<<\n";
+			print $SOCK_HANDLE "$descriptionFile\n";
+			print $SOCK_HANDLE "@txtDesc\n";
+			print $SOCK_HANDLE ">>### END FILE SEND: ###<<\n";
+		}
+		# send signal that all files have been sent
+		print $SOCK_HANDLE ">>### END ALL FILE SEND: ###<<\n";
+	
+	
+		# wait for signal that previous check in is done
+		while (<$SOCK_HANDLE>) {
+			if (m%^>>### END INDIVIDUAL FILE CHECK IN ###<<$%) { 
+				# if ci failed don't do unlinks and chmods below
+				$doActionOnLocalFile = <$SOCK_HANDLE>;
+				chop $doActionOnLocalFile;
+				last;
+			}
+			else {
+				print;
+			}
+		}
+		# if not -l or -u remove local file
+		if ((! $IsDashUOption) && ! ($IsDashLOption) && ($doActionOnLocalFile)) {
+			unlink $currentLocalFile;
+		}
+		# if -u chmod local file -w
+		# currently assume not setuid or setgid files
+		if (($IsDashUOption) && ($doActionOnLocalFile)){
+			if (($isExecutable) || ($remoteFileMustBeExecutable)){		
+				chmod 0555, $currentLocalFile;
+			}
+			else { 
+				chmod 0444, $currentLocalFile;
+			}
+		}
+	}
+		# signal remotely that all information has been sent for this file
+		print $SOCK_HANDLE ">>### CI ALL DONE ###<<\n";
+	#
+	# clean up encryption directory
+	#
+	if ( -d $cryptdir) {
+		unlink <$cryptdir/*>;
+		rmdir ("$cryptdir");
+	}
+	print "Closing socket\n" if $Debug;
+	&sock'close($SOCK_HANDLE);
+	exit;
+}

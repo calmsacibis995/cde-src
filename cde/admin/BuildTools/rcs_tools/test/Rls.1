@@ -1,0 +1,69 @@
+.\" $Header: Rls.1,v 1.1 93/12/06 16:37:01 xbuild_hp_cv Exp $
+.TH Rls 1 "" "" HP-UX
+.ds )H Hewlett-Packard Company CV
+.ds ]W June 1993
+.SH NAME
+Rls \- RCS listing tool with remote capabilities.
+.SH SYNOPSIS
+.B Rls
+.RI [ \|options\| ]
+.I paths
+.SH DESCRIPTION
+.I Rls
+is a perl front-end to the HP
+.I ls
+program
+and is used like the HP executable.
+.I Rls
+prints information about
+.SM RCS
+files.
+Files ending in
+.I ,v
+are
+.SM RCS
+files. Rls lists the contents of the RCS vault for the given paths.
+A mixture of files and directories can be listed as paths.
+For a complete listing of options consult the HP 
+.I ls
+man page.
+.SH EXAMPLES
+.nf
+Rls (Listing of RCS vault of current directory)
+Rls RCS (Listing of RCS vault of current directory)
+Rls RCS/* (Listing of RCS vault of current directory)
+Rls foo foo1 (Listing in RCS vault for foo & foo1)
+Rls RCS/foo,v RCS/foo1,v (Listing in RCS vault for foo & foo1)
+Rls somedir/RCS/foo,v (Listing in somedir/RCS vault for foo)
+Rls /tmp/somedir (Listing of RCS vault pointed to by /tmp/somedir)
+Rls -B somedir (Lists parent directory of RCS vault pointed 
+		to somedir/RCS. This is used for listing binary files.)
+Rls -Rl somepath (Recursive long listing of the RCS vault in 
+		  the directory somedir)
+.fi
+.SS Options
+.TP 15
+.I -B
+Usually 
+.I Rls
+gives a listing of the RCS directory. The 
+.I -B 
+option lists the parent directory of the RCS directory inside the RCS
+vault.  This is where binary files are stored by
+.IR Cib.
+To look at binary files in the source tree use this option.
+.SH WARNINGS
+Rls -Rl will not recursively descend the directory structure if the directory
+is a symbolic link on the server. Rls -R will correctly recurse the
+directory structure in this situation.
+.SH AUTHOR
+.I Rls
+was developed by Marc Ayotte
+WTG-CV, Hewlett-Packard.
+.SH SEE ALSO
+Co(1),
+Rcs(1), Rcsdiff(1),
+Rlog(1),
+Ci(1),
+Cib(1),
+Rcslocks(1).

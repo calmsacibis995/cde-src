@@ -1,0 +1,191 @@
+.TH dtspcdenv 4m "12 January 1994"
+.\" *************************************************************************
+.\" **  (c) Copyright 1994 Hewlett-Packard Company
+.\" **  (c) Copyright 1994 International Business Machines Corp.
+.\" **  (c) Copyright 1994 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1994 Novell, Inc.
+.\" *************************************************************************
+.SH NAME
+dtspcdenv \- environment Variable File for the CDE Subprocess Control Service
+.SH DESCRIPTION
+The CDE Subprocess Control service provides the
+ability for a process running on one system to
+invoke another process on a different system.
+By default, the environment variables of the
+parent process are passed unmodified to the
+child process (on the remote host);
+however, there are some environment
+variables that are given special handling.
+In
+addition, the user or system administrator can
+specify environment variables that should be
+modified when they are passed to the child process.
+.P
+The system-wide environment files are: 
+.br 
+\f3/etc/dt/config/dtspcdenv
+.br
+/usr/dt/config/dtspcdenv\f1
+.sp 1
+and the user-specific environment file is:
+.br
+\f3$HOME/.dt/dtspcdenv\f1
+.sp 1
+The file
+.B /usr/dt/config/dtspcdenv
+is created
+when CDE is installed.
+This file may be overwritten
+by subsequent CDE installations.
+Consequently, local
+variable definitions should be placed in the file
+.B /etc/dt/config/dtspcdenv
+because this file is not
+overwritten during installation.
+.P
+The environment variable files are evaluated in the following order:
+.br
+local host:  \f3/usr/dt/config/dtspcdenv\f1
+.br
+local host:  \f3/etc/dt/config/dtspcdenv\f1
+.br
+local host:  \f3$HOME/.dt/dtspcdenv\f1
+.br
+remote host: \f3/usr/dt/config/dtspcdenv\f1
+.br
+remote host: \f3/etc/dt/config/dtspcdenv\f1
+.br
+remote host: \f3$HOME/.dt/dtspcdenv\f1
+.sp 1
+The precedence occurs in the reverse order of
+evaluation.
+Thus, variables in the remote
+host's
+.B $HOME/.dt/dtspcdenv
+file have the highest
+precedence and variables in the local host's
+.B /etc/dt/config/dtspcdenv
+file have the lowest
+precedence.
+In this context, the local host is the
+host where a CDE client is running and
+the remote host is the host where a remote
+process will be started (on behalf of
+the local client).
+.P
+Lines beginning with a numer symbol (#) are considered 
+comments and are not processed.
+.P
+The syntax for a non-commented line is:
+.Cs I
+VAR_NAME=some_value
+.Ce
+.sp 1
+where
+.I VAR_NAME
+is the name of an 
+environment variable and
+.I some_value
+is the value assigned to the variable.
+.P
+If
+.I some_value
+contains a variable reference,
+the reference will be replaced by the variable's
+value.
+For example, if a CDE client has the
+following definition in its environment:
+.Cs I
+PATH=/bin:/sbin:/usr/local/bin
+.Ce
+.sp 1
+and the following definition occurs in one of the
+environment files:
+.Cs I
+PATH=/opt/foo/bin:$PATH
+.Ce
+.sp 1
+then before the remote process is executed,
+.I PATH
+
+will be expanded to:
+.Cs I
+PATH=/opt/foo/bin:/bin:/sbin:/usr/local/bin
+.Ce
+.sp 1
+The environment variable names may consist of
+letters, digits or underscores and may be
+enclosed in curly braces.
+.sp 1
+The environment variable files may contain
+"unset <variable_name>" commands to prevent 
+an environment variable from being propagated 
+to the remote process.
+For example, the following line would 
+prevent the variable
+.I LIB_PATH
+from being
+propagated to the remote process:
+.Cs I 
+unset LIB_PATH
+.Ce
+.SH "ENVIRONMENT VARIABLES"
+The 
+.B dtspcd
+daemon treats the following variables specially: 
+.VL 15
+.LI \f2DISPLAY\f1
+If
+.I DISPLAY
+is set to "unix:<n>", "local:<n>" or ":<n>"
+(where <n> is the screen number), then before the
+remote process is executed, 
+.I DISPLAY
+is changed to the name of the local host and
+the screen number is preserved.
+.LI \f2HOME\f1
+Before the remote process is executed,
+.I HOME
+is set 
+to the value of the user's home directory in
+the password file on the remote host.
+.LI \f2SHELL\f1
+If
+.I SHELL
+is not in the parent processes environment,
+.I SHELL
+is set to the value of the user's shell in
+the password file on the remote host.
+.LI \f2PWD\f1
+The variable
+.I PWD
+is not propagated to
+the remote host.
+.sp 1
+Note that the above variables will be
+overridden by their corresponding definitions 
+in an environment file.
+.SH "EXAMPLES"
+The following definition sets the variable
+.I FOO_BIN_PATH
+to the value
+.BR /var/foo/bin :
+.sp 1
+.B FOO_BIN_PATH=/var/foo/bin
+.SH FILES
+.VL 15
+.LI \f3/usr/dt/config/dtspcdenv\f1
+System-wide, installed environment variable definitions 
+used when a process is executed
+.LI \f3/etc/dt/config/dtspcdenv\f1
+System-wide, locally defined environment variable definitions 
+used when a process is executed
+.LI \f3$HOME/.dt/dtspcdenv\f1
+User-specific environment variable definitions used 
+when a process is executed
+.LE
+.SH "SEE ALSO"
+.BR dtspcd (1).
+
+
+

@@ -1,0 +1,74 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+.\" **
+.\" **
+.\" ** (c) Copyright 1994 Hewlett-Packard Company
+.\" ** (c) Copyright 1994 International Business Machines Corp.
+.\" ** (c) Copyright 1994 Sun Microsystems, Inc.
+.\" ** (c) Copyright 1994 Unix Systems Labs, Inc., a subsidiary of Novell, Inc.
+.\" **
+.\" **
+.TH DtWsmGetWorkspaceList 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Common Desktop Environment 1.0: January 1994
+.SH NAME
+\fBDtWsmGetWorkspaceList\fP \- get the names of the currently defined 
+workspaces.
+.iX "DtWsmGetWorkspaceList"
+.iX "workspace functions" "DtWsmGetWorkspaceList"
+.sp .5
+.SH SYNOPSIS
+\fB
+\&#include <Dt/Wsm.h>
+.sp .5
+Status DtWsmGetWorkspaceList (
+.br
+.ta 0.75i 2.20i
+	Display *	\fIdisplay\fP,
+.br
+	Window	\fIroot\fP,
+.br
+	Atom **	\fIppaWorkspaces\fP,
+.br
+	int *	\fIpNumWorkspaces\fP)
+.fi
+\fP
+.SH DESCRIPTION
+\fBDtWsmGetWorkspaceList\fP returns a list of the names of the currently
+defined workspaces. Each name has been converted into an X atom.
+\fBDtWsmGetWorkspaceList\fP is designed to work with the Common Desktop
+Environment window/workspace manager \fBdtwm\fP.
+.sp .5
+.IP "\fIdisplay\fP" 1.00i
+The X display.
+.IP "\fIroot\fP" 1.00i
+The root window of the screen of interest.
+.IP "\fIppaWorkspaces\fP" 1.00i
+Address of a pointer to receive the returned pointer to the workspace
+list. Each atom in the returned list can be converted to a string name
+via \fBXGetAtomName(3X)\fP. This data should be freed with 
+\fBXtFree(3X)\fP. 
+.IP "\fIpNumWorkspaces\fP" 1.00i
+Address of a integer to receive the number of elements in the workspace
+list.
+.PP
+To get detailed information on all the available workspaces, first call
+\fBDtWsmGetWorkspaceList\fP to get the names of all the workspaces. Then,
+for each workspace in the list, call \fBDtWsmGetWorkspaceInfo(3X)\fP to 
+get detailed information for that workspace.
+.PP
+.sp .5
+.SH RETURN VALUE
+.IP "\fBSuccess\fP" 1.00i
+The workspace list was allocated and returned successfully. 
+.IP "not \fBSuccess\fP" 1.00i
+The function failed and no data was allocated or returned. This may
+be due to a memory allocation error or failure to find the correct
+workspace information (i.e. dtwm was not running).
+.sp .5
+.SH RELATED INFORMATION
+\fBdtwm(1X)\fP, \fBDtWsmGetWorkspaceInfo(3X)\fP.
+.sp .5

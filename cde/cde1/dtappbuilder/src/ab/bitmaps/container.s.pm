@@ -1,0 +1,36 @@
+/* XPM */
+static char * container_s_pm[] = {
+/* width height ncolors cpp [x_hot y_hot] */
+"28 20 10 1 0 0",
+/* colors */
+" 	c #CCCCCCCCCCCC",
+".    s iconGray2     m white c #bdbdbdbdbdbd",
+"X    s iconGray5     m black c #737373737373",
+"o    s iconGray4     m white c #949494949494",
+"O	s iconColor1	m black	c black",
+"+	c #C3C3C3C3C3C3",
+"@	c #7E7E7E7E7E7E",
+"#	s iconColor2	m white	c white",
+"$    s iconGray8     m black c #212121212121",
+"%    s iconGray1     m white c #dededededede",
+/* pixels */
+"                       ....X",
+" ooooooooooooooooooooooooooX",
+" oOOOOOOO+oooooooooooooooooX",
+" oO@@@@@@.##ooooooo$$$$$$$oX",
+" oO@#@@@X##Ooo###oo$......oX",
+" oO###@X##Ooooo#ooo$......oX",
+" o#######Oooooo#o#o$......oX",
+" o$#####O.ooooo#o#o.......oX",
+" oOX###OX+oooooooooooooooooX",
+" oO@X#OXX+oooooooooooooooooX",
+" o+++..+++oooooooooooooooooX",
+" ooooooooooooooooooooooooooX",
+" ooooooooooooooooooooooooooX",
+" o$$$$$$$$$$$$$$$$$$$$$$$$oX",
+" o$oooooo%%%%$%%%$ooooooo%oX",
+" o$oooooo%..X$%..$ooooooo%oX",
+".o$oooooo%$$$$$$$$ooooooo%oX",
+".o$%%%%%%%%%%%%%%%%%%%%%%%oX",
+".ooooooooooooooooooooooooooX",
+".XXXXXXXXXXXXXXXXXXXXXXXXXXX"};

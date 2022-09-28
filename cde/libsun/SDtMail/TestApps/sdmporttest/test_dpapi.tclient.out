@@ -1,0 +1,1773 @@
+sdmporttest> ##
+sdmporttest> ## This tests the tclient through the data port api interface
+sdmporttest> ##
+sdmporttest> 
+sdmporttest> # create the token that names a test message store object
+sdmporttest> 
+sdmporttest> token create token1
+token token1: defined
+sdmporttest> token set token1 servicetype test
+token token1: set
+sdmporttest> token set token1 serviceoption messagestorename test.mbx
+token token1: set
+sdmporttest> # token set token1 serviceoption readonly
+sdmporttest> 
+sdmporttest> # create and open a data port on that object
+sdmporttest> 
+sdmporttest> port create port1
+data port port1: defined
+sdmporttest> port startup port1
+data port port1: started
+sdmporttest> port open port1 token1
+data port port1: opened
+sdmporttest> 
+sdmporttest> # this attach should fail with an 'already open' error
+sdmporttest> 
+sdmporttest> port attach port1 token1
+data port port1: attach failed with error 15: Sdm_EC_Open
+sdmporttest> 
+sdmporttest> # perform operations
+sdmporttest> 
+sdmporttest> port getstatus port1
+data port port1: status information:
+ flags = 0x0000003f, uidvalidity = 0x00000000, checksum = 0, checksumbytes = 0
+ messages = 4, recent = 4, unseen = 4, uidnext = 5
+sdmporttest> port checkfornewmessages port1
+data port port1: check for new messages successful: 0 new messages arrived
+sdmporttest> 
+sdmporttest> # test getflags
+sdmporttest> 
+sdmporttest> port getflags port1 *
+data port port1: getflags successful
+ message 1: 0x00000010                                Recent     
+ message 2: 0x00000010                                Recent     
+ message 3: 0x00000018                        Flagged Recent     
+ message 4: 0x00000010                                Recent     
+sdmporttest> port getflags port1 2:3
+data port port1: getflags successful
+ message 2: 0x00000010                                Recent     
+ message 3: 0x00000018                        Flagged Recent     
+sdmporttest> port getflags port1 1
+data port port1: getflags successful
+ message 1: 0x00000010                                Recent     
+sdmporttest> port getflags port1 4,2
+data port port1: getflags successful
+ message 4: 0x00000010                                Recent     
+ message 2: 0x00000010                                Recent     
+sdmporttest> port getflags port1 4,3,2,1
+data port port1: getflags successful
+ message 4: 0x00000010                                Recent     
+ message 3: 0x00000018                        Flagged Recent     
+ message 2: 0x00000010                                Recent     
+ message 1: 0x00000010                                Recent     
+sdmporttest> 
+sdmporttest> # test setflags
+sdmporttest> 
+sdmporttest> port setflags port1 1 answered
+data port port1: setflags successful
+sdmporttest> port getflags port1 1
+data port port1: getflags successful
+ message 1: 0x00000011 Answered                       Recent     
+sdmporttest> port clearflags port1 1 answered
+data port port1: clearflags successful
+sdmporttest> port getflags port1 1
+data port port1: getflags successful
+ message 1: 0x00000010                                Recent     
+sdmporttest> port setflags port1 * answered
+data port port1: setflags successful
+sdmporttest> port getflags port1 *
+data port port1: getflags successful
+ message 1: 0x00000011 Answered                       Recent     
+ message 2: 0x00000011 Answered                       Recent     
+ message 3: 0x00000019 Answered               Flagged Recent     
+ message 4: 0x00000011 Answered                       Recent     
+sdmporttest> port clearflags port1 * answered
+data port port1: clearflags successful
+sdmporttest> port getflags port1 *
+data port port1: getflags successful
+ message 1: 0x00000010                                Recent     
+ message 2: 0x00000010                                Recent     
+ message 3: 0x00000018                        Flagged Recent     
+ message 4: 0x00000010                                Recent     
+sdmporttest> port setflags port1 2,4 answered
+data port port1: setflags successful
+sdmporttest> port getflags port1 *
+data port port1: getflags successful
+ message 1: 0x00000010                                Recent     
+ message 2: 0x00000011 Answered                       Recent     
+ message 3: 0x00000018                        Flagged Recent     
+ message 4: 0x00000011 Answered                       Recent     
+sdmporttest> port clearflags port1 2,4 answered
+data port port1: clearflags successful
+sdmporttest> port getflags port1 *
+data port port1: getflags successful
+ message 1: 0x00000010                                Recent     
+ message 2: 0x00000010                                Recent     
+ message 3: 0x00000018                        Flagged Recent     
+ message 4: 0x00000010                                Recent     
+sdmporttest> 
+sdmporttest> # test getheaders
+sdmporttest> 
+sdmporttest> port getheaders port1
+data port port1: getheaders successful
+ message 1:
+      Return-Path: <daemon@mocha.bunyip.com>
+         Received: from Eng.Sun.COM (engmail1) by basilisk.Eng.Sun.COM (5.x/SMI-SVR4)	id AA23600; Fri, 17 Feb 1995 16:34:22 -0800
+         Received: from Sun.COM (sun-barr.EBay.Sun.COM) by Eng.Sun.COM (5.x/SMI-5.3)	id AA14531; Fri, 17 Feb 1995 16:34:18 -0800
+         Received: from mocha.bunyip.com by Sun.COM (sun-barr.Sun.COM)	id AA07389; Fri, 17 Feb 95 16:34:16 PST
+         Received: by mocha.bunyip.com (5.65a/IDA-1.4.2b/CC-Guru-2b)        id AA24308  (mail destined for Gary.Gere@eng.sun.com) on Fri, 17 Feb 95 19:32:47 -0500
+             Date: Fri, 17 Feb 95 19:32:47 -0500
+       Message-Id: <9502180032.AA24308@mocha.bunyip.com>
+             From: paf@bunyip.com
+               To: MIME-tester@bunyip.com
+               Cc: mail-testers@test.com
+              Bcc: tattle-tale@bcc.gov
+     Mime-Version: 1.0
+          Subject: M1 - MIME-Version: 1.0 header field test
+     Content-Type: text
+   Content-Length: 63
+ message 2:
+      Return-Path: <daemon@mocha.bunyip.com>
+         Received: from Eng.Sun.COM (engmail1) by basilisk.Eng.Sun.COM (5.x/SMI-SVR4)	id AA23697; Fri, 17 Feb 1995 16:35:45 -0800
+         Received: from Sun.COM (sun-barr.EBay.Sun.COM) by Eng.Sun.COM (5.x/SMI-5.3)	id AA14664; Fri, 17 Feb 1995 16:35:42 -0800
+         Received: from mocha.bunyip.com by Sun.COM (sun-barr.Sun.COM)	id AA07716; Fri, 17 Feb 95 16:35:42 PST
+         Received: by mocha.bunyip.com (5.65a/IDA-1.4.2b/CC-Guru-2b)        id AA24451  (mail destined for Gary.Gere@eng.sun.com) on Fri, 17 Feb 95 19:34:13 -0500
+             Date: Fri, 17 Feb 95 19:34:13 -0500
+       Message-Id: <9502180034.AA24451@mocha.bunyip.com>
+             From: paf@bunyip.com
+               To: MIME-tester@bunyip.com
+     Mime-Version: 1.0
+          Subject: M3-2 - Content-Type: text/plain
+     Content-Type: text/plain
+   Content-Length: 386
+ message 3:
+      Return-Path: <daemon@mocha.bunyip.com>
+         Received: from Eng.Sun.COM (engmail1) by basilisk.Eng.Sun.COM (5.x/SMI-SVR4)	id AA23707; Fri, 17 Feb 1995 16:35:56 -0800
+         Received: from Sun.COM (sun-barr.EBay.Sun.COM) by Eng.Sun.COM (5.x/SMI-5.3)	id AA14677; Fri, 17 Feb 1995 16:35:53 -0800
+         Received: from mocha.bunyip.com by Sun.COM (sun-barr.Sun.COM)	id AA07749; Fri, 17 Feb 95 16:35:53 PST
+         Received: by mocha.bunyip.com (5.65a/IDA-1.4.2b/CC-Guru-2b)        id AA24496  (mail destined for Gary.Gere@eng.sun.com) on Fri, 17 Feb 95 19:34:24 -0500
+             Date: Fri, 17 Feb 95 19:34:24 -0500
+       Message-Id: <9502180034.AA24496@mocha.bunyip.com>
+             From: paf@bunyip.com
+               To: MIME-tester@bunyip.com
+     Mime-Version: 1.0
+          Subject: M4.1.1 - Content-Type: text/plain; charset="US-ASCII"
+     Content-Type: text/plain; charset="US-ASCII"
+   Content-Length: 84
+ message 4:
+      Return-Path: <daemon@mocha.bunyip.com>
+         Received: from Eng.Sun.COM (engmail1) by basilisk.Eng.Sun.COM (5.x/SMI-SVR4)	id AA23835; Fri, 17 Feb 1995 16:36:57 -0800
+         Received: from Sun.COM (sun-barr.EBay.Sun.COM) by Eng.Sun.COM (5.x/SMI-5.3)	id AA14751; Fri, 17 Feb 1995 16:36:54 -0800
+         Received: from mocha.bunyip.com by Sun.COM (sun-barr.Sun.COM)	id AA07909; Fri, 17 Feb 95 16:36:53 PST
+         Received: by mocha.bunyip.com (5.65a/IDA-1.4.2b/CC-Guru-2b)        id AA24721  (mail destined for Gary.Gere@eng.sun.com) on Fri, 17 Feb 95 19:35:24 -0500
+             Date: Fri, 17 Feb 95 19:35:24 -0500
+       Message-Id: <9502180035.AA24721@mocha.bunyip.com>
+             From: paf@bunyip.com
+               To: MIME-tester@bunyip.com
+               Cc: mail-testers@test.com
+               Cc: interest-lists@mailtest.com
+              Bcc: tattle-tale@bcc.gov
+              Bcc: nsa-secrets@nsa.gov
+     Mime-Version: 1.0
+          Subject: M4.3.1 - Content-Type: multipart/mixed; boundary=this_is_a_boundary
+     Content-Type: multipart/mixed; boundary=this_is_a_boundary
+   Content-Length: 1124
+sdmporttest> port getheaders port1 * to
+data port port1: getheaders successful
+ message 1:
+               To: MIME-tester@bunyip.com
+ message 2:
+               To: MIME-tester@bunyip.com
+ message 3:
+               To: MIME-tester@bunyip.com
+ message 4:
+               To: MIME-tester@bunyip.com
+sdmporttest> port getheaders port1 * from message-id
+data port port1: getheaders successful
+ message 1:
+       Message-Id: <9502180032.AA24308@mocha.bunyip.com>
+             From: paf@bunyip.com
+ message 2:
+       Message-Id: <9502180034.AA24451@mocha.bunyip.com>
+             From: paf@bunyip.com
+ message 3:
+       Message-Id: <9502180034.AA24496@mocha.bunyip.com>
+             From: paf@bunyip.com
+ message 4:
+       Message-Id: <9502180035.AA24721@mocha.bunyip.com>
+             From: paf@bunyip.com
+sdmporttest> port getheaders port1 2:3 subject
+data port port1: getheaders successful
+ message 2:
+          Subject: M3-2 - Content-Type: text/plain
+ message 3:
+          Subject: M4.1.1 - Content-Type: text/plain; charset="US-ASCII"
+sdmporttest> port getheaders port1 1:2 to subject
+data port port1: getheaders successful
+ message 1:
+               To: MIME-tester@bunyip.com
+          Subject: M1 - MIME-Version: 1.0 header field test
+ message 2:
+               To: MIME-tester@bunyip.com
+          Subject: M3-2 - Content-Type: text/plain
+sdmporttest> port getheaders port1 1 to
+data port port1: getheaders successful
+ message 1:
+               To: MIME-tester@bunyip.com
+sdmporttest> port getheaders port1 1 from date
+data port port1: getheaders successful
+ message 1:
+             Date: Fri, 17 Feb 95 19:32:47 -0500
+             From: paf@bunyip.com
+sdmporttest> port getheaders port1 1,2 to
+data port port1: getheaders successful
+ message 1:
+               To: MIME-tester@bunyip.com
+ message 2:
+               To: MIME-tester@bunyip.com
+sdmporttest> port getheaders port1 3,4 from date nosuch-header
+data port port1: getheaders successful
+ message 3:
+             Date: Fri, 17 Feb 95 19:34:24 -0500
+             From: paf@bunyip.com
+ message 4:
+             Date: Fri, 17 Feb 95 19:35:24 -0500
+             From: paf@bunyip.com
+sdmporttest> port getheaders port1 3,2
+data port port1: getheaders successful
+ message 3:
+      Return-Path: <daemon@mocha.bunyip.com>
+         Received: from Eng.Sun.COM (engmail1) by basilisk.Eng.Sun.COM (5.x/SMI-SVR4)	id AA23707; Fri, 17 Feb 1995 16:35:56 -0800
+         Received: from Sun.COM (sun-barr.EBay.Sun.COM) by Eng.Sun.COM (5.x/SMI-5.3)	id AA14677; Fri, 17 Feb 1995 16:35:53 -0800
+         Received: from mocha.bunyip.com by Sun.COM (sun-barr.Sun.COM)	id AA07749; Fri, 17 Feb 95 16:35:53 PST
+         Received: by mocha.bunyip.com (5.65a/IDA-1.4.2b/CC-Guru-2b)        id AA24496  (mail destined for Gary.Gere@eng.sun.com) on Fri, 17 Feb 95 19:34:24 -0500
+             Date: Fri, 17 Feb 95 19:34:24 -0500
+       Message-Id: <9502180034.AA24496@mocha.bunyip.com>
+             From: paf@bunyip.com
+               To: MIME-tester@bunyip.com
+     Mime-Version: 1.0
+          Subject: M4.1.1 - Content-Type: text/plain; charset="US-ASCII"
+     Content-Type: text/plain; charset="US-ASCII"
+   Content-Length: 84
+ message 2:
+      Return-Path: <daemon@mocha.bunyip.com>
+         Received: from Eng.Sun.COM (engmail1) by basilisk.Eng.Sun.COM (5.x/SMI-SVR4)	id AA23697; Fri, 17 Feb 1995 16:35:45 -0800
+         Received: from Sun.COM (sun-barr.EBay.Sun.COM) by Eng.Sun.COM (5.x/SMI-5.3)	id AA14664; Fri, 17 Feb 1995 16:35:42 -0800
+         Received: from mocha.bunyip.com by Sun.COM (sun-barr.Sun.COM)	id AA07716; Fri, 17 Feb 95 16:35:42 PST
+         Received: by mocha.bunyip.com (5.65a/IDA-1.4.2b/CC-Guru-2b)        id AA24451  (mail destined for Gary.Gere@eng.sun.com) on Fri, 17 Feb 95 19:34:13 -0500
+             Date: Fri, 17 Feb 95 19:34:13 -0500
+       Message-Id: <9502180034.AA24451@mocha.bunyip.com>
+             From: paf@bunyip.com
+               To: MIME-tester@bunyip.com
+     Mime-Version: 1.0
+          Subject: M3-2 - Content-Type: text/plain
+     Content-Type: text/plain
+   Content-Length: 386
+sdmporttest> 
+sdmporttest> # these tests should fail as they lookup non-existent headers
+sdmporttest> 
+sdmporttest> port getheaders port1 * bookem-dano
+data port port1: getheaders failed with error 33: Sdm_EC_RequestedDataNotFound
+sdmporttest> port getheaders port1 1 nosuch-header
+data port port1: getheaders failed with error 33: Sdm_EC_RequestedDataNotFound
+sdmporttest> port getheaders port1 2:3 probably-not there-too
+data port port1: getheaders failed with error 33: Sdm_EC_RequestedDataNotFound
+sdmporttest> port getheaders port1 1,4 bad-header-list
+data port port1: getheaders failed with error 33: Sdm_EC_RequestedDataNotFound
+sdmporttest> 
+sdmporttest> # test getheaders with abstract header names
+sdmporttest> # "Real" headers: RBCC RCC RDate RFrom RSubject RTo 
+sdmporttest> # "Pseudo" headers: PBcc PCc PMessageId PReceivedDate PCc PTo PSender PSentDate PSubject PTo
+sdmporttest> 
+sdmporttest> port getheaders port1 * -a
+data port port1: getheaders successful
+ message 1:
+              Bcc: tattle-tale@bcc.gov
+               Cc: mail-testers@test.com
+             Date: Fri, 17 Feb 95 19:32:47 -0500
+             From: paf@bunyip.com
+          Subject: M1 - MIME-Version: 1.0 header field test
+               To: MIME-tester@bunyip.com
+              Bcc: tattle-tale@bcc.gov
+               Cc: mail-testers@test.com
+               Cc: mail-testers@test.com
+               To: MIME-tester@bunyip.com
+             From: paf@bunyip.com
+             Date: Fri, 17 Feb 95 19:32:47 -0500
+          Subject: M1 - MIME-Version: 1.0 header field test
+               To: MIME-tester@bunyip.com
+ message 2:
+             Date: Fri, 17 Feb 95 19:34:13 -0500
+             From: paf@bunyip.com
+          Subject: M3-2 - Content-Type: text/plain
+               To: MIME-tester@bunyip.com
+               To: MIME-tester@bunyip.com
+             From: paf@bunyip.com
+             Date: Fri, 17 Feb 95 19:34:13 -0500
+          Subject: M3-2 - Content-Type: text/plain
+               To: MIME-tester@bunyip.com
+ message 3:
+             Date: Fri, 17 Feb 95 19:34:24 -0500
+             From: paf@bunyip.com
+          Subject: M4.1.1 - Content-Type: text/plain; charset="US-ASCII"
+               To: MIME-tester@bunyip.com
+               To: MIME-tester@bunyip.com
+             From: paf@bunyip.com
+             Date: Fri, 17 Feb 95 19:34:24 -0500
+          Subject: M4.1.1 - Content-Type: text/plain; charset="US-ASCII"
+               To: MIME-tester@bunyip.com
+ message 4:
+              Bcc: tattle-tale@bcc.gov
+              Bcc: nsa-secrets@nsa.gov
+               Cc: mail-testers@test.com
+               Cc: interest-lists@mailtest.com
+             Date: Fri, 17 Feb 95 19:35:24 -0500
+             From: paf@bunyip.com
+          Subject: M4.3.1 - Content-Type: multipart/mixed; boundary=this_is_a_boundary
+               To: MIME-tester@bunyip.com
+              Bcc: tattle-tale@bcc.gov
+              Bcc: nsa-secrets@nsa.gov
+               Cc: mail-testers@test.com
+               Cc: interest-lists@mailtest.com
+               Cc: mail-testers@test.com
+               Cc: interest-lists@mailtest.com
+               To: MIME-tester@bunyip.com
+             From: paf@bunyip.com
+             Date: Fri, 17 Feb 95 19:35:24 -0500
+          Subject: M4.3.1 - Content-Type: multipart/mixed; boundary=this_is_a_boundary
+               To: MIME-tester@bunyip.com
+sdmporttest> port getheaders port1 * -a rdate
+data port port1: getheaders successful
+ message 1:
+             Date: Fri, 17 Feb 95 19:32:47 -0500
+ message 2:
+             Date: Fri, 17 Feb 95 19:34:13 -0500
+ message 3:
+             Date: Fri, 17 Feb 95 19:34:24 -0500
+ message 4:
+             Date: Fri, 17 Feb 95 19:35:24 -0500
+sdmporttest> port getheaders port1 * -a rdate rsubject
+data port port1: getheaders successful
+ message 1:
+             Date: Fri, 17 Feb 95 19:32:47 -0500
+          Subject: M1 - MIME-Version: 1.0 header field test
+ message 2:
+             Date: Fri, 17 Feb 95 19:34:13 -0500
+          Subject: M3-2 - Content-Type: text/plain
+ message 3:
+             Date: Fri, 17 Feb 95 19:34:24 -0500
+          Subject: M4.1.1 - Content-Type: text/plain; charset="US-ASCII"
+ message 4:
+             Date: Fri, 17 Feb 95 19:35:24 -0500
+          Subject: M4.3.1 - Content-Type: multipart/mixed; boundary=this_is_a_boundary
+sdmporttest> port getheaders port1 * -a rbcc rcc rdate rfrom rsubject rto
+data port port1: getheaders successful
+ message 1:
+              Bcc: tattle-tale@bcc.gov
+               Cc: mail-testers@test.com
+             Date: Fri, 17 Feb 95 19:32:47 -0500
+             From: paf@bunyip.com
+          Subject: M1 - MIME-Version: 1.0 header field test
+               To: MIME-tester@bunyip.com
+ message 2:
+             Date: Fri, 17 Feb 95 19:34:13 -0500
+             From: paf@bunyip.com
+          Subject: M3-2 - Content-Type: text/plain
+               To: MIME-tester@bunyip.com
+ message 3:
+             Date: Fri, 17 Feb 95 19:34:24 -0500
+             From: paf@bunyip.com
+          Subject: M4.1.1 - Content-Type: text/plain; charset="US-ASCII"
+               To: MIME-tester@bunyip.com
+ message 4:
+              Bcc: tattle-tale@bcc.gov
+              Bcc: nsa-secrets@nsa.gov
+               Cc: mail-testers@test.com
+               Cc: interest-lists@mailtest.com
+             Date: Fri, 17 Feb 95 19:35:24 -0500
+             From: paf@bunyip.com
+          Subject: M4.3.1 - Content-Type: multipart/mixed; boundary=this_is_a_boundary
+               To: MIME-tester@bunyip.com
+sdmporttest> port getheaders port1 1 -a rfrom
+data port port1: getheaders successful
+ message 1:
+             From: paf@bunyip.com
+sdmporttest> port getheaders port1 1 -a rfrom rto rsubject
+data port port1: getheaders successful
+ message 1:
+             From: paf@bunyip.com
+          Subject: M1 - MIME-Version: 1.0 header field test
+               To: MIME-tester@bunyip.com
+sdmporttest> port getheaders port1 1:2 -a rfrom
+data port port1: getheaders successful
+ message 1:
+             From: paf@bunyip.com
+ message 2:
+             From: paf@bunyip.com
+sdmporttest> port getheaders port1 2:3 -a rfrom rto rsubject
+data port port1: getheaders successful
+ message 2:
+             From: paf@bunyip.com
+          Subject: M3-2 - Content-Type: text/plain
+               To: MIME-tester@bunyip.com
+ message 3:
+             From: paf@bunyip.com
+          Subject: M4.1.1 - Content-Type: text/plain; charset="US-ASCII"
+               To: MIME-tester@bunyip.com
+sdmporttest> port getheaders port1 1,2 -a rfrom
+data port port1: getheaders successful
+ message 1:
+             From: paf@bunyip.com
+ message 2:
+             From: paf@bunyip.com
+sdmporttest> port getheaders port1 3,4 -a rfrom rto rsubject
+data port port1: getheaders successful
+ message 3:
+             From: paf@bunyip.com
+          Subject: M4.1.1 - Content-Type: text/plain; charset="US-ASCII"
+               To: MIME-tester@bunyip.com
+ message 4:
+             From: paf@bunyip.com
+          Subject: M4.3.1 - Content-Type: multipart/mixed; boundary=this_is_a_boundary
+               To: MIME-tester@bunyip.com
+sdmporttest> 
+sdmporttest> port getheaders port1 * -a
+data port port1: getheaders successful
+ message 1:
+              Bcc: tattle-tale@bcc.gov
+               Cc: mail-testers@test.com
+             Date: Fri, 17 Feb 95 19:32:47 -0500
+             From: paf@bunyip.com
+          Subject: M1 - MIME-Version: 1.0 header field test
+               To: MIME-tester@bunyip.com
+              Bcc: tattle-tale@bcc.gov
+               Cc: mail-testers@test.com
+               Cc: mail-testers@test.com
+               To: MIME-tester@bunyip.com
+             From: paf@bunyip.com
+             Date: Fri, 17 Feb 95 19:32:47 -0500
+          Subject: M1 - MIME-Version: 1.0 header field test
+               To: MIME-tester@bunyip.com
+ message 2:
+             Date: Fri, 17 Feb 95 19:34:13 -0500
+             From: paf@bunyip.com
+          Subject: M3-2 - Content-Type: text/plain
+               To: MIME-tester@bunyip.com
+               To: MIME-tester@bunyip.com
+             From: paf@bunyip.com
+             Date: Fri, 17 Feb 95 19:34:13 -0500
+          Subject: M3-2 - Content-Type: text/plain
+               To: MIME-tester@bunyip.com
+ message 3:
+             Date: Fri, 17 Feb 95 19:34:24 -0500
+             From: paf@bunyip.com
+          Subject: M4.1.1 - Content-Type: text/plain; charset="US-ASCII"
+               To: MIME-tester@bunyip.com
+               To: MIME-tester@bunyip.com
+             From: paf@bunyip.com
+             Date: Fri, 17 Feb 95 19:34:24 -0500
+          Subject: M4.1.1 - Content-Type: text/plain; charset="US-ASCII"
+               To: MIME-tester@bunyip.com
+ message 4:
+              Bcc: tattle-tale@bcc.gov
+              Bcc: nsa-secrets@nsa.gov
+               Cc: mail-testers@test.com
+               Cc: interest-lists@mailtest.com
+             Date: Fri, 17 Feb 95 19:35:24 -0500
+             From: paf@bunyip.com
+          Subject: M4.3.1 - Content-Type: multipart/mixed; boundary=this_is_a_boundary
+               To: MIME-tester@bunyip.com
+              Bcc: tattle-tale@bcc.gov
+              Bcc: nsa-secrets@nsa.gov
+               Cc: mail-testers@test.com
+               Cc: interest-lists@mailtest.com
+               Cc: mail-testers@test.com
+               Cc: interest-lists@mailtest.com
+               To: MIME-tester@bunyip.com
+             From: paf@bunyip.com
+             Date: Fri, 17 Feb 95 19:35:24 -0500
+          Subject: M4.3.1 - Content-Type: multipart/mixed; boundary=this_is_a_boundary
+               To: MIME-tester@bunyip.com
+sdmporttest> port getheaders port1 * -a psentdate
+data port port1: getheaders successful
+ message 1:
+             Date: Fri, 17 Feb 95 19:32:47 -0500
+ message 2:
+             Date: Fri, 17 Feb 95 19:34:13 -0500
+ message 3:
+             Date: Fri, 17 Feb 95 19:34:24 -0500
+ message 4:
+             Date: Fri, 17 Feb 95 19:35:24 -0500
+sdmporttest> port getheaders port1 * -a psentdate psubject
+data port port1: getheaders successful
+ message 1:
+             Date: Fri, 17 Feb 95 19:32:47 -0500
+          Subject: M1 - MIME-Version: 1.0 header field test
+ message 2:
+             Date: Fri, 17 Feb 95 19:34:13 -0500
+          Subject: M3-2 - Content-Type: text/plain
+ message 3:
+             Date: Fri, 17 Feb 95 19:34:24 -0500
+          Subject: M4.1.1 - Content-Type: text/plain; charset="US-ASCII"
+ message 4:
+             Date: Fri, 17 Feb 95 19:35:24 -0500
+          Subject: M4.3.1 - Content-Type: multipart/mixed; boundary=this_is_a_boundary
+sdmporttest> port getheaders port1 * -a pbcc pcc pmessageid preceiveddate pcc pto psender psentdate psubject pto
+?Abstract header name 'pmessageid' is not recognized
+Header names recognized are:  RBCC RCC RDate RFrom RSubject RTo PBcc PCc PReceivedDate PReplyTo PSender PSentDate PSubject PTo
+sdmporttest> port getheaders port1 1 -a psender
+data port port1: getheaders successful
+ message 1:
+             From: paf@bunyip.com
+sdmporttest> port getheaders port1 1 -a psender pto psubject
+data port port1: getheaders successful
+ message 1:
+             From: paf@bunyip.com
+          Subject: M1 - MIME-Version: 1.0 header field test
+               To: MIME-tester@bunyip.com
+sdmporttest> port getheaders port1 1:2 -a psender
+data port port1: getheaders successful
+ message 1:
+             From: paf@bunyip.com
+ message 2:
+             From: paf@bunyip.com
+sdmporttest> port getheaders port1 2:3 -a psender pto psubject
+data port port1: getheaders successful
+ message 2:
+             From: paf@bunyip.com
+          Subject: M3-2 - Content-Type: text/plain
+               To: MIME-tester@bunyip.com
+ message 3:
+             From: paf@bunyip.com
+          Subject: M4.1.1 - Content-Type: text/plain; charset="US-ASCII"
+               To: MIME-tester@bunyip.com
+sdmporttest> port getheaders port1 1,2 -a psender
+data port port1: getheaders successful
+ message 1:
+             From: paf@bunyip.com
+ message 2:
+             From: paf@bunyip.com
+sdmporttest> port getheaders port1 3,4 -a psender pto psubject
+data port port1: getheaders successful
+ message 3:
+             From: paf@bunyip.com
+          Subject: M4.1.1 - Content-Type: text/plain; charset="US-ASCII"
+               To: MIME-tester@bunyip.com
+ message 4:
+             From: paf@bunyip.com
+          Subject: M4.3.1 - Content-Type: multipart/mixed; boundary=this_is_a_boundary
+               To: MIME-tester@bunyip.com
+sdmporttest> 
+sdmporttest> # test getheaders with abstract header names returning abstract header values
+sdmporttest> 
+sdmporttest> port getheaders port1 * -A
+data port port1: getheaders successful
+ message 1:
+              Bcc: tattle-tale@bcc.gov
+               Cc: mail-testers@test.com
+             Date: Fri, 17 Feb 95 19:32:47 -0500
+             From: paf@bunyip.com
+          Subject: M1 - MIME-Version: 1.0 header field test
+               To: MIME-tester@bunyip.com
+             PBcc: tattle-tale@bcc.gov
+              PCc: mail-testers@test.com
+        PReply_Cc: mail-testers@test.com
+        PReply_To: MIME-tester@bunyip.com
+          PSender: paf@bunyip.com
+        PSentDate: Fri, 17 Feb 95 19:32:47 -0500
+         PSubject: M1 - MIME-Version: 1.0 header field test
+              PTo: MIME-tester@bunyip.com
+ message 2:
+             Date: Fri, 17 Feb 95 19:34:13 -0500
+             From: paf@bunyip.com
+          Subject: M3-2 - Content-Type: text/plain
+               To: MIME-tester@bunyip.com
+        PReply_To: MIME-tester@bunyip.com
+          PSender: paf@bunyip.com
+        PSentDate: Fri, 17 Feb 95 19:34:13 -0500
+         PSubject: M3-2 - Content-Type: text/plain
+              PTo: MIME-tester@bunyip.com
+ message 3:
+             Date: Fri, 17 Feb 95 19:34:24 -0500
+             From: paf@bunyip.com
+          Subject: M4.1.1 - Content-Type: text/plain; charset="US-ASCII"
+               To: MIME-tester@bunyip.com
+        PReply_To: MIME-tester@bunyip.com
+          PSender: paf@bunyip.com
+        PSentDate: Fri, 17 Feb 95 19:34:24 -0500
+         PSubject: M4.1.1 - Content-Type: text/plain; charset="US-ASCII"
+              PTo: MIME-tester@bunyip.com
+ message 4:
+              Bcc: tattle-tale@bcc.gov
+              Bcc: nsa-secrets@nsa.gov
+               Cc: mail-testers@test.com
+               Cc: interest-lists@mailtest.com
+             Date: Fri, 17 Feb 95 19:35:24 -0500
+             From: paf@bunyip.com
+          Subject: M4.3.1 - Content-Type: multipart/mixed; boundary=this_is_a_boundary
+               To: MIME-tester@bunyip.com
+             PBcc: tattle-tale@bcc.gov
+             PBcc: nsa-secrets@nsa.gov
+              PCc: mail-testers@test.com
+              PCc: interest-lists@mailtest.com
+        PReply_Cc: mail-testers@test.com
+        PReply_Cc: interest-lists@mailtest.com
+        PReply_To: MIME-tester@bunyip.com
+          PSender: paf@bunyip.com
+        PSentDate: Fri, 17 Feb 95 19:35:24 -0500
+         PSubject: M4.3.1 - Content-Type: multipart/mixed; boundary=this_is_a_boundary
+              PTo: MIME-tester@bunyip.com
+sdmporttest> port getheaders port1 * -A rdate
+data port port1: getheaders successful
+ message 1:
+             Date: Fri, 17 Feb 95 19:32:47 -0500
+ message 2:
+             Date: Fri, 17 Feb 95 19:34:13 -0500
+ message 3:
+             Date: Fri, 17 Feb 95 19:34:24 -0500
+ message 4:
+             Date: Fri, 17 Feb 95 19:35:24 -0500
+sdmporttest> port getheaders port1 * -A rdate rsubject
+data port port1: getheaders successful
+ message 1:
+             Date: Fri, 17 Feb 95 19:32:47 -0500
+          Subject: M1 - MIME-Version: 1.0 header field test
+ message 2:
+             Date: Fri, 17 Feb 95 19:34:13 -0500
+          Subject: M3-2 - Content-Type: text/plain
+ message 3:
+             Date: Fri, 17 Feb 95 19:34:24 -0500
+          Subject: M4.1.1 - Content-Type: text/plain; charset="US-ASCII"
+ message 4:
+             Date: Fri, 17 Feb 95 19:35:24 -0500
+          Subject: M4.3.1 - Content-Type: multipart/mixed; boundary=this_is_a_boundary
+sdmporttest> port getheaders port1 * -A rbcc rcc rdate rfrom rsubject rto
+data port port1: getheaders successful
+ message 1:
+              Bcc: tattle-tale@bcc.gov
+               Cc: mail-testers@test.com
+             Date: Fri, 17 Feb 95 19:32:47 -0500
+             From: paf@bunyip.com
+          Subject: M1 - MIME-Version: 1.0 header field test
+               To: MIME-tester@bunyip.com
+ message 2:
+             Date: Fri, 17 Feb 95 19:34:13 -0500
+             From: paf@bunyip.com
+          Subject: M3-2 - Content-Type: text/plain
+               To: MIME-tester@bunyip.com
+ message 3:
+             Date: Fri, 17 Feb 95 19:34:24 -0500
+             From: paf@bunyip.com
+          Subject: M4.1.1 - Content-Type: text/plain; charset="US-ASCII"
+               To: MIME-tester@bunyip.com
+ message 4:
+              Bcc: tattle-tale@bcc.gov
+              Bcc: nsa-secrets@nsa.gov
+               Cc: mail-testers@test.com
+               Cc: interest-lists@mailtest.com
+             Date: Fri, 17 Feb 95 19:35:24 -0500
+             From: paf@bunyip.com
+          Subject: M4.3.1 - Content-Type: multipart/mixed; boundary=this_is_a_boundary
+               To: MIME-tester@bunyip.com
+sdmporttest> port getheaders port1 1 -A rfrom
+data port port1: getheaders successful
+ message 1:
+             From: paf@bunyip.com
+sdmporttest> port getheaders port1 1 -A rfrom rto rsubject
+data port port1: getheaders successful
+ message 1:
+             From: paf@bunyip.com
+          Subject: M1 - MIME-Version: 1.0 header field test
+               To: MIME-tester@bunyip.com
+sdmporttest> port getheaders port1 1:2 -A rfrom
+data port port1: getheaders successful
+ message 1:
+             From: paf@bunyip.com
+ message 2:
+             From: paf@bunyip.com
+sdmporttest> port getheaders port1 2:3 -A rfrom rto rsubject
+data port port1: getheaders successful
+ message 2:
+             From: paf@bunyip.com
+          Subject: M3-2 - Content-Type: text/plain
+               To: MIME-tester@bunyip.com
+ message 3:
+             From: paf@bunyip.com
+          Subject: M4.1.1 - Content-Type: text/plain; charset="US-ASCII"
+               To: MIME-tester@bunyip.com
+sdmporttest> port getheaders port1 1,2 -A rfrom
+data port port1: getheaders successful
+ message 1:
+             From: paf@bunyip.com
+ message 2:
+             From: paf@bunyip.com
+sdmporttest> port getheaders port1 3,4 -A rfrom rto rsubject
+data port port1: getheaders successful
+ message 3:
+             From: paf@bunyip.com
+          Subject: M4.1.1 - Content-Type: text/plain; charset="US-ASCII"
+               To: MIME-tester@bunyip.com
+ message 4:
+             From: paf@bunyip.com
+          Subject: M4.3.1 - Content-Type: multipart/mixed; boundary=this_is_a_boundary
+               To: MIME-tester@bunyip.com
+sdmporttest> 
+sdmporttest> port getheaders port1 * -A
+data port port1: getheaders successful
+ message 1:
+              Bcc: tattle-tale@bcc.gov
+               Cc: mail-testers@test.com
+             Date: Fri, 17 Feb 95 19:32:47 -0500
+             From: paf@bunyip.com
+          Subject: M1 - MIME-Version: 1.0 header field test
+               To: MIME-tester@bunyip.com
+             PBcc: tattle-tale@bcc.gov
+              PCc: mail-testers@test.com
+        PReply_Cc: mail-testers@test.com
+        PReply_To: MIME-tester@bunyip.com
+          PSender: paf@bunyip.com
+        PSentDate: Fri, 17 Feb 95 19:32:47 -0500
+         PSubject: M1 - MIME-Version: 1.0 header field test
+              PTo: MIME-tester@bunyip.com
+ message 2:
+             Date: Fri, 17 Feb 95 19:34:13 -0500
+             From: paf@bunyip.com
+          Subject: M3-2 - Content-Type: text/plain
+               To: MIME-tester@bunyip.com
+        PReply_To: MIME-tester@bunyip.com
+          PSender: paf@bunyip.com
+        PSentDate: Fri, 17 Feb 95 19:34:13 -0500
+         PSubject: M3-2 - Content-Type: text/plain
+              PTo: MIME-tester@bunyip.com
+ message 3:
+             Date: Fri, 17 Feb 95 19:34:24 -0500
+             From: paf@bunyip.com
+          Subject: M4.1.1 - Content-Type: text/plain; charset="US-ASCII"
+               To: MIME-tester@bunyip.com
+        PReply_To: MIME-tester@bunyip.com
+          PSender: paf@bunyip.com
+        PSentDate: Fri, 17 Feb 95 19:34:24 -0500
+         PSubject: M4.1.1 - Content-Type: text/plain; charset="US-ASCII"
+              PTo: MIME-tester@bunyip.com
+ message 4:
+              Bcc: tattle-tale@bcc.gov
+              Bcc: nsa-secrets@nsa.gov
+               Cc: mail-testers@test.com
+               Cc: interest-lists@mailtest.com
+             Date: Fri, 17 Feb 95 19:35:24 -0500
+             From: paf@bunyip.com
+          Subject: M4.3.1 - Content-Type: multipart/mixed; boundary=this_is_a_boundary
+               To: MIME-tester@bunyip.com
+             PBcc: tattle-tale@bcc.gov
+             PBcc: nsa-secrets@nsa.gov
+              PCc: mail-testers@test.com
+              PCc: interest-lists@mailtest.com
+        PReply_Cc: mail-testers@test.com
+        PReply_Cc: interest-lists@mailtest.com
+        PReply_To: MIME-tester@bunyip.com
+          PSender: paf@bunyip.com
+        PSentDate: Fri, 17 Feb 95 19:35:24 -0500
+         PSubject: M4.3.1 - Content-Type: multipart/mixed; boundary=this_is_a_boundary
+              PTo: MIME-tester@bunyip.com
+sdmporttest> port getheaders port1 * -A psentdate
+data port port1: getheaders successful
+ message 1:
+        PSentDate: Fri, 17 Feb 95 19:32:47 -0500
+ message 2:
+        PSentDate: Fri, 17 Feb 95 19:34:13 -0500
+ message 3:
+        PSentDate: Fri, 17 Feb 95 19:34:24 -0500
+ message 4:
+        PSentDate: Fri, 17 Feb 95 19:35:24 -0500
+sdmporttest> port getheaders port1 * -A psentdate psubject
+data port port1: getheaders successful
+ message 1:
+        PSentDate: Fri, 17 Feb 95 19:32:47 -0500
+         PSubject: M1 - MIME-Version: 1.0 header field test
+ message 2:
+        PSentDate: Fri, 17 Feb 95 19:34:13 -0500
+         PSubject: M3-2 - Content-Type: text/plain
+ message 3:
+        PSentDate: Fri, 17 Feb 95 19:34:24 -0500
+         PSubject: M4.1.1 - Content-Type: text/plain; charset="US-ASCII"
+ message 4:
+        PSentDate: Fri, 17 Feb 95 19:35:24 -0500
+         PSubject: M4.3.1 - Content-Type: multipart/mixed; boundary=this_is_a_boundary
+sdmporttest> port getheaders port1 * -A pbcc pcc pmessageid preceiveddate pcc pto psender psentdate psubject pto
+?Abstract header name 'pmessageid' is not recognized
+Header names recognized are:  RBCC RCC RDate RFrom RSubject RTo PBcc PCc PReceivedDate PReplyTo PSender PSentDate PSubject PTo
+sdmporttest> port getheaders port1 1 -A psender
+data port port1: getheaders successful
+ message 1:
+          PSender: paf@bunyip.com
+sdmporttest> port getheaders port1 1 -A psender pto psubject
+data port port1: getheaders successful
+ message 1:
+          PSender: paf@bunyip.com
+         PSubject: M1 - MIME-Version: 1.0 header field test
+              PTo: MIME-tester@bunyip.com
+sdmporttest> port getheaders port1 1:2 -A psender
+data port port1: getheaders successful
+ message 1:
+          PSender: paf@bunyip.com
+ message 2:
+          PSender: paf@bunyip.com
+sdmporttest> port getheaders port1 2:3 -A psender pto psubject
+data port port1: getheaders successful
+ message 2:
+          PSender: paf@bunyip.com
+         PSubject: M3-2 - Content-Type: text/plain
+              PTo: MIME-tester@bunyip.com
+ message 3:
+          PSender: paf@bunyip.com
+         PSubject: M4.1.1 - Content-Type: text/plain; charset="US-ASCII"
+              PTo: MIME-tester@bunyip.com
+sdmporttest> port getheaders port1 1,2 -A psender
+data port port1: getheaders successful
+ message 1:
+          PSender: paf@bunyip.com
+ message 2:
+          PSender: paf@bunyip.com
+sdmporttest> port getheaders port1 3,4 -A psender pto psubject
+data port port1: getheaders successful
+ message 3:
+          PSender: paf@bunyip.com
+         PSubject: M4.1.1 - Content-Type: text/plain; charset="US-ASCII"
+              PTo: MIME-tester@bunyip.com
+ message 4:
+          PSender: paf@bunyip.com
+         PSubject: M4.3.1 - Content-Type: multipart/mixed; boundary=this_is_a_boundary
+              PTo: MIME-tester@bunyip.com
+sdmporttest> 
+sdmporttest> # test getstructure
+sdmporttest> 
+sdmporttest> port getstructure port1 *
+data port port1: getstructure successful
+ message 1:
+  ID              TYPE        SUBTYPE         MIME-TYPE         ENCODING LINES BYTES  NAME       DISP     MODE ISECTION DESCRIPTION
+  0.1             text        (none)          text/plain        7bit     4     63     (none)     (unspec) 0    1.1 	(none)
+ message 2:
+  0.1             text        plain           text/plain        7bit     9     387    (none)     (unspec) 0    2.2 	(none)
+ message 3:
+  0.1             text        plain           text/plain        7bit     3     84     (none)     (unspec) 0    3.3 	(none)
+ message 4:
+  0.1             multipart   mixed           multipart/mixed   7bit     2     117    (none)     (unspec) 0    4.8 	(none)
+  0.1.1           text        plain           text/plain        7bit     7     278    part-one   attach   544  4.5 	(none)
+  0.1.2           text        plain           text/plain        7bit     7     370    part-two   inline   544  4.6 	(none)
+  0.1.3           text        plain           text/plain        7bit     5     191    part-three attach   544  4.7 	(none)
+sdmporttest> port getstructure port1 1
+data port port1: getstructure successful
+ message 1:
+  ID              TYPE        SUBTYPE         MIME-TYPE         ENCODING LINES BYTES  NAME       DISP     MODE ISECTION DESCRIPTION
+  0.1             text        (none)          text/plain        7bit     4     63     (none)     (unspec) 0    1.1 	(none)
+sdmporttest> port getstructure port1 2,3
+data port port1: getstructure successful
+ message 2:
+  ID              TYPE        SUBTYPE         MIME-TYPE         ENCODING LINES BYTES  NAME       DISP     MODE ISECTION DESCRIPTION
+  0.1             text        plain           text/plain        7bit     9     387    (none)     (unspec) 0    2.2 	(none)
+ message 3:
+  0.1             text        plain           text/plain        7bit     3     84     (none)     (unspec) 0    3.3 	(none)
+sdmporttest> port getstructure port1 4,1,3,2
+data port port1: getstructure successful
+ message 4:
+  ID              TYPE        SUBTYPE         MIME-TYPE         ENCODING LINES BYTES  NAME       DISP     MODE ISECTION DESCRIPTION
+  0.1             multipart   mixed           multipart/mixed   7bit     2     117    (none)     (unspec) 0    4.8 	(none)
+  0.1.1           text        plain           text/plain        7bit     7     278    part-one   attach   544  4.5 	(none)
+  0.1.2           text        plain           text/plain        7bit     7     370    part-two   inline   544  4.6 	(none)
+  0.1.3           text        plain           text/plain        7bit     5     191    part-three attach   544  4.7 	(none)
+ message 1:
+  0.1             text        (none)          text/plain        7bit     4     63     (none)     (unspec) 0    1.1 	(none)
+ message 3:
+  0.1             text        plain           text/plain        7bit     3     84     (none)     (unspec) 0    3.3 	(none)
+ message 2:
+  0.1             text        plain           text/plain        7bit     9     387    (none)     (unspec) 0    2.2 	(none)
+sdmporttest> 
+sdmporttest> # test getattributes
+sdmporttest> 
+sdmporttest> port getattributes port1 1 0.1
+data port port1: getattributes failed with error 33: Sdm_EC_RequestedDataNotFound
+sdmporttest> port getattributes port1 2 0.1
+data port port1: getattributes failed with error 33: Sdm_EC_RequestedDataNotFound
+sdmporttest> port getattributes port1 3 0.1
+data port port1: getattributes successful
+ message 3 component 0.1: 1 attributes returned
+          charset: US-ASCII
+sdmporttest> port getattributes port1 4 0.1
+data port port1: getattributes successful
+ message 4 component 0.1: 1 attributes returned
+         boundary: this_is_a_boundary
+sdmporttest> port getattributes port1 4 0.1.1
+data port port1: getattributes failed with error 33: Sdm_EC_RequestedDataNotFound
+sdmporttest> port getattributes port1 4 0.1.2
+data port port1: getattributes failed with error 33: Sdm_EC_RequestedDataNotFound
+sdmporttest> port getattributes port1 4 0.1.3
+data port port1: getattributes failed with error 33: Sdm_EC_RequestedDataNotFound
+sdmporttest> port getattributes port1 4 0.1 boundary
+data port port1: getattributes successful
+ message 4 component 0.1: 1 attribute returned
+         boundary: this_is_a_boundary
+sdmporttest> port getattributes port1 4 0.1 test boundary this
+data port port1: getattributes successful
+ message 4 component 0.1: 1 attributes returned
+         boundary: this_is_a_boundary
+sdmporttest> port getattributes port1 4 0.1 test
+data port port1: getattributes failed with error 33: Sdm_EC_RequestedDataNotFound
+sdmporttest> 
+sdmporttest> # test getattributes with abstract attribute names
+sdmporttest> 
+sdmporttest> port getattributes port1 3 0.1 -a
+data port port1: getattributes successful
+ message 3 component 0.1: 1 attributes returned
+          charset: US-ASCII
+sdmporttest> port getattributes port1 3 0.1 -a charset
+data port port1: getattributes successful
+ message 3 component 0.1: 1 attributes returned
+          charset: US-ASCII
+sdmporttest> port getattributes port1 4 0.1 -a
+data port port1: getattributes failed with error 33: Sdm_EC_RequestedDataNotFound
+sdmporttest> port getattributes port1 4 0.1 -a charset
+data port port1: getattributes failed with error 33: Sdm_EC_RequestedDataNotFound
+sdmporttest> 
+sdmporttest> # test getcontents
+sdmporttest> 
+sdmporttest> port getcontents port1 1
+data port port1: getcontents failed with error 1: Sdm_EC_Fail
+sdmporttest> port getcontents port1 1 -f
+data port port1: getcontents successful
+-->message 1: 
+Return-Path: <daemon@mocha.bunyip.com>
+Received: from Eng.Sun.COM (engmail1) by basilisk.Eng.Sun.COM (5.x/SMI-SVR4)	id AA23600; Fri, 17 Feb 1995 16:34:22 -0800
+Received: from Sun.COM (sun-barr.EBay.Sun.COM) by Eng.Sun.COM (5.x/SMI-5.3)	id AA14531; Fri, 17 Feb 1995 16:34:18 -0800
+Received: from mocha.bunyip.com by Sun.COM (sun-barr.Sun.COM)	id AA07389; Fri, 17 Feb 95 16:34:16 PST
+Received: by mocha.bunyip.com (5.65a/IDA-1.4.2b/CC-Guru-2b)        id AA24308  (mail destined for Gary.Gere@eng.sun.com) on Fri, 17 Feb 95 19:32:47 -0500
+Date: Fri, 17 Feb 95 19:32:47 -0500
+Message-Id: <9502180032.AA24308@mocha.bunyip.com>
+From: paf@bunyip.com
+To: MIME-tester@bunyip.com
+Cc: mail-testers@test.com
+Bcc: tattle-tale@bcc.gov
+Mime-Version: 1.0
+Subject: M1 - MIME-Version: 1.0 header field test
+Content-Type: text
+Content-Length: 63
+
+  M1
+    Always generate a "MIME-Version: 1.0" header field.
+
+
+
+sdmporttest> port getcontents port1 1 -h
+data port port1: getcontents successful
+-->message 1: 
+Return-Path: <daemon@mocha.bunyip.com>
+Received: from Eng.Sun.COM (engmail1) by basilisk.Eng.Sun.COM (5.x/SMI-SVR4)	id AA23600; Fri, 17 Feb 1995 16:34:22 -0800
+Received: from Sun.COM (sun-barr.EBay.Sun.COM) by Eng.Sun.COM (5.x/SMI-5.3)	id AA14531; Fri, 17 Feb 1995 16:34:18 -0800
+Received: from mocha.bunyip.com by Sun.COM (sun-barr.Sun.COM)	id AA07389; Fri, 17 Feb 95 16:34:16 PST
+Received: by mocha.bunyip.com (5.65a/IDA-1.4.2b/CC-Guru-2b)        id AA24308  (mail destined for Gary.Gere@eng.sun.com) on Fri, 17 Feb 95 19:32:47 -0500
+Date: Fri, 17 Feb 95 19:32:47 -0500
+Message-Id: <9502180032.AA24308@mocha.bunyip.com>
+From: paf@bunyip.com
+To: MIME-tester@bunyip.com
+Cc: mail-testers@test.com
+Bcc: tattle-tale@bcc.gov
+Mime-Version: 1.0
+Subject: M1 - MIME-Version: 1.0 header field test
+Content-Type: text
+Content-Length: 63
+
+sdmporttest> port getcontents port1 1 -b
+data port port1: getcontents successful
+-->message 1: 
+  M1
+    Always generate a "MIME-Version: 1.0" header field.
+
+
+
+sdmporttest> 
+sdmporttest> port getcontents port1 2
+data port port1: getcontents failed with error 1: Sdm_EC_Fail
+sdmporttest> port getcontents port1 2 -f
+data port port1: getcontents successful
+-->message 2: 
+Return-Path: <daemon@mocha.bunyip.com>
+Received: from Eng.Sun.COM (engmail1) by basilisk.Eng.Sun.COM (5.x/SMI-SVR4)	id AA23697; Fri, 17 Feb 1995 16:35:45 -0800
+Received: from Sun.COM (sun-barr.EBay.Sun.COM) by Eng.Sun.COM (5.x/SMI-5.3)	id AA14664; Fri, 17 Feb 1995 16:35:42 -0800
+Received: from mocha.bunyip.com by Sun.COM (sun-barr.Sun.COM)	id AA07716; Fri, 17 Feb 95 16:35:42 PST
+Received: by mocha.bunyip.com (5.65a/IDA-1.4.2b/CC-Guru-2b)        id AA24451  (mail destined for Gary.Gere@eng.sun.com) on Fri, 17 Feb 95 19:34:13 -0500
+Date: Fri, 17 Feb 95 19:34:13 -0500
+Message-Id: <9502180034.AA24451@mocha.bunyip.com>
+From: paf@bunyip.com
+To: MIME-tester@bunyip.com
+Mime-Version: 1.0
+Subject: M3-2 - Content-Type: text/plain
+Content-Type: text/plain
+Content-Length: 386
+
+This email is marked as being text, so a normal user
+should get this information without a question.
+
+  M3   
+       Recognize and interpret the Content-Type header field, and avoid
+       showing users raw data with a Content-Type field other than text.
+       Be able to send at least text/plain messages, with the character
+       set specified as a parameter if it is not US-ASCII.
+
+
+sdmporttest> port getcontents port1 2 -h
+data port port1: getcontents successful
+-->message 2: 
+Return-Path: <daemon@mocha.bunyip.com>
+Received: from Eng.Sun.COM (engmail1) by basilisk.Eng.Sun.COM (5.x/SMI-SVR4)	id AA23697; Fri, 17 Feb 1995 16:35:45 -0800
+Received: from Sun.COM (sun-barr.EBay.Sun.COM) by Eng.Sun.COM (5.x/SMI-5.3)	id AA14664; Fri, 17 Feb 1995 16:35:42 -0800
+Received: from mocha.bunyip.com by Sun.COM (sun-barr.Sun.COM)	id AA07716; Fri, 17 Feb 95 16:35:42 PST
+Received: by mocha.bunyip.com (5.65a/IDA-1.4.2b/CC-Guru-2b)        id AA24451  (mail destined for Gary.Gere@eng.sun.com) on Fri, 17 Feb 95 19:34:13 -0500
+Date: Fri, 17 Feb 95 19:34:13 -0500
+Message-Id: <9502180034.AA24451@mocha.bunyip.com>
+From: paf@bunyip.com
+To: MIME-tester@bunyip.com
+Mime-Version: 1.0
+Subject: M3-2 - Content-Type: text/plain
+Content-Type: text/plain
+Content-Length: 386
+
+sdmporttest> port getcontents port1 2 -b
+data port port1: getcontents successful
+-->message 2: 
+This email is marked as being text, so a normal user
+should get this information without a question.
+
+  M3   
+       Recognize and interpret the Content-Type header field, and avoid
+       showing users raw data with a Content-Type field other than text.
+       Be able to send at least text/plain messages, with the character
+       set specified as a parameter if it is not US-ASCII.
+
+
+sdmporttest> 
+sdmporttest> port getcontents port1 3
+data port port1: getcontents failed with error 1: Sdm_EC_Fail
+sdmporttest> port getcontents port1 3 -f
+data port port1: getcontents successful
+-->message 3: 
+Return-Path: <daemon@mocha.bunyip.com>
+Received: from Eng.Sun.COM (engmail1) by basilisk.Eng.Sun.COM (5.x/SMI-SVR4)	id AA23707; Fri, 17 Feb 1995 16:35:56 -0800
+Received: from Sun.COM (sun-barr.EBay.Sun.COM) by Eng.Sun.COM (5.x/SMI-5.3)	id AA14677; Fri, 17 Feb 1995 16:35:53 -0800
+Received: from mocha.bunyip.com by Sun.COM (sun-barr.Sun.COM)	id AA07749; Fri, 17 Feb 95 16:35:53 PST
+Received: by mocha.bunyip.com (5.65a/IDA-1.4.2b/CC-Guru-2b)        id AA24496  (mail destined for Gary.Gere@eng.sun.com) on Fri, 17 Feb 95 19:34:24 -0500
+Date: Fri, 17 Feb 95 19:34:24 -0500
+Message-Id: <9502180034.AA24496@mocha.bunyip.com>
+From: paf@bunyip.com
+To: MIME-tester@bunyip.com
+Mime-Version: 1.0
+Subject: M4.1.1 - Content-Type: text/plain; charset="US-ASCII"
+Content-Type: text/plain; charset="US-ASCII"
+Content-Length: 84
+
+  M4.1.1
+    Recognize and display "text" mail with the character set "US-ASCII." 
+
+
+sdmporttest> port getcontents port1 3 -h
+data port port1: getcontents successful
+-->message 3: 
+Return-Path: <daemon@mocha.bunyip.com>
+Received: from Eng.Sun.COM (engmail1) by basilisk.Eng.Sun.COM (5.x/SMI-SVR4)	id AA23707; Fri, 17 Feb 1995 16:35:56 -0800
+Received: from Sun.COM (sun-barr.EBay.Sun.COM) by Eng.Sun.COM (5.x/SMI-5.3)	id AA14677; Fri, 17 Feb 1995 16:35:53 -0800
+Received: from mocha.bunyip.com by Sun.COM (sun-barr.Sun.COM)	id AA07749; Fri, 17 Feb 95 16:35:53 PST
+Received: by mocha.bunyip.com (5.65a/IDA-1.4.2b/CC-Guru-2b)        id AA24496  (mail destined for Gary.Gere@eng.sun.com) on Fri, 17 Feb 95 19:34:24 -0500
+Date: Fri, 17 Feb 95 19:34:24 -0500
+Message-Id: <9502180034.AA24496@mocha.bunyip.com>
+From: paf@bunyip.com
+To: MIME-tester@bunyip.com
+Mime-Version: 1.0
+Subject: M4.1.1 - Content-Type: text/plain; charset="US-ASCII"
+Content-Type: text/plain; charset="US-ASCII"
+Content-Length: 84
+
+sdmporttest> port getcontents port1 3 -b
+data port port1: getcontents successful
+-->message 3: 
+  M4.1.1
+    Recognize and display "text" mail with the character set "US-ASCII." 
+
+
+sdmporttest> 
+sdmporttest> port getcontents port1 4
+data port port1: getcontents failed with error 1: Sdm_EC_Fail
+sdmporttest> port getcontents port1 4 -f
+data port port1: getcontents successful
+-->message 4: 
+Return-Path: <daemon@mocha.bunyip.com>
+Received: from Eng.Sun.COM (engmail1) by basilisk.Eng.Sun.COM (5.x/SMI-SVR4)	id AA23835; Fri, 17 Feb 1995 16:36:57 -0800
+Received: from Sun.COM (sun-barr.EBay.Sun.COM) by Eng.Sun.COM (5.x/SMI-5.3)	id AA14751; Fri, 17 Feb 1995 16:36:54 -0800
+Received: from mocha.bunyip.com by Sun.COM (sun-barr.Sun.COM)	id AA07909; Fri, 17 Feb 95 16:36:53 PST
+Received: by mocha.bunyip.com (5.65a/IDA-1.4.2b/CC-Guru-2b)        id AA24721  (mail destined for Gary.Gere@eng.sun.com) on Fri, 17 Feb 95 19:35:24 -0500
+Date: Fri, 17 Feb 95 19:35:24 -0500
+Message-Id: <9502180035.AA24721@mocha.bunyip.com>
+From: paf@bunyip.com
+To: MIME-tester@bunyip.com
+Cc: mail-testers@test.com
+Cc: interest-lists@mailtest.com
+Bcc: tattle-tale@bcc.gov
+Bcc: nsa-secrets@nsa.gov
+Mime-Version: 1.0
+Subject: M4.3.1 - Content-Type: multipart/mixed; boundary=this_is_a_boundary
+Content-Type: multipart/mixed; boundary=this_is_a_boundary
+Content-Length: 1124
+
+ This is a text which is NOT included in the MIME message.
+ Therefore, this text should not be visible for the user.
+
+--this_is_a_boundary
+Content-type: text/plain
+
+  (This is the first part out of three)
+
+  M4.3.1
+       Recognize the primary (mixed) subtype. Display all relevant
+       information on the message level and the body part header level  
+       and then display or offer to display each of the body parts
+       individually.
+
+--this_is_a_boundary
+Content-type: text/plain
+
+  (This is the second part out of three)
+
+       (Interopability comment: For maximum usage friendliness, we
+       recommend the software to open as few windows as possible, i.e. if
+       the software itself can display several different media-types,
+       parts made up of these types should be shown together without any
+       need for interaction with the user,)
+
+--this_is_a_boundary
+Content-type: text/plain
+
+  (This is the third part out of three)
+
+       Note that even though all three parts is text/plain, it is
+       still three different parts, and this should be visible for
+       the user.
+
+--this_is_a_boundary--
+
+sdmporttest> port getcontents port1 4 -h
+data port port1: getcontents successful
+-->message 4: 
+Return-Path: <daemon@mocha.bunyip.com>
+Received: from Eng.Sun.COM (engmail1) by basilisk.Eng.Sun.COM (5.x/SMI-SVR4)	id AA23835; Fri, 17 Feb 1995 16:36:57 -0800
+Received: from Sun.COM (sun-barr.EBay.Sun.COM) by Eng.Sun.COM (5.x/SMI-5.3)	id AA14751; Fri, 17 Feb 1995 16:36:54 -0800
+Received: from mocha.bunyip.com by Sun.COM (sun-barr.Sun.COM)	id AA07909; Fri, 17 Feb 95 16:36:53 PST
+Received: by mocha.bunyip.com (5.65a/IDA-1.4.2b/CC-Guru-2b)        id AA24721  (mail destined for Gary.Gere@eng.sun.com) on Fri, 17 Feb 95 19:35:24 -0500
+Date: Fri, 17 Feb 95 19:35:24 -0500
+Message-Id: <9502180035.AA24721@mocha.bunyip.com>
+From: paf@bunyip.com
+To: MIME-tester@bunyip.com
+Cc: mail-testers@test.com
+Cc: interest-lists@mailtest.com
+Bcc: tattle-tale@bcc.gov
+Bcc: nsa-secrets@nsa.gov
+Mime-Version: 1.0
+Subject: M4.3.1 - Content-Type: multipart/mixed; boundary=this_is_a_boundary
+Content-Type: multipart/mixed; boundary=this_is_a_boundary
+Content-Length: 1124
+
+sdmporttest> port getcontents port1 4 -b
+data port port1: getcontents successful
+-->message 4: 
+ This is a text which is NOT included in the MIME message.
+ Therefore, this text should not be visible for the user.
+
+--this_is_a_boundary
+Content-type: text/plain
+
+  (This is the first part out of three)
+
+  M4.3.1
+       Recognize the primary (mixed) subtype. Display all relevant
+       information on the message level and the body part header level  
+       and then display or offer to display each of the body parts
+       individually.
+
+--this_is_a_boundary
+Content-type: text/plain
+
+  (This is the second part out of three)
+
+       (Interopability comment: For maximum usage friendliness, we
+       recommend the software to open as few windows as possible, i.e. if
+       the software itself can display several different media-types,
+       parts made up of these types should be shown together without any
+       need for interaction with the user,)
+
+--this_is_a_boundary
+Content-type: text/plain
+
+  (This is the third part out of three)
+
+       Note that even though all three parts is text/plain, it is
+       still three different parts, and this should be visible for
+       the user.
+
+--this_is_a_boundary--
+
+sdmporttest> 
+sdmporttest> port getcontents port1 1 0.1
+data port port1: message component '0.1' does not exist in message 1
+sdmporttest> port getcontents port1 1 -f 0.1
+data port port1: message component '0.1' does not exist in message 1
+sdmporttest> port getcontents port1 1 -h 0.1
+data port port1: message component '0.1' does not exist in message 1
+sdmporttest> port getcontents port1 1 -b 0.1
+data port port1: message component '0.1' does not exist in message 1
+sdmporttest> 
+sdmporttest> port getstructure port1 4
+data port port1: getstructure successful
+ message 4:
+  ID              TYPE        SUBTYPE         MIME-TYPE         ENCODING LINES BYTES  NAME       DISP     MODE ISECTION DESCRIPTION
+  0.1             multipart   mixed           multipart/mixed   7bit     2     117    (none)     (unspec) 0    4.8 	(none)
+  0.1.1           text        plain           text/plain        7bit     7     278    part-one   attach   544  4.5 	(none)
+  0.1.2           text        plain           text/plain        7bit     7     370    part-two   inline   544  4.6 	(none)
+  0.1.3           text        plain           text/plain        7bit     5     191    part-three attach   544  4.7 	(none)
+sdmporttest> 
+sdmporttest> port getcontents port1 4 0.1
+data port port1: message component '0.1' does not exist in message 4
+sdmporttest> port getcontents port1 4 -f 0.1
+data port port1: message component '0.1' does not exist in message 4
+sdmporttest> port getcontents port1 4 -h 0.1
+data port port1: message component '0.1' does not exist in message 4
+sdmporttest> port getcontents port1 4 -b 0.1
+data port port1: message component '0.1' does not exist in message 4
+sdmporttest> 
+sdmporttest> port getcontents port1 4 0.1.1
+data port port1: message component '0.1.1' does not exist in message 4
+sdmporttest> port getcontents port1 4 -f 0.1.1
+data port port1: message component '0.1.1' does not exist in message 4
+sdmporttest> port getcontents port1 4 -h 0.1.1
+data port port1: message component '0.1.1' does not exist in message 4
+sdmporttest> port getcontents port1 4 -b 0.1.1
+data port port1: message component '0.1.1' does not exist in message 4
+sdmporttest> 
+sdmporttest> port getcontents port1 4 0.1.2
+data port port1: message component '0.1.2' does not exist in message 4
+sdmporttest> port getcontents port1 4 -f 0.1.2
+data port port1: message component '0.1.2' does not exist in message 4
+sdmporttest> port getcontents port1 4 -h 0.1.2
+data port port1: message component '0.1.2' does not exist in message 4
+sdmporttest> port getcontents port1 4 -b 0.1.2
+data port port1: message component '0.1.2' does not exist in message 4
+sdmporttest> 
+sdmporttest> port getcontents port1 4 0.1.3
+data port port1: message component '0.1.3' does not exist in message 4
+sdmporttest> port getcontents port1 4 -f 0.1.3
+data port port1: message component '0.1.3' does not exist in message 4
+sdmporttest> port getcontents port1 4 -h 0.1.3
+data port port1: message component '0.1.3' does not exist in message 4
+sdmporttest> port getcontents port1 4 -b 0.1.3
+data port port1: message component '0.1.3' does not exist in message 4
+sdmporttest> 
+sdmporttest> # test scannamespace
+sdmporttest> 
+sdmporttest> port scannamespace port1 . %
+data port port1: scannamespace successful, returned 55 names
+	noinferiors                       unchanged 	./Makefile
+	             cannotOpen                     	./SCCS
+	noinferiors                       unchanged 	./Sdmporttest.cc
+	noinferiors                       unchanged 	./Sdmporttest.hh
+	noinferiors                       unchanged 	./Sdmptcbody.cc
+	noinferiors                       unchanged 	./Sdmptcbody.hh
+	noinferiors                       unchanged 	./Sdmptcconnection.cc
+	noinferiors                       unchanged 	./Sdmptcconnection.hh
+	noinferiors                       unchanged 	./Sdmptcenvelope.cc
+	noinferiors                       unchanged 	./Sdmptcenvelope.hh
+	noinferiors                       unchanged 	./Sdmptchelp.cc
+	noinferiors                       unchanged 	./Sdmptchelp.hh
+	noinferiors                       unchanged 	./Sdmptcmdscan.cc
+	noinferiors                       unchanged 	./Sdmptcmdscan.hh
+	noinferiors                       unchanged 	./Sdmptcmessage.cc
+	noinferiors                       unchanged 	./Sdmptcmessage.hh
+	noinferiors                       unchanged 	./Sdmptcoverview.cc
+	noinferiors                       unchanged 	./Sdmptcoverview.hh
+	noinferiors                                 	./Sdmptcport.cc
+	noinferiors                       unchanged 	./Sdmptcport.hh
+	noinferiors                       unchanged 	./Sdmptcquit.cc
+	noinferiors                       unchanged 	./Sdmptcquit.hh
+	noinferiors                       unchanged 	./Sdmptcsession.cc
+	noinferiors                       unchanged 	./Sdmptcsession.hh
+	noinferiors                       unchanged 	./Sdmptcstore.cc
+	noinferiors                       unchanged 	./Sdmptcstore.hh
+	noinferiors                       unchanged 	./Sdmptctoken.cc
+	noinferiors                       unchanged 	./Sdmptctoken.hh
+	             cannotOpen                     	./Templates.DB
+	noinferiors                                 	./c_imap_basic.tst
+	noinferiors                                 	./c_imap_basic_mime.tst
+	noinferiors                                 	./c_imap_extended.tst
+	noinferiors                                 	./c_imap_extended_mime.tst
+	noinferiors                                 	./c_local_basic.tst
+	noinferiors                                 	./c_local_basic_mime.tst
+	noinferiors                                 	./c_local_extended.tst
+	noinferiors                                 	./c_local_extended_mime.tst
+	noinferiors                       unchanged 	./core
+	noinferiors                                 	./make
+	noinferiors                                 	./metatest1
+	noinferiors                       unchanged 	./metatest2
+	noinferiors                       unchanged 	./sdmporttest
+	noinferiors                       unchanged 	./sdmporttest.BMF
+	noinferiors              changed            	./sdmporttest.LNI
+	noinferiors                       unchanged 	./sdmporttest.RGB
+	             cannotOpen                     	./shared_objs
+	             cannotOpen                     	./static_objs
+	noinferiors                                 	./test.token
+	noinferiors              changed            	./test.token.out
+	noinferiors                       unchanged 	./test1
+	noinferiors                       unchanged 	./test2
+	noinferiors                       unchanged 	./test3
+	noinferiors                       unchanged 	./test_dpapi.tclient
+	noinferiors              changed            	./test_dpapi.tclient.out
+	noinferiors                       unchanged 	./test_feapi.tclient
+sdmporttest> port scannamespace port1 . SCCS/%
+data port port1: scannamespace successful, returned 37 names
+	noinferiors                       unchanged 	./SCCS/p.Sdmptcmessage.cc
+	noinferiors                                 	./SCCS/p.test_dpapi.tclient.out
+	noinferiors                       unchanged 	./SCCS/p.test_feapi.tclient
+	noinferiors                       unchanged 	./SCCS/s.Makefile
+	noinferiors                       unchanged 	./SCCS/s.Sdmporttest.cc
+	noinferiors                       unchanged 	./SCCS/s.Sdmporttest.hh
+	noinferiors                       unchanged 	./SCCS/s.Sdmptcbody.cc
+	noinferiors                       unchanged 	./SCCS/s.Sdmptcbody.hh
+	noinferiors                       unchanged 	./SCCS/s.Sdmptcconnection.cc
+	noinferiors                       unchanged 	./SCCS/s.Sdmptcconnection.hh
+	noinferiors                       unchanged 	./SCCS/s.Sdmptcenvelope.cc
+	noinferiors                       unchanged 	./SCCS/s.Sdmptcenvelope.hh
+	noinferiors                       unchanged 	./SCCS/s.Sdmptchelp.cc
+	noinferiors                       unchanged 	./SCCS/s.Sdmptchelp.hh
+	noinferiors                       unchanged 	./SCCS/s.Sdmptcmdscan.cc
+	noinferiors                       unchanged 	./SCCS/s.Sdmptcmdscan.hh
+	noinferiors                       unchanged 	./SCCS/s.Sdmptcmessage.cc
+	noinferiors                       unchanged 	./SCCS/s.Sdmptcmessage.hh
+	noinferiors                       unchanged 	./SCCS/s.Sdmptcoverview.cc
+	noinferiors                       unchanged 	./SCCS/s.Sdmptcoverview.hh
+	noinferiors                       unchanged 	./SCCS/s.Sdmptcport.cc
+	noinferiors                       unchanged 	./SCCS/s.Sdmptcport.hh
+	noinferiors                       unchanged 	./SCCS/s.Sdmptcquit.cc
+	noinferiors                       unchanged 	./SCCS/s.Sdmptcquit.hh
+	noinferiors                       unchanged 	./SCCS/s.Sdmptcsession.cc
+	noinferiors                       unchanged 	./SCCS/s.Sdmptcsession.hh
+	noinferiors                       unchanged 	./SCCS/s.Sdmptcstore.cc
+	noinferiors                       unchanged 	./SCCS/s.Sdmptcstore.hh
+	noinferiors                       unchanged 	./SCCS/s.Sdmptctoken.cc
+	noinferiors                       unchanged 	./SCCS/s.Sdmptctoken.hh
+	noinferiors                                 	./SCCS/s.metatest1
+	noinferiors                       unchanged 	./SCCS/s.metatest2
+	noinferiors                       unchanged 	./SCCS/s.test.token
+	noinferiors                       unchanged 	./SCCS/s.test.token.out
+	noinferiors                       unchanged 	./SCCS/s.test_dpapi.tclient
+	noinferiors                       unchanged 	./SCCS/s.test_dpapi.tclient.out
+	noinferiors                       unchanged 	./SCCS/s.test_feapi.tclient
+sdmporttest> port scannamespace port1 /etc auto%
+data port port1: scannamespace successful, returned 4 names
+	noinferiors                       unchanged 	/etc/auto_home
+	noinferiors                       unchanged 	/etc/auto_master
+	noinferiors                       unchanged 	/etc/auto_master~
+	noinferiors                                 	/etc/autopush
+sdmporttest> port scannamespace port1 .. sdm%
+data port port1: scannamespace successful, returned 2 names
+	             cannotOpen                     	../sdmporttest
+	             cannotOpen                     	../sdmtest
+sdmporttest> port scannamespace port1 .. sdm%/%.cc
+data port port1: scannamespace successful, returned 24 names
+	noinferiors                       unchanged 	../sdmporttest/Sdmporttest.cc
+	noinferiors                       unchanged 	../sdmporttest/Sdmptcbody.cc
+	noinferiors                       unchanged 	../sdmporttest/Sdmptcconnection.cc
+	noinferiors                       unchanged 	../sdmporttest/Sdmptcenvelope.cc
+	noinferiors                       unchanged 	../sdmporttest/Sdmptchelp.cc
+	noinferiors                       unchanged 	../sdmporttest/Sdmptcmdscan.cc
+	noinferiors                       unchanged 	../sdmporttest/Sdmptcmessage.cc
+	noinferiors                       unchanged 	../sdmporttest/Sdmptcoverview.cc
+	noinferiors                                 	../sdmporttest/Sdmptcport.cc
+	noinferiors                       unchanged 	../sdmporttest/Sdmptcquit.cc
+	noinferiors                       unchanged 	../sdmporttest/Sdmptcsession.cc
+	noinferiors                       unchanged 	../sdmporttest/Sdmptcstore.cc
+	noinferiors                       unchanged 	../sdmporttest/Sdmptctoken.cc
+	noinferiors                       unchanged 	../sdmtest/SdmAsyncTest.cc
+	noinferiors                       unchanged 	../sdmtest/SdmBasicTest.cc
+	noinferiors                       unchanged 	../sdmtest/SdmConnectionTest.cc
+	noinferiors                                 	../sdmtest/SdmMain.cc
+	noinferiors                       unchanged 	../sdmtest/SdmMessageBodyTest.cc
+	noinferiors                       unchanged 	../sdmtest/SdmMessageEnvelopeTest.cc
+	noinferiors                       unchanged 	../sdmtest/SdmMessageStoreTest.cc
+	noinferiors                       unchanged 	../sdmtest/SdmMessageTest.cc
+	noinferiors                                 	../sdmtest/SdmSearchTest.cc
+	noinferiors                       unchanged 	../sdmtest/SdmSessionTest.cc
+	noinferiors                       unchanged 	../sdmtest/SdmUtilityTest.cc
+sdmporttest> port scannamespace port1 /foo %/bar
+data port port1: scannamespace failed with error 1: Sdm_EC_Fail
+sdmporttest> port scannamespace port1 . %/bar/hum
+data port port1: scannamespace failed with error 1: Sdm_EC_Fail
+sdmporttest> 
+sdmporttest> # test scansubscribednamespace
+sdmporttest> 
+sdmporttest> port addtosubscribednamespace port1 /test/space1/alpha
+data port port1: addtosubscribednamespace successful
+sdmporttest> port addtosubscribednamespace port1 /test/space1/alpha/name2
+data port port1: addtosubscribednamespace successful
+sdmporttest> port addtosubscribednamespace port1 /test/space1/alpha/name3
+data port port1: addtosubscribednamespace successful
+sdmporttest> port addtosubscribednamespace port1 /test/space1/beta
+data port port1: addtosubscribednamespace successful
+sdmporttest> port addtosubscribednamespace port1 /test/space1/beta/name4
+data port port1: addtosubscribednamespace successful
+sdmporttest> port addtosubscribednamespace port1 /test/space1/beta/name5
+data port port1: addtosubscribednamespace successful
+sdmporttest> port addtosubscribednamespace port1 /test/space1/beta/name6
+data port port1: addtosubscribednamespace successful
+sdmporttest> port scansubscribednamespace port1 /test *
+pattern is /test/*
+data port port1: scansubscribednamespace successful, returned 7 names
+	                                            	/test/space1/alpha
+	                                            	/test/space1/alpha/name2
+	                                            	/test/space1/alpha/name3
+	                                            	/test/space1/beta
+	                                            	/test/space1/beta/name4
+	                                            	/test/space1/beta/name5
+	                                            	/test/space1/beta/name6
+sdmporttest> port scansubscribednamespace port1 /test %
+pattern is /test/%
+data port port1: scansubscribednamespace failed with error 33: Sdm_EC_RequestedDataNotFound
+sdmporttest> port scansubscribednamespace port1 /test %/*
+pattern is /test/%/*
+data port port1: scansubscribednamespace successful, returned 7 names
+	                                            	/test/space1/alpha
+	                                            	/test/space1/alpha/name2
+	                                            	/test/space1/alpha/name3
+	                                            	/test/space1/beta
+	                                            	/test/space1/beta/name4
+	                                            	/test/space1/beta/name5
+	                                            	/test/space1/beta/name6
+sdmporttest> port scansubscribednamespace port1 /test %/%
+pattern is /test/%/%
+data port port1: scansubscribednamespace successful, returned 2 names
+	                                            	/test/space1/alpha
+	                                            	/test/space1/beta
+sdmporttest> port scansubscribednamespace port1 /test %/%/*
+pattern is /test/%/%/*
+data port port1: scansubscribednamespace successful, returned 5 names
+	                                            	/test/space1/alpha/name2
+	                                            	/test/space1/alpha/name3
+	                                            	/test/space1/beta/name4
+	                                            	/test/space1/beta/name5
+	                                            	/test/space1/beta/name6
+sdmporttest> port scansubscribednamespace port1 /test %/%/%
+pattern is /test/%/%/%
+data port port1: scansubscribednamespace successful, returned 5 names
+	                                            	/test/space1/alpha/name2
+	                                            	/test/space1/alpha/name3
+	                                            	/test/space1/beta/name4
+	                                            	/test/space1/beta/name5
+	                                            	/test/space1/beta/name6
+sdmporttest> port scansubscribednamespace port1 /test %/%/%/*
+pattern is /test/%/%/%/*
+data port port1: scansubscribednamespace failed with error 33: Sdm_EC_RequestedDataNotFound
+sdmporttest> port scansubscribednamespace port1 /test %/%/%/%
+pattern is /test/%/%/%/%
+data port port1: scansubscribednamespace failed with error 33: Sdm_EC_RequestedDataNotFound
+sdmporttest> port scansubscribednamespace port1 /test/space1 %
+pattern is /test/space1/%
+data port port1: scansubscribednamespace successful, returned 2 names
+	                                            	/test/space1/alpha
+	                                            	/test/space1/beta
+sdmporttest> port scansubscribednamespace port1 /test/space1 %/%
+pattern is /test/space1/%/%
+data port port1: scansubscribednamespace successful, returned 5 names
+	                                            	/test/space1/alpha/name2
+	                                            	/test/space1/alpha/name3
+	                                            	/test/space1/beta/name4
+	                                            	/test/space1/beta/name5
+	                                            	/test/space1/beta/name6
+sdmporttest> port scansubscribednamespace port1 /test/space1 %/%/%
+pattern is /test/space1/%/%/%
+data port port1: scansubscribednamespace failed with error 33: Sdm_EC_RequestedDataNotFound
+sdmporttest> port scansubscribednamespace port1 /test/space1/alpha %
+pattern is /test/space1/alpha/%
+data port port1: scansubscribednamespace successful, returned 2 names
+	                                            	/test/space1/alpha/name2
+	                                            	/test/space1/alpha/name3
+sdmporttest> port scansubscribednamespace port1 /test/space1/alpha %/%
+pattern is /test/space1/alpha/%/%
+data port port1: scansubscribednamespace failed with error 33: Sdm_EC_RequestedDataNotFound
+sdmporttest> port scansubscribednamespace port1 /test/space1/alpha %/%/%
+pattern is /test/space1/alpha/%/%/%
+data port port1: scansubscribednamespace failed with error 33: Sdm_EC_RequestedDataNotFound
+sdmporttest> 
+sdmporttest> port scansubs port1 /test/space1 %/name%
+pattern is /test/space1/%/name%
+data port port1: scansubscribednamespace successful, returned 5 names
+	                                            	/test/space1/alpha/name2
+	                                            	/test/space1/alpha/name3
+	                                            	/test/space1/beta/name4
+	                                            	/test/space1/beta/name5
+	                                            	/test/space1/beta/name6
+sdmporttest> 
+sdmporttest> port removefromsubscribednamespace port1 /test/space1/alpha/name2
+data port port1: removefromsubscribednamespace successful
+sdmporttest> port removefromsubscribednamespace port1 /test/space1/beta/name6
+data port port1: removefromsubscribednamespace successful
+sdmporttest> port scansubscribednamespace port1 /test *
+pattern is /test/*
+data port port1: scansubscribednamespace successful, returned 5 names
+	                                            	/test/space1/alpha
+	                                            	/test/space1/alpha/name3
+	                                            	/test/space1/beta
+	                                            	/test/space1/beta/name4
+	                                            	/test/space1/beta/name5
+sdmporttest> port removefromsubscribednamespace port1 /test/space1/alpha
+data port port1: removefromsubscribednamespace successful
+sdmporttest> port removefromsubscribednamespace port1 /test/space1/alpha/name3
+data port port1: removefromsubscribednamespace successful
+sdmporttest> port removefromsubscribednamespace port1 /test/space1/beta
+data port port1: removefromsubscribednamespace successful
+sdmporttest> port removefromsubscribednamespace port1 /test/space1/beta/name4
+data port port1: removefromsubscribednamespace successful
+sdmporttest> port removefromsubscribednamespace port1 /test/space1/beta/name5
+data port port1: removefromsubscribednamespace successful
+sdmporttest> port scansubscribednamespace port1 /test *
+pattern is /test/*
+data port port1: scansubscribednamespace failed with error 33: Sdm_EC_RequestedDataNotFound
+sdmporttest> 
+sdmporttest> # test deleting messages
+sdmporttest> 
+sdmporttest> port clearflags port1 * deleted
+data port port1: clearflags successful
+sdmporttest> port expungedeleted port1
+data port port1: expungedeleted successful; 0 messages deleted: 
+sdmporttest> port getstatus port1
+data port port1: status information:
+ flags = 0x0000003f, uidvalidity = 0x00000000, checksum = 0, checksumbytes = 0
+ messages = 4, recent = 4, unseen = 4, uidnext = 5
+sdmporttest> port getstructure port1 *
+data port port1: getstructure successful
+ message 1:
+  ID              TYPE        SUBTYPE         MIME-TYPE         ENCODING LINES BYTES  NAME       DISP     MODE ISECTION DESCRIPTION
+  0.1             text        (none)          text/plain        7bit     4     63     (none)     (unspec) 0    1.1 	(none)
+ message 2:
+  0.1             text        plain           text/plain        7bit     9     387    (none)     (unspec) 0    2.2 	(none)
+ message 3:
+  0.1             text        plain           text/plain        7bit     3     84     (none)     (unspec) 0    3.3 	(none)
+ message 4:
+  0.1             multipart   mixed           multipart/mixed   7bit     2     117    (none)     (unspec) 0    4.8 	(none)
+  0.1.1           text        plain           text/plain        7bit     7     278    part-one   attach   544  4.5 	(none)
+  0.1.2           text        plain           text/plain        7bit     7     370    part-two   inline   544  4.6 	(none)
+  0.1.3           text        plain           text/plain        7bit     5     191    part-three attach   544  4.7 	(none)
+sdmporttest> port setflags port1 2 deleted
+data port port1: setflags successful
+sdmporttest> port expungedeleted port1
+data port port1: expungedeleted successful; 1 messages deleted: 2
+sdmporttest> port getstatus port1
+data port port1: status information:
+ flags = 0x0000003f, uidvalidity = 0x00000000, checksum = 0, checksumbytes = 0
+ messages = 3, recent = 3, unseen = 3, uidnext = 5
+sdmporttest> port getstructure port1 *
+data port port1: getstructure successful
+ message 1:
+  ID              TYPE        SUBTYPE         MIME-TYPE         ENCODING LINES BYTES  NAME       DISP     MODE ISECTION DESCRIPTION
+  0.1             text        (none)          text/plain        7bit     4     63     (none)     (unspec) 0    1.1 	(none)
+ message 2:
+  0.1             text        plain           text/plain        7bit     3     84     (none)     (unspec) 0    3.3 	(none)
+ message 3:
+  0.1             multipart   mixed           multipart/mixed   7bit     2     117    (none)     (unspec) 0    4.8 	(none)
+  0.1.1           text        plain           text/plain        7bit     7     278    part-one   attach   544  4.5 	(none)
+  0.1.2           text        plain           text/plain        7bit     7     370    part-two   inline   544  4.6 	(none)
+  0.1.3           text        plain           text/plain        7bit     5     191    part-three attach   544  4.7 	(none)
+sdmporttest> port setflags port1 2,3 deleted
+data port port1: setflags successful
+sdmporttest> port expungedeleted port1
+data port port1: expungedeleted successful; 2 messages deleted: 2, 3
+sdmporttest> port getstatus port1
+data port port1: status information:
+ flags = 0x0000003f, uidvalidity = 0x00000000, checksum = 0, checksumbytes = 0
+ messages = 1, recent = 1, unseen = 1, uidnext = 2
+sdmporttest> port getstructure port1 *
+data port port1: getstructure successful
+ message 1:
+  ID              TYPE        SUBTYPE         MIME-TYPE         ENCODING LINES BYTES  NAME       DISP     MODE ISECTION DESCRIPTION
+  0.1             text        (none)          text/plain        7bit     4     63     (none)     (unspec) 0    1.1 	(none)
+sdmporttest> port setflags port1 * deleted
+data port port1: setflags successful
+sdmporttest> port expungedeleted port1
+data port port1: expungedeleted successful; 1 messages deleted: 1
+sdmporttest> port getstatus port1
+data port port1: status information:
+ flags = 0x0000003f, uidvalidity = 0x00000000, checksum = 0, checksumbytes = 0
+ messages = 0, recent = 0, unseen = 0, uidnext = 1
+sdmporttest> port getstructure port1 *
+data port port1: no messages in store to operate on
+sdmporttest> 
+sdmporttest> # close the port
+sdmporttest> 
+sdmporttest> port close port1
+data port port1: closed
+sdmporttest> port shutdown port1
+data port port1: shutdown
+sdmporttest> port delete port1
+data port port1: deleted
+sdmporttest> 
+sdmporttest> ##
+sdmporttest> ## Test attach
+sdmporttest> ##
+sdmporttest> 
+sdmporttest> port create port1
+data port port1: defined
+sdmporttest> port startup port1
+data port port1: started
+sdmporttest> port attach port1 token1
+data port port1: attached
+sdmporttest> 
+sdmporttest> # test scannamespace
+sdmporttest> 
+sdmporttest> port scannamespace port1 . %
+data port port1: scannamespace successful, returned 55 names
+	noinferiors                       unchanged 	./Makefile
+	             cannotOpen                     	./SCCS
+	noinferiors                       unchanged 	./Sdmporttest.cc
+	noinferiors                       unchanged 	./Sdmporttest.hh
+	noinferiors                       unchanged 	./Sdmptcbody.cc
+	noinferiors                       unchanged 	./Sdmptcbody.hh
+	noinferiors                       unchanged 	./Sdmptcconnection.cc
+	noinferiors                       unchanged 	./Sdmptcconnection.hh
+	noinferiors                       unchanged 	./Sdmptcenvelope.cc
+	noinferiors                       unchanged 	./Sdmptcenvelope.hh
+	noinferiors                       unchanged 	./Sdmptchelp.cc
+	noinferiors                       unchanged 	./Sdmptchelp.hh
+	noinferiors                       unchanged 	./Sdmptcmdscan.cc
+	noinferiors                       unchanged 	./Sdmptcmdscan.hh
+	noinferiors                       unchanged 	./Sdmptcmessage.cc
+	noinferiors                       unchanged 	./Sdmptcmessage.hh
+	noinferiors                       unchanged 	./Sdmptcoverview.cc
+	noinferiors                       unchanged 	./Sdmptcoverview.hh
+	noinferiors                                 	./Sdmptcport.cc
+	noinferiors                       unchanged 	./Sdmptcport.hh
+	noinferiors                       unchanged 	./Sdmptcquit.cc
+	noinferiors                       unchanged 	./Sdmptcquit.hh
+	noinferiors                       unchanged 	./Sdmptcsession.cc
+	noinferiors                       unchanged 	./Sdmptcsession.hh
+	noinferiors                       unchanged 	./Sdmptcstore.cc
+	noinferiors                       unchanged 	./Sdmptcstore.hh
+	noinferiors                       unchanged 	./Sdmptctoken.cc
+	noinferiors                       unchanged 	./Sdmptctoken.hh
+	             cannotOpen                     	./Templates.DB
+	noinferiors                                 	./c_imap_basic.tst
+	noinferiors                                 	./c_imap_basic_mime.tst
+	noinferiors                                 	./c_imap_extended.tst
+	noinferiors                                 	./c_imap_extended_mime.tst
+	noinferiors                                 	./c_local_basic.tst
+	noinferiors                                 	./c_local_basic_mime.tst
+	noinferiors                                 	./c_local_extended.tst
+	noinferiors                                 	./c_local_extended_mime.tst
+	noinferiors                       unchanged 	./core
+	noinferiors                                 	./make
+	noinferiors                                 	./metatest1
+	noinferiors                       unchanged 	./metatest2
+	noinferiors                       unchanged 	./sdmporttest
+	noinferiors                       unchanged 	./sdmporttest.BMF
+	noinferiors              changed            	./sdmporttest.LNI
+	noinferiors                       unchanged 	./sdmporttest.RGB
+	             cannotOpen                     	./shared_objs
+	             cannotOpen                     	./static_objs
+	noinferiors                                 	./test.token
+	noinferiors              changed            	./test.token.out
+	noinferiors                       unchanged 	./test1
+	noinferiors                       unchanged 	./test2
+	noinferiors                       unchanged 	./test3
+	noinferiors                       unchanged 	./test_dpapi.tclient
+	noinferiors              changed            	./test_dpapi.tclient.out
+	noinferiors                       unchanged 	./test_feapi.tclient
+sdmporttest> port scannamespace port1 . SCCS/%
+data port port1: scannamespace successful, returned 37 names
+	noinferiors                       unchanged 	./SCCS/p.Sdmptcmessage.cc
+	noinferiors                                 	./SCCS/p.test_dpapi.tclient.out
+	noinferiors                       unchanged 	./SCCS/p.test_feapi.tclient
+	noinferiors                       unchanged 	./SCCS/s.Makefile
+	noinferiors                       unchanged 	./SCCS/s.Sdmporttest.cc
+	noinferiors                       unchanged 	./SCCS/s.Sdmporttest.hh
+	noinferiors                       unchanged 	./SCCS/s.Sdmptcbody.cc
+	noinferiors                       unchanged 	./SCCS/s.Sdmptcbody.hh
+	noinferiors                       unchanged 	./SCCS/s.Sdmptcconnection.cc
+	noinferiors                       unchanged 	./SCCS/s.Sdmptcconnection.hh
+	noinferiors                       unchanged 	./SCCS/s.Sdmptcenvelope.cc
+	noinferiors                       unchanged 	./SCCS/s.Sdmptcenvelope.hh
+	noinferiors                       unchanged 	./SCCS/s.Sdmptchelp.cc
+	noinferiors                       unchanged 	./SCCS/s.Sdmptchelp.hh
+	noinferiors                       unchanged 	./SCCS/s.Sdmptcmdscan.cc
+	noinferiors                       unchanged 	./SCCS/s.Sdmptcmdscan.hh
+	noinferiors                       unchanged 	./SCCS/s.Sdmptcmessage.cc
+	noinferiors                       unchanged 	./SCCS/s.Sdmptcmessage.hh
+	noinferiors                       unchanged 	./SCCS/s.Sdmptcoverview.cc
+	noinferiors                       unchanged 	./SCCS/s.Sdmptcoverview.hh
+	noinferiors                       unchanged 	./SCCS/s.Sdmptcport.cc
+	noinferiors                       unchanged 	./SCCS/s.Sdmptcport.hh
+	noinferiors                       unchanged 	./SCCS/s.Sdmptcquit.cc
+	noinferiors                       unchanged 	./SCCS/s.Sdmptcquit.hh
+	noinferiors                       unchanged 	./SCCS/s.Sdmptcsession.cc
+	noinferiors                       unchanged 	./SCCS/s.Sdmptcsession.hh
+	noinferiors                       unchanged 	./SCCS/s.Sdmptcstore.cc
+	noinferiors                       unchanged 	./SCCS/s.Sdmptcstore.hh
+	noinferiors                       unchanged 	./SCCS/s.Sdmptctoken.cc
+	noinferiors                       unchanged 	./SCCS/s.Sdmptctoken.hh
+	noinferiors                                 	./SCCS/s.metatest1
+	noinferiors                       unchanged 	./SCCS/s.metatest2
+	noinferiors                       unchanged 	./SCCS/s.test.token
+	noinferiors                       unchanged 	./SCCS/s.test.token.out
+	noinferiors                       unchanged 	./SCCS/s.test_dpapi.tclient
+	noinferiors                       unchanged 	./SCCS/s.test_dpapi.tclient.out
+	noinferiors                       unchanged 	./SCCS/s.test_feapi.tclient
+sdmporttest> port scannamespace port1 /etc auto%
+data port port1: scannamespace successful, returned 4 names
+	noinferiors                       unchanged 	/etc/auto_home
+	noinferiors                       unchanged 	/etc/auto_master
+	noinferiors                       unchanged 	/etc/auto_master~
+	noinferiors                                 	/etc/autopush
+sdmporttest> port scannamespace port1 .. sdm%
+data port port1: scannamespace successful, returned 2 names
+	             cannotOpen                     	../sdmporttest
+	             cannotOpen                     	../sdmtest
+sdmporttest> port scannamespace port1 .. sdm%/%.cc
+data port port1: scannamespace successful, returned 24 names
+	noinferiors                       unchanged 	../sdmporttest/Sdmporttest.cc
+	noinferiors                       unchanged 	../sdmporttest/Sdmptcbody.cc
+	noinferiors                       unchanged 	../sdmporttest/Sdmptcconnection.cc
+	noinferiors                       unchanged 	../sdmporttest/Sdmptcenvelope.cc
+	noinferiors                       unchanged 	../sdmporttest/Sdmptchelp.cc
+	noinferiors                       unchanged 	../sdmporttest/Sdmptcmdscan.cc
+	noinferiors                       unchanged 	../sdmporttest/Sdmptcmessage.cc
+	noinferiors                       unchanged 	../sdmporttest/Sdmptcoverview.cc
+	noinferiors                                 	../sdmporttest/Sdmptcport.cc
+	noinferiors                       unchanged 	../sdmporttest/Sdmptcquit.cc
+	noinferiors                       unchanged 	../sdmporttest/Sdmptcsession.cc
+	noinferiors                       unchanged 	../sdmporttest/Sdmptcstore.cc
+	noinferiors                       unchanged 	../sdmporttest/Sdmptctoken.cc
+	noinferiors                       unchanged 	../sdmtest/SdmAsyncTest.cc
+	noinferiors                       unchanged 	../sdmtest/SdmBasicTest.cc
+	noinferiors                       unchanged 	../sdmtest/SdmConnectionTest.cc
+	noinferiors                                 	../sdmtest/SdmMain.cc
+	noinferiors                       unchanged 	../sdmtest/SdmMessageBodyTest.cc
+	noinferiors                       unchanged 	../sdmtest/SdmMessageEnvelopeTest.cc
+	noinferiors                       unchanged 	../sdmtest/SdmMessageStoreTest.cc
+	noinferiors                       unchanged 	../sdmtest/SdmMessageTest.cc
+	noinferiors                                 	../sdmtest/SdmSearchTest.cc
+	noinferiors                       unchanged 	../sdmtest/SdmSessionTest.cc
+	noinferiors                       unchanged 	../sdmtest/SdmUtilityTest.cc
+sdmporttest> port scannamespace port1 /foo %/bar
+data port port1: scannamespace failed with error 33: Sdm_EC_RequestedDataNotFound
+sdmporttest> port scannamespace port1 . %/bar/hum
+data port port1: scannamespace failed with error 33: Sdm_EC_RequestedDataNotFound
+sdmporttest> 
+sdmporttest> # close the port
+sdmporttest> 
+sdmporttest> port close port1
+data port port1: closed
+sdmporttest> port shutdown port1
+data port port1: shutdown
+sdmporttest> port delete port1
+data port port1: deleted
+sdmporttest> 
+sdmporttest> quit

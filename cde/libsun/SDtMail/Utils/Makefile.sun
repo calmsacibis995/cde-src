@@ -1,0 +1,88 @@
+# "@(#)Makefile.sun	1.27 96/07/09 SMI"
+
+.KEEP_STATE:
+.PARALLEL:
+
+# Paths
+BINDIR  = ../../bin
+INCDIR  = -I../include -I.. -I$(CCLIENT)/include
+STATIC_OBJDIR  = ../../static_objs
+SHARED_OBJDIR  = ../../shared_objs
+SHARED_LIBDIR  = ../../shared_libs
+SHARED_LIB = $(SHARED_LIBDIR)/libutils.so
+
+BASENAME = /usr/bin/basename
+
+CCLIENT = /net/jans/export1/c-client
+MOTIFHOME = /usr/dt
+OPENWINHOME = /usr/openwin
+
+# Default target is to build shared
+default: shared
+all: shared static
+
+# Create all required directories up front
+.INIT: $(SHARED_OBJDIR) $(STATIC_OBJDIR) $(SHARED_LIBDIR)
+
+$(SHARED_OBJDIR) $(STATIC_OBJDIR) $(SHARED_LIBDIR):
+	@test -d $@ || mkdir $@
+
+# Hooks to perform removes for make clean
+RM = rm -f
+RM_CMD = $(RM) *.i *.CKP *.ln *.BAK *.bak *.o core errs ,* *~ *.a .emacs_* \
+	tags TAGS make.log make.out .make.state MakeOut
+
+CC-G = CC -G -z text
+
+# Compile Time Flags
+TMLT_FLAGS = 
+THREAD_FLAGS = -D_REENTRANT -mt
+SDMDEBFLAGS	= -g
+CCFLAGS += $(SDMDEBFLAGS) $(TMLT_FLAGS) $(THREAD_FLAGS)
+
+# Make Dependencies and Rules
+SRCS = \
+	CclientUtility.cc	\
+	DataTypeUtility.cc	\
+	LockUtility.cc		\
+	MemoryUtility.cc	\
+	MessageUtility.cc	\
+	SystemUtility.cc	\
+	Utility.cc
+
+OBJS = $(SRCS:%.cc=$(VARIANT)/%.o)
+
+CPPFLAGS    +=   $(INCDIR) \
+                -I$(OPENWINHOME)/include \
+                -I$(MOTIFHOME)/include
+
+$$(VARIANT)/%.o: %.cc
+	$(COMPILE.cc) $< -o $@
+
+# Static Variant - just build the object files
+static := CCFLAGS += -ptr$(STATIC_OBJDIR)
+static := VARIANT = $(STATIC_OBJDIR)
+static: $$(OBJS)
+
+# Shared variant
+shared := CCFLAGS += -ptr$(SHARED_OBJDIR) -KPIC
+shared := VARIANT = $(SHARED_OBJDIR)
+shared: $$(SHARED_LIB)
+
+$(SHARED_LIB): $$(OBJS)
+	$(CC-G) -o $@ -h `$(BASENAME) $@` -ptr. -ptr$(SHARED_OBJDIR) $(OBJS)
+
+Makefiles:
+	rm -f Makefile
+	ln -s Makefile.sun Makefile
+
+clean_static := VARIANT = $(STATIC_OBJDIR)
+clean_static:
+	@$(RM) $(OBJS)
+
+clean_shared := VARIANT = $(SHARED_OBJDIR)
+clean_shared:
+	@$(RM) $(OBJS) $(SHARED_LIB)
+
+clean: clean_static clean_shared
+	@$(RM_CMD) "#"*

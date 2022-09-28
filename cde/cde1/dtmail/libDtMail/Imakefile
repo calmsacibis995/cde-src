@@ -1,0 +1,169 @@
+XCOMM
+XCOMM	RESTRICTED CONFIDENTIAL INFORMATION:
+XCOMM	
+XCOMM	The information in this document is subject to special
+XCOMM	restrictions in a confidential disclosure agreement bertween
+XCOMM	HP, IBM, Sun, USL, SCO and Univel.  Do not distribute this
+XCOMM	document outside HP, IBM, Sun, USL, SCO, or Univel wihtout
+XCOMM	Sun's specific written approval.  This documment and all copies
+XCOMM	and derivative works thereof must be returned or destroyed at
+XCOMM	Sun's request.
+XCOMM
+XCOMM	Copyright 1993 Sun Microsystems, Inc.  All rights reserved.
+XCOMM
+XCOMM	@(#)Imakefile	1.40 03/01/95
+XCOMM
+
+#ifdef SunArchitecture
+.NO_PARALLEL:
+#endif
+
+#ifndef DoNormalLib
+#define DoNormalLib NormalLibDtMail
+#endif
+#ifndef DoSharedLib
+#define DoSharedLib SharedLibDtMail
+#endif
+
+/*
+ * I turned this off so that it would stop trying to rebuild imake.
+ * Imake is another component, let them build it.
+ */
+#undef  ImakeDependency
+#define ImakeDependency(dummy)	/**/
+
+#define IHaveSubdirs
+#define PassCDebugFlags /**/
+
+/*
+ * We need to define a new archive library target that builds a .a
+ * and has a different dependency and $(OBJ)
+ */
+#undef NormalLibraryTarget
+#define NormalLibraryTarget(libname,depends,objlist)			@@\
+AllTarget(Concat(lib,libname.a))					@@\
+									@@\
+Concat(lib,libname.a): depends	OtherObjects.List			@@\
+	$(RM) $@							@@\
+	CreateHPVersion()						@@\
+	$(AR) $@ objlist $(HP_VERSION_OBJ)				@@\
+	RemoveHPVersion()						@@\
+	RanLibrary($@)
+
+#if defined(USLArchitecture)
+#ifdef DoNormalLib
+#undef DoNormalLib
+#endif
+#endif
+
+#ifdef SunArchitecture
+#undef DoNormalLib
+#undef DoSharedLib
+
+#define DoNormalLib NormalLibDtMail
+#define DoSharedLib SharedLibDtMail
+
+REQUIREDLIBS	=	
+
+#ifdef USE_SPRO_V3
+REQUIREDLIBS	+=      -noex
+#ifdef DEBUGTREE
+REQUIREDLIBS	+=      -g -xsb
+#endif
+#else
+REQUIREDLIBS	+=	-L$(SUNPRO_DIR)/lib
+#endif
+
+#if DoSharedLib
+/*
+ * We need to define our own shared library target. We can not link using
+ * ld because we depend on the -mt flag to do the right thing when linking
+ * and we need to have a special depend target (OtherObjects.List).
+ *
+ */
+SOMDTMAILREV	=	1
+
+#undef SharedLibraryTarget
+#define SharedLibraryTarget(libname,rev,solist,down,up)			@@\
+AllTarget(Concat(lib,libname.so.rev))					@@\
+									@@\
+Concat(lib,libname.so.rev): OtherObjects.List				@@\
+	$(RM) $@							@@\
+	$(C++) -Qoption ld -ztext $(RUNPATH)		\
+		-o up/$@ $(SHLIBLDFLAGS) 				\
+		-h Concat(lib,libname.so.rev) solist $(REQUIREDLIBS)	@@\
+	$(RM) Concat(lib,libname.so)					@@\
+	$(LN) $@ Concat(lib,libname.so)					@@\
+									@@\
+clean::									@@\
+	$(RM) lib*so* lib*.a
+
+#endif /* DoSharedLib */
+
+#endif /* SunArchitecture */
+
+SUBDIRS		=	Common RFC
+
+MakeSubdirs($(SUBDIRS))
+DependSubdirs($(SUBDIRS))
+
+OBJS_LISTS	= \
+			Common/Obj.List \
+			RFC/Obj.List
+
+OBJ_FILES	=	`cat OtherObjects.List`
+
+#if defined(USLArchitecture)
+REQUIREDLIBS    =       $(OBJ_FILES)
+SHLIBLDFLAGS    = -G -z text
+SOMDTMAILREV    = 1
+#endif
+
+#include <Library.tmpl>
+
+LibraryObjectRule()
+
+/* For install of developer's build environment */
+LOCAL_BINSTALL_LIBDEST = lib
+
+all:: OtherObjects.List
+ 
+OtherObjects.List : $(OBJS_LISTS)
+        cat $(OBJS_LISTS) > $@
+        @$(RM) libDtmail*
+
+#ifdef SunArchitecture
+
+#if DoSharedLib
+SharedLibraryTarget(DtMail,$(SOMDTMAILREV),$(OBJS),.,.)
+#else
+NormalLibraryTarget(DtMail,OtherObjects.List,$(OBJ_FILES))
+#endif
+
+clean::
+	$(RM) -r .sh .make.state
+
+#else /* ! SunArchitecture */
+
+#if DoSharedLib
+SharedLibraryTarget(DtMail,$(SOMDTMAILREV),$(OBJS),.,.)
+#ifdef HPArchitecture
+OBJS		=	$(OBJ_FILES)
+all:: loadlibDtMail.sl
+#endif
+#endif
+#if DoNormalLib
+NormalLibraryTarget(DtMail,OtherObjects.List,$(OBJ_FILES))
+#endif
+
+#endif /* ! SunArchitecture */
+
+#ifndef SunArchitecture
+DependTarget()
+#endif
+
+MakeDirectories(install,$(INCDIR)/Dt)
+
+clean::
+	$(RM) OtherObjects.List
+

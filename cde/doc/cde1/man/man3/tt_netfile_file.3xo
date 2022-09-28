@@ -1,0 +1,121 @@
+.TH tt_netfile_file 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+tt_netfile_file \- map between canonical and local pathnames on the local host
+.SH SYNOPSIS
+.yS
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'char *tt_netfile_file('u
+char *tt_netfile_file(const char *\f2netfilename\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn tt_netfile_file
+function
+converts a
+.I netfilename
+of the format returned by
+.Fn tt_file_netfile 3
+to a pathname that is valid on the local host.
+If the file
+is not currently mounted on the local host,
+.Fn tt_netfile_file
+constructs a pathname of the form:
+.Cs I
+.RI / mountpoint / host / filepath
+.Ce
+.P
+where
+.I mountpoint
+is the mount point pathname in
+the environment variable
+.IR DTMOUNTPOINT ,
+or
+.B /net
+if the variable is null or unset.
+.P
+The
+.I netfilename
+argument is a copy of a null-terminated string returned by
+.Fn tt_netfile_file 3
+or
+.Fn tt_host_netfile_file 3.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn tt_netfile_file
+function returns
+a null-terminated local filename;
+otherwise, it returns an error pointer.
+The application can use
+.Fn tt_ptr_error 3
+to extract one of the following
+.B Tt_status
+values from the returned pointer:
+.VL 8
+.Lc TT_ERR_NETFILE
+.br
+The
+.I netfilename
+argument
+is not a valid netfilename.
+.LE
+.SH "APPLICATION USAGE"
+The
+.Fn tt_file_netfile 3,
+.Fn tt_netfile_file 3,
+.Fn tt_host_file_netfile 3
+and
+.Fn tt_host_netfile_file 3
+functions allow an
+application to determine a path valid on remote hosts,
+perhaps for purposes of constructing a command string valid for remote
+execution on that host.
+By composing the two calls, paths for files not accessible from the
+current host can be constructed.
+For example, if path
+.B /sample/file
+is valid on host A, a program
+running on host B can use
+.Cs I
+tt_host_netfile_file("C", tt_host_file_netfile("A", "/sample/file"))
+.Ce
+to determine a path to the same file valid on host C, if such a
+path is possible.
+.P
+The
+.I netfilename
+string input to
+.Fn tt_netfile_file
+should be considered opaque;
+the content and format of the strings are not a public interface.
+These strings can be safely copied (with
+.Fn strcpy 3C
+or similar methods), written to files, or transmitted
+to other processes, perhaps on other hosts.
+.P
+The
+.I mountpoint
+value is intended to be the mount point for the automounter's host map
+on those systems supporting automounting services.
+.P
+Allocated strings should be freed using either
+.Fn tt_free 3
+or
+.Fn tt_release 3.
+.P
+The
+.Fn tt_open 3
+function need not be called before
+.Fn tt_netfile_file .
+.SH "SEE ALSO"
+.Hd Tt/tt_c.h 5,
+.Fn tt_file_netfile 3,
+.Fn tt_host_file_netfile 3,
+.Fn tt_host_netfile_file 3,
+.Fn tt_open 3,
+.Fn tt_free 3,
+.Fn tt_release 3.

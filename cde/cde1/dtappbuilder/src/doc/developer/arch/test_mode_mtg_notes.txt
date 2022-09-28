@@ -1,0 +1,130 @@
+				 Test Mode
+			       Meeting Notes
+			Thu Dec 15 15:00:00 PST 1994
+
+This meeting was called to determine what should be done with Test
+Mode. There has been no real *design* of Test Mode and there are a
+significant and potientially endless amount of bugs against it. The major
+problem is that when you build->test->build the appearance of the objects is
+different when you re-enter build mode. The user is faced with the question:
+What do I get when I save? What's in props, or what's on the screen. 
+
+To start things off ~bfreeman/ab/arch/test_mode.txt was proposed as the
+basic design of Test Mode. With a few minor modifications, it was accepted
+as the correct base. 
+
+Once the design was accepted, how to bring the current implementation was
+discussed. The problem lies in getting the Test Mode manipulated widgets
+back into their properties definition.
+
+Constraints
+    o No Documentation Changes
+    o Performance
+    o Minimal Resources Used
+
+Possible solutions
+    1) Brute Force re-instantiation
+
+    2) intellegent re-instantiation
+        o dirty windows
+        	- window gains focus => re-set ui args
+        	- window is resized  => destroy and rebuild
+        	- connection to object in window => re-set ui args on window
+
+    3) Control of resetting to initial state:
+        a) always
+        b) ask on exit of test mode
+        c) configurable
+
+
+       	    	Pro  	    	    Con
+    1 & c	Low Cost    	    Slow
+
+    2 & a
+    2 & b   	Better Usability    More Work
+    2 & a/b
+
+
+Given the charter to attempt 2). Time frame given 2 days.
+
+
+Misc discussed
+
+o A possible implementation of determining if window was resized is to setup
+  a structure notify callback on the window shells. If resized then destroy
+  and re-instantiate the window.
+
+o The state of the windows, size/config, *is* saved in the attr fields of
+  the objects.
+
+o The iconified state is hard to determine
+
+o A Message Dispatch Tool to see/generate messages, and possibly
+  connections?, would be an interesting addition. 
+
+o tty output from app into a Output window ?
+
+o It is *OK* to write messages to stdout/stderr
+
+o Need Test Mode Assertions
+
+			   Implementation Details
+			     Discussion w/Jeff
+			Thu Dec 15 17:00:00 PST 1994
+
+Here is what we're trying to implement. For each window:
+    On focus or connection, reset the ui args on the tree
+    On resize, destroy and re-instantiate the tree
+
+add in the obj structure:
+
+    void *test_mode_data;
+
+like what was done for cgen_data and CGenFlags
+
+The test_mode_data structure should look something like:
+    struct {
+    	Boolean	    isDirty;	    /* window dirty */
+    	Boolean	    wasResized;	    /* window was resized */
+    }
+
+amply comment the data structure!
+
+steps
+-----
+o when go into test mode create the dirty list (use ABObjList => obj_list.h)
+o add to the dirty list when recieve focus or connection.
+
+o On exit from test mode postprocess for resize of windows. Trav the windows
+  in the app. If resized, compair get values to attr info; add to the dirty
+  list.
+
+o Cleanup. Walk the dirty list:
+    if wasResized
+    {
+    	destroy 
+    	re-instantiate
+    }
+    else if isDirty
+    {
+    	ui set args on tree
+    }
+
+It might be economical up front to trav the obj structure for windows and
+create a window list. It could be used for reference through out test mode.
+    
+Need a method to add/remove object specific functionality when enter/leave
+test mode.
+    Say the FSD needs to be configed before entering test mode and
+    unconfiged after test mode. Need a spot and a method.
+
+APIs needed:
+
+create_test_mode_data()   constructor
+destroy_test_mode_data()  destructor
+reset_test_mode_data()    reset to default values
+set_test_mode_flag()	  set a flag
+clear_test_mode_flag()    clear a flag
+
+obj_get_window()	    trav up til reach window parent
+

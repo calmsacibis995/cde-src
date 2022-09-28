@@ -1,0 +1,170 @@
+XCOMM @(#)Imakefile	1.30 97/04/29 SMI
+XCOMM Copyright (c) 1996 Sun Microsystems, Inc.
+
+#define IHaveSubdirs
+#define PassCDebugFlags 'C++DEBUGFLAGS=$(C++DEBUGFLAGS)'
+
+LIBTOPDIR = .
+LIBCURDIR = .
+
+#ifdef SunArchitecture
+#define SDMNOKEEPSTATE
+.NO_PARALLEL:
+#endif
+
+#include "ImakeSdm.tmpl"
+#include <Library.tmpl>
+
+#ifndef DoNormalLib
+#define DoNormalLib NormalLibSDtMail
+#endif
+#ifndef DoSharedLib
+#define DoSharedLib SharedLibSDtMail
+#endif
+#if ! DoNormalLib && ! DoSharedLib
+#undef  DoSharedLib
+#define DoSharedLib YES
+#endif
+#ifndef SharedSDtMailRev
+#define SharedSDtMailRev 2
+#endif
+
+INCDIR  = include
+LIBDIRS = CtrlObjs DataObjs DataStore DataStructs DataTypes \
+	  Manager PortObjs TranObjs Utils
+TESTDIR = TestApps
+
+SUBDIRS = $(INCDIR) $(LIBDIRS) $(TESTDIR)
+
+MakeSubdirs($(SUBDIRS))
+SdmTestSubdirs($(SUBDIRS))
+DependSubdirs($(SUBDIRS))
+
+CtrlObjs_OBJS = \
+	CtrlObjs/Disp.o \
+	CtrlObjs/RepSWER.o \
+	CtrlObjs/RepSWMR.o \
+	CtrlObjs/ReplyQueue.o \
+	CtrlObjs/RequestQueue.o \
+	CtrlObjs/TickDisp.o \
+	CtrlObjs/TimeDisp.o
+
+DataObjs_OBJS = \
+	DataObjs/Data.o \
+	DataObjs/Message.o \
+	DataObjs/MessageBody.o \
+	DataObjs/MessageEnvelope.o \
+	DataObjs/OutgoingMessage.o
+
+DataStore_OBJS = \
+	DataStore/MessageStore.o \
+	DataStore/OutgoingStore.o \
+	DataStore/Server.o
+
+DataStructs_OBJS = \
+	DataStructs/DeliveryResponse.o \
+	DataStructs/Error.o \
+	DataStructs/Prim.o \
+	DataStructs/RecursiveMutexEntry.o \
+	DataStructs/RWLockEntry.o \
+	DataStructs/Search.o \
+	DataStructs/ServiceFunction.o \
+	DataStructs/TodoVec.o \
+	DataStructs/Token.o
+
+DataTypes_OBJS = \
+	DataTypes/ContentBuffer.o \
+	DataTypes/DoubleLinkedList.o \
+	DataTypes/LinkedList.o \
+	DataTypes/SimpleTuples.o \
+	DataTypes/String.o \
+	DataTypes/Time.o
+
+Manager_OBJS = \
+	Manager/Connection.o \
+	Manager/ISess.o \
+	Manager/MailRc.o \
+	Manager/OSess.o \
+	Manager/Session.o \
+	Manager/SessionLink.o
+
+PortObjs_OBJS = \
+	PortObjs/CclientCallbacks.o \
+	PortObjs/DataChan.o \
+	PortObjs/DataChanCclient.o \
+	PortObjs/DataChanTclient.o \
+	PortObjs/DataChanEditMsg.o \
+	PortObjs/DataChanSmtp.o \
+	PortObjs/DataPort.o \
+	PortObjs/DynamicPredicateUtility.o \
+	PortObjs/PortObjects.o \
+	PortObjs/SearchEngine.o
+
+TranObjs_OBJS = \
+	TranObjs/ArgumentList.o \
+	TranObjs/Reply.o \
+	TranObjs/Request.o \
+	TranObjs/SyncRequestEntry.o 
+
+Utils_OBJS = \
+	Utils/CclientUtility.o \
+	Utils/DataTypeUtility.o	\
+	Utils/LockUtility.o \
+	Utils/MessageUtility.o \
+	Utils/SystemUtility.o \
+	Utils/Utility.o \
+	Utils/md5c_opt.o
+
+OBJS	= \
+	$(CtrlObjs_OBJS) \
+	$(DataObjs_OBJS) \
+	$(DataStore_OBJS) \
+	$(DataStructs_OBJS) \
+	$(DataTypes_OBJS) \
+	$(Manager_OBJS) \
+	$(PortObjs_OBJS) \
+	$(TranObjs_OBJS) \
+	$(Utils_OBJS)
+
+LIB_NAME = SDtMail
+LIB_REV	 = SharedSDtMailRev
+
+#ifdef SunArchitecture
+
+#if OSMajorVersion > 5 || (OSMajorVersion == 5 && OSMinorVersion > 5)
+EXTRA_REQUIREDLIBS      = -lsocket -lnsl -mt 
+#else
+EXTRA_REQUIREDLIBS      = -lsocket -lnsl 
+#endif
+
+LD			= $(C++)
+SHLIBLDFLAGS 		= $(SDMSHLIBLDFLAGS)
+#endif
+
+REQUIREDLIBS = $(DTSVCLIB) $(EXTRA_REQUIREDLIBS)
+
+LibraryObjectRule()
+
+/* For install of developer's build environment */
+LOCAL_BINSTALL_LIBDEST = lib
+
+#if DoSharedLib
+#if DoNormalLib
+SharedLibraryTarget($(LIB_NAME),$(LIB_REV),$(OBJS),shared,..)
+#else
+SharedLibraryTarget($(LIB_NAME),$(LIB_REV),$(OBJS),.,.)
+#endif /* DoNormalLib */
+SharedLibraryBuildInstall($(LIB_NAME),$(LIB_REV),$(LOCAL_BINSTALL_LIBDEST))
+InstallSharedLibrary($(LIB_NAME),$(LIB_REV),$(USRLIBDIR))
+#endif /* DoSharedLib */
+
+#if DoNormalLib
+NormalLibraryTarget($(LIB_NAME),$(OBJS))
+NormalLibraryBuildInstall($(LIB_NAME),$(LOCAL_BINSTALL_LIBDEST))
+InstallLibrary($(LIB_NAME),$(USRLIBDIR))
+#endif
+
+DependTarget()
+
+clean::
+	$(RM) -r Templates.DB

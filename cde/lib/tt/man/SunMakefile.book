@@ -1,0 +1,455 @@
+# Makefile for Solaris ToolTalk Reference Manual, version 3.5
+#  
+# Revised 2/96 William Sisson
+#
+#       
+#       
+
+
+REGISTERS	= -rO -rD1 -rF1 -rP1 
+INDEX		= index.assist
+EXTRAS		=
+RELEASE		=
+PREFACE		= preface
+
+# NOTE: The FILES list should NOT contain any shadow files
+# The Intro should be first; all others in alphabetical order
+
+FILES1		=	\
+	man1/Intro.1\
+	man1/tt_enumerated_types.1\
+	man1/tt_type_comp.1\
+	man1/ttcp.1\
+	man1/ttmv.1\
+	man1/ttrm.1\
+	man1/ttrmdir.1\
+	man1/ttsession.1\
+	man1/ttsnoop.6 \
+	man1/tttar.1\
+	man1/tttrace.1
+	
+FILES1M		=	\
+	man1m/Intro.1m \
+	man1m/ttdbck.1m\
+	man1m/ttdbserver.1m
+
+FILES3		= 	 \
+	man3/Intro.3\
+	man3/tt_bcontext_join.3\
+	man3/tt_bcontext_quit.3\
+	man3/tt_close.3\
+	man3/tt_context_join.3\
+	man3/tt_context_quit.3\
+	man3/tt_default_file.3\
+	man3/tt_default_file_set.3\
+	man3/tt_default_procid.3\
+	man3/tt_default_procid_set.3\
+	man3/tt_default_ptype.3\
+	man3/tt_default_ptype_set.3\
+	man3/tt_default_session.3\
+	man3/tt_default_session_set.3\
+	man3/tt_error.3\
+	man3/tt_error_int.3\
+	man3/tt_error_pointer.3\
+	man3/tt_fd.3\
+	man3/tt_feature_enabled.3\
+	man3/tt_feature_required.3\
+	man3/tt_file_copy.3\
+	man3/tt_file_destroy.3\
+	man3/tt_file_join.3\
+	man3/tt_file_move.3\
+	man3/tt_file_netfile.3\
+	man3/tt_file_objects_query.3\
+	man3/tt_file_quit.3\
+	man3/tt_free.3\
+	man3/tt_host_file_netfile.3\
+	man3/tt_host_netfile_file.3\
+	man3/tt_icontext_join.3\
+	man3/tt_icontext_quit.3\
+	man3/tt_initial_session.3\
+	man3/tt_int_error.3\
+	man3/tt_is_err.3\
+	man3/tt_malloc.3\
+	man3/tt_mark.3\
+	man3/tt_message_abstainer.3\
+	man3/tt_message_abstainers_count.3\
+	man3/tt_message_accept.3\
+	man3/tt_message_accepter.3\
+	man3/tt_message_accepters_count.3\
+	man3/tt_message_address.3\
+	man3/tt_message_address_set.3\
+	man3/tt_message_arg_add.3\
+	man3/tt_message_arg_bval.3\
+	man3/tt_message_arg_bval_set.3\
+	man3/tt_message_arg_ival.3\
+	man3/tt_message_arg_ival_set.3\
+	man3/tt_message_arg_mode.3\
+	man3/tt_message_arg_type.3\
+	man3/tt_message_arg_val.3\
+	man3/tt_message_arg_val_set.3\
+	man3/tt_message_arg_xval.3\
+	man3/tt_message_arg_xval_set.3\
+	man3/tt_message_args_count.3\
+	man3/tt_message_barg_add.3\
+	man3/tt_message_bcontext_set.3\
+	man3/tt_message_callback_add.3\
+	man3/tt_message_class.3\
+	man3/tt_message_class_set.3\
+	man3/tt_message_context_bval.3\
+	man3/tt_message_context_ival.3\
+	man3/tt_message_context_set.3\
+	man3/tt_message_context_slotname.3\
+	man3/tt_message_context_val.3\
+	man3/tt_message_context_xval.3\
+	man3/tt_message_contexts_count.3\
+	man3/tt_message_create.3\
+	man3/tt_message_create_super.3\
+	man3/tt_message_destroy.3\
+	man3/tt_message_disposition.3\
+	man3/tt_message_disposition_set.3\
+	man3/tt_message_fail.3\
+	man3/tt_message_file.3\
+	man3/tt_message_file_set.3\
+	man3/tt_message_gid.3\
+	man3/tt_message_handler.3\
+	man3/tt_message_handler_ptype.3\
+	man3/tt_message_handler_ptype_set.3\
+	man3/tt_message_handler_set.3\
+	man3/tt_message_iarg_add.3\
+	man3/tt_message_icontext_set.3\
+	man3/tt_message_id.3\
+	man3/tt_message_object.3\
+	man3/tt_message_object_set.3\
+	man3/tt_message_op.3\
+	man3/tt_message_op_set.3\
+	man3/tt_message_opnum.3\
+	man3/tt_message_otype.3\
+	man3/tt_message_otype_set.3\
+	man3/tt_message_pattern.3\
+	man3/tt_message_print.3\
+	man3/tt_message_receive.3\
+	man3/tt_message_reject.3\
+	man3/tt_message_rejecter.3\
+	man3/tt_message_rejecters_count.3\
+	man3/tt_message_reply.3\
+	man3/tt_message_scope.3\
+	man3/tt_message_scope_set.3\
+	man3/tt_message_send.3\
+	man3/tt_message_send_on_exit.3\
+	man3/tt_message_sender.3\
+	man3/tt_message_sender_ptype.3\
+	man3/tt_message_sender_ptype_set.3\
+	man3/tt_message_session.3\
+	man3/tt_message_session_set.3\
+	man3/tt_message_state.3\
+	man3/tt_message_status.3\
+	man3/tt_message_status_set.3\
+	man3/tt_message_status_string.3\
+	man3/tt_message_status_string_set.3\
+	man3/tt_message_uid.3\
+	man3/tt_message_user.3\
+	man3/tt_message_user_set.3\
+	man3/tt_message_xarg_add.3\
+	man3/tt_message_xcontext_set.3\
+	man3/tt_netfile_file.3\
+	man3/tt_objid_equal.3\
+	man3/tt_objid_objkey.3\
+	man3/tt_onotice_create.3\
+	man3/tt_open.3\
+	man3/tt_orequest_create.3\
+	man3/tt_otype_base.3\
+	man3/tt_otype_derived.3\
+	man3/tt_otype_deriveds_count.3\
+	man3/tt_otype_hsig_arg_mode.3\
+	man3/tt_otype_hsig_arg_type.3\
+	man3/tt_otype_hsig_args_count.3\
+	man3/tt_otype_hsig_count.3\
+	man3/tt_otype_hsig_op.3\
+	man3/tt_otype_is_derived.3\
+	man3/tt_otype_opnum_callback_add.3\
+	man3/tt_otype_osig_arg_mode.3\
+	man3/tt_otype_osig_arg_type.3\
+	man3/tt_otype_osig_args_count.3\
+	man3/tt_otype_osig_count.3\
+	man3/tt_otype_osig_op.3\
+	man3/tt_pattern_address_add.3\
+	man3/tt_pattern_arg_add.3\
+	man3/tt_pattern_barg_add.3\
+	man3/tt_pattern_bcontext_add.3\
+	man3/tt_pattern_callback_add.3\
+	man3/tt_pattern_category.3\
+	man3/tt_pattern_category_set.3\
+	man3/tt_pattern_class_add.3\
+	man3/tt_pattern_context_add.3\
+	man3/tt_pattern_create.3\
+	man3/tt_pattern_destroy.3\
+	man3/tt_pattern_disposition_add.3\
+	man3/tt_pattern_file_add.3\
+	man3/tt_pattern_iarg_add.3\
+	man3/tt_pattern_icontext_add.3\
+	man3/tt_pattern_object_add.3\
+	man3/tt_pattern_op_add.3\
+	man3/tt_pattern_opnum_add.3\
+	man3/tt_pattern_otype_add.3\
+	man3/tt_pattern_print.3\
+	man3/tt_pattern_register.3\
+	man3/tt_pattern_scope_add.3\
+	man3/tt_pattern_sender_add.3\
+	man3/tt_pattern_sender_ptype_add.3\
+	man3/tt_pattern_session_add.3\
+	man3/tt_pattern_state_add.3\
+	man3/tt_pattern_unregister.3\
+	man3/tt_pattern_user.3\
+	man3/tt_pattern_user_set.3\
+	man3/tt_pattern_xarg_add.3\
+	man3/tt_pattern_xcontext_add.3\
+	man3/tt_pnotice_create.3\
+	man3/tt_pointer_error.3\
+	man3/tt_prequest_create.3\
+	man3/tt_procid_session.3\
+	man3/tt_ptr_error.3\
+	man3/tt_ptype_declare.3\
+	man3/tt_ptype_exists.3\
+	man3/tt_ptype_opnum_callback_add.3\
+	man3/tt_ptype_undeclare.3\
+	man3/tt_release.3\
+	man3/tt_session_bprop.3\
+	man3/tt_session_bprop_add.3\
+	man3/tt_session_bprop_set.3\
+	man3/tt_session_join.3\
+	man3/tt_session_prop.3\
+	man3/tt_session_prop_add.3\
+	man3/tt_session_prop_count.3\
+	man3/tt_session_prop_set.3\
+	man3/tt_session_propname.3\
+	man3/tt_session_propnames_count.3\
+	man3/tt_session_quit.3\
+	man3/tt_session_types_load.3\
+	man3/tt_spec_bprop.3\
+	man3/tt_spec_bprop_add.3\
+	man3/tt_spec_bprop_set.3\
+	man3/tt_spec_create.3\
+	man3/tt_spec_destroy.3\
+	man3/tt_spec_file.3\
+	man3/tt_spec_move.3\
+	man3/tt_spec_prop.3\
+	man3/tt_spec_prop_add.3\
+	man3/tt_spec_prop_count.3\
+	man3/tt_spec_prop_set.3\
+	man3/tt_spec_propname.3\
+	man3/tt_spec_propnames_count.3\
+	man3/tt_spec_type.3\
+	man3/tt_spec_type_set.3\
+	man3/tt_spec_write.3\
+	man3/tt_status_message.3\
+	man3/tt_thread_procid.3\
+	man3/tt_thread_procid_set.3\
+	man3/tt_thread_session.3\
+	man3/tt_thread_session_set.3\
+	man3/tt_trace_control.3\
+	man3/tt_xcontext_join.3\
+	man3/tt_xcontext_quit.3\
+	man3/tt_X_session.3\
+	man3/ttdt_Get_Modified.3\
+	man3/ttdt_Revert.3\
+	man3/ttdt_Save.3\
+	man3/ttdt_close.3\
+	man3/ttdt_file_event.3\
+	man3/ttdt_file_join.3\
+	man3/ttdt_file_notice.3\
+	man3/ttdt_file_quit.3\
+	man3/ttdt_file_request.3\
+	man3/ttdt_message_accept.3\
+	man3/ttdt_open.3\
+	man3/ttdt_sender_imprint_on.3\
+	man3/ttdt_session_join.3\
+	man3/ttdt_session_quit.3\
+	man3/ttdt_subcontract_manage.3\
+	man3/ttmedia_Deposit.3\
+	man3/ttmedia_load.3\
+	man3/ttmedia_load_reply.3\
+	man3/ttmedia_ptype_declare.3\
+	man3/tttk_Xt_input_handler.3\
+	man3/tttk_block_while.3\
+	man3/tttk_message_abandon.3\
+	man3/tttk_message_create.3\
+	man3/tttk_message_destroy.3\
+	man3/tttk_message_fail.3\
+	man3/tttk_message_reject.3\
+	man3/tttk_op_string.3\
+	man3/tttk_string_op.3
+
+FILES4		=	\
+	man4/Intro.4\
+	man4/ttDesktop.4 \
+	man4/ttMedia.4 \
+	man4/ttPolicy.4 \
+	man4/Deposit.4\
+	man4/Display.4\
+	man4/Edit.4\
+	man4/Get_Environment.4\
+	man4/Get_Geometry.4\
+	man4/Get_Iconified.4\
+	man4/Get_Locale.4\
+	man4/Get_Mapped.4\
+	man4/Get_Modified.4\
+	man4/Get_Situation.4\
+	man4/Get_Status.4\
+	man4/Get_Sysinfo.4\
+	man4/Get_XInfo.4\
+	man4/hostname_map.4\
+	man4/Lower.4\
+	man4/Mail.4\
+	man4/Modified.4\
+	man4/partition_map.4\
+	man4/Pause.4\
+	man4/Print.4\
+	man4/Quit.4\
+	man4/Raise.4\
+	man4/Resume.4\
+	man4/Revert.4\
+	man4/Reverted.4\
+	man4/Save.4\
+	man4/Saved.4\
+	man4/Set_Environment.4\
+	man4/Set_Geometry.4\
+	man4/Set_Iconified.4\
+	man4/Set_Locale.4\
+	man4/Set_Mapped.4\
+	man4/Set_Situation.4\
+	man4/Signal.4\
+	man4/Started.4\
+	man4/Status.4\
+	man4/Stopped.4\
+	man4/Translate.4\
+	man4/ttsession_file.4\
+	man4/tttracefile.4
+
+FILES5		=	\
+	man5/Intro.5\
+	man5/tttk.5 \
+	man5/tt_c.5
+	
+FILES6		=	\
+	man6/Intro.6\
+	man6/ttsample1.6
+
+
+book: doc_tt1.dit doc_tt1m.dit doc_tt3.dit doc_tt4.dit doc_tt5.dit doc_tt6.dit index.dit \
+	preface.dit contents.dit cover.dit credits_fr.dit split
+
+#book: doc_tt1.dit doc_tt1m.dit doc_tt3.dit doc_tt4.dit doc_tt5.dit doc_tt6.dit
+
+doc_tt1.dit: 	$(FILES1)
+	@echo
+	@echo      Making $@ from $<
+	@echo
+	xref  $(FILES1) | pic | tbl | eqn | troff $(REGISTERS) -t -mansun \
+	  $(EXTRAS) $(RELEASE) -  > doc_tt1.dit 2> slush.tmp
+	recode < slush.tmp > slush1.file
+	rm -f slush.tmp
+
+doc_tt1m.dit: 	$(FILES1M)
+	@echo
+	@echo      Making $@ from $<
+	@echo
+	xref  $(FILES1M) | pic | tbl | eqn | troff $(REGISTERS) -t -mansun \
+	  $(EXTRAS) $(RELEASE) -  > doc_tt1m.dit 2> slush.tmp
+	recode < slush.tmp > slush1m.file
+	rm -f slush.tmp
+	
+doc_tt3.dit: 	$(FILES3)
+	@echo
+	@echo      Making $@ from $<
+	@echo
+	xref  $(FILES3) | pic | tbl | eqn | troff $(REGISTERS) -t -mansun \
+	  $(EXTRAS) $(RELEASE) -  > doc_tt3.dit 2> slush.tmp
+	recode < slush.tmp > slush3.file
+	rm -f slush.tmp
+
+doc_tt4.dit: 	$(FILES4)
+	@echo
+	@echo      Making $@ from $<
+	@echo
+	xref  $(FILES4) | pic | tbl | eqn | troff $(REGISTERS) -t -mansun \
+	  $(EXTRAS) $(RELEASE) -  > doc_tt4.dit 2> slush.tmp
+	recode < slush.tmp > slush4.file
+	rm -f slush.tmp
+
+doc_tt5.dit: 	$(FILES5)
+	@echo
+	@echo      Making $@ from $<
+	@echo
+	xref  $(FILES5) | pic | tbl | eqn | troff $(REGISTERS) -t -mansun \
+	  $(EXTRAS) $(RELEASE) -  > doc_tt5.dit 2> slush.tmp
+	recode < slush.tmp > slush5.file
+	rm -f slush.tmp
+	
+doc_tt6.dit: 	$(FILES5)
+	@echo
+	@echo      Making $@ from $<
+	@echo
+	xref  $(FILES6) | pic | tbl | eqn | troff $(REGISTERS) -t -mansun \
+	  $(EXTRAS) $(RELEASE) -  > doc_tt6.dit 2> slush.tmp
+	recode < slush.tmp > slush6.file
+	rm -f slush.tmp
+	cat slush1.file slush1m.file slush3.file slush4.file slush5.file slush6.file> slush.file	
+
+
+index.dit: doc_tt1.dit
+	grep '^\.IE' slush.file | (echo .UH INDEX; index) | \
+	troff -mx -rC1 -rD1 -rF1 -t -rP`grep 'section 1:' slush.file | \
+	awk '{printf("%s", $$3+(($$3%2)+1))}'` > index.dit 2>>slush.tmp
+
+preface.dit: preface
+	troff -mx -t -rP5 $(PREFACE) > preface.dit
+
+contents.dit:
+#	(echo .UH CONTENTS ; egrep '^\.CE' slush.file) | \
+#	sed -e 's/[0-9][0-9]*\\(hy\([0-9][0-9]*\)/\1/' | \
+#	troff -mx -rC4 -t -rP3 > contents.dit 
+	tbl contents | troff -t -mx > contents.dit
+
+cover.dit: cover.mx
+	 troff -t -mx -rF1 cover.mx > cover.dit
+
+credits_fr.dit: credits_fr.mx
+	 troff -t -mx credits_fr.mx > credits_fr.dit
+
+paginate.dit:
+	recode < slush.tmp > slush.file
+	/home/tylie/bin/paginate.nl -b2 slush.file | pic |\
+                troff -t -mex /usr/doctools/lib/paginate.mex - > paginate.dit
+
+split: index.dit contents.dit preface.dit credits_fr.dit cover.dit
+	 cp cover.dit hardcopy.dit
+	 cat contents.dit >> hardcopy.dit
+	 cat preface.dit >> hardcopy.dit
+	 cat doc_tt1.dit >> hardcopy.dit
+	 cat doc_tt1m.dit >> hardcopy.dit
+	 cat doc_tt3.dit >> hardcopy.dit
+	 cat doc_tt4.dit >> hardcopy.dit
+	 cat doc_tt5.dit >> hardcopy.dit
+	 cat doc_tt6.dit >> hardcopy.dit	 
+	 cat index.dit >> hardcopy.dit
+	 cat credits_fr.dit >> hardcopy.dit
+
+#split: index.dit contents.dit preface.dit credits_fr.dit cover.dit
+#	 cp cover.dit hardcopy.dit
+#	 cat contents.dit >> hardcopy.dit
+#	 cat preface.dit >> hardcopy.dit
+#	 cat doc_tt1.dit >> hardcopy.dit
+#	 cat doc_tt1m.dit >> hardcopy.dit
+#	 cat doc_tt3.dit >> hardcopy.dit
+#	 cat doc_tt4.dit >> hardcopy.dit
+#	 cat doc_tt5.dit >> hardcopy.dit
+#	 cat doc_tt6.dit >> hardcopy.dit	 
+#	 cat index.dit >> hardcopy.dit
+#	 cat credits_fr.dit >> hardcopy.dit
+#	 ditsheet -o1-99	hardcopy.dit	> Part1.dit
+#	 ditsheet -o100-199	hardcopy.dit	> Part2.dit
+#	 ditsheet -o200-299     hardcopy.dit    > Part3.dit
+#	 ditsheet -o300-        hardcopy.dit    > Part4.dit
+
+clean:
+	rm -f slush.file slush.tmp slush1.file slush1m.file slush3.file slush4.file slush5.file slush6.file *.dit

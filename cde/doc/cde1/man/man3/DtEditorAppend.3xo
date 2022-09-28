@@ -1,0 +1,135 @@
+.TH DtEditorAppend 3 "30 July 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.\" *************************************************************************
+.SH NAME
+DtEditorAppend \- append data to a DtEditor widget
+.SH SYNOPSIS
+.yS
+#include <Dt/Editor.h>
+.sp 0.5v
+.ta \w'DtEditorErrorCode DtEditorAppend('u
+DtEditorErrorCode DtEditorAppend(Widget \f2widget\fP,
+	DtEditorContentRec *\f2data\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn DtEditorAppend
+function appends either a
+.Cn NULL -terminated
+string, wide character string or sized buffer
+after the last character in a DtEditor widget.
+The data is transferred to the DtEditor widget using a
+.BR DtEditorContentRec ,
+which indicates the
+type of data being transferred along with the actual data.
+After the data is appended, the insertion cursor is positioned at the
+new last character.
+.P
+The
+.I widget
+argument specifies the DtEditor widget ID.
+.P
+The
+.I data
+argument points to the data structure containing the data to append.
+.cde .P
+.cde For a complete definition of the DtEditor widget
+.cde and its associated resources, see
+.cde .Fn DtEditor 3.
+.P
+For a complete definition of
+.BR DtEditorContentRec ,
+see
+.Hd Dt/Editor 5.
+.SH "RETURN VALUE"
+.xos
+Upon successful completion, the
+.Fn DtEditorAppend
+function returns
+.Cn DtEDITOR_\%NO_ERRORS ;
+otherwise, it returns one of the following values:
+.xoe
+.cdes
+Upon successful completion, the
+.Fn DtEditorAppend
+function returns one of the following values:
+.VL 6
+.Lc DtEDITOR_NO_ERRORS
+.br
+The data was appended sucessfully.
+.Lc DtEDITOR_NULLS_REMOVED
+.br
+NULL characters were found and removed from the data.
+.LE
+.P
+Otherwise, if
+the
+.Fn DtEditorAppend
+function
+cannot append the data into the DtEditor widget,
+it returns one of the following values:
+.cdee
+.VL 6
+.Lc DtEDITOR_INVALID_TYPE
+.br
+The
+.I type
+field is unrecognized.
+.Lc DtEDITOR_ILLEGAL_SIZE
+.br
+The size of the buffer passed in is negative.
+.Lc DtEDITOR_NULL_ITEM
+.br
+The buffer is
+.Cn NULL .
+.cdes
+.Lc DtEDITOR_INSUFFICIENT_MEMORY
+.br
+Not enough system memory is available to append the data.
+.cdee
+.LE
+.SH EXAMPLES
+The following code segment sets the contents of a DtEditor
+widget to ``The quick brown fox.''
+.Cs I
+Widget                  editor;
+DtEditorContentRec      cr;
+DtEditorErrorCode       status;
+char                    *sampleString1="The quick",
+                        *secondString2=" brown fox";
+.sp 0.5v
+cr.type = DtEDITOR_TEXT;
+cr.value.string = sampleString1;
+status = DtEditorSetContents(editor, &cr);
+.xo if (status != DtEDITOR_NO_ERRORS) {
+.cde if (status != DtEDITOR_NO_ERRORS && status != DtEDITOR_NULLS_REMOVED) {
+        printf("Unable to set the contents of the widget\en");
+} else {
+        cr.type = DtEDITOR_TEXT;
+        cr.value.string = sampleString2;
+        status = DtEditorAppend(editor, &cr);
+        if (status != DtEDITOR_NO_ERRORS)
+                printf("Unable to append to the contents of the widget\en");
+}
+.Ce
+.SH "APPLICATION USAGE"
+If the data is in a disk file, rather than in memory, the application should
+use
+.Fn DtEditorAppendFromFile 3.
+.SH "SEE ALSO"
+.Hd Dt/Editor.h 5,
+.Fn DtEditor 3,
+.Fn DtEditorAppendFromFile 3,
+.Fn DtEditorGetContents 3,
+.Fn DtEditorInsert 3,
+.Fn DtEditorInsertFromFile 3,
+.Fn DtEditorReplace 3,
+.Fn DtEditorReplaceFromFile 3,
+.Fn DtEditorSaveContentsToFile 3,
+.Fn DtEditorSetContents 3,
+.Fn DtEditorSetContentsFromFile 3.

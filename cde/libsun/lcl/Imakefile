@@ -1,0 +1,37 @@
+XCOMM libsun @(#)Imakefile	1.8 97/06/04 SMI
+XCOMM Copyright (c) 1996, 1997 Sun Microsystems, Inc.
+
+.KEEP_STATE:
+.NO_PARALLEL:
+#
+# @(#)Imakefile	1.8 97/06/04
+#
+# Make the lcl library
+
+SHLIB           =       libc-lcl.so.1
+
+debug opt all: lcl includes .WAIT
+
+depend:
+
+includes::
+	if [ ! -d  include/lcl ]; then mkdir -p include/lcl; fi
+	if [ -f  include/lcl/lcl.h ]; then rm -f include/lcl/lcl.h; fi
+	ln -s ../../src/lcl.h include/lcl/lcl.h; \
+	if [ -d  ../../binstall/include/lcl ]; then set +x; \
+	else (set -x; mkdir -p ../../binstall/include/lcl ); fi
+	case '${MFLAGS}' in *[i]*) set +e;; esac; \
+	echo "  cd"  ../../binstall/include/lcl; cd ../../binstall/include/lcl; \
+	for i in lcl.h; do (set -x; $(RM) $$i; ln -s ../../../libsun/lcl/include/lcl/$$i .); done
+	if [ -d  ../../binstall/lib ]; then set +x; \
+	else (set -x; mkdir -p  ../../binstall/lib ); fi
+	case '${MFLAGS}' in *[i]*) set +e;; esac; \
+echo "  cd"  ../../binstall/lib; cd  ../../binstall/lib; \
+	for i in liblcl.a; do (set -x; $(RM) $$i; ln -s ../../libsun/lcl/lib/$$i .); done
+
+lcl:
+	(cd src;$(MAKE) all)
+
+clean::
+	$(RM) -r include lib
+	cd src;$(MAKE) clean 

@@ -1,0 +1,218 @@
+XCOMM $XConsortium: Imakefile /main/cde1_maint/5 1995/10/09 14:50:19 pascale $
+/************************************<+>*************************************
+ ****************************************************************************
+ **
+ **   File:        Imakefile
+ **
+ **   Project:     Desktop File Manager
+ **
+ **   Description: This Imakefile is used to create Makefile to build the
+ **                File Manager source files.
+ **
+ **  (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+ **  (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+ **  (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+ **  (c) Copyright 1993, 1994, 1995 Novell, Inc.
+ **
+ **
+ ****************************************************************************
+ ************************************<+>*************************************/
+
+DESKTOP_VERSION_STRING = DesktopVersionString
+
+#define IHaveSubdirs
+#define PassCDebugFlags 'CDEBUGFLAGS=$(CDEBUGFLAGS)'
+
+SUBDIRS = dtcopy
+LINTSUBDIRS = dtcopy
+
+MakeSubdirs($(SUBDIRS))
+DependSubdirs($(SUBDIRS))
+LintSubdirs($(LINTSUBDIRS))
+
+
+/* General case INCLUDES DEFINES LOCAL_LIBRARIES
+ * Each individual architecture may have more or less of the above.
+ * USE_libraryname in LOCAL_LIBRARIES is by default empty.
+ * It should be set when necessary to the real library macro name.
+ */
+DEFINES = -DXK_MISCELLANY -DSHAPE \
+                  -D_ILS_MACROS \
+                  -DCDE_INSTALLATION_TOP=\"$(CDE_INSTALLATION_TOP)\" \
+                  -DCDE_CONFIGURATION_TOP=\"$(CDE_CONFIGURATION_TOP)\"
+/* Why does dtfile need to include XMSRC. Looks bad */
+       INCLUDES = -I. -I../dtcompat -I./dtcopy -I$(BMSLIBSRC) -I$(XMSRC)
+
+/* DEPLIBS contains the list of library depencies for a client.
+ * LOCAL_LIBRARIES contains the list of libraries on the link line.
+ * Generally, the dependency form of a library has DEP as a prefix.
+ * e.g. put $(XLIB) in LOCAL_LIBRARIES and $(DEPXLIB) in DEPLIBS.
+ * NOTE: if DEPLIBS is not set here, it is by default null and there
+ *       are no library dependencies for clients.
+ *       You cannot put -Llibpath into DEPLIBS. You must put actual
+ *       paths to the library.
+ */
+#if defined (SunArchitecture)
+DEPLIBS = $(DEPDTSVCLIB) $(DEPDTWIDGETLIB) \
+                  $(DEPTTLIB) $(DEPXMLIB) $(DEPXTOOLLIB) $(DEPEXTENSIONLIB) $(DEPXLIB)
+LOCAL_LIBRARIES = $(DTSVCLIB) $(DTWIDGETLIB) \
+                  $(TTLIB) $(XMLIB) $(XTOOLLIB) $(EXTENSIONLIB) $(XLIB)
+#else
+DEPLIBS = $(DEPDTHELPLIB) $(DEPDTSVCLIB) $(DEPDTWIDGETLIB) \
+                  $(DEPTTLIB) $(DEPXMLIB) $(DEPXTOOLLIB) $(DEPXLIB)
+LOCAL_LIBRARIES = $(DTHELPLIB) $(DTSVCLIB) $(DTWIDGETLIB) \
+                  $(TTLIB) $(XMLIB) $(XTOOLLIB) $(XLIB)
+#endif /* SunArchitecture */
+SYS_LIBRARIES	= -lm
+
+
+EXTRA_DEFINES = -DXT_HAS_TRANS_FIX -DSUN_PERF -D_TT_MULTI_SCREEN \
+		-D_SHOW_LINK -DSUN_ACLFS
+
+#ifdef AlphaArchitecture
+EXTRA_DEFINES = -DMESSAGE_CAT -D_TOOLTALK -DXT_HAS_TRANS_FIX
+# EXTRA_DEFINES = -D_TOOLTALK -DXT_HAS_TRANS_FIX
+#endif
+
+#ifdef HPArchitecture
+#if OSMajorVersion < 8
+EXTRA_DEFINES = -DMESSAGE_CAT -DXT_HAS_TRANS_FIX
+#else
+EXTRA_DEFINES = -DMESSAGE_CAT
+#endif
+#endif
+
+#ifdef RsArchitecture
+SYS_LIBRARIES = -lm -liconv
+#endif
+
+
+
+#if defined (SunArchitecture)
+
+#ifdef REORDER_PROFILED
+SYS_LIBRARIES = -lm -ldl $(WIDECHARSYSLIB)
+CC = CcCmd -xpg $(BBAFLAGS)
+LOCAL_LDFLAGS = -L/usr/dt/lib -lmcount
+#else
+SYS_LIBRARIES = -lm -ldl $(WIDECHARSYSLIB)
+EXTRA_CCOPTIONS = -xF -xstrconst -dalign
+LOCAL_LDFLAGS = -M mapfile.reorder
+#endif
+
+#endif
+
+
+
+
+
+
+
+
+#if defined (USLArchitecture)
+SYS_LIBRARIES = -lm -ldl $(WIDECHARSYSLIB) -lgen
+#endif
+
+#if defined (UXPArchitecture)
+SYS_LIBRARIES = -lm -ldl $(WIDECHARSYSLIB) -lgen
+#endif
+
+#if defined(HPOSFArchitecture)
+#endif
+
+#if defined(ApolloArchitecture)
+EXTRA_DEFINES = -DMESSAGE_CAT -DXT_HAS_TRANS_FIX
+EXTRA_INCLUDES = -I/bsd4.3/usr/include -I/sys5/usr/include
+SYS_LIBRARIES = -lm
+#endif
+
+PROGRAMS=dtfile
+
+OBJS =  SharedMsgs.o	Help.o		HelpCB.o	HelpP.o \
+	Desktop.o \
+        ChangeDir.o	ChangeDirP.o	Command.o	Common.o \
+        Directory.o	File.o		FileOp.o	FileDialog.o \
+        FileManip.o	FileMgr.o	Filter.o	FilterP.o \
+        Find.o		FindP.o		fsDialog.o	IconWindow.o	Main.o \
+        MkDir.o		Menu.o		ModAttr.o	ModAttrP.o \
+        Prefs.o		PrefsP.o	Trash.o	\
+	Encaps.o	MultiView.o	SharedProcs.o	IconicPath.o \
+	version.o	ToolTalk.o	Utils.o \
+	OverWrite.o     dtcopy/sharedFuncs.o            dtcopy/fsrtns.o
+
+SRCS =  SharedMsgs.c	Help.c		HelpCB.c	HelpP.c \
+	Desktop.c \
+        ChangeDir.c	ChangeDirP.c	Command.c	Common.c \
+        Directory.c	File.c		FileOp.c	FileDialog.c \
+        FileManip.c	FileMgr.c	Filter.c	FilterP.c \
+        Find.c		FindP.c		fsDialog.c	IconWindow.c	Main.c \
+        MkDir.c		Menu.c		ModAttr.c	ModAttrP.c \
+        Prefs.c		PrefsP.c	Trash.c	\
+	Encaps.c	MultiView.c	SharedProcs.c	IconicPath.c \
+	version.c	ToolTalk.c	Utils.c		OverWrite.c
+
+all::
+NormalLibraryObjectRule()
+
+#ifdef i386
+/*
+  Problem with Menu.o with the new CBE 4.2 compilers.
+  The work around for now is to reduce the optimization
+  level to "xO1" for this file only.
+*/
+Menu.o:
+        $(RM) $@
+        $(CC) -c $(CFLAGS) -xO1 $(__NOOP__) $*.c
+#endif
+
+Directory.o File.o FileOp.o FileManip.o ModAttr.o Trash.o dtcopy/sharedFuncs.o := CCOPTIONS = -Xa
+
+/*  Bug fix 4043959 */
+Directory.o := CDEBUGFLAGS = -g
+
+/* The following is for an optimizer problem in the 9.0 release 300
+   compiler .
+*/
+#ifndef _BE_USED /* if chroot 9.0 official BE, no problem */
+#ifdef __hp9000s300
+#if (OSMajorVersion==9) && (OSMinorVersion==0)
+SpecialObjectRule(Trash.o,$(NULL),+O1)
+#endif
+#endif
+#endif
+
+ComplexProgramTarget($(PROGRAMS))
+
+/***** For dtge make a client_OBJS.o using client_main.o ******/
+/***** This implies the existence of client_main.c       ******/
+/***** dtge hidden symbols *******/
+#ifdef BuildHugeObject
+#ifdef HPArchitecture
+#ifdef __hp9000s300
+HIDDEN_SYMBOLS = -h _main -h __XmInputInGadget -h __XmInputForGadget \
+        -h __XmConfigureObject -h __XmResizeObject -h __XmMoveObject \
+        -h __XmRedisplayGadgets -h __XmDispatchGadgetInput \
+        -h _CancelOut 
+#else
+HIDDEN_SYMBOLS = -h main -h _XmInputInGadget -h _XmInputForGadget \
+        -h _XmConfigureObject -h _XmResizeObject -h _XmMoveObject \
+        -h _XmRedisplayGadgets -h _XmDispatchGadgetInput \
+        -h  CancelOut 
+#endif 
+SpecialRelocatableTarget(dtfile,$(HIDDEN_SYMBOLS),$(OBJS))
+#endif
+#endif
+
+LOCAL_CPP_DEFINES = -DCDE_INSTALLATION_TOP=$(CDE_INSTALLATION_TOP) \
+                    -DCDE_CONFIGURATION_TOP=$(CDE_CONFIGURATION_TOP)
+
+#if defined(USLArchitecture)
+    PREPROCESSCMD = $(CPP)
+#endif
+
+#if defined(UXPArchitecture)
+    PREPROCESSCMD = $(CPP)
+#endif
+
+CppTextRule(dtfile.config,dtfile.config.src,$(LOCAL_CPP_DEFINES),)
+CppTextRule(dtfile_error,dtfile_error.src,$(LOCAL_CPP_DEFINES),)

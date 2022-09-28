@@ -1,0 +1,54 @@
+/*
+ *+SNOTICE
+ *
+ *
+ *	$Revision: 1.3 $
+ *
+ *	RESTRICTED CONFIDENTIAL INFORMATION:
+ *	
+ *	The information in this document is subject to special
+ *	restrictions in a confidential disclosure agreement bertween
+ *	HP, IBM, Sun, USL, SCO and Univel.  Do not distribute this
+ *	document outside HP, IBM, Sun, USL, SCO, or Univel wihtout
+ *	Sun's specific written approval.  This documment and all copies
+ *	and derivative works thereof must be returned or destroyed at
+ *	Sun's request.
+ *
+ *	Copyright 1993 Sun Microsystems, Inc.  All rights reserved.
+ *
+ *+ENOTICE
+ */
+
+#ifndef I_HAVE_NO_IDENT
+#pragma ident "@(#)ObjectKey.hh	1.3 02/22/95"
+#endif
+
+#ifndef _OBJECTKEY_HH
+#define _OBJECTKEY_HH
+
+#include <DtMail/DtLanguages.hh>
+
+typedef char * ObjectKeyType;
+typedef short HashVal;
+
+class ObjectKey : public DtCPlusPlusAllocator {
+  public:
+    ObjectKey(ObjectKeyType type);
+    ObjectKey(ObjectKey &);
+    virtual ~ObjectKey(void);
+
+    virtual int operator==(ObjectKey &) = 0;
+    virtual int operator!=(ObjectKey &) = 0;
+    virtual int operator<(ObjectKey &) = 0;
+    virtual int operator>(ObjectKey &) = 0;
+    virtual int operator<=(ObjectKey &) = 0;
+    virtual int operator>=(ObjectKey &) = 0;
+
+    virtual HashVal hashValue(void) = 0;
+
+  protected:
+    ObjectKeyType	_type;
+    HashVal genericHashValue(void * buf, int len);
+};
+
+#endif

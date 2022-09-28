@@ -1,0 +1,97 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Novell, Inc
+...\" **
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH XmSetColorCalculation 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmSetColorCalculation\fP \- A function to set the procedure used for default color calculation
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/Xm.h>
+.sp \n(PDu
+XmColorProc XmSetColorCalculation (\fBcolor_proc\fI)
+.ta .5i 1.5i
+.nf
+	XmColorProc	\fBcolor_proc\fI;
+.wH
+.fi
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+\fIXmSetColorCalculation\fP sets the procedure to calculate
+default colors.
+This procedure is used to calculate the foreground, top shadow, bottom
+shadow, and select colors on the basis of a given background color.
+If called with an argument of NULL, it restores the default procedure
+used to calculate colors.
+.IP "\fBcolor_proc\fP"
+Specifies the procedure to use for color calculation.
+.PP 
+Following is a description of the \fIXmColorProc\fP type used by
+\fIXmSetColorCalculation\fP:
+.PP 
+.ne 2i
+.sS
+.iS
+void (*\fBcolor_proc\fI) (\fBbackground_color, foreground_color, select_color, top_shadow_color, bottom_shadow_color\fI)
+.ta 0.5i 1.5i
+.nf
+	XColor	\fB*background_color\fI;
+	XColor	\fB*foreground_color\fI;
+	XColor	\fB*select_color\fI;
+	XColor	\fB*top_shadow_color\fI;
+	XColor	\fB*bottom_shadow_color\fI;
+.wH
+.fi
+.iE
+.sE
+.PP 
+Specifies the procedure used to calculate default colors.
+The procedure is passed a pointer to an \fIXColor\fP structure
+representing the background color.
+The \fBpixel\fP, \fBred\fP, \fBgreen\fP, and \fBblue\fP members of this
+structure are filled in with values that are valid for the current
+colormap.
+.PP 
+The procedure is passed pointers to \fIXColor\fP structures representing
+the foreground, select, top shadow, and bottom shadow colors to be
+calculated.
+The procedure calculates and fills in the \fBred\fP, \fBgreen\fP, and
+\fBblue\fP members of these structures.
+The procedure should not allocate color cells for any of these colors.
+.IP "\fBbackground_color\fP"
+Specifies the background color.
+.IP "\fBforeground_color\fP"
+Specifies the foreground color to be calculated.
+.IP "\fBselect_color\fP"
+Specifies the select color to be calculated.
+.IP "\fBtop_shadow_color\fP"
+Specifies the top shadow color to be calculated.
+.IP "\fBbottom_shadow_color\fP"
+Specifies the bottom shadow color to be calculated.
+.SH RETURN VALUE
+Returns the color calculation procedure that was used at the time this
+routine was called.
+.SH RELATED INFORMATION
+.na
+\fIXmChangeColor(3X)\fP,
+\fIXmGetColors(3X)\fP, and
+\fIXmGetColorCalculation(3X)\fP.
+.ad

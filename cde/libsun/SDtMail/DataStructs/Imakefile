@@ -1,0 +1,49 @@
+XCOMM @(#)Imakefile	1.7 97/03/21 SMI
+XCOMM Copyright (c) 1996 Sun Microsystems, Inc.
+
+LIBTOPDIR = ..
+LIBCURDIR = DataStructs
+
+#include "../ImakeSdm.tmpl"
+#include <Library.tmpl>
+
+HEADERS  = \
+	MutexEntry.hh \
+	RecursiveMutexEntry.hh \
+	TodoVec.hh
+
+SRCS     = \
+	DeliveryResponse.cc \
+	Error.cc \
+	RecursiveMutexEntry.cc \
+	Prim.cc \
+	RWLockEntry.cc \
+	Search.cc \
+	ServiceFunction.cc \
+	TodoVec.cc \
+	Token.cc
+
+OBJS     = \
+	DeliveryResponse.o \
+	Error.o \
+	RecursiveMutexEntry.o \
+	Prim.o \
+	RWLockEntry.o \
+	Search.o \
+	ServiceFunction.o \
+	TodoVec.o \
+	Token.o
+
+INCLUDES = $(SDMINCLUDES)  $(SDMCCLIENTINCLUDES)
+DEFINES  = $(SDMDEFINES)
+
+LibraryObjectRule()
+
+AllTarget($(OBJS))
+
+SdmObjectListTarget($(LIBCURDIR),$(OBJS))
+
+SdmTestLibraryTarget($(LIBCURDIR),$(OBJS))
+
+DependTarget()
+

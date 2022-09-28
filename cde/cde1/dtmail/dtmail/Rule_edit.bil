@@ -1,0 +1,489 @@
+:bil-version	1 0
+:module Rule_edit
+(
+
+:element dialog
+(
+	:type			:dialog
+	:bg-color		"white"
+	:label			"Mailer - Rules Editor"
+	:resizable		:true
+	:visible		:false
+	:children		(
+		controlpane
+		dialog_button_panel
+	)
+)
+:element controlpane
+(
+	:type			:container
+	:container-type		:relative
+	:visible		:true
+	:active			:true
+	:border-frame		:none
+	:north-attachment	(:point 0 0)
+	:south-attachment	(:obj dialog -1)
+	:east-attachment	(:obj dialog -1)
+	:west-attachment	(:point 0 0)
+	:children		(
+		sep3
+		sep1
+		sep2
+		if_label
+		matchi_label_tf_gp
+		rule_on_off_checkbox
+		rule_name_tf
+		checkbox
+		then_label
+		action_gp
+	)
+)
+:element sep3
+(
+	:type			:separator
+	:line-style		:etched-in
+	:orientation		:horizontal
+	:x			-2
+	:y			540
+	:height			11
+	:visible		:true
+	:north-attachment	(:obj action_gp 15)
+	:east-attachment	(:obj controlpane 2)
+	:west-attachment	(:obj controlpane -2)
+)
+:element sep1
+(
+	:type			:separator
+	:line-style		:etched-in
+	:orientation		:horizontal
+	:x			0
+	:y			104
+	:height			10
+	:visible		:true
+	:north-attachment	(:obj rule_on_off_checkbox 23)
+	:east-attachment	(:obj controlpane -2)
+	:west-attachment	(:obj controlpane 0)
+)
+:element sep2
+(
+	:type			:separator
+	:line-style		:etched-in
+	:orientation		:horizontal
+	:x			-3
+	:y			323
+	:height			10
+	:visible		:true
+	:north-attachment	(:obj matchi_label_tf_gp 11)
+	:east-attachment	(:obj controlpane 5)
+	:west-attachment	(:point 0 -3)
+)
+:element if_label
+(
+	:type			:label
+	:x			33
+	:y			122
+	:label-type		:string
+	:label			"If message meets these criteria:\n"
+	:label-alignment	:center
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj sep1 8)
+	:west-attachment	(:point 0 33)
+)
+:element matchi_label_tf_gp
+(
+	:type			:container
+	:container-type		:group
+	:active			:true
+	:visible		:true
+	:x			146
+	:y			156
+	:group-type		:column
+	:column-alignment	:labels
+	:voffset		5
+	:vattach_type		:obj
+	:border-frame		:none
+	:north-attachment	(:obj if_label 0)
+	:west-attachment	(:point 0 146)
+	:children		(
+		editor_to_tf
+		editor_cc_tf
+		editor_to_or_cc_tf
+		editor_from_tf
+		editor_sub_tf
+	)
+)
+:element editor_to_tf
+(
+	:type			:text-field
+	:text-type		:alphanumeric
+	:label-type		:string
+	:label			"To:"
+	:label-position		:west
+	:num-columns		38
+	:max-length		80
+	:read-only		:false
+	:active			:true
+	:visible		:true
+)
+:element editor_cc_tf
+(
+	:type			:text-field
+	:text-type		:alphanumeric
+	:label-type		:string
+	:label			"Cc:"
+	:label-position		:west
+	:num-columns		38
+	:max-length		80
+	:read-only		:false
+	:active			:true
+	:visible		:true
+)
+:element editor_to_or_cc_tf
+(
+	:type			:text-field
+	:text-type		:alphanumeric
+	:label-type		:string
+	:label			"To or Cc:"
+	:label-position		:west
+	:num-columns		38
+	:max-length		80
+	:read-only		:false
+	:active			:true
+	:visible		:true
+)
+:element editor_from_tf
+(
+	:type			:text-field
+	:text-type		:alphanumeric
+	:label-type		:string
+	:label			"From:"
+	:label-position		:west
+	:num-columns		38
+	:max-length		80
+	:read-only		:false
+	:active			:true
+	:visible		:true
+)
+:element editor_sub_tf
+(
+	:type			:text-field
+	:text-type		:alphanumeric
+	:label-type		:string
+	:label			"Subject:"
+	:label-position		:west
+	:num-columns		38
+	:max-length		80
+	:read-only		:false
+	:active			:true
+	:visible		:true
+)
+:element rule_on_off_checkbox
+(
+	:type			:choice
+	:choice-type		:exclusive
+	:x			528
+	:y			21
+	:num-columns		1
+	:orientation		:vertical
+	:selection-required	:false
+	:active			:true
+	:visible		:true
+	:north-attachment	(:point 0 21)
+	:west-attachment	(:obj rule_name_tf 31)
+	:children		(
+		rule_on_off_checkbox_On_item
+		rule_on_off_checkbox_Off_item
+	)
+)
+:element rule_on_off_checkbox_On_item
+(
+	:type			:item
+	:item-type		:item-for-choice
+	:label-type		:string
+	:label			"On"
+	:active			:true
+	:selected		:true
+)
+:element rule_on_off_checkbox_Off_item
+(
+	:type			:item
+	:item-type		:item-for-choice
+	:label-type		:string
+	:label			"Off"
+	:active			:true
+	:selected		:false
+)
+:element rule_name_tf
+(
+	:type			:text-field
+	:text-type		:alphanumeric
+	:x			138
+	:y			28
+	:label-type		:string
+	:label			"Rule name:"
+	:label-position		:west
+	:num-columns		38
+	:max-length		80
+	:read-only		:false
+	:active			:true
+	:visible		:true
+	:north-attachment	(:point 0 28)
+	:west-attachment	(:point 0 138)
+)
+:element checkbox
+(
+	:type			:choice
+	:choice-type		:nonexclusive
+	:x			131
+	:y			64
+	:num-columns		1
+	:orientation		:vertical
+	:selection-required	:false
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj rule_name_tf 9)
+	:west-attachment	(:obj-edge rule_name_tf -7)
+	:children		(
+		checkbox_Skip_remaining_rules_if_message_matches_this_rule_item
+	)
+)
+:element checkbox_Skip_remaining_rules_if_message_matches_this_rule_item
+(
+	:type			:item
+	:item-type		:item-for-choice
+	:label-type		:string
+	:label			"Skip remaining rules if message matches this rule"
+	:active			:true
+	:selected		:true
+)
+:element then_label
+(
+	:type			:label
+	:x			31
+	:y			340
+	:label-type		:string
+	:label			"Then do this:"
+	:label-alignment	:center
+	:active			:true
+	:visible		:true
+	:north-attachment	(:obj sep2 8)
+	:west-attachment	(:point 0 31)
+)
+:element action_gp
+(
+	:type			:container
+	:container-type		:group
+	:active			:true
+	:visible		:true
+	:x			85
+	:y			361
+	:group-type		:row
+	:row-alignment		:hcenter
+	:hoffset		13
+	:hattach_type		:obj
+	:border-frame		:none
+	:north-attachment	(:obj then_label 2)
+	:west-attachment	(:point 0 85)
+	:children		(
+		store_msg_tf
+		browse_but
+	)
+)
+:element store_msg_tf
+(
+	:type			:text-field
+	:text-type		:alphanumeric
+	:label-type		:string
+	:label			"Store message to:"
+	:label-position		:west
+	:num-columns		38
+	:max-length		80
+	:read-only		:false
+	:active			:true
+	:visible		:true
+)
+:element browse_but
+(
+	:type			:button
+	:button-type		:push-button
+	:label-type		:string
+	:label-alignment	:center
+	:label			"Select Mailbox..."
+	:active			:true
+	:visible		:true
+)
+:element dialog_button_panel
+(
+	:type			:container
+	:container-type		:button-panel
+	:height			48
+	:visible		:true
+	:active			:true
+	:border-frame		:none
+	:children		(
+		add_button
+		change_button
+		reset_button
+		cancel_button
+		help_button
+	)
+)
+:element add_button
+(
+	:type			:button
+	:button-type		:push-button
+	:x			601
+	:y			457
+	:width			110
+	:height			23
+	:label-type		:string
+	:label-alignment	:center
+	:label			"Add"
+	:active			:true
+	:visible		:true
+	:north-attachment	(:point 0 5)
+	:east-attachment	(:grid-line 19 0)
+	:west-attachment	(:grid-line 2 0)
+)
+:element change_button
+(
+	:type			:button
+	:button-type		:push-button
+	:x			701
+	:y			457
+	:width			117
+	:height			23
+	:label-type		:string
+	:label-alignment	:center
+	:label			"Change"
+	:active			:true
+	:visible		:true
+	:north-attachment	(:point 0 5)
+	:east-attachment	(:grid-line 39 0)
+	:west-attachment	(:grid-line 21 0)
+)
+:element reset_button
+(
+	:type			:button
+	:button-type		:push-button
+	:x			801
+	:y			457
+	:width			117
+	:height			23
+	:label-type		:string
+	:label-alignment	:center
+	:label			"Reset"
+	:active			:true
+	:visible		:true
+	:north-attachment	(:point 0 5)
+	:east-attachment	(:grid-line 59 0)
+	:west-attachment	(:grid-line 41 0)
+)
+:element cancel_button
+(
+	:type			:button
+	:button-type		:push-button
+	:x			901
+	:y			457
+	:width			117
+	:height			23
+	:label-type		:string
+	:label-alignment	:center
+	:label			"Cancel"
+	:active			:true
+	:visible		:true
+	:north-attachment	(:point 0 5)
+	:east-attachment	(:grid-line 79 0)
+	:west-attachment	(:grid-line 61 0)
+)
+:element help_button
+(
+	:type			:button
+	:button-type		:push-button
+	:x			1001
+	:y			457
+	:width			110
+	:height			23
+	:label-type		:string
+	:label-alignment	:center
+	:label			"Help"
+	:active			:true
+	:visible		:true
+	:north-attachment	(:point 0 5)
+	:east-attachment	(:grid-line 98 0)
+	:west-attachment	(:grid-line 81 0)
+)
+:connection
+(
+	:from			add_button
+	:when			:activate
+	:action-type		:call-function
+	:action			editor_add_cb
+)
+:connection
+(
+	:from			change_button
+	:when			:activate
+	:action-type		:call-function
+	:action			editor_change_cb
+)
+:connection
+(
+	:from			reset_button
+	:when			:activate
+	:action-type		:call-function
+	:action			editor_reset_cb
+)
+:connection
+(
+	:from			cancel_button
+	:to			dialog
+	:when			:activate
+	:action-type		:builtin
+	:action			:hide
+	:arg-type		:void
+)
+:connection
+(
+	:from			help_button
+	:when			:activate
+	:action-type		:call-function
+	:action			editor_help_cb
+)
+:connection
+(
+	:from			editor_to_tf
+	:when			:after-create
+	:action-type		:call-function
+	:action			create_match_tf
+)
+:connection
+(
+	:from			editor_cc_tf
+	:when			:after-create
+	:action-type		:call-function
+	:action			create_match_tf
+)
+:connection
+(
+	:from			editor_sub_tf
+	:when			:after-create
+	:action-type		:call-function
+	:action			create_match_tf
+)
+:connection
+(
+	:from			editor_from_tf
+	:when			:after-create
+	:action-type		:call-function
+	:action			create_match_tf
+)
+:connection
+(
+	:from			editor_to_or_cc_tf
+	:when			:after-create
+	:action-type		:call-function
+	:action			create_match_tf
+)
+)

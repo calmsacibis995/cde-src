@@ -1,0 +1,61 @@
+# %%  (c) Copyright 1993, 1994 Hewlett-Packard Company			
+# %%  (c) Copyright 1993, 1994 International Business Machines Corp.	
+# %%  (c) Copyright 1993, 1994 Sun Microsystems, Inc.			
+# %%  (c) Copyright 1993, 1994 Novell, Inc. 				
+# %%  $Revision: $ 			 				
+#ifdef HideFromImake
+ #
+ # IMakeFile 1.2	30 Jul 1993
+ #
+ # This preamble turns this imakefile into a shell script which will
+ # create/update this directory's makefile when invoked as follows:
+ # % sh IMakeFile [[GNU]MakeFile]
+ #
+IMAKEDIR=../../imake; export IMAKEDIR
+exec make -f $IMAKEDIR/Boot.mk ${1+"$@"}
+#endif HideFromImake
+
+TT_DIR	= ../..
+
+include $(TT_DIR)/Make.macros
+
+default: all
+
+All:: $(MAKEFILE)s all
+all:	DynamicOptimizedProg(ttmv) \
+	DynamicOptimizedProg(ttrm) \
+	DynamicOptimizedProg(ttcp)
+
+install_O:: \
+	$(INSTALL_DIR)/bin/ttmv \
+	$(INSTALL_DIR)/bin/ttrm \
+	$(INSTALL_DIR)/bin/ttrmdir \
+	$(INSTALL_DIR)/bin/ttcp
+
+$(INSTALL_DIR)/bin/%: $(OEUVRE)/pic/O/%
+	$(TTINSTALL) $(@D) $<
+
+$(INSTALL_DIR)/bin/ttrmdir: $(OEUVRE)/pic/O/ttrm
+	cd $(INSTALL_DIR)/bin; rm -f ttrmdir; ln ttrm ttrmdir
+
+ttmv_SOURCES.cc = ttmv.cc mover.cc
+ttrm_SOURCES.cc = ttrm.cc remover.cc
+ttcp_SOURCES.cc = ttcp.cc copier.cc
+
+ProgramDynamicOptimized(ttmv)
+ProgramDynamicOptimized(ttrm)
+ProgramDynamicOptimized(ttcp)
+SourceHygiene(ttmv)
+SourceHygiene(ttrm)
+SourceHygiene(ttcp)
+
+VERSION_USERS = %/mover.o %/remover.o %/copier.o
+WhenAssign($(VERSION_USERS),AppendVal(CPPFLAGS,$(CPPFLAGS_version)))
+
+AppendVal(LDFLAGS,-L$(PROTO_DIR)/lib/$(OEUVRE)/pic/O)
+
+AppendVal(LDLIBS,-ltt)
+loc_LDLIBS_spro		= -Bstatic
+loc_LDLIBS_SunOS4	= -lce -lX -lI18N -ldl
+loc_LDLIBS_SunOS5	= -lnsl -lsocket -lintl -ldl -lc -lw
+AppendVal(LDLIBS,$(loc_LDLIBS_$(OS)) $(loc_LDLIBS_$(Tools)))

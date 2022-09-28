@@ -1,0 +1,21 @@
+Synopses: $(SOURCES)
+	rm -f $@
+	first=1; \
+	for file in $(SOURCES); do \
+		if [ $$first ]; then first=; else echo "	" >>$@; fi; \
+		awk 'BEGIN {s = 0} /.SH SYNOPSIS/,/^[^.]/ {if (s == 0) s = 1} /^[^.]/ {if (s == 1) {s = 2; printf $$0} else {if (s == 2) printf "\n%s", $$0}} /^\./ {if (s == 2) s = 3}' $$file >>$@; \
+	done
+	chmod -w $@
+
+%.mml: %
+	rm -f $@; man2mml $* > $@
+
+%.txt: %
+	rm -f $@; nroff -man $* | ul -t dumb | uniq > $@
+
+%.ps: %
+	rm -f $@; troff -man $* | dpost > $@
+
+clean::
+	rm -f All All.ps All.txt All.mml Intro.txt Intro.mml Synopses \
+		$(SOURCES:%=%.mml) $(SOURCES:%=%.txt)

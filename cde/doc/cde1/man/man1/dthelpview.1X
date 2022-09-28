@@ -1,0 +1,174 @@
+.\" **
+.\" **
+.\" ** (c) Copyright 1994 Hewlett-Packard Company
+.\" ** (c) Copyright 1994 International Business Machines Corp.
+.\" ** (c) Copyright 1994 Sun Microsystems, Inc.
+.\" ** (c) Copyright 1994 Unix Systems Labs, Inc., a subsidiary of Novell, Inc.
+.\" **
+.\" **
+.\" **
+.TH dthelpview 1 "11 Jan 1994"
+.BH "11 Jan 1994"
+.\"----------------------------------------------------------------------------
+.SH NAME
+dthelpview \- Cde online help viewer.
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- SYNOPSIS 
+.\"--- This section is a syntax diagram.  
+.\"---
+.SH SYNOPSIS
+.B dthelpview
+[ \fIoptions\fP ]
+.LP
+.nf
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- DESCRIPTION 
+.\"--- This section tells concisely what the command does 
+.\"---
+.SH DESCRIPTION
+\fBdthelpview\fP supports viewing of Cde online help volume(s), ASCII files,
+or man pages.
+.I dthelpview
+is an integral part of the Cde application help
+environment.  Its functionality and user interface is almost completely that 
+of the standard Cde general help and quick help dialog widgets.  
+See \fIDtCreateHelpDialog(3)\fP and \fIDtCreateQuickHelpDialog(3).\fP 
+.SH OPTIONS
+.TP
+.BI \-helpVolume " volume"
+Specifies the name of the <filename>.sdl file you want to 
+view. A path is not required unless the volume is not in the 
+current directory or the volume has not been registered.
+If \fBlocationId\fP is not set, the \fI_HOMETOPIC\fR will be be used.
+.TP
+.BI \-locationId " location_id"
+Specifies the location ID, representing the desired help topic to be viewed.
+If you do not specify an ID, Helpview uses \fI_HOMETOPIC\fR by default.
+.TP
+.BI \-file " file"
+Specifies a particular ASCII text file to be displayed.
+.TP
+.BI \-manPage " man_page"
+Specifies a particular man page to be displayed.
+.TP
+.BI \-man
+Displays a dialog that prompts for a man page to view, 
+then displays the requested man page.
+.RE
+.SH RESOURCES
+For information on help dialog widget resources refer to
+\fBDtCreateHelpDialog(3)\fP or \fBDtCreateQuickHelpDialog(3)\fP.
+.SS "dthelpview specific resources set in the Dthelpview app-defaults file"
+.PD 0
+.TP 30
+Dthelpview*manBox*rows: 
+32
+.TP
+Dthelpview*manBox*columns:
+80
+.TP
+Dthelpview*fileBox*rows:
+32
+.TP
+Dthelpview*fileBox*columns:  
+80
+.TP
+Dthelpview*man_text.columns:
+20
+.SH EXAMPLES
+.TP 10
+dthelpview -helpVolume dtintro.sdl -locationId _hometopic
+Displays the topic associated with _hometopic in the help 
+volume dtintor.sdl.
+.TP 10
+dthelpview -file /etc/checklist
+Displays the file /etc/checklist in a general help dialog
+.TP 10
+dthelpview -man grep
+Displays the grep man page in a quick help dialog
+.SH ENVIRONMENT VARIABLES
+The Cde help system utilizes two environment variables for locating 
+help volumes and family files within the desktop environment:
+.TP 10
+.SM \fBDTHELPSEARCHPATH\fP
+\fISystem\fP search path environment variable for locating
+help volumes on local and/or remote nfs mounted systems.
+.TP 10
+.SM \fBDTHELPUSERSEARCHPATH\fP
+\fIUsers\fP search path environment variable for locating user
+specific help volumes on local and/or remote nfs mounted systems.
+.P
+.sp 1
+The environment variables  contain colon-separated lists of directory paths.
+Each directory path can contain both environment variable names as well as
+special field descriptors that are expanded at runtime via each help component
+that uses these environment variables.
+.P
+Field descriptors consist of a
+.B %
+followed by a single character.
+Field descriptors and their substitution values are:
+.RS
+.TP 8
+.B %H
+This value is replaced with the current volume or family name being searched 
+for.
+.PD 0
+.TP
+.B %L
+Replaced with the current value of the $LANG environment variable.
+.SM .
+.TP
+.B %%
+Replaced with a single
+.BR % .
+.PD
+.RE
+.sp1
+The default value for DTHELPUSERSEARCH path is: NULL.
+.sp1
+If the DTHELPUSERSEARCH is set, its searched for the requested volume. If
+the volume is not found, the DTHELPSEARCHPATH value is searched.
+.P
+The default value for DTHELPSEARCHPATH path is:
+.ta li
+\fB
+.br
+$HOME/.dt/help/%H:
+.br
+$HOME/.dt/help/%H.hv:
+.br
+/etc/dt/appconfig/help/%L/%H:
+.br
+/etc/dt/appconfig/help/%L/%H.sdl:
+.br
+/etc/dt/appconfig/help/%L/%H.hv:
+.br
+/usr/dt/appconfig/help/%L/%H:
+.br
+/usr/dt/appconfig/help/%L/%H.sdl:
+.br
+/usr/dt/appconfig/help/%L/%H.hv
+.fi
+\fP
+.sp 1
+.SH FILES
+.PD 0
+.TP 30
+Dthelpview
+App-defaults file used by this client. 
+.sp1
+.SH "SEE ALSO"
+.BR dtsearchpath (1),
+.BR dtsdlfile (4),
+.BR "Cde Help System Author's and Programmer's Guide"
+
+
+
+
+
+
+
+

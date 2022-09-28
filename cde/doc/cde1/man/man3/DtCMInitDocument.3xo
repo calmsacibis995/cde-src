@@ -1,0 +1,74 @@
+.TH DtCMInitDocument 3 "17 January 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH "NAME"
+DtCMInitDocument \- initialize a Cde container document for access
+.SH "SYNOPSIS"
+.yS
+#include <Bento/DtCM.h>
+.sp 0.5v
+.ta \w'DtCMDocument DtCMInitDocument('u
+DtCMDocument DtCMInitDocument(CMContainer \f2container\fP,
+	CMEnv *\f2error\fP,
+	CMBoolean \f2create\fP);
+.yE
+.SH "DESCRIPTION"
+The
+.Fn DtCMInitDocument
+function initializes a
+.BR DtCMDocument
+handle from a container.
+The container can be an existing Cde container document, a new
+empty container, or a container from another application.
+If the container is new or from another application that does
+not have Cde container document objects, the application must set the
+.I create
+parameter to
+.Cn CM_TRUE ,
+or an error will be returned.
+Setting
+.I create
+to
+.Cn CM_TRUE
+adds Cde container document objects to the container
+if they do not already exist.
+.P
+The
+.I container
+argument is an open Cde document container handle.
+The container must be open for
+update if
+.I create
+is
+.Cn CM_TRUE .
+The
+.I error
+argument is a pointer to an error return structure.
+For the
+.I create
+argument, a value of
+.Cn CM_TRUE
+causes Cde container document objects to be added if they do not already exist.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn DtCMInitDocument
+function returns a
+.BR DtCMDocument
+handle.
+If an error occurs,
+.Fn DtCMInitDocument
+sets the major code in the
+.I error
+structure to
+.Cn USER_EXCEPTION ,
+and the application can use the
+.Fn CMRexception_number
+function to determine the minor code.
+See the Error API Appendix in the \*(ZB.
+.SH "SEE ALSO"
+.Fn DtCMFiniDocument 3,
+.Hd Bento/DtCM.h 5;
+.Fn CMRexception_number
+in the \*(ZB.

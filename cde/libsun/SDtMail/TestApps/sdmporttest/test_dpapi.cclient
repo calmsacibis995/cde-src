@@ -1,0 +1,212 @@
+##
+## This tests the cclient through the data port api interface
+##
+
+# create the token that names a test message store object
+
+token create token1
+
+token set token1 serviceprovider cclient
+token set token1 servicetype local
+token set token1 serviceoption messagestorename /tmp/test.mbx
+
+# create the token that names the smtp transport service
+
+token create token2
+
+token set token2 servicetype smtp
+token set token2 serviceclass messagetransport
+
+###
+### First pass of tests
+###
+
+# copy the test mailbox to /tmp
+
+! /usr/bin/rm -f /tmp/test.mbx /tmp/.test.mbx_* /tmp/.test.mbx_dt_index
+! /usr/bin/cp test1.mbx /tmp/test.mbx
+! /usr/bin/chmod 666 /tmp/test.mbx
+
+# create and open a data port on the message store
+
+port create port1
+port startup port1
+port open port1 token1
+
+## test expunge effect on a message
+## cause changes to an existing message, delete a message on either side of it,
+## expunge the messages, and see if the remaining messages are accessed properly
+
+port getstructure port1 *
+port getheaders port1 *
+
+# create a new message not derived from any existing message
+# this message is assigned message number -1
+
+port newmessagecreate port1 
+port getstructure port1 -1
+port addmessagebodytomessage port1 -1 text plain
+port addheader port1 -1 To Gary.M.Gere
+port setcontents port1 -1 0.1 This is the contents of the message C'est bien moche man
+
+# cause message 2 to be edited by changing the To header
+
+port addheader port1 2 To GaryGere
+port getstructure port1 2
+port getheaders port1 2 To
+
+# cause messages 1 and 3 to be deleted, and the expunge the message store
+
+port setflags port1 1 deleted
+port setflags port1 3 deleted
+port getheaders port1 *
+port expunge port1
+port getstructure port1 *
+port getheaders port1 *
+
+# To header for message 1 should be GaryGere
+# Message 2 should be MIME-tester@bunyip.com
+
+port getheaders port1 1 To
+port getheaders port1 2 To
+
+# These commits should cause messages 1, 2 and -1 to be committed to the store
+# Message 1 is the old message 2 and has been edited, so it gets rewritten as message 5
+# Message -1 gets written as message 6
+
+port commit port1 1
+port commit port1 2
+port commit port1 -1
+port checkfornewmessages port1
+
+port getheaders port1 5 To
+port getheaders port1 6 To
+
+# We stared with 6 messages, deleted 2, and added one, so the final count should be 5
+
+port getstructure port1 *
+
+# Now do an expunge again: since message 1 was edited and committed, message 1 should
+# come back expunged, and there should now be 5 messages in the store - message 4 should
+# have taken the place of the old message 1
+
+port getheaders port1 1
+port getheaders port1 5
+
+port expunge port1
+port getstructure port1 *
+
+# close down this test
+
+port close port1
+port shutdown port1
+
+###
+### Second pass of tests
+###
+
+# copy the test mailbox to /tmp
+
+! /usr/bin/rm -f /tmp/test.mbx /tmp/.test.mbx_* /tmp/.test.mbx_dt_index
+! /usr/bin/cp test1.mbx /tmp/test.mbx
+! /usr/bin/chmod 666 /tmp/test.mbx
+
+# create and open a data port on that object
+
+port create port1
+port startup port1
+port open port1 token1
+
+port getstructure port1 1
+port setflags port1 1 answered
+port getstructure port1 1
+port getstructure port1 2
+port getattributes port1 2 0.1
+port setattributes port1 2 0.1 foobar humbug
+port getattributes port1 2 0.1
+port getstructure port1 2
+port setattributes port1 2 0.1 barfo matic
+port getattributes port1 2 0.1
+port setattributes port1 2 0.1 foobar barfum
+port getattributes port1 2 0.1
+port setattributes port1 2 0.1 foobar
+port getattributes port1 2 0.1
+port setattributes port1 2 0.1 barfo
+port getattributes port1 2 0.1
+
+port getattributes port1 5 0.1
+port getattributes port1 5 0.1 CHARSET
+port getattributes port1 5 0.1.1
+port getattributes port1 5 0.1.1 CHARSET
+port getattributes port1 5 0.1.2
+port getattributes port1 5 0.1.2 CHARSET
+port getattributes port1 5 0.1.3
+port getattributes port1 5 0.1.3 CHARSET
+
+port getstructure port1 5
+port addmessagebodytomessage port1 5 text plain 0.1
+port getstructure port1 5
+port addmessagebodytomessage port1 5 multipart mixed 0.1
+port getstructure port1 5
+port addmessagebodytomessage port1 5 text plain 0.1.5
+port getstructure port1 5
+
+port derivedmessagecreate port1 5
+port getstructure port1 -2
+
+port derivedmessagecreate port1 3
+port getstructure port1 -3
+
+port newmessagecreate port1
+port getstructure port1 -4
+port addheader port1 -4 To gary.gere
+port addheader port1 -4 Subject testing
+port addheader port1 -4 From testing program
+port addmessagebodytomessage port1 -4 multipart mixed
+port getstructure port1 -4
+port addmessagebodytomessage port1 -4 text plain 0.1
+port getstructure port1 -4
+port setcontents port1 -4 0.1.1 this is a test of this great system
+port getcontents port1 -4 0.1.1
+port addmessagebodytomessage port1 -4 text plain 0.1
+port getstructure port1 -4
+port setcontents port1 -4 0.1.2 this is a test of this great system
+port getcontents port1 -4 0.1.2
+port getstructure port1 -4
+
+port setflags port1 3 deleted
+
+port getstructure port1 *
+port getstructure port1 -2
+port getstructure port1 -3
+port getstructure port1 -4
+
+port expunge port1
+
+port getstructure port1 *
+port getstructure port1 -2
+port getstructure port1 -3
+port getstructure port1 -4
+
+port commit port1 -2
+port commit port1 -3
+port commit port1 -4
+port checkfornewmessages port1
+
+port getstructure port1 *
+
+port expunge port1
+
+port getstructure port1 *
+
+# close the port
+
+port close port1
+port shutdown port1
+port delete port1
+
+# done
+
+quit
+
+

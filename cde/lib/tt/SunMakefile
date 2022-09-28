@@ -1,0 +1,88 @@
+# %%  (c) Copyright 1993, 1994 Hewlett-Packard Company			
+# %%  (c) Copyright 1993, 1994 International Business Machines Corp.	
+# %%  (c) Copyright 1993, 1994 Sun Microsystems, Inc.			
+# %%  (c) Copyright 1993, 1994 Novell, Inc. 				
+# %%  $Revision: $ 			 				
+# @(#)SunMakefile	1.23 93/07/31
+# The ToolTalk top level Makefile
+#
+# Copyright (c) 1991-1993 by Sun Microsystems, Inc.
+#
+
+# Most common make targets.  All these are recursive over all appropriate
+# directories.
+#
+# make		- same as make all
+# make all	- make and install a complete debug (-g) version
+# make product  - make and install a complete production (-O) version.
+# make bb	- make (but do not install) a debug (-g) version of the "backbone"
+#		  (libtt.so.1 and ttsession)
+# make clean	- remove derived files
+# make sccs-clean - remove sccs work files, force sccs gets
+
+# Less common make targets, for specific purposes
+
+# make tcov	- test coverage
+# make lprof	- line by line profiling (does not work on libtt)
+# make gprof	- call graph profiling
+
+# Less common make targets, useful for quick partial builds when you know
+# what you want. <VAR> is a variant key, one of:
+# g		- debug variant
+# O		- optimized variant
+# tcov		- tcov variant
+# gp		- gprof variant
+# lprof		- lprof variant
+
+# make proto-<VAR>	- make libraries, prep for building binaries
+# make bin-<VAR>	- make binaries, assumes proper make proto-<VAR> done
+# make install-<VAR>	- install already built binaries and libraries
+
+
+TT_DIR = .
+
+THIS_DIR = .
+
+SUBDIRS = mini_isam lib slib bin
+# Save time in "bb" (backbone) makes by avoiding mini_isam, demo, and man dirs
+# XXX - man subdir deleted from list for now since the .xo format for CDE won't
+# ttinstall correctly.
+#
+bb	:= SUBDIRS = lib slib bin
+
+# always make ttinstall.  I can't figure out how to do this only 
+# when doing actual makes since the "here" targets get done after the
+# recursive targets, so adding ttinstall to HEADER_DEPENDENCIES gets
+# ttinstall done too late.
+
+.INIT:: ttinstall
+
+# very oddly, writing this line as "include $(TT_DIR)/Makefile-head.mk"
+# as it must be in other directories breaks the automatic sccs get
+# mechanism in make...
+include SunMakefile-head.mk
+
+
+# Normally during development, make libraries -g, binaries -g, then install.
+all::		proto-g bin-g install-g
+
+# For quick builds during backbone development make only libraries-g
+# and ttsession -g.
+bb:		proto-g bb-g
+
+# To make the product, make libraries -O, then binaries -O, then install.
+product: 	proto-O bin-O install-O
+
+# Make a development version with tcov instrumentation.
+tcov:		proto-tcov bin-tcov
+
+# Make a development version with lprof instrumentation.
+lprof:		proto-lprof bin-lprof
+
+# Make a development version with gprof instrumentation.
+gprof:		proto-pg bin-pg
+
+Clean::
+	$(RM) -r $(PROTO_DIR) ttinstall
+
+include SunMakefile-tail.mk

@@ -1,0 +1,145 @@
+XCOMM 
+XCOMM (c) Copyright 1989, 1990, 1991, 1992, 1993 OPEN SOFTWARE FOUNDATION, INC. 
+XCOMM ALL RIGHTS RESERVED 
+XCOMM 
+XCOMM 
+XCOMM Motif Release 1.2.2
+XCOMM 
+XCOMM   $XConsortium: Imakefile /main/cde1_maint/5 1995/10/08 22:50:10 pascale $
+
+#define DoNormalLib NormalLibUil
+#define DoSharedLib SharedLibUil
+#define DoDebugLib DebugLibUil
+#define DoProfileLib ProfileLibUil
+
+#include <Library.tmpl>
+
+#ifdef AlphaArchitecture
+SO_REQLIBS = $(ALL_LIBPATH) $(MRMLIB) $(XMLIB) $(XTOOLLIB) $(XLIB) -lm -lc
+#endif
+
+#ifdef RsArchitecture
+REQUIREDLIBS = $(MRMLIB) $(XMLIB) $(XTOOLLIB) $(XLIB)
+#endif
+
+INCLUDES = -I. -I$(INCLUDESRC) -I$(MINCLUDESRC) -I$(MLIBSRC)
+       DEPLIBS1 = BuildClientDepLibs
+LOCAL_LIBRARIES = BuildClientLibs
+LINTLIBS = $(LINTMRESOURCE) $(LINTXMLIB) $(LINTXMTOOL) $(LINTXLIB)
+INSTALLFLAGS = $(INSTINCFLAGS)
+
+#if defined(SunArchitecture)
+SYS_LIBRARIES = -lc
+DEFINES = -DNO_ALLOCA
+EXTRA_DEFINES = -D_TS_ERRNO
+
+UilSrcSrc.o UilLexAna.o := EXTRA_CCOPTIONS = -Xa
+
+/* override LD for Sun */
+LD=$(CC)
+REQUIREDLIBS = $(ALL_LIBPATH) $(MRMLIB) $(XMLIB) $(XTOOLLIB) $(XLIB) $(SYS_LIBRARIES)
+#endif
+
+#ifdef HPArchitecture
+LOCAL_LDFLAGS=-Wl,+s
+#endif
+
+#if defined(USLArchitecture)
+SYS_LIBRARIES = -ldl $(WIDECHARSYSLIB) -lgen
+#endif
+
+#if defined(UXPArchitecture)
+SYS_LIBRARIES = -ldl $(WIDECHARSYSLIB) -lgen
+#endif
+
+SRCS1 =	UilCmd.c 	UilDiags.c	UilKeyTab.c	UilLexAna.c  \
+	UilLexPars.c	UilLstLst.c	UilP2Out.c	UilP2Reslv.c \
+	UilSarComp.c	UilSarExp.c	UilSarInc.c	UilSarMod.c \
+	UilSarObj.c	UilSarProc.c	UilSarVal.c	UilSrcSrc.c  \
+	UilSymNam.c	UilSymStor.c	UilData.c	UilMain.c \
+	UilLstMac.c	UilSemVal.c	UilSemCSet.c	UilDB.c
+
+OBJS1 =	UilCmd.o	UilDiags.o	UilKeyTab.o	UilLexAna.o  \
+	UilLexPars.o	UilLstLst.o	UilP2Out.o	UilP2Reslv.o \
+	UilSarComp.o	UilSarExp.o	UilSarInc.o	UilSarMod.o \
+	UilSarObj.o	UilSarProc.o	UilSarVal.o	UilSrcSrc.o  \
+	UilSymNam.o	UilSymStor.o	UilData.o	UilMain.o \
+	UilLstMac.o	UilSemVal.o	UilSemCSet.o	UilDB.o
+
+SRCS2 = UilCmd.c	UilDiags.c	UilKeyTab.c	UilLexAna.c  \
+	UilLexPars.c	UilLstLst.c	UilP2Out.c	UilP2Reslv.c \
+	UilSarComp.c	UilSarExp.c	UilSarInc.c	UilSarMod.c \
+	UilSarObj.c	UilSarProc.c	UilSarVal.c	UilSrcSrc.c  \
+	UilSymNam.c	UilSymStor.c	UilData.c \
+	UilLstMac.c	UilSemVal.c	UilSemCSet.c	UilDB.c
+
+OBJS2 =	UilCmd.o	UilDiags.o	UilKeyTab.o	UilLexAna.o  \
+	UilLexPars.o	UilLstLst.o	UilP2Out.o	UilP2Reslv.o \
+	UilSarComp.o	UilSarExp.o	UilSarInc.o	UilSarMod.o \
+	UilSarObj.o	UilSarProc.o	UilSarVal.o	UilSrcSrc.o  \
+	UilSymNam.o	UilSymStor.o	UilData.o	UilParser.o \
+	UilLstMac.o	UilSemVal.o	UilSemCSet.o	UilDB.o
+
+HEADERS = 	Uil.h	UilSymGl.h	UilDBDef.h	UilSymDef.h \
+	UilDef.h	XmAppl.uil
+
+PROGRAMS = uil
+
+LibraryObjectRule()
+MComplexProgramTarget_1(uil,$(LOCAL_LIBRARIES),NullParameter)
+
+SpecialLibObjectRule(UilDB.o,$(ICONFIGFILES),-DLIBDIR=\"$(LIBDIR)\" -DINCDIR=\"$(INCDIR)\")
+
+/* For install of developer's build environment */
+LOCAL_BINSTALL_LIBDEST = lib
+LOCAL_BINSTALL_BINDEST = bin
+LOCAL_BINSTALL_INCLUDEDEST = include/uil
+
+#if DoSharedLib
+#if DoNormalLib
+SharedLibraryTarget(Uil,$(SOUILREV),$(OBJS2),shared,..)
+#else
+SharedLibraryTarget(Uil,$(SOUILREV),$(OBJS2),.,.)
+#endif
+SharedLibraryBuildInstall(Uil,$(SOUILREV),$(LOCAL_BINSTALL_LIBDEST))
+InstallSharedLibrary(Uil,$(SOUILREV),$(USRLIBDIR))
+#ifdef DEBUGTREE
+#if DoNormalLib
+SharedLibraryTarget(Uil_d,$(SOUILREV),$(OBJS2),shared,..)
+#else
+SharedLibraryTarget(Uil_d,$(SOUILREV),$(OBJS2),.,.)
+#endif
+SharedLibraryBuildInstall(Uil_d,$(SOUILREV),$(LOCAL_BINSTALL_LIBDEST))
+InstallSharedLibrary(Uil_d,$(SOUILREV),$(USRLIBDIR))
+#endif  /* DEBUGTREE */
+#endif
+#if DoNormalLib
+NormalLibraryTarget(Uil,$(OBJS2))
+NormalLibraryBuildInstall(Uil,$(LOCAL_BINSTALL_LIBDEST))
+InstallLibrary(Uil,$(USRLIBDIR))
+#endif
+#if DoProfileLib
+ProfiledLibraryTarget(Uil,$(OBJS2))
+InstallLibrary(Uil_p,$(USRLIBDIR))
+#endif
+#if DoDebugLib
+DebuggedLibraryTarget(Uil,$(OBJS2))
+InstallLibrary(Uil_d,$(USRLIBDIR))
+#endif
+
+LintLibraryTarget(Uil,$(SRCS2))
+InstallLintLibrary(Uil,$(LINTLIBDIR))
+
+BuildIncludes($(HEADERS),uil,..)
+BuildMultipleInstall($(HEADERS),$(LOCAL_BINSTALL_INCLUDEDEST))
+BuildMultipleInstall(uil,$(LOCAL_BINSTALL_BINDEST))
+
+
+InstallMultiple($(HEADERS),$(USRINCDIR)/uil)
+
+LinkFile(UilParser.c,UilMain.c)
+SpecialLibObjectRule(UilParser.o,NullParameter,-DCALLABLE)
+
+#ifdef UseVista
+VistaMapRule(uil.M,libUil.a)
+#endif

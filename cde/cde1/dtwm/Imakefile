@@ -1,0 +1,203 @@
+XCOMM $XConsortium: Imakefile /main/cde1_maint/7 1995/10/18 14:33:21 drk $
+EMDESKTOP_VERSION_STRING = DesktopVersionString
+/*******************************************************
+ Imakefile for dtwm, the CDE Window/Workspace Manager
+
+ (c) Copyright 1993, 1994 Hewlett-Packard Company
+ (c) Copyright 1993, 1994 International Business Machines Corp.
+ (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+ (c) Copyright 1993, 1994 Novell, Inc.
+
+********************************************************/
+MODULE=dtwm
+
+/* General case INCLUDES DEFINES LOCAL_LIBRARIES
+ * Each individual architecture may have more or less of the above.
+ * Use EXTRA_DEFINES and EXTRA_INCLUDES to add defines and includes
+ * to an individual architecture.  There is no equivalent for
+ * LOCAL_LIBRARIES.
+ * It should be set when necessary to the real library macro name.
+ */
+
+DEFINES = -DLARGECURSORS -DHP_MOTIF -DR2_COMPAT -DOPAQUE -DSHAPE  \
+          -DUNMAP_ON_RESTART -DWSM -DPANELIST -DFWS \
+          -DBATCH_DRAG_REQUESTS -DMESSAGE_CAT \
+          -DCDE_INSTALLATION_TOP=\"$(CDE_INSTALLATION_TOP)\" \
+          -DCDE_CONFIGURATION_TOP=\"$(CDE_CONFIGURATION_TOP)\"
+
+INCLUDES = -I. -I$(BMSLIBSRC)
+
+
+#if defined (SunArchitecture)
+/* Turn off use of libDtHelp lib since wrappers are in libDtSvc on sun */
+DEPDTHELPLIB =
+DTHELPLIB =
+#endif /* SunArchitecture */
+
+DEPLIBS = $(DEPDTHELPLIB) $(DEPDTWIDGETLIB) $(DEPDTSVCLIB) $(DEPTTLIB) \
+                  $(DEPXMLIB)  $(DEPXTOOLLIB) $(DEPXLIB) $(DEPEXTENSIONLIB)
+LOCAL_LIBRARIES = $(DTHELPLIB) $(DTWIDGETLIB) $(DTSVCLIB) $(TTLIB) \
+                  $(XMLIB) $(XTOOLLIB) $(XLIB) $(EXTENSIONLIB)
+SYS_LIBRARIES = -lm
+
+/** You must explicitly list the dependent libraries in DEPLIBS */
+
+#if defined(AlphaArchitecture)
+EXTRA_DEFINES = -DMULTIBYTE -DMINIMAL_DT -DALPHA_BUG_FIX -DOSF_v1_2_4
+SYS_LIBRARIES = -lm $(TTLIB)
+#endif
+
+#if defined(HPArchitecture)
+EXTRA_DEFINES = -DMULTIBYTE -DMINIMAL_DT -DANSICPP -D_HPUX_SOURCE 
+#endif	/* HPArchitecture */	
+
+
+#if defined(HPOSFArchitecture)
+#    endif	/* ApolloArchitecture */
+
+#if defined(ApolloArchitecture)
+#    endif	/* HPOSFArchitecture */
+
+
+
+
+
+#if defined (SunArchitecture)
+
+EXTRA_DEFINES = -DMULTIBYTE -DMINIMAL_DT -DALLPLANES -mt -DSUN_CDE_PERF
+
+#if REORDER_PROFILED
+CC = CcCmd -xpg $(BBAFLAGS)
+LOCAL_LDFLAGS = -L/usr/dt/lib -lmcount
+#else
+EXTRA_CCOPTIONS = -xF -dalign -xstrconst
+dtwm		:= LOCAL_LDFLAGS = -Wl,-M,mapfile.reorder -mt
+#endif
+
+/* Intel 3.0.1 compilers crash with both -Xc and -xstrconst
+ * so work around this bug by going back to -Xa
+ * Only need this for WmHelp.o
+ */
+WmHelp.o	:= CCOPTIONS = -Xa
+
+#endif /* SunArchitecture */
+ 
+
+
+
+#if defined(USLArchitecture)
+EXTRA_DEFINES = -DMULTIBYTE -DMINIMAL_DT
+SYS_LIBRARIES = -lm -ldl $(WIDECHARSYSLIB) -lgen
+#endif /* USLArchitecture */
+
+#if defined(UXPArchitecture)
+EXTRA_DEFINES = -DMULTIBYTE -DMINIMAL_DT
+SYS_LIBRARIES = -lm -ldl $(WIDECHARSYSLIB) -lgen
+#endif /* UXPArchitecture */
+
+#if defined (RsArchitecture)
+EXTRA_DEFINES = -DMULTIBYTE -DMINIMAL_DT -DANSICPP -DPORT_NOVFORK
+SYS_LIBRARIES = -lm -liconv
+#endif /* RsArchitecture */
+
+#if defined (SCOArchitecture)
+EXTRA_DEFINES = -DMULTIBYTE -DMINIMAL_DT -DPORT_NOVFORK
+#endif /* SCOArchitecture */
+
+
+PROGRAMS=dtwm dtfplist
+MSGPROGRAMS=dtwm
+
+OBJS1=	WmBackdrop.o	WmCDInfo.o	WmCDecor.o	WmCEvent.o\
+	WmCPlace.o	WmColormap.o			WmError.o\
+	WmEvent.o	          	WmFeedback.o	            \
+	WmFunction.o	WmGraphics.o	WmHelp.o	WmIDecor.o\
+	WmIPC.o		WmIPlace.o	WmIconBox.o	WmImage.o\
+	WmInitWs.o	WmKeyFocus.o	WmMain.o	WmManage.o\
+	WmMenu.o	WmOL.o \
+	WmPresence.o	WmProperty.o	WmProtocol.o	WmResCvt.o\
+	WmResParse.o	WmResource.o	WmSignal.o	            \
+	WmWinConf.o	WmWinInfo.o	WmWinList.o	WmWinState.o\
+	WmWrkspace.o	version.o 	Button.o	Clock.o	\
+	PanelS.o	WmParse.o	WmParseP.o	WmFP.o\
+	Parse.o		DataBaseLoad.o	UI.o\
+	Callback.o	PopupMenu.o	Session.o\
+	WmFws.o
+
+SRCS1=	WmBackdrop.c	WmCDInfo.c	WmCDecor.c	WmCEvent.c\
+	WmCPlace.c	WmColormap.c			WmError.c\
+	WmEvent.c	          	WmFeedback.c	            \
+	WmFunction.c	WmGraphics.c	WmHelp.c	WmIDecor.c\
+	WmIPC.c		WmIPlace.c	WmIconBox.c	WmImage.c\
+	WmInitWs.c	WmKeyFocus.c	WmMain.c	WmManage.c\
+	WmMenu.c	WmOL.c \
+	WmPresence.c	WmProperty.c	WmProtocol.c	WmResCvt.c\
+	WmResParse.c	WmResource.c	WmSignal.c	            \
+	WmWinConf.c	WmWinInfo.c	WmWinList.c	WmWinState.c\
+	WmWrkspace.c	version.c       Button.c	Clock.c		\
+	PanelS.c	WmParse.c	WmParseP.c	WmFP.c\
+	Parse.c		DataBaseLoad.c	UI.c\
+	Callback.c	PopupMenu.c	Session.c\
+	WmFws.c
+
+OBJS2=  Print.o         Parse.o         DataBaseLoad.o	WmParse.o \
+	Session.o
+
+SRCS2=  Print.c         Parse.c         DataBaseLoad.c	WmParse.c \
+	Session.c
+
+
+NormalLibraryObjectRule()
+ComplexProgramTarget_1(dtwm,$(LOCAL_LIBRARIES),$(SYSTEM_LIBRARIES))
+ComplexProgramTarget_2(dtfplist,$(LOCAL_LIBRARIES),$(SYSTEM_LIBRARIES))
+
+
+/* This is added for 8.07 optimizer bug -see Keith Taylor.
+*/
+#ifdef HPArchitecture
+#if (OSMajorVersion == 8) && (OSMinorVersion == 07)
+#ifndef DEBUGTREE
+SpecialObjectRule(WmCEvent.o,WmCEvent.c,+O0)
+#endif 
+#endif 
+#endif 
+
+MAN1PGS= dtwm.man
+MAN4PGS= dtwmrc.man4
+
+dtwmrc.man : dtwmrc.man4
+	ln -s dtwmrc.man4 dtwmrc.man
+
+ManToTxtRule(online,$(MAN1PGS:.man=.1),1)
+ManToTxtRule(online,$(MAN4PGS:.man4=.4),4)
+
+LOCAL_CPP_DEFINES = -DCDE_INSTALLATION_TOP=$(CDE_INSTALLATION_TOP) \
+                    -DCDE_CONFIGURATION_TOP=$(CDE_CONFIGURATION_TOP)
+
+#if defined(USLArchitecture)
+    PREPROCESSCMD = $(CPP)
+#endif
+
+#if defined(UXPArchitecture)
+    PREPROCESSCMD = $(CPP)
+#endif
+
+CppTextRule(Dtwm.defs,Dtwm.defs.src,$(LOCAL_CPP_DEFINES),)
+CppTextRule(sys.dtwmrc,sys.dtwmrc.src,$(LOCAL_CPP_DEFINES),)
+
+
+/***** For dtge make a client_OBJS.o using client_main.o ******/
+/***** This implies the existence of client_main.c       ******/
+
+/***** dtge hidden symbols *******/
+#ifdef BuildHugeObject
+#ifdef HPArchitecture
+#ifdef __hp9000s300
+HIDDEN_SYMBOLS = -h _main -h _SystemCmd
+#else
+HIDDEN_SYMBOLS = -h main -h SystemCmd
+#endif
+#endif
+SpecialRelocatableTarget(dtwm,$(HIDDEN_SYMBOLS),$(OBJS1))
+#endif
+

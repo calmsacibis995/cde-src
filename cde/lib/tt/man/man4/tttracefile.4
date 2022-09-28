@@ -1,0 +1,127 @@
+.TH tttracefile 4 "1 March 1996" "ToolTalk 1.3" "ToolTalk Commands" 
+.BH "1 March 1996"
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\"  (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\"  (c) Copyright 1993, 1994 International Business Machines Corp.
+.\"  (c) Copyright 1993, 1994 Novell, Inc.
+.IX "tttracefile.4" "" "tttracefile.4" ""
+.SH NAME
+tttracefile - script of settings for ToolTalk tracing
+.SH DESCRIPTION
+.PP
+A
+.B tttrace
+script contains settings that control ToolTalk calls and messages.
+A 
+.B tttrace
+script consists of commands separated by semicolons or newlines.
+The first command must be the
+.B version
+command.
+.SS Commands
+.PP
+If conflicting values are given for a setting, the last value wins.
+.TP
+\fBversion\fR n
+The version of the
+.B tttracefile
+command syntax used.  The current version is 1.
+.TP
+\fBfollow\fR [\fBoff\fR | \fBon\fR]
+Sets whether to follow all children forked by the traced client or
+subsequently started in the traced session.  Default is
+.BR off .
+.TP
+\fB[> | >>]\fI outfile\fR
+File to be used for the trace output.  By default, trace output
+goes to standard error.  Normal
+.BR sh (1)
+interpretation of
+.I >
+and
+.I >>
+applies.
+.TP
+\fBfunctions\fR [\fBall\fR | \fBnone\fR | \fIfunc...\fR]
+ToolTalk API functions to trace.
+.I func
+may include
+.BR sh (1)
+wildcard characters. Default is
+.BR all .
+.TP
+\fBattributes\fR [\fBall\fR | \fBnone\fR]
+.B none
+means use only a single line when printing a message on the trace
+output.
+.B all
+means print all attributes, arguments, and context slots of traced
+messages.  Default is
+.BR none .
+.TP
+\fBstates\fR [\fBnone\fR | \fBedge\fR | \fBdeliver\fR | \fBdispatch\fR | \fITt_state\fR]...
+State(s) through which to trace messages.  In addition to
+the \f(CWTt_state\fRs defined in \f(CWtt_c.h\fR, valid \fIstate\fRs
+are:
+.PD 0
+.RS 8
+.HP 2
+\(bu \f(CWnone\fR - disable all message tracing
+.HP 2
+\(bu \f(CWedge\fR - messages entering initial (\f(CWTT_SENT\fR) and final
+(\f(CWTT_HANDLED\fR, \f(CWTT_FAILED\fR) states.
+.HP 2
+\(bu \f(CWdeliver\fR - all state changes and all client deliveries.
+.HP 2
+\(bu \f(CWdispatch\fR - \f(CWdeliver\fR + all patterns considered for
+matching.  (default)
+.RE
+.PD
+.PP
+.PD 0
+.HP 5
+\fBops\fI toTrace\fR...
+.HP 5
+\fBsender_ptypes\fI toTrace\fR...
+.TP
+\fBhandler_ptypes\fI toTrace\fR...
+.PD
+Trace messages that have
+.I toTrace
+as a value for the indicated message attribute.
+.I toTrace
+may include
+.BR sh (1)
+wildcard characters.
+If no
+.I toTrace
+argument is included for a given message attribute, then
+no value of that attribute excludes a message from tracing.
+.SS Comments
+.PP
+A word beginning with
+.B #
+causes that word and all the following characters up to a newline to
+be ignored.
+.SH EXAMPLES
+.PP
+To trace all attribute-getting and -setting messages sent by ptype starting
+with "Dt",
+.IP
+.nf
+\fBversion \f(CW1	
+\fBops \f(CWGet* Set*	
+\fBsender_ptypes \f(CWDt*
+.fi
+.PP
+To trace only ToolTalk function calls (but not messages) in a
+process tree,
+.IP
+\fBversion 1; follow on; states none\fR
+.SH SEE ALSO
+.PP
+.BR ttsession (1),
+.BR tttrace (1),
+the
+.BR Session_Trace ()
+ToolTalk request

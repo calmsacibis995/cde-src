@@ -1,0 +1,25 @@
+/* This file is a special .tmpl file that is included by Imake.tmpl
+ * It is used to overwrite defines in hp.cf for a specific tree 
+ * To make a tree use these defaults simply link localtree.tmpl to this
+ * file.
+ */
+
+#define OSRev 7.0
+#define OSName HP-UX G-PROFILED
+/* Now preset in OSVersion.tmpl */
+#ifndef OSMajorVersion
+#define OSMajorVersion         7
+#endif
+#ifndef OSMinorVersion
+#define OSMinorVersion         0
+#endif
+
+#define PROFILE_TREE
+#define Slink pslink
+
+#undef OptimizedCDebugFlags
+#if __hp9000s800
+#define OptimizedCDebugFlags -O -G -z
+#else
+#define OptimizedCDebugFlags  -O -G
+#endif

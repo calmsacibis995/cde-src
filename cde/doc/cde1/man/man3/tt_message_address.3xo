@@ -1,0 +1,73 @@
+.TH tt_message_address 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+tt_message_address \- retrieve the address attribute from a message
+.SH SYNOPSIS
+.yS
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'Tt_address tt_message_address('u
+Tt_address tt_message_address(Tt_message \f2m\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn tt_message_address
+function
+retrieves the address attribute from the specified message.
+.P
+The
+.I m
+argument is the opaque handle for the message involved in this operation.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn tt_message_address
+function returns a value that specifies which message attributes
+form the address of this message.
+The
+.Fn tt_message_address
+function returns one of the following
+.B Tt_address
+values:
+.VL 8
+.Lc TT_HANDLER
+.br
+The message is addressed to a specific handler
+that can perform this operation with these arguments.
+.Lc TT_OBJECT
+.br
+The message is addressed to a specific object
+that can perform this operation with these arguments.
+.Lc TT_OTYPE
+.br
+The message is addressed to the type of object
+that can perform this operation with these arguments.
+.Lc TT_PROCEDURE
+.br
+The message is addressed to any process
+that can perform this operation with these arguments.
+.LE
+.P
+The application can use
+.Fn tt_int_error 3
+to extract one of the following
+.B Tt_status
+values from the returned integer:
+.VL 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_NOMP
+.br
+The
+.Cm ttsession 1
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_POINTER
+.br
+The pointer passed does not point to an object of
+the correct type for this operation.
+.LE
+.SH "SEE ALSO"
+.Hd Tt/tt_c.h 5,
+.Fn tt_int_error 3.

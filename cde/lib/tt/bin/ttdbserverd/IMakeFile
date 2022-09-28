@@ -1,0 +1,81 @@
+# %%  (c) Copyright 1993, 1994 Hewlett-Packard Company			
+# %%  (c) Copyright 1993, 1994 International Business Machines Corp.	
+# %%  (c) Copyright 1993, 1994 Sun Microsystems, Inc.			
+# %%  (c) Copyright 1993, 1994 Novell, Inc. 				
+# %%  $Revision: $ 			 				
+#ifdef HideFromImake
+ #
+ # IMakeFile 1.2	30 Jul 1993
+ #
+ # This preamble turns this imakefile into a shell script which will
+ # create/update this directory's makefile when invoked as follows:
+ # % sh IMakeFile [[GNU]MakeFile]
+ #
+IMAKEDIR=../../imake; export IMAKEDIR
+exec make -f $IMAKEDIR/Boot.mk ${1+"$@"}
+#endif HideFromImake
+
+TT_DIR	= ../..
+
+include $(TT_DIR)/Make.macros
+
+default: all
+
+All:: $(MAKEFILE)s all
+all: DynamicOptimizedProg(rpc.ttdbserverd) DynamicOptimizedProg(rpc.ttdbserver)
+
+install_O:: $(INSTALL_DIR)/bin/rpc.ttdbserverd (INSTALL_DIR)/bin/rpc.ttdbserver
+
+$(INSTALL_DIR)/bin/%: $(OEUVRE)/pic/O/%
+	$(TTINSTALL) $(@D) $<
+
+rpc.ttdbserverd_SOURCES.cc = \
+	db_server_functions.cc \
+        db_server_svc.cc \
+	dm_access_cache.cc \
+	dm_server.cc \
+	tt_db_message_info_utils.cc \
+	tt_db_msg_q_lock.cc \
+	tt_db_msg_q_lock_entry_utils.cc \
+	tt_db_partition_global_map_ref.cc \
+	tt_db_partition_redirection_map.cc \
+	tt_db_server_db.cc \
+	tt_db_server_db_utils.cc \
+	tt_isam_file.cc \
+	tt_isam_file_utils.cc \
+	tt_isam_key_descriptor.cc \
+	tt_isam_key_descriptor_utils.cc \
+	tt_isam_record.cc \
+	tt_isam_record_utils.cc
+
+ProgramDynamicOptimized(rpc.ttdbserverd)
+ProgramDynamicOptimized(rpc.ttdbserver)
+SourceHygiene(rpc.ttdbserverd)
+SourceHygiene(rpc.ttdbserver)
+
+ISAM_USERS = \
+	%/db_server_functions.o \
+	%/db_server_svc.o \
+	%/dm_access_cache.o \
+	%/dm_server.o \
+	%/tt_db_partition_global_map_ref.o \
+	%/tt_db_server_db.o \
+	%/tt_db_server_db_utils.o \
+	%/tt_isam_file.o \
+	%/tt_isam_file_utils.o \
+	%/tt_isam_key_descriptor.o \
+	%/tt_isam_key_descriptor_utils.o \
+	%/tt_isam_record.o \
+	%/tt_isam_record_utils.o
+
+AppendVal(CPPFLAGS,-I$(TT_DIR)/slib)
+WhenAssign($(ISAM_USERS),AppendVal(CPPFLAGS,$(CPPFLAGS_isam)))
+WhenAssign(%/db_server_svc.o,AppendVal(CPPFLAGS,$(CPPFLAGS_version)))
+
+AppendVal(LDFLAGS,-L$(PROTO_DIR)/lib/$(OEUVRE)/pic/O -L$(PROTO_DIR)/lib/$(OEUVRE)/pdc/O)
+
+AppendVal(LDLIBS,-ltt -lstt -lisam)
+loc_LDLIBS_spro		= -Bstatic
+loc_LDLIBS_SunOS4	= -lce -lX -lI18N -ldl
+loc_LDLIBS_SunOS5	= -lnsl -lsocket -lintl -ldl -lc -lw
+AppendVal(LDLIBS,$(loc_LDLIBS_$(OS)) $(loc_LDLIBS_$(Tools)))

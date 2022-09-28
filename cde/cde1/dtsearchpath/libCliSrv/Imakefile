@@ -1,0 +1,75 @@
+XCOMM $XConsortium: Imakefile /main/cde1_maint/3 1995/10/09 15:05:58 pascale $
+#include <Library.tmpl>
+
+/* General case INCLUDES DEFINES
+ * Each individual architecture may have more or less of the above.
+ * Use EXTRA_DEFINES and EXTRA_INCLUDES to add defines and includes
+ * to an individual architecture.
+ */
+INCLUDES = -I.
+
+/* DEPLIBS contains the list of library depencies for a client.
+ * LOCAL_LIBRARIES contains the list of libraries on the link line.
+ * Generally, the dependency form of a library has DEP as a prefix.
+ * e.g. put $(XLIB) in LOCAL_LIBRARIES and $(DEPXLIB) in DEPLIBS.
+ * NOTE: if DEPLIBS is not set here, it is by default null and there
+ *       are no library dependencies for clients.
+ *       You cannot put -Llibpath into DEPLIBS. You must put actual
+ *       paths to the library.
+ */
+
+/* put EXTRA_DEFINES and EXTRA_INCLUDES and anything else below */
+#ifdef AlphaArchitecture
+# if DoSharedLib
+SO_REQLIBS = $(XTOOLLIB) $(XLIB) -lcxx -lc
+# endif
+#endif
+
+#ifdef HPArchitecture
+#endif
+
+#ifdef SunArchitecture
+SYS_LIBRARIES = -ldl $(I18NSYSLIB)
+LAST_LOAD_FLAGS = -Bstatic -lC -Bdynamic -lm -lc -ladm -Bstatic
+EXTRA_DEFINES = -DIOSTREAMSWORKS
+#endif
+
+#ifdef RsArchitecture
+EXTRA_DEFINES = -DIOSTREAMSWORKS
+#endif
+
+#ifdef USLArchitecture
+#endif
+
+#ifdef UXPArchitecture
+#endif
+
+HEADERS=\
+	DirIterator.h \
+	Environ.h \
+	TTFile.h \
+	cstring.h
+
+LIBSRCS = \
+	DirIterator.C \
+	Environ.C \
+	cstring.C \
+	TTFile.C \
+	UnixEnv.C
+
+LIBOBJS = \
+	DirIterator.o \
+	Environ.o \
+	cstring.o \
+	TTFile.o \
+	UnixEnv.o
+
+LibraryObjectRule()
+NormalLibraryTarget(CliSrv,$(LIBOBJS))
+DependTarget()
+
+#ifdef TestBuildInstall
+TEST_INSTALL_ROOT = ../../..
+TestBuildInstall(cstring.h,$(TEST_INSTALL_ROOT)/include)
+TestLibraryBuildInstall(CliSrv,$(TEST_INSTALL_ROOT)/lib)
+#endif

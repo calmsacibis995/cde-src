@@ -1,0 +1,32 @@
+\#!/bin/ksh 
+\#####################################################################
+\###  File:              sessionetc
+\###
+\###  Default Location:  /usr/dt/config/sessionetc
+\###
+\###  Purpose:		 To start additional programs under user's id at login
+\### 			 time after all user saved session applications have
+\###			 been started.
+\###
+\###       		 The /usr/dt/config location can be overwritten by 
+\###			 system software upgrades.  If you want to start 
+\###			 additional programs specific to a this workstation and
+\###			 not be effected by system upgrades, instead create a 
+\###			 similar executable file at /etc/dt/config/sessionetc.
+\###
+\###  Invoked by:        CDE SessionMgr (dtsession)
+\###
+\###  Revision:          @(#)sessionetc.src 1.3 97/05/26 
+\###
+\###  (c) Copyright 1997 Sun Microsystems, Inc.
+\###
+\#####################################################################
+
+if [ "$DTXSERVERLOCATION" != "remote" ]
+then
+    if [ -x /usr/dt/bin/sdtvolcheck ]
+    then
+	/usr/dt/bin/sdtvolcheck -d -z 5 cdrom &
+	echo $! | /bin/cat > /var/dt/tmp/$DTUSERSESSION/sdtvolcheck_pid
+    fi
+fi

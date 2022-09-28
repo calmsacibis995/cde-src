@@ -1,0 +1,64 @@
+# %%  (c) Copyright 1993, 1994 Hewlett-Packard Company			
+# %%  (c) Copyright 1993, 1994 International Business Machines Corp.	
+# %%  (c) Copyright 1993, 1994 Sun Microsystems, Inc.			
+# %%  (c) Copyright 1993, 1994 Novell, Inc. 				
+# %%  $Revision: $ 			 				
+#
+#
+# @(#)SunMakefile	1.23 31 Jul 1993
+#
+# The ToolTalk ttdbck utility makefile
+#
+# Copyright (c) 1992 by Sun Microsystems, Inc.
+#
+
+TT_DIR = ../..
+THIS_DIR = bin/dbck
+
+include $(TT_DIR)/SunMakefile-head.mk
+
+all::			Bin-g
+
+$(BIN_TARGETS)::	ttdbck
+
+$(INSTALL_TARGETS)::	$(INSTALL_DIR)/bin/ttdbck
+
+Clean::
+	$(RM) ttdbck
+
+TTDBCK_CONTENTS = \
+	ttdbck.o \
+	binkey.o \
+	binkey_utils.o \
+	common.o \
+	options.o \
+	options_tt.o \
+	prop.o \
+	prop_utils.o \
+	spec.o \
+	spec_repair.o \
+	spec_utils.o
+
+
+CPPFLAGS	+=	$(CPPFLAGS-bin) -I$(TT_DIR)/slib $(CPPFLAGS-isam)
+CCFLAGS		+=	$(CCFLAGS-bin)
+CFLAGS		+=	$(CFLAGS-bin)
+LDFLAGS		+=	$(LDFLAGS-bin)
+
+MYLDLIBS_SunOS_4=	-lce -lX -lI18N -ldl
+LDLIBS		+=	$(MYLDLIBS_$(OS_NAME)_$(OS_VERSION))
+
+%/options.o	:=	CPPFLAGS +=	$(CPPFLAGS-version)
+
+OBJECTS =	$(TTDBCK_CONTENTS:%=$(DERIVED)/%)
+
+# We should probably try to generate a standard link for utilities
+# Trailing -Bstatic ensures libC is linked statically -- that could
+# go away in the future when libC is bundled.
+
+ttdbck:	$$(DERIVED) $$(OBJECTS) $$(LIBDEPENDENCY) $$(SLIBDEPENDENCY)
+	$(LINK.cc) -o $@ $(OBJECTS) \
+	-lstt -ltt -lisam \
+	$(LDLIBS) -Bstatic 2>&1 | c++filt
+
+include $(TT_DIR)/SunMakefile-tail.mk

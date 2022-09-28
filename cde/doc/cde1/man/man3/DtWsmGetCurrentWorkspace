@@ -1,0 +1,84 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+.\" **
+.\" **
+.\" ** (c) Copyright 1994 Hewlett-Packard Company
+.\" ** (c) Copyright 1994 International Business Machines Corp.
+.\" ** (c) Copyright 1994 Sun Microsystems, Inc.
+.\" ** (c) Copyright 1994 Unix Systems Labs, Inc., a subsidiary of Novell, Inc.
+.\" **
+.\" **
+.TH DtWsmGetCurrentWorkspace 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Common Desktop Environment 1.0: January 1994
+.SH NAME
+\fBDtWsmGetCurrentWorkspace\fP,
+\fBDtWsmSetCurrentWorkspace\fP \- get or set the current workspace.
+.iX "DtWsmGetCurrentWorkspace"
+.iX "workspace functions" "DtWsmGetCurrentWorkspace"
+.iX "DtWsmSetCurrentWorkspace"
+.iX "workspace functions" "DtWsmSetCurrentWorkspace"
+.sp .5
+.SH SYNOPSIS
+\fB
+\&#include <Dt/Wsm.h>
+.sp .5
+Status DtWsmGetCurrentWorkspace (
+.br
+.ta 0.75i 2.20i
+	Display *	\fIdisplay\fP,
+.br
+	Window	\fIroot\fP,
+.br
+	Atom *	\fIpaWorkspace\fP,
+.sp .5
+Status DtWsmSetCurrentWorkspace (
+.br
+.ta 0.75i 2.20i
+	Widget	\fIwidget\fP,
+.br
+	Atom	\fIaWorkspace\fP)
+.sp .5
+\fP
+.SH DESCRIPTION
+These functions are designed to work with the Common Desktop Environment
+window/workspace manager (dtwm).
+.PP
+\fBDtWsmGetCurrentWorkspace\fP returns the name of the current workspace
+(converted to an X Atom). It takes the following arguments:
+.sp .5
+.IP "\fIdisplay\fP" 1.00i
+The X display.
+.IP "\fIroot\fP" 1.00i
+The root window of the screen of interest.
+.IP "\fIpaWorkspace\fP" 1.00i
+The address of an Atom to receive the identifier for the current
+workspace.
+.PP
+\fBDtWsmSetCurrentWorkspace\fP sets the current workspace. This function
+can be used to switch to from the current workspace to another
+workspace. It takes the following arguments:
+.sp .5
+.IP "\fIwidget\fP" 1.00i
+A realized widget on the screen of interest. Note that a window is
+required from this widget.
+.IP "\fIaWorkspace\fP" 1.00i
+The name (in X Atom form) of the workspace that should be made current.
+.PP
+NOTE: \fBDtWsmSetCurrentWorkspace\fP simply sends a message to dtwm to switch 
+workspaces. If the workspace identifier is not valid, no error is
+reported.
+.sp .5
+.SH RETURN VALUE
+.IP "\fBSuccess\fP" 1.00i
+The function performed without error.
+.IP "not \fBSuccess\fP" 1.00i
+The function failed. The most likely reason for failure is that dtwm is
+not running.
+.sp .5
+.SH RELATED INFORMATION
+\fBdtwm(1X)\fP.
+.sp .5

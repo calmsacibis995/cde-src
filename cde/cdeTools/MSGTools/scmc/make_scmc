@@ -1,0 +1,33 @@
+# @(#)make_scmc	1.10  @(#)make_scmc	1.10 11/13/93 23:37:19
+#
+# COMPONENT_NAME: (PIITOOLS) AIX PII Tools
+#
+# FUNCTIONS: Makefile for AIX PII Tool SCMC
+#
+# ORIGINS: 27
+#
+# IBM CONFIDENTIAL -- (IBM Confidential Restricted when
+# combined with the aggregated modules for this product)
+# OBJECT CODE ONLY SOURCE MATERIALS
+# (C) COPYRIGHT International Business Machines Corp. 1989
+# All Rights Reserved
+#
+# US Government Users Restricted Rights - Use, duplication or
+# disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
+.SUFFIXES:	.msg .cat
+
+.msg.cat:
+	mkcatdefs $* $< | gencat    $@
+LDFLAGS = -lcur -lcurses -lPW -lmisc -L.
+
+all:	scmc.cat \
+	libmisc.a \
+	scmc
+
+libmisc_obj = \
+	libmisc.a(select.o) \
+	libmisc.a(spell.o) \
+	libmisc.a(help.o) \
+	libmisc.a(chkfmt.o)
+
+libmisc.a:	$(libmisc_obj)

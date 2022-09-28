@@ -1,0 +1,199 @@
+\#######################################################################
+\#
+\#     dthelp.dt
+\#
+\#     Actions and filetypes for Help files.
+\#
+\#    (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+\#    (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+\#    (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+\#    (c) Copyright 1993, 1994, 1995 Novell, Inc.
+\#
+\#     $XConsortium: dthelp.dt.src /main/cde1_maint/5 1995/10/31 11:22:08 rcs $
+\#
+\######################################################################
+set DtDbVersion=1.0
+
+\###############################################################################
+\#
+%|nls-10-#\# WARNING:...#|
+\#
+\###############################################################################
+
+\###################################################################
+\#
+%|nls-11-#\# Data Attributes#|
+\#
+\###################################################################
+DATA_ATTRIBUTES DTHELP_VOL
+{
+        ACTIONS         Open,Print
+        ICON		Dthvol
+        NAME_TEMPLATE   %s.sdl
+        MIME_TYPE	application/octet-stream
+        DESCRIPTION     %|nls-11001-#This is#|
+        TYPE_LABEL      %|nls-31047-#DTHELP_VOL#|
+}
+DATA_CRITERIA DTHELP_VOL1
+{
+        DATA_ATTRIBUTES_NAME DTHELP_VOL
+        MODE            f
+        NAME_PATTERN    *.sdl
+}
+DATA_CRITERIA DTHELP_VOL2
+{
+        DATA_ATTRIBUTES_NAME DTHELP_VOL
+        MODE            f
+        NAME_PATTERN    *.hv
+}
+ACTION Open
+{
+        LABEL           %|nls-1-Open|
+	ARG_TYPE 	DTHELP_VOL
+	TYPE		MAP
+        MAP_ACTION	Dthelpview
+}
+ACTION Print
+{
+        LABEL           %|nls-2-Print|
+        ARG_TYPE        DTHELP_VOL
+        TYPE            MAP
+        MAP_ACTION      NoPrint
+}
+
+\##########################################################
+
+DATA_ATTRIBUTES DTHELP_HT
+{
+        ACTIONS		(None)         
+        ICON		Dthtop
+        NAME_TEMPLATE   %s.ht
+        MIME_TYPE	application/octet-stream
+        DESCRIPTION     %|nls-11002-#This is#|
+        TYPE_LABEL      %|nls-31048-#DTHELP_HT#|
+}
+DATA_CRITERIA DTHELP_HT1
+{
+        DATA_ATTRIBUTES_NAME DTHELP_HT
+        NAME_PATTERN    *.ht
+        MODE            f
+}
+
+\##########################################################
+
+DATA_ATTRIBUTES DTHELP_HVK
+{
+        ACTIONS		(None)         
+        ICON		Dthtop
+        NAME_TEMPLATE   %s.hvk
+        MIME_TYPE	application/octet-stream
+        DESCRIPTION     %|nls-11003-#This is#|
+        TYPE_LABEL      %|nls-31049-#DTHELP_HVK#|
+}
+DATA_CRITERIA DTHELP_HVK1
+{
+        DATA_ATTRIBUTES_NAME DTHELP_HVK
+        NAME_PATTERN    *.hvk
+        MODE            f
+}
+
+\##########################################################
+
+DATA_ATTRIBUTES DTHELP_XRH
+{
+        ACTIONS		(None)         
+        ICON		Dthtop
+        NAME_TEMPLATE   %s.xrh
+        MIME_TYPE	application/octet-stream
+        DESCRIPTION     %|nls-11004-#This is#|
+        TYPE_LABEL      %|nls-31050-#DTHELP_XRH#|
+}
+DATA_CRITERIA DTHELP_XRH
+{
+        DATA_ATTRIBUTES_NAME DTHELP_XRH
+        NAME_PATTERN    *.xrh
+        MODE            f
+}
+
+\###################################################################
+\###################################################################
+\#
+%|nls-12-#\# Actions#|
+\#
+\###################################################################
+ACTION Dthelpview
+{
+        LABEL           %|nls-11005-#Help Viewer#|
+	ARG_COUNT	0
+        ICON		Fphelp
+	TYPE		COMMAND
+	WINDOW_TYPE	NO_STDIO
+        EXEC_STRING     /bin/sh -c '/usr/dt/bin/dthelpgen -dir $HOME/.dt/help/$DTUSERSESSION; \
+                           /usr/dt/bin/dthelpview -helpVolume browser '
+	DESCRIPTION	%|nls-11007-#The#|
+}
+ACTION Dthelpview
+{
+        LABEL           %|nls-11005-#Help Viewer#|
+        ICON		Fphelp
+	TYPE		COMMAND
+	WINDOW_TYPE	NO_STDIO
+        EXEC_STRING     /bin/sh -c '/usr/dt/bin/dthelpgen 	\
+			    -dir $HOME/.dt/help/$DTUSERSESSION; \
+                            /usr/dt/bin/dthelpview -helpVolume "%(File)Arg_1%" '
+	DESCRIPTION	%|nls-11007-#The#|
+}
+
+\########
+
+ACTION Dthelpgen
+{
+        LABEL           %|nls-11014-#Help Generator#|
+        ICON		Fphelp
+	TYPE		COMMAND
+	WINDOW_TYPE	NO_STDIO
+        EXEC_STRING     /bin/sh -c '/usr/dt/bin/dthelpgen -dir \
+                         "%(File)Arg_1"%|nls-11015-#Location to put files:#|"%"'
+	DESCRIPTION	%|nls-11016-#The#|
+}
+ACTION Dthelpgen_delay
+{
+        LABEL           %|nls-11014-#Help Generator#|
+        ICON		Fphelp
+	TYPE		COMMAND
+	WINDOW_TYPE	NO_STDIO
+        EXEC_STRING     /bin/sh -c 'sleep 15; /usr/dt/bin/dthelpgen -dir \
+                         $HOME/.dt/help/$DTUSERSESSION'
+	DESCRIPTION	%|nls-11016-#The#|
+}
+
+\########
+
+ACTION Dtmanpageview 
+{
+        LABEL           %|nls-11010-#Man Page Viewer#|
+        ICON            Dthover
+        TYPE            COMMAND
+        WINDOW_TYPE     NO_STDIO
+	ARG_TYPE	MAN_PAGE
+        EXEC_STRING     sh -c '\
+	    MAN_PAGE=`basename "%(File)Arg_1"%|nls-11011-#Man#|"%"`; \
+	    PAGE="`echo \${MAN_PAGE} | cut -f1 -d\. `" ; \
+	    SECT="`echo \${MAN_PAGE} | cut -f2 -d\. `" ; \
+	    dthelpview -manPage "-s \${SECT} \${PAGE}" -xrm "Dthelpview*manBox.columns: %|nls-11012-#100#|"'
+        DESCRIPTION     %|nls-11013-#The#|
+}
+
+
+ACTION Dtmanpageview 
+{
+        LABEL           %|nls-11010-#Man Page Viewer#|
+        ICON		Dthover
+	TYPE		COMMAND
+	WINDOW_TYPE	NO_STDIO
+        EXEC_STRING     sh -c '	\
+		dthelpview -manPage "%(String)Arg_1"%|nls-11011-#Man#|"%" -xrm "Dthelpview*manBox.columns: %|nls-11012-#100#|"'
+        DESCRIPTION     %|nls-11013-#The#|
+}
+
+\########################### EOF ##############################################

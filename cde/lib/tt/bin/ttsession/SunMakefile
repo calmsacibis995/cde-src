@@ -1,0 +1,65 @@
+# %%  (c) Copyright 1993, 1994 Hewlett-Packard Company			
+# %%  (c) Copyright 1993, 1994 International Business Machines Corp.	
+# %%  (c) Copyright 1993, 1994 Sun Microsystems, Inc.			
+# %%  (c) Copyright 1993, 1994 Novell, Inc. 				
+# %%  $Revision: $ 			 				
+#
+#
+# @(#)SunMakefile	1.26 31 Jul 1993
+#
+# The ToolTalk ttsession server makefile
+#
+# Copyright (c) 1992 by Sun Microsystems, Inc.
+#
+
+TT_DIR = ../..
+THIS_DIR = bin/ttsession
+
+include $(TT_DIR)/SunMakefile-head.mk
+
+all::		Bin-g
+
+$(BIN_TARGETS)::	ttsession
+
+$(INSTALL_TARGETS)::	$(INSTALL_DIR)/bin/ttsession
+
+$(BB_TARGETS)::		ttsession
+
+Clean::
+	$(RM) ttsession
+
+TTSESSION_CONTENTS =	mp_server.o
+
+CPPFLAGS	+=	$(CPPFLAGS-bin) -I$(TT_DIR)/slib
+CCFLAGS		+=	$(CCFLAGS-bin)
+CFLAGS		+=	$(CFLAGS-bin)
+LDFLAGS		+=	$(LDFLAGS-bin)
+
+MAP_CCFLAGS_glob=
+MAP_CCFLAGS_SunOS_5=	-Qoption ld -MMapfile
+MAP_CCFLAGS_loc	=	$(MAP_CCFLAGS_$(OS_NAME)_$(OS_VERSION))
+MAP_CCFLAGS	=	$(MAP_CCFLAGS_glob$(MAP_CCFLAGS_loc))$(MAP_CCFLAGS_loc)
+
+LDFLAGS-O	+=	$(MAP_CCFLAGS)
+LDFLAGS-g	+=	$(MAP_CCFLAGS)
+
+MYLDLIBS_SunOS_4=	-lce -lX -lI18N -ldl
+MYLDLIBS_SunOS_5=	-lw
+LDLIBS		+=	$(MYLDLIBS_$(OS_NAME)_$(OS_VERSION))
+
+%/mp_server.o	:=	CPPFLAGS +=     $(CPPFLAGS-version)
+
+OBJECTS =	$(TTSESSION_CONTENTS:%=$(DERIVED)/%)
+
+# We don't try to generate a general rule for linking ttsession, since
+# it links differently from any other binary in the system anyway.
+# Trailing -Bstatic ensures libC is linked statically -- that could
+# go away in the future when libC is bundled.
+
+ttsession:	$$(DERIVED) $$(OBJECTS) \
+		$$(SLIBDEPENDENCY) $$(LIBDEPENDENCY) \
+		Mapfile
+	$(LINK.cc) -o $@ $(OBJECTS) \
+	-lstt -ltt $(LDLIBS) -Bstatic
+
+include $(TT_DIR)/SunMakefile-tail.mk

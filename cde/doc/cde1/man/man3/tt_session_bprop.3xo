@@ -1,0 +1,85 @@
+.TH tt_session_bprop 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+tt_session_bprop \- retrieve the ith value of the named property of a session
+.SH SYNOPSIS
+.yS
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'Tt_status tt_session_bprop('u
+Tt_status tt_session_bprop(const char *\f2sessid\fP,
+	const char *\f2propname\fP,
+	int \f2i\fP,
+	unsigned char **\f2value\fP,
+	int *\f2length\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn tt_session_bprop
+function
+retrieves the
+.IR i th
+value of the named property of the specified session.
+.P
+If there are
+.I i
+values or fewer, both the returned value and the returned length
+are set to zero.
+.P
+The
+.I sessid
+argument is the session joined.
+The application can use the
+.I sessid
+value returned when
+.Fn tt_default_session
+is called.
+The
+.I propname
+argument is the name of the property from which values are to be obtained.
+The
+.I i
+argument is the number of the item in the property list from which the value is to be
+obtained.
+The list numbering begins with zero.
+The
+.I value
+argument is the
+address of a character pointer to which the ToolTalk service is to point a
+string that contains the contents of the property.
+The
+.I len
+argument is the address of an integer to which the ToolTalk service is to set the length of
+the value in bytes.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn tt_session_bprop
+function returns the status of the operation as one of the following
+.B Tt_status
+values:
+.VL 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_NOMEM
+.br
+There is insufficient memory available to perform the function.
+.Lc TT_ERR_NOMP
+.br
+The
+.Cm ttsession 1
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_NUM
+.br
+The integer value passed was invalid (out of range).
+.Lc TT_ERR_PROPNAME
+.br
+The specified property name is syntactically invalid.
+.Lc TT_ERR_SESSION
+.br
+The specified ToolTalk session is out of date or invalid.
+.LE
+.SH "SEE ALSO"
+.Hd Tt/tt_c.h 5.

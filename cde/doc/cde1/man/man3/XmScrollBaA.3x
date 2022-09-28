@@ -1,0 +1,533 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH XmScrollBar 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmScrollBar\fP \- The ScrollBar widget class
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/ScrollBar.h>
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+The ScrollBar widget allows the user to view data that is too large to be
+displayed all at once.  ScrollBars are usually located inside a
+ScrolledWindow and adjacent to
+the widget that contains the data to be viewed.  When the user interacts
+with the ScrollBar, the data within the other widget scrolls.
+.PP 
+A ScrollBar consists of two arrows placed at each end of a rectangle.  The
+rectangle is called the scroll region.  A smaller rectangle, called the
+slider, is placed within the scroll region.  The data is scrolled by
+clicking either arrow, selecting on the scroll region, or dragging the slider.
+When an arrow is selected, the slider within the scroll region is
+moved in the direction of the arrow by an amount supplied by the
+application.  If the mouse button is held down, the slider continues to
+move at a constant rate.
+.PP 
+The ratio of the slider size to the scroll region size typically
+corresponds to the
+relationship between the size of the visible data and the total size
+of the data.  For example, if 10 percent of the data is visible, the
+slider typically occupies 10 percent of the scroll region.  This provides the
+user with a visual clue to the size of the invisible data.
+.SS "Classes"
+ScrollBar inherits behavior and resources from the \fICore\fP and
+\fIXmPrimitive\fP classes.
+.PP 
+The class pointer is \fIxmScrollBarWidgetClass\fP.
+.PP 
+The class name is \fIXmScrollBar\fP.
+.SS "New Resources"
+The following table defines a set of widget resources used by the programmer
+to specify data.  The programmer can also set the resource values for the
+inherited classes to set attributes for this widget.  To reference a
+resource by name or by class in a .Xdefaults file, remove the \fIXmN\fP or
+\fIXmC\fP prefix and use the remaining letters.  To specify one of the defined
+values for a resource in a .Xdefaults file, remove the \fIXm\fP prefix and use
+the remaining letters (in either lowercase or uppercase, but include any
+underscores between words).
+The codes in the access column indicate if the given resource can be
+set at creation time (C),
+set by using \fIXtSetValues\fP (S),
+retrieved by using \fIXtGetValues\fP (G), or is not applicable (N/A).
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmScrollBar Resource Set
+Name	Class	Type	Default	Access
+_
+XmNdecrementCallback	XmCCallback	XtCallbackList	NULL	C
+XmNdragCallback	XmCCallback	XtCallbackList	NULL	C
+XmNincrement	XmCIncrement	int	1	CSG
+XmNincrementCallback	XmCCallback	XtCallbackList	NULL	C
+XmNinitialDelay	XmCInitialDelay	int	250 ms	CSG
+XmNmaximum	XmCMaximum	int	dynamic	CSG
+XmNminimum	XmCMinimum	int	0	CSG
+XmNorientation	XmCOrientation	unsigned char	XmVERTICAL	CSG
+XmNpageDecrementCallback	XmCCallback	XtCallbackList	NULL	C
+XmNpageIncrement	XmCPageIncrement	int	10	CSG
+XmNpageIncrementCallback	XmCCallback	XtCallbackList	NULL	C
+XmNprocessingDirection	XmCProcessingDirection	unsigned char	dynamic	CSG
+XmNrepeatDelay	XmCRepeatDelay	int	50 ms	CSG
+XmNshowArrows	XmCShowArrows	Boolean	True	CSG
+.wH
+.tH
+XmNsliderSize	XmCSliderSize	int	dynamic	CSG
+XmNtoBottomCallback	XmCCallback	XtCallbackList	NULL	C
+XmNtoTopCallback	XmCCallback	XtCallbackList	NULL	C
+XmNtroughColor	XmCTroughColor	Pixel	dynamic	CSG
+XmNvalue	XmCValue	int	dynamic	CSG
+XmNvalueChangedCallback	XmCCallback	XtCallbackList	NULL	C
+.TE
+.KE
+.in
+.sp 1
+.IP "\fIXmNdecrementCallback\fP"
+Specifies the list of callbacks that is called when the user takes an
+action that moves the ScrollBar by one increment and the value
+decreases.
+The reason passed to the callback is \fIXmCR_DECREMENT\fP.
+.IP "\fIXmNdragCallback\fP"
+Specifies the list of callbacks that is called
+on each incremental change of position
+when the slider is being dragged.  The reason sent by the
+callback is \fIXmCR_DRAG\fP.
+.IP "\fIXmNincrement\fP"
+Specifies the amount by which the value increases or decreases when the
+user takes an action that moves the slider by one increment.
+The actual change in value is the lesser of \fIXmNincrement\fP and
+(previous \fIXmNvalue\fP\ \- \fIXmNminimum\fP) when the slider moves to
+the end of the ScrollBar with the minimum value,
+and the lesser of\fIXmNincrement\fP
+and (\fIXmNmaximum\fP\- \fIXmNsliderSize\fP\ \-
+previous \fIXmNvalue\fP) when the slider moves to the end of the
+ScrollBar with the maximum value.
+The value of this resource must be greater than 0.
+.nL
+.ne 6
+.IP "\fIXmNincrementCallback\fP"
+Specifies the list of callbacks that is called when the user takes an
+action that moves the ScrollBar by one increment and the value
+increases.
+The reason passed to the callback is \fIXmCR_INCREMENT\fP.
+.IP "\fIXmNinitialDelay\fP"
+Specifies the amount of time in milliseconds to wait before starting
+continuous
+slider movement while a button is pressed in an arrow or the scroll region.
+The value of this resource must be greater than 0.
+.IP "\fIXmNmaximum\fP"
+Specifies the slider's maximum value.  ScrollBars contained within
+ScrolledWindows have a maximum equal to the size of ScrollBar (that
+is, the height if it is vertical, or the width if it is horizontal).
+\fIXmNmaximum\fP must be greater than \fIXmNminimum\fP.
+.IP "\fIXmNminimum\fP"
+Specifies the slider's minimum value.
+\fIXmNmaximum\fP must be greater than \fIXmNminimum\fP.
+.IP "\fIXmNorientation\fP"
+Specifies whether the ScrollBar is displayed vertically or horizontally.
+This resource can have values of \fIXmVERTICAL\fP and \fIXmHORIZONTAL\fP.
+.IP "\fIXmNpageDecrementCallback\fP"
+Specifies the list of callbacks that is called when the user takes an
+action that moves the ScrollBar by one page increment and the value
+decreases.
+The reason passed to the callback is \fIXmCR_PAGE_DECREMENT\fP.
+.IP "\fIXmNpageIncrement\fP"
+Specifies the amount by which the value increases or decreases when
+the user takes an action that moves the slider by one page increment.
+The actual change in value is the lesser of \fIXmNpageIncrement\fP and
+(previous \fIXmNvalue\fP\ \- \fIXmNminimum\fP) when the slider moves to
+the end of the ScrollBar with the
+minimum value, and the lesser of
+\fIXmNpageIncrement\fP and (\fIXmNmaximum\fP\- \fIXmNsliderSize\fP\ \-
+previous \fIXmNvalue\fP) when the slider moves to the end of the
+ScrollBar with the maximum value.
+The value of this resource must be greater than 0.
+.nL
+.ne 10
+.IP "\fIXmNpageIncrementCallback\fP"
+Specifies the list of callbacks that is called when the user takes an
+action that moves the ScrollBar by one page increment and the value
+increases.
+The reason passed to the callback is \fIXmCR_PAGE_INCREMENT\fP.
+.IP "\fIXmNprocessingDirection\fP"
+Specifies whether the value for \fIXmNmaximum\fP should be on the right or
+left side of \fIXmNminimum\fP for horizontal ScrollBars
+or above or below \fIXmNminimum\fP for vertical ScrollBars.
+This resource can have values of \fIXmMAX_ON_TOP, XmMAX_ON_BOTTOM,XmMAX_ON_LEFT\fP, and \fIXmMAX_ON_RIGHT\fP.
+If the XmScrollBar is oriented vertically,
+the default value is \fIXmMAX_ON_BOTTOM\fP.
+If the XmScrollBar is oriented horizontally,
+the default value may depend on the value of the
+\fIXmNstringDirection\fP resource.
+.IP "\fIXmNrepeatDelay\fP"
+Specifies the amount of time in milliseconds to wait between
+subsequent slider movements after the \fIXmNinitialDelay\fP has been processed.
+The value of this resource must be greater than 0.
+.IP "\fIXmNshowArrows\fP"
+Specifies whether the arrows are displayed.
+.IP "\fIXmNsliderSize\fP"
+Specifies the length of the slider between the values of 1 and
+(\fIXmNmaximum\fP\ \- \fIXmNminimum\fP).
+The value is constrained to be within these inclusive bounds.
+The default value is (\fIXmNmaximum\fP\ \- \fIXmNminimum\fP) divided by
+10, with a minimum of 1.
+.nL
+.ne 15
+.IP "\fIXmNtoBottomCallback\fP"
+Specifies the list of callbacks that is called when the user takes an
+action that moves the slider to the end of the ScrollBar with the
+maximum value.
+The reason passed to the callback is \fIXmCR_TO_BOTTOM\fP.
+.ne 10
+.IP "\fIXmNtoTopCallback\fP"
+Specifies the list of callbacks that is called when the user takes an
+action that moves the slider to the end of the ScrollBar with the
+minimum value.
+The reason passed to the callback is \fIXmCR_TO_TOP\fP.
+.IP "\fIXmNtroughColor\fP"
+Specifies the color of the slider trough.
+.IP "\fIXmNvalue\fP"
+Specifies the slider's position, between \fIXmNminimum\fP and
+(\fIXmNmaximum\fP\ \- \fIXmNsliderSize\fP).
+The value is constrained to be within these inclusive bounds.
+The initial value of this resource is the larger of 0 and \fIXmNminimum\fP.
+.IP "\fIXmNvalueChangedCallback\fP"
+Specifies the list of callbacks that is called when the slider is
+released after being dragged.
+These callbacks are also called in place of \fIXmNincrementCallback\fP,
+\fIXmNdecrementCallback\fP, \fIXmNpageIncrementCallback\fP,
+\fIXmNpageDecrementCallback\fP, \fIXmNtoTopCallback\fP, or
+\fIXmNtoBottomCallback\fP when one of these callback lists would
+normally be called but the value of the corresponding resource is NULL.
+The reason passed to the callback is \fIXmCR_VALUE_CHANGED\fP.
+.SS "Inherited Resources"
+ScrollBar inherits behavior and resources from the following
+superclasses.  For a complete description of each resource, refer to the
+man page for that superclass.
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmPrimitive Resource Set
+Name	Class	Type	Default	Access
+_
+XmNbottomShadowColor	XmCBottomShadowColor	Pixel	dynamic	CSG
+XmNbottomShadowPixmap	XmCBottomShadowPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNforeground	XmCForeground	Pixel	dynamic	CSG
+XmNhelpCallback	XmCCallback	XtCallbackList	NULL	C
+XmNhighlightColor	XmCHighlightColor	Pixel	dynamic	CSG
+XmNhighlightOnEnter	XmCHighlightOnEnter	Boolean	False	CSG
+XmNhighlightPixmap	XmCHighlightPixmap	Pixmap	dynamic	CSG
+XmNhighlightThickness	XmCHighlightThickness	Dimension	dynamic	CSG
+.wH
+.tH
+XmNnavigationType	XmCNavigationType	XmNavigationType	XmSTICKY_TAB_GROUP	CSG
+XmNshadowThickness	XmCShadowThickness	Dimension	2	CSG
+XmNtopShadowColor	XmCTopShadowColor	Pixel	dynamic	CSG
+XmNtopShadowPixmap	XmCTopShadowPixmap	Pixmap	dynamic	CSG
+XmNtraversalOn	XmCTraversalOn	Boolean	dynamic	CSG
+XmNunitType	XmCUnitType	unsigned char	dynamic	CSG
+XmNuserData	XmCUserData	XtPointer	NULL	CSG
+.TE
+.KE
+.in
+.sp 1
+.P 
+.wH
+.in 0 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+Core Resource Set
+Name	Class	Type	Default	Access
+_
+XmNaccelerators	XmCAccelerators	XtAccelerators	dynamic	CSG
+XmNancestorSensitive	XmCSensitive	Boolean	dynamic	G
+XmNbackground	XmCBackground	Pixel	dynamic	CSG
+XmNbackgroundPixmap	XmCPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNborderColor	XmCBorderColor	Pixel	XtDefaultForeground	CSG
+XmNborderPixmap	XmCPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNborderWidth	XmCBorderWidth	Dimension	0	CSG
+XmNcolormap	XmCColormap	Colormap	dynamic	CG
+XmNdepth	XmCDepth	int	dynamic	CG
+XmNdestroyCallback	XmCCallback	XtCallbackList	NULL	C
+XmNheight	XmCHeight	Dimension	dynamic	CSG
+XmNinitialResourcesPersistent	XmCInitialResourcesPersistent	Boolean	True	C
+XmNmappedWhenManaged	XmCMappedWhenManaged	Boolean	True	CSG
+XmNscreen	XmCScreen	Screen *	dynamic	CG
+.wH
+.tH
+XmNsensitive	XmCSensitive	Boolean	True	CSG
+XmNtranslations	XmCTranslations	XtTranslations	dynamic	CSG
+XmNwidth	XmCWidth	Dimension	dynamic	CSG
+XmNx	XmCPosition	Position	0	CSG
+XmNy	XmCPosition	Position	0	CSG
+.TE
+.KE
+.in
+.sp 1
+.wH
+.in  
+.SS "Callback Information"
+A pointer to the following structure is passed to each callback:
+.sS
+.iS
+.ta .25i 1.1i
+.nf
+typedef struct
+{
+	int	\fBreason\fI;
+	XEvent	\fB* event\fI;
+	int	\fBvalue\fI;
+	int	\fBpixel\fI;
+} XmScrollBarCallbackStruct;
+.iE
+.sE
+.wH
+.fi
+.IP "\fBreason\fP"
+Indicates why the callback was invoked.
+.IP "\fBevent\fP"
+Points to the \fIXEvent\fP that triggered the callback.
+.IP "\fBvalue\fP"
+Contains the new slider location value.
+.IP "\fBpixel\fP"
+Is used only for \fIXmNtoTopCallback\fP and \fIXmNtoBottomCallback\fP.
+For horizontal ScrollBars, it contains the \fBx\fP coordinate of where
+the mouse button selection occurred.  For vertical ScrollBars, it
+contains the \fBy\fP coordinate.
+.SS "Translations"
+XmScrollBar includes translations from Primitive.
+The XmScrollBar translations are listed below.
+These translations may not directly correspond to a
+translation table.
+.iS
+.ta 1.5i
+.nf
+BSelect Press:	Select()
+BSelect Release:	Release()
+BSelect Press Moved:	Moved()
+.sp \n(PDu
+BDrag Press:	Select()
+BDrag Release:	Release()
+BDrag Press Moved:	Moved()
+.sp \n(PDu
+MCtrl BSelect Press:	TopOrBottom()
+MCtrl BSelect Release:	Release()
+.sp \n(PDu
+KUp:	IncrementUpOrLeft(0)
+MCtrl KUp:	PageUpOrLeft(0)
+.sp \n(PDu
+KDown:	IncrementDownOrRight(0)
+MCtrl KDown:	PageDownOrRight(0)
+.sp \n(PDu
+KLeft:	IncrementUpOrLeft(1)
+MCtrl KLeft:	PageUpOrLeft(1)
+.sp \n(PDu
+KRight:	IncrementDownOrRight(1)
+MCtrl KRight:	PageDownOrRight(1)
+.sp \n(PDu
+KPageUp:	PageUpOrLeft(0)
+KPageDown:	PageDownOrRight(0)
+KPageLeft:	PageUpOrLeft(1)
+KPageRight:	PageDownOrRight(1)
+.sp \n(PDu
+KBeginLine:	TopOrBottom()
+KEndLine:	TopOrBottom()
+.sp \n(PDu
+KBeginData:	TopOrBottom()
+KEndData:	TopOrBottom()
+.sp \n(PDu
+KNextField:	PrimitiveNextTabGroup()
+KPrevField:	PrimitivePrevTabGroup()
+.sp \n(PDu
+KActivate:	PrimitiveParentActivate()
+KCancel:	CancelDrag()
+.sp \n(PDu
+KHelp:	PrimitiveHelp()
+.iE
+.wH
+.fi
+.SS "Action Routines"
+The ScrollBar action routines are described below:
+.IP "\fICancelDrag()\fP:"
+If the key press occurs during scrolling, cancels the
+scroll and returns the slider to its previous location in the scrollbar,
+otherwise, and if the parent is a manager, it passes the event to
+the parent.
+.IP "\fIIncrementDownOrRight(0|1)\fP:"
+With an argument of 0, moves the slider down by one increment.
+With an argument of 1, moves the slider right by one increment.
+If \fIXmNprocessingDirection\fP is \fIXmMAX_ON_RIGHT\fP or
+\fIXmMAX_ON_BOTTOM\fP, movement toward the right or
+bottom calls the callbacks for \fIXmNincrementCallback\fP.
+If \fIXmNprocessingDirection\fP is \fIXmMAX_ON_LEFT\fP or
+\fIXmMAX_ON_TOP\fP, movement toward the right or
+bottom calls the callbacks for \fIXmNdecrementCallback\fP.
+The \fIXmNvalueChangedCallback\fP is called if the
+\fIXmNincrementCallback\fP or \fIXmNdecrementCallback\fP is NULL.
+.IP "\fIIncrementUpOrLeft(0|1)\fP:"
+With an argument of 0, moves the slider up by one increment.
+With an argument of 1, moves the slider left by one increment.
+If \fIXmNprocessingDirection\fP is \fIXmMAX_ON_RIGHT\fP or
+\fIXmMAX_ON_BOTTOM\fP,
+movement to the left or top calls the callbacks for
+\fIXmNdecrementCallback\fP.
+If \fIXmNprocessingDirection\fP is \fIXmMAX_ON_LEFT\fP or
+\fIXmMAX_ON_TOP\fP,
+movement to the left or top calls the callbacks for
+\fIXmNincrementCallback\fP.
+The \fIXmNvalueChangedCallback\fP is called if the
+\fIXmNincrementCallback\fP or \fIXmNdecrementCallback\fP is NULL.
+.IP "\fIMoved()\fP:"
+If the button press occurs within the slider, the subsequent motion
+events move the slider to the position of the pointer and call the
+callbacks for \fIXmNdragCallback\fP.
+.IP "\fIPageDownOrRight(0|1)\fP:"
+With an argument of 0, moves the slider down by one page increment.
+With an argument of 1, moves the slider right by one page increment.
+If \fIXmNprocessingDirection\fP is \fIXmMAX_ON_RIGHT\fP or
+\fIXmMAX_ON_BOTTOM\fP, movement toward the right or
+bottom calls the callbacks for \fIXmNpageIncrementCallback\fP.
+If \fIXmNprocessingDirection\fP is \fIXmMAX_ON_LEFT\fP or
+\fIXmMAX_ON_TOP\fP, movement toward the right or
+bottom calls the callbacks for \fIXmNpageDecrementCallback\fP.
+The \fIXmNvalueChangedCallback\fP is called if the
+\fIXmNpageIncrementCallback\fP or \fIXmNpageDecrementCallback\fP is NULL.
+.IP "\fIPageUpOrLeft(0|1)\fP:"
+With an argument of 0, moves the slider up by one page increment.
+With an argument of 1, moves the slider left by one page increment.
+If \fIXmNprocessingDirection\fP is \fIXmMAX_ON_RIGHT\fP or
+\fIXmMAX_ON_BOTTOM\fP,
+movement to the left or top calls the callbacks for
+\fIXmNpageDecrementCallback\fP.
+If \fIXmNprocessingDirection\fP is \fIXmMAX_ON_LEFT\fP or
+\fIXmMAX_ON_TOP\fP,
+movement to the left or top calls the callbacks for
+\fIXmNpageIncrementCallback\fP.
+The \fIXmNvalueChangedCallback\fP is called if the
+\fIXmNpageIncrementCallback\fP or \fIXmNpageDecrementCallback\fP is NULL.
+.IP "\fIPrimitiveHelp()\fP:"
+Calls the callbacks for \fIXmNhelpCallback\fP if any exist.  If there are no help
+callbacks for this widget, this action calls the help callbacks
+for the nearest ancestor that has them.
+.IP "\fIPrimitiveNextTabGroup()\fP:"
+Traverses to the first item in the next tab group.  If
+the current tab group is the last entry in the tab group list, it
+wraps to the beginning of the tab group list.
+.IP "\fIPrimitiveParentActivate()\fP:"
+If the parent is a manager,
+passes the event to the parent.
+.IP "\fIPrimitivePrevTabGroup()\fP:"
+Traverses to the first item in the previous tab group.
+If the beginning of the tab group list is reached, it wraps to the end
+of the tab group list.
+.nL
+.ne 5
+.IP "\fIRelease()\fP:"
+If the button press occurs within the slider and the slider position
+is changed, the callbacks for \fIXmNvalueChangedCallback\fP are called.
+.IP "\fISelect()\fP:"
+\fI(in arrow)\fP:  Moves the slider by one increment in the direction
+of the arrow.
+If \fIXmNprocessingDirection\fP is \fIXmMAX_ON_RIGHT\fP or
+\fIXmMAX_ON_BOTTOM\fP, movement toward the right or
+bottom calls the callbacks for \fIXmNincrementCallback\fP,
+and movement to the left or top calls the callbacks for
+\fIXmNdecrementCallback\fP.
+If \fIXmNprocessingDirection\fP is \fIXmMAX_ON_LEFT\fP or
+\fIXmMAX_ON_TOP\fP, movement toward the right or
+bottom calls the callbacks for \fIXmNdecrementCallback\fP,
+and movement to the left or top calls the callbacks for
+\fIXmNincrementCallback\fP.
+The \fIXmNvalueChangedCallback\fP is called if the
+\fIXmNincrementCallback\fP or \fIXmNdecrementCallback\fP is NULL.
+.P
+\fI(in scroll region between an arrow and the slider)\fP:  Moves the
+slider by one page increment in the direction of the arrow.
+If \fIXmNprocessingDirection\fP is \fIXmMAX_ON_RIGHT\fP or
+\fIXmMAX_ON_BOTTOM\fP, movement toward the right or
+bottom calls the callbacks for \fIXmNpageIncrementCallback\fP,
+and movement to the left or top calls the callbacks for
+\fIXmNpageDecrementCallback\fP.
+If \fIXmNprocessingDirection\fP is \fIXmMAX_ON_LEFT\fP or
+\fIXmMAX_ON_TOP\fP, movement toward the right or
+bottom calls the callbacks for \fIXmNpageDecrementCallback\fP,
+and movement to the left or top calls the callbacks for
+\fIXmNpageIncrementCallback\fP.
+The \fIXmNvalueChangedCallback\fP is called if the
+\fIXmNpageIncrementCallback\fP or \fIXmNpageDecrementCallback\fP is
+NULL.
+.P
+\fI(in slider)\fP:  Activates the interactive dragging of the slider.
+.P
+If the button is held down in either the arrows or the scroll region
+longer than the \fIXmNinitialDelay\fP resource, the slider is
+moved again by the same increment and the same callbacks are called.
+.ne 5
+After the initial delay has been used, the time delay changes to the
+time defined by the resource \fIXmNrepeatDelay\fP.
+.IP "\fITopOrBottom()\fP:"
+\fIMCtrl BSelect Press\fP in an arrow or in the scroll region between an
+arrow and the slider moves the slider as far as possible in the
+direction of the arrow.
+If \fIXmNprocessingDirection\fP is \fIXmMAX_ON_RIGHT\fP or
+\fIXmMAX_ON_BOTTOM\fP, movement toward the right or
+bottom calls the callbacks for \fIXmNtoBottomCallback\fP,
+and movement to the left or top calls the callbacks for
+\fIXmNtoTopCallback\fP.
+If \fIXmNprocessingDirection\fP is \fIXmMAX_ON_LEFT\fP or
+\fIXmMAX_ON_TOP\fP, movement toward the right or
+bottom calls the callbacks for \fIXmNtoTopCallback\fP,
+and movement to the left or top calls the callbacks for
+\fIXmNtoBottomCallback\fP.
+The \fIXmNvalueChangedCallback\fP is called if the
+\fIXmNtoTopCallback\fP or \fIXmNtoBottomCallback\fP is NULL.
+Pressing \fIKBeginLine\fP or \fIKBeginData\fP moves the slider to the
+minimum value and invokes the \fIXmNtoTopCallback\fP.
+Pressing \fIKEndLine\fP or \fIKEndData\fP moves the slider to the
+maximum value and invokes the \fIXmNtoBottomCallback\fP.
+.SS "Virtual Bindings"
+The bindings for virtual keys are vendor specific.
+For information about bindings for virtual buttons and keys, see \fIVirtualBindings(3X)\fP.
+.SH RELATED INFORMATION
+.na
+\fICore(3X)\fP, \fIXmCreateScrollBar(3X)\fP, \fIXmPrimitive(3X)\fP,
+\fIXmScrollBarGetValues(3X)\fP, and
+\fIXmScrollBarSetValues(3X)\fP.
+.ad

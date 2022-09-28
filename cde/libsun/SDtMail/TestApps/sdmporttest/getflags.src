@@ -1,0 +1,46 @@
+/* @(#)getflags.src	1.2 97/04/29 SMI */
+
+token create token1
+#include "setup.src"
+token set token1 serviceoption messagestorename /tmp/test.mbx
+
+! /usr/bin/rm -f /tmp/test.mbx /tmp/.test.mbx_* /tmp/.test.mbx_dt_index
+! /usr/bin/cp test2.mbx /tmp/test.mbx
+! /usr/bin/chmod 660 /tmp/test.mbx
+
+/**/# Create, startup and open a dataport
+port create port1
+port startup port1
+port open port1 token1
+
+/**/# Set, clear and get flags
+port getflags port1 4
+port getflags port1 6,7,9,12
+port getflags port1 6:8
+
+port getflags port1 10:20
+port setflags port1 10 answered
+port setflags port1 10,11 flagged seen draft
+port clearflags port1 12,14 deleted flagged seen draft recent answered
+port setflags port1 15:20 deleted flagged seen draft recent answered
+port getflags port1 10:20
+port clearflags port1 10:20 answered recent draft seen flagged deleted
+port setflags port1 10:20 seen
+port getflags port1 10:20
+
+/**/# Get status, delete a message, expunge, and get status again
+port getstatus port1
+port setflags port1 20 deleted
+/**/# The next one should fail, since message number out of range
+port setflags port1 200 deleted
+port setflags port1 40,41,42 deleted
+port setflags port1 50:60 deleted
+port expungedeleted port1
+port getstatus port1
+
+/**/# Close the port and exit
+port close port1
+port shutdown port1
+port delete port1
+
+quit

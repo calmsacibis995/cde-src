@@ -1,0 +1,1945 @@
+.TH DtEditor 3 "2 September 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.\" *************************************************************************
+.SH NAME
+DtEditor \- the DtEditor widget class
+.SH SYNOPSIS
+.yS
+#include <Dt/Editor.h>
+.yE
+.SH DESCRIPTION
+The DtEditor widget supports creating and editing text files.
+It gives applications running in the desktop environment a
+consistent method for editing text data.
+The widget consists of:
+.VL 3
+.LI \(bu
+A scrolled edit window for text
+.LI \(bu
+Dialogs for finding and changing text
+.cdes
+.LI \(bu
+Optional status line
+.LI \(bu
+Spell checking option
+.cdee
+.LI \(bu
+Formatting options
+.LI \(bu
+Convenience functions for programmatically controlling the widget
+.LE
+.P
+The DtEditor widget supports the following set of basic editing operations:
+.VL 3
+.LI \(bu
+Finding and changing text
+.LI \(bu
+Simple formatting
+.cdes
+.LI \(bu
+Spell checking
+.cdee
+.LI \(bu
+Undoing the previous edit operation
+.LE
+.P
+.cdes
+All operations, except for spell
+checking, support locales with single- and multi-byte characters.
+.P
+.cdee
+.xos
+All operations support locales with single- and multi-byte characters.
+.P
+.xoe
+.cdes
+The DtEditor widget also
+supports input and output of ASCII text, multi-byte text and
+buffers of data.
+Data can be passed between the application and the DtEditor widget, or
+a file and the widget.
+.cdee
+.xos
+The DtEditor widget also
+supports multi-byte text and buffers of data.
+Data can be passed between the application and the DtEditor widget, or
+a file and the widget.
+.xoe
+.P
+The DtEditor widget provides separate callback lists to track when text is
+selected or deselected.
+In addition, it extends the standard help callback to report
+help requests from any of its components.
+.P
+Widget subclassing is not supported for the DtEditor widget class.
+.HU "Edit Window"
+.cdes
+The edit window supports basic editing operations
+such as cut and paste, find and change, simple formatting and spell
+checking.
+.cdee
+.xos
+The edit window supports basic editing operations
+such as cut and paste, find and change, and simple formatting.
+.xoe
+.HU "Mouse and Keyboard"
+The user can use the mouse to move the edit cursor and to select
+portions of a document for editing operations.
+Selection is based on
+the model specified in the
+.I "Inter-Client Communication Conventions Manual"
+.cde (ICCCM).
+.xo (ICCCM\(emsee the \*(Zi).
+The DtEditor widget supports primary and secondary selection.
+.P
+The user can cut, copy and paste text using the clipboard, primary
+transfer or secondary transfer.
+The DtEditor widget accepts drops of
+text, text files or buffers of data.
+Text drops are inserted where the mouse button is released to complete
+the drop.
+Dropped files and buffers of data are placed at the insertion cursor.
+The DtEditor widget supports dragging of text within the edit window or
+to a different widget.
+.P
+The DtEditor widget provides a set of translations for the edit window.
+The default
+translations provide key bindings for moving the insertion cursor, and
+deleting, inserting and selecting text.
+The insertion cursor, displayed as an I-beam, shows where input is
+inserted.
+Input is inserted just before the insertion cursor.
+.cdes
+.HU "Status Line"
+The status line, which can be shown or hidden, displays the current line
+number, total line count and
+whether the DtEditor widget is in overstrike mode.
+The current line-number
+display shows the line number of the line containing the insertion
+cursor.
+The user can go directly to any line in the document by entering
+the number into the current line number display.
+The status line also provides a text field
+for displaying application-supplied messages.
+For information on
+localizing the status line, see the
+.B "Localization Resources"
+section.
+.cdee
+.HU Dialogs
+The DtEditor widget includes dialogs to provide a graphical user interface
+to its functionality:
+.VL 3
+.LI \(bu
+Find/Change dialog
+.cdes
+.LI \(bu
+Spell dialog.
+.cdee
+.LI \(bu
+Format Settings dialog
+.LE
+.P
+The titles of all dialogs are
+controlled with the
+.B DtNdialogTitle
+resource.
+All dialogs are
+posted using corresponding convenience functions and remain posted until
+dismissed by the user.
+Each dialog includes Close and Help buttons in
+addition to buttons described in the following lists.
+.cdes
+For information on localizing
+these dialogs, see the
+.B Localization Resources
+section.
+.cdee
+.P
+The Find/Change dialog for the DtEditor widget enables
+users to search for, and optionally replace, a string in
+the edit window.
+The dialog includes fields for specifying
+the find string and the replacement string.
+.xo When the user initiates a Find,
+.cdes
+Buttons initiate the
+find or change either the next occurrence or all occurrences of the find
+string to the replacement string.
+When the user selects the Find button,
+.cdee
+the next occurrence of the specified string
+(regular expressions are not supported)
+is highlighted in the DtEditor widget, if found;
+otherwise, the DtEditor widget
+displays a message dialog stating the string was not found.
+If the string was found, the user has the option to change
+the highlighted occurrence or all occurrences.
+.P
+The
+.Fn DtEditorFind 3
+and
+.Fn DtEditorChange 3
+functions provide a programmatic interface to the find and change
+functionality of the DtEditor widget.
+.P
+.cdes
+The Spell dialog is used to check the contents of the edit window for
+spelling errors.
+It consists of a list of misspelled words, replacement string field
+and the same set of buttons as the Find dialog.
+Choosing a word from the list automatically selects it as the
+find string.
+Double-clicking on a word searches for the next occurrence of that word.
+The list of misspelled words is automatically generated
+using the filter specified by
+.B DtNspellFilter
+when the dialog is displayed.
+The actions for
+find, change to and change all are the same as the Find dialog.
+.P
+.cdee
+The Format Settings dialog for the DtEditor widget enables users to format the
+contents of
+the edit window, format just the paragraph containing the insertion
+cursor, or specify the arguments used when formatting text.
+The
+arguments include margin settings and text alignment.
+The user has the choice of aligning the text flush with the
+left or right margin, centering each line of text between the margins,
+or aligning it flush with both margins.
+.cdes
+The user enter the left and right
+margin values into text fields and choose an alignment option from a set
+of toggle buttons.
+Two push buttons allow them to format the current
+paragraph or format the complete document.
+.cdee
+.P
+.cdes
+The margin values used for formatting do not have to be the same as the
+width of the edit window.
+It is possible to format the text with margin
+values that are narrower or wider than the displayed edit window.
+By default, values for the format margins are the current size of
+the edit window.
+If text is formatted wider than the edit window and the
+.B DtNwordWrap
+resource is
+True,
+text wraps at the right edge of the edit
+window (see the description for
+.BR DtNwordWrap ),
+regardless of the right margin setting.
+To format text wider than the edit window,
+.B DtNwordWrap
+should be
+False.
+.P
+.cdee
+The
+.Fn DtEditorFormat 3
+function provides a programmatic interface to the format functionality of the
+DtEditor widget.
+.HU "Word Wrap and Formatting"
+Word wrap and text formatting are essentially independent operations.
+Word wrap pertains to the dynamic display of
+lines, as delimited by
+.tK newline
+characters, which exceed the width of the Text Editor window
+and is based on the left and right window boundaries.
+When word wrap mode is off (the default), each line of text is
+displayed on a single line on the display and text entered
+at the right window boundary causes the window to
+scroll automatically to the right to accommodate the new
+text until an actual
+.tK newline
+character is entered
+(normally, by pressing the Return key).
+When word wrap mode is on, lines longer than the window width are
+automatically wrapped at the right window margin to one or
+more display lines, and text entered at the right window
+boundary is automatically broken on a word boundary to the
+first column of the next display line.
+Word wrap is dynamic in that word-wrapped lines are automatically
+adjusted when text is inserted or deleted or when the
+window is resized.
+Word wrap only affects the display of lines;
+it does not actually insert
+.tK newline
+characters in the text.
+.P
+Text formatting is a static operation that inserts actual
+.tK newline
+(and/or
+.tK space )
+characters directly in the text to
+match it to the left and right margins (and justification
+mode) specified in the Format Settings dialog.
+Format settings affect text only when explicitly applied and have
+no affect on word wrap or previously formatted text.
+Initially, and whenever the window is resized, the right
+format margin is automatically set to the window width to
+match the word wrap boundary.
+.HU Classes
+The DtEditor widget inherits behavior and resources from
+.IR Core ,
+.IR Composite ,
+.IR Constraint ,
+.IR XmManager ,
+.I XmBulletinBoard
+and
+.I XmForm
+classes.
+.P
+The class pointer is
+.BR dtEditorWidgetClass .
+.P
+The class name is
+.IR DtEditorWidget .
+.HU "New Resources"
+The following table defines a set of widget resources the application uses
+to specify data.
+The application can also set the resource values for the
+inherited classes to set attributes for this widget.
+To reference a
+resource by name or by class in a
+.B \&.Xdefaults
+file, the application must remove the
+.B DtN
+or
+.B DtC
+prefix and use the remaining letters.
+To specify one of the defined
+values for a resource in a
+.B \&.Xdefaults
+file, the application must remove the
+.B Dt
+prefix and use
+the remaining letters (in either lower case or upper case,
+but including any underscores between words).
+The codes in the access column indicate if the given resource can be
+set at creation time (C),
+set by using
+.Fn XtSetValues
+(S), retrieved by using
+.Fn XtGetValues
+(G), or is not applicable (N/A).
+.P
+.cde .ne 10
+.DS
+.S -1
+.TS
+.xo expand box tab(@);
+.cde expand tab(@);
+cf3 ssss
+.xo lf3 1 | lf3 1 | lf3 1 | lf3 1 | lf3
+.xo lf3 1 | lf3 1 | lf3 1 | l   1 | l .
+.cde lf3 1 lf3 1 lf3 1 lf3 1 lf3
+.cde lf3 1 lf3 1 lf3 1 l   1 l .
+DtEditor Resource Set
+_
+Name@Class@Type@Default@Access
+_
+DtNautoShowCursorPosition@DtCAutoShowCursorPosition@Boolean@True@CSG
+DtNblinkRate@DtCBlinkRate@int@500@CSG
+DtNbuttonFontList@DtCFontList@XmFontList@dynamic@CSG
+DtNcolumns@DtCColumns@XmNcolumns@dynamic@CSG
+DtNcursorPosition@DtCCursorPosition@XmTextPosition@0@CSG
+DtNcursorPositionVisible@DtCCursorPositionVisible@Boolean@True@CSG
+DtNdialogTitle@DtCDialogTitle@XmString@NULL@CSG
+DtNeditable@DtCEditable@Boolean@True@CSG
+DtNlabelFontList@DtCFontList@XmFontList@dynamic@CSG
+DtNmaxLength@DtCMaxLength@int@largest integer@CSG
+DtNoverstrike@DtCOverstrike@Boolean@False@CSG
+DtNrows@DtCRows@XmNrows@dynamic@CSG
+DtNscrollHorizontal@DtCScroll@Boolean@True@CG
+DtNscrollLeftSide@DtCScrollSide@Boolean@dynamic@CG
+DtNscrollTopSide@DtCScrollSide@Boolean@False@CG
+DtNscrollVertical@DtCScroll@Boolean@True@CG
+.cdes
+DtNshowStatusLine@DtCShowStatusLine@Boolean@False@CSG
+DtNspellFilter@DtCspellFilter@char *@spell@CSG
+.cdee
+DtNtextBackground@DtCBackground@Pixel@dynamic@CSG
+DtNtextDeselectCallback@DtCCallback@XtCallbackList@NULL@C
+DtNtextFontList@DtCFontList@XmFontList@dynamic@CSG
+DtNtextForeground@DtCForeground@Pixel@dynamic@CSG
+DtNtextSelectCallback@DtCCallback@XtCallbackList@NULL@C
+DtNtextTranslations@DtCTranslations@XtTranslations@NULL@CS
+DtNtopCharacter@DtCTextPosition@XmTextPosition@0@CSG
+DtNwordWrap@DtCWordWrap@Boolean@False@CSG
+.TE
+.S +1
+.DE
+.VL 6
+.LI \f3DtNautoShowCursorPosition\fP
+.br
+Ensures that the text visible in the scrolled edit window contains the insert
+cursor when set to
+True.
+If the insert cursor changes, the contents
+of the DtEditor widget may scroll in order to bring the insertion
+point into the window.
+.LI \f3DtNblinkRate\fP
+.br
+Specifies the blink rate of the text cursor in milliseconds.
+The time indicated in the blink rate relates to the
+time the cursor is visible and the time the
+cursor is invisible (that is, the time it takes to blink
+the insertion cursor on and off is twice the blink
+rate).
+The cursor does not blink when the blink rate
+is set to zero.
+The value cannot be negative.
+.LI \f3DtNbuttonFontList\fP
+.br
+Specifies the font list used for the DtEditor buttons
+(the buttons appearing in the DtEditor dialogs).
+If this value is
+.Cn NULL
+at initialization,
+it is initialized by looking up the parent hierarchy of the
+widget for an ancestor that is a subclass of the
+.IR XmBulletinBoard ,
+.I VendorShell
+or
+.I XmMenuShell
+widget class.
+If such an ancestor is
+found, the font list is initialized to the appropriate default
+font list of the ancestor widget (\c
+.B XmNdefaultFontList
+for
+.I VendorShell
+and
+.IR XmMenuShell ,
+and
+.B XmNbuttonFontList
+for
+.IR XmBulletinBoard ).
+If no such ancestor is found, the default is
+implementation dependent.
+.cdes
+Refer to
+.Fn XmFontList 3X
+for more information on the creation and structure of a font list.
+.cdee
+.LI \f3DtNcolumns\fP
+.br
+Specifies the initial width of the edit window
+of the DtEditor widget as an integral
+number of characters.
+The width equals the number of characters this resource specifies multiplied
+by the maximum character width of the associated font.
+For proportionate fonts, the actual number of characters that fit
+on a given line may be greater than the value specified.
+The value must be greater than zero.
+The default value depends on the value of the
+.B DtNwidth
+resource.
+.LI \f3DtNcursorPosition\fP
+.br
+Indicates the position in the DtEditor widget where the
+current insert cursor is located.
+This position is determined by the number of characters from the beginning of
+the text.
+The first character position is zero.
+.LI \f3DtNcursorPositionVisible\fP
+.br
+When set to True, this resource
+specifies that the insert cursor position is marked by a blinking text
+cursor.
+.LI \f3DtNdialogTitle\fP
+.br
+Specifies an XmString that appears as part of the titles for the dialogs
+displayed by the DtEditor widget.
+If this resource is non-\c
+.Cn NULL ,
+it is used as the prefix of the
+.cde titles for the Find/Change, Spell and Format Settings dialogs.
+.xo titles for the Find/Change and the Format Settings dialogs.
+.LI \f3DtNeditable\fP
+.br
+When set to True, this resource
+indicates that the user can edit the text;
+otherwise, it prohibits the user from editing the text.
+.LI \f3DtNlabelFontList\fP
+.br
+Specifies the font list used for the labels for DtEditor
+(the labels appear in the
+.cde status line and the
+DtEditor dialogs).
+If this value is
+.Cn NULL
+at initialization,
+it is initialized by looking up the parent hierarchy of the
+widget for an ancestor that is a subclass of the
+.IR XmBulletinBoard ,
+.I VendorShell
+or
+.I XmMenuShell
+widget class.
+If such an ancestor is
+found, the font list is initialized to the
+.B XmNlabelFontList
+of the ancestor widget.
+If no such ancestor is found, the default is
+implementation dependent.
+.cdes
+Refer to
+.Fn XmFontList 3X
+for more information on the creation and structure of a font list.
+.cdee
+.LI \f3DtNmaxLength\fP
+.br
+Specifies the maximum length of the text string that can be entered into
+the DtEditor widget from the keyboard.
+This value must be non-negative.
+Strings entered using the
+.Fn DtEditorSetContents 3
+or
+.Fn DtEditorSetContentsFromFile 3
+functions ignore this resource.
+.LI \f3DtNoverstrike\fP
+.br
+When set to
+False,
+characters typed into the DtEditor widget are inserted
+at the position of the insertion cursor.
+This is the default behavior.
+If set to
+True,
+characters typed into the DtEditor widget replace the
+characters that directly follow the insertion cursor.
+When the end of
+the line is reached, characters are appended to the end of the line.
+.cdes
+If the status line is visible,
+.B DtNoverstrikeIndicatorLabel
+appears in the status line whenever
+.B DtNoverstrike
+is
+True.
+.cdee
+.LI \f3DtNrows\fP
+.br
+Specifies the initial height of the edit window of the DtEditor widget
+measured in character heights.
+The value must be greater than zero.
+.LI \f3DtNscrollHorizontal\fP
+.br
+When set to True, this resource
+adds a ScrollBar that allows the user to scroll horizontally through text.
+.LI \f3DtNscrollLeftSide\fP
+.br
+When set to True, this resource
+indicates that the vertical ScrollBar should be placed on the left side of
+the scrolled edit window.
+This attribute
+is ignored if
+.B DtNscrollVertical
+is
+False.
+The default value may depend on the value of the
+.B XmNstringDirection
+resource.
+.LI \f3DtNscrollTopSide\fP
+.br
+When set to True, this resource
+indicates that the horizontal ScrollBar should be placed on the top side of the
+scrolled edit window.
+This attribute is ignored if
+.B DtNscrollHorizontal
+is False.
+.br
+.LI \f3DtNscrollVertical\fP
+.br
+When set to True, this resource
+adds a ScrollBar that allows the user to scroll vertically through text.
+.cdes
+.LI \f3DtNshowStatusLine\fP
+.br
+When set to True,
+the DtEditor widget displays a status line below the
+edit window.
+The status line contains a field
+that displays the current line number of the insert cursor, total
+number of lines in the document, and whether
+the DtEditor widget is in overstrike mode.
+The user can enter a line number in the
+line number display to go directly to that line.
+.P
+The status line also includes a Motif Text Field widget
+(XmTextField)
+for displaying application supplied messages.
+This field is a convenient way for an application to display status and
+feedback about the document being edited.
+The Text Field ID is retrieved using
+.Fn DtEditorGetMessageTextFieldID 3.
+A message is displayed by
+setting the
+.B XmNvalue
+or
+.B XmNvalueWcs
+resource of this widget.
+If the Text field is not needed, it can be unmanaged by calling
+.Fn XtUnmanageWidget 3X
+with its ID.
+.LI \f3DtNspellFilter\fP
+.br
+Specifies the filter used to identify spelling errors.
+The
+.Fn DtEditorInvokeSpellDialog 3
+function filters the contents of a DtEditor widget
+through the filter specified by
+.BR DtNspellFilter .
+The filter
+specified should accept a file name and produce a list of misspelled and
+unrecognized words in this file on standard out.
+The default filter is
+.Cm spell 1.
+.cdee
+.LI \f3DtNtextBackground\fP
+.br
+Specifies the background of the edit window and the text fields for DtEditor
+(the text fields appear in the
+.cde status line and
+DtEditor dialogs).
+.LI \f3DtNtextDeselectCallback\fP
+.br
+Specifies a function called whenever the selection becomes
+.Cn NULL
+(that is, no text is selected within the edit area).
+The reason sent by the callback is
+.Cn DtEDITOR_TEXT_DESELECT .
+.LI \f3DtNtextFontList\fP
+.br
+Specifies the font list used for the edit window and the text fields for
+DtEditor (the text fields appear in the
+.cde status line and
+DtEditor dialogs).
+If this value is
+.Cn NULL
+at initialization,
+it is initialized by looking up the parent hierarchy of the
+widget for an ancestor that is a subclass of the
+.I XmBulletinBoard
+or
+.I VendorShell
+widget class.
+If such an ancestor is
+found, the font list is initialized to the
+.B XmNtextFontList
+of the ancestor widget.
+If no such ancestor is found, the default is
+implementation dependent.
+.cdes
+Refer to
+.Fn XmFontList 3X
+for more information on the creation and structure of a font list.
+.cdee
+.LI \f3DtNtextForeground\fP
+.br
+Specifies the foreground of the edit window and the text fields for DtEditor
+(the text fields appear in the
+.cde status line and
+DtEditor dialogs).
+.LI \f3DtNtextSelectCallback\fP
+.br
+Specifies a function called whenever the selection becomes non-\c
+.Cn NULL
+(that is, some text is selected within the edit area).
+The reason sent by the callback is
+.Cn DtEDITOR_TEXT_SELECT .
+.LI \f3DtNtextTranslations\fP
+.br
+Adds translations to the edit window.
+Translations specified with
+.B DtNtextTranslations
+override any duplicate translations
+defined for the edit window.
+.LI \f3DtNtopCharacter\fP
+.br
+Displays the line that contains the position of text at the top of the
+scrolled edit window.
+The line is displayed at the top of the DtEditor widget without shifting the
+text left or right.
+The position is determined by the number of characters from the
+beginning of the text.
+The first character position is zero.
+.P
+.Fn XtGetValues 3X
+for
+.B DtNtopCharacter
+returns the position of the
+first character in the line that is displayed at the top of the
+DtEditor widget.
+.LI \f3DtNwordWrap\fP
+.br
+Indicates that text not go off the right edge of the window,
+but that lines are broken at word breaks with soft line feeds
+when they reach the right edge of the window.
+.P
+Word wrap affects only the visual appearance of the contents of
+a DtEditor widget.
+The line breaks (soft line feeds) are not
+physically inserted into the text.
+The DtEditor widget supports substituting
+.tK newline s
+when the contents of the widget are retrieved or
+saved to a file (see
+.Fn DtEditorGetContents 3
+and
+.Fn DtEditorSaveContentsToFile 3).
+.LE
+.cdes
+.HU "Localization Resources"
+The following table defines a set of widget resources designed for
+localization of the DtEditor widget and its dialogs.
+Default values for these resources depends on the locale.
+.TS
+center, expand, tab(@);
+cf3 ssss
+lf3 1 lf3 1 lf3 1 lf3 1 lf3
+lf3 1 lf3 1 lf3 1 l   1 l .
+DtEditor Localization Resource Set
+_
+Name@Class@Type@Default@Access
+_
+DtNcenterToggleLabel@DtCCenterToggleLabel@XmString@Dynamic@CSG
+DtNchangeAllButtonLabel@DtCChangeAllButtonLabel@XmString@Dynamic@CSG
+DtNchangeButtonLabel@DtCChangeButtonLabel@XmString@Dynamic@CSG
+DtNchangeFieldLabel@DtCChangeFieldLabel@XmString@Dynamic@CSG
+DtNcurrentLineLabel@DtCCurrentLineLabel@XmString@Dynamic@CSG
+DtNfindButtonLabel@DtCFindButtonLabel@XmString@Dynamic@CSG
+DtNfindChangeDialogTitle@DtCFindChangeDialogTitle@XmString@Dynamic@CSG
+DtNfindFieldLabel@DtCFindFieldLabel@XmString@Dynamic@CSG
+DtNformatAllButtonLabel@DtCFormatAllButtonLabel@XmString@Dynamic@CSG
+DtNformatParagraphButton-@DtCFormatParagraphButton-@XmString@Dynamic@CSG
+   Label@   Label
+DtNformatSettingsDialogTitle@DtCFormatSettingsDialogTitle@XmString@Dynamic@CSG
+DtNinformationDialogTitle@DtCInformationDialogTitle@XmString@Dynamic@CSG
+DtNjustifyToggleLabel@DtCJustifyToggleLabel@XmString@Dynamic@CSG
+DtNleftAlignToggleLabel@DtCLeftAlignToggleLabel@XmString@Dynamic@CSG
+DtNleftMarginFieldLabel@DtCLeftMarginFieldLabel@XmString@Dynamic@CSG
+DtNmisspelledListLabel@DtCMisspelledListLabel@XmString@Dynamic@CSG
+DtNoverstrikeLabel@DtCOverstrikeLabel@XmString@Dynamic@CSG
+DtNrightAlignToggleLabel@DtCRightAlignToggleLabel@XmString@Dynamic@CSG
+DtNrightMarginFieldLabel@DtCRightMarginFieldLabel@XmString@Dynamic@CSG
+DtNspellDialogTitle@DtCSpellDialogTitle@XmString@Dynamic@CSG
+DtNtotalLineCountLabel@DtCTotalLineCountLabel@XmString@Dynamic@CSG
+.TE
+.VL 6
+.LI \f3DtNcenterToggleLabel\fP
+.br
+Specifies the label for the center alignment toggle button in the
+Format Settings dialog.
+The default value in the C locale is
+.BR Center .
+.LI \f3DtNchangeAllButtonLabel\fP
+.br
+Specifies the label for the button in the
+Find/Change and Spell dialogs that change all
+occurrences of the Find string in the document.
+The default value in the C locale is
+.BR "Change All" .
+.LI \f3DtNchangeButtonLabel\fP
+.br
+Specifies the label for the button in the
+Find/Change and Spell dialogs that change the next
+occurrence of the Find string in the document.
+The default value in the C locale is
+.BR Change .
+.LI \f3DtNchangeFieldLabel\fP
+.br
+Specifies the label for the field in the
+Find/Change dialog where the user specifies the
+replacement string.
+The default value in the C locale is
+.BR "Change To:" .
+.LI \f3DtNcurrentLineLabel\fP
+.br
+Specifies the label for the current line number field in the status line.
+The default value in the C locale is
+.BR Line: .
+.LI \f3DtNfindButtonLabel\fP
+.br
+Specifies the label for the button in the
+Find/Change dialog that finds the next occurrence
+of the Find string in the document.
+The default value in the C locale is
+.BR Find .
+.LI \f3DtNfindChangeDialogTitle\fP
+.br
+Specifies the title for the Find/Change dialog.
+If
+.B DtNdialogTitle
+is non-\c
+.Cn NULL ,
+it is added as a prefix to this resource to form the title.
+The default value in the C locale is
+.BR Find/Change .
+.LI \f3DtNfindFieldLabel\fP
+.br
+Specifies the label for the field in the
+Find/Change dialog where the user specifies the
+search string.
+The default value in the C locale is
+.BR Find: .
+.LI \f3DtNformatAllButtonLabel\fP
+.br
+Specifies the label for the button in the
+Format Settings dialog that formats the complete document.
+The default value in the C locale is
+.BR All .
+.LI \f3DtNformatParagraphButtonLabel\fP
+.br
+Specifies the label for the button in the
+Format Settings dialog that formats the paragraph
+containing the insertion cursor.
+The default value in the C locale is
+.BR Paragraph .
+.LI \f3DtNformatSettingsDialogTitle\fP
+.br
+Specifies the title for the Format Settings dialog.
+If
+.B DtNdialogTitle
+is non-\c
+.Cn NULL ,
+it is added as a prefix to this resource to form the title.
+The default value in the C locale is
+.BR "Format Settings" .
+.LI \f3DtNinformationDialogTitle\fP
+.br
+Specifies the title for the Information dialog used to present
+feedback and general information to the user.
+If
+.B DtNdialogTitle
+is non-\c
+.Cn NULL ,
+it is added as a prefix to this resource to form the title.
+The default value in the C locale is
+.BR Information .
+.LI \f3DtNjustifyToggleLabel\fP
+.br
+Specifies the label for the justify alignment toggle button in the
+Format Settings dialog.
+The default value in the C locale is
+.BR Justify .
+.LI \f3DtNleftAlignToggleLabel\fP
+.br
+Specifies the label for the left alignment toggle button in the
+Format Settings dialog.
+The default value in the C locale is
+.BR "Left Align" .
+.LI \f3DtNleftMarginFieldLabel\fP
+.br
+Specifies the label for the left margin value field in the
+Format Settings dialog.
+The default value in the C locale is
+.BR "Left Margin:" .
+.LI \f3DtNmisspelledListLabel\fP
+.br
+Specifies the label for the list of unrecognized and misspelled
+words in the Spell dialog.
+The default value in the C locale is
+.BR "Misspelled Words:" .
+.LI \f3DtNoverstrikeLabel\fP
+.br
+Specifies the label in the status line that indicates
+that the DtEditor widget is in overstrike mode.
+The default value in the C locale is
+.BR Overstrike .
+.LI \f3DtNrightAlignToggleLabel\fP
+.br
+Specifies the label for the right alignment toggle button in the
+Format Settings dialog.
+The default value in the C locale is
+.BR "Right Align" .
+.LI \f3DtNrightMarginFieldLabel\fP
+.br
+Specifies the label for the right margin value field in the
+Format Settings dialog.
+The default value in the C locale is
+.BR "Right Margin:" .
+.LI \f3DtNspellDialogTitle\fP
+.br
+Specifies the title for the Spell dialog.
+If
+.B DtNdialogTitle
+is non-\c
+.Cn NULL ,
+it is added as a prefix to this resource to form the title.
+The default value in the C locale is
+.BR Spell .
+.LI \f3DtNtotalLineCountLabel\fP
+.br
+Specifies the label for the display showing the total number of
+lines in the document.
+The total number of lines displayed is part of the status line.
+The default value in the C locale is
+.BR Total: .
+.LE
+.cdee
+.xos
+.HU "Localization Resources"
+The following table defines a set of widget resources designed for
+localization of the DtEditor widget and its dialogs.
+Default values for these resources depends on the locale.
+.DS
+.S -1
+.TS
+expand box tab(@);
+cf3 ssss
+lf3 1 | lf3 1 | lf3 1 | lf3 1 | lf3
+lf3 1 | lf3 1 | lf3 1 | l   1 | l .
+DtEditor Localization Resource Set
+_
+Name@Class@Type@Default@Access
+_
+DtNfindChangeDialogTitle@DtCFindChangeDialogTitle@XmString@Dynamic@CSG
+DtNformatSettingsDialogTitle@DtCFormatSettingsDialogTitle@XmString@Dynamic@CSG
+DtNinformationDialogTitle@DtCInformationDialogTitle@XmString@Dynamic@CSG
+.TE
+.S +1
+.DE
+.VL 6
+.LI \f3DtNfindChangeDialogTitle\fP
+.br
+Specifies the title for the Find/Change dialog.
+If
+.B DtNdialogTitle
+is non-\c
+.Cn NULL ,
+it is added as a prefix to this resource to form the title.
+The default value in the C locale is
+.BR Find/Change .
+.LI \f3DtNformatSettingsDialogTitle\fP
+.br
+Specifies the title for the Format Settings dialog.
+If
+.B DtNdialogTitle
+is non-\c
+.Cn NULL ,
+it is added as a prefix to this resource to form the title.
+The default value in the C locale is
+.BR "Format Settings" .
+.LI \f3DtNinformationDialogTitle\fP
+.br
+Specifies the title for the Information dialog used to present
+feedback and general information to the user.
+If
+.B DtNdialogTitle
+is non-\c
+.Cn NULL ,
+it is added as a prefix to this resource to form the title.
+The default value in the C locale is
+.BR Information .
+.LE
+.xoe
+.HU "Inherited Resources"
+The DtEditor widget
+inherits behavior and resources from the following named superclasses.
+For a complete description of each resource, see the
+.cde man page
+.xo entry in \*(ZM
+for that superclass.
+.P
+.cde .ne 10
+.DS
+.S -1
+.TS
+.xo expand box tab(@);
+.cde expand tab(@);
+cf3 ssss
+.xo lf3 1 | lf3 1 | lf3 1 | lf3 1 | lf3
+.xo lf3 1 | lf3 1 | lf3 1 | l   1 | l .
+.cde lf3 1 lf3 1 lf3 1 lf3 1 lf3
+.cde lf3 1 lf3 1 lf3 1 l   1 l .
+XmForm Resource Set
+_
+Name@Class@Type@Default@Access
+_
+XmNfractionBase@XmCMaxValue@int@100@CSG
+XmNhorizontalSpacing@XmCSpacing@Dimension@0@CSG
+XmNrubberPositioning@XmCRubberPositioning@Boolean@False@CSG
+XmNverticalSpacing@XmCSpacing@Dimension@0@CSG
+.TE
+.S +1
+.DE
+.P
+.cde .ne 10
+.DS
+.S -1
+.TS
+.xo expand box tab(@);
+.cde expand tab(@);
+cf3 ssss
+.xo lf3 1 | lf3 1 | lf3 1 | lf3 1 | lf3
+.xo lf3 1 | lf3 1 | lf3 1 | l   1 | l .
+.cde lf3 1 lf3 1 lf3 1 lf3 1 lf3
+.cde lf3 1 lf3 1 lf3 1 l   1 l .
+XmBulletinBoard Resource Set
+_
+Name@Class@Type@Default@Access
+_
+XmNallowOverlap@XmCAllowOverlap@Boolean@True@CSG
+XmNautoUnmanage@XmCAutoUnmanage@Boolean@True@CG
+XmNbuttonFontList@XmCButtonFontList@XmFontList@dynamic@CSG
+XmNcancelButton@XmCWidget@Window@NULL@SG
+XmNdefaultButton@XmCWidget@Window@SG
+XmNdefaultPosition@XmCDefaultPosition@Boolean@True@CSG
+XmNdialogStyle@XmCDialogStyle@unsigned char@dynamic@CSG
+XmNdialogTitle@XmCDialogTitle@XmString@NULL@CSG
+XmNfocusCallback@XmCCallback@XtCallbackList@NULL@C
+XmNlabelFontList@XmCLabelFontListk@XmFontList@dynamic@CSG
+XmNmapCallback@XmCCallback@XtCallbackList@NULL@C
+XmNmarginHeight@XmCMarginHeight@Dimension@10@CSG
+XmNmarginWidth@XmCMarginWidth@Dimension@10@CSG
+XmNnoResize@XmCNoResize@Boolean@False@CSG
+XmNresizePolicy@XmCResizePolicy@unsigned char@XmRESIZE_ANY@CSG
+XmNshadowType@XmCShadowType@unsigned char@XmSHADOW_OUT@CSG
+XmNtextFontList@XmCTextFontList@XmFontList@dynamic@CSG
+XmNtextTranslations@XmCTranslations@XtTranslations@NULL@C
+XmNunmapCallback@XmCCallback@XtCallbackList@NULL@C
+.TE
+.S +1
+.DE
+.P
+.cde .ne 10
+.DS
+.S -1
+.TS
+.xo expand box tab(@);
+.cde expand tab(@);
+cf3 ssss
+.xo lf3 1 | lf3 1 | lf3 1 | lf3 1 | lf3
+.xo lf3 1 | lf3 1 | lf3 1 | l   1 | l .
+.cde lf3 1 lf3 1 lf3 1 lf3 1 lf3
+.cde lf3 1 lf3 1 lf3 1 l   1 l .
+XmManager Resource Set
+_
+Name@Class@Type@Default@Access
+_
+XmNbottomShadowColor@XmCBottomShadowColor@Pixel@dynamic@CSG
+XmNbottomShadow-@XmCBottomShadow-@Pixmap@XmUNSPECIFIED-@CSG
+Pixmap@Pixmap@@_PIXMAP
+XmNforeground@XmCForeground@Pixel@dynamic@CSG
+XmNhelpCallback@XmCCallback@XtCallbackList@NULL@C
+XmNhighlightColor@XmCHighlightColor@Pixel@dynamic@CSG
+XmNhighlightPixmap@XmCHighlightPixmap@Pixmap@dynamic@CSG
+XmNinitialFocus@XmCInitialFocus@Widget@NULL@CSG
+XmNnavigationType@XmCNavigationType@XmNavigation-@dynamic@CSG
+@@Type
+XmNshadowThickness@XmCShadowThickness@Dimension@dynamic@CSG
+XmNstringDirection@XmCStringDirection@XmString-@dynamic@CG
+@@Dynamic
+XmNtopShadowColor@XmCTopShadowColor@Pixel@dynamic@CSG
+XmNtopShadowPixmap@XmCTopShadowPixmap@Pixmap@dynamic@CSG
+XmNtraversalOn@XmCTraversalOn@Boolean@dynamic@CSG
+XmNunitType@XmCUnitType@unsigned char@dynamic@CSG
+XmNuserData@XmCUserData@XtPointer@NULL@CSG
+.TE
+.S +1
+.DE
+.P
+.cde .ne 10
+.DS
+.S -1
+.TS
+.xo expand box tab(@);
+.cde expand tab(@);
+cf3 ssss
+.xo lf3 1 | lf3 1 | lf3 1 | lf3 1 | lf3
+.xo lf3 1 | lf3 1 | lf3 1 | l   1 | l .
+.cde lf3 1 lf3 1 lf3 1 lf3 1 lf3
+.cde lf3 1 lf3 1 lf3 1 l   1 l .
+Composite Resource Set
+_
+Name@Class@Type@Default@Access
+_
+XmNchildren@XmCReadOnly@WidgetList@NULL@G
+XmNinsertPosition@XmCInsertPosition@XtOrderProc@default procedure@CSG
+XmNnumChildren@XmCReadOnly@Cardinal@0@G
+.TE
+.S +1
+.DE
+.P
+.cde .ne 10
+.DS
+.S -1
+.TS
+.xo expand box tab(@);
+.cde expand tab(@);
+cf3 ssss
+.xo lf3 1 | lf3 1 | lf3 1 | lf3 1 | lf3
+.xo lf3 1 | lf3 1 | lf3 1 | l   1 | l .
+.cde lf3 1 lf3 1 lf3 1 lf3 1 lf3
+.cde lf3 1 lf3 1 lf3 1 l   1 l .
+Core Resource Set
+_
+Name@Class@Type@Default@Access
+_
+XmNaccelerators@XmCAccelerators@XtAccelerators@dynamic@CSG
+XmNancestorSensitive@XmCSensitive@Boolean@dynamic@G
+XmNbackground@XmCBackground@Pixel@dynamic@CSG
+XmNbackgroundPixmap@XmCPixmap@Pixmap@XmUNSPECIFIED-@CSG
+@@@   _PIXMAP
+XmNborderColor@XmCBorderColor@Pixel@XtDefaultForeground@CSG
+XmNborderPixmap@XmCPixmap@Pixmap@XmUNSPECIFIED-@CSG
+@@@   _PIXMAP
+XmNborderWidth@XmCBorderWidth@Dimension@0@CSG
+XmNcolormap@XmCColormap@Colormap@dynamic@CG
+XmNdepth@XmCDepth@int@dynamic@CG
+XmNdestroyCallback@XmCCallback@XtCallbackList@NULL@C
+XmNheight@XmCHeight@Dimension@dynamic@CSG
+XmNinitial-@XmCInitial-@Boolean@True@C
+   ResourcesPersistent@   ResourcesPersistent
+XmNmappedWhen-@XmCMappedWhen-@Boolean@True@CSG
+   Managed@   Managed
+XmNscreen@XmCScreen@Screen *@dynamic@CG
+XmNsensitive@XmCSensitive@Boolean@True@CSG
+XmNtranslations@XmCTranslations@XtTranslations@dynamic@CSG
+XmNwidth@XmCWidth@Dimension@dynamic@CSG
+XmNx@XmCPosition@Position@0@CSG
+XmNy@XmCPosition@Position@0@CSG
+.TE
+.S +1
+.DE
+.HU "Callback Information"
+The DtEditor widget has three callback functions of interest:
+.VL 6
+.LI "\f3DtNtextSelectCallback\fP and \f3DtNtextDeselectCallback\fP"
+.br
+The
+.B DtNtextSelectCallback
+and
+.B DtNtextDeselectCallback
+resources allow an application to enable and disable certain commands
+or menu items based on whether there is a selection.
+.B DtNtextSelectCallback
+specifies a function called whenever the selection becomes non-\c
+.Cn NULL
+(that is, some text is selected within the edit window), while
+.B DtNtextDeselectCallback
+specifies a function called whenever the selection becomes
+.Cn NULL
+(that is, no text is selected within the edit window).
+The reasons sent by the callbacks are
+.Cn DtEDITOR_TEXT_SELECT
+and
+.Cn DtEDITOR_TEXT_\%DESELECT .
+.LI \f3XmNhelpCallback\fP
+.br
+An application that wishes to present help information to the
+user on the DtEditor widget
+and its dialogs should set the
+.B XmNhelpCallback
+resource and use the Reason
+field passed as part of
+.B DtEditorHelpCallbackStruct
+to set the contents of its Help dialog.
+A pointer to the following structure is passed to the
+.B XmNHelpCallback
+callback.
+.Cs I
+typedef struct {
+	int \f2reason\fP,
+	XEvent *\f2event\fP
+} XmAnyCallbackStruct;
+.Ce
+.LI \f2reason\fP
+.br
+Indicates why the callback was invoked.
+The possible reasons are:
+.VL 6
+.Lc DtEDITOR_HELP_EDIT_WINDOW
+.br
+The help request originated in the edit window.
+.cdes
+.Lc DtEDITOR_HELP_STATUS_LINE
+.br
+The help request originated in the status line.
+.Lc DtEDITOR_HELP_STATUS_CURRENT_LINE
+.br
+The help request originated in the Current Line number
+display in the status line.
+.Lc DtEDITOR_HELP_STATUS_TOTAL_LINES
+.br
+The help request originated in the Total Lines display in
+the status line.
+.Lc DtEDITOR_HELP_STATUS_MESSAGE
+.br
+The help request originated in the Message field in the
+status line.
+.Lc DtEDITOR_HELP_STATUS_OVERSTRIKE
+.br
+The help request originated in the Overstrike Indicator in
+the status line.
+.cdee
+.Lc DtEDITOR_HELP_FORMAT_DIALOG
+.br
+The help request originated in the Help button in the
+Format dialog.
+.Lc DtEDITOR_HELP_FORMAT_LEFT_MARGIN
+.br
+The help request originated in the Left Margin field in the
+Format dialog.
+.Lc DtEDITOR_HELP_FORMAT_RIGHT_MARGIN
+.br
+The help request originated in the Right Margin field in
+the Format dialog.
+.Lc DtEDITOR_HELP_FORMAT_ALIGNMENT
+.br
+The help request originated in the Alignment buttons in the
+Format dialog.
+.Lc DtEDITOR_HELP_CHANGE_DIALOG
+.br
+The help request originated in the Help button in the
+Find/Change dialog.
+.Lc DtEDITOR_HELP_CHANGE_FIND
+.br
+The help request originated in the Find field in the
+Find/Change dialog.
+.Lc DtEDITOR_HELP_CHANGE_CHANGE
+.br
+The help request originated in the Change To field in the
+Find/Change dialog.
+.cdes
+.Lc DtEDITOR_HELP_SPELL_DIALOG
+.br
+The help request originated in the help button in the Spell
+dialog.
+.Lc DtEDITOR_HELP_SPELL_MISSPELLED_WORDS
+.br
+The help request originated in the List of Misspelled Words
+in the Spell dialog.
+.Lc DtEDITOR_HELP_SPELL_CHANGE
+.br
+The help request originated in the Change To field in the
+Spell dialog.
+.cdee
+.LE
+.LI \f2event\fP
+.br
+A pointer to the
+.B XEvent
+that caused this callback to be invoked.
+It may be
+.Cn NULL .
+.LE
+.HU Translations
+The DtEditor
+widget translations for the edit window are described in the following list.
+The
+.B DtNtextTranslations
+resource can be used to modify these translations.
+.VL 6
+.LI KLeft
+.br
+.Fn backward-character
+.LI "MShift KLeft"
+.br
+.xo .I key-select \c
+.cde .B key-select \c
+.RI ( left )
+.LI "MCtrl KLeft"
+.br
+.Fn backward-word
+.LI "MShift MCtrl KLeft"
+.br
+.xo .I backward-word \c
+.cde .B backward-word \c
+.RI ( extend )
+.LI KRight
+.br
+.Fn forward-character
+.LI "MShift KRight"
+.br
+.xo .I key-select \c
+.cde .B key-select \c
+.RI ( right )
+.LI "MCtrl KRight"
+.br
+.Fn forward-word
+.LI "MShift MCtrl KRight"
+.br
+.xo .I forward-word \c
+.cde .B forward-word \c
+.RI ( extend )
+.LI KUp
+.br
+.Fn process-up
+.LI "MShift KUp"
+.br
+.Fn process-shift-up
+.LI "MCtrl KUp"
+.br
+.Fn backward-paragraph
+.LI "MShift MCtrl KUp"
+.br
+.xo .I backward-paragraph \c
+.cde .B backward-paragraph \c
+.RI ( extend )
+.LI KDown
+.br
+.Fn process-down
+.LI "MShift KDown"
+.br
+.Fn process-shift-down
+.LI "MCtrl KDown"
+.br
+.Fn forward-paragraph
+.LI "MShift MCtrl KDown"
+.br
+.xo .I forward-paragraph \c
+.cde .B forward-paragraph \c
+.RI ( extend )
+.LI KBeginLine
+.br
+.Fn beginning-of-line
+.LI "MShift KBeginLine"
+.br
+.xo .I beginning-of-line \c
+.cde .B beginning-of-line \c
+.RI ( extend )
+.LI KEndLine
+.br
+.Fn end-of-line
+.LI "MShift KEndLine"
+.br
+.xo .I end-of-line \c
+.cde .B end-of-line \c
+.RI ( extend )
+.LI KPageUp
+.br
+.Fn previous-page
+.LI "MShift KPageUp"
+.br
+.xo .I previous-page \c
+.cde .B previous-page \c
+.RI ( extend )
+.LI KPageLeft
+.br
+.Fn page-left
+.LI KPageDown
+.br
+.Fn next-page
+.LI "MShift KPageDown"
+.br
+.xo .I next-page \c
+.cde .B next-page \c
+.RI ( extend )
+.LI KPageRight
+.br
+.Fn page-right
+.LI KBeginData
+.br
+.Fn beginning-of-file
+.LI "MShift KBeginData"
+.br
+.xo .I beginning-of-file \c
+.cde .B beginning-of-file \c
+.RI ( extend )
+.LI KEndData
+.br
+.Fn end-of-file
+.LI "MShift KEndData"
+.br
+.xo .I end-of-file \c
+.cde .B end-of-file \c
+.RI ( extend )
+.LI KDelete
+.br
+.Fn delete-next-character
+.LI "MCtrl KDelete"
+.br
+.Fn delete-to-end-of-line
+.LI KBackSpace
+.br
+.Fn delete-previous-character
+.LI "MCtrl KBackSpace"
+.br
+.Fn delete-previous-word
+.LI "MShift KBackSpace"
+.br
+.Fn delete-to-start-of-line
+.LI "MAlt KBackSpace"
+.br
+.Fn undo-edit
+.LI "MCtrl Kz"
+.br
+.Fn undo-edit
+.LI "MCtrl K/"
+.br
+.Fn select-all
+.br
+.ne 3
+.LI "MCtrl K\e"
+.br
+.Fn deselect-all
+.cdes
+.LI "MCtrl Kg"
+.br
+.Fn go-to-line
+.cdee
+.LI "MCtrl Kq"
+.br
+.Fn quote-next-character
+.LI "MCtrl Kx"
+.br
+.Fn cut-clipboard
+.LI "MCtrl Kc"
+.br
+.Fn copy-clipboard
+.LI "MCtrl Kv"
+.br
+.Fn paste-clipboard
+.LI KHelp
+.br
+.Fn Help
+.LI "KInsert"
+.br
+.Fn toggle-insert-mode
+.LI KEnter
+.br
+.Fn new-line-and-indent
+.LI MAnyKCancel
+.br
+.Fn process-cancel
+.LE
+.HU "Action Routines"
+The DtEditor widget action routines are described here:
+.VL 6
+.LI \f2backward-character\f1\^(\|)
+.br
+This action moves the insertion cursor one character to the left.
+This action may have different behavior in a right-to-left language
+environment.
+.LI \f2backward-paragraph\f1\^(\f2extend\f1)
+.br
+If this action is called with no argument, it
+moves the insertion cursor to the first non-whitespace character following
+the first previous blank line or beginning of the text.
+If the insertion cursor is already at the beginning of a paragraph, the action
+moves the insertion cursor to the beginning of the previous paragraph.
+.P
+If this action is called with an argument of
+.IR extend ,
+it moves the insertion cursor, as
+in the case of no argument, and extends the current selection.
+.LI \f2backward-word\f1\^(\f2extend\f1)
+.br
+If this action is called with no argument, it
+moves the insertion cursor to the first non-whitespace character after the
+first whitespace character to the left or after the beginning of the line.
+If the insertion cursor is already at the beginning of a word, this action
+moves the insertion cursor to the beginning of the previous word.
+This action may have different behavior in a locale other than the C locale.
+.P
+If this action is called with an argument of
+.IR extend ,
+it moves the insertion cursor, as
+in the case of no argument, and extends the current selection.
+.LI \f2beginning-of-file\f1\^(\f2extend\f1)
+.br
+If this action is called with no argument,
+it moves the insertion cursor to the beginning of the text.
+.P
+If this action is called with an argument of
+.IR extend ,
+it moves the insertion cursor, as
+in the case of no argument, and extends the current selection.
+.LI \f2beginning-of-line\f1\^(\f2extend\f1)
+.br
+If this action is called with no argument,
+it moves the insertion cursor to the beginning of the line.
+.P
+If this action is called with an argument of
+.IR extend ,
+it moves the insertion cursor, as
+in the case of no argument, and extends the current selection.
+.LI \f2clear-selection\f1\^(\|)
+.br
+This action clears the current selection by replacing each character except
+.tK carriage-return
+with a
+.tK space
+character.
+.LI \f2copy-clipboard\f1\^(\|)
+.br
+This action copies the current selection to the clipboard.
+.LI \f2cut-clipboard\f1\^(\|)
+.br
+This action cuts the current selection to the clipboard.
+.LI \f2delete-next-character\f1\^(\|)
+.br
+If there is a non-\c
+.Cn NULL
+selection, this action deletes the selection; otherwise,
+it deletes the character following the insertion cursor.
+.LI \f2delete-next-word\f1\^(\|)
+.br
+If there is a non-\c
+.Cn NULL
+selection, this action deletes the selection; otherwise,
+it deletes the characters following the insertion cursor to the next
+space, tab or end of line character.
+.LI \f2delete-previous-character\f1\^(\|)
+.br
+If there is a non-\c
+.Cn NULL
+selection, this action deletes the selection; otherwise,
+it deletes the character of text immediately preceding the insertion cursor.
+.LI \f2delete-previous-word\f1\^(\|)
+.br
+If there is a non-\c
+.Cn NULL
+selection, this action deletes the selection; otherwise,
+it deletes the characters preceding the insertion cursor to the next
+space, tab or beginning of the line character.
+This action may have different behavior in a locale other than the C locale.
+.LI \f2delete-to-end-of-line\f1\^(\|)
+.br
+If there is a non-\c
+.Cn NULL
+selection, this action deletes the selection; otherwise,
+it deletes the characters following the insertion cursor to the next
+end-of-line character.
+.LI \f2delete-to-start-of-line\f1\^(\|)
+.br
+If there is a non-\c
+.Cn NULL
+selection, this action deletes the selection; otherwise,
+it deletes the characters preceding the insertion cursor to the previous
+beginning-of-line character.
+.LI \f2deselect-all\f1\^(\|)
+.br
+This action deselects the current selection.
+.LI \f2end-of-file\f1\^(\f2extend\f1)
+.br
+If this action is called with no argument,
+it moves the insertion cursor to the end of the text.
+.P
+If this action is called with an argument of
+.IR extend ,
+it moves the insertion cursor, as
+in the case of no argument, and extends the current selection.
+.LI \f2end-of-line\f1\^(\f2extend\f1)
+.br
+If this action is called with no argument,
+it moves the insertion cursor to the end of the line.
+.P
+If this action is called with an argument of
+.IR extend ,
+it moves the insertion cursor, as
+in the case of no argument, and extends the current selection.
+.LI \f2forward-character\f1\^(\|)
+.br
+This action moves the insertion cursor one character to the right.
+This action may have different behavior in a right-to-left language
+environment.
+.LI \f2forward-paragraph\f1\^(\f2extend\f1)
+.br
+If this action is called with no argument,
+it moves the insertion cursor to the first non-whitespace character
+following the next blank line.
+If the insertion cursor is already at the beginning of a paragraph,
+this action moves the insertion cursor to the beginning of the next paragraph.
+.P
+If this action is
+called with an argument of
+.IR extend ,
+it moves the insertion cursor, as
+in the case of no argument, and extends the current selection.
+.LI \f2forward-word\f1\^(\f2extend\f1)
+.br
+If this action is called with no argument, it moves the insertion cursor to
+the first whitespace character or end-of-line following the next
+non-whitespace character.
+If the insertion cursor is already at the end of a word,
+this action moves the insertion cursor to the end of the next word.
+This action may have different behavior in a locale other than the C locale.
+.P
+If called with an argument of
+.IR extend ,
+this action moves the insertion cursor, as
+in the case of no argument, and extends the current selection.
+.cdes
+.LI \f2go-to-line\f1\^(\|)
+.br
+This action moves the keyboard focus to the Current Line text field to allow the user to
+move the insertion cursor to a new line.
+This action is only valid if
+.B DtNshowStatusLine
+has a value of
+True.
+For a description of the status line, see the
+.B "Editor Status Line"
+heading in this manual page.
+.cdee
+.LI \f2Help\f1\^(\|)
+.br
+This action calls the callbacks for
+.B XmNhelpCallback
+if any exist.
+If there are no help
+callbacks for this widget, this action calls the help callbacks
+for the nearest ancestor that has them.
+.LI \f2insert-string\f1\^(\f2string\f1)
+.br
+This action deletes the entire selection
+if there is a non-\c
+.Cn NULL
+selection and the cursor is not disjoint from it.
+It inserts
+.B string
+before the insertion cursor.
+.LI \f2key-select\f1\^(\f2direction\f1)
+.br
+If this action is called with an argument of
+.IR right ,
+it moves the insertion cursor
+one character to the right and extends the current selection.
+If this action is called with an argument of
+.IR left ,
+it moves the insertion cursor
+one character to the left and extends the current selection.
+If this action is called with no argument, it extends the current selection.
+.LI \f2newline-and-backup\f1\^(\|)
+.br
+If there is a non-\c
+.Cn NULL
+selection and the cursor is not disjoint from it,
+this action deletes the entire selection,
+inserts a newline just before the insertion cursor and repositions the
+insertion cursor to the end of the line before the newline.
+.LI \f2newline-and-indent\f1\^(\|)
+.br
+If there is a non-\c
+.Cn NULL
+selection and the cursor is not disjoint from it,
+this action deletes the entire selection,
+inserts a newline and then the same number of whitespace characters as
+at the beginning of the previous line.
+.LI \f2next-page\f1\^(\f2extend\f1)
+.br
+If this action is called with no argument,
+it moves the insertion cursor forward one page.
+.P
+If this action is called with an argument of
+.IR extend ,
+it moves the insertion cursor, as
+in the case of no argument, and extends the current selection.
+.LI \f2page-left\f1\^(\|)
+.br
+This action scrolls the viewing window left one page of text.
+.LI \f2page-right\f1\^(\|)
+.br
+This action scrolls the viewing window right one page of text.
+.LI \f2paste-clipboard\f1\^(\|)
+.br
+This action pastes the contents of the clipboard before the insertion cursor.
+.LI \f2previous-page\f1\^(\f2extend\f1)
+.br
+If this action is called with no argument,
+it moves the insertion cursor back one page.
+.P
+If this action is called with an argument of
+.IR extend ,
+it moves the insertion cursor, as
+in the case of no argument, and extends the current selection.
+.LI \f2process-cancel\f1\^(\|)
+.br
+This action
+cancels the current
+.Fn extend-adjust
+or
+.Fn secondary-adjust
+operation and leaves the selection state as it was before the operation;
+otherwise, (and if the parent is a manager) it passes the event to the parent.
+.LI \f2process-down\f1\^(\|)
+.br
+This action moves the insertion cursor down one line.
+.LI \f2process-shift-down\f1\^(\|)
+.br
+This action moves the insertion cursor down one line,
+extending the current selection.
+.br
+.LI \f2process-shift-up\f1\^(\|)
+.br
+This action moves the insertion cursor up one line,
+extending the current selection.
+.br
+.LI \f2process-up\f1\^(\|)
+.br
+This action moves the insertion cursor up one line.
+.LI \f2select-all\f1\^(\|)
+.br
+Selects all text.
+.LI \f2toggle-insert-mode\f1\^(\|)
+.br
+This action toggles the state of the text insertion mode.
+By default,
+characters typed into the DtEditor widget are inserted at
+the position of the insertion cursor.
+In overstrike
+mode, characters entered into the DtEditor widget replace
+the characters that directly follow the insertion cursor.
+In overstrike mode,
+characters are appended to the end of the line when the
+end of a line is reached.
+.LI \f2quote-next-character\f1\^(\|)
+.br
+This action treats the next typed character as a special character and inserts it
+into the text without interpreting it.
+Enables the insertion of special instructional characters or special
+language characters, such as the character marking a form feed or
+the umlaut used in German text.
+.LI \f2undo-edit\f1\^(\|)
+.br
+This action undoes the last change (deletion or insertion) made to the text.
+A
+change consists of either a set of consecutive insertions, or a set of
+consecutive deletions followed by up
+to one set of consecutive insertions.
+An insertion is consecutive if there have been no intervening deletions,
+and it is continuing forward from the same point.
+A deletion is consecutive if there have been no intervening insertions,
+and its start or end position is coincidental with the last deletion
+(that is, the deletion is continuing from the same point, either forward or
+backward).
+Undoing an edit once restores the original text.
+Undoing an edit twice restores the last change.
+.LE
+.cdes
+.\" these summary lists are not used in X/Open; see the function man pages
+.HU "Convenience Functions"
+The Widget Library contains a number of functions that apply to the
+DtEditor widget.
+The following lists summarize these functions.
+.HU "DtEditor Life Cycle Functions"
+.VL 6
+.LI \f2DtCreateEditor\f1\^(\|)
+.br
+Creates a new instance of a DtEditor widget.
+.LI \f2DtEditorReset\f1\^(\|)
+.br
+Restores a DtEditor widget to its initial state.
+.LE
+.HU "DtEditor Input/Output Functions"
+.VL 6
+.LI \f2DtEditorAppend\f1\^(\|)
+.br
+Appends content data to the end of a DtEditor
+widget.
+.LI \f2DtEditorAppendFromFile\f1\^(\|)
+.br
+Appends the contents of a file to the end of a DtEditor
+widget.
+.LI \f2DtEditorGetContents\f1\^(\|)
+.br
+Retrieves the entire contents of a DtEditor
+widget.
+.LI \f2DtEditorInsert\f1\^(\|)
+.br
+Inserts content data at the current insert position.
+.LI \f2DtEditorInsertFromFile\f1\^(\|)
+.br
+Inserts the contents of a file at the current insert position.
+.LI \f2DtEditorReplace\f1\^(\|)
+.br
+Replaces a portion of text with the supplied data.
+.LI \f2DtEditorReplaceFromFile\f1\^(\|)
+.br
+Replaces a portion of text with the contents of a file.
+.LI \f2DtEditorSaveContentsToFile\f1\^(\|)
+.br
+Saves the entire contents to a file.
+.LI \f2DtEditorSetContents\f1\^(\|)
+.br
+Loads content data into a DtEditor
+widget, replacing the entire contents of the widget.
+.LI \f2DtEditorSetContentsFromFile\f1\^(\|)
+.br
+Loads the contents of a file into a DtEditor
+widget, replacing the entire contents of the widget.
+.LE
+.HU "DtEditor Selection Functions"
+.VL 6
+.LI \f2DtEditorClearSelection\f1\^(\|)
+.br
+Replaces the currently selected contents with blanks.
+.LI \f2DtEditorCopyToClipboard\f1\^(\|)
+.br
+Copies the currently selected contents to the clipboard.
+.LI \f2DtEditorCutToClipboard\f1\^(\|)
+.br
+Removes the currently selected contents, placing it on the clipboard.
+.LI \f2DtEditorDeleteSelection\f1\^(\|)
+.br
+Removes the currently selected contents.
+.LI \f2DtEditorDeselect\f1\^(\|)
+.br
+Deselects any selected contents.
+.LI \f2DtEditorPasteFromClipboard\f1\^(\|)
+.br
+Pastes the contents of the clipboard into a DtEditor
+widget, replacing any currently selected contents.
+.LI \f2DtEditorSelectAll\f1\^(\|)
+.br
+Selects the entire contents of a DtEditor widget.
+.LE
+.HU "DtEditor Format Functions"
+.VL 6
+.LI \f2DtEditorFormat\f1\^(\|)
+.br
+Formats the contents of all or part of a DtEditor
+widget.
+.LI \f2DtEditorInvokeFormatDialog\f1\^(\|)
+.br
+Displays the format dialog that enables the user
+to specify format settings for margins and
+justification style and to perform formatting
+operations.
+.LE
+.HU "DtEditor Find and Change Text Functions"
+.VL 6
+.LI \f2DtEditorChange\f1\^(\|)
+.br
+Changes one or all occurrences of a string.
+.LI \f2DtEditorFind\f1\^(\|)
+.br
+Finds the next occurrence of a string.
+.LI \f2DtEditorInvokeFindChangeDialog\f1\^(\|)
+.br
+Displays the dialog that enables the user
+to search for, and optionally change, a string.
+.LI \f2DtEditorInvokeSpellDialog\f1\^(\|)
+.br
+Displays a dialog with a list of misspelled
+words in the current contents.
+.LE
+.HU "DtEditor Auxiliary Functions"
+.VL 6
+.cdes
+.LI \f2DtEditorDisableRedisplay\f1\^(\|)
+.br
+Temporarily prevents visual update of a DtEditor widget.
+.LI \f2DtEditorEnableRedisplay\f1\^(\|)
+.br
+Forces the visual update of a DtEditor widget.
+.cdee
+.LI \f2DtEditorCheckForUnsavedChanges\f1\^(\|)
+.br
+Reports whether the contents of a DtEditor
+widget have been altered since they were last
+retrieved or saved.
+.LI \f2DtEditorGetInsertionPosition\f1\^(\|)
+.br
+Returns the insertion cursor position of a DtEditor
+widget.
+.LI \f2DtEditorGetLastPosition\f1\^(\|)
+.br
+Returns the position of the last character
+in the edit window.
+.LI \f2DtEditorGetMessageTextFieldID\f1\^(\|)
+.br
+Retrieves the widget ID of the Text Field
+widget used to display application messages.
+.LI \f2DtEditorGetSizeHints\f1\^(\|)
+.br
+Retrieves sizing information from a DtEditor
+widget.
+.LI \f2DtEditorGoToLine\f1\^(\|)
+.br
+Moves the insert cursor to the specified line.
+.LI \f2DtEditorSetInsertionPosition\f1\^(\|)
+Sets the position of the insertion cursor.
+.LI \f2DtEditorTraverseToEditor\f1\^(\|)
+.br
+Sets keyboard traversal to the edit window of a DtEditor
+widget.
+.LI \f2DtEditorUndoEdit\f1\^(\|)
+.br
+Undoes the last edit made by a user.
+.LE
+.SH FILES
+.VL 6
+.LI \f2/usr/dt/lib/nls/msg/$LANG/DtWidget.cat\f1\^(\|)
+.br
+Message catalog for DtWidget library.
+.LE
+.cdee
+.SH "SEE ALSO"
+.Hd Dt/Editor.h 5,
+.Fn DtCreateEditor 3,
+.Fn DtEditorAppend 3,
+.Fn DtEditorAppendFromFile 3,
+.Fn DtEditorChange 3,
+.Fn DtEditorCheckForUnsavedChanges 3,
+.Fn DtEditorClearSelection 3,
+.Fn DtEditorCopyToClipboard 3,
+.Fn DtEditorCutToClipboard 3,
+.Fn DtEditorDeleteSelection 3,
+.Fn DtEditorDeselect 3,
+.cdes
+.Fn DtEditorDisableRedisplay 3,
+.Fn DtEditorEnableRedisplay 3,
+.cdee
+.Fn DtEditorFind 3,
+.Fn DtEditorFormat 3,
+.Fn DtEditorGetContents 3,
+.Fn DtEditorGetInsertionPosition 3,
+.Fn DtEditorGetLastPosition 3,
+.cdes
+.Fn DtEditorGetMessageTextFieldID 3,
+.cdee
+.Fn DtEditorGetSizeHints 3,
+.Fn DtEditorGoToLine 3,
+.Fn DtEditorInsert 3,
+.Fn DtEditorInsertFromFile 3,
+.Fn DtEditorInvokeFindChangeDialog 3,
+.Fn DtEditorInvokeFormatDialog 3,
+.cdes
+.Fn DtEditorInvokeSpellDialog 3,
+.cdee
+.Fn DtEditorPasteFromClipboard 3,
+.Fn DtEditorReplace 3,
+.Fn DtEditorReplaceFromFile 3,
+.cdes
+.Fn DtEditorReset 3,
+.cdee
+.Fn DtEditorSaveContentsToFile 3,
+.Fn DtEditorSelectAll 3,
+.Fn DtEditorSetContents 3,
+.Fn DtEditorSetContentsFromFile 3,
+.Fn DtEditorSetInsertionPosition 3,
+.Fn DtEditorTraverseToEditor 3,
+.Fn DtEditorUndoEdit 3;
+.xos
+.IR Composite ,
+.IR Constraint ,
+.IR Core ,
+.IR XmBulletinBoard ,
+.IR XmFontList ,
+.IR XmForm ,
+.IR XmManager
+in the \*(ZM.
+.xoe
+.cdes
+.Fn Composite 3X,
+.Fn Constraint 3X,
+.Fn Core 3X,
+.Fn XmBulletinBoard 3X,
+.Fn XmFontList 3X,
+.Fn XmForm 3X,
+.Fn XmManager 3X,
+.Fn XmTextField 3X.
+.cdee

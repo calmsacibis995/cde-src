@@ -1,0 +1,41 @@
+XCOMM @(#)Imakefile	1.5 96/07/24 SMI
+XCOMM Copyright (c) 1996 Sun Microsystems, Inc.
+
+LIBTOPDIR = ..
+LIBCURDIR = DataTypes
+
+#include "../ImakeSdm.tmpl"
+#include <Library.tmpl>
+
+HEADERS  = \
+	StringRep.hh
+
+SRCS     = \
+	ContentBuffer.cc \
+	DoubleLinkedList.cc \
+	LinkedList.cc \
+	SimpleTuples.cc \
+	String.cc \
+	Time.cc
+
+OBJS     = \
+	ContentBuffer.o \
+	DoubleLinkedList.o \
+	LinkedList.o \
+	SimpleTuples.o \
+	String.o \
+	Time.o
+
+INCLUDES = $(SDMINCLUDES) $(SDMCCLIENTINCLUDES) $(SDMLCLINCLUDES)
+DEFINES  = $(SDMDEFINES)
+
+LibraryObjectRule()
+
+AllTarget($(OBJS))
+
+SdmObjectListTarget($(LIBCURDIR),$(OBJS))
+
+SdmTestLibraryTarget($(LIBCURDIR),$(OBJS))
+
+DependTarget()
+

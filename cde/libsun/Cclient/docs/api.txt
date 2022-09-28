@@ -1,0 +1,1277 @@
+* Types
+
+BODY - 
+
+DRIVER - mail driver dispatch structure, common to all drivers
+
+ENVELOPE - 
+
+MAILHANDLE - 
+
+MAILSTREAM - 
+
+MESSAGECACHE -
+
+NETMBX - 
+
+SEARCHPGM - A structure that defines a "search program" which the c-client
+  uses to search mailbox contents and return restrictive results.
+
+  These functions take a SEARCHPGM as an argument:can use from the following functions:
+    - mail_free_searchpgm
+    - mail_local_search
+    - mail_search_full
+    - mail_search_msg
+    - valid_local_search
+
+  These functions return a SEARCHPGM as a result:
+    - mail_criteria
+    - mail_newsearchpgm
+
+SEARCHPGMLIST - A structure that allows a list of "SEARCHPGM"s to be defined
+  and can use from the following functions:
+    - mail_free_searchpgmlist
+
+  These functions return a SEARCHPGMLIST as a result:
+    - mail_newsearchpgmlist
+
+STRINGLIST - 
+
+
+* Functions
+
+
+/* Default limited get string
+ * Accepts: readin function pointer
+ *	    stream to use
+ *	    number of bytes
+ * Returns: string read in, truncated if necessary
+ *
+ * This is a sample mailgets routine.  It simply truncates any data larger
+ * than MAXMESSAGESIZE.  On most systems, you generally don't use a mailgets
+ * routine at all, but on some systems (e.g. DOS) it's required to prevent the
+ * application from crashing.  This one is filled in by the os driver for any
+ * OS that requires a mailgets routine and the main program has not already
+ * supplied one, generally in tcp_open().
+ */
+
+char *mm_gets (readfn_t f,void *stream,unsigned long size)
+
+
+/* Default mail cache handler
+ * Accepts: pointer to cache handle
+ *	    message number
+ *	    caching function
+ * Returns: cache data
+ */
+
+void *mm_cache (MAILSTREAM *stream,unsigned long msgno,long op)
+
+
+/* Initialize mail string structure for in-memory string
+ * Accepts: string structure
+ *	    pointer to string
+ *	    size of string
+ */
+
+void mail_string_init (STRING *s,void *data,unsigned long size)
+
+
+
+/* Get next character from string
+ * Accepts: string structure
+ * Returns: character, string structure chunk refreshed
+ */
+
+char mail_string_next (STRING *s)
+
+
+
+/* Set string pointer position
+ * Accepts: string structure
+ *	    new position
+ */
+
+void mail_string_setpos (STRING *s,unsigned long i)
+
+
+/* Mail routines
+ *
+ *  mail_xxx routines are the interface between this module and the outside
+ * world.  Only these routines should be referenced by external callers.
+ *
+ *  Note that there is an important difference between a "sequence" and a
+ * "message #" (msgno).  A sequence is a string representing a sequence in
+ * {"n", "n:m", or combination separated by commas} format, whereas a msgno
+ * is a single integer.
+ *
+ */
+
+/* Mail link driver
+ * Accepts: driver to add to list
+ */
+
+void mail_link (DRIVER *driver)
+
+
+/* Mail manipulate driver parameters
+ * Accepts: mail stream
+ *	    function code
+ *	    function-dependent value
+ * Returns: function-dependent return value
+ */
+
+void *mail_parameters (MAILSTREAM *stream,long function,void *value)
+
+
+/* Mail validate mailbox name
+ * Accepts: MAIL stream
+ *	    mailbox name
+ *	    purpose string for error message
+ * Return: driver factory on success, NIL on failure
+ */
+
+DRIVER *mail_valid (MAILSTREAM *stream,char *mailbox,char *purpose)
+
+
+/* Mail validate network mailbox name
+ * Accepts: mailbox name
+ *	    mailbox driver to validate against
+ *	    pointer to where to return host name if non-NIL
+ *	    pointer to where to return mailbox name if non-NIL
+ * Returns: driver on success, NIL on failure
+ */
+
+DRIVER *mail_valid_net (char *name,DRIVER *drv,char *host,char *mailbox)
+
+
+
+/* Mail validate network mailbox name
+ * Accepts: mailbox name
+ *	    NETMBX structure to return values
+ * Returns: T on success, NIL on failure
+ */
+
+long mail_valid_net_parse (char *name,NETMBX *mb)
+
+
+/*
+ * Sun Imap4: Holdover from imap2bis. 
+ */
+
+void mail_find_all_local(MAILSTREAM *stream, char *pat)
+
+
+/* Mail list mailboxes
+ * Accepts: mail stream
+ *	    reference
+ *	    pattern to search
+ */
+
+void mail_list (MAILSTREAM *stream,char *ref,char *pat)
+
+
+
+/* Mail list subscribed mailboxes
+ * Accepts: mail stream
+ *	    pattern to search
+ */
+
+void mail_lsub (MAILSTREAM *stream,char *ref,char *pat)
+
+
+/* Mail subscribe to mailbox
+ * Accepts: mail stream
+ *	    mailbox to add to subscription list
+ * Returns: T on success, NIL on failure
+ */
+
+long mail_subscribe (MAILSTREAM *stream,char *mailbox)
+
+
+
+/* Mail unsubscribe to mailbox
+ * Accepts: mail stream
+ *	    mailbox to delete from subscription list
+ * Returns: T on success, NIL on failure
+ */
+
+long mail_unsubscribe (MAILSTREAM *stream,char *mailbox)
+
+
+/* Mail create mailbox
+ * Accepts: mail stream
+ *	    mailbox name to create
+ * Returns: T on success, NIL on failure
+ */
+
+long mail_create (MAILSTREAM *stream,char *mailbox)
+
+
+/* Mail delete mailbox
+ * Accepts: mail stream
+ *	    mailbox name to delete
+ * Returns: T on success, NIL on failure
+ */
+
+long mail_delete (MAILSTREAM *stream,char *mailbox)
+
+
+
+/* Mail rename mailbox
+ * Accepts: mail stream
+ *	    old mailbox name
+ *	    new mailbox name
+ * Returns: T on success, NIL on failure
+ */
+
+long mail_rename (MAILSTREAM *stream,char *old,char *newname)
+
+/* Mail status of mailbox
+ * Accepts: mail stream
+ *	    mailbox name
+ *	    status flags
+ * Returns: T on success, NIL on failure
+ */
+
+long mail_status (MAILSTREAM *stream,char *mbx,long flags)
+
+
+
+/* Mail open
+ * Accepts: candidate stream for recycling
+ *	    mailbox name
+ *	    open options
+ * Returns: stream to use on success, NIL on failure
+ */
+
+MAILSTREAM *mail_open (MAILSTREAM *stream,char *name,long options)
+
+
+** mail_close_full - Close a mailbox
+  Synopsis: MAILSTREAM *mail_close_full (MAILSTREAM *stream,long options)
+  Arguments:
+    MAILSTREAM *stream
+    long options - if CL_EXPUNGE is present, the mailbox is expunged instead
+                   of checked.
+  Returns: NIL always.
+  Description:
+
+Calls the stream driver's close method.
+Frees the storage occupied by stream->mailbox.
+Frees stream.
+
+
+/* Mail make handle
+ * Accepts: mail stream
+ * Returns: handle
+ *
+ *  Handles provide a way to have multiple pointers to a stream yet allow the
+ * stream's owner to nuke it or recycle it.
+ */
+
+MAILHANDLE *mail_makehandle (MAILSTREAM *stream)
+
+
+/* Mail release handle
+ * Accepts: Mail handle
+ */
+
+void mail_free_handle (MAILHANDLE **handle)
+
+
+/* Mail get stream handle
+ * Accepts: Mail handle
+ * Returns: mail stream or NIL if stream gone
+ */
+
+MAILSTREAM *mail_stream (MAILHANDLE *handle)
+
+
+/* Mail fetch long cache element
+ * Accepts: mail stream
+ *	    message # to fetch
+ * Returns: long cache element of this message
+ * Can also be used to create cache elements for new messages.
+ */
+mail_lelt - Fetch long cache element
+  Synopsis: LONGCACHE *mail_lelt (MAILSTREAM *stream, unsigned long msgno)
+  Arguments:
+    MAILSTREAM *stream
+    unsigned long msgno
+  Returns: long cache element of this message.
+  Description:
+
+/* Mail fetch cache element
+ * Accepts: mail stream
+ *	    message # to fetch
+ * Returns: cache element of this message
+ * Can also be used to create cache elements for new messages.
+ */
+
+MESSAGECACHE *mail_elt (MAILSTREAM *stream,unsigned long msgno)
+
+
+/* Mail fetch fast information
+ * Accepts: mail stream
+ *	    sequence
+ *	    option flags
+ *
+ * Generally, mail_fetchstructure_full is preferred
+ */
+
+void mail_fetchfast_full (MAILSTREAM *stream,char *sequence,long flags)
+
+
+
+/* Mail fetch flags
+ * Accepts: mail stream
+ *	    sequence
+ *	    option flags
+ */
+
+void mail_fetchflags_full (MAILSTREAM *stream,char *sequence,long flags)
+
+
+
+/* Mail fetch message structure
+ * Accepts: mail stream
+ *	    message # to fetch
+ *	    pointer to return body
+ *	    option flags
+ * Returns: envelope of this message, body returned in body value
+ *
+ * Fetches the "fast" information as well
+ */
+
+ENVELOPE *mail_fetchstructure_full (MAILSTREAM *stream,unsigned long msgno,
+				    BODY **body,long flags)
+
+mail_fetchheader_full - Fetch the header for a message in RFC822 format.
+  Synopsis: char *mail_fetchheader_full(MAILSTREAM *stream,unsigned long
+		      msgno, STRINGLIST *lines,unsigned long *len,long flags)
+  Arguments:
+    MAILSTREAM *stream
+    unsigned long msgno - Either integer message no. or UID (see flags).
+    STRINGLIST *lines   - List of header fields to fetch.
+    unsigned long *len  - Pointer in which header length is stored.
+    long flags		- FT_UID  The given msgno is a UID
+			- FT_INTERNAL Return the internal pointer to the
+			  header.  If lines is non-NIL, this flag is ignored.
+  Returns: The message header in RFC822 format.  The length of the header is
+	   returned in the "len" argument.
+  Notes: 
+      RFC822 format implies that each line is terminated by CRLF.
+
+      In the solaris driver, text is internally copied to a local buffer,
+      replacing LF by CRLF.  Normally, a pointer to this local buffer is
+      returned.  Beware that the data in this local buffer is volatile and
+      will not persist between calls into the c-client which modify this
+      local buffer.
+
+      If lines is NIL and FT_INTERNAL is set, then a pointer to an internal
+      buffer is returned and no LF to CRLF translation is done.
+
+      If "lines" is present, the given header fields are fetched by calling
+      mail_filter.  The flags are passed through to this function, and the
+      flag FT_NOT is consulted.
+
+      The macro mail_simple_fetchheader calls this function and defaults
+      lines, len and flags all to NIL
+
+/* Mail fullheader cached
+ * Accepts: mail stream
+ *	    message # to check
+ * Returns: T if indeed it is or is available locally.
+ */
+
+int mail_fullheader_cached(MAILSTREAM *stream, unsigned long msgno)
+ 
+/* Mail fetch message text (body only)
+ * Accepts: mail stream
+ *	    message # to fetch
+ *	    pointer to returned length
+
+ *	    flags
+ * Returns: message text in RFC822 format
+ */
+
+char *mail_fetchtext_full (MAILSTREAM *stream,unsigned long msgno,
+			   unsigned long *len,long flags)
+
+
+mail_fetchbody_full - Fetch the text for a given message body part.
+  Synopsis: char *mail_fetchbody_full (MAILSTREAM *stream,unsigned long
+                         msgno,char *sec, unsigned long *len,long flags)
+  Arguments:
+    MAILSTREAM *stream
+    unsigned long msgno - Either integer message no. or UID (see flags).
+    STRINGLIST *lines   - List of header fields to fetch.
+    char *sec           - Section specifier (#.#.#...#)
+    unsigned long *len  - Pointer in which body length is stored.
+    long flags		- FT_UID - the given msgno is a UID
+  Returns: The message body part in RFC822 format.  The length of the header
+           returned in the address pointed to by the "len" argument.
+  Notes: 
+      If the section is "0", then the header is returned.  In the solaris
+      driver, it simply calls solaris_fetchheader.
+
+      In the solaris driver, text is internally copied to a local buffer,
+      replacing LF by CRLF.  Normally, a pointer to this local buffer is
+      returned.  Beware that the data in this local buffer is volatile and
+      will not persist between calls into the c-client which modify this
+      local buffer.
+
+/* Mail fetch UID
+ * Accepts: mail stream
+ *	    message number
+ * Returns: UID
+ */
+
+unsigned long mail_uid (MAILSTREAM *stream,unsigned long msgno)
+
+/* Mail fetch msgno
+ * Accepts: mail stream
+ *	    UID
+ * Returns: msgno or 0
+ */
+
+unsigned long mail_msgno (MAILSTREAM *stream,unsigned long uid)
+
+
+
+/* Mail fetch From string for menu
+ * Accepts: destination string
+ *	    mail stream
+ *	    message # to fetch
+ *	    desired string length
+ * Returns: string of requested length
+ */
+
+void mail_fetchfrom (char *s,MAILSTREAM *stream,unsigned long msgno,
+		     long length)
+
+
+
+/* Mail fetch Subject string for menu
+ * Accepts: destination string
+ *	    mail stream
+ *	    message # to fetch
+ *	    desired string length
+ * Returns: string of no more than requested length
+ */
+
+void mail_fetchsubject (char *s,MAILSTREAM *stream,unsigned long msgno,
+			long length)
+
+
+/* Mail set flag
+ * Accepts: mail stream
+ *	    sequence
+ *	    flag(s)
+ *	    option flags
+ */
+
+void mail_setflag_full (MAILSTREAM *stream,char *sequence,char *flag,
+			long flags)
+
+
+
+/* Mail clear flag
+ * Accepts: mail stream
+ *	    sequence
+ *	    flag(s)
+ *	    option flags
+ */
+
+void mail_clearflag_full (MAILSTREAM *stream,char *sequence,char *flag,
+			  long flags)
+
+/*
+ * determine if the search can be done out of the local cache, ie,
+ * sinfo information. 
+ */
+
+int valid_local_search (SEARCHPGM *pgm)
+/*
+ * Check here for searching FROM the local cache rather than
+ * using the imapd. If we do NOT have ALL short info, then only
+ * search "ALL" is permitted. WJY.
+ */
+int mail_local_search(MAILSTREAM *stream, SEARCHPGM *pgm)
+
+
+/* BEGIN VF - Mail simple search for messages
+ * Accepts: mail stream
+ *	    search criteria
+ * Does NOT automatically return flags, envelopes, etc ...
+ * Also, will do search from local cache if possible.
+ */
+
+void mail_simple_search (MAILSTREAM *stream, char *criteria, char *charset,
+			 long flags)
+
+
+/* Mail search for messages
+ * Accepts: mail stream
+ *	    character set
+ *	    search program
+ *	    option flags
+ */
+
+void mail_search_full (MAILSTREAM *stream,char *charset,SEARCHPGM *pgm,
+		       long flags)
+
+
+/* Mail ping mailbox
+ * Accepts: mail stream
+ * Returns: stream if still open else NIL
+ */
+
+long mail_ping (MAILSTREAM *stream)
+
+
+
+/* Mail check mailbox
+ * Accepts: mail stream
+ */
+
+void mail_check (MAILSTREAM *stream)
+
+
+
+/* Mail expunge mailbox
+ * Accepts: mail stream
+ */
+
+void mail_expunge (MAILSTREAM *stream)
+
+
+/* Mail copy message(s)
+ * Accepts: mail stream
+ *	    sequence
+ *	    destination mailbox
+ *	    flags
+ */
+
+long mail_copy_full (MAILSTREAM *stream,char *sequence,char *mailbox,
+		     long options)
+
+
+
+/* Mail append message string
+ * Accepts: mail stream
+ *	    destination mailbox
+ *	    initial flags
+ *	    message internal date
+ *	    stringstruct of message to append
+ * Returns: T on success, NIL on failure
+ */
+
+long mail_append_full (MAILSTREAM *stream,char *mailbox,char *flags,char *date,
+		       STRING *message)
+
+
+/* Mail garbage collect stream
+ * Accepts: mail stream
+ *	    garbage collection flags
+ */
+
+void mail_gc (MAILSTREAM *stream,long gcflags)
+
+
+/* Mail output date from elt fields
+ * Accepts: character string to write into
+ *	    elt to get data data from
+ * Returns: the character string
+ */
+
+const char *days[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
+
+const char *months[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
+			"Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+
+char *mail_date (char *string,MESSAGECACHE *elt)
+
+
+
+/* Mail output cdate format date from elt fields
+ * Accepts: character string to write into
+ *	    elt to get data data from
+ * Returns: the character string
+ */
+
+char *mail_cdate (char *string,MESSAGECACHE *elt)
+
+
+/* Mail parse date into elt fields
+ * Accepts: elt to write into
+ *	    date string to parse
+ * Returns: T if parse successful, else NIL 
+ * This routine parses dates as follows:
+ * . leading three alphas followed by comma and space are ignored
+ * . date accepted in format: mm/dd/yy, mm/dd/yyyy, dd-mmm-yy, dd-mmm-yyyy,
+ *    dd mmm yy, dd mmm yyyy
+ * . space or end of string required
+ * . time accepted in format hh:mm:ss or hh:mm
+ * . end of string accepted
+ * . timezone accepted: hyphen followed by symbolic timezone, or space
+ *    followed by signed numeric timezone or symbolic timezone
+ * Examples of normal input:
+ * . IMAP date-only (SEARCH): dd-mmm-yy, dd-mmm-yyyy, mm/dd/yy, mm/dd/yyyy
+ * . IMAP date-time (INTERNALDATE):
+ *    dd-mmm-yy hh:mm:ss-zzz
+ *    dd-mmm-yyyy hh:mm:ss +zzzz
+ * . RFC-822:
+ *    www, dd mmm yy hh:mm:ss zzz
+ *    www, dd mmm yyyy hh:mm:ss +zzzz
+ */
+
+long mail_parse_date (MESSAGECACHE *elt,char *s)
+
+
+/* Mail n messages exist
+ * Accepts: mail stream
+ *	    number of messages
+ *
+ * Calls external "mm_exists" function that notifies main program prior
+ * to updating the stream
+ */
+
+void mail_exists (MAILSTREAM *stream,unsigned long nmsgs)
+
+
+/* Mail n messages are recent
+ * Accepts: mail stream
+ *	    number of recent messages
+ */
+
+void mail_recent (MAILSTREAM *stream,unsigned long recent)
+
+
+
+/* Mail message n is expunged
+ * Accepts: mail stream
+ *	    message #
+ *
+ * Calls external "mm_expunged" function that notifies main program prior
+ * to updating the stream
+ */
+
+void mail_expunged (MAILSTREAM *stream,unsigned long msgno)
+
+
+/* Mail stream status routines */
+
+
+/* Mail lock stream
+ * Accepts: mail stream
+ */
+
+void mail_lock (MAILSTREAM *stream)
+
+
+
+/* Mail unlock stream
+ * Accepts: mail stream
+ */
+ 
+void mail_unlock (MAILSTREAM *stream)
+
+
+
+/* Mail turn on debugging telemetry
+ * Accepts: mail stream
+ */
+
+void mail_debug (MAILSTREAM *stream)
+
+
+
+/* Mail turn off debugging telemetry
+ * Accepts: mail stream
+ */
+
+void mail_nodebug (MAILSTREAM *stream)
+
+
+/* Mail parse UID sequence
+ * Accepts: mail stream
+ *	    sequence to parse
+ * Returns: T if parse successful, else NIL
+ */
+
+long mail_uid_sequence (MAILSTREAM *stream,char *sequence)
+
+
+/* Mail filter text by header lines
+ * Accepts: text to filter
+ *	    length of text
+ *	    list of lines
+ *	    fetch flags
+ * Returns: new text size
+ */
+
+unsigned long mail_filter (char *text,unsigned long len,STRINGLIST *lines,
+			   long flags)
+
+
+/* Local mail search message
+ * Accepts: MAIL stream
+ *	    message number
+ *	    search charset
+ *	    search program
+ * Returns: T if found, NIL otherwise
+ *
+ * Slight modification to use SHORTINFO data when present
+ * allows searches on:
+ *   rfc822_date, From, Subject, Flags, rfc822_size, and UID.
+ *   Only Froma nd Subject must be extracted from the sinfo
+ *   structure. The rest are cached in the elt.
+ * This will allow us to search from the cache in lieu of
+ * fetching the data for searches that only involve the above
+ * data.
+ */
+
+static STRINGLIST *sstring =NIL;/* stringlist for searching */
+static char *scharset = NIL;	/* charset for searching */
+
+long mail_search_msg (MAILSTREAM *stream,unsigned long msgno,char *charset,
+		      SEARCHPGM *pgm)
+
+
+/* Mail search keyword
+ * Accepts: MAIL stream
+ *	    elt to get flags from
+ *	    keyword list
+ * Returns: T if search found a match
+ */
+
+long mail_search_keyword (MAILSTREAM *stream,MESSAGECACHE *elt,STRINGLIST *st)
+
+
+
+/* Mail search an address list
+ * Accepts: address list
+ *	    character set
+ *	    string list
+ * Returns: T if search found a match
+ */
+
+long mail_search_addr (ADDRESS *adr,char *charset,STRINGLIST *st)
+
+
+
+/* Mail search string
+ * Accepts: text string
+ *	    character set
+ *	    string list
+ * Returns: T if search found a match
+ */
+
+long mail_search_string (char *txt,char *charset,STRINGLIST *st)
+
+
+/* Get string for searching
+ * Accepts: readin function pointer
+ *	    stream to use
+ *	    number of bytes
+ * Returns: non-NIL if error
+ */
+
+#define SEARCHSLOP 128
+
+char *mail_search_gets (readfn_t f,void *stream,unsigned long size)
+
+
+
+/* Mail search text
+ * Accepts: text string
+ *	    text length
+ *	    character set
+ *	    string list
+ * Returns: T if search found a match
+ */
+
+long mail_search_text (char *txt,long len,char *charset,STRINGLIST *st)
+
+
+/* Mail parse search criteria
+ * Accepts: criteria
+ * Returns: search program if parse successful, else NIL
+ */
+
+SEARCHPGM *mail_criteria (char *criteria)
+
+
+/* Parse a date
+ * Accepts: pointer to date integer to return
+ * Returns: T if successful, else NIL
+ */
+
+int mail_criteria_date (unsigned short *date)
+
+
+
+/* Parse a string
+ * Accepts: pointer to stringlist
+ * Returns: T if successful, else NIL
+ */
+
+int mail_criteria_string (STRINGLIST **s)
+
+
+/* Mail parse sequence
+ * Accepts: mail stream
+ *	    sequence to parse
+ * Returns: T if parse successful, else NIL
+ */
+
+long mail_sequence (MAILSTREAM *stream,char *sequence)
+
+
+/* Mail parse sequence for which the elt has a uid
+ * Accepts: mail stream
+ *	    sequence to parse
+ * Returns: T if parse successful, else NIL
+ */
+
+long mail_sequence_with_uid (MAILSTREAM *stream,char *sequence)
+
+
+/* Parse flag list
+ * Accepts: MAIL stream
+ *	    flag list as a character string
+ *	    pointer to user flags to return
+ * Returns: system flags
+ */
+
+long mail_parse_flags (MAILSTREAM *stream,char *flag,unsigned long *uf)
+
+
+/* Mail data structure instantiation routines */
+
+
+/* Mail instantiate envelope
+ * Returns: new envelope
+ */
+
+ENVELOPE *mail_newenvelope (void)
+
+
+
+/* Mail instantiate address
+ * Returns: new address
+ */
+
+ADDRESS *mail_newaddr (void)
+
+
+
+/* Mail instantiate body
+ * Returns: new body
+ */
+
+BODY *mail_newbody (void)
+
+
+/* Mail initialize body
+ * Accepts: body
+ * Returns: body
+ */
+
+BODY *mail_initbody (BODY *body)
+
+
+
+/* Mail instantiate body parameter
+ * Returns: new body part
+ */
+
+PARAMETER *mail_newbody_parameter (void)
+
+
+
+/* Mail instantiate body part
+ * Returns: new body part
+ */
+
+PART *mail_newbody_part (void)
+
+
+/* Mail instantiate string list
+ * Returns: new string list
+ */
+
+STRINGLIST *mail_newstringlist (void)
+
+
+
+/* Mail instantiate new search program
+ * Returns: new search program
+ */
+
+SEARCHPGM *mail_newsearchpgm (void)
+
+
+
+/* Mail instantiate new search program
+ * Accepts: header line name   
+ * Returns: new search program
+ */
+
+SEARCHHEADER *mail_newsearchheader (char *line)
+
+
+/* Mail instantiate new search set
+ * Returns: new search set
+ */
+
+SEARCHSET *mail_newsearchset (void)
+
+
+
+/* Mail instantiate new search or
+ * Returns: new search or
+ */
+
+SEARCHOR *mail_newsearchor (void)
+
+
+
+/* Mail instantiate new searchpgmlist
+ * Returns: new searchpgmlist
+ */
+
+SEARCHPGMLIST *mail_newsearchpgmlist (void)
+
+
+/* Mail garbage collection routines */
+
+
+/* Mail garbage collect body
+ * Accepts: pointer to body pointer
+ */
+
+void mail_free_body (BODY **body)
+
+
+
+/* Mail garbage collect body data
+ * Accepts: body pointer
+ */
+
+void mail_free_body_data (BODY *body)
+
+
+/* Mail garbage collect body parameter
+ * Accepts: pointer to body parameter pointer
+ */
+
+void mail_free_body_parameter (PARAMETER **parameter)
+
+
+
+/* Mail garbage collect body part
+ * Accepts: pointer to body part pointer
+ */
+
+void mail_free_body_part (PART **part)
+
+
+/* Mail garbage collect message cache
+ * Accepts: mail stream
+ *
+ * The message cache is set to NIL when this function finishes.
+ */
+
+void mail_free_cache (MAILSTREAM *stream)
+
+/* same as above but we have a good connection with
+ * a possibly invalid cache because inconsistent with
+ * server state.  Hmmm. THIS WILL CHANGE WITH cache resolution?
+ * KEEP the msgno as valid, it is. Free the rest */
+void mail_free_playback_cache (MAILSTREAM *stream)
+
+
+
+/* Mail garbage collect cache element
+ * Accepts: pointer to cache element pointer
+ */
+
+void mail_free_elt (MESSAGECACHE **elt)
+
+
+
+/* Mail garbage collect long cache element
+ * Accepts: pointer to long cache element pointer
+ */
+
+void mail_free_lelt (LONGCACHE **lelt)
+
+/* Mail garbage collect cache element
+ * Accepts: pointer to cache element pointer
+ */
+
+void mail_always_free_elt (MESSAGECACHE **elt)
+
+
+void mail_always_free_lelt (LONGCACHE **lelt)
+
+
+
+
+/* Mail garbage collect envelope
+ * Accepts: pointer to envelope pointer
+ */
+
+void mail_free_envelope (ENVELOPE **env)
+
+
+
+/* Mail garbage collect address
+ * Accepts: pointer to address pointer
+ */
+
+void mail_free_address (ADDRESS **address)
+
+
+
+/* Mail garbage collect stringlist
+ * Accepts: pointer to stringlist pointer
+ */
+
+void mail_free_stringlist (STRINGLIST **string)
+
+
+/* Mail garbage collect searchpgm
+ * Accepts: pointer to searchpgm pointer
+ */
+
+void mail_free_searchpgm (SEARCHPGM **pgm)
+
+/* Mail flush searchpgm - does NOT FREE the program itself.
+ * Accepts: pointer to searchpgm pointer
+ * WJY -- 24-Sep-95
+ */
+
+void mail_flush_searchpgm (SEARCHPGM *pgm)
+
+
+
+
+/* Mail garbage collect searchheader
+ * Accepts: pointer to searchheader pointer
+ */
+
+void mail_free_searchheader (SEARCHHEADER **hdr)
+
+
+
+/* Mail garbage collect searchset
+ * Accepts: pointer to searchset pointer
+ */
+
+void mail_free_searchset (SEARCHSET **set)
+
+
+
+/* Mail garbage collect searchor
+ * Accepts: pointer to searchor pointer
+ */
+
+void mail_free_searchor (SEARCHOR **orl)
+
+
+
+/* Mail garbage collect search program list
+ * Accepts: pointer to searchor pointer
+ */
+
+void mail_free_searchpgmlist (SEARCHPGMLIST **pgl)
+
+
+/* SUN Imap4 additions here */
+/* called from the imapd when "From: .." is missing
+ * we call the driver to fabricate a line */
+char *mail_fabricate_from (MAILSTREAM *stream, long msgno)
+        
+/*
+ * Convert a uid sequence to a msg sequence */
+#define MAXINTBUFLEN 32
+char *mail_uidseq_to_sequence(MAILSTREAM *stream, char *uidseq)
+
+/* mail_uidseq:
+ *  Generate a uid sequence from a any uid sequence
+ *  Compress consecutive uid seq nos using :
+ *  Returns  "" if nothing set, else a sequnce.
+ */
+char *mail_uidseq (MAILSTREAM *stream, char *uid_seq)
+
+/* mail_uidseq:
+ *  Generate a uid sequence from a any sequence
+ *  Compress consecutive uid seq nos using :
+ *  Returns  "" if nothing set, else a sequnce.
+ */
+char *mail_seq_to_uidseq (MAILSTREAM *stream, char *msgseq, 
+			  int mort)
+
+
+/*
+ * compress message sequence */
+char *mail_msgseq (MAILSTREAM *stream, char *msg_seq)
+
+/*
+ * compress message sequence to those which have uids only  */
+char *mail_msgseq_with_uid (MAILSTREAM *stream, char *msg_seq)
+
+  
+/* Mail set ONE flag
+ * Accepts: mail stream
+ *	    sequence
+ *	    flag(s)
+ *	    option flags
+ */
+
+void mail_set1flag_full (MAILSTREAM *stream,char *sequence,char *flag,
+			long flags)
+
+
+
+/* Mail clear ONE flag
+ * Accepts: mail stream
+ *	    sequence
+ *	    flag(s)
+ *	    option flags
+ */
+
+void mail_clear1flag_full (MAILSTREAM *stream,char *sequence,char *flag,
+			  long flags)
+
+/*
+ * make a from line from the short info */
+char *mail_make_from(SHORTINFO *sinfo)
+
+
+void mail_free_fshort_data (SHORTINFO *sinfo)
+
+/*
+ * mail_checksum: 
+ *
+ * checksum the associated mailbox */
+void mail_checksum(MAILSTREAM *stream)
+
+
+/*  BEGIN VF - Mail sunversion 
+ * Accepts: mail stream
+ *
+ * Returns T if the server supports the sunversion */
+int mail_sunversion(MAILSTREAM *stream)
+
+/* mail_imap4server:
+ * Accepts: mail stream
+ *
+ * Returns T if imap4 is supported */
+int mail_imap4support(MAILSTREAM *stream)
+
+
+/*
+ * mail_checkpoint 
+ * Accepts mail stream
+ *
+ * Checkpoints mail stream - closes connection but leaves
+ * cache intact */
+void mail_checkpoint(MAILSTREAM *stream, long min_msgno, long flags)
+
+
+void mail_disconnect(MAILSTREAM *stream)
+
+
+void mail_clear_iocount (MAILSTREAM *stream)
+
+
+/* BEGIN VF - Mail fetch short
+ * Accepts: Mail stream
+ *	    message # to fetch
+ *          pointer to shortinfo structure for the data.
+ * Returns: T on success with shortinfo supplied.
+ */
+
+int mail_fetchshort_full (MAILSTREAM *stream, unsigned long msgno, SHORTINFO *user_info,
+			  long flags)
+ 
+       
+/*
+ * call the driver routine to increment the urgent 
+ * data sending */
+void mail_increment_send_urgent(MAILSTREAM *stream)
+
+/* Mail echo
+ *         Attempts to open a connection to the server.
+ *         If successful, then closes the connection.
+ *         Just verify the path exists.
+ * Accepts: 
+ *	    mailbox name
+ * Returns: T if a connection succeeds, else NIL
+ */
+
+int mail_echo (char *name)
+
+/* Mail expand UID sequence
+ * Accepts: mail stream
+ *	    sequence to expand
+ * Returns: expanded sequence array (must be freed by caller).
+ * EG:  1000:1003,2001 ==> 1001,1001,1002,1003,2001
+ */
+
+ulong *mail_expand_uid_sequence (MAILSTREAM *stream,char *sequence)
+
+/*
+ * play back to an open stream
+ * Merde, c'est truc est presque fini!
+ * Bill Yeager - 21 Sep. 95  */
+int mail_playback(MAILSTREAM *stream)
+
+
+/*
+ * small functions to enable recording,
+ * and enable reconnecting */
+void mail_enable_recording(MAILSTREAM *stream, char *subdir)
+
+
+void mail_disable_recording(MAILSTREAM *stream)
+
+
+/*
+ * This function saves the c-clients cache to a disk file.
+ * Passed parameter: 
+ *
+ *  stream
+ *
+ * Returns T on success otherwise NIL
+ * The file name is in savecachefile.
+ */
+int mail_cache_to_disk (MAILSTREAM *stream, int *errno)
+
+/*
+ * Given a mailbox name, this call creates MAILSTREAM
+ * for a checkpointed mailbox.
+ */
+MAILSTREAM *mail_restore_cache (char *mbox, int *errno)
+
+
+/* The following two calls are NOT necessary
+ * if one is in record mode */
+/*
+ * set disconnected state BEFORE saving cache */
+int mail_set_disconnected_state(MAILSTREAM *stream)
+
+/*
+ * clear disconnected state AFTER saving cache */
+int mail_clear_disconnected_state(MAILSTREAM *stream)
+
+/*
+ * Return T if a checkpointed file name can
+ * be copied into buf else NIL */
+int mail_cached_filename(char *name,char *buf)
+

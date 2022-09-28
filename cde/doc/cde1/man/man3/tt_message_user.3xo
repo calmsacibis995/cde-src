@@ -1,0 +1,75 @@
+.TH tt_message_user 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+tt_message_user \- retrieve the user information associated with a message object
+.SH SYNOPSIS
+.yS
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'void *tt_message_user('u
+void *tt_message_user(Tt_message \f2m\fP,
+	int \f2key\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn tt_message_user
+function
+retrieves the user information stored in data cells associated with the
+specified message object.
+.P
+The user data is part of the message object
+(that is, the storage buffer in the
+application); it is not a part of the actual message.
+The application can, therefore, only
+retrieve user information that the application placed in the message.
+.P
+The
+.I m
+argument is the opaque handle for the message involved in this operation.
+The
+.I key
+argument is the user data cell to be retrieved.
+The user data cell must be unique for this message.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn tt_message_user
+function returns the data cell,
+a piece of arbitrary user data that can hold a
+.BR "void\ *" .
+The application can use
+.Fn tt_ptr_error 3
+to extract one of the following
+.B Tt_status
+values from the returned data:
+.VL 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_NOMP
+.br
+The
+.Cm ttsession 1
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_POINTER
+.br
+The pointer passed does not point to an object of
+the correct type for this operation.
+.LE
+.SH "APPLICATION USAGE"
+The application should use
+.Fn tt_free 3
+to free any data stored in the address returned by the
+ToolTalk API.
+.P
+The user data cell is intended to hold an address.
+If the address selected is equal to one of the
+.B Tt_status
+enumerated values, the result of the
+.Fn tt_ptr_error 3
+function will not be reliable.
+.SH "SEE ALSO"
+.Hd Tt/tt_c.h 5,
+.Fn tt_ptr_error 3,
+.Fn tt_free 3.

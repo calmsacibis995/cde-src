@@ -1,0 +1,97 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Novell, Inc
+...\" **
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH XmStringDrawImage 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmStringDrawImage\fP \- A compound string function that draws a compound string in an X Window and creates an image
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/Xm.h>
+.sp \n(PDu
+.ta 1i
+.nf
+void XmStringDrawImage (\fBd, w, fontlist, string, gc, x, y, width, alignment,
+	layout_direction, clip\fI)
+.ta .5i 1.5i
+.nf
+	Display	\fB* d\fI;
+	Window	\fBw\fI;
+	XmFontList	\fBfontlist\fI;
+	XmString	\fBstring\fI;
+	GC	\fBgc\fI;
+	Position	\fBx\fI;
+	Position	\fBy\fI;
+	Dimension	\fBwidth\fI;
+	unsigned char	\fBalignment\fI;
+	unsigned char	\fBlayout_direction\fI;
+	XRectangle	\fB* clip\fI;
+.wH
+.fi
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+\fIXmStringDrawImage\fP
+draws a compound string in an X Window and paints both the
+foreground and background bits of each character.
+If a compound string segment uses a font list entry that
+defines a font set, the graphic context passed to this
+routine will have the GC font member left in an undefined
+state.  The underlying \fIXmbStringDraw\fP function called
+by this routine modifies the font id field of the GC passed
+into it and does not attempt to restore the font id to the
+incoming value.  If the compound string segment is not drawn using
+a font set, the graphic context must contain a valid font
+member.  Graphic contexts created by \fIXtGetGC\fP are not
+accepted by this routine; instead, use \fIXtAllocateGC\fP
+to create a graphic context.
+.IP "\fBd\fP"
+Specifies the display.
+.IP "\fBw\fP"
+Specifies the window.
+.IP "\fBfontlist\fP"
+Specifies the font list.
+.IP "\fBstring\fP"
+Specifies the string.
+.IP "\fBgc\fP"
+Specifies the graphics context to use.
+.IP "\fBx\fP"
+Specifies a coordinate of the rectangle that will contain the displayed
+compound string.
+.IP "\fBy\fP"
+Specifies a coordinate of the rectangle that will contain the displayed
+compound string.
+.IP "\fBwidth\fP"
+Specifies the width of the rectangle that will contain the
+displayed compound string.
+.IP "\fBalignment\fP"
+Specifies how the string will be aligned within the specified rectangle.
+It is either \fIXmALIGNMENT_BEGINNING\fP, \fIXmALIGNMENT_CENTER\fP, or
+\fIXmALIGNMENT_END\fP.
+.IP "\fBlayout_direction\fP"
+Controls the direction in which the segments of the compound string will
+be laid out.  It also determines the meaning of the \fBalignment\fP parameter.
+.IP "\fBclip\fP"
+Allows the application to restrict the area into which the compound string
+will be drawn.  If NULL, no clipping will be done.
+.SH RELATED INFORMATION
+.na
+\fIXmStringCreate(3X)\fP.
+.ad

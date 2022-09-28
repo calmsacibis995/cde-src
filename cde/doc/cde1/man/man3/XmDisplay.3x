@@ -1,0 +1,466 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH XmDisplay 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmDisplay\fP \- The Display widget class
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/Display.h>
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+The XmDisplay object is used by the Motif widgets to store information
+that is specific to a display.  It also allows the toolkit to access
+certain information on widget hierarchies that would otherwise be
+unavailable.  Each client has one XmDisplay object for each display
+it accesses.
+.PP
+An XmDisplay object is automatically created when the application
+creates the first shell on a display (usually accomplished by a call to
+\fIXtAppInitialize\fP or \fIXtAppCreateShell\fP).
+It is not necessary to create an XmDisplay object by any other means.
+An application can use the function \fIXmGetXmDisplay\fP to obtain the
+widget ID of the XmDisplay object for a given display.
+.PP
+An application cannot supply initial values for XmDisplay resources as
+arguments to a call to any function that creates widgets.
+The application or user can supply initial values in a resource file.
+After creating the first shell on the display, the application can use
+\fIXmGetXmDisplay\fP to obtain the widget ID of the XmDisplay object and
+then call \fIXtSetValues\fP to set the XmDisplay resources.
+.PP
+XmDisplay resources specify the drag protocol style for a client
+participating in drag and drop transactions.  There are two basic
+protocol types, preregister and dynamic.  When a preregister protocol
+is used, the toolkit handles any communication between the initiator
+and receiver clients, and displays the appropriate drag-over and
+drag-under visual effects.  A client registers its drop sites in
+advance and this information is stored in a property for each 
+top-level window.  When the drag pointer enters a top level window,
+the drop site information is read by the initiator.  A dynamic
+protocol allows the source and destination clients to dynamically 
+communicate drag and drop state information between each other, and
+to update their respective visuals accordingly.  The toolkit provides
+drop site information as the pointer passes over any given drop site.
+In this mode, a receiver can supply a procedure to generate its
+own drag-under effects.
+.SS "Classes"
+Display inherits behavior and resources from \fICore\fP, \fIComposite\fP,
+\fIShell\fP, \fIWMShell\fP, \fIVendorShell\fP, \fITopLevelShell\fP, and
+\fIApplicationShell\fP classes.
+.PP 
+The class pointer is \fIxmDisplayClass\fP.
+.PP 
+The class name is \fIXmDisplay\fP.
+.SS "New Resources"
+The following table defines a set of widget resources used by the
+programmer to specify data.  The programmer can also set the resource
+values for the inherited classes to set attributes for this widget.
+To reference a resource by name or by class in an \fI.Xdefaults\fP file,
+remove the \fIXmN\fP or \fIXmC\fP prefix and use the remaining letters.
+To specify one of the defined values for a resource in an \fI.Xdefaults\fP
+file, remove the \fIXm\fP prefix and use the remaining letters (in
+either lowercase or uppercase, but include any underscores between
+words).  The codes in the access column indicate if the given resource
+can be set at creation time (\fIC\fP), set by using \fIXtSetValues\fP
+(\fIS\fP), retrieved by using \fIXtGetValues\fP (\fIG\fP), or is not
+applicable (\fIN/A\fP).
+.P 
+.sp 1
+.in 0
+.KS
+.TS
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmDisplay Resource Set
+Name	Class	Type	Default	Access
+_
+XmNdefaultVirtualBindings	DefaultVirtualBindings	String	dynamic	CG
+XmNdragInitiatorProtocolStyle	XmCDragInitiatorProtocolStyle	unsigned char	XmDRAG_PREFER_RECEIVER	CG
+XmNdragReceiverProtocolStyle	XmCDragReceiverProtocolStyle	unsigned char	XmDRAG_PREFER_PREREGISTER	CG
+defaultButtonEmphasis	DefaultButtonEmphasis	XtEnum	"external_highlight"	CG
+enableBtn1Transfer	EnableBtn1Transfer	Boolean	False	CG
+enableButtonTab	EnableButtonTab	Boolean	False	CG
+enableDragIcon	EnableDragIcon	Boolean	False	CG
+enableEtchedInMenu	EnableEtchedInMenu	Boolean	False	CG
+enableMultiKeyBindings	EnableMultiKeyBindings	Boolean	False	CG
+enableToggleColor	EnableToggleColor	Boolean	False	CG
+enableToggleVisual	EnableToggleVisual	Boolean	False	CG
+enableUnselectableDrag	EnableUnselectableDrag	Boolean	True	CG
+.TE
+.KE
+.in
+.sp 1
+.P
+.IP "\fIXmNdefaultVirtualBindings\fP"
+Specifies the default virtual bindings for the display.
+Following is an example of a specification for the
+\fIdefaultVirtualBindings\fP resource in a resource file:
+.oS
+.ta 0.5i 2i 2.5i 3.75i
+.nf
+*defaultVirtualBindings: \e
+	osfBackSpace	:	<Key>BackSpace	\en\e
+	osfInsert	:	<Key>InsertChar	\en\e
+\&...
+	osfDelete	:	<Key>DeleteChar
+.fi
+.oE
+.IP "\fIXmNdragInitiatorProtocolStyle\fP"
+Specifies the drag and drop protocol requirements or preference when
+the client is an initiator.  The possible values are
+.IP "\fIXmDRAG_PREREGISTER\fP"
+As an initiator, this client does not use the dynamic protocol and
+can only arrange visual effects with receivers who provide
+preregistered information.
+.IP "\fIXmDRAG_DYNAMIC\fP"
+As an initiator, this client does not make use of any preregistered
+drop site information made available by other clients, and can only
+arrange visual effects with receivers who use the dynamic protocol.
+.IP "\fIXmDRAG_NONE\fP"
+Specifies that drag and drop is disabled for this client.
+.IP "\fIXmDRAG_DROP_ONLY\fP"
+As an initiator, this client does not use either the preregistered
+drop site information or the dynamic protocol.  It supports dragging,
+and any time the cursor is over a client that supports drag and
+drop, valid feedback is provided.  There are no other visual effects.
+.IP "\fIXmDRAG_PREFER_DYNAMIC\fP"
+As an initiator, this client can support both the preregister and
+dynamic protocols, but prefers to use dynamic protocols whenever
+possible in order to provide high-quality drag-under feedback.
+.IP "\fIXmDRAG_PREFER_PREREGISTER\fP"
+As an initiator, this client can support both the preregister and
+dynamic protocols, but prefers to use the preregister protocol
+whenever possible in order to accommodate performance needs or to
+provide consistent drag-over feedback.
+.IP "\fIXmDRAG_PREFER_RECEIVER\fP"
+Indicates that this client can support both preregister and dynamic
+protocols, but will defer to the preference of the receiver client.
+This value is valid only for the \fIXmNdragInitiatorProtocolStyle\fP
+resource, and is its default value.
+.LI "\fIXmNdragReceiverProtocolStyle\fP"
+Specifies the drag and drop protocol requirements or preference
+when this client is a receiver.  The values are
+.IP "\fIXmDRAG_PREREGISTER\fP"
+As a receiver, this client preregisters drop site information and
+does not use the dynamic protocol.  It can only arrange visual
+effects with initiators who make use of the preregistered information.
+.IP "\fIXmDRAG_DYNAMIC\fP"
+As a receiver, this client uses the dynamic protocol and does
+not preregister drop site information.  It can only arrange visual
+effects with initiators who use the dynamic protocol.
+.IP "\fIXmDRAG_NONE\fP"
+Specifies that drag and drop is disabled for this client.
+.IP "\fIXmDRAG_DROP_ONLY\fP"
+As a receiver, this client neither uses the dynamic protocol
+nor preregisters drop site information.  It supports
+dropping, and when dragging over this client, valid feedback
+is always provided, but there are no other visual effects.
+.IP "\fIXmDRAG_PREFER_DYNAMIC\fP"
+As a receiver, this client can support both the preregister and
+dynamic protocols, but prefers to use dynamic protocol whenever
+possible in order to provide high-quality drag-under feedback.
+.IP "\fIXmDRAG_PREFER_PREREGISTER\fP"
+As a receiver, this client can support both the preregister and
+dynamic protocols, but prefers to use the preregister protocol
+whenever possible in order to accommodate performance
+needs.
+.IP
+The actual protocol used between an initiator and a receiver
+is based on the protocol style of the receiver and initiator.  The
+decision matrix is as follows:
+.PP
+.sp 1
+.in 0
+.KS
+.TS
+center, box, tab(@);
+cbp6 |cbp6  s s s 
+^ | lbp6 | lbp6 | lbp6 |lbp6 
+rbp6 | lp6 | lp6 | lp6 | lp6.
+T{
+.nf
+Drag Initiator
+Protocol Style
+.fi
+T}@Drag Receiver Protocol Style
+_
+@Preregister@Prefer Preregister@Prefer Dynamic@Dynamic
+_
+Preregister@Preregister@Preregister@Preregister@Drop Only
+_
+Prefer Preregister@Preregister@Preregister@Preregister@Dynamic
+_
+Prefer Receiver@Preregister@Preregister@Dynamic@Dynamic
+_
+Prefer Dynamic@Preregister@Dynamic@Dynamic@Dynamic
+_
+Dynamic@Drop Only@Dynamic@Dynamic@Dynamic
+.TE
+.KE
+.in
+.sp 1
+.IP
+The value \fIXmDRAG_NONE\fP does not appear in the above
+matrix.  When specified for either the initiator or receiver side,
+\fIXmDRAG_NONE\fP implies that drag and drop transactions are not
+supported.  A value of \fIXmDRAG_DROP_ONLY\fP (Drop Only) results
+when an initiator and receiver cannot compromise protocol styles,
+that is, one client requires dynamic mode while the other
+can only support preregister mode, or if either explicitly has
+specified \fIXmDRAG_DROP_ONLY\fP.
+.IP "\fIdefaultButtonEmphasis\fP"
+This resource specifies whether to change the look of the
+PushButton widget and gadget that have the \fIXmNshowAsDefault\fP resource
+set.
+When the control is the default, the PushButton has
+an etched out button which is enclosed with another etched in border.
+When this resource is "internal_highlight", the location cursor appears in
+between the two etched borders to minimize the space required.
+When this resource is "external_highlight", the default PushButton draws
+the location cursor outside the second border.
+.IP "\fIenableBtn1Transfer\fP"
+When this resource is True, it specifies that the actions for selection
+and transfer are integrated on the Button1, and the extend selection
+actions are activated from Button2.
+This resource impacts the actions of the XmText, XmTextField, and XmList
+widgets.
+.IP "\fIenableButtonTab\fP"
+When this resource is True, it specifies whether to modify the action for
+the TAB key (KNextField and KPrevField) to move as an arrow key until the
+boundary of a tab group is reached.
+When at the boundary of the tab group, the KNextField and KPrevField actions
+will move to the next or previous tab group, respectively.
+This resource affects the actions of XmPushButtons, XmArrowButtons, and
+XmDrawnButtons.
+.IP "\fIenableDragIcon\fP"
+Specifies which set of icons be used for the system default cursors during
+drag and drop operations.
+When this resource is False, the standard Motif icons are used.
+When this resource is True, an alternate set of icons that human interface
+experts designed are used.
+This resource affects both the 16x16 icons and the 32x32 icons that are
+the system defaults for each of the XmScreen objects associated with this
+display.
+.IP "\fIenableEtchedInMenu\fP"
+Specifies the shadowing of the button widgets and gadgets in menus
+when the control is activated.
+When \fIenableEtchedInMenu\fP is True, the selected menu control is drawn
+with the shadow etched in; this shadow style is consistent with the selected
+appearance of other button widgets outside of menus.
+When \fIenableEtchedInMenu\fP is False, the selected menu control is drawn
+with the shadow etched out.
+This resource impacts the appearance of PushButtons, ToggleButtons,
+and CascadeButtons when they are children of an XmMenu.
+.IP "\fIenableMultiKeyBindings\fP"
+Specifies whether to modify the widget and gadget translations to support
+some MS-Windows common key bindings.
+When this resource is False, the default, the translations are not modified.
+When this resource is True, the following XtNbaseTranslations resources are
+merged into the resource database.
+When an application has specified a XtNbaseTranslations resource, it will have
+precedence over these definitions.
+.nf
+	*XmArrowButton.baseTranslations: #override
+		<Key>F1 : Help()
+		c<Key>s : PrimitiveParentCancel()
+		<Key>Escape : PrimitiveParentCancel()
+	*XmBulletinBoard.baseTranslations: #override
+		<Key>F1:ManagerGadgetHelp()
+		c<Key>s : ManagerParentCancel()
+		<Key>Escape : ManagerParentCancel()
+	*XmCascadeButton.baseTranslations: #override
+		<Key>F1:Help()
+		c<Key>s : CleanupMenuBar()
+		<Key>Escape : CleanupMenuBar()
+	*XmDragContext.baseTranslations : #override
+		<Key>F1:HelpDrag()
+		c<Key>s : CancelDrag()
+		<Key>Escape : CancelDrag()
+	*XmDrawingArea.baseTranslations: #override
+		<Key>F1 : DrawingAreaInput() ManagerGadgetHelp()
+		c<Key>s : DrawingAreaInput() ManagerParentCancel()
+		<Key>Escape : DrawingAreaInput() ManagerParentCancel()
+	*XmDrawnButton.baseTranslations: #override
+		<Key>F1:Help()
+		c<Key>s : PrimitiveParentCancel()
+		<Key>Escape : PrimitiveParentCancel()
+		*XmFrame.baseTranslations: #override
+		c<Key>s : ManagerParentCancel()
+		<Key>Escape : ManagerParentCancel()
+	*XmLabel.baseTranslations: #override
+		<Key>F1:Help()
+		c<Key>s : PrimitiveParentCancel()
+		<Key>Escape : PrimitiveParentCancel()
+		<Btn2Down>:
+	*XmList.baseTranslations: #override
+		<Key>F1:PrimitiveHelp()
+		c<Key>s : ListKbdCancel()
+		<Key>Escape : ListKbdCancel()
+	*XmManager.baseTranslations: #override
+		<Key>F1:ManagerGadgetHelp()
+		c<Key>s : ManagerParentCancel()
+		<Key>Escape : ManagerParentCancel()
+	*XmPrimitive.baseTranslations: #override
+		<Key>F1:PrimitiveHelp()
+		c<Key>s : PrimitiveParentCancel() 
+		<Key>Escape : PrimitiveParentCancel()
+	*XmPushButton.baseTranslations: #override
+		<Key>F1:Help()
+		c<Key>s : PrimitiveParentCancel()
+		<Key>Escape : PrimitiveParentCancel()
+		<Btn2Down>:
+	*XmRowColumn.baseTranslations: #override
+		<Key>F1:MenuHelp() 
+		c<Key>s : ManagerParentCancel()
+ 		<Key>Escape : ManagerParentCancel()
+	*XmSash.baseTranslations: #override
+		<Key>F1:Help()
+		c<Key>s : PrimitiveParentCancel()
+		<Key>Escape : PrimitiveParentCancel()
+	*XmScrollBar.baseTranslations: #override
+		<Key>F1:PrimitiveHelp()
+		c<Key>s : CancelDrag()
+		<Key>Escape : CancelDrag()
+	*XmScrolledWindow.baseTranslations: #override
+		<Key>F1:ManagerGadgetHelp()
+		c<Key>s : ManagerParentCancel()
+		<Key>Escape : ManagerParentCancel()
+	*XmTextField.baseTranslations: #override
+		<Key>F1: Help()
+		c<Key>s : process-cancel()
+		<Key>Escape : process-cancel()
+		c<Key>x : cut-clipboard()
+		c<Key>c : copy-clipboard()
+		c<Key>v : paste-clipboard()
+		s<Key>Delete : cut-clipboard()
+		c<Key>Insert : copy-clipboard()
+		s<Key>Insert : paste-clipboard()
+	*XmText.baseTranslations: #override
+		<Key>F1: Help()
+		c<Key>s : process-cancel()
+		<Key>Escape : process-cancel()
+		c<Key>x : cut-clipboard()
+		c<Key>c : copy-clipboard()
+		c<Key>v : paste-clipboard()
+		s<Key>Delete : cut-clipboard()
+		c<Key>Insert : copy-clipboard()
+		s<Key>Insert : paste-clipboard()
+	*XmToggleButton.baseTranslations: #override
+		<Key>F1: Help()
+		c<Key>s : PrimitiveParentCancel()
+		<Key>Escape : PrimitiveParentCancel()
+		<Btn2Down>:
+.fi
+.IP
+From the user's perspective, setting the \fIenableMultiKeyBindings\fP
+resource to True has the following affect:
+.wH
+.rS 
+.TP
+\(bu
+use of F1 function key for accessing help
+.TP
+\(bu
+use both <Ctrl>s and Escape for canceling an operation
+.TP
+\(bu
+disable drag from labels in XmLabel, XmPushButton, XmToggleButton, and
+XmScale widgets and gadgets
+.TP
+\(bu
+use both <Ctrl>x and <Shift>Delete to cut text
+.TP
+\(bu
+use both <Ctrl>c and <Ctrl>Insert to copy text
+.TP
+\(bu
+use both <Ctrl>v and <Shift>Insert to paste text
+.wH
+.rE
+.nL
+.ne 10
+.IP "\fIenableToggleColor\fP"
+Specifies whether the fill color of the ToggleButton widget and gadget
+uses the background or the highlight color.
+When \fIenableToggleColor\fP is True, the fill color uses the highlight color.
+The highlight color makes it more obvious to the end user that the Toggle
+has been set.
+When \fIenableToggleColor\fP is False, the fill color uses the background
+color.
+This resource affects the appearance of all ToggleButton widgets and gadgets.
+.IP "\fIenableToggleVisual\fP"
+Specifies the visual appearance of the ToggleButton widget and gadgets.
+When this resource is True, the look specified by the ToggleButton's
+\fIXmNindicatorType\fP resource is as follows:
+.wH
+.rS 
+.TP
+\(bu
+\fIXmONE_OF_MANY\fP - a shadowed circle
+.TP
+\(bu
+\fIXmN_OF_MANY\fP - a shadowed square with a check mark when set
+.wH
+.rE
+.nL
+.ne 6
+.IP
+When this resource is False, the look specified by the ToggleButton's
+\fIXmNindicatorType\fP resource is as follows:
+.wH
+.rS 
+.TP
+\(bu
+\fIXmONE_OF_MANY\fP - a shadowed diamond
+.TP
+\(bu
+\fIXmN_OF_MANY\fP - a shadowed square
+.wH
+.rE
+.nL
+.ne 6
+.IP
+This resource affects the appearance of all ToggleButton widgets and gadgets.
+.IP "\fIenableUnselectableDrag\fP"
+Specifies whether the user can drag text that is not selectable such as the
+labels on buttons.
+The default is True so that the use can drag all text.
+When this resource is set to False, the text on Buttons, Labels, and Scales
+cannot be the source of a drag operation.
+.LE
+.SS "Inherited Resources"
+All of the superclass resources inherited by XmDisplay are 
+designated N/A (not applicable).
+.SH RELATED INFORMATION
+.na
+\fIApplicationShell(3X)\fP,
+\fIComposite(3X)\fP,
+\fICore(3X)\fP,
+\fITopLevelShell(3X)\fP,
+\fIVendorShell(3X)\fP,
+\fIWMShell(3X)\fP,
+\fIXmGetXmDisplay(3X)\fP, and
+\fIXmScreen(3X)\fP.
+.ad

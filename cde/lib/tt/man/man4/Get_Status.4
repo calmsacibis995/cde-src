@@ -1,0 +1,106 @@
+.TH Get_Status 4 "1 March 1996" "ToolTalk 1.3" "Desktop Services Message Sets"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.BH "1 March 1996" 
+.IX "Get_Status.4" "" "Get_Status.4" "" 
+.SH NAME
+Get_Status \- retrieve a tool's current status
+.SH SYNOPSIS
+.ft 3
+.nf
+.ta \w@Get_Status(@u
+Get_Status(out string \f2status\fP,
+	out string \f2vendor\fP,
+	out string \f2toolName\fP,
+	out string \f2toolVersion\fP
+	[in messageID \f2operation2Query\fP]);
+.PP
+.fi
+.SH DESCRIPTION
+The
+.I Get_Status
+request
+retrieves the current status of a tool (or,
+optionally, of a specific operation being performed by a tool).
+.PP
+The
+.I status
+argument
+is the status retrieved.
+.PP
+The
+.I vendor
+argument
+is the name of the vendor of the handling tool.
+.PP
+The
+.I toolName
+argument
+is the name of the handling tool.
+.PP
+The
+.I toolVersion
+argument
+is the version of the handling tool.
+.SH OPTIONAL ARGUMENTS
+.PP
+The
+.I operation2Query
+argument
+is the ID of the request that initiated the operation the
+status of which is being requested.
+.SH "APPLICATION USAGE"
+The
+.BR ttdt_session_join (3),
+and
+.BR ttdt_message_accept (3),
+functions can be used to register for, and
+help process, the
+.I Get_Status
+request.
+.SH EXAMPLES
+After sending a
+.BR \s-1TT_REQUEST\s+1
+and storing its handle in
+.B Tt_message
+.IR request_I_sent ,
+if the handler identifies itself with a
+.I Status
+notice
+saved in
+.B Tt_message
+.IR status_msg_from_handler ,
+then the status of
+.I request_I_sent
+can be queried as in the following example:
+.PP
+.sp -1
+.RS 5
+.ta 4m +4m +4m +4m +4m +4m +4m
+.nf
+.ft 3
+Tt_message msg = tttk_message_create(0, TT_REQUEST, TT_SESSION,
+		tt_message_sender(status_msg_from_handler),
+		TTDT_GET_STATUS, my_callback);
+tt_message_arg_add(msg, TT_OUT, Tttk_string, 0);
+tt_message_arg_add(msg, TT_OUT, Tttk_string, 0);
+tt_message_arg_add(msg, TT_OUT, Tttk_string, 0);
+tt_message_arg_add(msg, TT_OUT, Tttk_string, 0);
+tt_message_arg_add(msg, TT_IN, Tttk_string,
+			tt_message_id(request_I_sent));
+tt_message_send(msg);
+.PP
+.ft 1
+.fi
+.RE
+.SH "SEE ALSO"
+.na
+.BR tt_message_arg_add (3),
+.BR tt_message_id (3),
+.BR tt_message_send (3),
+.BR ttdt_message_accept (3),
+.BR tt_message_sender (3),
+.BR ttdt_session_join (3).

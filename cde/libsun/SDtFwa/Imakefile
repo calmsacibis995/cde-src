@@ -1,0 +1,62 @@
+XCOMM libSDtFwa @(#)Imakefile	1.7 97/04/02 SMI
+XCOMM Copyright (c) 1996 Sun Microsystems, Inc.
+
+#ifndef DoNormalLib
+#define DoNormalLib NormalLibSDtFwa
+#endif
+#ifndef DoSharedLib
+#define DoSharedLib SharedLibSDtFwa
+#endif
+#if ! DoNormalLib && ! DoSharedLib
+#undef  DoSharedLib
+#define DoSharedLib YES
+#endif
+#ifndef SharedSDtFwaRev
+#define SharedSDtFwaRev 1
+#endif
+
+#include <Library.tmpl>
+
+HEADERS  = flyalloc.h
+SRCS     = flyalloc.c
+OBJS     = flyalloc.o
+
+LIB_NAME = SDtFwa
+LIB_REV	 = SharedSDtFwaRev
+
+INCLUDES = -I.
+DEFINES  =
+
+flyalloc.o := CCOPTIONS = =Xa
+
+#ifdef SunArchitecture
+EXTRA_DEFINES   	= -D_REENTRANT NoLargeFiles
+EXTRA_CCOPTIONS 	= -dalign
+EXTRA_REQUIREDLIBS	= -ldl
+#endif
+
+REQUIREDLIBS = $(EXTRA_REQUIREDLIBS) -lc
+
+LibraryObjectRule()
+
+/* For install of developer's build environment */
+LOCAL_BINSTALL_LIBDEST = lib
+
+#if DoSharedLib
+#if DoNormalLib
+SharedLibraryTarget($(LIB_NAME),$(LIB_REV),$(OBJS),shared,..)
+#else
+SharedLibraryTarget($(LIB_NAME),$(LIB_REV),$(OBJS),.,.)
+#endif /* DoNormalLib */
+SharedLibraryBuildInstall($(LIB_NAME),$(LIB_REV),$(LOCAL_BINSTALL_LIBDEST))
+InstallSharedLibrary($(LIB_NAME),$(LIB_REV),$(USRLIBDIR))
+#endif /* DoSharedLib */
+
+#if DoNormalLib
+NormalLibraryTarget($(LIB_NAME),$(OBJS))
+NormalLibraryBuildInstall($(LIB_NAME),$(LOCAL_BINSTALL_LIBDEST))
+InstallLibrary($(LIB_NAME),$(USRLIBDIR))
+#endif
+
+DependTarget()
+

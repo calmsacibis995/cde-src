@@ -1,0 +1,214 @@
+.\" **
+.\" ** (c) Copyright 1994 Hewlett-Packard Company
+.\" ** (c) Copyright 1994 International Business Machines Corp.
+.\" ** (c) Copyright 1994 Novell, Inc.
+.\" ** (c) Copyright 1994 Sun Microsystems, Inc.
+.\" **
+.TH DtEditorSaveContentsToFile 3 ""
+.BH "3 May - 1994"
+.SH NAME
+\fBDtEditorSaveContentsToFile(3) \- Save the contents of an Editor widget
+to a file.\fP
+.iX "DtEditorSaveContentsToFile"
+.iX "DtEditor functions" "DtEditorSaveContentsToFile"
+.sp .5
+.SH SYNOPSIS
+\fB
+\&#include <Dt/Editor.h>
+.sp .5
+DtEditorErrorCode DtEditorSaveContentsToFile (
+.br
+.ta	0.75i 1.75i
+	Widget	\fIwidget\fP,
+.br
+	char	*\fIhostName\fP,
+.br
+	char	*\fIfileName\fP,
+.br
+	DtEditorFormat *\fIfileType\fP,
+.br
+	Boolean	\fIhardCarriageReturns\fP,
+.br
+	Boolean	\fImarkContentsAsSaved\fP)
+.fi
+\fP
+.SH DESCRIPTION
+\fBDtEditorSaveContentsToFile\fP saves the entire contents of the 
+Editor widget, \fIwidget\fP, to a file in the format specified by
+\fIfileType\fP.  If \fIfileName\fP does not exist or has the correct write
+permissions, \fBDtEditorSaveContentsToFile\fP will save the contents to
+the file, otherwise an error is returned.
+.P
+The Editor widget keeps track of whether there have been changes to its
+contents since the contents were last saved or retrieved.
+There may be times when an application will want to request a
+copy of the contents without effecting whether
+\fBDtEditorCheckForUnsavedChanges(3)\fP reports there are
+unsaved changes.  For example, when the application needs a
+temporary copy of the contents for printing.  The application can
+indicate this with \fImarkContentsAsSaved\fP.
+.sp .5
+.IP "\fIwidget\fP" 1.00i
+Specifies the editor widget ID.
+.IP "\fIhostName\fP" 1.00i
+The hostname of the system where \fIfileName\fP will be created.  It should 
+be set to NULL if the file should be stored on the local system.
+.IP "\fIfileName\fP" 1.00i
+Path and name of the file to store the widget's contents.  If \fIhostName\fP
+is NULL, it is assumed the path is relative to the local system.
+.sp .5
+.IP "\fIfileType\fP"
+Indicates the format to use when saving the data.
+At this point in time, the only type supported is \fBDtEDITOR_TEXT\fP.
+.sp .5
+.IP "\fIhardCarriageReturns\fP"
+If set to True, \fIhardCarriageReturns\fP indicates the widget should replace
+any soft line feeds (window wraps) with hard carriage returns when saving 
+the data.  When set to False, any line wrapped because it reaches the
+right edge of the window will be saved as one complete line.
+.IP "\fImarkContentsAsSaved\fP" 1.00i
+Setting \fImarkContentsAsSaved\fP to True causes the Editor to mark that
+all changes made to date have been saved.  When set to False, the Editor
+will not change its status regarding unsaved changes.
+.sp .5
+.PP
+For a complete definition of Editor and its associated resources, see
+\fBDtEditor(3)\fP.
+.sp .5
+.SH RETURN VALUE
+\fBDtEditorSaveContentsToFile\fP returns \fBDtEDITOR_NO_ERRORS\fP 
+when it sucessfully saves the data to the File.
+.PP
+.ta	2.6i
+\fBDtEditorSaveContentsToFile\fP returns one of the following values 
+if it cannot save the data to the file:
+.wH
+.rS
+.TP
+\(bu
+\fBDtEDITOR_INVALID_FILENAME\fP	no file was specified
+.TP
+\(bu
+\fBDtEDITOR_OWNER_UNWRITEABLE_FILE\fP	the file's owneer does not have
+write permission
+.TP
+\(bu
+\fBDtEDITOR_NONOWNER_UNWRITEABLE_FILE\fP	the application does not 
+own the file and write permission for non-owners is turned off
+.TP
+\(bu
+\fBDtEDITOR_UNWRITEABLE_FILE\fP	the application does not have write
+permission for the file or directory.
+.TP
+\(bu
+\fBDtEDITOR_CHAR_SPECIAL_FILE\fP	the specified file is a device
+special file
+.TP
+\(bu
+\fBDtEDITOR_BLOCK_MODE_FILE\fP	the specified file is a block mode device
+.TP
+\(bu
+\fBDtEDITOR_SAVE_FAILED\fP	the contents could not be saved for an 
+unlisted reason
+.TP
+\(bu
+\fBDtEDITOR_INVALID_TYPE\fP	the specified type is unrecognized
+.sp .5
+.SH EXAMPLES
+.P
+The following code segment saves the contents 
+of an Editor widget to the local file, Foo, substituting hard carriage
+returns for soft carriage returns.  It also indicates that all changes
+to the contents of the widget have been saved.
+.P
+.nf
+.ta .25i 1.1i 
+	Widget			editor;
+	DtEditorErrorCode       status;
+	DtEditorFormat		type = DtEDITOR_TEXT;
+	char * 			fname = "Foo",
+				hname = NULL;
+	Boolean			hardReturns = True,
+				markContentsAsSaved = True;
+
+	status = DtEditorSaveContentsToFile ( editor, 
+					      hname, fname, 
+					      &type,
+					      hardReturns, 
+					      markContentsAsSaved );
+
+	switch ( status )
+	{
+	  case DtEDITOR_NO_ERRORS:
+	  {
+	    printf("The file has been saved.\\n" );
+	    break;
+	  }
+	  case DtEDITOR_OWNER_UNWRITEABLE_FILE:
+	  {
+	    printf("The owner does not have write permission.\\n");
+	    break;
+	  }
+	  case DtEDITOR_NONOWNER_UNWRITEABLE_FILE:
+	  {
+	    printf("Nonowners do not have write permissions for this file.\\n");
+	    break;
+	  }
+	  case DtEDITOR_UNWRITEABLE_FILE:
+	  {
+	    printf( "This file does not have write permissions.\\n");
+	    break;
+	  }
+	  case DtEDITOR_SAVE_FAILED:
+	  {
+	    printf( "Could not save contents.  There may not be enough
+		     disc space.\\n" );
+	    break;
+	  }
+	  case DtEDITOR_INVALID_FILENAME:
+	  {
+	    printf("No filename specified.\\n");
+	    break;
+	  }
+	  case DtEDITOR_DIRECTORY:
+	  {
+	    printf( "The name given is a directory.\\n" );
+	    break;
+	  }
+	  case DtEDITOR_CHAR_SPECIAL_FILE:
+	  {
+	    printf( "The name given is a character special device.\\n" );
+	    break;
+	  }
+	  case DtEDITOR_BLOCK_MODE_FILE:
+	  {
+	    printf( "The name given is a block mode device.\\n");
+	    break;
+	  }
+	  case DtEDITOR_INVALID_TYPE:
+	  {
+	    printf("Incorrect format specified.\\n");
+	    break;
+	  }
+	}
+.fi
+.SH APPLICATION USAGE
+.P
+Note, \fBDtEditorSaveContentsToFile\fP does NOT guard against
+overwriting existing files.  The function assumes the application has
+already checked for this condition and warned the user, if necessary.
+.P
+To retrieve the data in a memory buffer, rather than a disk file, the 
+application should use \fBDtEditorGetContents(3)\fP.
+.SH RELATED INFORMATION
+\fBDtEditor(3)\fP, 
+\fBDtEditorAppend(3)\fP,
+\fBDtEditorAppendFromFile(3)\fP,
+\fBDtEditorCheckForUnsavedChanges(3)\fP,
+\fBDtEditorGetContents(3)\fP,
+\fBDtEditorInsert(3)\fP,
+\fBDtEditorInsertFromFile(3)\fP,
+\fBDtEditorSetContentsFromFile(3)\fP, and
+\fBDtEditorSetContents(3)\fP.
+.sp .5
+

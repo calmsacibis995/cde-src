@@ -1,0 +1,78 @@
+.TH Get_Modified 4 "13 May 1994"
+.SH NAME
+Get_Modified request \- ask whether an entity has been modified
+.SH SYNOPSIS
+.yS
+.ta \w@[\f2file\fP] Get_Modified(@u
+[\f2file\fP] Get_Modified(in \f2type ID\fP,
+	out boolean \f2modified\fP);
+.yE
+.SH DESCRIPTION
+The
+.I Get_Modified
+request
+asks whether any tool has modified a volatile,
+non-shared (for example, in-memory) representation of the persistent
+state of an entity (such as a file) with the intention of
+eventually making that representation persistent.
+.P
+Thus, a tool should register a dynamic pattern for this request
+when it has modified an entity of possible shared interest.
+.P
+The
+.I ID
+argument is the identity of the persistent entity being asked about.
+When its
+.I type
+is
+.BR File ,
+then
+.I ID
+is unset (in other words, has a value of
+.BR (char\ *)0 ),
+and it refers to the file or directory
+named in the message's file attribute.
+.P
+The
+.I modified
+argument
+argument is a
+Boolean value indicating whether a volatile, non-shared
+(for example, in-memory) representation of the entity has been
+modified with the intention of eventually making that
+representation persistent.
+.SH ERRORS
+The ToolTalk service may return one of the following errors
+in processing the
+.I Get_Modified
+request:
+.VL 6
+.Lc TT_ERR_NO_MATCH
+.br
+Since no handler could be found, the entity in question can be assumed
+not to be modified.
+.LE
+.SH "APPLICATION USAGE"
+The
+.Fn ttdt_file_join 3,
+function
+can be used to register for,
+and transparently process, the
+.I Get_Modified
+request.
+.P
+The
+.I Get_Modified
+request can be sent with
+.Fn ttdt_file_request 3;
+.Fn ttdt_Get_Modified 3,
+can send the
+.I Get_Modified
+request and block on the reply.
+.SH "SEE ALSO"
+.Fn ttdt_file_join 3,
+.Fn ttdt_file_request 3,
+.Fn ttdt_file_request 3,
+.Fn ttdt_Get_Modified 3;
+.I Set_Modified
+request.

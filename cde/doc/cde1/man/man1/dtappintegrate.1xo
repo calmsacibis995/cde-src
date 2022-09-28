@@ -1,0 +1,181 @@
+.TH dtappintegrate 1 "17 June 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.SH NAME
+dtappintegrate \- integrate applications into the Cde
+.SH SYNOPSIS
+.yS
+dtappintegrate
+\-s\0\f2application_root\fP
+[\-t\0\f2target_path\fP]
+[\-l\0\f2locale\fP]
+[\-u]
+[\-?]
+.yE
+.SH DESCRIPTION
+The
+.Cm dtappintegrate
+utility integrates applications into Cde.
+Application installation scripts should invoke
+.Cm dtappintegrate
+as the last step before exiting.
+The
+.Cm dtappintegrate
+.cde utility must be invoked with root user authority.
+.xo utility requires appropriate privileges.
+.P
+When
+.Cm dtappintegrate
+is invoked with no
+.I target_path
+specified, it creates
+symbolic links to the application's Cde configuration
+files under the following default Cde system locations:
+.VL 6
+.LI "\f3/etc/dt/appconfig/types/\f2<locale>\f1"
+.br
+Contains symbolic links to the application action and datatype files
+.LI "\f3/etc/dt/appconfig/appmanager/\f2<locale>\f1"
+.br
+Contains symbolic links to the application group subdirectory
+.LI "\f3/etc/dt/appconfig/help/\f2<locale>\f1"
+.br
+Contains symbolic links to the application help files
+.LI "\f3/etc/dt/appconfig/icons/\f2<locale>\f1"
+.br
+Contains symbolic links to the application icons
+.LE
+.SH OPTIONS
+.xos
+The
+.Cm dtappintegrate
+utility supports the \*(Zu.
+.xoe
+The following options are available:
+.VL 6
+.LI \f3\-s\0\f2application_root\f1
+.br
+Integrate the application files that are located under
+.IR application_root .
+The
+.I application_root
+is the top directory
+under which all of an application's files are installed.
+The
+.Cm dtappintegrate
+utility looks for application Cde configuration files in
+the following subdirectories, with all C locale subdirectories
+containing the application's default Cde configuration files:
+.VL 6
+.LI \f2<application_root>\f3/dt/appconfig/types/\f2<locale>\f1
+.br
+Contains application action and datatype files
+.LI \f2<application_root>\f3/dt/appconfig/appmanager/\f2<locale>\f1
+.br
+Contains application group files
+.\"jcd: pending resolution of naming clash of "application group" vs. "folder"
+.LI \f2<application_root>\f3/dt/appconfig/icons/\f2<locale>\f1
+.br
+Contains application icons
+.LI \f2<application_root>\f3/dt/appconfig/help/\f2<locale>\f1
+.br
+Contains application help files
+.LE
+.LI \f3\-t\0\f2target_path\f1
+.br
+Link the application Cde configuration files to
+.I target_path
+rather than to the default Cde system locations.
+.LI \f3\-l\0\f2locale\f1
+.br
+Integrate only the files found in the
+.I locale
+subdirectories.
+If this option is not specified, all of the application's Cde
+configuration files are integrated.
+.LI \f3\-u\fP
+Destroy the symbolic links previously created by
+.Cm dtappintegrate.
+If
+.B \-l
+is specified with the
+.B \-u
+option, only the
+symbolic links to the
+Cde configuration files in the specified
+.I locale
+subdirectories
+are destroyed.
+.LI \f3\-?\fP
+Write a help message to standard output that describes the command syntax of
+.Cm dtappintegrate
+and exit.
+.LE
+.SH OPERANDS
+None.
+.SH STDIN
+Not used.
+.SH "INPUT FILES"
+None.
+.SH "ENVIRONMENT VARIABLES"
+None.
+.SH RESOURCES
+None.
+.SH "ASYNCHRONOUS EVENTS"
+.xo Default.
+.cde The
+.cde .Cm dtappintegrate
+.cde utility takes the standard action for all signals.
+.SH STDOUT
+When no option or the
+.B \-?
+option is used,
+.Cm dtappintegrate
+writes to standard output a usage message.
+.P
+During execution,
+.Cm dtappintegrate
+writes confirmation messages to standard output.
+.SH STDERR
+Used only for diagnostic messages.
+.SH "OUTPUT FILES"
+The
+.Cm dtappintegrate
+utility
+creates the symbolic links to the application's Cde configuration files.
+.cdes
+.P
+During execution,
+.Cm dtappintegrate
+writes to the text file,
+.BR /tmp/dtappint.log ,
+output from the underlying
+system commands it invokes.
+.cdee
+.SH "EXTENDED DESCRIPTION"
+None.
+.SH "EXIT STATUS"
+The following exit values are returned:
+.VL 3
+.LI 0
+Successful completion.
+.LI 2
+Help message displayed.
+.LI 3
+Not invoked with
+.cde root user authority.
+.xo appropriate privileges.
+.LI 4
+Invalid option.
+.LE
+.SH "CONSEQUENCE OF ERRORS"
+Default.
+.SH "APPLICATION USAGE"
+None.
+.SH EXAMPLES
+None.
+.SH "SEE ALSO"
+None.

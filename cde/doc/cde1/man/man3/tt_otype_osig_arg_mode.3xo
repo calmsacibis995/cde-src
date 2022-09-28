@@ -1,0 +1,89 @@
+.TH tt_otype_osig_arg_mode 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+tt_otype_osig_arg_mode \- return the mode of an argument of a notice signature of an otype
+.SH SYNOPSIS
+.yS
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'Tt_mode tt_otype_osig_arg_mode('u
+Tt_mode tt_otype_osig_arg_mode(const char *\f2otype\fP,
+	int \f2sig\fP,
+	int \f2arg\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn tt_otype_osig_arg_mode
+function
+returns the mode of the
+.IR arg th
+argument of the
+.IR sig th
+notice signature of the
+given
+otype.
+.P
+The
+otype
+argument is the object type involved in this operation.
+The
+.I sig
+argument is the zero-based index into the notice
+signatures of the specified
+otype.
+The
+.I arg
+argument is the zero-based index into the arguments of
+the specified signature.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn tt_otype_osig_arg_mode
+function returns a value that determines who
+(sender or handler) writes and reads a message argument.
+The following modes are defined:
+.VL 8
+.Lc TT_IN
+The argument is written by the sender and read by the
+handler and any observers.
+.Lc TT_OUT
+.br
+The argument is written by the handler and read by the
+sender and any reply observers.
+.Lc TT_INOUT
+.br
+The argument is written by the sender and the
+handler and read by all.
+.LE
+.P
+The application can use
+.Fn tt_int_error 3
+to extract one of the following
+.B Tt_status
+values from the
+.B Tt_mode
+integer return value:
+.VL 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_NOMP
+.br
+The
+.Cm ttsession 1
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_NUM
+.br
+The integer value passed was invalid (out of range).
+.Lc TT_ERR_OTYPE
+.br
+The specified object type is not the name of an installed object type.
+.LE
+.SH "SEE ALSO"
+.Hd Tt/tt_c.h 5,
+.Fn tt_otype_osig_arg_type 3,
+.Fn tt_otype_osig_count 3,
+.Fn tt_otype_osig_args_count 3,
+.Fn tt_otype_osig_op 3,
+.Fn tt_int_error 3.

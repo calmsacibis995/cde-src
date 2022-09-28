@@ -1,0 +1,17 @@
+#!/bin/ksh
+
+typeset TOOLDIR=../../../tools
+typeset SCRIPT=$TOOLDIR/AwkHPTagComments
+
+
+TARGETTYPE=$1 shift
+
+for FILE in $*; do
+OBJNAME=`sed 's/\s$//'<<-EOF
+$FILE
+EOF`
+#     echo 	$SCRIPT -p $TARGETTYPE $FILE  $OBJNAME
+	rm -f $OBJNAME
+	$SCRIPT -p $TARGETTYPE $FILE > $OBJNAME
+
+done

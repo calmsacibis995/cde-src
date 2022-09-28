@@ -1,0 +1,147 @@
+.cdes
+.TH dtcm_entry 4 "15 Jun 1994"
+.\" CDE Common Source Format, Version 1.0.0
+.\" (c) Copyright 1993, 1994, 1995 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994, 1995 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994, 1995 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994, 1995 Novell, Inc.
+.SH NAME
+dtcm_entry \- format of calendar/appointment entry
+.SH DESCRIPTION
+.cdee
+.xo .H 3 "Calendar Entry Format"
+.xo .xR3 calapptfmt
+The calendar entry file format
+defines how one entry is saved to a file
+or used in a drag-and-drop transaction with another client.
+A grammar for the entry format is:
+.P
+.S -1
+.TS
+center;
+.xo lf5 1 cf5 1 lf5w(3i) .
+.cde lf3 1 cf3 1 lf3w(3i) .
+appt_file	::=	\f6header_string\fP \f6entry_definition\fP
+	::=	`\en\en\et**Calendar Appointment **\en'
+entry_definition	::=	\f6appt_def\fP `\en' \f6old_appt\fP
+	|	\f6old_appt;\fP
+old_appt	::=	\f6date_mark start_mark end_mark repeat_mark\fP
+	|	\f6duration_mark text_mark\fP
+date_mark	::=	`\etDate: ' \f6date_value\fP `\en'
+date_value	::=	T{
+.na
+.ft 1
+Date as
+.IR mm /\c
+.IR dd /\c
+.IR yyyy
+T}
+start_mark	::=	`\etStart: ' \f6start_value\fP `\en'
+start_value	::=	T{
+.na
+.ft 1
+Entry begin time as \f2hh\f1:\f2mm\f3[\f2ampm\f3]\f1,
+where \f2hh\fP and \f2mm\fP
+represent two-digit hours and minutes
+and the optional \f2ampm\fP suffix is the string
+\f3am\fP or \f3pm\fP
+T}
+end_mark	::=	`\etEnd: ' \f6end_value\fP `\en'
+end_value	::=	T{
+.na
+.ft 1
+Entry begin time as \f2hh\f1:\f2mm\f3[\f2ampm\f3]\f1
+T}
+repeat_mark	::=	`\etRepeat: ' \f6repeat_value\fP `\en'
+repeat_value	::=	`One Time' | `Daily' | `Weekly' | `Every Two Weeks'
+	|	`Monthly By Date' | `Yearly' | `Monthly By Weekday'
+	|	`Monday Thru Friday' | `Mon, Wed, Fri' | `Tuesday, Thursday'
+duration_mark	::=	`\etFor: ' \f6duration_value\fP `\en'
+duration_value	::=	T{
+.na
+.ft 1
+Integer that describes the number of repetitions.
+T}
+text_mark	::=	`\etWhat: ' \f6text_value\fP
+text_value	::=	T{
+.na
+.ft 1
+Up to 5 lines of text.
+Each line after the first must have a leading
+.tK tab
+character.
+T}
+appt_def	::=	\f6appt_start_marker\fP \f6attr_list\fP \f6appt_end_marker\fP
+attr_list	::=	\f6attr_def\fP \f6att_list\fP
+	|	\f6attr_def\fP
+appt_start_marker	::=	\f6appt_marker\fP `:string:begin\en'
+appt_end_marker	::=	\f6appt_marker\fP `:string:end\en'
+appt_marker	::=	`-//CDE_XAPIA_PRIVATE/CS/API/ENTRYATTR//NONSGML ApptDelimiter//EN'
+attr_def	::=	\f6attr_name\fP `:' \f6attr_type\fP `:' \f6attr_value\fP `\en'
+attr_type	::=	`string' | `integer' | `reminder'
+	|	`accesslist' | `repeatdefinition' | `custom'
+attr_name	::=	T{
+.na
+.ft 1
+XAPIA string.
+The span of characters that can be used in the
+definition of an attribute name is specified in the \*(Za.
+T}
+.TE
+.S +1
+.P
+An example entry:
+.Cs
+.S -1
+
+        ** Calendar Appointment **
+-//CDE_XAPIA_PRIVATE/CS/API/ENTRYATTR//NONSGML ApptDelimiter//EN:string:begin
+-//XAPIA/CS/API/ENTRYATTR//NONSGML Start Date//EN:integer:775148400
+-//XAPIA/CS/API/ENTRYATTR//NONSGML End Date//EN:integer:775148900
+-//XAPIA/CS/API/ENTRYATTR//NONSGML Type//EN:string:CSA_TYPE_EVENT
+-//CDE_XAPIA_PRIVATE/CS/API/ENTRYATTR//NONSGML Showtime//EN:integer:1
+-//XAPIA/CS/API/ENTRYATTR//NONSGML Summary//EN:string:Foundation planning meeting
+	in Hari's office
+-//XAPIA/CS/API/ENTRYATTR//NONSGML Status//EN:integer:0
+-//XAPIA/CS/API/ENTRYATTR//NONSGML Recurrence Rule//EN:string:M60 #12
+-//XAPIA/CS/API/ENTRYATTR//NONSGML Audio Reminder//EN:reminder:-60:
+-//XAPIA/CS/API/ENTRYATTR//NONSGML Flashing Reminder//EN:reminder:-60:
+-//XAPIA/CS/API/ENTRYATTR//NONSGML Mail Reminder//EN:reminder:-1800:hseldon@trantor
+-//XAPIA/CS/API/ENTRYATTR//NONSGML Popup Reminder//EN:reminder:300:
+-//CDE_XAPIA_PRIVATE/CS/API/ENTRYATTR//NONSGML ApptDelimiter//EN:string:end
+
+        Date: 7/25/1994
+        Start:  8:00am
+        End:  9:00am
+        Repeat: Every Two Weeks, last
+        For:26
+        What: Foundation planning meeting
+		in Hari's office
+.S +1
+.Ce
+.cdes
+.SH "SEE ALSO"
+.Hd csa/csa.h 5,
+.Fn csa_add_entry 3,
+.Fn csa_call_callbacks 3,
+.Fn csa_delete_calendar 3,
+.Fn csa_delete_entry 3,
+.Fn csa_free 3,
+.Fn csa_free_time_search 3,
+.Fn csa_list_calendar_attributes 3,
+.Fn csa_list_calendars 3,
+.Fn csa_list_entries 3,
+.Fn csa_list_entry_attributes 3,
+.Fn csa_list_entry_sequence 3,
+.Fn csa_logoff 3,
+.Fn csa_logon 3,
+.Fn csa_look_up 3,
+.Fn csa_query_configuration 3,
+.Fn csa_read_calendar_attributes 3,
+.Fn csa_read_entry_attributes 3,
+.Fn csa_read_next_reminder 3,
+.Fn csa_register_callback 3,
+.Fn csa_unregister_callback 3,
+.Fn csa_update_calendar_attributes 3,
+.Fn csa_update_entry_attributes 3.
+.cdee

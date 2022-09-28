@@ -1,0 +1,103 @@
+.TH tt_file_move 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+tt_file_move \- move objects from one file to another
+.SH SYNOPSIS
+.yS
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'Tt_status tt_file_move('u
+Tt_status tt_file_move(const char *\f2oldfilepath\fP,
+	const char *\f2newfilepath\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn tt_file_move
+function
+destroys all objects that exist on the files and directories rooted at
+.IR newfilepath ,
+then moves all objects that exist on
+.I oldfilepath
+to
+.IR newfilepath .
+.P
+If
+.I oldfilepath
+and
+.I newfilepath
+reside in the same file system,
+.Fn tt_file_move
+replaces
+.I oldfilepath
+with
+.I newfilepath
+in the path associated with every object in
+that file system; that is, all the objects in the directory tree rooted at
+.I oldfilepath
+are overlaid onto
+.IR newfilepath .
+In this mode, the behavior of
+.Fn tt_file_move
+is similar to
+.Fn rename 2.
+.P
+If
+.I oldfilepath
+and
+.I newfilepath
+reside in different file systems, and either is a directory,
+undefined results occur.
+.P
+The
+.I oldfilepath
+argument is the name of the file or directory whose objects are to be moved.
+The
+.I newfilepath
+argument is the name of the file or directory to which the objects
+are to be moved.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn tt_file_move
+function returns the status of the operation as one of the following
+.B Tt_status
+values:
+.VL 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_ACCESS
+.br
+The user does not have the necessary access to the object and/or the process.
+.Lc TT_ERR_DBAVAIL
+.br
+The ToolTalk service could not access the
+ToolTalk database needed for this operation.
+.Lc TT_ERR_DBEXIST
+.br
+The ToolTalk service could not access the
+specified ToolTalk database in the expected place.
+.Lc TT_ERR_FILE
+.br
+The specified file does not exist or it is inaccessible.
+.Lc TT_ERR_NOMP
+.br
+The
+.Cm ttsession 1
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_PATH
+.br
+The specified pathname included an unsearchable directory.
+.Lc TT_ERR_POINTER
+.br
+The pointer passed does not point to an object of
+the correct type for this operation.
+.LE
+.SH "SEE ALSO"
+.Hd Tt/tt_c.h 5,
+.Fn tt_file_copy 3,
+.Fn tt_file_destroy 3;
+.cde .Cm rename 2
+.xo .Cm rename 2
+.xo in the \*(ZC.

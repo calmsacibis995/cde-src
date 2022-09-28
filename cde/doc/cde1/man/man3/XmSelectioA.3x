@@ -1,0 +1,557 @@
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Unix System Labs, Inc.,
+...\" **      a subsidiary of Novell, Inc.
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH XmSelectionBox 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmSelectionBox\fP \- The SelectionBox widget class
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/SelectioB.h>
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+SelectionBox is a general dialog widget that allows the user to
+select one item from a list.
+By default a SelectionBox includes the following:
+.TP
+\(bu
+A scrolling list of alternatives
+.TP
+\(bu
+An editable text field for the selected alternative
+.TP
+\(bu
+Labels for the list and text field
+.TP
+\(bu
+Three or four buttons
+.PP 
+The default button labels are \fIOK\fP, \fICancel\fP, and \fIHelp\fP.
+By default an \fIApply\fP button is also created; if the parent of the
+SelectionBox is a DialogShell it is managed, and otherwise it is unmanaged.
+Additional children may be added to the SelectionBox after
+creation.
+The first child is used as a work area.  The value of
+\fIXmNchildPlacement\fP determines if the work area is placed above
+or below the Text area, or above or below the List area.  Additional
+children are laid out in the following manner:
+.TP
+\(bu
+Menubar \- The first menu bar child is placed at the top of the window.
+.TP
+\(bu
+Buttons \- All \fIXmPushButton\fP
+widgets or gadgets, and their subclasses are
+placed after the \fIOK\fP button in the order of their creation.
+.TP
+\(bu
+The layout of additional children which are not in the above categories
+is undefined.
+.PP 
+The user can select an item in two ways:
+by scrolling through the list and selecting the desired
+item or by entering the item name directly into the text edit area.
+Selecting an item from
+the list causes that item name to appear in the selection text edit
+area.
+.PP 
+The user may select a new item
+as many times as desired.  The item is not actually selected until
+the user presses the \fIOK\fP PushButton.
+.PP 
+The default value for the \fIXmBulletinBoard\fP resource
+\fIXmNcancelButton\fP is the Cancel button unless \fIXmNdialogType\fP is
+\fIXmDIALOG_COMMAND\fP, when the default is NULL.
+The default value for the \fIXmBulletinBoard\fP resource
+\fIXmNdefaultButton\fP is the OK button unless \fIXmNdialogType\fP is
+\fIXmDIALOG_COMMAND\fP, when the default is NULL.
+.PP
+For SelectionBox and its subclasses, the default value for
+\fIXmNinitialFocus\fP is the text edit area.
+.PP
+The user can specify resources in a resource file for the automatically
+created widgets and gadgets of SelectionBox.  The following list
+identifies the names of these widgets (or gadgets) and the associated
+SelectionBox areas.
+.TP
+\(bu
+List Items Label \- "Items"
+.TP
+\(bu
+List Items \- "ItemsList"
+.TP
+\(bu
+Selection Label \- "Selection"
+.TP
+\(bu
+Selection Text \- "Text"
+.TP
+\(bu
+Selection Separator \- "Separator"
+.SS "Classes"
+SelectionBox inherits behavior and resources from \fICore\fP,
+\fIComposite\fP, \fIConstraint\fP, \fIXmManager\fP,
+and \fIXmBulletinBoard\fP Classes.
+.PP 
+The class pointer is \fIxmSelectionBoxWidgetClass\fP.
+.PP 
+The class name is \fIXmSelectionBox\fP.
+.SS "New Resources"
+The following table defines a set of widget resources used by the programmer
+to specify data.  The programmer can also set the resource values for the
+inherited classes to set attributes for this widget.  To reference a
+resource by name or by class in a .Xdefaults file, remove the \fIXmN\fP or
+\fIXmC\fP prefix and use the remaining letters.  To specify one of the defined
+values for a resource in a .Xdefaults file, remove the \fIXm\fP prefix and use
+the remaining letters (in either lowercase or uppercase, but include any
+underscores between words).
+The codes in the access column indicate if the given resource can be
+set at creation time (C),
+set by using \fIXtSetValues\fP (S),
+retrieved by using \fIXtGetValues\fP (G), or is not applicable (N/A).
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmSelectionBox Resource Set
+Name	Class	Type	Default	Access
+_
+XmNapplyCallback	XmCCallback	XtCallbackList	NULL	C
+XmNapplyLabelString	XmCApplyLabelString	XmString	dynamic	CSG
+XmNcancelCallback	XmCCallback	XtCallbackList	NULL	C
+XmNcancelLabelString	XmCCancelLabelString	XmString	dynamic 	CSG
+XmNchildPlacement	XmCChildPlacement	unsigned char	XmPLACE_ABOVE_SELECTION	CSG
+XmNdialogType	XmCDialogType	unsigned char	dynamic 	CG
+XmNhelpLabelString	XmCHelpLabelString	XmString	dynamic 	CSG
+XmNlistItemCount	XmCItemCount	int	0 	CSG
+XmNlistItems	XmCItems	XmStringTable	NULL	CSG
+XmNlistLabelString	XmCListLabelString	XmString	dynamic	CSG
+XmNlistVisibleItemCount	XmCVisibleItemCount	int	dynamic 	CSG
+XmNminimizeButtons	XmCMinimizeButtons	Boolean	False	CSG
+XmNmustMatch	XmCMustMatch	Boolean	False 	CSG
+XmNnoMatchCallback	XmCCallback	XtCallbackList	NULL	C
+.wH
+.tH
+XmNokCallback	XmCCallback	XtCallbackList	NULL	C
+XmNokLabelString	XmCOkLabelString	XmString	dynamic	CSG
+XmNselectionLabelString	XmCSelectionLabelString	XmString	dynamic	CSG
+XmNtextAccelerators	XmCTextAccelerators	XtAccelerators	default	C
+XmNtextColumns	XmCColumns	short	dynamic	CSG
+XmNtextString	XmCTextString	XmString	""	CSG
+.TE
+.KE
+.in
+.sp 1
+.IP "\fIXmNapplyCallback\fP"
+Specifies the list of callbacks called
+when the user activates the \fIApply\fP
+button.  The callback reason is \fIXmCR_APPLY\fP.
+.IP "\fIXmNapplyLabelString\fP"
+Specifies the string label for the \fIApply\fP button.
+The default for this resource depends on the locale.
+In the C locale the default is "Apply".
+.IP "\fIXmNcancelCallback\fP"
+Specifies the list of callbacks called
+when the user activates
+the \fICancel\fP button.  The callback reason is \fIXmCR_CANCEL\fP.
+.IP "\fIXmNcancelLabelString\fP"
+Specifies the string label for the \fICancel\fP button.
+The default for this resource depends on the locale.
+In the C locale the default is "Cancel".
+.IP "\fIXmNchildPlacement\fP"
+Specifies the placement of the work area child.  The 
+possible values are:
+.TP
+\(bu
+\fIXmPLACE_ABOVE_SELECTION\fP \- places the work area child
+above the Text area
+.TP
+\(bu
+\fIXmPLACE_BELOW_SELECTION\fP \- places the work area child
+below the Text area
+.TP
+\(bu
+\fIXmPLACE_TOP\fP \- places the work area child above the List area,
+and below a menubar, if one is present
+.IP "\fIXmNdialogType\fP"
+Determines the set of SelectionBox children widgets that are created
+and managed at initialization.  The following are possible values:
+.wH
+.rS 
+.TP
+\(bu
+\fIXmDIALOG_PROMPT\fP \- all standard children except the list and
+list label are created, and all except the \fIApply\fP button are
+managed
+.TP
+\(bu
+\fIXmDIALOG_COMMAND\fP \- only the list, the selection label, and the
+text field are created and managed
+.TP
+\(bu
+\fIXmDIALOG_SELECTION\fP \- all standard children are created and
+managed
+.TP
+\(bu
+\fIXmDIALOG_FILE_SELECTION\fP \- all standard children are created and
+managed
+.TP
+\(bu
+\fIXmDIALOG_WORK_AREA\fP \- all standard children are created, and all
+except the \fIApply\fP button are managed
+.wH
+.rE
+.PP
+If the parent of the SelectionBox is a DialogShell, the default is
+\fIXmDIALOG_SELECTION\fP; otherwise, the default is \fIXmDIALOG_WORK_AREA\fP.
+\fIXmCreatePromptDialog\fP and \fIXmCreateSelectionDialog\fP set and append
+this resource to the creation \fBarglist\fP supplied by the application.
+This resource cannot be modified after creation.
+.IP "\fIXmNhelpLabelString\fP"
+Specifies the string label for the \fIHelp\fP button.
+The default for this resource depends on the locale.
+In the C locale the default is "Help".
+.IP "\fIXmNlistItems\fP"
+Specifies the items in the SelectionBox list.
+\fIXtGetValues\fP for this resource returns the list items themselves,
+not a copy of the list items.
+The application must not free the returned items.
+.IP "\fIXmNlistItemCount\fP"
+Specifies the number of items in the SelectionBox
+list.
+The value must not be negative.
+.IP "\fIXmNlistLabelString\fP"
+Specifies the string label to appear above the SelectionBox list
+containing the selection items.
+The default for this resource depends on the locale.
+In the C locale the default is "Items"
+unless \fIXmNdialogType\fP is
+\fIXmDIALOG_PROMPT\fP; in that case the default is NULL.
+.IP "\fIXmNlistVisibleItemCount\fP"
+Specifies the number of items displayed in the SelectionBox
+list.
+The value must be greater than 0 unless \fIXmNdialogType\fP is
+\fIXmDIALOG_PROMPT\fP; in that case the value is always 0.
+The default is dynamic based on the height of the list.
+.IP "\fIXmNminimizeButtons\fP"
+Sets the buttons to the width of the widest button and height of the
+tallest button if False.  If True, button width and height are not
+modified.
+.IP "\fIXmNmustMatch\fP"
+Specifies whether the selection widget should check if the
+user's selection in the text edit field has an exact match in
+the SelectionBox list when the \fIOK\fP button is activated.
+If the selection does not have an exact match, and
+\fIXmNmustMatch\fP is True, the \fIXmNnoMatchCallback\fP callbacks are
+called.
+If the selection does have an exact match or if \fIXmNmustMatch\fP is
+False, \fIXmNokCallback\fP callbacks are called.
+.IP "\fIXmNnoMatchCallback\fP"
+Specifies the list of callbacks called
+when the user makes a selection
+from the text edit field that does not have an exact match with
+any of the items in the list box.
+The callback reason is \fIXmCR_NO_MATCH\fP.
+Callbacks in this list are called only if \fIXmNmustMatch\fP
+is true.
+.IP "\fIXmNokCallback\fP"
+Specifies the list of callbacks called
+when the user activates the \fIOK\fP button.
+The callback reason is \fIXmCR_OK\fP.
+If the selection text does not match a list item, and
+\fIXmNmustMatch\fP is True, the \fIXmNnoMatchCallback\fP callbacks are
+called instead.
+.IP "\fIXmNokLabelString\fP"
+Specifies the string label for the \fIOK\fP button.
+The default for this resource depends on the locale.
+In the C locale the default is "OK".
+.IP "\fIXmNselectionLabelString\fP"
+Specifies the string label for the selection text edit field.
+The default for this resource depends on the locale.
+In the C locale the default is "Selection".
+.IP "\fIXmNtextAccelerators\fP"
+Specifies translations added to the Text widget child of the
+SelectionBox.
+The default includes bindings for the up and down keys
+for auto selection of list items.
+This resource is ignored if \fIXmNaccelerators\fP is initialized to a
+nondefault value.
+.IP "\fIXmNtextColumns\fP"
+Specifies the number of columns in the Text widget.
+The value must be greater than 0.
+.IP "\fIXmNtextString\fP"
+Specifies the text in the text edit selection field.
+.SS "Inherited Resources"
+SelectionBox inherits behavior and resources from the following
+superclasses.  For a complete description of each resource, refer to the
+man page for that superclass.
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmBulletinBoard Resource Set
+Name	Class	Type	Default	Access
+_
+XmNallowOverlap	XmCAllowOverlap	Boolean	True	CSG
+XmNautoUnmanage	XmCAutoUnmanage	Boolean	True	CG
+XmNbuttonFontList	XmCButtonFontList	XmFontList	dynamic	CSG
+XmNcancelButton	XmCWidget	Widget	dynamic	SG
+XmNdefaultButton	XmCWidget	Widget	dynamic	SG
+XmNdefaultPosition	XmCDefaultPosition	Boolean	True	CSG
+XmNdialogStyle	XmCDialogStyle	unsigned char	dynamic	CSG
+XmNdialogTitle	XmCDialogTitle	XmString	NULL	CSG
+XmNfocusCallback	XmCCallback	XtCallbackList	NULL	C
+XmNlabelFontList	XmCLabelFontList	XmFontList	dynamic	CSG
+XmNmapCallback	XmCCallback	XtCallbackList	NULL	C
+XmNmarginHeight	XmCMarginHeight	Dimension	10	CSG
+XmNmarginWidth	XmCMarginWidth	Dimension	10 	CSG
+XmNnoResize	XmCNoResize	Boolean	False	CSG
+.wH
+.tH
+XmNresizePolicy	XmCResizePolicy	unsigned char	XmRESIZE_ANY	CSG
+XmNshadowType	XmCShadowType	unsigned char	XmSHADOW_OUT	CSG
+XmNtextFontList	XmCTextFontList	XmFontList	dynamic	CSG
+XmNtextTranslations	XmCTranslations	XtTranslations	NULL	C
+XmNunmapCallback	XmCCallback	XtCallbackList	NULL	C
+.TE
+.KE
+.in
+.sp 1
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmManager Resource Set
+Name	Class	Type	Default	Access
+_
+XmNbottomShadowColor	XmCBottomShadowColor	Pixel	dynamic	CSG
+XmNbottomShadowPixmap	XmCBottomShadowPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNforeground	XmCForeground	Pixel	dynamic	CSG
+XmNhelpCallback	XmCCallback	XtCallbackList	NULL	C
+XmNhighlightColor	XmCHighlightColor	Pixel	dynamic	CSG
+XmNhighlightPixmap	XmCHighlightPixmap	Pixmap	dynamic	CSG
+XmNinitialFocus	XmCInitialFocus	Widget	dynamic	CSG
+XmNnavigationType	XmCNavigationType	XmNavigationType	XmTAB_GROUP	CSG
+XmNshadowThickness	XmCShadowThickness	Dimension	dynamic	CSG
+XmNstringDirection	XmCStringDirection	XmStringDirection	dynamic	CG
+XmNtopShadowColor	XmCTopShadowColor	Pixel	dynamic	CSG
+XmNtopShadowPixmap	XmCTopShadowPixmap	Pixmap	dynamic	CSG
+XmNtraversalOn	XmCTraversalOn	Boolean	True	CSG
+XmNunitType	XmCUnitType	unsigned char	dynamic	CSG
+XmNuserData	XmCUserData	XtPointer	NULL	CSG
+.TE
+.KE
+.in
+.sp 1
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+Composite Resource Set
+Name	Class	Type	Default	Access
+_
+XmNchildren	XmCReadOnly	WidgetList	NULL	G
+XmNinsertPosition	XmCInsertPosition	XtOrderProc	NULL	CSG
+XmNnumChildren	XmCReadOnly	Cardinal	0	G
+.TE
+.KE
+.in
+.sp 1
+.P 
+.wH
+.in 0 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+Core Resource Set
+Name	Class	Type	Default	Access
+_
+XmNaccelerators	XmCAccelerators	XtAccelerators	dynamic	N/A
+XmNancestorSensitive	XmCSensitive	Boolean	dynamic	G
+XmNbackground	XmCBackground	Pixel	dynamic	CSG
+XmNbackgroundPixmap	XmCPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNborderColor	XmCBorderColor	Pixel	XtDefaultForeground	CSG
+XmNborderPixmap	XmCPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNborderWidth	XmCBorderWidth	Dimension	0	CSG
+XmNcolormap	XmCColormap	Colormap	dynamic	CG
+XmNdepth	XmCDepth	int	dynamic	CG
+XmNdestroyCallback	XmCCallback	XtCallbackList	NULL	C
+XmNheight	XmCHeight	Dimension	dynamic	CSG
+XmNinitialResourcesPersistent	XmCInitialResourcesPersistent	Boolean	True	C
+XmNmappedWhenManaged	XmCMappedWhenManaged	Boolean	True	CSG
+XmNscreen	XmCScreen	Screen *	dynamic	CG
+.wH
+.tH
+XmNsensitive	XmCSensitive	Boolean	True	CSG
+XmNtranslations	XmCTranslations	XtTranslations	dynamic	CSG
+XmNwidth	XmCWidth	Dimension	dynamic	CSG
+XmNx	XmCPosition	Position	0	CSG
+XmNy	XmCPosition	Position	0	CSG
+.TE
+.KE
+.in
+.sp 1
+.wH
+.in  
+.SS "Callback Information"
+A pointer to the following structure is passed to each callback:
+.sS
+.iS
+.ta .25i 1.50i
+.nf
+typedef struct
+{
+	int	\fBreason\fI;
+	XEvent	\fB* event\fI;
+	XmString	\fBvalue\fI;
+	int	\fBlength\fI;
+} XmSelectionBoxCallbackStruct;
+.iE
+.sE
+.wH
+.fi
+.IP "\fBreason\fP"
+Indicates why the callback was invoked
+.IP "\fBevent\fP"
+Points to the \fIXEvent\fP that triggered the callback
+.IP "\fBvalue\fP"
+Indicates the \fIXmString\fP value selected by the user from the
+SelectionBox list or entered into the SelectionBox text field
+.IP "\fBlength\fP"
+Indicates the size in bytes of the \fIXmString\fP value
+.SS "Translations"
+.ne 3i
+XmSelectionBox inherits translations from XmBulletinBoard.
+.SS "Accelerators"
+The \fIXmNtextAccelerators\fP are added to the Text descendant of
+XmSelectionBox.
+The default accelerators are listed below.
+These accelerators may not directly correspond to a
+translation table.
+.iS
+.ta 1.5i
+.nf
+KUp:	SelectionBoxUpOrDown(0)
+KDown:	SelectionBoxUpOrDown(1)
+KBeginData:	SelectionBoxUpOrDown(2)
+KEndData:	SelectionBoxUpOrDown(3)
+KRestore:	SelectionBoxRestore()
+.wH
+.fi
+.iE
+.SS "Action Routines"
+The XmSelectionBox action routines are described below:
+.IP "\fISelectionBoxUpOrDown(0|1|2|3)\fP:"
+When called with a 0 argument, selects the previous item in the
+list and replaces the text with that item.
+.P
+When called with a 1 argument, selects the next item in the
+list and replaces the text with that item.
+.P
+When called with a 2 argument, selects the first item in the
+list and replaces the text with that item.
+.P
+When called with a 3 argument, selects the last item in the
+list and replaces the text with that item.
+.IP "\fISelectionBoxRestore()\fP:"
+Replaces the text value with the list selection.
+If no item in the list is selected, clears the text.
+.P 
+.ne 3i
+.SS "Additional Behavior"
+The SelectionBox widget has the additional behavior described below:
+.IP "\fIMAny\ KCancel\fP:"
+Calls the activate callbacks for the cancel button if it is sensitive.
+If no cancel button exists and the parent of the SelectionBox is a manager,
+passes the event to the parent.
+.IP "\fIKActivate\fP:"
+Calls the activate callbacks for the button with the keyboard focus.
+If no button has the keyboard focus, calls the activate callbacks
+for the default button if it is sensitive.
+In a List widget or single-line Text widget,
+the List or Text action associated with \fIKActivate\fP
+is called before the SelectionBox actions associated with
+\fIKActivate\fP.
+In a multi-line Text widget, any \fIKActivate\fP
+event except \fIKEnter\fP calls
+the Text action associated with \fIKActivate\fP,
+then the SelectionBox actions associated with \fIKActivate\fP.
+If no button has the focus, no default button exists, and the parent
+of the SelectionBox is a manager, passes the event to the parent.
+.IP "\fI<OK\ Button\ Activated>\fP:"
+If \fIXmNmustMatch\fP is True and the text does not match an item in the
+file list, calls the \fIXmNnoMatchCallback\fP callbacks with reason
+\fIXmCR_NO_MATCH\fP.
+Otherwise, calls the \fIXmNokCallback\fP callbacks with reason
+\fIXmCR_OK\fP.
+.IP "\fI<Apply\ Button\ Activated>\fP:"
+Calls the \fIXmNapplyCallback\fP callbacks with reason \fIXmCR_APPLY\fP.
+.IP "\fI<Cancel\ Button\ Activated>\fP:"
+Calls the \fIXmNcancelCallback\fP callbacks with reason
+\fIXmCR_CANCEL\fP.
+.IP "\fI<Help\ Button\ Activated>\fP:"
+Calls the \fIXmNhelpCallback\fP callbacks with reason \fIXmCR_HELP\fP.
+.IP "\fI<MapWindow>\fP:"
+Calls the callbacks for \fIXmNmapCallback\fP if the SelectionBox
+is a child of a Dialog shell.
+.IP "\fI<UnmapWindow>\fP:"
+Calls the callbacks for \fIXmNunmapCallback\fP if the SelectionBox is
+the child of a DialogShell.
+.SS "Virtual Bindings"
+The bindings for virtual keys are vendor specific.
+For information about bindings for virtual buttons and keys, see \fIVirtualBindings(3X)\fP.
+.SH RELATED INFORMATION
+.na
+\fIComposite(3X)\fP,
+\fIConstraint(3X)\fP,
+\fICore(3X)\fP,
+\fIXmBulletinBoard(3X)\fP,
+\fIXmCreateSelectionBox(3X)\fP,
+\fIXmCreateSelectionDialog(3X)\fP,
+\fIXmCreatePromptDialog(3X)\fP,
+\fIXmManager(3X)\fP, and
+\fIXmSelectionBoxGetChild(3X)\fP.
+.ad

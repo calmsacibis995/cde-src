@@ -1,0 +1,115 @@
+.\" *************************************************************************
+.\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" **  (c) Copyright 1993, 1994 Novell, Inc.
+.\" *************************************************************************
+.TH dthffile 4 "11 Jan 1994"
+.BH "11 Jan 1994"
+.\"----------------------------------------------------------------------------
+.SH NAME
+dthffile \- format and location of desktop data type and action files
+.\"----------------------------------------------------------------------------
+.\"---
+.\"--- SYNOPSIS 
+.\"--- This section is a syntax diagram.  
+.\"---
+.SH SYNOPSIS
+See
+.BR dthelpgen(1).
+.SH DESCRIPTION
+.RS
+The Family file is based on the X11 syntax for application resources.  The are
+used in conjunction with dthelpgen(1), to generate a "browser" help volume 
+that allows users to navigate through all of the available help information.
+.P
+The family file, <filename>.hf, contains the following fields: character set,
+title, abstract, volume list and an optional image name.
+.TP 8
+.B charSet
+Specifies the standard Cde locale and code set value, to be used in
+parsing the title and abstract fields of the family file. The default 
+value is 'en_US.iso8859-1'. See "Cde Help System Author's and Programmer's
+Guide" for a complete list of supported locales and code sets. The
+family title and abstract must not contain any HelpTag
+markup as this file is not processed by the HelpTag
+software.
+.TP
+.B title
+Specifies the title of the family, as displayed in the top-level of the browser
+help volume.
+.TP
+.B abstract
+Specifies the abstract for the family. Used to describe the family, it
+gives information about what type of volumes are in this family or
+why these volumes are related. For long abstracts, the
+backslash character can be used to continue to the next line.
+.TP
+.B volumes
+Specifies which volumes belong to the family. The 
+volumes will be listed in the order they appear on this line. A volume may 
+be listed in more than one family. This is a list of volume
+names separated by spaces. The ending
+.B .sdl
+extension must be specified if the search path contains a
+.B %H
+rather than a
+.BR %H.sdl .
+See the
+.B Environment Variables
+section for more information about Cde Help search path syntax and utilization.
+.TP
+.B [bitmap]
+Specifies the image that pictorially describes the family. 
+This image will be displayed in the top-level browser volume just under the 
+family title, and left of the abstract text.  
+.P
+The icon file is optional. If you provide one, the 
+path you use to specify the location of the file should be a complete 
+pathname. If you do not provide an icon, do not include the *.bitmap 
+resource in your family file. 
+.P
+The extension to the file name indicates the image type.
+.ta .5i 1.5i
+.br
+	.xwd     X11 XWD file
+.br
+	.tif     TIFF 5.0 image file
+.br
+	.pm      X11 X Pixmap file
+.br
+	.bm      X11 Bitmap file
+.fi
+.RE
+.sp1
+.SS FAMILY FILE EXAMPLE
+.ta
+.br
+        *.charSet:    iso8859-1
+.br
+
+.br
+        *.title:      Developer's Information About The Help System
+.br
+
+.br
+        *.abstract:   Abstract giving a short description about \\
+.br
+        the help system... 
+.br
+        *.volumes:    helpkit.sdl helpdemo.sdl
+.br
+        *.bitmap:     /usr/local/bitmap/helpGraphic.bm
+.fi
+.sp1
+.SS REGISTERING A PRODUCT FAMILY
+If you are also registering a product family, you create and install a help 
+family file (product.hf) with the rest of the product's help files. 
+You register the family file by running the dtappintegrate script which 
+creates a symbolic link to the product.hf file. For most products, the 
+appropriate place for the link is /etc/dt/appconfig/help/language/. See
+dtappintegrate(1), for more information on registering help within the desktop.
+.PP
+.SH "SEE ALSO"
+.BR  dthelpgen(1)
+

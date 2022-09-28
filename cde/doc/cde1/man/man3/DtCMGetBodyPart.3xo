@@ -1,0 +1,61 @@
+.TH DtCMGetBodyPart 3 "17 January 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH "NAME"
+DtCMGetBodyPart \- retrieve a body part with a persistent body-part reference
+.SH "SYNOPSIS"
+.yS
+#include <Bento/DtCM.h>
+.sp 0.5v
+.ta \w'DtCMBodyPart *DtCMGetBodyPart('u
+DtCMBodyPart *DtCMGetBodyPart(DtCMDocument \f2document\fP,
+	CMEnv *\f2error\fP,
+	CMReference \f2reference\fP);
+.yE
+.SH "DESCRIPTION"
+The
+.Fn DtCMGetBodyPart
+function returns a body part from a persistent reference.
+The
+.I reference
+argument must be from the current
+.I document
+argument or an error occurs.
+An error occurs if the body part has been deleted.
+.P
+The
+.I document
+argument is a document handle created by the
+.Fn DtCMInitDocument 3
+function.
+The
+.I error
+argument is a pointer to an error return structure.
+The
+.I reference
+argument is a persistent reference for the body part.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn DtCMGetBodyPart
+function returns a pointer to a
+.BR DtCMBodyPart
+structure or
+.Cn NULL
+if no body parts exist.
+If an error occurs,
+.Fn DtCMGetBodyPart
+sets the major code in the
+.I error
+structure to
+.Cn USER_EXCEPTION ,
+and the application can use the
+.Fn CMRexception_number
+function to determine the minor code.
+See the Error API Appendix in the \*(ZB.
+.SH "SEE ALSO"
+.Fn DtCMReleaseBodyPart 3,
+.Hd Bento/DtCM.h 5;
+.Fn CMRexception_number
+in the \*(ZB.

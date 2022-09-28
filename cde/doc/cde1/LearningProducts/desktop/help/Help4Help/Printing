@@ -1,0 +1,189 @@
+<s1 id=Printing>Printing Help Topics
+					<idx|printing help topics|
+					<idx|help, printing|
+<note>
+Printing online help is disabled in the CDE Desktop
+software snapshot (October 1993).  If you select the Print
+option in a Help window, a message states that printing is
+currently unavailable. 
+<\note>
+
+<procedure>To print help topics:
+
+<list order>
+
+ * Choose Print from the File menu to display the Print dialog (Alt+F, P).
+
+ * Select the topics you want to print:
+
+   <list bullet tight>
+    * Print All -- to print all topics.
+    * Print Current Topic -- to print only the current topic (the default).
+    * Print Current and Down -- to print the current topic and its subtopics.
+   <\list>
+
+ * Choose OK.
+
+<\list>
+
+
+<!-- PRINTING IS DISABLED IN OCT RELEASE
+
+<note>
+
+   In quick help dialogs, the Print button immediately prints the current
+   topic, without displaying the Print dialog.
+
+<\note>
+
+<procedure>See Also
+
+<list bullet tight>
+ * <xref Printing-ChoosingAPrinter>
+ * <xref Printing-Command>
+ * <xref Commands>
+<\list>
+
+<s2 id=Printing-ChoosingAPrinter>Choosing a Printer
+			<idx|printing help topics|
+			<idx|help, printing|
+			<idx|configuring help|
+			<idx|help, configuring|
+			<location id=ThePrinterResource>&empty;<\location>
+
+By default, printed output from HP Help is directed to your default
+printer.  You can specify another printer by setting the ``printer.name''
+resource.  If you are not printing to a LaserJet Series III (or later)
+printer, you must also set the ``printer.%%name%%.model'' resource.
+
+<list bullet>
+ * <xref Printing-ChoosingAPrinter-Personal>
+ * <xref Printing-ChoosingAPrinter-System>
+<\list>
+
+<s3 id=Printing-ChoosingAPrinter-Personal>To choose a printer for yourself
+
+<list order>
+
+ * Copy the ``/usr/lib/X11/app-defaults/Helpprint'' file into your home
+   directory and make it writable.
+
+ * Edit your ``/%%HomeDirectory%%/Helpprint'' file, setting the ``name''
+   and ``model'' resources for the printer you want to use:
+
+<ex>
+*printer.name:  %%name%%
+*printer.%%name%%.model:  %%model%%
+<\ex>
+
+Where %%name%% is the device name of the printer and %%model%% is
+either ``LJII'' or ``LJIII''.  The default model is ``LJIII''.
+<\list>
+
+Your system administrator may have already edited the ``Helpprint'' file to
+configure the correct models for the printers on your system.  If so, you
+specify just the ``printer.name'' to access the correct printer.
+
+Comments within the ``Helpprint'' app-defaults file also describe how to
+set the page size, if your paper is not the default size.
+
+<procedure>Examples
+
+Suppose you have a LaserJet II printer named ``hp-laser''.  To direct all
+printed help topics to that printer, enter these resources into your
+``Helpprint'' file:
+
+<ex>
+*printer.name:             hp-laser
+*printer.hp-laser.model:   LJII
+<\ex>
+
+!!Or!!, suppose you want to direct all printed help topics to a LaserJet
+III printer named ``lj3d''.  Since the default model is ``LJIII'', you need
+to specify only this single resource:
+
+<ex>
+*printer.name:        lj3d
+<\ex>
+
+
+<procedure>See Also
+
+<list bullet tight>
+ * <xref Printing-ChoosingAPrinter-System>
+ * <xref Printing-Command>
+<\list>
+
+
+<s3 id=Printing-ChoosingAPrinter-System>To choose a printer for all users
+
+<list order>
+
+ * Login as superuser.
+
+ * Edit the ``/usr/lib/X11/app-defaults/Helpprint'' file, adding the
+   necessary ``model'' resource for each printer as follows:
+
+<ex>
+*printer.%%name%%.model: %%model%%
+<\ex>
+
+Where %%name%% is the device name of the printer and %%model%% is
+either ``LJII'' or ``LJIII''.  The default model is ``LJIII''.
+
+ * To specify the default printer, use the printer ``name'' resource:
+
+<ex>
+*printer.name:  %%name%%
+<\ex>
+
+Where %%name%% is the device name of the printer you are configuring.
+
+<\list>
+
+<procedure>See Also
+
+<list bullet tight>
+ * <xref Printing-ChoosingAPrinter-Personal>
+ * <xref Printing-Command>
+<\list>
+
+
+
+<s2 id=Printing-Command>Printing Help from the Command Line
+					<idx|printing help topics|
+					<idx|help, printing|
+
+Printing within the HP Help System is actually done by a separate
+program called ``helpprint''.
+
+<note>
+  Running the ``helpprint'' program directly is intended for advanced
+  users or online help developers.  
+<\note>
+
+You can run ``helpprint'' to print
+a help topic using a command like this:
+
+<ex>helpprint -helpVolume %%volume%% -locationId %%id%%<\ex>
+
+Where %%volume%% is the name of the help volume you want to print and
+%%id%% is the internal ID string associated with the topic you want
+to print.  
+
+An additional option, ``-R'', causes all subtopics to be printed.
+For example, to print all of the topics in a help volume named "Vuefile," 
+the command is:
+<ex smaller>helpprint -R -helpVolume /usr/vhelp/volumes/C/Vuefile.hv -locationId _hometopic<\ex>
+
+The ``helpprint'' program is installed in the directory ``/usr/vue/bin''
+by default.  You may need to add that directory to your path before
+running ``helpprint''.
+
+<procedure>See Also
+
+<list bullet tight>
+ * <xref Printing>
+ * <xref Printing-ChoosingAPrinter>
+<\list>
+-->

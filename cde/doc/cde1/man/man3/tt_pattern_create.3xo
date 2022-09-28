@@ -1,0 +1,63 @@
+.TH tt_pattern_create 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+tt_pattern_create \- request a new pattern object
+.SH SYNOPSIS
+.yS
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'Tt_pattern tt_pattern_create('u
+Tt_pattern tt_pattern_create(void);
+.yE
+.SH DESCRIPTION
+The
+.Fn tt_pattern_create
+function
+requests a new pattern object.
+.P
+After receiving the pattern object,
+the application fills in the message pattern fields to indicate
+what type of messages the process wants to receive and then registers the
+pattern with the ToolTalk service.
+.P
+The application can supply multiple values for each attribute
+added to a pattern
+(although some attributes are set and can only have one value).
+The pattern
+attribute matches a message attribute if any of the values in the pattern match
+the value in the message.
+If no value is specified for an attribute,
+the ToolTalk service assumes that any value will match.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn tt_pattern_create
+function returns the opaque handle for a message pattern.
+The application can use this handle in future calls to
+identify the pattern object.
+The application can use
+.Fn tt_ptr_error 3
+to extract one of the following
+.B Tt_status
+values from the returned handle:
+.VL 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_NOMP
+.br
+The
+.Cm ttsession 1
+process is not running and the ToolTalk service cannot restart it.
+.LE
+.SH "APPLICATION USAGE"
+The application should use
+.Fn tt_free 3
+to free any data stored in the address returned by the
+ToolTalk API.
+.SH "SEE ALSO"
+.Hd Tt/tt_c.h 5,
+.Fn tt_pattern_register 3,
+.Fn tt_ptr_error 3,
+.Fn tt_free 3.

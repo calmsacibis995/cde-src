@@ -1,0 +1,31 @@
+#
+# Makefile.AIXv2
+#
+# Common Desktop Environment (CDE)
+#
+# Makefile for building a AIX Version 2 dtlpstatd daemon
+#
+#     (c) Copyright 1993, 1994 Hewlett-Packard Company
+#     (c) Copyright 1993, 1994 International Business Machines Corp.
+#     (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+#     (c) Copyright 1993, 1994 Unix System Labs, Inc., a subsidiary
+#         of Novell, Inc.
+#
+
+BIN = dtlpstatd dtlpstat
+GEN = lpstat_svc.c lpstat_xdr.c lpstat.h
+CFLAGS = -O -Daixv2 -DNO_CLNT_CONTROL -DNO_SPERROR
+OTHER = lpstat_aixv2.o
+OTHER1 = rlpstat.o $(OTHER)
+
+all: $(BIN)
+
+dtlpstatd: lpstat_proc.o lpstat_svc.o lpstat_xdr.o $(OTHER)
+	$(CC) -o $@ lpstat_proc.o lpstat_svc.o lpstat_xdr.o $(OTHER)
+
+dtlpstat: dtlpstat.o lpstat_xdr.o $(OTHER1)
+	$(CC) -o $@ dtlpstat.o lpstat_xdr.o $(OTHER1)
+
+dtlpstat.o: dtlpstat.c lpstat.h
+
+lpstat_proc.o: lpstat_proc.c lpstat.h

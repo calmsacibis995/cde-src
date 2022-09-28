@@ -1,0 +1,62 @@
+/* @(#)scan.src	1.2 97/04/29 SMI */
+
+token create token1
+#include "setup.src"
+token set token1 serviceoption messagestorename /tmp/a.mbx
+
+! /usr/bin/rm -f /tmp/a.mbx /tmp/.a.mbx_* /tmp/.a.mbx_dt_index
+! /usr/bin/touch /tmp/a.mbx
+! /usr/bin/rm -f /tmp/b.mbx /tmp/.b.mbx_* /tmp/.b.mbx_dt_index
+! /usr/bin/touch /tmp/b.mbx
+! /usr/bin/rm -f /tmp/c.mbx /tmp/.c.mbx_* /tmp/.c.mbx_dt_index
+/**/# Create some subdirectory structure to test the * option to scan
+! /usr/bin/rm -rf /tmp/imaptest
+! /usr/bin/mkdir -p /tmp/imaptest
+! /usr/bin/touch /tmp/imaptest/x.mbox
+! /usr/bin/touch /tmp/imaptest/y.mbox
+! /usr/bin/touch /tmp/imaptest/z.mbox
+
+/**/# Create and startup a dataport
+port create port1
+port startup port1
+
+/**/# Test scan when the dataport is "attached"
+port attach port1 token1
+port scannamespace port1 /tmp %
+port scannamespace port1 /tmp/ %
+
+port addtosubscribednamespace port1 /tmp/a.mbx
+port addtosubscribednamespace port1 /tmp/b.mbx
+/**/# This should fail, since the mailbox doesn't exist
+port addtosubscribednamespace port1 /tmp/c.mbx
+
+/**/# Open the dataport
+port open port1 token1
+
+port scannamespace port1 /tmp %
+port scannamespace port1 /tmp/ %
+port scannamespace port1 /tmp/ *
+
+#if 0
+These tests need to be reinstated once scansubscribed is fixed in the
+cclient.
+
+port scansubscribednamespace port1 /tmp/ %
+port scansubscribednamespace port1 /tmp %
+port scansubscribednamespace port1 /tmp/ *
+#endif
+
+/**/# Restore original state
+port removefromsubscribednamespace port1 /tmp/a.mbx
+port removefromsubscribednamespace port1 /tmp/b.mbx
+
+/**/# Close the port and exit
+port close port1
+port shutdown port1
+port delete port1
+
+! /usr/bin/rm -f /tmp/a.mbx
+! /usr/bin/rm -f /tmp/b.mbx
+! /usr/bin/rm -rf /tmp/imaptest
+
+quit

@@ -1,0 +1,336 @@
+.\" **
+.\" ** (c) Copyright 1994 Hewlett-Packard Company
+.\" ** (c) Copyright 1994 International Business Machines Corp.
+.\" ** (c) Copyright 1994 Novell, Inc.
+.\" ** (c) Copyright 1994 Sun Microsystems, Inc.
+.\" **
+.TH DtEditor 3 ""
+.BH "3 May - 1994"
+.SH NAME
+\fBDtEditor(3) \- the Editor widget class.\fP
+.iX "DtEditor"
+.iX "widget class" "DtEditor"
+.sp .5
+.SH SYNOPSIS
+\fB#include <Dt/Editor.h>\fP
+.sp .5
+.SH DESCRIPTION
+The Editor widget provides support for creating and editing text files
+and documents.  It consists of a scrolled edit window for text and an
+optional status line.  The edit window supports basic editing operations
+such as cut and paste, search and replace, simple formatting, and spell
+checking.  The status line displays the current line number and an
+optional application supplied message.  The Editor widget can load and
+save files directly.
+.P
+Users can use the mouse for moving the edit cursor and for selecting
+portions of a document for editing operations.  Selection is based on
+the model specified in the \fBInter-Client Communication Conventions
+Manual\fP (ICCCM).  Editor supports primary and secondary selection.
+.P
+The user can cut, copy, and paste text using the clipboard, primary
+transfer, or secondary transfer.  The Editor widget will accept drops of
+text or text files.  It supports dragging of text within the Editor or
+to a different widget.
+.P
+The Editor widget supports a number of basic editing operations that
+aren't provided by the Motif text widget.  These include searching and
+replacing, simple formatting, spell checking and undoing previous edit
+operations.
+.PP
+Widget subclassing is not supported for the DtEditor widget class.
+.sp .5
+.SS "Classes"
+Editor inherits behavior and resources from \fBCore\fP, \fBComposite\fP,
+\fBConstraint\fP, \fBXmManager\fP, and \fBXmForm\fP classes.  TEXT too XXX?
+.PP
+The class pointer is dtEditorWidgetClass.
+.PP
+The class name is DtEditorWidget.
+.sp .5
+.SS "New Resources"
+The following table defines a set of widget resources used by the programmer
+to specify data.  The programmer can also set the resource values for the
+inherited classes to set attributes for this widget.  To reference a
+resource by name or by class in a .Xdefaults file, remove the \fBXmN\fP or
+\fBXmC\fP prefix and use the remaining letters.  To specify one of the defined
+values for a resource in a .Xdefaults file, remove the \fBXm\fP prefix and use
+the remaining letters (in either lowercase or uppercase, but include any
+underscores between words).
+The codes in the access column indicate if the given resource can be
+set at creation time (\fBC\fP),
+set by using \fBXtSetValues\fP (\fBS\fP),
+retrieved by using \fBXtGetValues\fP (\fBG\fP), or is not applicable (\fBN/A\fP).
+.sp .5
+.sp .5
+.in 0
+.KS
+.sp 1
+.in 0
+.TS
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+DtEditor Resource Set
+Name	Class	Type	Default	Access
+_
+DtNcolumns	DtCColumns	XmNcolumns	dynamic	CSG
+DtNdialogTitle	DtCDialogTitle	XmString	NULL	CSG
+DtNeditable	DtCEditable	Boolean	True	CSG
+DtNhelpCallback	DtCCallback	XtCallbackList	NULL	C
+DtNoverstrike	DtCOverstrike	Boolean	False	CSG
+DtNrows	DtCRows	XmNrows	dynamic	CSG
+DtNscrollLeftSide	DtCscrollSide	Boolean	dynamic	CG XXX?
+DtNscrollRightSide	DtCscrollSide	Boolean	dynamic	CG XXX?
+DtNshowStatusLine	DtCShowStatusLine	Boolean	False	CSG
+DtNspellFilter	DtCSpellFilter	char *	NULL	CSG
+DtNstatusLineMessage	DtCStatusLineMessage	XmString	NULL	CSG
+DtNwindowWrap	DtCWindowWrap	Boolean	True	CSG
+.TE
+.in
+.sp 1
+.KE
+.in
+.sp .5
+.IP "\fBDtNcolumns\fP"
+Specifies the initial width of the Editor as an integer number of characters.
+The value must be greater than 0 (zero).  If no value  is specified, the 
+default is 20.
+.IP "\fBDtNdialogTitle\fP"
+Specifies the title for all dialogs displayed by DtEditor.  These include the
+dialogs for: word search and replace, misspelled words, and format settings.
+XXX See BBoard (1-196)
+.IP "\fBDtNEditable\fP"
+Indicates that the user can edit the data when set to
+True.  Prohibits the user from editing the when set to False.
+.IP "\fBDtNhelpCallback\fP"
+Specifies a function which is called whenever a "Help" request occurs in
+the context of the Editor widget or any associated dialogs.  If
+\fIDtNhelpCallback\fP is not set, DtEditor will post its own Help
+dialog(s) when the user requests Help.
+.IP
+An application which wishes to present a single "Help" dialog to the
+user should set \fIDtNhelpCallback\fP, and use the \fBhelp_volume\fP and
+\fBvolume_location\fP fields passed as part of
+\fIDteditHelpCallbackStruct\fP to set the contents of its Help dialog.
+.IP "\fBDtNOverstrike\fP"
+When set to False, characters typed into the Editor widget are inserted
+at the position of the insertion cursor.  This is the default behavior.
+If set to True, characters entered into the Editor widget replace the
+characters that directly follow the insertion cursor.  When the end of
+the line is reached, characters are appended to the end of the line.
+.IP "\fBDtNrows\fP"
+Specifies the initial heigth of the Editor measured in character heights. 
+The value must be greater than 0 (zero).  If no value  is specified, the 
+default is 1.
+.IP "\fBDtNshowStatusLine\fP"
+If set to true, Editor will display a status line below the
+text window.  The status line contains a field
+which displays the current line number of the insert cursor.  It also displays
+an optional message string.
+.IP "\fBDtNspellFilter\fP"
+Specifies the filter used to identify spelling errors. The function
+DtEditorInvokeSpellDialog() filters the contents of an Editor 
+through the filter specified by DtEditorNspellFilter. The default filter is
+spell(1).
+.IP "\fBDtNstatusLineMessage\fP"
+String which will be displayed in the status line to the right of the
+line number field.  It provides a way for an application to supply
+status about the document being edited, such as: read only or unsaved
+changes.
+.IP "\fBDtNwindowWrap\fP"
+Indicates that text should not go off the right edge of the window, 
+rather lines will be broken at word breaks with soft carriage returns 
+when they reach the right edge of the window.
+.P
+Note, window wrap affects only the visual appearance of the contents of
+an Editor widget.  The line breaks (soft carriage returns) are not
+physically inserted into the text.
+.sp .5
+.SS "Inherited Resources"
+DtEditor inherits behavior and resources from the following named
+superclasses.  For a complete description of each resource, refer to the
+man page for that superclass.
+.P
+.sp 1
+.in 0
+.KS
+.TS
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmForm Resource Set
+Name	Class	Type	Default	Access
+_
+XmNfractionBase	XmCMaxValue	int	100	CSG
+XmNhorizontalSpacing	XmCSpacing	Dimension	0	CSG
+XmNrubberPositioning	XmCRubberPositioning	Boolean	False	CSG
+XmNverticalSpacing	XmCSpacing	Dimension	0	CSG
+.TE
+.KE
+.in
+.sp 1
+.P
+.sp 1
+.in 0
+.KS
+.TS
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmManager Resource Set
+Name	Class	Type	Default	Access
+_
+XmNbottomShadowColor	XmCBottomShadowColor	Pixel	dynamic	CSG
+XmNbottomShadowPixmap	XmCBottomShadowPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNforeground	XmCForeground	Pixel	dynamic	CSG
+XmNhelpCallback	XmCCallback	XtCallbackList	NULL	C
+XmNhighlightColor	XmCHighlightColor	Pixel	dynamic	CSG
+XmNhighlightPixmap	XmCHighlightPixmap	Pixmap	dynamic	CSG
+XmNinitialFocus	XmCInitialFocus	Widget	NULL	CSG
+XmNnavigationType	XmCNavigationType	XmNavigationType	dynamic	CSG
+XmNshadowThickness	XmCShadowThickness	Dimension	dynamic	CSG
+XmNstringDirection	XmCStringDirection	XmStringDirection	dynamic	CG
+XmNtopShadowColor	XmCTopShadowColor	Pixel	dynamic	CSG
+XmNtopShadowPixmap	XmCTopShadowPixmap	Pixmap	dynamic	CSG
+XmNtraversalOn	XmCTraversalOn	Boolean	dynamic	CSG
+XmNunitType	XmCUnitType	unsigned char	dynamic	CSG
+XmNuserData	XmCUserData	XtPointer	NULL	CSG
+.TE
+.KE
+.in
+.sp 1
+.P
+.sp 1
+.in 0
+.KS
+.TS
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+Composite Resource Set
+Name	Class	Type	Default	Access
+_
+XmNchildren	XmCReadOnly	WidgetList	NULL	G
+XmNinsertPosition	XmCInsertPosition	XtOrderProc	default procedure	CSG
+XmNnumChildren	XmCReadOnly	Cardinal	0	G
+.TE
+.KE
+.in
+.sp 1
+.P
+.wH
+.in 0
+.sp 1
+.in 0
+.KS
+.TS
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+Core Resource Set
+Name	Class	Type	Default	Access
+_
+XmNaccelerators	XmCAccelerators	XtAccelerators	dynamic	CSG
+XmNancestorSensitive	XmCSensitive	Boolean	dynamic	G
+XmNbackground	XmCBackground	Pixel	dynamic	CSG
+XmNbackgroundPixmap	XmCPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNborderColor	XmCBorderColor	Pixel	XtDefaultForeground	CSG
+XmNborderPixmap	XmCPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNborderWidth	XmCBorderWidth	Dimension	0	CSG
+XmNcolormap	XmCColormap	Colormap	dynamic	CG
+XmNdepth	XmCDepth	int	dynamic	CG
+XmNdestroyCallback	XmCCallback	XtCallbackList	NULL	C
+XmNheight	XmCHeight	Dimension	dynamic	CSG
+XmNinitialResourcesPersistent	XmCInitialResourcesPersistent	Boolean	True	C
+XmNmappedWhenManaged	XmCMappedWhenManaged	Boolean	True	CSG
+XmNscreen	XmCScreen	Screen *	dynamic	CG
+.wH
+.tH
+XmNsensitive	XmCSensitive	Boolean	True	CSG
+XmNtranslations	XmCTranslations	XtTranslations	dynamic	CSG
+XmNwidth	XmCWidth	Dimension	dynamic	CSG
+XmNx	XmCPosition	Position	0	CSG
+XmNy	XmCPosition	Position	0	CSG
+.TE
+.KE
+.in
+.sp 1
+.wH
+.in
+.sp .5
+.SS "Callback Information"
+The Editor widget supports one callback function:
+.IP "\fBDtEditorNHelpCallback\fP"
+.P 
+A pointer to the following structure is passed to
+\fBDtEditorNHelpCallback\fP callback.
+.sp .5
+.nf
+.ta .25i 1.1i
+\fBtypedef struct \fP{
+	\fBint\fP 	\fIreason\fP;
+	\fBXEvent\fP	\fI* event\fP;
+	\fBchar\fP	\fI* help_volume\fP;
+	\fBchar\fP	\fI* volume_location\fP;
+	\fBXtPointer\fP	\fIclient_data\fP;
+} \fBDtEditorHelpCallbackStruct\fP;
+.fi
+.sp .5
+.IP "\fIreason\fP"
+Indicates why the callback was invoked.
+.IP "\fIevent\fP"
+A pointer to the event that caused this callback to be invoked.
+It can be NULL.
+.IP "\fIhelp_volume\fP"
+The help volume name.
+.IP "\fIvolume_location\fP"
+The location ID within the volume.
+.SS "Translations"
+(XXX need translation table)
+.SH "SEE ALSO"
+.BR Composite(3X),
+.BR Constraint(3X),
+.BR Core(3X),
+.BR DtCreateEditor(3),
+.BR DtEditorAppend(3),
+.BR DtEditorAppendFromFile(3),
+.BR DtEditorChange(3),
+.BR DtEditorCheckForUnsavedChanges(3),
+.BR DtEditorClearSelection(3),
+.BR DtEditorCopyToClipboard(3),
+.BR DtEditorCutToClipboard(3),
+.BR DtEditorDeleteSelection(3),
+.BR DtEditorFind(3),
+.BR DtEditorFormat(3),
+.BR DtEditorGetContents(3),
+.BR DtEditorGetSizeHints(3),
+.BR DtEditorGotoLine(3),
+.BR DtEditorInsert(3),
+.BR DtEditorInsertFromFile(3),
+.BR DtEditorInvokeFindChangeDialog(3),
+.BR DtEditorInvokeFormatDialog(3),
+.BR DtEditorInvokeSpellDialog(3),
+.BR DtEditorManageDialogs(3),
+.BR DtEditorPasteFromClipboard(3),
+.BR DtEditorReset(3),
+.BR DtEditorSaveContentsToFile(3),
+.BR DtEditorSelectAll(3),
+.BR DtEditorSetContents(3),
+.BR DtEditorSetContentsFromFile(3),
+.BR DtEditorSetOverstrike(3),
+.BR DtEditorSetStatusLine(3),
+.BR DtEditorSetStatusMessage(3),
+.BR DtEditorSetWindowWrap(3),
+.BR DtEditorTraverseToEditor(3),
+.BR DtEditorUndoEdit(3),
+.BR DtEditorUnmanageDialogs(3),
+.BR DtEditorUnselect(3),
+.BR XmForm(3X),
+.BR XmManager(3X), and
+.BR XmText(3X).

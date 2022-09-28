@@ -1,0 +1,221 @@
+.\"----------------------------------------------------------------------------
+.\"----------------------------------------------------------------------------
+.TH dtappgather 1 "22 August 1994"
+.BH "22 August -1994"
+.\"----------------------------------------------------------------------------
+.\"---Define variables used by this man page
+.de V1
+\fBdtappgather\fR
+..
+.de V2
+Application Manager
+..
+.de V3
+\fBdtsearchpath\fR
+..
+.de V4
+\f(CWReloadApps\fR
+..
+.de V5
+\f(CWDTAPPSEARCHPATH\fR
+..
+.\"---
+.\"----------------------------------------------------------------------------
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+dtappgather \- Gather application files for presentation by the 
+Application Manager.
+.\"----------------------------------------------------------------------------
+.SH SYNOPSIS
+.V1
+[ \fB-r\fR ]
+.SH DESCRIPTION
+The 
+.V2
+presents personal, system, and factory applications in
+an easy-to-access window.
+The
+.V2
+is implemented as a special File Manager view of a 
+subdirectory that is built on a per-user, per-session basis.
+The
+.V1
+utility is responsible for creating and refreshing
+the user's
+.V2 
+subdirectory.
+.PP
+.V1 
+is run at login and whenever the user invokes the
+.V4
+action.
+The user's individual subdirectory for the 
+Application Manager, \f(CW/var/dt/appconfig/appmanager/$DTUSERSESSION\fR,
+is opened when the user presses the Application Manager control
+on the Front Panel.
+.P
+The sequence of events is as follows:
+.TP 4
+\(em
+When the user logs in, the \fBXsession\fR script sources in the
+Xsession.d script that sets the \f(CWDTUSERSESSION\fR environment
+variable.
+.TP 4
+\(em
+\fBXsession\fR then invokes the
+.V3
+utility to set the \f(CWDTAPPSEARCHPATH\fR environment variable.
+.RE
+.TP 4
+\(em
+After 
+.V3
+returns with the \f(CWDTAPPSEARCHPATH\fR assembled,
+the \fBXsession\fR script calls \fBdtappgather\fR.
+.TP 4
+\(em
+As its main function,
+.V1
+traverses the \f(CWDTAPPSEARCHPATH\fR,
+examining each possible source of applications and, where
+there are existing source subdirectories, creates symbolic links between
+the source and the user's \f(CWDTUSERSESSION\fR subdirectory.
+.TP 4
+\(em
+Finally,
+.V1
+turns off write permissions on the resulting subdirectory to ensure its
+integrity.
+.PP
+A similar sequence occurs when the user double-clicks the \f(CWReloadApps\fR
+action after logging in.
+.PP
+Although the value of the \f(CWDTAPPSEARCHPATH\fR can be modified in a
+local shell, the
+.V2
+view based on its value is \fInot\fR functional until you log out and
+log back in. Since this can be a tedious venture, you can verify the
+.V2
+view by executing dtsearchpath and dtappgather in the local shell. For
+example, to add host trout as a system-wide
+application server, set the dtsearchpath input environment variable,
+DTSPSYSAPPHOSTS:
+.P
+.in +5
+DTSPSYSAPPHOSTS=trout:
+.in -5
+.P
+Then, execute dtsearchpath to update the DTAPPSEARCHPATH environment
+variable.
+.P
+.in +5
+eval `dtsearchpath`
+.in -5
+.P
+Finally, gather the new applications by executing dtappgather. The
+.V2
+will show the new application groups but will not be functional.
+.\"----------------------------------------------------------------------------
+.SH OPTIONS
+.TP
+\fB-r\fR
+Causes
+.V1
+to retain the previous contents of the Application Manager, although
+discarding broken links.  At login,
+.V1
+destroys the user's previous \f(CWDTUSERSESSION\fR subdirectory before
+creating a new one.  At \f(CWReloadApps\fR time, the \fB-r\fR option
+is used to minimize visual disruption of any opened
+.V2
+views.
+.SH RETURN VALUES
+.TP 15
+0
+The command always returns 0 for successful completion.
+.SH ENVIRONMENT
+.LP
+.TP 15
+.SM DTAPPSEARCHPATH
+Set by the 
+.V3
+utility.  \f(CWDTAPPSEARCHPATH\fR controls the places
+where 
+.V1 
+will gather applications.  The default locations consist of
+\f(CW$HOME/.dt/appmanager\fR (for end users),
+\f(CW/etc/dt/appconfig/appmanager/$LANG\fR (for system administrators), and
+\f(CW/usr/dt/appconfig/appmanager/$LANG\fR (for factory applications).
+.TP 15
+.SM DTUSERSESSION
+Controls the location of the end user's subdirectory where the
+Application Manager will be rooted.  The subdirectory name includes
+both the user's \f(CW$LOGNAME\fR and \f(CW$DISPLAY\fR in order to
+ensure the user's view of the Application Manager remains consistent
+across sessions.
+.SH LOCALES
+When searching for system administrator and factory default 
+.V2
+files,
+.V1
+always uses a value of \f(CW$LANG\fR equal to \f(CWC\fR.  When the
+user picks a language at login, the corresponding \f(CW$LANG\fR
+subdirectories are searched.  If multiple $LANG subdirectories exist
+in \f(CW/etc/dt/appconfig/appmanager\fR, all $LANG subdirectories will
+appear in the Application Manager. However, if multiple $LANG
+subdirectories exist in /usr/dt/appconfig/appmanager then the
+language-specific subdirectory based on the current value of $LANG is
+chosen instead of the \f(CWC\fR subdirectory.
+.P
+Regardless of locale, all the action files that exist under the user's
+\f(CW$HOME/.dt/appmanager\fR subdirectory will be symbolically linked
+to the user's
+.V2
+subdirectory.
+.SH FILES
+.PD 0
+.TP 20
+.B /usr/dt/bin/Xsession
+Among its tasks at login,
+the \fBXsession\fR script invokes 
+.V3
+and then
+\fBdtappgather\fR.
+.TP 20
+.B /var/dt/appconfig/appmanager/$DTUSERSESSION
+This subdirectory is where
+.V1
+assembles the 
+.V2
+view for the particular user and CDE session.
+.PD
+.SH "SEE ALSO"
+\fBdtappintegrate(1)\fR,
+\fBdtsearchpath(1)\fR
+.SH NOTES
+.LP
+In the case of multiple search locations having the \fIsame name\fR,
+.V1
+picks only the first and discards the rest.  For example, if the
+system administrator sets
+.PP
+.RS 4
+\f(CWDTSPSYSAPPHOSTS=tuna:,trout:\fR
+.RE
+.PP
+and if both hosts \f(CWtuna\fR and \f(CWtrout\fR have an
+\f(CW/etc/dt/appconfig/appmanager/C/Editors\fR folder, then only the
+\f(CWEditors\fR folder from \f(CWtuna\fR (the first host) will appear
+in the user's Application Manager.
+.PP
+After building the user's \f(CWDTUSERSESSION\fR,
+.V1
+turns off write permissions on that subdirectory to disallow alteration
+by the end user.  Although the end user can resize the
+window and rearrange the icons within the window, the Application
+Manager is intended to be a read-only source of local
+and networked applications.
+.\""""""""""""""""""""""""""""eof

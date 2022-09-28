@@ -1,0 +1,122 @@
+.\"--- 
+.\"     (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\"     (c) Copyright 1993, 1994 International Business Machines Corp.
+.\"    (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\"    (c) Copyright 1993, 1994 Unix System Labs, Inc., a subsidiary of Novell, Inc.
+.\"--- 
+.TH dtappintegrate 1X "29 March. 1994"
+.BH "29 March. 1994""
+.SH NAME
+dtappintegrate - The common Desktop Environment application integration tool.
+.SH SYNOPSIS
+.B dtappintegrate 
+.B \-s 
+.I <application_root> 
+[
+.B \-t 
+.I <target_path>
+] [
+.B \-l 
+.I <language>
+] [ 
+.B \-u 
+]
+.SH DESCRIPTION
+The dtappintegrate command is used during the installation process of
+an application. The application installation script should invoke the
+dtappintegrate command at the end. The purpose of the dtappintegrate
+command is to link the application CDE configuration files from
+application-specific locations to system locations.
+.SH OPTIONS
+.TP 8
+.BI \-s " application_root"
+Integrate the application that is located at application_root.	 This
+parameter is required. 
+.TP 8
+.BI \-t " target_path"
+Link the application CDE configuration files from the application
+specific location to target_path  
+rather than to the system locations. This parameter is optional.
+.TP 8
+.BI \-l " language"
+Specifies the language to integrate. This indicates the
+directories under which to find the application CDE configuration
+files. If this parameter is not specified, all languages will be
+integrated. This parameter is optional.
+.TP 8
+.B \-u
+Unintegrate the application. This will undo the integration process.
+This parameter is optional. 
+.SH RESOURCES
+None
+.SH DIRECTORIES
+There are four key subdirectories, under the application root (referred to
+as 
+.B $APP_ROOT
+), dictated by CDE policy. They are the following:
+.SS $APP_ROOT/dt/appconfig/types/\f2<language>\fP
+For action and datatype definition files.
+.SS $APP_ROOT/dt/appconfig/appmanager/\f2<language>\fP
+For application group files, and action files.
+.SS $APP_ROOT/dt/appconfig/icons/\f2<language>\fP	
+For icon files.
+.SS $APP_ROOT/dt/appconfig/help/\f2<language>\fP
+For application help files.
+.PP
+For example, the default-language application SpreadSheet would load
+its desktop icons under: 
+.B /opt/SpreadSheet/dt/appconfig/icons/C/*.bm
+.P
+--and--
+.P
+.B /opt/SpreadSheet/dt/appconfig/icons/C/*.pm
+.P
+--where 
+.B /opt/SpreadSheet
+is the value of 
+.B $APP_ROOT. 
+(Please note that 
+.B $APP_ROOT 
+is simply a syntactical convention of this document--it is not used by
+the runtime environment.)
+.P
+Note that all of these CDE configuration files and subdirectories are
+placed under a common top-- 
+.B$APP_ROOT/dt/appconfig, 
+and should always include the default language subdirectory, "C".
+.SH APPLICATION USAGE
+In the simplest case, the command takes as input the application root,
+for example, /opt/thisapp. The outputs from this operation are
+corresponding subdirectories and files on the application server that
+contain relative 
+.B symbolic 
+links to the applications CDE configuration
+files described above, under the following system locations:
+.SS /etc/dt/appconfig		
+Top-level application configuration subdirectory, consists of
+following subdirectories. 
+.SS /etc/dt/appconfig/types/\f2<language>\f3/		
+Contains the *.dt symbolic links.
+.SS /etc/dt/appconfig/appmanager/\f2<language>\f3/
+Contains the symbolic links to the application group 
+subdirectory
+.SS /etc/dt/appconfig/help/\f2<language>\f3/
+Contains symbolic links to the help files installed under the
+application's root. 
+.SS /etc/dt/appconfig/icons/\f2<language>\f3/
+Contains symbolic links to the CDE icons for the application.
+.PP
+If the optional 
+.B \-t 
+parameter is supplied, the files will be linked under the specified
+subdirectory. For example, specifying 
+.B \-t 
+.B /etc/dt/private
+would cause the application help files to be symbolically linked under
+.BI /etc/dt/private/help/<language>. 
+This option is typically used by system administrators who want
+the applications to be integrated into a private location that is not
+accessable system wide.  By default (with no -t option specified), the
+applications are integrated into the 
+.BI /etc/dt/appconfig 
+key subdirectories making them accessable system wide.

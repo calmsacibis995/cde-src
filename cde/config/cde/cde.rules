@@ -1,0 +1,271 @@
+/*
+ *		   CDE EXTRA BUILD RULES
+ *
+ * Warning, when defining rules: make sure you do not include both a trailing
+ * backslash and double ampersand backslash or else you will get an extra
+ * backslash in the Makefile.
+ * 
+ * The following macros are defined for the various templates and Imakefiles
+ * (for a list of the applicable make variables, see the template files):
+ * 
+ * BuildInstall(file,dest)
+ * BuildMultipleInstall(list,dest)
+ * LibraryBuildInstall(libname,dest)  see OSvendor.rules 
+ * BinstallSubdirs(dirs)
+ * 
+ */
+
+#define NullParameter
+
+/*
+ * Package Rule - Create SystemV packages
+ * SunSoft 04/14/95, Eric Nielsen x62449
+ */
+#ifndef PackageCreate
+#define PackageCreate(cde_pkgs)											@@\
+CreatePackage::                                                                  				@@\
+	@for pkg in cde_pkgs; do \										@@\
+        cd $$pkg ; \                                                      					@@\
+        echo "Making all in pkgs/$$pkg ..."; \      	                   					@@\
+        echo The Values are: CDE_PACK_VER CDE_PACK_DATE BUILD_ARCH BUILD_TREE ; \  				@@\
+        rm -f $$pkg.clean ; \                                                 					@@\
+        mv pkginfo.$$pkg  pkginfo.$$pkg.clean ; \ 	                        				@@\
+	cp pkginfo.$$pkg.clean pkginfo.$$pkg ; \								@@\
+	chmod 666 pkginfo.$$pkg ; \										@@\
+	sed s/REV=/REV=CDE_PACK_VER.CDE_PACK_DATE/ pkginfo.$$pkg > pkginfo.$$pkg.tmp ; \			@@\
+	mv pkginfo.$$pkg.tmp pkginfo.$$pkg ; \									@@\
+	pkgmk -a BUILD_ARCH -b BUILD_TREE -o -d BUILD_TREE/pkgs/packages/ -f ./prototype.$$pkg ; \  		@@\
+	rm pkginfo.$$pkg	; \										@@\
+	mv pkginfo.$$pkg.clean pkginfo.$$pkg; cd ..; done 						    	@@\
+
+#endif /* PackageCreate */
+
+
+/* BuildInstall - install a file to a destination.
+ * Remove it first if you can. If not, move them to file~.
+ */
+#ifndef BuildInstall
+#define	BuildInstall(file,dest)						@@\
+$(INST_STEP)::								@@\
+	MakeDir($(BINSTALLPATH)/dest)					@@\
+	@if [ -f $(BINSTALLPATH)/dest/file ];then \			@@\
+	  $(RM) $(BINSTALLPATH)/dest/file || \				@@\
+	  $(MV) $(BINSTALLPATH)/dest/file Concat($(BINSTALLPATH)/dest/file,~);fi	@@\
+	$(BINSTALL) -f $(BINSTALLPATH)/dest file			@@\
+									@@\
+LinkBuildFileList($(BUILDINCTOP),includes,file,$(BINSTALLPATH),dest,$(CURRENT_DIR))
+#endif /* BuildInstall */
+
+
+/* BuildMultipleInstall - install  files to a destination.
+ * Remove them first if you can. If not, move them to file~.
+ */
+#ifndef BuildMultipleInstall
+#define	BuildMultipleInstall(list,dest)					@@\
+$(INST_STEP)::								@@\
+	MakeDir($(BINSTALLPATH)/dest)					@@\
+	@for i in list; do \						@@\
+	  if [ -f $(BINSTALLPATH)/dest/$$i ];then \			@@\
+	    $(RM) $(BINSTALLPATH)/dest/$$i || \				@@\
+	    $(MV) $(BINSTALLPATH)/dest/$$i Concat($(BINSTALLPATH)dest/$$i,~);fi;\	@@\
+	  $(BINSTALL) -f $(BINSTALLPATH)/dest $$i;done			@@\
+									@@\
+LinkBuildFileList($(BUILDINCTOP),includes,list,$(BINSTALLPATH),dest,$(CURRENT_DIR))
+#endif /* BuildMultipleInstall */
+
+/* This rule links to alternate places */
+#if UseInstalledBuildInTree && !UseInstalledBuild
+#ifndef LinkBuildFileList
+#define LinkBuildFileList(dirtop,step,list,dir,dest,curdir)		@@\
+step::									@@\
+	MakeDir(dir/dest)						@@\
+	@(echo "cd dir/dest";cd dir/dest; \				@@\
+	tdir=dest;updir=; \						@@\
+	while [ "$$tdir" != "." ]; do \					@@\
+	updir=$${updir}/..;tdir=`dirname $$tdir`; done; \		@@\
+	for i in list;do \						@@\
+	echo "$(RM) $$i";$(RM) $$i; \					@@\
+	echo "$(LN) dirtop/$$updir/curdir/$$i $$i;done"; \		@@\
+	$(LN) dirtop/$$updir/curdir/$$i $$i;done)
+#endif /* LinkBuildFileList */
+#else
+#ifndef LinkBuildFileList
+#define LinkBuildFileList(dirtop,step,list,dir,dest,curdir) /**/
+#endif
+#endif /* UseBuildInstallInTree */
+
+
+/* NormalLibraryBuildInstall - install an archived library to a destination.
+ * Remove it first if you can. If not, move them to file~.
+ */
+#ifndef NormalLibraryBuildInstall
+#define	NormalLibraryBuildInstall(libname,dest)				@@\
+$(INST_STEP)::								@@\
+	MakeDir($(BINSTALLPATH)/dest)					@@\
+	@if [ -f Concat($(BINSTALLPATH)/dest/lib,libname.a) ];then \		@@\
+	  $(RM) Concat($(BINSTALLPATH)/dest/lib,libname.a) || \		@@\
+	  $(MV) Concat($(BINSTALLPATH)/dest/lib,libname.a) Concat(Concat($(BINSTALLPATH)dest/lib,libname.a),~);fi	@@\
+	$(BINSTALL) -f $(BINSTALLPATH)/dest Concat(lib,libname.a)	@@\
+									@@\
+LinkBuildFileList($(BUILDINCTOP),includes,Concat(lib,libname.a),$(BINSTALLPATH),dest,$(CURRENT_DIR))
+#endif /* NormalLibraryBuildInstall */
+
+
+/* empty rules for common source between cde and test builds */
+#ifndef	TestBuildInstall
+#define TestBuildInstall(parm1,parm2)  /**/
+#endif
+#ifndef	TestBuildMultipleInstall
+#define TestBuildMultipleInstall(parm1,parm2)  /**/
+#endif
+#ifndef	TestLibraryBuildInstall
+#define TestLibraryBuildInstall(parm1,parm2) /**/
+#endif
+
+/*
+ * LocalIncludesSubdirs - generate rules to recursively do the 
+ * make localincludes step.
+ */
+/*
+ * LocalIncludesSubdirs - generate rules to recursively install programs and files.
+ */
+#ifndef LocalIncludesSubdirs
+#define LocalIncludesSubdirs(dirs) \
+NamedTargetSubdirs(localincludes,dirs,"including local headers",NullParameter,localincludes)
+#endif /* LocalIncludesSubdirs */
+
+
+/***********************************************************************
+ * BINSTALL RULES AND TARGETS 
+ ***********************************************************************/
+/*
+ * BinstallSubdirs - generate rules to recursively install programs and
+ * files. This rule is specifically for the BuildInstall rules above.
+ */
+/*
+ * BInstallSubdirs - generate rules to recursively install programs and files.
+ */
+#ifndef BInstallSubdirs
+#define BInstallSubdirs(dirs) \
+NamedTargetSubdirs(binstall,dirs,"installing build",BINSTALLPATH='$(BINSTALLPATH)',binstall)
+#endif /* BInstallSubdirs */
+
+
+/* DirectoryInstall - install a directory hierarchy to a destination.
+ * Remove it first if you can. If not, move them to file~.
+ */
+#ifndef DirectoryInstall
+#define	DirectoryInstall(dir,dest)					@@\
+$(INST_STEP)::								@@\
+	MakeDir($(BINSTALLPATH)/dest)					@@\
+	$(CLONE) dir $(BINSTALLPATH)/dest	
+#endif /* DirectoryInstall */
+
+/**** MakeSubdirs
+ * This rule has been modified to include the Binstall Target
+ */
+#ifndef MakeSubdirs
+#define MakeSubdirs(dirs)						@@\
+NamedMakeSubdirs(all,dirs)						@@\
+									@@\
+BInstallSubdirs(dirs)
+#endif /* MakeSubdirs */
+
+/** empty rule for build installing shared libraries.
+ ** This rule should be defined is VendorLib.rules.
+ **/
+#ifndef SharedLibraryBuildInstall
+#define SharedLibraryBuildInstall(libname,rev,dest)	/**/	
+#endif /* SharedLibraryBuildInstall */
+
+/* don't need build includes for new build scheme */
+/* Temporarily allow build includes to X11 directory until
+   Gnumake components are gone. */
+/* #if UseAltBuildScheme
+#ifndef BuildIncludes
+#define BuildIncludes(srclist,dstsubdir,dstupdir) */ /**/
+/* #endif
+#endif */
+
+/* Build Local includes. A way to link header files in your own 
+ * directory structure.
+ * Parameters: list of header files
+ *             path to directories where links will reside.
+ *             path from link directory to real file directory
+ * This rule can be triggered from make includes and make localincludes
+ *
+ */
+#ifndef BuildLocalIncludes
+#define BuildLocalIncludes(srclist,dstsubdir,dstupdir)			@@\
+includes::								@@\
+	$(MKDIRHIER) dstsubdir						@@\
+	@(set -x; cd dstsubdir; for i in srclist; do \			@@\
+		$(RM) $$i; \						@@\
+		$(LN) dstupdir/$$i .; \					@@\
+	done)								@@\
+									@@\
+localincludes::								@@\
+	$(MKDIRHIER) dstsubdir						@@\
+	@(set -x; cd dstsubdir; for i in srclist; do \			@@\
+		$(RM) $$i; \						@@\
+		$(LN) dstupdir/$$i .; \					@@\
+	done)
+#endif /* BuildLocalIncludes */
+
+
+#if defined(RsArchitecture) && UseCPlusPlus
+#ifndef AixLinkArchivedLibC
+#define AixLinkArchivedLibC()						@@\
+nonsharelibC.o:								@@\
+	$(RM) nonsharelibC.o						@@\
+	ar x /usr/lpp/xlC/lib/libC.a shr.o				@@\
+	ld -r shr.o -o nonsharelibC.o -bnso				@@\
+	$(RM) shr.o
+#endif /*  RsArchitecture */
+#else
+#define  AixLinkArchivedLibC()	/**/	
+#endif /*  AixLinkArchivedLibC */
+
+/*
+ * NamedMakeSubdirs - generate rules to do makes in the given
+subdirectories.
+ * If you want CDEBUGFLAGS passed along to subdirectories, provide a
+line like
+ * the following in the appropriate Imakefile
+ *
+ *         #define PassCDebugFlags 'CDEBUGFLAGS=$(CDEBUGFLAGS)'
+ * NOTE:
+ * This rule is modified to add FIRST_LIBPATH and FIRST_INCLUDES
+ *
+ */
+#ifndef NamedMakeSubdirs
+#define NamedMakeSubdirs(name,dirs) \
+NamedTargetSubdirs(name,dirs,"making" name,PassCDebugFlags 'FIRST_LIBPATH=$(FIRST_LIBPATH)' 'FIRST_INCLUDES=$(FIRST_INCLUDES)',all)
+#endif /* NamedMakeSubdirs */
+
+/* ImakeDependency
+ * This rule is overwritten so that Sun can use .KEEP_STATE.
+ * The target:: $(IMAKE) dependency causes imake to rebuild always.
+ * The rule is being turned off unless the BuildImake cpp macro
+ * is YES. This should be set in a directory's admindefines file.
+ * By default it will be set in the top level Imakefile and config.
+ */
+#ifdef SunArchitecture
+#if UseKeepState
+#ifndef ImakeDependency
+#define ImakeDependency(target) /**/
+#endif
+#endif
+#endif
+
+/* XwdToTiffRule
+ * This rule convertes .xwd files to .tif files using the IMAGEUTIL
+ * program. Options are passed through IMAGEUTILOPTIONS.
+ */
+#ifndef XwdToTifRule
+#define XwdToTifRule()							@@\
+.SUFFIXES: .xwd .tif							@@\
+.xwd.tif:								@@\
+	$(IMAGEUTIL) $*.xwd $(IMAGEUTILOPTIONS) -of $*.tif
+#endif
+

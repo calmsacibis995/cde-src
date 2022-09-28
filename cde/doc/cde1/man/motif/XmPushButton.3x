@@ -1,0 +1,525 @@
+'\" t
+...\" **  (c) Copyright 1993, 1994 Hewlett-Packard Company
+...\" **  (c) Copyright 1993, 1994 International Business Machines Corp.
+...\" **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+...\" **  (c) Copyright 1993, 1994 Novell, Inc
+...\" **
+...\" **
+...\" **
+...\" **  (c) Copyright 1989, 1990, 1992 by Open Software Foundation, Inc.
+...\" **      All Rights Reserved.
+...\" **
+...\" **  (c) Copyright 1987, 1988, 1989, by Hewlett-Packard Company
+...\" **
+...\" **  (c) Copyright 1987, 1988 by Digital Equipment Corporation,
+...\" **      Maynard, MA.  All Rights Reserved.
+...\" **
+...\" **
+.TH XmPushButton 3X "" "" "" ""
+.ds )H Hewlett-Packard Company
+.ds ]W Motif Release 1.2: May 1992
+.SH NAME
+\fIXmPushButton\fP \- The PushButton widget class
+.SH SYNOPSIS
+.nf
+.sS
+.iS
+\&#include <Xm/PushB.h>
+.iE
+.sE
+.SH DESCRIPTION
+.fi
+PushButton issues commands within an application.
+It consists of a text label or pixmap surrounded
+by a border shadow.
+When a PushButton is selected, the shadow changes to give the appearance
+that it has been pressed in.  When a PushButton is
+unselected, the shadow changes to give the appearance that it is out.
+.PP 
+The default behavior associated with a PushButton in a menu depends on
+the type of menu system in which it resides.
+By default, \fIBSelect\fP controls the behavior of the PushButton.
+In addition, \fIBMenu\fP controls the behavior of the PushButton if
+it resides in a Menu system.
+The actual mouse button used is determined by its RowColumn parent.
+.PP 
+Thickness for a second shadow, used when the PushButton is the default
+button,  may be specified by using the
+\fIXmNshowAsDefault\fP resource.  If it has a non-zero value, the Label's
+resources \fIXmNmarginLeft\fP, \fIXmNmarginRight\fP, \fIXmNmarginTop\fP, and
+\fIXmNmarginBottom\fP may be modified to accommodate the second shadow.
+.PP 
+If an initial value is specified for \fIXmNarmPixmap\fP but not for
+\fIXmNlabelPixmap\fP, the \fIXmNarmPixmap\fP value is used for
+\fIXmNlabelPixmap\fP.
+.SS "Classes"
+PushButton inherits behavior and resources from \fICore\fP, \fIXmPrimitive\fP,
+and \fIXmLabel\fP Classes.
+.PP 
+The class pointer is \fIxmPushButtonWidgetClass\fP.
+.PP 
+The class name is \fIXmPushButton\fP.
+.SS "New Resources"
+The following table defines a set of widget resources used by the programmer
+to specify data.  The programmer can also set the resource values for the
+inherited classes to set attributes for this widget.  To reference a
+resource by name or by class in a .Xdefaults file, remove the \fIXmN\fP or
+\fIXmC\fP prefix and use the remaining letters.  To specify one of the defined
+values for a resource in a .Xdefaults file, remove the \fIXm\fP prefix and use
+the remaining letters (in either lowercase or uppercase, but include any
+underscores between words).
+The codes in the access column indicate if the given resource can be
+set at creation time (C),
+set by using \fIXtSetValues\fP (S),
+retrieved by using \fIXtGetValues\fP (G), or is not applicable (N/A).
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmPushButton Resource Set
+Name	Class	Type	Default	Access
+_
+XmNactivateCallback	XmCCallback	XtCallbackList	NULL	C
+XmNarmCallback	XmCCallback	XtCallbackList	NULL	C
+XmNarmColor	XmCArmColor	Pixel	dynamic	CSG
+XmNarmPixmap	XmCArmPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNdefaultButtonShadowThickness	XmCDefaultButtonShadowThickness	Dimension	dynamic	CSG
+XmNdisarmCallback	XmCCallback	XtCallbackList	NULL	C
+XmNfillOnArm	XmCFillOnArm	Boolean	True	CSG
+XmNmultiClick	XmCMultiClick	unsigned char	dynamic	CSG
+XmNshowAsDefault	XmCShowAsDefault	Dimension	0	CSG
+.TE
+.KE
+.in
+.sp 1
+.wH
+.in  
+.IP "\fIXmNactivateCallback\fP"
+Specifies the list of callbacks that is called when PushButton is activated.
+PushButton is activated when the user presses
+and releases the active mouse button
+while the pointer is inside that widget.  Activating the PushButton
+also disarms it.
+For this callback the reason is \fIXmCR_ACTIVATE\fP.
+.IP "\fIXmNarmCallback\fP"
+Specifies the list of callbacks that is called when PushButton is armed.
+PushButton is armed when the user presses
+the active mouse button while the pointer is inside that
+widget.
+For this callback the reason is \fIXmCR_ARM\fP.
+.nL
+.ne 3
+.IP "\fIXmNarmColor\fP"
+Specifies the color with which to fill the armed button.
+\fIXmNfillOnArm\fP must be set to True for this resource to have an effect.
+The default for a color display is a color between the background and the
+bottom shadow color.  For a monochrome display, the default is set to the
+foreground color, and any text in the label appears in the background
+color when the button is armed.
+.IP "\fIXmNarmPixmap\fP"
+Specifies the pixmap to be used as the button face if \fIXmNlabelType\fP is
+\fIXmPIXMAP\fP and PushButton is armed.  This resource is disabled when the
+PushButton is in a menu.
+.IP "\fIXmNdefaultButtonShadowThickness\fP"
+This resource specifies the width of the default button indicator shadow.
+If this resource is zero, the width of the shadow comes from the value of
+the \fIXmNshowAsDefault\fP resource.  If this resource is greater than
+zero, the \fIXmNshowAsDefault\fP resource is only used to specify whether
+this button is the default.
+The default value is the initial value of \fIXmNshowAsDefault\fP.
+.IP "\fIXmNdisarmCallback\fP"
+Specifies the list of callbacks
+that is called when PushButton is disarmed.  PushButton is disarmed when
+the user presses and releases the active mouse button
+while the pointer is inside that widget.  For this callback, the reason is
+\fIXmCR_DISARM\fP.
+.IP "\fIXmNfillOnArm\fP"
+Forces the PushButton to fill the background of the button with the
+color specified by \fIXmNarmColor\fP when the button is armed and when this
+resource is set to True.  If False, only the top and bottom
+shadow colors are switched.
+When the PushButton is in a menu, this resource is ignored and assumed to be
+False.
+.IP "\fIXmNmultiClick\fP"
+If a button click is followed by another button click within the time
+span specified by the display's multi-click time, and this resource is
+set to \fIXmMULTICLICK_DISCARD\fP, do not process the second click.
+If this resource is set to \fIXmMULTICLICK_KEEP\fP, process the event
+and increment \fBclick_count\fP in the callback structure.
+When the button is in a menu, the default is \fIXmMULTICLICK_DISCARD\fP;
+otherwise, for a button not in a menu, \fIXmMULTICLICK_KEEP\fP is
+the default value.
+.IP "\fIXmNshowAsDefault\fP"
+If \fIXmNdefaultButtonShadowThickness\fP is greater than zero, a value
+greater than zero in this resource
+specifies to mark this button as the default button.
+If \fIXmNdefaultButtonShadowThickness\fP is zero, a value greater than
+zero in this resource specifies to mark this button as the default
+button with the shadow thickness specified by this resource.
+The space between
+the shadow and the default shadow is equal to the sum of both shadows.
+The default value is zero.
+.IP
+When the XmDisplay resource \fIdefaultButtonEmphasis\fP is "external_highlight" (the default),
+the PushButton draws the location cursor outside of the outer
+shadow.
+When this resource is "internal_highlight", the highlight is drawn between the inner and outer
+shadows.
+.IP
+When the \fIXmNshowAsDefault\fP value is not zero, the Label
+resources \fIXmNmarginLeft\fP, \fIXmNmarginRight\fP, \fIXmNmarginTop\fP, and
+\fIXmNmarginBottom\fP may be modified to accommodate the second shadow.
+This resource is disabled when the PushButton is in a menu.
+.SS "Inherited Resources"
+PushButton inherits behavior and resources from the following
+superclasses.  For a complete description of each resource, refer to the
+man page for that superclass.
+.P 
+.wH
+.in 0 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmLabel Resource Set
+Name	Class	Type	Default	Access
+_
+XmNaccelerator	XmCAccelerator	String	NULL	CSG
+XmNacceleratorText	XmCAcceleratorText	XmString	NULL	CSG
+XmNalignment	XmCAlignment	unsigned char	dynamic	CSG
+XmNfontList	XmCFontList	XmFontList	dynamic	CSG
+XmNlabelInsensitivePixmap	XmCLabelInsensitivePixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNlabelPixmap	XmCLabelPixmap	Pixmap	dynamic	CSG
+XmNlabelString	XmCXmString	XmString	dynamic	CSG
+XmNlabelType	XmCLabelType	unsigned char	XmSTRING	CSG
+XmNmarginBottom	XmCMarginBottom	Dimension	dynamic	CSG
+XmNmarginHeight	XmCMarginHeight	Dimension	2	CSG
+XmNmarginLeft	XmCMarginLeft	Dimension	dynamic	CSG
+XmNmarginRight	XmCMarginRight	Dimension	dynamic	CSG
+XmNmarginTop	XmCMarginTop	Dimension	dynamic	CSG
+XmNmarginWidth	XmCMarginWidth	Dimension	2	CSG
+.wH
+.tH
+XmNmnemonic	XmCMnemonic	KeySym	NULL	CSG
+XmNmnemonicCharSet	XmCMnemonicCharSet	String	XmFONTLIST_DEFAULT_TAG	CSG
+XmNrecomputeSize	XmCRecomputeSize	Boolean	True	CSG
+XmNstringDirection	XmCStringDirection	XmStringDirection	dynamic	CSG
+.TE
+.KE
+.in
+.sp 1
+.wH
+.in  
+.P 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+XmPrimitive Resource Set
+Name	Class	Type	Default	Access
+_
+XmNbottomShadowColor	XmCBottomShadowColor	Pixel	dynamic	CSG
+XmNbottomShadowPixmap	XmCBottomShadowPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNforeground	XmCForeground	Pixel	dynamic	CSG
+XmNhelpCallback	XmCCallback	XtCallbackList	NULL	C
+XmNhighlightColor	XmCHighlightColor	Pixel	dynamic	CSG
+XmNhighlightOnEnter	XmCHighlightOnEnter	Boolean	False	CSG
+XmNhighlightPixmap	XmCHighlightPixmap	Pixmap	dynamic	CSG
+XmNhighlightThickness	XmCHighlightThickness	Dimension	2	CSG
+.wH
+.tH
+XmNnavigationType	XmCNavigationType	XmNavigationType	XmNONE	CSG
+XmNshadowThickness	XmCShadowThickness	Dimension	2	CSG
+XmNtopShadowColor	XmCTopShadowColor	Pixel	dynamic	CSG
+XmNtopShadowPixmap	XmCTopShadowPixmap	Pixmap	dynamic	CSG
+XmNtraversalOn	XmCTraversalOn	Boolean	True	CSG
+XmNunitType	XmCUnitType	unsigned char	dynamic	CSG
+XmNuserData	XmCUserData	XtPointer	NULL	CSG
+.TE
+.KE
+.in
+.sp 1
+.P 
+.wH
+.in 0 
+.sp 1
+.in 0
+.KS
+.TS 
+center;
+cBp7 ssss
+lBp6 lBp6 lBp6 lBp6 lBp6
+lp6 lp6 lp6 lp6 lp6.
+Core Resource Set
+Name	Class	Type	Default	Access
+_
+XmNaccelerators	XmCAccelerators	XtAccelerators	dynamic	CSG
+XmNancestorSensitive	XmCSensitive	Boolean	dynamic	G
+XmNbackground	XmCBackground	Pixel	dynamic	CSG
+XmNbackgroundPixmap	XmCPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNborderColor	XmCBorderColor	Pixel	XtDefaultForeground	CSG
+XmNborderPixmap	XmCPixmap	Pixmap	XmUNSPECIFIED_PIXMAP	CSG
+XmNborderWidth	XmCBorderWidth	Dimension	0	CSG
+XmNcolormap	XmCColormap	Colormap	dynamic	CG
+XmNdepth	XmCDepth	int	dynamic	CG
+XmNdestroyCallback	XmCCallback	XtCallbackList	NULL	C
+XmNheight	XmCHeight	Dimension	dynamic	CSG
+XmNinitialResourcesPersistent	XmCInitialResourcesPersistent	Boolean	True	C
+XmNmappedWhenManaged	XmCMappedWhenManaged	Boolean	True	CSG
+XmNscreen	XmCScreen	Screen *	dynamic	CG
+.wH
+.tH
+XmNsensitive	XmCSensitive	Boolean	True	CSG
+XmNtranslations	XmCTranslations	XtTranslations	dynamic	CSG
+XmNwidth	XmCWidth	Dimension	dynamic	CSG
+XmNx	XmCPosition	Position	0	CSG
+XmNy	XmCPosition	Position	0	CSG
+.TE
+.KE
+.in
+.sp 1
+.wH
+.in  
+.SS "Callback Information"
+A pointer to the following structure is passed to each callback:
+.sS
+.iS
+.ta .25i 1.1i
+.nf
+typedef struct
+{
+	int	\fBreason\fI;
+	XEvent	\fB* event\fI;
+	int	\fBclick_count\fI;
+} XmPushButtonCallbackStruct;
+.iE
+.sE
+.wH
+.fi
+.IP "\fBreason\fP"
+Indicates why the callback was invoked.
+.IP "\fBevent\fP"
+Points to the \fIXEvent\fP that triggered the callback.
+.IP "\fBclick_count\fP"
+This value is valid only when the reason is \fIXmCR_ACTIVATE\fP.
+It contains the number of clicks in the last multiclick sequence
+if the \fIXmNmultiClick\fP resource is set to \fIXmMULTICLICK_KEEP\fP,
+otherwise it contains \fI1\fP.
+The activate callback is invoked for each click if \fIXmNmultiClick\fP
+is set to \fIXmMULTICLICK_KEEP\fP.
+.SS "Translations"
+XmPushButton includes translations from Primitive.
+.PP 
+Note that altering translations in \fI#override\fP
+or \fI#augment\fP mode is undefined.
+.PP 
+Additional XmPushButton translations for XmPushButtons not in a
+menu system are listed below.
+These translations may not directly correspond to a
+translation table.
+.iS
+.ta 1.5i
+.nf
+BDrag Press:	ProcessDrag()
+.sp \n(PDu
+BSelect Press:	Arm()
+BSelect Click:	Activate()
+	Disarm()
+BSelect Release:	Activate()
+	Disarm()
+BSelect Press 2+:	MultiArm()
+BSelect Release 2+:	MultiActivate()
+	Disarm()
+KSelect:	ArmAndActivate()
+KHelp:	Help()
+.wH
+.fi
+.iE
+.PP 
+XmPushButton inherits menu traversal translations
+from XmLabel.
+Additional XmPushButton translations for PushButtons in a
+menu system are listed below.
+In a menu system, \fIBMenu\fP also performs the \fIBSelect\fP
+actions.
+These translations may not directly correspond to a
+translation table.
+.iS
+.ta 1.5i
+.nf
+BSelect Press:	BtnDown()
+BSelect Release:	BtnUp()
+KActivate:	ArmAndActivate()
+KSelect:	ArmAndActivate()
+MAny KCancel:	MenuShellPopdownOne()
+.wH
+.fi
+.iE
+.SS "Action Routines"
+The XmPushButton action routines are described below:
+.IP "\fIActivate()\fP:"
+This action draws the shadow in the unarmed
+state.
+If the button is not in a menu and if \fIXmNfillOnArm\fP is set to True,
+the background color reverts to the unarmed color.
+If \fIXmNlabelType\fP is \fIXmPIXMAP\fP, the \fIXmNlabelPixmap\fP is
+used for the button face.
+If the pointer is still within the button,
+this action calls the callbacks for \fIXmNactivateCallback\fP.
+.IP "\fIArm()\fP:"
+This action arms the PushButton.
+It draws the shadow in the armed state.
+If the button is not in a menu and if \fIXmNfillOnArm\fP is set
+to True, it fills the button with the color specified by
+\fIXmNarmColor\fP.
+If \fIXmNlabelType\fP is \fIXmPIXMAP\fP, the \fIXmNarmPixmap\fP is
+used for the button face.
+It calls the \fIXmNarmCallback\fP callbacks.
+.IP "\fIArmAndActivate()\fP:"
+In a menu, does the following:
+Unposts all menus in the menu hierarchy.
+Unless the button is already armed,
+calls the \fIXmNarmCallback\fP callbacks.
+Calls the \fIXmNactivateCallback\fP and
+\fIXmNdisarmCallback\fP callbacks.
+.IP
+Outside a menu, does the following:
+Draws the shadow in the armed state and, if
+\fIXmNfillOnArm\fP is set to True, fills the button with the color
+specified by \fIXmNarmColor\fP.
+If \fIXmNlabelType\fP is \fIXmPIXMAP\fP, the \fIXmNarmPixmap\fP is
+used for the button face.
+Calls the \fIXmNarmCallback\fP callbacks.
+.IP
+Outside a menu, this action also arranges for the following to happen,
+either immediately or at a later time:
+The shadow is drawn in the unarmed state and, if \fIXmNfillOnArm\fP is set
+to True, the background color reverts to the unarmed color.
+If \fIXmNlabelType\fP is \fIXmPIXMAP\fP, the \fIXmNlabelPixmap\fP is
+used for the button face.
+The \fIXmNactivateCallback\fP and \fIXmNdisarmCallback\fP callbacks are
+called.
+.IP "\fIBtnDown()\fP:"
+This action unposts any menus posted by the PushButton's parent menu,
+disables keyboard traversal for the menu, and enables mouse traversal
+for the menu.
+It draws the shadow in the armed state
+and, unless the button is already armed, calls the \fIXmNarmCallback\fP
+callbacks.
+.nL
+.ne 5
+.IP "\fIBtnUp()\fP:"
+This action unposts all menus in the menu hierarchy and activates the
+PushButton.
+It calls the \fIXmNactivateCallback\fP callbacks and then the
+\fIXmNdisarmCallback\fP callbacks.
+.IP "\fIDisarm()\fP:"
+Calls the callbacks for \fIXmNdisarmCallback\fP.
+.IP "\fIHelp()\fP:"
+In a Pulldown or Popup MenuPane, unposts all menus in the menu hierarchy
+and,
+when the shell's keyboard focus policy is \fIXmEXPLICT\fP,
+restores keyboard focus to the widget that had the focus before
+the menu system was entered.
+Calls the callbacks for \fIXmNhelpCallback\fP if any exist.
+If there are no help
+callbacks for this widget, this action calls the help callbacks
+for the nearest ancestor that has them.
+.IP "\fIMenuShellPopdownOne()\fP:"
+In a toplevel Pulldown MenuPane from a MenuBar, unposts the menu,
+disarms the MenuBar CascadeButton and the MenuBar, and,
+when the shell's keyboard focus policy is \fIXmEXPLICT\fP,
+restores keyboard
+focus to the widget that had the focus before the MenuBar was
+entered.
+In other Pulldown MenuPanes, unposts the menu.
+.IP
+In a Popup MenuPane, unposts the menu and restores keyboard focus to the
+widget from which the menu was posted.
+.IP "\fIMultiActivate()\fP:"
+If \fIXmNmultiClick\fP is \fIXmMULTICLICK_DISCARD\fP, this action does
+nothing.
+.IP
+If \fIXmNmultiClick\fP is \fIXmMULTICLICK_KEEP\fP, this action does the
+following:
+Increments \fBclick_count\fP in the callback structure.
+Draws the shadow in the unarmed state.
+If the button is not in a menu and if \fIXmNfillOnArm\fP is set to True,
+the background color reverts to the unarmed color.
+If \fIXmNlabelType\fP is \fIXmPIXMAP\fP, the \fIXmNlabelPixmap\fP is
+used for the button face.
+If the pointer is within the PushButton, calls the
+callbacks for \fIXmNactivateCallback\fP.
+Calls the callbacks for \fIXmNdisarmCallback\fP.
+.IP "\fIMultiArm()\fP:"
+If \fIXmNmultiClick\fP is \fIXmMULTICLICK_DISCARD\fP, this action does
+nothing.
+.IP
+If \fIXmNmultiClick\fP is \fIXmMULTICLICK_KEEP\fP, this action does the
+following:
+Draws the shadow in the armed state.
+If the button is not in a menu and if \fIXmNfillOnArm\fP is set
+to True, fills the button with the color specified by
+\fIXmNarmColor\fP.
+If \fIXmNlabelType\fP is \fIXmPIXMAP\fP, the \fIXmNarmPixmap\fP is
+used for the button face.
+Calls the \fIXmNarmCallback\fP callbacks.
+.IP "\fIProcessDrag()\fP:"
+Drags the contents of a PushButton label, identified by
+pressing \fIBDrag\fP.  This action creates a DragContext object
+whose \fIXmNexportTargets\fP resource is set to "COMPOUND_TEXT" for
+a label type of \fIXmSTRING\fP; otherwise, "PIXMAP" if the
+label type is \fIXmPIXMAP\fP.  This action is undefined for
+PushButtons used in a menu system.
+.IP
+This action is disabled if the XmDisplay's \fIenableUnselectableDrag\fP
+resource is True.
+.SS "Additional Behavior"
+This widget has the additional behavior described below:
+.IP "\fI<EnterWindow>\fP:"
+In a menu, if keyboard traversal is enabled, this action does nothing.
+Otherwise, it draws the shadow in the armed state and calls the
+\fIXmNarmCallback\fP callbacks.
+.IP
+If the PushButton is not in a menu and the cursor leaves and then
+reenters the PushButton's window while the button is pressed, this
+action draws the shadow in the armed state.
+If \fIXmNfillOnArm\fP is set to True, it also fills the button with the
+color specified by \fIXmNarmColor\fP.
+If \fIXmNlabelType\fP is \fIXmPIXMAP\fP, the \fIXmNarmPixmap\fP is
+used for the button face.
+.IP "\fI<LeaveWindow>\fP:"
+In a menu, if keyboard traversal is enabled, this action does nothing.
+Otherwise, it draws the shadow in the unarmed state and calls the
+\fIXmNdisarmCallback\fP callbacks.
+.IP
+If the PushButton is not in a menu and the cursor leaves the
+PushButton's window while the button is pressed, this action draws the
+shadow in the unarmed state.
+If \fIXmNfillOnArm\fP is set to True, the background color reverts to
+the unarmed color.
+If \fIXmNlabelType\fP is \fIXmPIXMAP\fP, the \fIXmNlabelPixmap\fP is
+used for the button face.
+.ne 8
+.SS "Virtual Bindings"
+The bindings for virtual keys are vendor specific.
+For information about bindings for virtual buttons and keys, see \fIVirtualBindings(3X)\fP.
+.SH RELATED INFORMATION
+.na
+\fICore(3X)\fP,
+\fIXmCreatePushButton(3X)\fP, \fIXmDisplay(3X)\fP, \fIXmLabel(3X)\fP,
+\fIXmPrimitive(3X)\fP, and \fIXmRowColumn(3X)\fP.
+.ad

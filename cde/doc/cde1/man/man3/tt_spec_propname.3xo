@@ -1,0 +1,80 @@
+.TH tt_spec_propname 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+tt_spec_propname \- return an element of the property name list for an object spec
+.SH SYNOPSIS
+.yS
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'char *tt_spec_propname('u
+char *tt_spec_propname(const char *\f2objid\fP,
+	int \f2n\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn tt_spec_propname
+function
+returns the
+.IR n th
+element of the property name list for this object spec.
+.P
+The
+.I objid
+argument is the identifier of the object involved in this operation.
+The
+.I n
+argument is the item of the list whose element is to be returned.
+The list numbering
+begins with zero.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn tt_spec_propname
+function returns the property name.
+If there are
+.I n
+properties or less,
+.Fn tt_spec_propname
+returns
+.Cn NULL .
+The application can use
+.Fn tt_ptr_error 3
+to extract one of the following
+.B Tt_status
+values from the returned pointer:
+.VL 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_DBAVAIL
+.br
+The ToolTalk service could not access the
+ToolTalk database needed for this operation.
+.Lc TT_ERR_DBEXIST
+.br
+The ToolTalk service could not access the
+specified ToolTalk database in the expected place.
+.Lc TT_ERR_NOMP
+.br
+The
+.Cm ttsession 1
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_NUM
+.br
+The integer value passed was invalid (out of range).
+.Lc TT_ERR_OBJID
+.br
+The
+.I objid
+passed to the ToolTalk service does not reference an existing object spec.
+.LE
+.SH "APPLICATION USAGE"
+The application should use
+.Fn tt_free 3
+to free any data stored in the address returned by the
+ToolTalk API.
+.SH "SEE ALSO"
+.Hd Tt/tt_c.h 5,
+.Fn tt_ptr_error 3,
+.Fn tt_free 3.

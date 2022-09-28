@@ -1,0 +1,97 @@
+XCOMM $XConsortium: Imakefile /main/cde1_maint/3 1995/10/05 14:23:58 gtsang $
+/**
+ **  (c) Copyright 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994
+ **      Hewlett-Packard Company
+ **  (c) Copyright 1993, 1994 International Business Machines Corp.
+ **  (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+ **  (c) Copyright 1993, 1994 Unix System Labs, Inc., a subsidiary of
+ **      Novell, Inc.
+ **/
+
+PROGRAMS = dthelpdemo
+
+/* General case INCLUDES DEFINES LOCAL_LIBRARIES
+ * Each individual architecture may have more or less of the above.
+ * Use EXTRA_DEFINES and EXTRA_INCLUDES to add defines and includes
+ * to an individual architecture.  There is no equivalent for
+ * LOCAL_LIBRARIES.
+ * USE_libraryname in LOCAL_LIBRARIES is by default empty.
+ * It should be set when necessary to the real library macro name.
+ */
+        DEFINES = -D_BMS
+       INCLUDES =  -I.
+
+/* DEPLIBS contains the list of library depencies for a client.
+ * LOCAL_LIBRARIES contains the list of libraries on the link line.
+ * Generally, the dependency form of a library has DEP as a prefix.
+ * e.g. put $(XLIB) in LOCAL_LIBRARIES and $(DEPXLIB) in DEPLIBS.
+ * NOTE: if DEPLIBS is not set here, it is by default null and there
+ *       are no library dependencies for clients.
+ *       You cannot put -Llibpath into DEPLIBS. You must put actual
+ *       paths to the library.
+ */
+DEPLIBS = $(DEPDTHELPLIB)  $(DEPDTSVCLIB) $(DEPXMLIB) $(DEPXTOOLLIB) $(DEPXLIB)
+LOCAL_LIBRARIES = $(DTHELPLIB)  $(DTSVCLIB) $(XMLIB) $(XTOOLLIB) $(XLIB)
+#SYS_LIBRARIES = -lm
+
+
+
+#ifdef HPArchitecture
+EXTRA_DEFINES = -DMESSAGE_CAT
+#endif
+
+#ifdef RsArchitecture
+SYS_LIBRARIES = -lm -liconv
+#endif
+
+#if defined (SunArchitecture)
+# SYS_LIBRARIES = -lm -ldl $(WIDECHARSYSLIB) -lC
+#endif /* SunArchitecture */
+
+#if defined (USLArchitecture)
+SYS_LIBRARIES = -lm -ldl $(WIDECHARSYSLIB) -lgen
+#endif /* USLArchitecture */
+
+#if defined (UXPArchitecture)
+SYS_LIBRARIES = -lm -ldl $(WIDECHARSYSLIB) -lgen
+#endif /* UXPArchitecture */
+
+
+SRCS = Main.c \
+       HourGlass.c \
+       HelpCache.c
+
+OBJS = Main.o \
+       HourGlass.o \
+       HelpCache.o
+
+NormalLibraryObjectRule()
+ComplexProgramTarget($(PROGRAMS))
+
+saber_src: $(SRCS) 
+	#setopt load_flags $(CFLAGS)
+        #load $(SRCS) $(LOCAL_LIBRARIES)
+
+unsaber_src:
+        #unload $(SRCS)
+
+/***** For dtge make a client_OBJS.o using client_main.o ******/
+/***** This implies the existence of client_main.c       ******/
+#ifdef BuildHugeObject
+#ifdef HPArchitecture
+/***** dtge hidden symbols *******/
+#ifdef __hp9000s300
+HIDDEN_SYMBOLS = -h _main
+#else
+HIDDEN_SYMBOLS = -h main
+#endif
+#endif
+SpecialRelocatableTarget(helpview,$(HIDDEN_SYMBOLS),$(OBJS))
+#endif
+
+
+
+
+
+
+

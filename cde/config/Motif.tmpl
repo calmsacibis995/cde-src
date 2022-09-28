@@ -1,0 +1,531 @@
+XCOMM 
+XCOMM (c) Copyright 1989, 1990, 1991, 1992, 1993 OPEN SOFTWARE FOUNDATION, INC. 
+XCOMM ALL RIGHTS RESERVED 
+XCOMM 
+XCOMM 
+XCOMM Motif Release 1.2.2
+XCOMM 
+XCOMM   $XConsortium: Motif.tmpl /main/cde1_maint/3 1995/10/04 11:42:19 lehors $
+/* SCCSID = OSF/Motif: @(#)Motif.tmpl	3.24 91/08/22 */
+
+/* Include AFTER Project.tmpl */
+
+#ifdef AUTOMATION
+#ifndef Automation
+#define Automation 	YES
+#endif
+#else
+#define NO_AUTOMATION
+#endif
+
+#ifdef USE_VISTACC
+#ifndef UseVista
+#define UseVista
+#endif
+#ifndef CATCMD
+#define CATCMD cat
+#endif
+#endif
+
+#ifdef USE_PURIFY
+#ifndef UsePurify
+#define UsePurify
+#endif
+#endif
+
+/*  Don't collide with the X installed flag */
+
+#ifndef _MUse
+#ifdef UseInstalledMotif
+#define _MUse(a,b) a
+#else
+#define _MUse(a,b) b
+#endif
+#endif
+
+#ifndef _MUseCat
+#if defined(__STDC__) && !defined(UnixCpp)
+#ifdef UseInstalledMotif
+#define _MUseCat(a,b,c) a##c
+#else
+#define _MUseCat(a,b,c) b##c
+#endif
+#else
+#ifdef UseInstalledMotif
+#define _MUseCat(a,b,c) a/**/c
+#else
+#define _MUseCat(a,b,c) b/**/c
+#endif
+#endif
+#endif
+
+/* As default Motif is in X tree */
+#ifndef MTop
+#define MTop $(TOP)
+#endif
+
+/* Change this to point to your X tree */
+#ifndef XTop
+#define XTop $(TOP)
+#endif
+
+#ifndef MotifDefines
+#define MotifDefines /**/
+#endif
+
+/* To compile without SHAPE extension, set this to -DNO_SHAPE */
+#ifndef MwmDefines
+#define MwmDefines /**/
+#endif
+
+#ifndef UilFlags
+#define UilFlags /**/
+#endif
+
+#ifndef TestDefines
+#define TestDefines -DMOTIF1_2 -DX11R5
+#endif
+
+#ifndef AutoDefines
+#if Automation
+#define AutoDefines -DAUTOMATION
+#else
+#define AutoDefines /**/
+#endif
+#endif
+
+#ifndef AutoIncludes
+#if Automation
+#define AutoIncludes -I$(AUTOSCRIPTSRC)
+#else
+#define AutoIncludes /**/
+#endif
+#endif
+
+#if Automation
+#define TestExtraFilesToClean *.Dat *.Scr
+#else 
+#define TestExtraFilesToClean *.Dat
+#endif 
+
+#ifndef UsrIncDir
+#define UsrIncDir IncRoot
+#endif
+
+#ifndef XBuildIncRoot
+#define XBuildIncRoot $(XTOP)
+#endif
+
+/* Place to install .uid files */
+#ifndef UidDir
+#define UidDir $(LIBDIR)/uid
+#endif
+
+#ifndef XmExtraLibraries
+#  if defined(HPArchitecture) && X11Release==4
+#define XmExtraLibraries -lPW
+#  else
+#define XmExtraLibraries /**/
+#  endif
+#endif
+
+#ifndef YaccFlags
+#define YaccFlags /**/
+#endif
+
+#ifndef SharedLibXm
+#define SharedLibXm HasSharedLibraries
+#endif
+#ifndef SharedLibMrm
+#define SharedLibMrm HasSharedLibraries
+#endif
+#ifndef SharedLibUil
+#define SharedLibUil HasSharedLibraries
+#endif
+#ifndef SharedLibACommon
+#define SharedLibACommon HasSharedLibraries
+#endif
+#ifndef SharedLibScript
+#define SharedLibScript HasSharedLibraries
+#endif
+#ifndef SharedLibUtil
+#define SharedLibUtil HasSharedLibraries
+#endif
+#ifndef SharedLibCreate
+#define SharedLibCreate HasSharedLibraries
+#endif
+#ifndef SharedLibVisual
+#define SharedLibVisual HasSharedLibraries
+#endif
+#ifndef SharedLibSynth
+#define SharedLibSynth HasSharedLibraries
+#endif
+#ifndef SharedLibMCommon
+#define SharedLibMCommon HasSharedLibraries
+#endif
+
+#ifndef NormalLibXm
+#define NormalLibXm (!SharedLibXm | ForceNormalLib)
+#endif
+#ifndef NormalLibMrm
+#define NormalLibMrm (!SharedLibMrm | ForceNormalLib)
+#endif
+#ifndef NormalLibUil
+#define NormalLibUil (!SharedLibUil | ForceNormalLib)
+#endif
+#ifndef NormalLibACommon
+#define NormalLibACommon (!SharedLibACommon | ForceNormalLib)
+#endif
+#ifndef NormalLibScript
+#define NormalLibScript (!SharedLibScript | ForceNormalLib)
+#endif
+#ifndef NormalLibUtil
+#define NormalLibUtil (!SharedLibUtil | ForceNormalLib)
+#endif
+#ifndef NormalLibCreate
+#define NormalLibCreate (!SharedLibCreate | ForceNormalLib)
+#endif
+#ifndef NormalLibVisual
+#define NormalLibVisual (!SharedLibVisual | ForceNormalLib)
+#endif
+#ifndef NormalLibSynth
+#define NormalLibSynth (!SharedLibSynth | ForceNormalLib)
+#endif
+#ifndef NormalLibMCommon
+#define NormalLibMCommon (!SharedLibMCommon | ForceNormalLib)
+#endif
+
+
+#ifdef SunArchitecture
+ 
+#ifndef SharedXmRev 
+#define SharedXmRev 3 
+#endif   
+#ifndef SharedMrmRev 
+#define SharedMrmRev 3
+#endif   
+#ifndef SharedUilRev 
+#define SharedUilRev 3
+#endif 
+ 
+#endif
+
+#ifndef SharedXmRev
+#define SharedXmRev 1.2
+#endif
+#ifndef SharedMrmRev
+#define SharedMrmRev 1.2
+#endif
+#ifndef SharedUilRev
+#define SharedUilRev 1.2
+#endif
+#ifndef SharedACommonRev
+#define SharedACommonRev 1.2
+#endif
+#ifndef SharedScriptRev
+#define SharedScriptRev 1.2
+#endif
+#ifndef SharedUtilRev
+#define SharedUtilRev 1.2
+#endif
+#ifndef SharedCreateRev
+#define SharedCreateRev 1.2
+#endif
+#ifndef SharedVisualRev
+#define SharedVisualRev 1.2
+#endif
+#ifndef SharedSynthRev
+#define SharedSynthRev 1.2
+#endif
+#ifndef SharedMCommonRev
+#define SharedMCommonRev 1.2
+#endif
+
+
+
+
+   MRESOURCELIB = $(MRMLIB)
+   DEPMRESOURCELIB = $(DEPMRMLIB)
+
+#if HasSharedLibraries
+          SOXMREV = SharedXmRev
+         SOMRMREV = SharedMrmRev
+         SOUILREV = SharedUilRev
+         SOACOMMONREV = SharedACommonRev
+         SOSCRIPTREV = SharedScriptRev
+         SOUTILREV = SharedUtilRev
+         SOCREATEREV = SharedCreateRev
+         SOVISUALREV = SharedVisualRev
+         SOSYNTHREV = SharedSynthRev
+         SOMCOMMONREV = SharedMCommonRev
+#endif
+
+#ifndef XmClientLibs
+#define XmClientLibs $(XMLIB) $(XTOOLLIB) $(XLIB) $(XMEXTRA_LIBS)
+#endif
+#ifndef XmClientDepLibs
+#define XmClientDepLibs $(DEPXMLIB) $(DEPXTOOLLIB) $(DEPXLIB)
+#endif
+
+#ifndef MrmClientLibs 
+#define MrmClientLibs $(MRESOURCELIB) $(XMLIB) $(XTOOLLIB) $(XLIB) $(XMEXTRA_LIBS)
+#endif
+#ifndef MrmClientDepLibs
+#define MrmClientDepLibs $(DEPMRESOURCELIB) $(DEPXMLIB) $(DEPXTOOLLIB) $(DEPXLIB)
+#endif
+
+/*
+ * BuildClientLibs should be set to a version of MrmClientLibs that can be
+ * used to build uil and wmldbcreate.  On the initial build, MrmClientLibs
+ * may refer to shared libraries that may not be usable, since some systems
+ * require a separate install step.  The default is to use ".a" files
+ * initially, or the standard libraries if UseInstalledMotif is YES.
+ */
+#ifndef BuildClientLibs
+#ifdef UseInstalledMotif
+#define BuildClientLibs MrmClientLibs
+#else
+#define BuildClientLibs $(MRMLIB) $(XMLIB) $(XTOOLLIB) $(XLIB) $(XMEXTRA_LIBS)
+
+
+
+#endif
+#endif
+#ifndef BuildClientDepLibs
+#ifdef UseInstalledMotif
+#define BuildClientDepLibs MrmClientDepLibs
+#else
+#define BuildClientDepLibs $(DEPMRMLIB) $(DEPXMLIB) $(DEPXTOOLLIB) $(DEPXLIB)
+#endif
+#endif
+
+#ifndef UilClientLibs
+#define UilClientLibs $(UILLIB) $(MRESOURCELIB) $(XMLIB) $(XTOOLLIB) $(XLIB) $(XMEXTRA_LIBS)
+#endif
+#ifndef UilClientDepLibs
+#define UilClientDepLibs $(DEPUILLIB) $(DEPMRESOURCELIB) $(DEPXMLIB) $(DEPXTOOLLIB) $(DEPXLIB)
+#endif
+
+#ifndef TestClientLibs
+#define TestClientLibs $(PURIFYLIBS) $(TESTMALFNS) $(TESTCOMLIB) \
+		$(AUTOSCRIPTLIB) $(AUTOUTILLIB) \
+		$(AUTOCREATELIB) $(AUTOVISUALLIB) $(SYNLIB) $(AUTOSYNTHLIB) \
+	$(XMLIB) $(TESTMALLOCLIB) $(XTOOLLIB) $(XLIB) \
+	$(AUTOEXTRALIBS) $(XMEXTRA_LIBS)
+#endif
+#ifndef TestUilClientLibs
+#define TestUilClientLibs $(PURIFYLIBS) $(TESTMALFNS) $(TESTCOMLIB) \
+		$(AUTOSCRIPTLIB) $(AUTOUTILLIB) \
+		$(AUTOCREATELIB) $(AUTOVISUALLIB) $(AUTOSYNTHLIB) \
+	$(UILLIB) $(MRESOURCELIB) $(XMLIB) $(TESTMALLOCLIB) $(XTOOLLIB) \
+	$(XLIB) $(AUTOEXTRALIBS) $(XMEXTRA_LIBS)
+#endif
+#ifndef TestClientDepLibs
+#define TestClientDepLibs XmClientDepLibs
+#endif
+#ifndef TestUilClientDepLibs
+#define TestUilClientDepLibs UilClientDepLibs
+#endif
+
+/* For separate Motif and X trees */
+
+              XTOP = XTop
+              MTOP = MTop
+     XBUILDINCROOT = XBuildIncRoot        /* base of X build loc */
+      XBUILDINCDIR = $(XBUILDINCROOT)/X11
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#ifdef UseInstalledMotif
+#if AlternateIncRoot
+      TOP_INCLUDES = -I$(INCROOT)	/* All installed; alternate root */
+#endif
+      UIL_INCLUDES = -I$(USRINCDIR)/uil
+#else
+
+
+
+
+
+
+
+
+
+      UIL_INCLUDES = -I$(UILSRC)
+#endif
+
+      USRINCDIR = UsrIncDir
+         UIDDIR = UidDir
+        TESTSRC = $(TOP)/osf/tests/QATS
+  GENERALSRCLIB = $(TESTSRC)/General/lib
+  GENERALSRCBIN = $(TESTSRC)/General/bin
+   MANUALSRCLIB = $(TESTSRC)/Manual/lib
+   MANUALSRCBIN = $(TESTSRC)/Manual/bin
+     AUTOSRCLIB = $(TESTSRC)/Auto/lib
+     AUTOSRCBIN = $(TESTSRC)/Auto/bin
+       COMMONPP = $(GENERALSRCBIN)/Commonpp
+         GENRUN = $(GENERALSRCBIN)/Genrun
+         MANRUN = $(GENERALSRCBIN)/Manrun
+#ifdef DebugLib
+  TESTMALLOCSRC = $(GENERALSRCLIB)/Malloc
+#endif
+#ifdef Automation
+     TESTCOMSRC = $(AUTOSRCLIB)/Common
+#else
+     TESTCOMSRC = $(MANUALSRCLIB)/Common
+#endif
+
+/* MTOOLKITSRC  should be removed */
+    MTOOLKITSRC = $(TOOLKITSRC)
+    MINCLUDESRC = $(MTOP)/X11
+        MLIBSRC = $(MTOP)/lib
+     MCLIENTSRC = $(MTOP)/clients
+       MDEMOSRC = $(MTOP)/demos/motif
+     MWIDGETSRC = $(MLIBSRC)/Xm
+   MRESOURCESRC = $(MLIBSRC)/Mrm
+
+#if UseAltBuildScheme
+            UIL = $(UILLIBPATHS) $(BINSTALL_BINDIR)/uil
+         DEPUIL = $(BINSTALL_BINDIR)/uil
+#else
+            UIL = _MUse($(UILLIBPATHS) uil,$(UILLIBPATHS) $(UILSRC)/uil)
+         DEPUIL = _MUseCat($(BINDIR),$(UILSRC),/uil)
+#endif
+
+/* If uil was built with shared libraries, we need to add an environment
+   variable to find those libraries in other than the default locations
+   If the toolkit is also in the tree. Set UIL_TOOLKITPATH
+ */
+#if !USE_XT_FROM_SYSTEM_ONLY
+UIL_TOOLKITPATH = :$(TOOLKITSRC)
+#endif
+
+#if defined(SunArchitecture) || defined(USLArchitecture) || defined(UXPArchitecture)
+#if UseAltBuildScheme
+UILLIBPATHS = LD_LIBRARY_PATH=$(BINSTALL_LIBDIR)
+#else
+UILLIBPATHS = LD_LIBRARY_PATH=$(MRMSRC):$(XMSRC)$(UIL_TOOLKITPATH)
+#endif
+#endif
+
+#ifdef RsArchitecture
+#if UseAltBuildScheme
+UILLIBPATHS = LIBPATH=$(BINSTALL_LIBDIR)
+#else
+UILLIBPATHS = LIBPATH=$(MRMSRC):$(XMSRC)$(UIL_TOOLKITPATH)
+#endif
+#endif
+
+#ifdef HPArchitecture
+#if UseAltBuildScheme
+UILLIBPATHS = SHLIB_PATH=$(BINSTALL_LIBDIR)
+#else
+UILLIBPATHS = SHLIB_PATH=$(MRMSRC):$(XMSRC)$(UIL_TOOLKITPATH)
+#endif
+#endif
+
+/* don't need UILLIBPATHS if totally archived build */
+#ifndef RsArchitecture
+#if (LinkArchivedMrm && LinkArchivedXm) || ARCHIVED_LINK
+UILLIBPATHS =
+#endif
+#endif
+
+
+
+#ifndef UnsharedLibReferences
+#define UnsharedLibReferences(varname,libname,libsource) \
+Concat(DEP,varname) = _LibUseCat($(USRLIBDIR)/lib,libsource/lib,libname.a) @@\
+varname = LoaderLibPrefix _LibUse(Concat(-l,libname),$(Concat(DEP,varname)))
+#endif
+#ifndef SharedLibReferences
+#define SharedLibReferences(varname,libname,libsource,rev) \
+Concat(DEP,varname) = /**/                                            @@\
+varname = LoaderLibPrefix _LibUse(/**/,Concat(-L,libsource)) Concat(-l,libname)
+#endif
+
+#undef _LibUse
+#undef _LibUseCat
+#define _LibUse _MUse
+#define _LibUseCat _MUseCat
+
+
+   XMEXTRA_LIBS = XmExtraLibraries
+
+#if SharedLibACommon
+SharedLibReferences(TESTCOMLIB,Common,$(TESTCOMSRC),$(SOACOMMONREV))
+#else
+UnsharedLibReferences(TESTCOMLIB,Common,$(TESTCOMSRC))
+#endif
+
+#ifdef DebugLib
+     TESTMALFNS = $(TESTMALLOCSRC)/MallocInit.o $(TESTMALLOCSRC)/MallocExit.o
+UnsharedLibReferences(TESTMALLOCLIB,Malloc,$(TESTMALLOCSRC))
+#endif
+
+#ifdef Automation
+  AUTOSCRIPTSRC = $(AUTOSRCLIB)/Script
+UnsharedLibReferences(AUTOSCRIPTLIB,Script,$(AUTOSCRIPTSRC))
+   AUTOSYNTHSRC = $(AUTOSRCLIB)/Synth
+UnsharedLibReferences(AUTOSYNTHLIB,Synth,$(AUTOSYNTHSRC))
+  AUTOCREATESRC = $(AUTOSRCLIB)/Create
+#if SharedLibCreate
+SharedLibReferences(AUTOCREATELIB,Create,$(AUTOCREATESRC),$(SOCREATEREV))
+#else
+UnsharedLibReferences(AUTOCREATELIB,Create,$(AUTOCREATESRC))
+#endif
+  AUTOVISUALSRC = $(AUTOSRCLIB)/Visual
+UnsharedLibReferences(AUTOVISUALLIB,Visual,$(AUTOVISUALSRC))
+    AUTOUTILSRC = $(AUTOSRCLIB)/Util
+#if SharedLibUtil
+SharedLibReferences(AUTOUTILLIB,Util,$(AUTOUTILSRC),$(SOUTILREV))
+#else
+UnsharedLibReferences(AUTOUTILLIB,Util,$(AUTOUTILSRC))
+#endif
+  AUTOEXTRALIBS = -ll -ly -lm
+#endif
+#ifdef UsePurify
+     PURIFYLIBS = $(PURIFYHOME)/purify_stubs.a
+#endif
+  LINTMRESOURCE = $(MRESOURCESRC)/libMrm.a
+LINTXMWIDGETLIB = $(MWIDGETSRC)/llib-l/Xm.ln
+     LINTXMTOOL = $(MTOOLKITSRC)/llib-lXt.ln
+     LINTUILLIB = $(UILSRC)/llib-lUil.ln
+
+      YACCFLAGS = YaccFlags
+       UILFLAGS = UilFlags
+
+         RM_CMD = $(RM) FilesToClean ExtraFilesToClean TestExtraFilesToClean
+
+
+
+
+/*
+ */
+
+
+
+
+
+
+
+
+
+

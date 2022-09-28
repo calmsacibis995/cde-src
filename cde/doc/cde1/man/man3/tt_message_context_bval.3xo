@@ -1,0 +1,69 @@
+.TH tt_message_context_bval 3 "11 May 1994"
+.\" (c) Copyright 1993, 1994 Hewlett-Packard Company
+.\" (c) Copyright 1993, 1994 International Business Machines Corp.
+.\" (c) Copyright 1993, 1994 Sun Microsystems, Inc.
+.\" (c) Copyright 1993, 1994 Novell, Inc.
+.SH NAME
+tt_message_context_bval \- retrieve the byte-array value and length of a message's context
+.SH SYNOPSIS
+.yS
+#include <Tt/tt_c.h>
+.sp 0.5v
+.ta \w'Tt_status tt_message_context_bval('u
+Tt_status tt_message_context_bval(Tt_message \f2m\fP,
+	const char *\f2slotname\fP,
+	unsigned char **\f2value\fP,
+	int *\f2len\fP);
+.yE
+.SH DESCRIPTION
+The
+.Fn tt_message_context_bval
+function
+retrieves the byte-array value and length of a message's context.
+.P
+If there is no context slot associated with
+.IR slotname ,
+.Fn tt_message_context_bval
+returns a
+.Cn NULL
+pointer in
+.I slotname
+and zero in
+.IR len .
+.P
+The
+.I m
+argument is the opaque handle for the message involved in this operation.
+The
+.I slotname
+argument describes the context of this message.
+The
+.I value
+argument points to the location to return the value.
+The
+.I len
+argument is the length of the value in bytes.
+.SH "RETURN VALUE"
+Upon successful completion, the
+.Fn tt_message_context_bval
+function returns the status of the operation as one of the following
+.B Tt_status
+values:
+.VL 8
+.Lc TT_OK
+The operation completed successfully.
+.Lc TT_ERR_NOMP
+.br
+The
+.Cm ttsession 1
+process is not running and the ToolTalk service cannot restart it.
+.Lc TT_ERR_POINTER
+.br
+The pointer passed does not point to an object of
+the correct type for this operation.
+.Lc TT_ERR_SLOTNAME
+.br
+The specified slotname is syntactically invalid.
+.LE
+.SH "SEE ALSO"
+.Hd Tt/tt_c.h 5.
